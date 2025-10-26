@@ -6,6 +6,27 @@ import me.liam.microsmith.dsl.core.MicrosmithExtension
  * Root extension that holds all declared schemas.
  */
 data class SchemasExtension(val schemas: List<Schema>) : MicrosmithExtension {
-    fun find(name: String) = schemas.find { it.name == name }
-    fun require(name: String) = find(name) ?: error("Schema with name '$name' not found.")
+    // Precompute an index for efficient lookups
+    private val index =
+        schemas.associateBy { it.type to it.name }
+
+    /**
+     * Find a schema by [type] and [name].
+     *
+     * @return the matching [Schema], or `null` if not found.
+     */
+    fun find(type: SchemaType, name: String) = index[type to name]
+
+    /**
+     * Require a schema by [type] and [name].
+     *
+     * @throws IllegalStateException if no schema with the given
+     * type and name exists.
+     */
+    fun require(type: SchemaType, name: String) = find(type, name) ?: error("Schema not found: $type:$name")
+
+    /**
+     * Convenience: return all schemas of a given [type].
+     */
+    fun allOf(type: SchemaType) = schemas.filter { it.type == type }
 }
