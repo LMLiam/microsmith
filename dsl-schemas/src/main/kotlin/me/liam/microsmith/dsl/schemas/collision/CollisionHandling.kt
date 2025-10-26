@@ -13,12 +13,13 @@ internal fun SchemasBuilder.handleCollision(key: String): Boolean {
                 error("Schema with name '$key' is already registered.")
             }
         }
+
         CollisionPolicy.KEEP_FIRST -> {
             if (schemas.any { it.name == key }) {
-                println("Warning: Schema with name '$key' is already registered. Keeping the first occurrence due to CollisionPolicy.")
                 return false
             }
         }
+
         CollisionPolicy.REPLACE -> {
             schemas.removeIf { it.name == key }
             return true

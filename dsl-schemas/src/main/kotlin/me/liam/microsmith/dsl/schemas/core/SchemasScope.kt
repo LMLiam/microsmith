@@ -12,7 +12,7 @@ import me.liam.microsmith.dsl.schemas.collision.CollisionPolicy
  */
 @MicrosmithDsl
 interface SchemasScope {
-    val policy: CollisionPolicy
+    var policy: CollisionPolicy
 }
 
 /**
