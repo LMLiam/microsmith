@@ -19,6 +19,12 @@ allprojects {
     repositories {
         mavenCentral()
     }
+
+    configurations.configureEach {
+        resolutionStrategy.dependencySubstitution {
+            substitute(module("me.liam:dsl")).using(project(":dsl"))
+        }
+    }
 }
 
 subprojects {
