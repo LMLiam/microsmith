@@ -2,6 +2,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '2.2.10' apply false
     id 'pl.allegro.tech.build.axion-release' version '1.21.0'
     id 'maven-publish'
+    id 'io.kotest' version '6.0.1' apply false
 }
 
 scmVersion {
@@ -23,13 +24,12 @@ allprojects {
 subprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'maven-publish'
+    apply plugin: 'io.kotest'
 
     dependencies {
-        testImplementation 'org.jetbrains.kotlin:kotlin-test'
-    }
-
-    test {
-        useJUnitPlatform()
+        testImplementation 'io.kotest:kotest-framework-engine:6.0.1'
+        testImplementation 'io.kotest:kotest-assertions-core:6.0.1'
+        testImplementation 'io.kotest:kotest-property:6.0.1'
     }
 
     kotlin {
