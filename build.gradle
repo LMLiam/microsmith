@@ -38,11 +38,11 @@ subprojects {
 
     publishing {
         publications {
-            register("mavenJava", MavenPublication) {
-                from(components["java"])
-                groupId = project.group.toString()
+            gpr(MavenPublication) {
+                from components.java
+                groupId = project.group
                 artifactId = project.name
-                version = project.version.toString()
+                version = project.version
             }
         }
         repositories {
