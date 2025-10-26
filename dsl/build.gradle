@@ -1,21 +1,3 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm'
-}
-
-group = 'me.liam'
-version = '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
-}
-
-test {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(24)
 }
