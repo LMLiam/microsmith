@@ -24,4 +24,4 @@ fun MicrosmithModel.extensions(): Collection<MicrosmithExtension> = this.keys().
 /**
  * Returns the set of extension types present in the model.
  */
-fun MicrosmithModel.extensionTypes(): Set<Class<out MicrosmithExtension>> = this.keys().map { it.java }.toSet()
+fun MicrosmithModel.extensionTypes() = this.keys().map { it.java }.toSet()
