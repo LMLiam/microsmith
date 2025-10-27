@@ -2,6 +2,7 @@ package me.liam.microsmith.dsl.schemas.protobuf
 
 class MessageBuilder(private val name: String) : MessageScope {
     private val fields = mutableMapOf<String, Field>()
+    private val oneofs = mutableSetOf<Oneof>()
     private val usedIndexes = mutableSetOf<Int>()
     private var fieldIndex = 1
 
@@ -27,6 +28,17 @@ class MessageBuilder(private val name: String) : MessageScope {
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
         val updated = field.copy(cardinality = Cardinality.REPEATED)
         fields[field.name] = updated
+    }
+
+    override fun oneof(name: String, block: OneofScope.() -> Unit) {
+        require(name.isNotBlank()) { "Oneof name cannot be blank" }
+        require(!fields.containsKey(name)) { "Duplicate oneof name: $name" }
+
+        val builder = OneofBuilder(name, fieldIndex).apply(block)
+        val oneof = builder.build()
+        oneof.fields.forEach { usedIndexes += it.index }
+        oneofs += oneof
+        fieldIndex = maxOf(fieldIndex + 1, oneof.fields.maxOf { it.index } + 1)
     }
 
     override fun int32(name: String, block: FieldScope.() -> Unit) = addField(name, FieldType.INT32, block)
@@ -68,5 +80,5 @@ class MessageBuilder(private val name: String) : MessageScope {
         require(index !in 19_000..19_999) { "Reserved field number: $index" }
     }
 
-    fun build() = Message(name, fields.values.toSet())
+    fun build() = Message(name, fields.values.toSet(), oneofs.toSet())
 }
