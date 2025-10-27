@@ -10,7 +10,7 @@ interface ProtobufScope {
     fun enum(name: String, block: EnumScope.() -> Unit = {})
 }
 
-interface Messages<TFieldScope : OneofFieldScope> {
+interface Fields<TFieldScope : OneofFieldScope> {
     fun int32(name: String, block: TFieldScope.() -> Unit = {}): Field
     fun int64(name: String, block: TFieldScope.() -> Unit = {}): Field
     fun uint32(name: String, block: TFieldScope.() -> Unit = {}): Field
@@ -29,7 +29,7 @@ interface Messages<TFieldScope : OneofFieldScope> {
 }
 
 @MicrosmithDsl
-interface MessageScope : Messages<FieldScope> {
+interface MessageScope : Fields<FieldScope> {
     fun optional(field: Field)
     fun optional(block: MessageScope.() -> Field)
     fun repeated(field: Field)
@@ -44,7 +44,7 @@ interface EnumScope {
 }
 
 @MicrosmithDsl
-interface OneofScope : Messages<OneofFieldScope>
+interface OneofScope : Fields<OneofFieldScope>
 
 @MicrosmithDsl
 interface FieldScope : OneofFieldScope {
