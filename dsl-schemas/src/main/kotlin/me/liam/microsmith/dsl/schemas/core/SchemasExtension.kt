@@ -5,7 +5,7 @@ import me.liam.microsmith.dsl.core.MicrosmithExtension
 /**
  * Root extension that holds all declared schemas.
  */
-data class SchemasExtension(val schemas: List<Schema>) : MicrosmithExtension {
+data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
     // Precompute an index for efficient lookups
     private val index =
         schemas.associateBy { it.type to it.name }
@@ -28,12 +28,12 @@ data class SchemasExtension(val schemas: List<Schema>) : MicrosmithExtension {
     /**
      * Convenience: return all schemas of a given [type].
      */
-    fun allOf(type: SchemaType) = schemas.filter { it.type == type }
+    fun allOf(type: SchemaType) = schemas.filter { it.type == type }.toSet()
 
     fun merge(other: SchemasExtension): SchemasExtension {
         val merged = (schemas + other.schemas)
             .associateBy { it.type to it.name }
-            .values.toList()
+            .values.toSet()
         return copy(schemas = merged)
     }
 }

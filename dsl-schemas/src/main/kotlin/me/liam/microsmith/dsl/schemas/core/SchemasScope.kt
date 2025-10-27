@@ -46,7 +46,7 @@ interface SchemasScope
  */
 fun MicrosmithScope.schemas(block: SchemasScope.() -> Unit) {
     val builder = SchemasBuilder().apply(block)
-    val newExt = builder.build()
+    val newExt = builder.toExtension()
 
     val msBuilder = this as MicrosmithBuilder
     val existing = msBuilder.model.get<SchemasExtension>()

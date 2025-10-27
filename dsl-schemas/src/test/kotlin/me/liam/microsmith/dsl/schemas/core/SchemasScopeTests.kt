@@ -28,7 +28,7 @@ class SchemasScopeTests : StringSpec({
         }
 
         val ext = builder.model.get<SchemasExtension>()
-        ext shouldBe SchemasExtension(listOf(ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User")))
+        ext shouldBe SchemasExtension(setOf(ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User")))
     }
 
     "schemas block can register multiple schemas" {
@@ -41,7 +41,7 @@ class SchemasScopeTests : StringSpec({
 
         val ext = builder.model.get<SchemasExtension>()
         ext shouldBe SchemasExtension(
-            listOf(
+            setOf(
                 ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User"),
                 ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User")
             )
@@ -61,7 +61,7 @@ class SchemasScopeTests : StringSpec({
 
         val ext = builder.model.get<SchemasExtension>()
         ext shouldBe SchemasExtension(
-            listOf(
+            setOf(
                 ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User"),
                 ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User")
             )
