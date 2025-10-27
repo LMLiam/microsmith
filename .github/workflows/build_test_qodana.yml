@@ -1,9 +1,4 @@
-#-------------------------------------------------------------------------------#
-#            Discover all capabilities of Qodana in our documentation           #
-#             https://www.jetbrains.com/help/qodana/about-qodana.html           #
-#-------------------------------------------------------------------------------#
-
-name: Qodana
+name: Build & Qodana
 on:
   workflow_dispatch:
   pull_request:
@@ -11,7 +6,7 @@ on:
     branches:
       - master
 jobs:
-  qodana:
+  build-and-qodana:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -23,6 +18,22 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 24
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Build
+        run: ./gradlew build --stacktrace
+      - name: Publish Test Report
+        uses: dorny/test-reporter@v2
+        if: always()
+        with:
+          name: Kotest Results
+          path: 'build/test-results/jvmKotest/*.xml'
+          reporter: java-junit
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2025.2
         env:
