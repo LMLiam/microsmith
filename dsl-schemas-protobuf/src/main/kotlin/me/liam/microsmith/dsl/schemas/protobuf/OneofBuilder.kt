@@ -1,8 +1,11 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
-class OneofBuilder(private val name: String, private var fieldIndex: Int) : OneofScope {
+class OneofBuilder(
+    private val name: String,
+    private var fieldIndex: Int,
+    private val usedIndexes: MutableSet<Int>
+) : OneofScope {
     private val fields = mutableMapOf<String, Field>()
-    private val usedIndexes = mutableSetOf<Int>()
 
     override fun int32(name: String, block: OneofFieldScope.() -> Unit): Field = addField(name, FieldType.INT32, block)
     override fun int64(name: String, block: OneofFieldScope.() -> Unit): Field = addField(name, FieldType.INT64, block)
@@ -22,15 +25,28 @@ class OneofBuilder(private val name: String, private var fieldIndex: Int) : Oneo
 
     private fun addField(name: String, type: FieldType, block: FieldScope.() -> Unit): Field {
         require(!fields.containsKey(name)) { "Duplicate field in oneof: $name" }
+
         val builder = FieldBuilder(fieldIndex).apply(block)
+
         require(builder.cardinality == Cardinality.REQUIRED) {
             "Oneof fields cannot be optional or repeated"
         }
+
+        // validate against global usedIndexes
+        require(builder.index !in usedIndexes) { "Duplicate field number: ${builder.index}" }
+        validateIndex(builder.index)
+
         val field = Field(name, type, builder.index, Cardinality.REQUIRED)
         fields[name] = field
         usedIndexes += builder.index
+
         fieldIndex = maxOf(fieldIndex + 1, builder.index + 1)
         return field
+    }
+
+    private fun validateIndex(index: Int) {
+        require(index in 1..536_870_911) { "Invalid field number: $index" }
+        require(index !in 19_000..19_999) { "Reserved field number: $index" }
     }
 
     fun build() = Oneof(name, fields.values.toSet())

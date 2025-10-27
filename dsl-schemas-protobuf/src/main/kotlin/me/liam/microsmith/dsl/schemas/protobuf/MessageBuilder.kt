@@ -34,10 +34,10 @@ class MessageBuilder(private val name: String) : MessageScope {
         require(name.isNotBlank()) { "Oneof name cannot be blank" }
         require(!fields.containsKey(name)) { "Duplicate oneof name: $name" }
 
-        val builder = OneofBuilder(name, fieldIndex).apply(block)
+        val builder = OneofBuilder(name, fieldIndex, usedIndexes).apply(block)
         val oneof = builder.build()
-        oneof.fields.forEach { usedIndexes += it.index }
         oneofs += oneof
+
         fieldIndex = maxOf(fieldIndex + 1, oneof.fields.maxOf { it.index } + 1)
     }
 
