@@ -1,5 +1,8 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
+import me.liam.microsmith.dsl.schemas.protobuf.enum.EnumBuilder
+import me.liam.microsmith.dsl.schemas.protobuf.message.MessageBuilder
+
 class ProtobufBuilder : ProtobufScope {
     private val schemas = mutableSetOf<ProtobufSchema>()
 

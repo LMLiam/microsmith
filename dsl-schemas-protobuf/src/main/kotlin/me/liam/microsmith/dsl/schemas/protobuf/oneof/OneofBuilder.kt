@@ -1,4 +1,10 @@
-package me.liam.microsmith.dsl.schemas.protobuf
+package me.liam.microsmith.dsl.schemas.protobuf.oneof
+
+import me.liam.microsmith.dsl.schemas.protobuf.OneofFieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
+import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
+import me.liam.microsmith.dsl.schemas.protobuf.field.OneofFieldBuilder
+import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveFieldType
 
 class OneofBuilder(
     private val name: String,

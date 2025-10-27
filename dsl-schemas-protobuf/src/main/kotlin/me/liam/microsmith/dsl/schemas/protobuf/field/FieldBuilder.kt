@@ -1,4 +1,8 @@
-package me.liam.microsmith.dsl.schemas.protobuf
+package me.liam.microsmith.dsl.schemas.protobuf.field
+
+import me.liam.microsmith.dsl.schemas.protobuf.MapFieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.OneofFieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.ScalarFieldScope
 
 class ScalarFieldBuilder(
     var index: Int? = null,

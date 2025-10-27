@@ -1,4 +1,6 @@
-package me.liam.microsmith.dsl.schemas.protobuf
+package me.liam.microsmith.dsl.schemas.protobuf.enum
+
+import me.liam.microsmith.dsl.schemas.protobuf.EnumScope
 
 class EnumBuilder(private val name: String) : EnumScope {
     private val values = mutableSetOf<EnumValue>()

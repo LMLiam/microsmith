@@ -1,4 +1,4 @@
-package me.liam.microsmith.dsl.schemas.protobuf
+package me.liam.microsmith.dsl.schemas.protobuf.field
 
 sealed interface FieldType
 

@@ -1,4 +1,4 @@
-package me.liam.microsmith.dsl.schemas.protobuf
+package me.liam.microsmith.dsl.schemas.protobuf.field
 
 enum class Cardinality {
     REQUIRED, // Default in proto3

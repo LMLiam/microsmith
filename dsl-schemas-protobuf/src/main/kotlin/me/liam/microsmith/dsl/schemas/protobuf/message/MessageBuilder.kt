@@ -1,4 +1,19 @@
-package me.liam.microsmith.dsl.schemas.protobuf
+package me.liam.microsmith.dsl.schemas.protobuf.message
+
+import me.liam.microsmith.dsl.schemas.protobuf.MapFieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.MessageScope
+import me.liam.microsmith.dsl.schemas.protobuf.oneof.Oneof
+import me.liam.microsmith.dsl.schemas.protobuf.oneof.OneofBuilder
+import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
+import me.liam.microsmith.dsl.schemas.protobuf.ScalarFieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.field.Cardinality
+import me.liam.microsmith.dsl.schemas.protobuf.field.Field
+import me.liam.microsmith.dsl.schemas.protobuf.field.MapField
+import me.liam.microsmith.dsl.schemas.protobuf.field.MapFieldBuilder
+import me.liam.microsmith.dsl.schemas.protobuf.field.MapFieldType
+import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveFieldType
+import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
+import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarFieldBuilder
 
 class MessageBuilder(private val name: String) : MessageScope {
     private val fields = mutableMapOf<String, Field>()
