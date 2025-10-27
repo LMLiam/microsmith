@@ -18,11 +18,8 @@ class MessageBuilder(private val name: String) : MessageScope {
             if (candidate in reservedIndexes) {
                 candidate = reservedIndexes.last + 1
             }
-            while (candidate in usedIndexes) {
+            while (candidate in usedIndexes || candidate in reservedIndexes) {
                 candidate++
-                if (candidate in reservedIndexes) {
-                    candidate = reservedIndexes.last + 1
-                }
             }
             validateIndex(candidate)
             usedIndexes += candidate
@@ -56,7 +53,22 @@ class MessageBuilder(private val name: String) : MessageScope {
     }
 
     override fun oneof(name: String, block: OneofScope.() -> Unit) {
-        val builder = OneofBuilder(name, this::allocateIndex).apply(block)
+        val builder = OneofBuilder(
+            name,
+            ::allocateIndex,
+            checkNameConflict = { candidate ->
+                // Check against top-level fields
+                require(candidate !in fields.keys) {
+                    "Duplicate field name in oneof: $candidate"
+                }
+                // Check against all existing oneof fields
+                val existingOneofNames = oneofs.flatMap { it.fields.map { name } }
+                require(candidate !in existingOneofNames) {
+                    "Duplicate field name across oneofs: $candidate"
+                }
+            }
+        ).apply(block)
+
         oneofs += builder.build()
     }
 
@@ -67,7 +79,7 @@ class MessageBuilder(private val name: String) : MessageScope {
         require(name.isNotBlank()) { "Field name cannot be blank" }
         require(name !in fields) { "Duplicate field name: $name" }
 
-        val builder = MapFieldBuilder(0).apply(block)
+        val builder = MapFieldBuilder().apply(block)
 
         val key = builder.key
         val value = builder.value
@@ -75,7 +87,7 @@ class MessageBuilder(private val name: String) : MessageScope {
         requireNotNull(key) { "Map key type must be set" }
         requireNotNull(value) { "Map value type must be set" }
 
-        val index = allocateIndex(builder.index.takeIf { it != 0 })
+        val index = allocateIndex(builder.index)
 
         return MapField(name, index, MapFieldType(key, value)).also {
             fields[name] = it
@@ -130,8 +142,8 @@ class MessageBuilder(private val name: String) : MessageScope {
         require(name.isNotBlank()) { "Field name cannot be blank" }
         require(!fields.containsKey(name)) { "Duplicate field name: $name" }
 
-        val builder = ScalarFieldBuilder(nextIndex).apply(block)
-        val index = allocateIndex(builder.index.takeIf { it != 0 }) // 0 means “use default”
+        val builder = ScalarFieldBuilder().apply(block)
+        val index = allocateIndex(builder.index)
 
         val field = ScalarField(name, index, type, builder.cardinality)
         fields[name] = field

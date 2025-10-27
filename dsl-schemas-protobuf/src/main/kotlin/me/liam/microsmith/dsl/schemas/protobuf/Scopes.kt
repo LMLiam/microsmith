@@ -42,7 +42,7 @@ interface MapFieldScope : FieldScope {
     fun key(keyType: MapKeyType)
     fun value(valueType: MapValueType)
     fun types(kvp: Pair<MapKeyType, MapValueType>)
-
+    fun kv(keyType: MapKeyType, valueType: MapValueType) = types(keyType to valueType)
     fun types(block: () -> Pair<MapKeyType, MapValueType>) = types(block())
     operator fun Pair<MapKeyType, MapValueType>.unaryPlus() = types(this)
 

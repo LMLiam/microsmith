@@ -1,7 +1,7 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
 class ScalarFieldBuilder(
-    var index: Int,
+    var index: Int? = null,
     var cardinality: Cardinality = Cardinality.REQUIRED
 ) : ScalarFieldScope {
 
@@ -25,7 +25,7 @@ class ScalarFieldBuilder(
 }
 
 class OneofFieldBuilder(
-    var index: Int
+    var index: Int? = null
 ) : OneofFieldScope {
     override fun index(index: Int) {
         this.index = index
@@ -33,7 +33,7 @@ class OneofFieldBuilder(
 }
 
 class MapFieldBuilder(
-    var index: Int,
+    var index: Int? = null,
     var key: MapKeyType? = null,
     var value: MapValueType? = null,
 ) : MapFieldScope {
