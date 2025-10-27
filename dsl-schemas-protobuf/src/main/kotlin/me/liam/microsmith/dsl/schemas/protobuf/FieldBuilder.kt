@@ -1,6 +1,9 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
-class FieldBuilder(var index: Int, var cardinality: Cardinality = Cardinality.REQUIRED) : FieldScope {
+class FieldBuilder(
+    var index: Int,
+    var cardinality: Cardinality = Cardinality.REQUIRED
+) : FieldScope {
     override fun optional() {
         require(cardinality == Cardinality.REQUIRED) { "Cardinality already set to $cardinality" }
         cardinality = Cardinality.OPTIONAL
@@ -11,6 +14,14 @@ class FieldBuilder(var index: Int, var cardinality: Cardinality = Cardinality.RE
         cardinality = Cardinality.REPEATED
     }
 
+    override fun index(index: Int) {
+        this.index = index
+    }
+}
+
+class OneofFieldBuilder(
+    var index: Int
+) : OneofFieldScope {
     override fun index(index: Int) {
         this.index = index
     }

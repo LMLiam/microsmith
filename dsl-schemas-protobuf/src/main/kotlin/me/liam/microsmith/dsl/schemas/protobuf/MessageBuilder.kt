@@ -7,23 +7,23 @@ class MessageBuilder(private val name: String) : MessageScope {
     private var nextIndex = 1
 
     internal fun allocateIndex(requested: Int? = null): Int {
-        var index = requested ?: nextIndex
+        return if (requested != null) {
+            validateIndex(requested)
+            require(requested !in reservedIndexes) { "Reserved field number: $requested" }
+            require(requested !in usedIndexes) { "Duplicate field number: $requested" }
 
-        if (index in reservedIndexes) {
-            index = reservedIndexes.last + 1
+            usedIndexes += requested
+            requested
+        } else {
+            var index = nextIndex
+            while (index in reservedIndexes || index in usedIndexes) {
+                index++
+            }
+            validateIndex(index)
+            usedIndexes += index
+            nextIndex = index + 1
+            index
         }
-
-        validateIndex(index)
-        require(index !in usedIndexes) { "Duplicate field number: $index" }
-
-        usedIndexes += index
-        nextIndex = index + 1
-
-        if (nextIndex in reservedIndexes) {
-            nextIndex = reservedIndexes.last + 1
-        }
-
-        return index
     }
 
     override fun optional(field: Field) {
