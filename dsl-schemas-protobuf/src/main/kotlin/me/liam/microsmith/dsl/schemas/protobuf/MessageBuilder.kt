@@ -60,21 +60,29 @@ class MessageBuilder(private val name: String) : MessageScope {
         oneofs += builder.build()
     }
 
+    override fun map(name: String, kvpBlock: MapFieldScope.() -> Pair<MapKeyType, MapValueType>): MapField {
+        require(name.isNotBlank()) { "Field name cannot be blank" }
+        require(!fields.containsKey(name)) { "Duplicate field name: $name" }
+
+        val builder = MapFieldBuilder(0)
+        val (key, value) = builder.kvpBlock()
+        val index = allocateIndex(builder.index.takeIf { it != 0 })
+
+        val field = MapField(name, index, MapFieldType(key, value))
+        fields[name] = field
+        return field
+    }
+
     override fun map(
         name: String,
         key: MapKeyType,
         value: MapValueType,
         block: MapFieldScope.() -> Unit
     ): MapField {
-        require(name.isNotBlank()) { "Field name cannot be blank" }
-        require(!fields.containsKey(name)) { "Duplicate field name: $name" }
-
-        val builder = MapFieldBuilder(0).apply(block)
-        val index = allocateIndex(builder.index.takeIf { it != 0 })
-
-        val field = MapField(name, index, MapFieldType(key, value))
-        fields[name] = field
-        return field
+        return map(name) {
+            block()
+            key to value
+        }
     }
 
     override fun int32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.INT32, block)

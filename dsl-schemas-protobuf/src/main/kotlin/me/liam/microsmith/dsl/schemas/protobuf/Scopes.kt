@@ -89,6 +89,11 @@ interface MessageFields<TFieldScope : FieldScope> : ScalarFields<TFieldScope, Sc
 
     fun map(
         name: String,
+        kvpBlock: MapFieldScope.() -> Pair<MapKeyType, MapValueType>,
+    ): MapField
+
+    fun map(
+        name: String,
         kvp: Pair<MapKeyType, MapValueType>,
         block: MapFieldScope.() -> Unit = {}
     ): MapField = map(
@@ -96,15 +101,6 @@ interface MessageFields<TFieldScope : FieldScope> : ScalarFields<TFieldScope, Sc
         key = kvp.first,
         value = kvp.second,
         block = block
-    )
-
-    fun map(
-        name: String,
-        kvpBlock: () -> Pair<MapKeyType, MapValueType>,
-    ): MapField = map(
-        name = name,
-        kvp = kvpBlock(),
-        block = {}
     )
 }
 
