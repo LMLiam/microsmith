@@ -14,7 +14,20 @@ interface MessageScope {
     fun optional(field: Field)
 
     fun int32(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun int64(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun uint32(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun uint64(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun sint32(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun sint64(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun fixed32(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun fixed64(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun sfixed32(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun sfixed64(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun float(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun double(name: String, block: FieldScope.() -> Unit = {}): Field
     fun string(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun bytes(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun bool(name: String, block: FieldScope.() -> Unit = {}): Field
 }
 
 @MicrosmithDsl
