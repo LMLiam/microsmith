@@ -31,7 +31,7 @@ package me.liam.microsmith.dsl.schemas.core
  * End-users never interact with [SchemasBuilder] directly; it is purely
  * an internal mechanism to accumulate schemas during DSL evaluation.
  */
-internal class SchemasBuilder : SchemasScope {
+class SchemasBuilder : SchemasScope {
     internal val schemas = mutableSetOf<Schema>()
 
     /**
