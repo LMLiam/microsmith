@@ -19,7 +19,7 @@ interface ProtobufScope {
     fun enum(name: String, block: EnumScope.() -> Unit = {})
 }
 
-interface Reserved {
+interface Reservable {
     fun reserved(vararg indexes: Int)
     fun reserved(vararg indexRanges: IntRange) = indexRanges.forEach { reserved(*it.toSet().toIntArray()) }
     fun reserved(vararg names: String)
@@ -28,12 +28,13 @@ interface Reserved {
 }
 
 @MicrosmithDsl
-interface MessageScope : MessageFields<ScalarFieldScope>, Reserved {
+interface MessageScope : ScalarFields<ScalarFieldScope, ScalarField>, Reservable {
     fun optional(field: ScalarField)
     fun optional(block: MessageScope.() -> ScalarField)
     fun repeated(field: ScalarField)
     fun repeated(block: MessageScope.() -> ScalarField)
     fun oneof(name: String, block: OneofScope.() -> Unit)
+    fun map(name: String, block: MapFieldScope.() -> Unit): MapField
 }
 
 @MicrosmithDsl
@@ -53,7 +54,7 @@ interface ReservedScope {
 }
 
 @MicrosmithDsl
-interface EnumScope : Reserved {
+interface EnumScope : Reservable {
     fun value(name: String)
     operator fun String.unaryPlus() = value(this)
 }
@@ -116,13 +117,6 @@ interface ScalarFields<TFieldScope : FieldScope, TField : Field> {
     fun string(name: String, block: TFieldScope.() -> Unit = {}): TField
     fun bytes(name: String, block: TFieldScope.() -> Unit = {}): TField
     fun bool(name: String, block: TFieldScope.() -> Unit = {}): TField
-}
-
-interface MessageFields<TFieldScope : FieldScope> : ScalarFields<TFieldScope, ScalarField> {
-    fun map(
-        name: String,
-        block: MapFieldScope.() -> Unit
-    ): MapField
 }
 
 fun SchemasScope.protobuf(block: ProtobufScope.() -> Unit) {
