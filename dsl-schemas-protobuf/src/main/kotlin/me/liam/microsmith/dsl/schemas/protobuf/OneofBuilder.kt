@@ -2,8 +2,7 @@ package me.liam.microsmith.dsl.schemas.protobuf
 
 class OneofBuilder(
     private val name: String,
-    private var fieldIndex: Int,
-    private val usedIndexes: MutableSet<Int>
+    private val allocateIndex: (Int?) -> Int
 ) : OneofScope {
     private val fields = mutableMapOf<String, Field>()
 
@@ -23,24 +22,15 @@ class OneofBuilder(
     override fun bytes(name: String, block: OneofFieldScope.() -> Unit): Field = addField(name, FieldType.BYTES, block)
     override fun bool(name: String, block: OneofFieldScope.() -> Unit): Field = addField(name, FieldType.BOOL, block)
 
-    private fun addField(name: String, type: FieldType, block: FieldScope.() -> Unit): Field {
+    private fun addField(name: String, type: FieldType, block: OneofFieldScope.() -> Unit): Field {
         require(!fields.containsKey(name)) { "Duplicate field in oneof: $name" }
-
-        val builder = FieldBuilder(fieldIndex).apply(block)
-
+        val builder = FieldBuilder(0).apply(block) // 0 = “use default”
         require(builder.cardinality == Cardinality.REQUIRED) {
             "Oneof fields cannot be optional or repeated"
         }
-
-        // validate against global usedIndexes
-        require(builder.index !in usedIndexes) { "Duplicate field number: ${builder.index}" }
-        validateIndex(builder.index)
-
-        val field = Field(name, type, builder.index, Cardinality.REQUIRED)
+        val index = allocateIndex(builder.index.takeIf { it != 0 })
+        val field = Field(name, type, index, Cardinality.REQUIRED)
         fields[name] = field
-        usedIndexes += builder.index
-
-        fieldIndex = maxOf(fieldIndex + 1, builder.index + 1)
         return field
     }
 

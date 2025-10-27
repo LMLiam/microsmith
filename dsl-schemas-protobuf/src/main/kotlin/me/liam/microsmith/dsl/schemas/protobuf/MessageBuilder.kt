@@ -4,7 +4,27 @@ class MessageBuilder(private val name: String) : MessageScope {
     private val fields = mutableMapOf<String, Field>()
     private val oneofs = mutableSetOf<Oneof>()
     private val usedIndexes = mutableSetOf<Int>()
-    private var fieldIndex = 1
+    private var nextIndex = 1
+
+    internal fun allocateIndex(requested: Int? = null): Int {
+        var index = requested ?: nextIndex
+
+        if (index in reservedIndexes) {
+            index = reservedIndexes.last + 1
+        }
+
+        validateIndex(index)
+        require(index !in usedIndexes) { "Duplicate field number: $index" }
+
+        usedIndexes += index
+        nextIndex = index + 1
+
+        if (nextIndex in reservedIndexes) {
+            nextIndex = reservedIndexes.last + 1
+        }
+
+        return index
+    }
 
     override fun optional(field: Field) {
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
@@ -31,14 +51,8 @@ class MessageBuilder(private val name: String) : MessageScope {
     }
 
     override fun oneof(name: String, block: OneofScope.() -> Unit) {
-        require(name.isNotBlank()) { "Oneof name cannot be blank" }
-        require(!fields.containsKey(name)) { "Duplicate oneof name: $name" }
-
-        val builder = OneofBuilder(name, fieldIndex, usedIndexes).apply(block)
-        val oneof = builder.build()
-        oneofs += oneof
-
-        fieldIndex = maxOf(fieldIndex + 1, oneof.fields.maxOf { it.index } + 1)
+        val builder = OneofBuilder(name, this::allocateIndex).apply(block)
+        oneofs += builder.build()
     }
 
     override fun int32(name: String, block: FieldScope.() -> Unit) = addField(name, FieldType.INT32, block)
@@ -61,24 +75,21 @@ class MessageBuilder(private val name: String) : MessageScope {
         require(name.isNotBlank()) { "Field name cannot be blank" }
         require(!fields.containsKey(name)) { "Duplicate field name: $name" }
 
-        val builder = FieldBuilder(fieldIndex).apply(block)
+        val builder = FieldBuilder(nextIndex).apply(block)
+        val index = allocateIndex(builder.index.takeIf { it != 0 }) // 0 means “use default”
 
-        validateIndex(builder.index)
-
-        require(!usedIndexes.contains(builder.index)) { "Duplicate field number: ${builder.index}" }
-
-        val field = Field(name, type, builder.index, builder.cardinality)
+        val field = Field(name, type, index, builder.cardinality)
         fields[name] = field
-        usedIndexes += builder.index
-
-        fieldIndex = maxOf(fieldIndex + 1, builder.index + 1)
         return field
     }
 
     private fun validateIndex(index: Int) {
         require(index in 1..536_870_911) { "Invalid field number: $index" }
-        require(index !in 19_000..19_999) { "Reserved field number: $index" }
     }
 
     fun build() = Message(name, fields.values.toSet(), oneofs.toSet())
+
+    companion object {
+        private val reservedIndexes = 19_000..19_999
+    }
 }
