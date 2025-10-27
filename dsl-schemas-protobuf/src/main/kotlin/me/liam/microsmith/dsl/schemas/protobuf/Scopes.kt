@@ -19,18 +19,21 @@ interface ProtobufScope {
     fun enum(name: String, block: EnumScope.() -> Unit = {})
 }
 
-@MicrosmithDsl
-interface MessageScope : MessageFields<ScalarFieldScope> {
-    fun optional(field: ScalarField)
-    fun optional(block: MessageScope.() -> ScalarField)
-    fun repeated(field: ScalarField)
-    fun repeated(block: MessageScope.() -> ScalarField)
-    fun oneof(name: String, block: OneofScope.() -> Unit)
+interface Reserved {
     fun reserved(vararg indexes: Int)
     fun reserved(vararg indexRanges: IntRange) = indexRanges.forEach { reserved(*it.toSet().toIntArray()) }
     fun reserved(vararg names: String)
     fun reserved(toMax: MaxRange)
     fun reserved(block: ReservedScope.() -> Unit)
+}
+
+@MicrosmithDsl
+interface MessageScope : MessageFields<ScalarFieldScope>, Reserved {
+    fun optional(field: ScalarField)
+    fun optional(block: MessageScope.() -> ScalarField)
+    fun repeated(field: ScalarField)
+    fun repeated(block: MessageScope.() -> ScalarField)
+    fun oneof(name: String, block: OneofScope.() -> Unit)
 }
 
 @MicrosmithDsl
@@ -50,7 +53,7 @@ interface ReservedScope {
 }
 
 @MicrosmithDsl
-interface EnumScope {
+interface EnumScope : Reserved {
     fun value(name: String)
     operator fun String.unaryPlus() = value(this)
 }
