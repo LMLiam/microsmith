@@ -46,6 +46,7 @@ interface ReservedScope {
     operator fun String.unaryPlus() = name(this)
     operator fun IntRange.unaryPlus() = range(this)
     operator fun MaxRange.unaryPlus() = range(this)
+    operator fun Int.rangeTo(max: Max) = MaxRange(this)
 }
 
 @MicrosmithDsl
