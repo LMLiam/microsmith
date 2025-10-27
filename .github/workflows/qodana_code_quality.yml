@@ -3,7 +3,7 @@
 #             https://www.jetbrains.com/help/qodana/about-qodana.html           #
 #-------------------------------------------------------------------------------#
 
-name: Qodana
+name: Build & Qodana
 on:
   workflow_dispatch:
   pull_request:
@@ -11,7 +11,7 @@ on:
     branches:
       - master
 jobs:
-  qodana:
+  build-and-qodana:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -23,6 +23,22 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 24
+          cache: gradle
+      - name: Build
+        run: ./gradlew build --stacktrace
+      - name: Test
+        id: test
+        run: ./gradlew kotest
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: '**/build/test-results/kotest/*.xml'
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2025.2
         env:

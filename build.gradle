@@ -36,6 +36,15 @@ subprojects {
         testImplementation 'io.kotest:kotest-framework-engine:6.0.1'
         testImplementation 'io.kotest:kotest-assertions-core:6.0.1'
         testImplementation 'io.kotest:kotest-property:6.0.1'
+        testImplementation 'io.kotest:kotest-extensions-junitxml:6.0.1'
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+        reports {
+            junitXml.required.set(false)
+        }
+        systemProperty("gradle.build.dir", project.buildDir)
     }
 
     kotlin {

@@ -1,3 +1,5 @@
 dependencies {
     implementation "me.liam:dsl:${version}"
+
+    testImplementation project(":kotest")
 }
