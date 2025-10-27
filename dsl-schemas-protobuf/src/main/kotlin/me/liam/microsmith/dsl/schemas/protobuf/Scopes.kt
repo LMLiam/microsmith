@@ -69,6 +69,26 @@ interface MessageFields<TFieldScope : FieldScope> : ScalarFields<TFieldScope, Sc
         value: MapValueType,
         block: MapFieldScope.() -> Unit = {}
     ): MapField
+
+    fun map(
+        name: String,
+        kvp: Pair<MapKeyType, MapValueType>,
+        block: MapFieldScope.() -> Unit = {}
+    ): MapField = map(
+        name = name,
+        key = kvp.first,
+        value = kvp.second,
+        block = block
+    )
+
+    fun map(
+        name: String,
+        kvpBlock: () -> Pair<MapKeyType, MapValueType>,
+    ): MapField = map(
+        name = name,
+        kvp = kvpBlock(),
+        block = {}
+    )
 }
 
 fun SchemasScope.protobuf(block: ProtobufScope.() -> Unit) {
