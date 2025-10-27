@@ -36,9 +36,9 @@ class SchemasBuilderTests : StringSpec({
         builder.register(s1)
         builder.register(s2)
 
-        val ext = builder.build()
+        val ext = builder.toExtension()
 
-        ext.schemas shouldContainExactly listOf(s1, s2)
+        ext.schemas shouldContainExactly setOf(s1, s2)
     }
 
     "SchemasExtension is immutable snapshot" {
@@ -46,10 +46,10 @@ class SchemasBuilderTests : StringSpec({
         val schema = FakeSchema(name = "User")
         builder.register(schema)
 
-        val ext = builder.build()
+        val ext = builder.toExtension()
 
         builder.register(FakeSchema(name = "Company"))
 
-        ext.schemas shouldContainExactly listOf(schema)
+        ext.schemas shouldContainExactly setOf(schema)
     }
 })

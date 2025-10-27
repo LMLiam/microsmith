@@ -17,28 +17,28 @@ private data class ExtFakeSchema(
 class SchemasExtensionTests : StringSpec({
     "find returns schema when present" {
         val s1 = ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")
-        val ext = SchemasExtension(listOf(s1))
+        val ext = SchemasExtension(setOf(s1))
 
         ext.find(TestSchemaTypes.PROTOBUF, "User") shouldBe s1
     }
 
     "find returns null when schema not present" {
         val s1 = ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")
-        val ext = SchemasExtension(listOf(s1))
+        val ext = SchemasExtension(setOf(s1))
 
         ext.find(TestSchemaTypes.JSON, "User") shouldBe null
     }
 
     "require returns schema when present" {
         val s1 = ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")
-        val ext = SchemasExtension(listOf(s1))
+        val ext = SchemasExtension(setOf(s1))
 
         ext.require(TestSchemaTypes.PROTOBUF, "User") shouldBe s1
     }
 
     "require throws when schema not present" {
         val s1 = ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")
-        val ext = SchemasExtension(listOf(s1))
+        val ext = SchemasExtension(setOf(s1))
 
         shouldThrow<IllegalStateException> {
             ext.require(TestSchemaTypes.JSON, "User")
@@ -49,9 +49,9 @@ class SchemasExtensionTests : StringSpec({
         val s1 = ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")
         val s2 = ExtFakeSchema(TestSchemaTypes.PROTOBUF, "Company")
         val s3 = ExtFakeSchema(TestSchemaTypes.JSON, "User")
-        val ext = SchemasExtension(listOf(s1, s2, s3))
+        val ext = SchemasExtension(setOf(s1, s2, s3))
 
-        ext.allOf(TestSchemaTypes.PROTOBUF) shouldBe listOf(s1, s2)
-        ext.allOf(TestSchemaTypes.JSON) shouldBe listOf(s3)
+        ext.allOf(TestSchemaTypes.PROTOBUF) shouldBe setOf(s1, s2)
+        ext.allOf(TestSchemaTypes.JSON) shouldBe setOf(s3)
     }
 })
