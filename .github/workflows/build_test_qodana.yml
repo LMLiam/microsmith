@@ -31,7 +31,7 @@ jobs:
         if: always()
         with:
           name: Kotest Results
-          path: '**/build/test-results/jvmKotest/*.xml'
+          path: 'build/test-results/jvmKotest/*.xml'
           reporter: java-junit
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2025.2
