@@ -12,9 +12,11 @@ scmVersion {
     versionCreator 'versionWithBranch'
 }
 
+version = scmVersion.version
+
 allprojects {
     group = 'me.liam'
-    version = scmVersion.version
+    project.version = rootProject.version
 
     repositories {
         mavenCentral()
