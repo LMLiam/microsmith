@@ -7,7 +7,7 @@ class KotestConfig : AbstractProjectConfig() {
     override val extensions = listOf(
         JunitXmlReporter(
             includeContainers = false,
-            useTestPathAsName = true,
+            useTestPathAsName = false,
             outputDir = "${System.getProperty("gradle.build.dir")}/test-results/kotest"
         )
     )
