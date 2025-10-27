@@ -12,7 +12,9 @@ interface ProtobufScope {
 @MicrosmithDsl
 interface MessageScope {
     fun optional(field: Field)
+    fun optional(block: MessageScope.() -> Field)
     fun repeated(field: Field)
+    fun repeated(block: MessageScope.() -> Field)
 
     fun int32(name: String, block: FieldScope.() -> Unit = {}): Field
     fun int64(name: String, block: FieldScope.() -> Unit = {}): Field

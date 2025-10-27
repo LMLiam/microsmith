@@ -10,9 +10,23 @@ class MessageBuilder(private val name: String) : MessageScope {
         fields[field.name] = field.copy(cardinality = Cardinality.OPTIONAL)
     }
 
+    override fun optional(block: MessageScope.() -> Field) {
+        val field = this.block()
+        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
+        val updated = field.copy(cardinality = Cardinality.OPTIONAL)
+        fields[field.name] = updated
+    }
+
     override fun repeated(field: Field) {
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
         fields[field.name] = field.copy(cardinality = Cardinality.REPEATED)
+    }
+
+    override fun repeated(block: MessageScope.() -> Field) {
+        val field = this.block()
+        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
+        val updated = field.copy(cardinality = Cardinality.REPEATED)
+        fields[field.name] = updated
     }
 
     override fun int32(name: String, block: FieldScope.() -> Unit) = addField(name, FieldType.INT32, block)
