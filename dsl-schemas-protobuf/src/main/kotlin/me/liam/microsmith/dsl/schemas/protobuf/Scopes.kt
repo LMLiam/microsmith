@@ -3,18 +3,16 @@ package me.liam.microsmith.dsl.schemas.protobuf
 import me.liam.microsmith.dsl.core.MicrosmithDsl
 import me.liam.microsmith.dsl.schemas.core.SchemasBuilder
 import me.liam.microsmith.dsl.schemas.core.SchemasScope
-import me.liam.microsmith.dsl.schemas.protobuf.field.Field
-import me.liam.microsmith.dsl.schemas.protobuf.field.MapField
-import me.liam.microsmith.dsl.schemas.protobuf.field.MapKeyType
-import me.liam.microsmith.dsl.schemas.protobuf.field.MapValueType
-import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
-import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveFieldType
-import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
+import me.liam.microsmith.dsl.schemas.protobuf.field.*
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.Max
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 
 @MicrosmithDsl
 interface ProtobufScope {
+    operator fun String.invoke(block: ProtobufScope.() -> Unit)
+    operator fun Int.invoke(block: ProtobufScope.() -> Unit)
+    fun version(version: Int, block: ProtobufScope.() -> Unit)
+
     fun message(name: String, block: MessageScope.() -> Unit = {})
     fun enum(name: String, block: EnumScope.() -> Unit = {})
 }
