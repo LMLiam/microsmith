@@ -28,6 +28,7 @@ allprojects {
     configurations.configureEach {
         resolutionStrategy.dependencySubstitution {
             substitute(module("me.liam:dsl")).using(project(":dsl"))
+            substitute(module("me.liam:dsl-schemas")).using(project(":dsl-schemas"))
         }
     }
 }

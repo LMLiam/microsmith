@@ -1,0 +1,5 @@
+dependencies {
+    implementation "me.liam:dsl-schemas:${version}"
+
+    testImplementation project(":kotest")
+}
