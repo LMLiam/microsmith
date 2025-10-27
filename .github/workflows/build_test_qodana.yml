@@ -27,10 +27,12 @@ jobs:
       - name: Build
         run: ./gradlew build --stacktrace
       - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v3
+        uses: dorny/test-reporter@v2
         if: always()
         with:
-          report_paths: '**/build/test-results/jvmKotest/*.xml'
+          name: Kotest Results
+          path: '**/build/test-results/jvmKotest/*.xml'
+          reporter: java-junit
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2025.2
         env:
