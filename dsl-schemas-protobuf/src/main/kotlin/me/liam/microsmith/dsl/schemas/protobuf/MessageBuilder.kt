@@ -60,28 +60,32 @@ class MessageBuilder(private val name: String) : MessageScope {
         oneofs += builder.build()
     }
 
-    override fun map(name: String, kvpBlock: MapFieldScope.() -> Pair<MapKeyType, MapValueType>): MapField {
-        require(name.isNotBlank()) { "Field name cannot be blank" }
-        require(!fields.containsKey(name)) { "Duplicate field name: $name" }
-
-        val builder = MapFieldBuilder(0)
-        val (key, value) = builder.kvpBlock()
-        val index = allocateIndex(builder.index.takeIf { it != 0 })
-
-        val field = MapField(name, index, MapFieldType(key, value))
-        fields[name] = field
-        return field
-    }
-
     override fun map(
         name: String,
-        key: MapKeyType,
-        value: MapValueType,
-        block: MapFieldScope.() -> Unit
+        kvpBlock: MapFieldScope.() -> Pair<MapKeyType, MapValueType>?
     ): MapField {
-        return map(name) {
-            block()
-            key to value
+        require(name.isNotBlank()) { "Field name cannot be blank" }
+        require(name !in fields) { "Duplicate field name: $name" }
+
+        val builder = MapFieldBuilder(0)
+
+        // Run the block once
+        val returnedTypes = builder.kvpBlock()
+        val builderTypes = builder.key to builder.value
+
+        // Prevent mixing return types with explicit builder state
+        if (returnedTypes != null && (builderTypes.first != null || builderTypes.second != null)) {
+            error("Cannot use return types when key or value is set explicitly")
+        }
+
+        val (key, value) = returnedTypes ?: builderTypes
+        requireNotNull(key) { "Map key type must be set" }
+        requireNotNull(value) { "Map value type must be set" }
+
+        val index = allocateIndex(builder.index.takeIf { it != 0 })
+
+        return MapField(name, index, MapFieldType(key, value)).also {
+            fields[name] = it
         }
     }
 

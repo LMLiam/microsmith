@@ -12,23 +12,6 @@ interface ProtobufScope {
 
 @MicrosmithDsl
 interface MessageScope : MessageFields<ScalarFieldScope> {
-    val int32 get() = PrimitiveFieldType.INT32
-    val int64 get() = PrimitiveFieldType.INT64
-    val uint32 get() = PrimitiveFieldType.UINT32
-    val uint64 get() = PrimitiveFieldType.UINT64
-    val sint32 get() = PrimitiveFieldType.SINT32
-    val sint64 get() = PrimitiveFieldType.SINT64
-    val fixed32 get() = PrimitiveFieldType.FIXED32
-    val fixed64 get() = PrimitiveFieldType.FIXED64
-    val sfixed32 get() = PrimitiveFieldType.SFIXED32
-    val sfixed64 get() = PrimitiveFieldType.SFIXED64
-    val float get() = PrimitiveFieldType.FLOAT
-    val double get() = PrimitiveFieldType.DOUBLE
-    val bytes get() = PrimitiveFieldType.BYTES
-    val bool get() = PrimitiveFieldType.BOOL
-    val string get() = PrimitiveFieldType.STRING
-
-
     fun optional(field: ScalarField)
     fun optional(block: MessageScope.() -> ScalarField)
     fun repeated(field: ScalarField)
@@ -55,7 +38,30 @@ interface ScalarFieldScope : FieldScope {
 interface OneofFieldScope : FieldScope
 
 @MicrosmithDsl
-interface MapFieldScope : FieldScope
+interface MapFieldScope : FieldScope {
+    fun key(keyType: MapKeyType)
+    fun value(valueType: MapValueType)
+    fun ret(kvp: Pair<MapKeyType, MapValueType>)
+
+    fun ret(block: () -> Pair<MapKeyType, MapValueType>) = ret(block())
+    operator fun Pair<MapKeyType, MapValueType>.unaryPlus() = ret(this)
+
+    val int32 get() = PrimitiveFieldType.INT32
+    val int64 get() = PrimitiveFieldType.INT64
+    val uint32 get() = PrimitiveFieldType.UINT32
+    val uint64 get() = PrimitiveFieldType.UINT64
+    val sint32 get() = PrimitiveFieldType.SINT32
+    val sint64 get() = PrimitiveFieldType.SINT64
+    val fixed32 get() = PrimitiveFieldType.FIXED32
+    val fixed64 get() = PrimitiveFieldType.FIXED64
+    val sfixed32 get() = PrimitiveFieldType.SFIXED32
+    val sfixed64 get() = PrimitiveFieldType.SFIXED64
+    val float get() = PrimitiveFieldType.FLOAT
+    val double get() = PrimitiveFieldType.DOUBLE
+    val bytes get() = PrimitiveFieldType.BYTES
+    val bool get() = PrimitiveFieldType.BOOL
+    val string get() = PrimitiveFieldType.STRING
+}
 
 interface FieldScope {
     fun index(index: Int)
@@ -82,26 +88,8 @@ interface ScalarFields<TFieldScope : FieldScope, TField : Field> {
 interface MessageFields<TFieldScope : FieldScope> : ScalarFields<TFieldScope, ScalarField> {
     fun map(
         name: String,
-        key: MapKeyType,
-        value: MapValueType,
-        block: MapFieldScope.() -> Unit = {}
+        kvpBlock: MapFieldScope.() -> Pair<MapKeyType, MapValueType>?,
     ): MapField
-
-    fun map(
-        name: String,
-        kvpBlock: MapFieldScope.() -> Pair<MapKeyType, MapValueType>,
-    ): MapField
-
-    fun map(
-        name: String,
-        kvp: Pair<MapKeyType, MapValueType>,
-        block: MapFieldScope.() -> Unit = {}
-    ): MapField = map(
-        name = name,
-        key = kvp.first,
-        value = kvp.second,
-        block = block
-    )
 }
 
 fun SchemasScope.protobuf(block: ProtobufScope.() -> Unit) {
