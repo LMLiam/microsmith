@@ -52,10 +52,5 @@ class OneofBuilder(
         return field
     }
 
-    private fun validateIndex(index: Int) {
-        require(index in 1..536_870_911) { "Invalid field number: $index" }
-        require(index !in 19_000..19_999) { "Reserved field number: $index" }
-    }
-
     fun build() = Oneof(name, fields.values.toSet())
 }
