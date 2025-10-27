@@ -10,6 +10,8 @@ import me.liam.microsmith.dsl.schemas.protobuf.field.MapValueType
 import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
 import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveFieldType
 import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.Max
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 
 @MicrosmithDsl
 interface ProtobufScope {
@@ -25,7 +27,25 @@ interface MessageScope : MessageFields<ScalarFieldScope> {
     fun repeated(block: MessageScope.() -> ScalarField)
     fun oneof(name: String, block: OneofScope.() -> Unit)
     fun reserved(vararg indexes: Int)
+    fun reserved(vararg indexRanges: IntRange) = indexRanges.forEach { reserved(*it.toSet().toIntArray()) }
     fun reserved(vararg names: String)
+    fun reserved(toMax: MaxRange)
+    fun reserved(block: ReservedScope.() -> Unit)
+}
+
+@MicrosmithDsl
+interface ReservedScope {
+    val max get() = Max
+
+    fun index(index: Int)
+    fun name(name: String)
+    fun range(range: IntRange)
+    fun range(range: MaxRange)
+    fun range(start: Int, end: Int) = range(start..end)
+
+    operator fun String.unaryPlus() = name(this)
+    operator fun IntRange.unaryPlus() = range(this)
+    operator fun MaxRange.unaryPlus() = range(this)
 }
 
 @MicrosmithDsl
