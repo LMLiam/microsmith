@@ -11,8 +11,10 @@ interface ProtobufScope {
 
 @MicrosmithDsl
 interface MessageScope {
-    fun int32(name: String, block: FieldScope.() -> Unit = {})
-    fun string(name: String, block: FieldScope.() -> Unit = {})
+    fun optional(field: Field)
+
+    fun int32(name: String, block: FieldScope.() -> Unit = {}): Field
+    fun string(name: String, block: FieldScope.() -> Unit = {}): Field
 }
 
 @MicrosmithDsl
