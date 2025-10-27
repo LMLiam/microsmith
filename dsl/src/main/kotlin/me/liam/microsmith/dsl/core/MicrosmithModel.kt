@@ -12,12 +12,10 @@ class MicrosmithModel internal constructor(
     private val extensions: Map<KClass<out MicrosmithExtension>, MicrosmithExtension>
 ) {
     /**
-     * Retrieve an extension of the given type, or null if not present.
+     * Retrieve an extension of the given type (gets the first if multiple of the same type exist), or null if not present.
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T : MicrosmithExtension> get(type: KClass<T>): T? {
-        return extensions[type] as? T?
-    }
+    fun <T : MicrosmithExtension> get(type: KClass<T>) = extensions[type] as? T?
 
     /**
      * Inline reified overload of [get] for convenience.
@@ -27,7 +25,9 @@ class MicrosmithModel internal constructor(
     /**
      * Internal: return a new model with the given extension attached.
      */
-    internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = MicrosmithModel(extensions + (type to value))
+    internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = MicrosmithModel(
+        extensions + (mapOf(type to value))
+    )
 
     /**
      * Internal: reified overload of [with].

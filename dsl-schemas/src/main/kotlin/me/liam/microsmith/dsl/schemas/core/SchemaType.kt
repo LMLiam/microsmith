@@ -3,7 +3,7 @@ package me.liam.microsmith.dsl.schemas.core
 /**
  * The type of schema.
  *
- * This sealed interface acts as a marker for dialect identifiers
+ * This interface acts as a marker for dialect identifiers
  * (e.g. `protobuf`, `json`, `avro`). By requiring implementors to
  * provide a `typeName`, developers are pushed into using a strongly
  * typed, canonical representation of schema types rather than
@@ -29,6 +29,6 @@ package me.liam.microsmith.dsl.schemas.core
  *
  * @see Schema
  */
-sealed interface SchemaType {
+interface SchemaType {
     val typeName: String
 }

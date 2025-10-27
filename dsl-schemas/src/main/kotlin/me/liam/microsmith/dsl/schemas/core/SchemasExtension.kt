@@ -29,4 +29,11 @@ data class SchemasExtension(val schemas: List<Schema>) : MicrosmithExtension {
      * Convenience: return all schemas of a given [type].
      */
     fun allOf(type: SchemaType) = schemas.filter { it.type == type }
+
+    fun merge(other: SchemasExtension): SchemasExtension {
+        val merged = (schemas + other.schemas)
+            .associateBy { it.type to it.name }
+            .values.toList()
+        return copy(schemas = merged)
+    }
 }

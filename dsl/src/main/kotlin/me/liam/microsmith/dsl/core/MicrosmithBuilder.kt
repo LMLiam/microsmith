@@ -16,7 +16,7 @@ class MicrosmithBuilder : MicrosmithScope {
     /**
      * The current immutable model snapshot being built.
      */
-    internal var model = MicrosmithModel.empty()
+    var model = MicrosmithModel.empty()
         private set
 
     fun <T : MicrosmithExtension> put(type: KClass<T>, ext: T) {
