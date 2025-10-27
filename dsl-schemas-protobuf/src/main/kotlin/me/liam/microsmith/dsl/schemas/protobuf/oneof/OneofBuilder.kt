@@ -9,7 +9,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveFieldType
 class OneofBuilder(
     private val name: String,
     private val allocateIndex: (Int?) -> Int,
-    private val checkNameConflict: (String) -> Unit
+    private val useName: (String) -> Unit
 ) : OneofScope {
     private val fields = mutableMapOf<String, OneofField>()
 
@@ -60,7 +60,7 @@ class OneofBuilder(
 
     private fun addField(name: String, type: PrimitiveFieldType, block: OneofFieldScope.() -> Unit): OneofField {
         require(!fields.containsKey(name)) { "Duplicate field in oneof: $name" }
-        checkNameConflict(name)
+        useName(name)
 
         val builder = OneofFieldBuilder().apply(block)
         val index = allocateIndex(builder.index)

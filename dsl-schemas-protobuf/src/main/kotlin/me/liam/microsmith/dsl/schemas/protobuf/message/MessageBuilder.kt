@@ -1,43 +1,25 @@
 package me.liam.microsmith.dsl.schemas.protobuf.message
 
-import me.liam.microsmith.dsl.schemas.protobuf.MapFieldScope
-import me.liam.microsmith.dsl.schemas.protobuf.MessageScope
+import me.liam.microsmith.dsl.schemas.protobuf.*
+import me.liam.microsmith.dsl.schemas.protobuf.field.*
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.OneofBuilder
-import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
-import me.liam.microsmith.dsl.schemas.protobuf.ReservedScope
-import me.liam.microsmith.dsl.schemas.protobuf.ScalarFieldScope
-import me.liam.microsmith.dsl.schemas.protobuf.extensions.merge
-import me.liam.microsmith.dsl.schemas.protobuf.field.Cardinality
-import me.liam.microsmith.dsl.schemas.protobuf.field.Field
-import me.liam.microsmith.dsl.schemas.protobuf.field.MapField
-import me.liam.microsmith.dsl.schemas.protobuf.field.MapFieldBuilder
-import me.liam.microsmith.dsl.schemas.protobuf.field.MapFieldType
-import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveFieldType
-import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
-import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarFieldBuilder
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.Max
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedBuilder
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
-import sun.security.util.KeyUtil.validate
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.*
+import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
+import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
 
 class MessageBuilder(private val name: String) : MessageScope {
+    private val allocator = IndexAllocator(1, protoReservedIndexes)
+    private val nameRegistry = NameRegistry()
+
     private val fields = mutableMapOf<String, Field>()
     private val oneofs = mutableSetOf<Oneof>()
-    private val usedIndexes = mutableSetOf<Int>()
-    private val reservedIndexes = mutableSetOf<IntRange>()
-    private val reservedNames = mutableSetOf<String>()
-    private var nextIndex = 1
 
     fun build() = Message(
         name,
         fields.values.sortedBy { it.index },
         oneofs.sortedBy { it.name },
-        reservedIndexes
+        allocator.reserved()
             .sortedBy { it.first }
             .map { r ->
                 when {
@@ -45,9 +27,7 @@ class MessageBuilder(private val name: String) : MessageScope {
                     r.last == Max.VALUE -> ReservedToMax(r.first)
                     else -> ReservedRange(r)
                 }
-            } +
-                reservedNames.sorted().map { ReservedName(it) }
-
+            } + nameRegistry.reserved().sorted().map { ReservedName(it) }
     )
 
     override fun optional(field: ScalarField) {
@@ -78,7 +58,7 @@ class MessageBuilder(private val name: String) : MessageScope {
         val builder = OneofBuilder(
             name,
             ::allocateIndex,
-            ::validate
+            nameRegistry::use
         ).apply(block)
 
         oneofs += builder.build()
@@ -107,21 +87,21 @@ class MessageBuilder(private val name: String) : MessageScope {
     }
 
     override fun reserved(vararg indexes: Int) =
-        indexes.forEach { reserveRange(it..it) }
+        indexes.forEach { allocator.reserve(it..it) }
 
     override fun reserved(vararg indexRanges: IntRange) =
-        indexRanges.forEach { reserveRange(it) }
+        indexRanges.forEach { allocator.reserve(it) }
 
     override fun reserved(toMax: MaxRange) =
-        reserveRange(toMax.from..Max.VALUE)
+        allocator.reserve(toMax.from..Max.VALUE)
 
     override fun reserved(vararg names: String) =
-        names.forEach { reserveName(it) }
+        names.forEach { this.nameRegistry.reserve(it) }
 
     override fun reserved(block: ReservedScope.() -> Unit) {
         val builder = ReservedBuilder().apply(block)
-        builder.reservedIndexes.forEach { reserveRange(it) }
-        builder.reservedNames.forEach { reserveName(it) }
+        builder.reservedIndexes.forEach { allocator.reserve(it) }
+        builder.reservedNames.forEach { nameRegistry.reserve(it) }
     }
 
     override fun int32(name: String, block: ScalarFieldScope.() -> Unit) =
@@ -168,30 +148,14 @@ class MessageBuilder(private val name: String) : MessageScope {
 
     override fun bool(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.BOOL, block)
 
-    private fun allocateIndex(idx: Int? = null): Int =
-        if (idx != null) {
-            validate(idx)
-            usedIndexes += idx
-            idx
-        } else {
-            val candidate = generateSequence(nextIndex) { it + 1 }
-                .first { c ->
-                    c !in usedIndexes &&
-                            c !in protoReservedIndexes &&
-                            reservedIndexes.none { c in it }
-                }
-            validate(candidate)
-            usedIndexes += candidate
-            nextIndex = candidate + 1
-            candidate
-        }
+    private fun allocateIndex(idx: Int? = null): Int = allocator.allocate(idx)
 
     private fun addField(
         name: String,
         type: PrimitiveFieldType,
         block: ScalarFieldScope.() -> Unit
     ): ScalarField {
-        validate(name)
+        nameRegistry.use(name)
 
         return ScalarFieldBuilder()
             .apply(block)
@@ -199,60 +163,6 @@ class MessageBuilder(private val name: String) : MessageScope {
                 ScalarField(name, allocateIndex(builder.index), type, builder.cardinality)
             }
             .also { field -> fields[name] = field }
-    }
-
-    private fun validateIndex(index: Int) {
-        require(index in 1..Max.VALUE) { "Invalid field number: $index" }
-    }
-
-    private fun validate(index: Int) {
-        validateIndex(index)
-
-        require(index !in usedIndexes) {
-            "Field number $index already used"
-        }
-        require(index < protoReservedIndexes.first || index > protoReservedIndexes.last) {
-            "Field number $index is in the proto reserved range"
-        }
-        require(reservedIndexes.none { index in it }) {
-            "Field number $index is already reserved"
-        }
-    }
-
-    private fun validate(range: IntRange) {
-        validateIndex(range.first)
-        validateIndex(range.last)
-
-        require(usedIndexes.none { it in range }) {
-            "Range $range overlaps with used field numbers"
-        }
-        require(range.last < protoReservedIndexes.first || range.first > protoReservedIndexes.last) {
-            "Range $range overlaps with proto reserved numbers"
-        }
-        require(reservedIndexes.none { existing ->
-            existing.first <= range.last && range.first <= existing.last
-        }) {
-            "Range $range overlaps with already reserved numbers"
-        }
-    }
-
-    private fun validate(name: String) {
-        require(name.isNotBlank()) { "Field name cannot be blank" }
-        require(name !in fields.keys) { "Cannot reserve used field name: $name" }
-        require(name !in oneofs.flatMap { it.fields.map { f -> f.name } }) {
-            "Cannot reserve used field name in oneof: $name"
-        }
-        require(name !in reservedNames) { "Field name already reserved: $name" }
-    }
-
-    private fun reserveRange(range: IntRange) {
-        validate(range)
-        reservedIndexes.merge(range)
-    }
-
-    private fun reserveName(name: String) {
-        validate(name)
-        reservedNames += name
     }
 
     companion object {

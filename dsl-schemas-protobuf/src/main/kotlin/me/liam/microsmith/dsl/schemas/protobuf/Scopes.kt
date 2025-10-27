@@ -55,9 +55,12 @@ interface ReservedScope {
 
 @MicrosmithDsl
 interface EnumScope : Reservable {
-    fun value(name: String)
+    fun value(name: String, block: EnumValueScope.() -> Unit = {})
     operator fun String.unaryPlus() = value(this)
 }
+
+@MicrosmithDsl
+interface EnumValueScope : FieldScope
 
 @MicrosmithDsl
 interface OneofScope : ScalarFields<OneofFieldScope, OneofField>
