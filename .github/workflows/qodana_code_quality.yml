@@ -33,7 +33,7 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
-          report_paths: '**/build/test-results/kotest/*.xml'
+          report_paths: '**/build/test-results/jvmKotest/*.xml'
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2025.2
         env:
