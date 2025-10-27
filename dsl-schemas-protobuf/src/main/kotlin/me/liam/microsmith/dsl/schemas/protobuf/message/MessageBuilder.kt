@@ -14,26 +14,33 @@ import me.liam.microsmith.dsl.schemas.protobuf.field.MapFieldType
 import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveFieldType
 import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarFieldBuilder
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.Reserved
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.combineReservedIndexes
 
 class MessageBuilder(private val name: String) : MessageScope {
     private val fields = mutableMapOf<String, Field>()
     private val oneofs = mutableSetOf<Oneof>()
     private val usedIndexes = mutableSetOf<Int>()
+    private val reservedIndexes = mutableSetOf<Int>()
+    private val reservedNames = mutableSetOf<String>()
     private var nextIndex = 1
 
     internal fun allocateIndex(requested: Int? = null): Int {
         return if (requested != null) {
             validateIndex(requested)
-            require(requested !in reservedIndexes) { "Reserved field number: $requested" }
+            require(requested !in protoReservedIndexes) { "Reserved field number: $requested" }
             require(requested !in usedIndexes) { "Duplicate field number: $requested" }
+            require(requested !in reservedIndexes) { "Reserved field number: $requested" }
             usedIndexes += requested
             requested
         } else {
             var candidate = nextIndex
-            if (candidate in reservedIndexes) {
-                candidate = reservedIndexes.last + 1
+            if (candidate in protoReservedIndexes) {
+                candidate = protoReservedIndexes.last + 1
             }
-            while (candidate in usedIndexes || candidate in reservedIndexes) {
+            while (candidate in usedIndexes || candidate in protoReservedIndexes || candidate in reservedIndexes) {
                 candidate++
             }
             validateIndex(candidate)
@@ -109,6 +116,25 @@ class MessageBuilder(private val name: String) : MessageScope {
         }
     }
 
+    override fun reserved(vararg indexes: Int) {
+        indexes.forEach {
+            validateIndex(it)
+            require(it !in usedIndexes) { "Cannot reserve used field number: $it" }
+            require(it !in reservedIndexes) { "Cannot reserve reserved field number: $it" }
+            require(it !in protoReservedIndexes) { "Cannot reserve proto reserved field number: $it" }
+            reservedIndexes += it
+        }
+    }
+
+    override fun reserved(vararg names: String) {
+        names.forEach {
+            require(it !in fields.keys) { "Cannot reserve used field name: $it" }
+            require(it !in oneofs.flatMap { fields.map { name } }) { "Cannot reserve used field name in oneof: $it" }
+            require(it !in reservedNames) { "Cannot reserve reserved field name: $it" }
+            reservedNames += it
+        }
+    }
+
     override fun int32(name: String, block: ScalarFieldScope.() -> Unit) =
         addField(name, PrimitiveFieldType.INT32, block)
 
@@ -155,7 +181,9 @@ class MessageBuilder(private val name: String) : MessageScope {
 
     private fun addField(name: String, type: PrimitiveFieldType, block: ScalarFieldScope.() -> Unit): ScalarField {
         require(name.isNotBlank()) { "Field name cannot be blank" }
-        require(!fields.containsKey(name)) { "Duplicate field name: $name" }
+        require(name !in fields.keys) { "Duplicate field name: $name" }
+        require(name !in oneofs.flatMap { fields.map { name } }) { "Duplicate field name in oneof: $name" }
+        require(name !in reservedNames) { "Duplicate field name in reserved names: $name" }
 
         val builder = ScalarFieldBuilder().apply(block)
         val index = allocateIndex(builder.index)
@@ -169,9 +197,17 @@ class MessageBuilder(private val name: String) : MessageScope {
         require(index in 1..536_870_911) { "Invalid field number: $index" }
     }
 
-    fun build() = Message(name, fields.values.toSet(), oneofs.toSet())
+    fun build() = Message(
+        name,
+        fields.values.toSet(),
+        oneofs.toSet(),
+        (
+                combineReservedIndexes(reservedIndexes) +
+                        reservedNames.map { ReservedName(it) }
+                ).toSet(),
+    )
 
     companion object {
-        private val reservedIndexes = 19_000..19_999
+        private val protoReservedIndexes = 19_000..19_999
     }
 }

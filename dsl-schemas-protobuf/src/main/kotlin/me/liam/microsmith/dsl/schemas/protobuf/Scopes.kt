@@ -24,6 +24,8 @@ interface MessageScope : MessageFields<ScalarFieldScope> {
     fun repeated(field: ScalarField)
     fun repeated(block: MessageScope.() -> ScalarField)
     fun oneof(name: String, block: OneofScope.() -> Unit)
+    fun reserved(vararg indexes: Int)
+    fun reserved(vararg names: String)
 }
 
 @MicrosmithDsl
