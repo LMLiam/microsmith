@@ -49,12 +49,7 @@ class EnumBuilder(private val name: String) : EnumScope {
         values.sortedBy { it.index },
         allocator.reserved()
             .sortedBy { it.first }
-            .map { r ->
-                when {
-                    r.first == r.last -> ReservedIndex(r.first)
-                    r.last == Max.VALUE -> ReservedToMax(r.first)
-                    else -> ReservedRange(r)
-                }
-            } + nameRegistry.reserved().sorted().map { ReservedName(it) }
+            .map(Reserved::fromRange) +
+                nameRegistry.reserved().sorted().map(::ReservedName)
     )
 }
