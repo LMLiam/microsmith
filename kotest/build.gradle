@@ -1,0 +1,6 @@
+dependencies {
+    api "io.kotest:kotest-framework-engine:6.0.1"
+    api "io.kotest:kotest-assertions-core:6.0.1"
+    api "io.kotest:kotest-property:6.0.1"
+    api "io.kotest:kotest-extensions-junitxml:6.0.1"
+}
