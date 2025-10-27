@@ -6,7 +6,13 @@ class MessageBuilder(private val name: String) : MessageScope {
     private var fieldIndex = 1
 
     override fun optional(field: Field) {
-        fields[field.name] = field.copy(optional = true)
+        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
+        fields[field.name] = field.copy(cardinality = Cardinality.OPTIONAL)
+    }
+
+    override fun repeated(field: Field) {
+        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
+        fields[field.name] = field.copy(cardinality = Cardinality.REPEATED)
     }
 
     override fun int32(name: String, block: FieldScope.() -> Unit) = addField(name, FieldType.INT32, block)
@@ -29,13 +35,13 @@ class MessageBuilder(private val name: String) : MessageScope {
         require(name.isNotBlank()) { "Field name cannot be blank" }
         require(!fields.containsKey(name)) { "Duplicate field name: $name" }
 
-        val builder = FieldBuilder(fieldIndex, false).apply(block)
+        val builder = FieldBuilder(fieldIndex).apply(block)
 
         validateIndex(builder.index)
 
         require(!usedIndexes.contains(builder.index)) { "Duplicate field number: ${builder.index}" }
 
-        val field = Field(name, type, builder.index, builder.optional)
+        val field = Field(name, type, builder.index, builder.cardinality)
         fields[name] = field
         usedIndexes += builder.index
 
