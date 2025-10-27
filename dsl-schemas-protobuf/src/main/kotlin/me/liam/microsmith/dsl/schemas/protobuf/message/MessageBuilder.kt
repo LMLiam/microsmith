@@ -94,9 +94,7 @@ class MessageBuilder(private val name: String) : MessageScope {
         names.forEach { this.nameRegistry.reserve(it) }
 
     override fun reserved(block: ReservedScope.() -> Unit) {
-        val builder = ReservedBuilder().apply(block)
-        builder.reservedIndexes.forEach { allocator.reserve(it) }
-        builder.reservedNames.forEach { nameRegistry.reserve(it) }
+        ReservedBuilder(allocator, nameRegistry).apply(block)
     }
 
     override fun int32(name: String, block: ScalarFieldScope.() -> Unit) =

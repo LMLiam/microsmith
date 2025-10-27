@@ -31,6 +31,11 @@ class IndexAllocator(
             candidate
         }
 
+    fun reserve(index: Int) {
+        validate(index)
+        reserved.merge(index..index)
+    }
+
     fun reserve(range: IntRange) {
         validate(range)
         reserved.merge(range)

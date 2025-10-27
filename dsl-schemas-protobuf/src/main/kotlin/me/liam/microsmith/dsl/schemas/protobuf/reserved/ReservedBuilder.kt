@@ -1,25 +1,26 @@
 package me.liam.microsmith.dsl.schemas.protobuf.reserved
 
 import me.liam.microsmith.dsl.schemas.protobuf.ReservedScope
-import me.liam.microsmith.dsl.schemas.protobuf.extensions.merge
+import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
+import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
 
 class ReservedBuilder(
-    internal val reservedIndexes: MutableSet<IntRange> = mutableSetOf(),
-    internal val reservedNames: MutableSet<String> = mutableSetOf(),
+    private val allocator: IndexAllocator,
+    private val names: NameRegistry,
 ) : ReservedScope {
     override fun index(index: Int) {
-        reservedIndexes.merge(index..index)
+        allocator.reserve(index)
     }
 
     override fun name(name: String) {
-        reservedNames += name
+        names.reserve(name)
     }
 
     override fun range(range: IntRange) {
-        reservedIndexes.merge(range)
+        allocator.reserve(range)
     }
 
     override fun range(range: MaxRange) {
-        reservedIndexes.merge(range.from..max.VALUE)
+        allocator.reserve(range.from..max.VALUE)
     }
 }

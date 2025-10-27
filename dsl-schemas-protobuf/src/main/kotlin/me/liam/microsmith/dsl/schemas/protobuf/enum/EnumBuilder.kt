@@ -39,9 +39,7 @@ class EnumBuilder(private val name: String) : EnumScope {
         names.forEach { this.nameRegistry.reserve(it) }
 
     override fun reserved(block: ReservedScope.() -> Unit) {
-        val builder = ReservedBuilder().apply(block)
-        builder.reservedIndexes.forEach { allocator.reserve(it) }
-        builder.reservedNames.forEach { nameRegistry.reserve(it) }
+        ReservedBuilder(allocator, nameRegistry).apply(block)
     }
 
     fun build() = Enum(
