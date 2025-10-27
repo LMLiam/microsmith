@@ -1,16 +1,21 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
-class MessageFieldBuilder(
+class ScalarFieldBuilder(
     var index: Int,
     var cardinality: Cardinality = Cardinality.REQUIRED
-) : MessageFieldScope {
+) : ScalarFieldScope {
+
     override fun optional() {
-        require(cardinality == Cardinality.REQUIRED) { "Cardinality already set to $cardinality" }
+        require(cardinality == Cardinality.REQUIRED) {
+            "Cardinality already set to $cardinality"
+        }
         cardinality = Cardinality.OPTIONAL
     }
 
     override fun repeated() {
-        require(cardinality == Cardinality.REQUIRED) { "Cardinality already set to $cardinality" }
+        require(cardinality == Cardinality.REQUIRED) {
+            "Cardinality already set to $cardinality"
+        }
         cardinality = Cardinality.REPEATED
     }
 
@@ -22,6 +27,14 @@ class MessageFieldBuilder(
 class OneofFieldBuilder(
     var index: Int
 ) : OneofFieldScope {
+    override fun index(index: Int) {
+        this.index = index
+    }
+}
+
+class MapFieldBuilder(
+    var index: Int
+) : MapFieldScope {
     override fun index(index: Int) {
         this.index = index
     }

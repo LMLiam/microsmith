@@ -31,24 +31,24 @@ class MessageBuilder(private val name: String) : MessageScope {
         }
     }
 
-    override fun optional(field: Field) {
+    override fun optional(field: ScalarField) {
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
         fields[field.name] = field.copy(cardinality = Cardinality.OPTIONAL)
     }
 
-    override fun optional(block: MessageScope.() -> Field) {
+    override fun optional(block: MessageScope.() -> ScalarField) {
         val field = this.block()
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
         val updated = field.copy(cardinality = Cardinality.OPTIONAL)
         fields[field.name] = updated
     }
 
-    override fun repeated(field: Field) {
+    override fun repeated(field: ScalarField) {
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
         fields[field.name] = field.copy(cardinality = Cardinality.REPEATED)
     }
 
-    override fun repeated(block: MessageScope.() -> Field) {
+    override fun repeated(block: MessageScope.() -> ScalarField) {
         val field = this.block()
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
         val updated = field.copy(cardinality = Cardinality.REPEATED)
@@ -60,30 +60,47 @@ class MessageBuilder(private val name: String) : MessageScope {
         oneofs += builder.build()
     }
 
-    override fun int32(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.INT32, block)
-    override fun int64(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.INT64, block)
-    override fun uint32(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.UINT32, block)
-    override fun uint64(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.UINT64, block)
-    override fun sint32(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.SINT32, block)
-    override fun sint64(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.SINT64, block)
-    override fun fixed32(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.FIXED32, block)
-    override fun fixed64(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.FIXED64, block)
-    override fun sfixed32(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.SFIXED32, block)
-    override fun sfixed64(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.SFIXED64, block)
-    override fun float(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.FLOAT, block)
-    override fun double(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.DOUBLE, block)
-    override fun string(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.STRING, block)
-    override fun bytes(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.BYTES, block)
-    override fun bool(name: String, block: MessageFieldScope.() -> Unit) = addField(name, FieldType.BOOL, block)
-
-    private fun addField(name: String, type: FieldType, block: MessageFieldScope.() -> Unit): Field {
+    override fun map(
+        name: String,
+        key: MapKeyType,
+        value: MapValueType,
+        block: MapFieldScope.() -> Unit
+    ): MapField {
         require(name.isNotBlank()) { "Field name cannot be blank" }
         require(!fields.containsKey(name)) { "Duplicate field name: $name" }
 
-        val builder = MessageFieldBuilder(nextIndex).apply(block)
+        val builder = MapFieldBuilder(0).apply(block)
+        val index = allocateIndex(builder.index.takeIf { it != 0 })
+
+        val field = MapField(name, index, MapFieldType(key, value))
+        fields[name] = field
+        return field
+    }
+
+    override fun int32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.INT32, block)
+    override fun int64(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.INT64, block)
+    override fun uint32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.UINT32, block)
+    override fun uint64(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.UINT64, block)
+    override fun sint32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.SINT32, block)
+    override fun sint64(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.SINT64, block)
+    override fun fixed32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.FIXED32, block)
+    override fun fixed64(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.FIXED64, block)
+    override fun sfixed32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.SFIXED32, block)
+    override fun sfixed64(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.SFIXED64, block)
+    override fun float(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.FLOAT, block)
+    override fun double(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.DOUBLE, block)
+    override fun string(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.STRING, block)
+    override fun bytes(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.BYTES, block)
+    override fun bool(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.BOOL, block)
+
+    private fun addField(name: String, type: PrimitiveFieldType, block: ScalarFieldScope.() -> Unit): ScalarField {
+        require(name.isNotBlank()) { "Field name cannot be blank" }
+        require(!fields.containsKey(name)) { "Duplicate field name: $name" }
+
+        val builder = ScalarFieldBuilder(nextIndex).apply(block)
         val index = allocateIndex(builder.index.takeIf { it != 0 }) // 0 means “use default”
 
-        val field = Field(name, type, index, builder.cardinality)
+        val field = ScalarField(name, index, type, builder.cardinality)
         fields[name] = field
         return field
     }

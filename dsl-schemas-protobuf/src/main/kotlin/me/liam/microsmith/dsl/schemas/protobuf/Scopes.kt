@@ -11,11 +11,11 @@ interface ProtobufScope {
 }
 
 @MicrosmithDsl
-interface MessageScope : Fields<MessageFieldScope> {
-    fun optional(field: Field)
-    fun optional(block: MessageScope.() -> Field)
-    fun repeated(field: Field)
-    fun repeated(block: MessageScope.() -> Field)
+interface MessageScope : MessageFields<ScalarFieldScope> {
+    fun optional(field: ScalarField)
+    fun optional(block: MessageScope.() -> ScalarField)
+    fun repeated(field: ScalarField)
+    fun repeated(block: MessageScope.() -> ScalarField)
     fun oneof(name: String, block: OneofScope.() -> Unit)
 }
 
@@ -26,10 +26,10 @@ interface EnumScope {
 }
 
 @MicrosmithDsl
-interface OneofScope : Fields<OneofFieldScope>
+interface OneofScope : ScalarFields<OneofFieldScope, OneofField>
 
 @MicrosmithDsl
-interface MessageFieldScope : FieldScope {
+interface ScalarFieldScope : FieldScope {
     fun optional()
     fun repeated()
 }
@@ -37,26 +37,38 @@ interface MessageFieldScope : FieldScope {
 @MicrosmithDsl
 interface OneofFieldScope : FieldScope
 
+@MicrosmithDsl
+interface MapFieldScope : FieldScope
+
 interface FieldScope {
     fun index(index: Int)
 }
 
-interface Fields<TFieldScope : FieldScope> {
-    fun int32(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun int64(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun uint32(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun uint64(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun sint32(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun sint64(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun fixed32(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun fixed64(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun sfixed32(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun sfixed64(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun float(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun double(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun string(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun bytes(name: String, block: TFieldScope.() -> Unit = {}): Field
-    fun bool(name: String, block: TFieldScope.() -> Unit = {}): Field
+interface ScalarFields<TFieldScope : FieldScope, TField : Field> {
+    fun int32(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun int64(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun uint32(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun uint64(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun sint32(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun sint64(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun fixed32(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun fixed64(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun sfixed32(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun sfixed64(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun float(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun double(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun string(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun bytes(name: String, block: TFieldScope.() -> Unit = {}): TField
+    fun bool(name: String, block: TFieldScope.() -> Unit = {}): TField
+}
+
+interface MessageFields<TFieldScope : FieldScope> : ScalarFields<TFieldScope, ScalarField> {
+    fun map(
+        name: String,
+        key: MapKeyType,
+        value: MapValueType,
+        block: MapFieldScope.() -> Unit = {}
+    ): MapField
 }
 
 fun SchemasScope.protobuf(block: ProtobufScope.() -> Unit) {
