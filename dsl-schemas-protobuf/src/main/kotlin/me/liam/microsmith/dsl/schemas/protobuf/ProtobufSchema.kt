@@ -9,7 +9,8 @@ enum class ProtobufSchemaType(override val typeName: String) : SchemaType {
 
 data class ProtobufSchema(
     override val name: String,
-    val message: Message? = null
+    val message: Message? = null,
+    val enum: Enum? = null
 ) : Schema {
     override val type = ProtobufSchemaType.PROTOBUF
 }

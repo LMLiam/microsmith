@@ -7,6 +7,7 @@ import me.liam.microsmith.dsl.schemas.core.SchemasScope
 @MicrosmithDsl
 interface ProtobufScope {
     fun message(name: String, block: MessageScope.() -> Unit = {})
+    fun enum(name: String, block: EnumScope.() -> Unit = {})
 }
 
 @MicrosmithDsl
@@ -31,6 +32,12 @@ interface MessageScope {
     fun string(name: String, block: FieldScope.() -> Unit = {}): Field
     fun bytes(name: String, block: FieldScope.() -> Unit = {}): Field
     fun bool(name: String, block: FieldScope.() -> Unit = {}): Field
+}
+
+@MicrosmithDsl
+interface EnumScope {
+    fun value(name: String)
+    operator fun String.unaryPlus() = value(this)
 }
 
 @MicrosmithDsl

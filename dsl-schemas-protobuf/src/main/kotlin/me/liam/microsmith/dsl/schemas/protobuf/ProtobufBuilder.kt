@@ -1,11 +1,15 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
 class ProtobufBuilder : ProtobufScope {
-    private val messages = mutableSetOf<Message>()
+    private val schemas = mutableSetOf<ProtobufSchema>()
 
     override fun message(name: String, block: MessageScope.() -> Unit) {
-        messages += MessageBuilder(name).apply(block).build()
+        schemas += ProtobufSchema(name, message = MessageBuilder(name).apply(block).build())
     }
 
-    fun build() = messages.map { ProtobufSchema(it.name, it) }.toSet()
+    override fun enum(name: String, block: EnumScope.() -> Unit) {
+        schemas += ProtobufSchema(name, enum = EnumBuilder(name).apply(block).build())
+    }
+
+    fun build() = schemas
 }
