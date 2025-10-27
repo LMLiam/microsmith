@@ -4,5 +4,5 @@ import me.liam.microsmith.dsl.schemas.protobuf.field.Field
 
 data class Oneof(
     val name: String,
-    val fields: Set<Field>
+    val fields: List<Field>
 )

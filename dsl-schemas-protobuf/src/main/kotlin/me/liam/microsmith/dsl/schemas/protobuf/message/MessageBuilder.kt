@@ -23,6 +23,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
+import sun.security.util.KeyUtil.validate
 
 class MessageBuilder(private val name: String) : MessageScope {
     private val fields = mutableMapOf<String, Field>()
@@ -34,20 +35,19 @@ class MessageBuilder(private val name: String) : MessageScope {
 
     fun build() = Message(
         name,
-        fields.values.sortedBy { it.index }.toSet(),
-        oneofs.sortedBy { it.name }.toSet(),
-        (
-                reservedIndexes
-                    .sortedBy { it.first }
-                    .map { r ->
-                        when {
-                            r.first == r.last -> ReservedIndex(r.first)
-                            r.last == Max.VALUE -> ReservedToMax(r.first)
-                            else -> ReservedRange(r)
-                        }
-                    } +
-                        reservedNames.sorted().map { ReservedName(it) }
-                ).toSet()
+        fields.values.sortedBy { it.index },
+        oneofs.sortedBy { it.name },
+        reservedIndexes
+            .sortedBy { it.first }
+            .map { r ->
+                when {
+                    r.first == r.last -> ReservedIndex(r.first)
+                    r.last == Max.VALUE -> ReservedToMax(r.first)
+                    else -> ReservedRange(r)
+                }
+            } +
+                reservedNames.sorted().map { ReservedName(it) }
+
     )
 
     override fun optional(field: ScalarField) {

@@ -17,5 +17,5 @@ class EnumBuilder(private val name: String) : EnumScope {
         values += EnumValue(name, nextIndex++)
     }
 
-    fun build() = Enum(name, values)
+    fun build() = Enum(name, values.sortedBy { it.index })
 }

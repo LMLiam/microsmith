@@ -70,5 +70,5 @@ class OneofBuilder(
         return field
     }
 
-    fun build() = Oneof(name, fields.values.toSet())
+    fun build() = Oneof(name, fields.values.sortedBy { it.index })
 }

@@ -6,7 +6,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.reserved.Reserved
 
 data class Message(
     val name: String,
-    val fields: Set<Field> = emptySet(),
-    val oneofs: Set<Oneof> = emptySet(),
-    val reserved: Set<Reserved> = emptySet()
+    val fields: List<Field> = emptyList(),
+    val oneofs: List<Oneof> = emptyList(),
+    val reserved: List<Reserved> = emptyList()
 )
