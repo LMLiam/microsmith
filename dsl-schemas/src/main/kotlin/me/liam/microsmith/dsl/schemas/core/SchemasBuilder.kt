@@ -9,7 +9,7 @@ package me.liam.microsmith.dsl.schemas.core
  * schemas and performs basic validation (e.g. schema names must not
  * be blank).
  *
- * The builder itself is mutable, but the result of [build] is an
+ * The builder itself is mutable, but the result of [toExtension] is an
  * immutable [SchemasExtension] that is attached to the overall
  * [me.liam.microsmith.dsl.core.MicrosmithModel] via the
  * [me.liam.microsmith.dsl.core.MicrosmithBuilder].
@@ -18,7 +18,7 @@ package me.liam.microsmith.dsl.schemas.core
  * - A new [SchemasBuilder] is created when entering a `schemas { }` block.
  * - Dialect DSL functions downcast the [SchemasScope] to [SchemasBuilder]
  *   and call [register] to contribute their definitions.
- * - Once the block completes, [build] is invoked to produce a
+ * - Once the block completes, [toExtension] is invoked to produce a
  *   [SchemasExtension] snapshot containing all registered schemas.
  *
  * ### Example
@@ -32,7 +32,7 @@ package me.liam.microsmith.dsl.schemas.core
  * an internal mechanism to accumulate schemas during DSL evaluation.
  */
 internal class SchemasBuilder : SchemasScope {
-    internal val schemas = mutableListOf<Schema>()
+    internal val schemas = mutableSetOf<Schema>()
 
     /**
      * Register a new [Schema] with this builder.
@@ -50,5 +50,5 @@ internal class SchemasBuilder : SchemasScope {
      * Finalise the builder and produce an immutable [SchemasExtension]
      * containing all registered schemas.
      */
-    fun build() = SchemasExtension(schemas.toList())
+    fun toExtension() = SchemasExtension(schemas.toSet())
 }
