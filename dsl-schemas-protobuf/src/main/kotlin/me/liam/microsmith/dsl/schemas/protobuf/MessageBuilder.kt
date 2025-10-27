@@ -11,18 +11,23 @@ class MessageBuilder(private val name: String) : MessageScope {
             validateIndex(requested)
             require(requested !in reservedIndexes) { "Reserved field number: $requested" }
             require(requested !in usedIndexes) { "Duplicate field number: $requested" }
-
             usedIndexes += requested
             requested
         } else {
-            var index = nextIndex
-            while (index in reservedIndexes || index in usedIndexes) {
-                index++
+            var candidate = nextIndex
+            if (candidate in reservedIndexes) {
+                candidate = reservedIndexes.last + 1
             }
-            validateIndex(index)
-            usedIndexes += index
-            nextIndex = index + 1
-            index
+            while (candidate in usedIndexes) {
+                candidate++
+                if (candidate in reservedIndexes) {
+                    candidate = reservedIndexes.last + 1
+                }
+            }
+            validateIndex(candidate)
+            usedIndexes += candidate
+            nextIndex = candidate + 1
+            candidate
         }
     }
 
