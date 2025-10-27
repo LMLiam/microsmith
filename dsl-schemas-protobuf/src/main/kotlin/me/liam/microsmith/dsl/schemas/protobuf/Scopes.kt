@@ -12,6 +12,23 @@ interface ProtobufScope {
 
 @MicrosmithDsl
 interface MessageScope : MessageFields<ScalarFieldScope> {
+    val int32 get() = PrimitiveFieldType.INT32
+    val int64 get() = PrimitiveFieldType.INT64
+    val uint32 get() = PrimitiveFieldType.UINT32
+    val uint64 get() = PrimitiveFieldType.UINT64
+    val sint32 get() = PrimitiveFieldType.SINT32
+    val sint64 get() = PrimitiveFieldType.SINT64
+    val fixed32 get() = PrimitiveFieldType.FIXED32
+    val fixed64 get() = PrimitiveFieldType.FIXED64
+    val sfixed32 get() = PrimitiveFieldType.SFIXED32
+    val sfixed64 get() = PrimitiveFieldType.SFIXED64
+    val float get() = PrimitiveFieldType.FLOAT
+    val double get() = PrimitiveFieldType.DOUBLE
+    val bytes get() = PrimitiveFieldType.BYTES
+    val bool get() = PrimitiveFieldType.BOOL
+    val string get() = PrimitiveFieldType.STRING
+
+
     fun optional(field: ScalarField)
     fun optional(block: MessageScope.() -> ScalarField)
     fun repeated(field: ScalarField)
