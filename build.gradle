@@ -47,6 +47,14 @@ subprojects {
         systemProperty("gradle.build.dir", project.buildDir)
     }
 
+    tasks.named("build") {
+        dependsOn(tasks.named("kotest"))
+    }
+
+    tasks.named("test") {
+        enabled = false
+    }
+
     kotlin {
         jvmToolchain(24)
     }
