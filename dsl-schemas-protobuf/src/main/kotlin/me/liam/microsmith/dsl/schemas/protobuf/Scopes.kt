@@ -41,10 +41,10 @@ interface OneofFieldScope : FieldScope
 interface MapFieldScope : FieldScope {
     fun key(keyType: MapKeyType)
     fun value(valueType: MapValueType)
-    fun ret(kvp: Pair<MapKeyType, MapValueType>)
+    fun types(kvp: Pair<MapKeyType, MapValueType>)
 
-    fun ret(block: () -> Pair<MapKeyType, MapValueType>) = ret(block())
-    operator fun Pair<MapKeyType, MapValueType>.unaryPlus() = ret(this)
+    fun types(block: () -> Pair<MapKeyType, MapValueType>) = types(block())
+    operator fun Pair<MapKeyType, MapValueType>.unaryPlus() = types(this)
 
     val int32 get() = PrimitiveFieldType.INT32
     val int64 get() = PrimitiveFieldType.INT64
@@ -88,7 +88,7 @@ interface ScalarFields<TFieldScope : FieldScope, TField : Field> {
 interface MessageFields<TFieldScope : FieldScope> : ScalarFields<TFieldScope, ScalarField> {
     fun map(
         name: String,
-        kvpBlock: MapFieldScope.() -> Pair<MapKeyType, MapValueType>?,
+        block: MapFieldScope.() -> Unit
     ): MapField
 }
 

@@ -62,23 +62,16 @@ class MessageBuilder(private val name: String) : MessageScope {
 
     override fun map(
         name: String,
-        kvpBlock: MapFieldScope.() -> Pair<MapKeyType, MapValueType>?
+        block: MapFieldScope.() -> Unit
     ): MapField {
         require(name.isNotBlank()) { "Field name cannot be blank" }
         require(name !in fields) { "Duplicate field name: $name" }
 
-        val builder = MapFieldBuilder(0)
+        val builder = MapFieldBuilder(0).apply(block)
 
-        // Run the block once
-        val returnedTypes = builder.kvpBlock()
-        val builderTypes = builder.key to builder.value
+        val key = builder.key
+        val value = builder.value
 
-        // Prevent mixing return types with explicit builder state
-        if (returnedTypes != null && (builderTypes.first != null || builderTypes.second != null)) {
-            error("Cannot use return types when key or value is set explicitly")
-        }
-
-        val (key, value) = returnedTypes ?: builderTypes
         requireNotNull(key) { "Map key type must be set" }
         requireNotNull(value) { "Map value type must be set" }
 
@@ -89,20 +82,48 @@ class MessageBuilder(private val name: String) : MessageScope {
         }
     }
 
-    override fun int32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.INT32, block)
-    override fun int64(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.INT64, block)
-    override fun uint32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.UINT32, block)
-    override fun uint64(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.UINT64, block)
-    override fun sint32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.SINT32, block)
-    override fun sint64(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.SINT64, block)
-    override fun fixed32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.FIXED32, block)
-    override fun fixed64(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.FIXED64, block)
-    override fun sfixed32(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.SFIXED32, block)
-    override fun sfixed64(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.SFIXED64, block)
-    override fun float(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.FLOAT, block)
-    override fun double(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.DOUBLE, block)
-    override fun string(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.STRING, block)
-    override fun bytes(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.BYTES, block)
+    override fun int32(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.INT32, block)
+
+    override fun int64(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.INT64, block)
+
+    override fun uint32(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.UINT32, block)
+
+    override fun uint64(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.UINT64, block)
+
+    override fun sint32(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.SINT32, block)
+
+    override fun sint64(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.SINT64, block)
+
+    override fun fixed32(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.FIXED32, block)
+
+    override fun fixed64(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.FIXED64, block)
+
+    override fun sfixed32(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.SFIXED32, block)
+
+    override fun sfixed64(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.SFIXED64, block)
+
+    override fun float(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.FLOAT, block)
+
+    override fun double(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.DOUBLE, block)
+
+    override fun string(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.STRING, block)
+
+    override fun bytes(name: String, block: ScalarFieldScope.() -> Unit) =
+        addField(name, PrimitiveFieldType.BYTES, block)
+
     override fun bool(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.BOOL, block)
 
     private fun addField(name: String, type: PrimitiveFieldType, block: ScalarFieldScope.() -> Unit): ScalarField {

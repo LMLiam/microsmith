@@ -51,7 +51,7 @@ class MapFieldBuilder(
         this.value = valueType
     }
 
-    override fun ret(kvp: Pair<MapKeyType, MapValueType>) {
+    override fun types(kvp: Pair<MapKeyType, MapValueType>) {
         key(kvp.first)
         value(kvp.second)
     }
