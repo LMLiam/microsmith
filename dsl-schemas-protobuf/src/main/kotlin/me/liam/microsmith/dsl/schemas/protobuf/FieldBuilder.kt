@@ -1,9 +1,9 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
-class FieldBuilder(
+class MessageFieldBuilder(
     var index: Int,
     var cardinality: Cardinality = Cardinality.REQUIRED
-) : FieldScope {
+) : MessageFieldScope {
     override fun optional() {
         require(cardinality == Cardinality.REQUIRED) { "Cardinality already set to $cardinality" }
         cardinality = Cardinality.OPTIONAL
