@@ -2,10 +2,10 @@ package me.liam.microsmith.dsl.schemas.protobuf.field
 
 import me.liam.microsmith.dsl.schemas.protobuf.types.Type
 
-sealed class Reference(
-    open val type: Type
+data class Reference(
+    val name: String
 ) : ValueType {
-    val name get() = type.name
+    lateinit var type: Type
 }
 
 data class ReferenceField(

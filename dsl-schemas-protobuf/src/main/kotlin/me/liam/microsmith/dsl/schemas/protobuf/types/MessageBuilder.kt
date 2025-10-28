@@ -1,18 +1,18 @@
 package me.liam.microsmith.dsl.schemas.protobuf.types
 
-import me.liam.microsmith.dsl.schemas.protobuf.MapFieldScope
-import me.liam.microsmith.dsl.schemas.protobuf.MessageScope
-import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
-import me.liam.microsmith.dsl.schemas.protobuf.ReservedScope
-import me.liam.microsmith.dsl.schemas.protobuf.ScalarFieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.*
 import me.liam.microsmith.dsl.schemas.protobuf.field.*
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.OneofBuilder
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.*
 import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
 import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
+import me.liam.microsmith.dsl.schemas.protobuf.support.resolveReference
 
-class MessageBuilder(private val name: String) : MessageScope {
+class MessageBuilder(
+    private val name: String,
+    private val segments: List<String>
+) : MessageScope {
     private val allocator = IndexAllocator(1, protoReservedIndexes)
     private val nameRegistry = NameRegistry()
 
@@ -56,6 +56,7 @@ class MessageBuilder(private val name: String) : MessageScope {
     override fun oneof(name: String, block: OneofScope.() -> Unit) {
         val builder = OneofBuilder(
             name,
+            segments,
             ::allocateIndex,
             nameRegistry::use
         ).apply(block)
@@ -83,6 +84,22 @@ class MessageBuilder(private val name: String) : MessageScope {
         return MapField(name, index, MapType(key, value)).also {
             fields[name] = it
         }
+    }
+
+    override fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit): ReferenceField {
+        nameRegistry.use(name)
+
+        val fqSegments = resolveReference(segments, target)
+        val fqName = fqSegments.joinToString(".")
+
+        val builder = ReferenceFieldBuilder().apply(block)
+        val index = allocateIndex(builder.index)
+
+        return ReferenceField(
+            name,
+            index,
+            Reference(fqName)
+        ).also { fields[name] = it }
     }
 
     override fun reserved(vararg indexes: Int) =

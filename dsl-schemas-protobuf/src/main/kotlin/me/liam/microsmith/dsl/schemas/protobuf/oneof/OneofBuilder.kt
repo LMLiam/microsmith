@@ -2,16 +2,33 @@ package me.liam.microsmith.dsl.schemas.protobuf.oneof
 
 import me.liam.microsmith.dsl.schemas.protobuf.OneofFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
-import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
-import me.liam.microsmith.dsl.schemas.protobuf.field.OneofFieldBuilder
-import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
+import me.liam.microsmith.dsl.schemas.protobuf.ReferenceFieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.field.*
+import me.liam.microsmith.dsl.schemas.protobuf.support.resolveReference
 
 class OneofBuilder(
     private val name: String,
+    private val segments: List<String>,
     private val allocateIndex: (Int?) -> Int,
     private val useName: (String) -> Unit
 ) : OneofScope {
     private val fields = mutableMapOf<String, OneofField>()
+
+    override fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit): OneofField {
+        useName(name)
+
+        val fqSegments = resolveReference(segments, target)
+        val fqName = fqSegments.joinToString(".")
+
+        val builder = ReferenceFieldBuilder().apply(block)
+        val index = allocateIndex(builder.index)
+
+        return OneofField(
+            name,
+            index,
+            Reference(fqName)
+        ).also { fields[name] = it }
+    }
 
     override fun int32(name: String, block: OneofFieldScope.() -> Unit): OneofField =
         addField(name, PrimitiveType.INT32, block)

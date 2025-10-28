@@ -12,6 +12,13 @@ fun main() {
                 "me.liam.microsmith" {
                     "domainA" {
                         version(1) {
+                            message("RefTest") {
+                                ref("somehow", ".v2.Empty") {
+                                    index(100)
+                                }
+                                ref("another", "..domainB.something")
+                            }
+
                             enum("Hello") {
                                 +"World"
                                 +"Wanker"

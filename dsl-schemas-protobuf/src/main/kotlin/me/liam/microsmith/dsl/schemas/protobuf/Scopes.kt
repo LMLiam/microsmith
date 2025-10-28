@@ -33,6 +33,7 @@ interface MessageScope : ScalarFields<ScalarFieldScope, ScalarField>, Reservable
     fun repeated(block: MessageScope.() -> ScalarField)
     fun oneof(name: String, block: OneofScope.() -> Unit)
     fun map(name: String, block: MapFieldScope.() -> Unit): MapField
+    fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit = {}): ReferenceField
 }
 
 @MicrosmithDsl
@@ -61,7 +62,9 @@ interface EnumScope : Reservable {
 interface EnumValueScope : FieldScope
 
 @MicrosmithDsl
-interface OneofScope : ScalarFields<OneofFieldScope, OneofField>
+interface OneofScope : ScalarFields<OneofFieldScope, OneofField> {
+    fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit = {}): OneofField
+}
 
 @MicrosmithDsl
 interface ScalarFieldScope : FieldScope {
@@ -98,6 +101,9 @@ interface MapFieldScope : FieldScope {
     val string get() = PrimitiveType.STRING
 }
 
+@MicrosmithDsl
+interface ReferenceFieldScope : FieldScope
+
 interface FieldScope {
     fun index(index: Int)
 }
@@ -122,5 +128,23 @@ interface ScalarFields<TFieldScope : FieldScope, TField : Field> {
 
 fun SchemasScope.protobuf(block: ProtobufScope.() -> Unit) {
     val builder = ProtobufBuilder().apply(block)
-    builder.build().forEach { (this as SchemasBuilder).register(it) }
+    builder.build()
+        .also { schemas ->
+            // go through schemas, for any ReferenceField, resolve the reference
+            val protobufSchemas = schemas.filterIsInstance<ProtobufMessageSchema>()
+            protobufSchemas
+                .flatMap { schema ->
+                    schema.message.fields.filterIsInstance<ReferenceField>().map { it.reference } +
+                            schema.message.oneofs.flatMap { oneof ->
+                                oneof.fields.map { it.fieldType }.filterIsInstance<Reference>()
+                            }
+                }
+                .forEach { ref ->
+                    val fqPath = ref.name.split(".").joinToString("/")
+                    val message = protobufSchemas.find { it.name.startsWith(fqPath) }?.message
+                    require(message != null) { "Unable to find referenced message: $ref" }
+                    ref.type = message
+                }
+        }
+        .forEach { (this as SchemasBuilder).register(it) }
 }
