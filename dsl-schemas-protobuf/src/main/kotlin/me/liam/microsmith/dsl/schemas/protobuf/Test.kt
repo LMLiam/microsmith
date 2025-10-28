@@ -20,9 +20,14 @@ fun main() {
                                 index(500)
                                 optional()
                             }
-                            ref("hello2", "wanker")
+                            ref("hello2", "wanker") {
+                                optional()
+                            }
                             map("wanker") {
                                 types(string to ref("wanker"))
+                            }
+                            oneof("ash") {
+                                ref("is a wanker", "wanker")
                             }
                         }
                     }

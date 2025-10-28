@@ -11,5 +11,6 @@ data class Reference(
 data class ReferenceField(
     override val name: String,
     override val index: Int,
-    val reference: Reference
+    val reference: Reference,
+    val cardinality: Cardinality = Cardinality.REQUIRED
 ) : Field

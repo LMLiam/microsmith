@@ -39,7 +39,19 @@ class MessageBuilder(
         fields[field.name] = field.copy(cardinality = Cardinality.OPTIONAL)
     }
 
+    override fun optional(field: ReferenceField) {
+        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
+        fields[field.name] = field.copy(cardinality = Cardinality.OPTIONAL)
+    }
+
     override fun optional(block: MessageScope.() -> ScalarField) {
+        val field = this.block()
+        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
+        val updated = field.copy(cardinality = Cardinality.OPTIONAL)
+        fields[field.name] = updated
+    }
+
+    override fun optional(block: MessageScope.() -> ReferenceField) {
         val field = this.block()
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
         val updated = field.copy(cardinality = Cardinality.OPTIONAL)
@@ -51,7 +63,19 @@ class MessageBuilder(
         fields[field.name] = field.copy(cardinality = Cardinality.REPEATED)
     }
 
+    override fun repeated(field: ReferenceField) {
+        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
+        fields[field.name] = field.copy(cardinality = Cardinality.REPEATED)
+    }
+
     override fun repeated(block: MessageScope.() -> ScalarField) {
+        val field = this.block()
+        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
+        val updated = field.copy(cardinality = Cardinality.REPEATED)
+        fields[field.name] = updated
+    }
+
+    override fun repeated(block: MessageScope.() -> ReferenceField) {
         val field = this.block()
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
         val updated = field.copy(cardinality = Cardinality.REPEATED)
@@ -96,11 +120,11 @@ class MessageBuilder(
 
         val fqName = getReferencePath(segments, target).joinToString(".")
 
-        val index = ReferenceFieldBuilder()
+        val (cardinality, index) = ReferenceFieldBuilder()
             .apply(block)
-            .let { allocateIndex(it.index) }
+            .let { it.cardinality to allocateIndex(it.index) }
 
-        return ReferenceField(name, index, Reference(fqName))
+        return ReferenceField(name, index, Reference(fqName), cardinality)
             .also { fields[name] = it }
     }
 

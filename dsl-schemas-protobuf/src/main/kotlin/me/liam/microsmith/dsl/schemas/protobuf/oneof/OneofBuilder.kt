@@ -1,6 +1,7 @@
 package me.liam.microsmith.dsl.schemas.protobuf.oneof
 
 import me.liam.microsmith.dsl.schemas.protobuf.OneofFieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.OneofReferenceFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
 import me.liam.microsmith.dsl.schemas.protobuf.ReferenceFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.field.*
@@ -17,7 +18,7 @@ class OneofBuilder(
     override fun ref(
         name: String,
         target: String,
-        block: ReferenceFieldScope.() -> Unit
+        block: OneofReferenceFieldScope.() -> Unit
     ): OneofField {
         useName(name)
 

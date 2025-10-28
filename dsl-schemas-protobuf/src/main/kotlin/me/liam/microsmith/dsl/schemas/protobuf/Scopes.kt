@@ -26,12 +26,19 @@ interface Reservable {
     fun reserved(block: ReservedScope.() -> Unit)
 }
 
+@Suppress("INAPPLICABLE_JVM_NAME")
 @MicrosmithDsl
 interface MessageScope : ScalarFields<ScalarFieldScope, ScalarField>, Reservable {
     fun optional(field: ScalarField)
+    fun optional(field: ReferenceField)
     fun optional(block: MessageScope.() -> ScalarField)
+    @JvmName("optionalRef")
+    fun optional(block: MessageScope.() -> ReferenceField)
     fun repeated(field: ScalarField)
+    fun repeated(field: ReferenceField)
     fun repeated(block: MessageScope.() -> ScalarField)
+    @JvmName("repeatedRef")
+    fun repeated(block: MessageScope.() -> ReferenceField)
     fun oneof(name: String, block: OneofScope.() -> Unit)
     fun map(name: String, block: MapFieldScope.() -> Unit): MapField
     fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit = {}): ReferenceField
@@ -64,7 +71,7 @@ interface EnumValueScope : FieldScope
 
 @MicrosmithDsl
 interface OneofScope : ScalarFields<OneofFieldScope, OneofField> {
-    fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit = {}): OneofField
+    fun ref(name: String, target: String, block: OneofReferenceFieldScope.() -> Unit = {}): OneofField
 }
 
 @MicrosmithDsl
@@ -76,17 +83,26 @@ interface ScalarFieldScope : FieldScope {
 @MicrosmithDsl
 interface OneofFieldScope : FieldScope
 
+@Suppress("INAPPLICABLE_JVM_NAME")
 @MicrosmithDsl
 interface MapFieldScope : FieldScope {
     fun key(keyType: MapKeyType)
     fun value(valueType: ValueType)
     fun value(targetRef: String) = value(target = ref(targetRef))
     fun value(target: Reference) = value(valueType = target)
-    fun types(blockValue: () -> Pair<MapKeyType, ValueType>) = types(blockValue())
+    fun types(blockValue: () -> Pair<MapKeyType, ValueType>) = types(kvpValue = blockValue())
     fun types(kvpValue: Pair<MapKeyType, ValueType>)
-    fun types(keyType: MapKeyType, valueType: ValueType) = types(keyType to valueType)
-    fun types(keyType: MapKeyType, target: String) = types(keyType to target)
-    fun types(keyType: MapKeyType, target: Reference) = types(keyType to target)
+    fun types(keyType: MapKeyType, valueType: ValueType) = types(kvpValue = keyType to valueType)
+    fun types(keyType: MapKeyType, target: String) = types(kvpRef = keyType to target)
+    fun types(keyType: MapKeyType, target: Reference) = types(kvpValue = keyType to target)
+    @JvmName("typesStr")
+    fun types(kvpRef: Pair<MapKeyType, String>) = types(kvp = kvpRef.first to ref(kvpRef.second))
+    @JvmName("typesRef")
+    fun types(kvp: Pair<MapKeyType, Reference>) = types(kvpValue = kvp)
+    @JvmName("typesPairRef")
+    fun types(block: () -> Pair<MapKeyType, Reference>) = types(kvpValue = block())
+    @JvmName("typesPairStr")
+    fun types(blockRef: () -> Pair<MapKeyType, String>) = types(kvpRef = blockRef())
 
     fun ref(target: String): Reference
 
@@ -107,17 +123,11 @@ interface MapFieldScope : FieldScope {
     val string get() = PrimitiveType.STRING
 }
 
-@JvmName("typesStr")
-fun MapFieldScope.types(kvpRef: Pair<MapKeyType, String>) = types(kvp = kvpRef.first to ref(kvpRef.second))
-@JvmName("typesRef")
-fun MapFieldScope.types(kvp: Pair<MapKeyType, Reference>) = types(kvpValue = kvp)
-@JvmName("typesPairRef")
-fun MapFieldScope.types(block: () -> Pair<MapKeyType, Reference>) = types(block())
-@JvmName("typesPairStr")
-fun MapFieldScope.types(blockRef: () -> Pair<MapKeyType, String>) = types(kvpRef = blockRef())
+@MicrosmithDsl
+interface OneofReferenceFieldScope : FieldScope
 
 @MicrosmithDsl
-interface ReferenceFieldScope : FieldScope
+interface ReferenceFieldScope : OneofReferenceFieldScope, ScalarFieldScope
 
 interface FieldScope {
     fun index(index: Int)
