@@ -48,6 +48,7 @@ class IndexAllocator(
             require(index !in it) { "Index $index is in proto reserved range" }
         }
         require(index !in used) { "Index $index already used" }
+        require(reserved.none { index in it }) { "Index $index is in reserved range" }
     }
 
     fun validate(range: IntRange) {

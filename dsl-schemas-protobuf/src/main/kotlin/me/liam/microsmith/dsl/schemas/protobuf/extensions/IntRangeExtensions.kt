@@ -1,20 +1,22 @@
 package me.liam.microsmith.dsl.schemas.protobuf.extensions
 
 internal fun MutableSet<IntRange>.merge(newRange: IntRange) {
+    val disjoint = mutableListOf<IntRange>()
+
     val merged = sortedBy { it.first }
         .fold(newRange) { current, range ->
             if (range.last + 1 < current.first || current.last + 1 < range.first) {
-                // disjoint, keep as is
-                add(range)
+                // disjoint, remember it
+                disjoint += range
                 current
             } else {
-                // overlapping or adjacent, merge into a single range
+                // overlapping or adjacent
                 minOf(range.first, current.first)..maxOf(range.last, current.last)
             }
         }
 
     clear()
-    addAll(filterNot { it overlaps merged })
+    addAll(disjoint)
     add(merged)
 }
 

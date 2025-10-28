@@ -3,7 +3,6 @@ package me.liam.microsmith.dsl.schemas.protobuf.oneof
 import me.liam.microsmith.dsl.schemas.protobuf.OneofFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.OneofReferenceFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
-import me.liam.microsmith.dsl.schemas.protobuf.ReferenceFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.field.*
 import me.liam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 
