@@ -1,8 +1,5 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
-import me.liam.microsmith.dsl.schemas.protobuf.enum.EnumBuilder
-import me.liam.microsmith.dsl.schemas.protobuf.message.MessageBuilder
-
 class ProtobufBuilder(
     private val segments: List<String> = emptyList()
 ) : ProtobufScope {

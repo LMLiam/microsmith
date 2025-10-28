@@ -75,27 +75,27 @@ interface OneofFieldScope : FieldScope
 @MicrosmithDsl
 interface MapFieldScope : FieldScope {
     fun key(keyType: MapKeyType)
-    fun value(valueType: MapValueType)
-    fun types(kvp: Pair<MapKeyType, MapValueType>)
-    fun kv(keyType: MapKeyType, valueType: MapValueType) = types(keyType to valueType)
-    fun types(block: () -> Pair<MapKeyType, MapValueType>) = types(block())
-    operator fun Pair<MapKeyType, MapValueType>.unaryPlus() = types(this)
+    fun value(valueType: ValueType)
+    fun types(kvp: Pair<MapKeyType, ValueType>)
+    fun kv(keyType: MapKeyType, valueType: ValueType) = types(keyType to valueType)
+    fun types(block: () -> Pair<MapKeyType, ValueType>) = types(block())
+    operator fun Pair<MapKeyType, ValueType>.unaryPlus() = types(this)
 
-    val int32 get() = PrimitiveFieldType.INT32
-    val int64 get() = PrimitiveFieldType.INT64
-    val uint32 get() = PrimitiveFieldType.UINT32
-    val uint64 get() = PrimitiveFieldType.UINT64
-    val sint32 get() = PrimitiveFieldType.SINT32
-    val sint64 get() = PrimitiveFieldType.SINT64
-    val fixed32 get() = PrimitiveFieldType.FIXED32
-    val fixed64 get() = PrimitiveFieldType.FIXED64
-    val sfixed32 get() = PrimitiveFieldType.SFIXED32
-    val sfixed64 get() = PrimitiveFieldType.SFIXED64
-    val float get() = PrimitiveFieldType.FLOAT
-    val double get() = PrimitiveFieldType.DOUBLE
-    val bytes get() = PrimitiveFieldType.BYTES
-    val bool get() = PrimitiveFieldType.BOOL
-    val string get() = PrimitiveFieldType.STRING
+    val int32 get() = PrimitiveType.INT32
+    val int64 get() = PrimitiveType.INT64
+    val uint32 get() = PrimitiveType.UINT32
+    val uint64 get() = PrimitiveType.UINT64
+    val sint32 get() = PrimitiveType.SINT32
+    val sint64 get() = PrimitiveType.SINT64
+    val fixed32 get() = PrimitiveType.FIXED32
+    val fixed64 get() = PrimitiveType.FIXED64
+    val sfixed32 get() = PrimitiveType.SFIXED32
+    val sfixed64 get() = PrimitiveType.SFIXED64
+    val float get() = PrimitiveType.FLOAT
+    val double get() = PrimitiveType.DOUBLE
+    val bytes get() = PrimitiveType.BYTES
+    val bool get() = PrimitiveType.BOOL
+    val string get() = PrimitiveType.STRING
 }
 
 interface FieldScope {

@@ -2,9 +2,9 @@ package me.liam.microsmith.dsl.schemas.protobuf.field
 
 sealed interface FieldType
 
-sealed interface MapValueType : FieldType
+sealed interface ValueType : FieldType
 
-sealed interface PrimitiveFieldType : MapValueType {
+sealed interface PrimitiveType : ValueType {
     object INT32 : MapKeyType
     object INT64 : MapKeyType
     object UINT32 : MapKeyType
@@ -17,14 +17,14 @@ sealed interface PrimitiveFieldType : MapValueType {
     object SFIXED64 : MapKeyType
     object STRING : MapKeyType
     object BOOL : MapKeyType
-    object FLOAT : PrimitiveFieldType
-    object DOUBLE : PrimitiveFieldType
-    object BYTES : PrimitiveFieldType
+    object FLOAT : PrimitiveType
+    object DOUBLE : PrimitiveType
+    object BYTES : PrimitiveType
 }
 
-sealed interface MapKeyType : PrimitiveFieldType
+sealed interface MapKeyType : PrimitiveType
 
-data class MapFieldType(
+data class MapType(
     val key: MapKeyType,
-    val value: MapValueType
+    val value: ValueType
 ) : FieldType

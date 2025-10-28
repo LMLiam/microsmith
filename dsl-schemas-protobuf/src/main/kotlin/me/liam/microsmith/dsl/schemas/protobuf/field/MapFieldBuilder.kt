@@ -5,7 +5,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.MapFieldScope
 class MapFieldBuilder(
     var index: Int? = null,
     var key: MapKeyType? = null,
-    var value: MapValueType? = null,
+    var value: ValueType? = null,
 ) : MapFieldScope {
     override fun index(index: Int) {
         this.index = index
@@ -16,12 +16,12 @@ class MapFieldBuilder(
         this.key = keyType
     }
 
-    override fun value(valueType: MapValueType) {
+    override fun value(valueType: ValueType) {
         require(this.value == null) { "Value already set to ${this.value}" }
         this.value = valueType
     }
 
-    override fun types(kvp: Pair<MapKeyType, MapValueType>) {
+    override fun types(kvp: Pair<MapKeyType, ValueType>) {
         key(kvp.first)
         value(kvp.second)
     }

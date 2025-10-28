@@ -1,6 +1,5 @@
-package me.liam.microsmith.dsl.schemas.protobuf.message
+package me.liam.microsmith.dsl.schemas.protobuf
 
-import me.liam.microsmith.dsl.schemas.protobuf.*
 import me.liam.microsmith.dsl.schemas.protobuf.field.*
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.OneofBuilder
@@ -76,7 +75,7 @@ class MessageBuilder(private val name: String) : MessageScope {
 
         val index = allocateIndex(builder.index)
 
-        return MapField(name, index, MapFieldType(key, value)).also {
+        return MapField(name, index, MapType(key, value)).also {
             fields[name] = it
         }
     }
@@ -98,54 +97,54 @@ class MessageBuilder(private val name: String) : MessageScope {
     }
 
     override fun int32(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.INT32, block)
+        addField(name, PrimitiveType.INT32, block)
 
     override fun int64(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.INT64, block)
+        addField(name, PrimitiveType.INT64, block)
 
     override fun uint32(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.UINT32, block)
+        addField(name, PrimitiveType.UINT32, block)
 
     override fun uint64(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.UINT64, block)
+        addField(name, PrimitiveType.UINT64, block)
 
     override fun sint32(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.SINT32, block)
+        addField(name, PrimitiveType.SINT32, block)
 
     override fun sint64(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.SINT64, block)
+        addField(name, PrimitiveType.SINT64, block)
 
     override fun fixed32(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.FIXED32, block)
+        addField(name, PrimitiveType.FIXED32, block)
 
     override fun fixed64(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.FIXED64, block)
+        addField(name, PrimitiveType.FIXED64, block)
 
     override fun sfixed32(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.SFIXED32, block)
+        addField(name, PrimitiveType.SFIXED32, block)
 
     override fun sfixed64(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.SFIXED64, block)
+        addField(name, PrimitiveType.SFIXED64, block)
 
     override fun float(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.FLOAT, block)
+        addField(name, PrimitiveType.FLOAT, block)
 
     override fun double(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.DOUBLE, block)
+        addField(name, PrimitiveType.DOUBLE, block)
 
     override fun string(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.STRING, block)
+        addField(name, PrimitiveType.STRING, block)
 
     override fun bytes(name: String, block: ScalarFieldScope.() -> Unit) =
-        addField(name, PrimitiveFieldType.BYTES, block)
+        addField(name, PrimitiveType.BYTES, block)
 
-    override fun bool(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveFieldType.BOOL, block)
+    override fun bool(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveType.BOOL, block)
 
     private fun allocateIndex(idx: Int? = null): Int = allocator.allocate(idx)
 
     private fun addField(
         name: String,
-        type: PrimitiveFieldType,
+        type: PrimitiveType,
         block: ScalarFieldScope.() -> Unit
     ): ScalarField {
         nameRegistry.use(name)
