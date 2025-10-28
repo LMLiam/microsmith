@@ -76,7 +76,7 @@ class MessageBuilder(
         require(name.isNotBlank()) { "Field name cannot be blank" }
         require(name !in fields) { "Duplicate field name: $name" }
 
-        val builder = MapFieldBuilder().apply(block)
+        val builder = MapFieldBuilder(segments).apply(block)
 
         val key = requireNotNull(builder.key) { "Map key type must be set" }
         val value = requireNotNull(builder.value) { "Map value type must be set" }

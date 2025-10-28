@@ -1,8 +1,10 @@
 package me.liam.microsmith.dsl.schemas.protobuf.field
 
 import me.liam.microsmith.dsl.schemas.protobuf.MapFieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 
 class MapFieldBuilder(
+    private val segments: List<String>,
     var index: Int? = null,
     var key: MapKeyType? = null,
     var value: ValueType? = null,
@@ -21,8 +23,13 @@ class MapFieldBuilder(
         this.value = valueType
     }
 
-    override fun types(kvp: Pair<MapKeyType, ValueType>) {
-        key(kvp.first)
-        value(kvp.second)
+    override fun types(kvpValue: Pair<MapKeyType, ValueType>) {
+        key(kvpValue.first)
+        value(kvpValue.second)
+    }
+
+    override fun ref(target: String): Reference {
+        val fqName = getReferencePath(segments, target).joinToString(".")
+        return Reference(fqName)
     }
 }

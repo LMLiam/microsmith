@@ -80,10 +80,15 @@ interface OneofFieldScope : FieldScope
 interface MapFieldScope : FieldScope {
     fun key(keyType: MapKeyType)
     fun value(valueType: ValueType)
-    fun types(kvp: Pair<MapKeyType, ValueType>)
-    fun kv(keyType: MapKeyType, valueType: ValueType) = types(keyType to valueType)
-    fun types(block: () -> Pair<MapKeyType, ValueType>) = types(block())
-    operator fun Pair<MapKeyType, ValueType>.unaryPlus() = types(this)
+    fun value(targetRef: String) = value(target = ref(targetRef))
+    fun value(target: Reference) = value(valueType = target)
+    fun types(blockValue: () -> Pair<MapKeyType, ValueType>) = types(blockValue())
+    fun types(kvpValue: Pair<MapKeyType, ValueType>)
+    fun types(keyType: MapKeyType, valueType: ValueType) = types(keyType to valueType)
+    fun types(keyType: MapKeyType, target: String) = types(keyType to target)
+    fun types(keyType: MapKeyType, target: Reference) = types(keyType to target)
+
+    fun ref(target: String): Reference
 
     val int32 get() = PrimitiveType.INT32
     val int64 get() = PrimitiveType.INT64
@@ -101,6 +106,15 @@ interface MapFieldScope : FieldScope {
     val bool get() = PrimitiveType.BOOL
     val string get() = PrimitiveType.STRING
 }
+
+@JvmName("typesStr")
+fun MapFieldScope.types(kvpRef: Pair<MapKeyType, String>) = types(kvp = kvpRef.first to ref(kvpRef.second))
+@JvmName("typesRef")
+fun MapFieldScope.types(kvp: Pair<MapKeyType, Reference>) = types(kvpValue = kvp)
+@JvmName("typesPairRef")
+fun MapFieldScope.types(block: () -> Pair<MapKeyType, Reference>) = types(block())
+@JvmName("typesPairStr")
+fun MapFieldScope.types(blockRef: () -> Pair<MapKeyType, String>) = types(kvpRef = blockRef())
 
 @MicrosmithDsl
 interface ReferenceFieldScope : FieldScope

@@ -1,9 +1,9 @@
 package me.liam.microsmith.dsl.schemas.protobuf.support
 
-import jdk.internal.joptsimple.internal.Messages.message
 import me.liam.microsmith.dsl.schemas.protobuf.ProtobufEnumSchema
 import me.liam.microsmith.dsl.schemas.protobuf.ProtobufMessageSchema
 import me.liam.microsmith.dsl.schemas.protobuf.ProtobufSchema
+import me.liam.microsmith.dsl.schemas.protobuf.field.MapField
 import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
 import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 
@@ -46,6 +46,11 @@ fun resolveReferences(schemas: Set<ProtobufSchema>): Set<ProtobufSchema> {
             schema.message.fields
                 .filterIsInstance<ReferenceField>()
                 .forEach { it.reference.resolve() }
+
+            schema.message.fields
+                .filterIsInstance<MapField>()
+                .mapNotNull { it.type.value as? Reference }
+                .forEach { it.resolve() }
 
             schema.message.oneofs
                 .flatMap { it.fields }
