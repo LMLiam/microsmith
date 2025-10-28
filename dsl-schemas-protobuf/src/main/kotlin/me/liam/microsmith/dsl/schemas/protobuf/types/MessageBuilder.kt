@@ -51,8 +51,10 @@ class MessageBuilder(
         fields[field.name] = updated
     }
 
-    override fun optional(block: MessageScope.() -> ReferenceField) {
-        val field = this.block()
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("optionalRef")
+    override fun optional(blockRef: MessageScope.() -> ReferenceField) {
+        val field = this.blockRef()
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
         val updated = field.copy(cardinality = Cardinality.OPTIONAL)
         fields[field.name] = updated
@@ -75,8 +77,10 @@ class MessageBuilder(
         fields[field.name] = updated
     }
 
-    override fun repeated(block: MessageScope.() -> ReferenceField) {
-        val field = this.block()
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("repeatedRef")
+    override fun repeated(blockRef: MessageScope.() -> ReferenceField) {
+        val field = this.blockRef()
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
         val updated = field.copy(cardinality = Cardinality.REPEATED)
         fields[field.name] = updated

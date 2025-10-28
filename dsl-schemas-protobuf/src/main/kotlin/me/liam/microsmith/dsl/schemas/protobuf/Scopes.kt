@@ -33,15 +33,18 @@ interface MessageScope : ScalarFields<ScalarFieldScope, ScalarField>, Reservable
     fun optional(field: ReferenceField)
     fun optional(block: MessageScope.() -> ScalarField)
     @JvmName("optionalRef")
-    fun optional(block: MessageScope.() -> ReferenceField)
+    fun optional(blockRef: MessageScope.() -> ReferenceField)
     fun repeated(field: ScalarField)
     fun repeated(field: ReferenceField)
     fun repeated(block: MessageScope.() -> ScalarField)
     @JvmName("repeatedRef")
-    fun repeated(block: MessageScope.() -> ReferenceField)
+    fun repeated(blockRef: MessageScope.() -> ReferenceField)
     fun oneof(name: String, block: OneofScope.() -> Unit)
     fun map(name: String, block: MapFieldScope.() -> Unit): MapField
     fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit = {}): ReferenceField
+
+    val max get() = Max
+    operator fun Int.rangeTo(max: Max) = MaxRange(this)
 }
 
 @MicrosmithDsl
