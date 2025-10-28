@@ -1,6 +1,7 @@
 package me.liam.microsmith.dsl.schemas.protobuf.support
 
 import jdk.internal.joptsimple.internal.Messages.message
+import me.liam.microsmith.dsl.schemas.protobuf.ProtobufEnumSchema
 import me.liam.microsmith.dsl.schemas.protobuf.ProtobufMessageSchema
 import me.liam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
@@ -27,26 +28,30 @@ fun getReferencePath(currentSegments: List<String>, target: String): List<String
     }
 
 fun resolveReferences(schemas: Set<ProtobufSchema>): Set<ProtobufSchema> {
-    val messages = schemas
-        .filterIsInstance<ProtobufMessageSchema>()
-        .associateBy { it.name }
+    val messages = schemas.associateBy { it.name }
 
     fun Reference.resolve() {
-        val target = messages[name]?.message
+        val target = when (val m = messages[name]) {
+            is ProtobufMessageSchema -> m.message
+            is ProtobufEnumSchema -> m.enum
+            else -> null
+        }
         checkNotNull(target) { "Unable to resolve reference: $name" }
         type = target
     }
 
-    messages.values.forEach { schema ->
-        schema.message.fields
-            .filterIsInstance<ReferenceField>()
-            .forEach { it.reference.resolve() }
+    messages.values
+        .filterIsInstance<ProtobufMessageSchema>()
+        .forEach { schema ->
+            schema.message.fields
+                .filterIsInstance<ReferenceField>()
+                .forEach { it.reference.resolve() }
 
-        schema.message.oneofs
-            .flatMap { it.fields }
-            .mapNotNull { it.fieldType as? Reference }
-            .forEach { it.resolve() }
-    }
+            schema.message.oneofs
+                .flatMap { it.fields }
+                .mapNotNull { it.fieldType as? Reference }
+                .forEach { it.resolve() }
+        }
 
     return schemas
 }

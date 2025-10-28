@@ -20,10 +20,6 @@ class ProtobufBuilder(
         ProtobufBuilder(segments + this.split('.')).apply(block).schemas.forEach { schemas += it }
     }
 
-    override operator fun Int.invoke(block: ProtobufScope.() -> Unit) {
-        version(this, block)
-    }
-
     override fun version(version: Int, block: ProtobufScope.() -> Unit) {
         ProtobufBuilder(segments + "v$version").apply(block).schemas.forEach { schemas += it }
     }
