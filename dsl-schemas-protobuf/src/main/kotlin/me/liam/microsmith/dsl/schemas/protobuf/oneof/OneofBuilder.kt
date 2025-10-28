@@ -4,7 +4,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.OneofFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
 import me.liam.microsmith.dsl.schemas.protobuf.ReferenceFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.field.*
-import me.liam.microsmith.dsl.schemas.protobuf.support.resolveReference
+import me.liam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 
 class OneofBuilder(
     private val name: String,
@@ -17,7 +17,7 @@ class OneofBuilder(
     override fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit): OneofField {
         useName(name)
 
-        val fqSegments = resolveReference(segments, target)
+        val fqSegments = getReferencePath(segments, target)
         val fqName = fqSegments.joinToString(".")
 
         val builder = ReferenceFieldBuilder().apply(block)

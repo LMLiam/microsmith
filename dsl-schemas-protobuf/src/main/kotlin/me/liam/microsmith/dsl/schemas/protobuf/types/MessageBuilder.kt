@@ -7,7 +7,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.oneof.OneofBuilder
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.*
 import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
 import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
-import me.liam.microsmith.dsl.schemas.protobuf.support.resolveReference
+import me.liam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 
 class MessageBuilder(
     private val name: String,
@@ -89,7 +89,7 @@ class MessageBuilder(
     override fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit): ReferenceField {
         nameRegistry.use(name)
 
-        val fqSegments = resolveReference(segments, target)
+        val fqSegments = getReferencePath(segments, target)
         val fqName = fqSegments.joinToString(".")
 
         val builder = ReferenceFieldBuilder().apply(block)

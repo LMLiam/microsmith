@@ -9,11 +9,11 @@ class ProtobufBuilder(
     private val schemas = mutableSetOf<ProtobufSchema>()
 
     override fun message(name: String, block: MessageScope.() -> Unit) {
-        schemas += ProtobufMessageSchema((segments + name).joinToString("/"), message = MessageBuilder(name, segments).apply(block).build())
+        schemas += ProtobufMessageSchema((segments + name).joinToString("."), message = MessageBuilder(name, segments).apply(block).build())
     }
 
     override fun enum(name: String, block: EnumScope.() -> Unit) {
-        schemas += ProtobufEnumSchema((segments + name).joinToString("/"), enum = EnumBuilder(name).apply(block).build())
+        schemas += ProtobufEnumSchema((segments + name).joinToString("."), enum = EnumBuilder(name).apply(block).build())
     }
 
     override operator fun String.invoke(block: ProtobufScope.() -> Unit) {

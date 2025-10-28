@@ -6,6 +6,7 @@ import me.liam.microsmith.dsl.schemas.core.SchemasScope
 import me.liam.microsmith.dsl.schemas.protobuf.field.*
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.Max
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
+import me.liam.microsmith.dsl.schemas.protobuf.support.resolveReferences
 
 @MicrosmithDsl
 interface ProtobufScope {
@@ -129,22 +130,6 @@ interface ScalarFields<TFieldScope : FieldScope, TField : Field> {
 fun SchemasScope.protobuf(block: ProtobufScope.() -> Unit) {
     val builder = ProtobufBuilder().apply(block)
     builder.build()
-        .also { schemas ->
-            // go through schemas, for any ReferenceField, resolve the reference
-            val protobufSchemas = schemas.filterIsInstance<ProtobufMessageSchema>()
-            protobufSchemas
-                .flatMap { schema ->
-                    schema.message.fields.filterIsInstance<ReferenceField>().map { it.reference } +
-                            schema.message.oneofs.flatMap { oneof ->
-                                oneof.fields.map { it.fieldType }.filterIsInstance<Reference>()
-                            }
-                }
-                .forEach { ref ->
-                    val fqPath = ref.name.split(".").joinToString("/")
-                    val message = protobufSchemas.find { it.name.startsWith(fqPath) }?.message
-                    require(message != null) { "Unable to find referenced message: $ref" }
-                    ref.type = message
-                }
-        }
+        .also { resolveReferences(it) }
         .forEach { (this as SchemasBuilder).register(it) }
 }
