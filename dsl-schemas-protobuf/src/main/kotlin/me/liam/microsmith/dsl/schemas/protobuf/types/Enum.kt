@@ -1,4 +1,4 @@
-package me.liam.microsmith.dsl.schemas.protobuf
+package me.liam.microsmith.dsl.schemas.protobuf.types
 
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.Reserved
 

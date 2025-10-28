@@ -1,5 +1,10 @@
-package me.liam.microsmith.dsl.schemas.protobuf
+package me.liam.microsmith.dsl.schemas.protobuf.types
 
+import me.liam.microsmith.dsl.schemas.protobuf.MapFieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.MessageScope
+import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
+import me.liam.microsmith.dsl.schemas.protobuf.ReservedScope
+import me.liam.microsmith.dsl.schemas.protobuf.ScalarFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.field.*
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.OneofBuilder

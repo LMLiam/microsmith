@@ -1,5 +1,9 @@
-package me.liam.microsmith.dsl.schemas.protobuf
+package me.liam.microsmith.dsl.schemas.protobuf.types
 
+import me.liam.microsmith.dsl.schemas.protobuf.EnumScope
+import me.liam.microsmith.dsl.schemas.protobuf.EnumValueScope
+import me.liam.microsmith.dsl.schemas.protobuf.FieldScope
+import me.liam.microsmith.dsl.schemas.protobuf.ReservedScope
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.*
 import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
 import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
