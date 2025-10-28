@@ -6,23 +6,25 @@ import me.liam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
 import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 
-fun getReferencePath(currentSegments: List<String>, target: String): List<String> {
-    if (!target.startsWith(".")) {
-        return if ('.' in target) {
-            target.split(".")
-        } else {
-            currentSegments + target
+fun getReferencePath(currentSegments: List<String>, target: String): List<String> =
+    when {
+        // absolute or unqualified
+        !target.startsWith(".") ->
+            if ('.' in target) {
+                target.split('.')
+            } else {
+                currentSegments + target
+            }
+
+        // relative: count leading dots, drop that many segments
+        else -> {
+            val upCount = target.takeWhile { it == '.' }.length
+            val remaining = target.drop(upCount)
+            currentSegments
+                .dropLast(upCount.coerceAtMost(currentSegments.size)) +
+                    remaining.split('.')
         }
     }
-
-    val segments = currentSegments.toMutableList()
-    var remaining = target
-    while (remaining.startsWith(".")) {
-        if (segments.isNotEmpty()) segments.removeLast()
-        remaining = remaining.removePrefix(".")
-    }
-    return segments + remaining.split(".")
-}
 
 fun resolveReferences(schemas: Set<ProtobufSchema>): Set<ProtobufSchema> {
     val messages = schemas

@@ -21,9 +21,12 @@ class EnumBuilder(private val name: String) : EnumScope {
 
     override fun value(name: String, block: EnumValueScope.() -> Unit) {
         nameRegistry.use(name)
-        val builder = EnumValueBuilder().apply(block)
-        val allocated = allocator.allocate(builder.index)
-        values += EnumValue(name, allocated)
+
+        EnumValueBuilder()
+            .apply(block)
+            .let { allocator.allocate(it.index) }
+            .let { EnumValue(name, it) }
+            .also { values += it }
     }
 
     override fun reserved(vararg indexes: Int) =
@@ -43,11 +46,16 @@ class EnumBuilder(private val name: String) : EnumScope {
     }
 
     fun build() = Enum(
-        name,
-        values.sortedBy { it.index },
-        allocator.reserved()
-            .sortedBy { it.first }
-            .map(Reserved::fromRange) +
-                nameRegistry.reserved().sorted().map(::ReservedName)
+        name = name,
+        values = values.sortedBy { it.index },
+        reserved = buildList {
+            allocator.reserved()
+                .sortedBy { it.first }
+                .mapTo(this, Reserved::fromRange)
+
+            nameRegistry.reserved()
+                .sorted()
+                .mapTo(this, ::ReservedName)
+        }
     )
 }

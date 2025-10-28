@@ -14,20 +14,21 @@ class OneofBuilder(
 ) : OneofScope {
     private val fields = mutableMapOf<String, OneofField>()
 
-    override fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit): OneofField {
+    override fun ref(
+        name: String,
+        target: String,
+        block: ReferenceFieldScope.() -> Unit
+    ): OneofField {
         useName(name)
 
-        val fqSegments = getReferencePath(segments, target)
-        val fqName = fqSegments.joinToString(".")
+        val fqName = getReferencePath(segments, target).joinToString(".")
 
-        val builder = ReferenceFieldBuilder().apply(block)
-        val index = allocateIndex(builder.index)
+        val index = ReferenceFieldBuilder()
+            .apply(block)
+            .let { allocateIndex(it.index) }
 
-        return OneofField(
-            name,
-            index,
-            Reference(fqName)
-        ).also { fields[name] = it }
+        return OneofField(name, index, Reference(fqName))
+            .also { fields[name] = it }
     }
 
     override fun int32(name: String, block: OneofFieldScope.() -> Unit): OneofField =
@@ -75,16 +76,20 @@ class OneofBuilder(
     override fun bool(name: String, block: OneofFieldScope.() -> Unit): OneofField =
         addField(name, PrimitiveType.BOOL, block)
 
-    private fun addField(name: String, type: PrimitiveType, block: OneofFieldScope.() -> Unit): OneofField {
-        require(!fields.containsKey(name)) { "Duplicate field in oneof: $name" }
+    private fun addField(
+        name: String,
+        type: PrimitiveType,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField {
+        require(name !in fields) { "Duplicate field in oneof: $name" }
         useName(name)
 
-        val builder = OneofFieldBuilder().apply(block)
-        val index = allocateIndex(builder.index)
+        val index = OneofFieldBuilder()
+            .apply(block)
+            .let { allocateIndex(it.index) }
 
-        val field = OneofField(name, index, type)
-        fields[name] = field
-        return field
+        return OneofField(name, index, type)
+            .also { fields[name] = it }
     }
 
     fun build() = Oneof(name, fields.values.sortedBy { it.index })

@@ -20,13 +20,18 @@ class MessageBuilder(
     private val oneofs = mutableSetOf<Oneof>()
 
     fun build() = Message(
-        name,
-        fields.values.sortedBy { it.index },
-        oneofs.sortedBy { it.name },
-        allocator.reserved()
-            .sortedBy { it.first }
-            .map(Reserved::fromRange) +
-                nameRegistry.reserved().sorted().map(::ReservedName)
+        name = name,
+        fields = fields.values.sortedBy { it.index },
+        oneofs = oneofs.sortedBy { it.name },
+        reserved = buildList {
+            allocator.reserved()
+                .sortedBy { it.first }
+                .mapTo(this, Reserved::fromRange)
+
+            nameRegistry.reserved()
+                .sorted()
+                .mapTo(this, ::ReservedName)
+        }
     )
 
     override fun optional(field: ScalarField) {
@@ -73,33 +78,30 @@ class MessageBuilder(
 
         val builder = MapFieldBuilder().apply(block)
 
-        val key = builder.key
-        val value = builder.value
-
-        requireNotNull(key) { "Map key type must be set" }
-        requireNotNull(value) { "Map value type must be set" }
+        val key = requireNotNull(builder.key) { "Map key type must be set" }
+        val value = requireNotNull(builder.value) { "Map value type must be set" }
 
         val index = allocateIndex(builder.index)
 
-        return MapField(name, index, MapType(key, value)).also {
-            fields[name] = it
-        }
+        return MapField(name, index, MapType(key, value))
+            .also { fields[name] = it }
     }
 
-    override fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit): ReferenceField {
+    override fun ref(
+        name: String,
+        target: String,
+        block: ReferenceFieldScope.() -> Unit
+    ): ReferenceField {
         nameRegistry.use(name)
 
-        val fqSegments = getReferencePath(segments, target)
-        val fqName = fqSegments.joinToString(".")
+        val fqName = getReferencePath(segments, target).joinToString(".")
 
-        val builder = ReferenceFieldBuilder().apply(block)
-        val index = allocateIndex(builder.index)
+        val index = ReferenceFieldBuilder()
+            .apply(block)
+            .let { allocateIndex(it.index) }
 
-        return ReferenceField(
-            name,
-            index,
-            Reference(fqName)
-        ).also { fields[name] = it }
+        return ReferenceField(name, index, Reference(fqName))
+            .also { fields[name] = it }
     }
 
     override fun reserved(vararg indexes: Int) =
