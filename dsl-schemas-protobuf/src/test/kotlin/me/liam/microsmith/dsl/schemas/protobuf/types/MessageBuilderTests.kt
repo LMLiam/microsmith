@@ -8,6 +8,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.field.Cardinality
 import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 
@@ -207,5 +208,119 @@ class MessageBuilderTests : StringSpec({
         field.cardinality shouldBe Cardinality.OPTIONAL
         field.index shouldBe 3
         field.reference.name shouldBe "pkg.sub.Person"
+    }
+
+    "repeated on scalar field flips cardinlaity and stores updated copy" {
+        val b = builder()
+        val s = b.int32("age") { index(3) }
+        b.repeated(s)
+        val msg = b.build()
+        val field = msg.fields.first { it.name == "age" } as ScalarField
+        field.cardinality shouldBe Cardinality.REPEATED
+        s.cardinality shouldBe Cardinality.REQUIRED
+    }
+
+    "repeated on reference field flips cardinality" {
+        val b = builder()
+        val s = b.ref("ref_field", "Person") { index(3) }
+        b.repeated(s)
+        val msg = b.build()
+        val field = msg.fields.first { it.name == "ref_field" } as ReferenceField
+        field.cardinality shouldBe Cardinality.REPEATED
+        s.cardinality shouldBe Cardinality.REQUIRED
+    }
+
+    "repeated(block) builds scalar, flips cardinality" {
+        val b = builder()
+        b.repeated(block = { int32("age") { index(3) }})
+        val msg = b.build()
+        val field = msg.fields.first { it.name == "age" } as ScalarField
+        field.cardinality shouldBe Cardinality.REPEATED
+        field.index shouldBe 3
+    }
+
+    "repeated(blockRef) builds reference, flips cardinality" {
+        val b = builder()
+        b.repeated(blockRef = { ref("ref_field", "Person") { index(3) }})
+        val msg = b.build()
+        val field = msg.fields.first { it.name == "ref_field" } as ReferenceField
+        field.cardinality shouldBe Cardinality.REPEATED
+        field.index shouldBe 3
+        field.reference.name shouldBe "pkg.sub.Person"
+    }
+
+   "oneof builds and adds to message" {
+       val b = builder()
+       b.oneof("choice") {
+           int32("optA") { index(33) }
+           int32("optB") { index(34) }
+       }
+       val msg = b.build()
+       msg.oneofs.map { it.name } shouldContainExactly listOf("choice")
+       msg.oneofs.first().fields.map { it.name } shouldContainExactly listOf("optA", "optB")
+   }
+
+    "oneof rejects duplicate field names inside oneof" {
+        val b = builder()
+        shouldThrow<IllegalArgumentException> {
+            b.oneof("dup") {
+                int32("same") { index(1) }
+                int32("same") { index(2) }
+            }
+        }
+    }
+
+    "reserved indexes prevent allocation of those indexes" {
+        val b = builder()
+        b.reserved(1)
+        shouldThrow<IllegalArgumentException> {
+            b.int32("foo") { index(1) }
+        }
+    }
+
+    "reserved ranges prevent allocation within range" {
+        val b = builder()
+        b.reserved(1..3)
+        shouldThrow<IllegalArgumentException> {
+            b.int32("foo") { index(2) }
+        }
+    }
+
+    "reserved toMax prevents allocation above threshold" {
+        val b = builder()
+        b.reserved(MaxRange(100))
+        shouldThrow<IllegalArgumentException> {
+            b.int32("foo") { index(101) }
+        }
+    }
+
+    "reserved names prevent using same name for fields" {
+        val b = builder()
+        b.reserved("FOO")
+        shouldThrow<IllegalArgumentException> {
+            b.int32("FOO")
+        }
+    }
+
+    "all scalar primitives construct fields and allocate indexes" {
+        val b = builder()
+        b.int32("i32")
+        b.int64("i64")
+        b.uint32("u32")
+        b.uint64("u64")
+        b.sint32("s32")
+        b.sint64("s64")
+        b.fixed32("f32")
+        b.fixed64("f64")
+        b.sfixed32("sf32")
+        b.sfixed64("sf64")
+        b.float("float")
+        b.double("double")
+        b.bytes("bytes")
+        b.bool("bool")
+        b.string("string")
+        val msg = b.build()
+        msg.fields.size shouldBe 15
+        msg.fields.map { it.index } shouldContainExactly (1..15).toList()
     }
 })
