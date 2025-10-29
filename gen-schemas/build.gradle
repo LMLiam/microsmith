@@ -1,5 +1,9 @@
+apply plugin: 'org.jetbrains.kotlin.kapt'
+
 dependencies {
     implementation "me.liam:gen:${version}"
     api "me.liam:dsl:${version}"
     implementation "me.liam:dsl-schemas:${version}"
+    api "io.github.eventhorizonlab:spi-tooling-annotations:0.1.20"
+    kapt "io.github.eventhorizonlab:spi-tooling-processor:0.1.20"
 }
