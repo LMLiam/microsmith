@@ -27,8 +27,7 @@ private suspend fun MicrosmithModel.runGenerators(
 ) = coroutineScope {
     extensions().map { ext ->
         async {
-            val gen = ext.getGenerator()
-            if (gen == null) {
+            val gen = ext.getGenerator() ?: run {
                 println("⚠️ No generator found for ${ext::class.simpleName}")
                 return@async emptyList()
             }
