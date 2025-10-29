@@ -5,5 +5,7 @@ import me.liam.microsmith.gen.files.FileSpace
 import me.liam.microsmith.gen.files.GeneratedFile
 
 interface SchemaEmitter<T : Schema> {
+    val type: T
+
     suspend fun T.emit(space: FileSpace): GeneratedFile
 }

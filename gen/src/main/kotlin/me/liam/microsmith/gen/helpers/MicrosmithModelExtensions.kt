@@ -3,6 +3,7 @@ package me.liam.microsmith.gen.helpers
 import kotlinx.coroutines.*
 import me.liam.microsmith.dsl.core.MicrosmithModel
 import me.liam.microsmith.dsl.helpers.extensions
+import me.liam.microsmith.gen.core.GeneratorRegistry
 import me.liam.microsmith.gen.core.GeneratorRegistry.getGenerator
 import me.liam.microsmith.gen.files.FileSpace
 import me.liam.microsmith.gen.files.GeneratedFile
@@ -10,6 +11,8 @@ import me.liam.microsmith.gen.files.TemporaryDirectory
 import java.nio.file.Files
 
 suspend fun MicrosmithModel.generate(finalDir: FileSpace) = coroutineScope {
+    GeneratorRegistry.load()
+
     TemporaryDirectory.create().use { tempSpace ->
         runGenerators(tempSpace)
     }
