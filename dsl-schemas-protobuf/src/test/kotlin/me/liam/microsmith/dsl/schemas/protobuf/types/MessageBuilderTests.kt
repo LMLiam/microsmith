@@ -78,7 +78,7 @@ class MessageBuilderTests : StringSpec({
     "duplicate field names are rejected" {
         val b = builder()
         b.int32("a")
-        shouldThrow<IllegalArgumentException>() {
+        shouldThrow<IllegalArgumentException> {
             b.int32("a")
         }
     }
@@ -200,9 +200,9 @@ class MessageBuilderTests : StringSpec({
         field.index shouldBe 3
     }
 
-    "optional(blockRef) builds reference, flips cardinality, and stores" {
+    "optional(block) builds reference, flips cardinality, and stores" {
         val b = builder()
-        b.optional(blockRef = { ref("ref_field", "Person") { index(3) }})
+        b.optional { ref("ref_field", "Person") { index(3) } }
         val msg = b.build()
         val field = msg.fields.first { it.name == "ref_field" } as ReferenceField
         field.cardinality shouldBe Cardinality.OPTIONAL
@@ -239,9 +239,9 @@ class MessageBuilderTests : StringSpec({
         field.index shouldBe 3
     }
 
-    "repeated(blockRef) builds reference, flips cardinality" {
+    "repeated(block) builds reference, flips cardinality" {
         val b = builder()
-        b.repeated(blockRef = { ref("ref_field", "Person") { index(3) }})
+        b.repeated { ref("ref_field", "Person") { index(3) } }
         val msg = b.build()
         val field = msg.fields.first { it.name == "ref_field" } as ReferenceField
         field.cardinality shouldBe Cardinality.REPEATED

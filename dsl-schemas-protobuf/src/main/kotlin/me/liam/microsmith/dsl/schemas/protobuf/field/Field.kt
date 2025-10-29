@@ -5,3 +5,6 @@ sealed interface Field {
     val index: Int
 }
 
+sealed interface CardinalityField : Field {
+    val cardinality: Cardinality
+}

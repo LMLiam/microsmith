@@ -34,55 +34,39 @@ class MessageBuilder(
         }
     )
 
-    override fun optional(field: ScalarField) {
+    override fun optional(field: CardinalityField) {
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        fields[field.name] = field.copy(cardinality = Cardinality.OPTIONAL)
+        fields[field.name] = when (field) {
+            is ReferenceField -> field.copy(cardinality = Cardinality.OPTIONAL)
+            is ScalarField -> field.copy(cardinality = Cardinality.OPTIONAL)
+        }
     }
 
-    override fun optional(field: ReferenceField) {
-        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        fields[field.name] = field.copy(cardinality = Cardinality.OPTIONAL)
-    }
-
-    override fun optional(block: MessageScope.() -> ScalarField) {
+    override fun optional(block: MessageScope.() -> CardinalityField) {
         val field = this.block()
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        val updated = field.copy(cardinality = Cardinality.OPTIONAL)
+        val updated = when (field) {
+            is ReferenceField -> field.copy(cardinality = Cardinality.OPTIONAL)
+            is ScalarField -> field.copy(cardinality = Cardinality.OPTIONAL)
+        }
         fields[field.name] = updated
     }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("optionalRef")
-    override fun optional(blockRef: MessageScope.() -> ReferenceField) {
-        val field = this.blockRef()
+    override fun repeated(field: CardinalityField) {
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        val updated = field.copy(cardinality = Cardinality.OPTIONAL)
-        fields[field.name] = updated
+        fields[field.name] = when (field) {
+            is ReferenceField -> field.copy(cardinality = Cardinality.REPEATED)
+            is ScalarField -> field.copy(cardinality = Cardinality.REPEATED)
+        }
     }
 
-    override fun repeated(field: ScalarField) {
-        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        fields[field.name] = field.copy(cardinality = Cardinality.REPEATED)
-    }
-
-    override fun repeated(field: ReferenceField) {
-        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        fields[field.name] = field.copy(cardinality = Cardinality.REPEATED)
-    }
-
-    override fun repeated(block: MessageScope.() -> ScalarField) {
+    override fun repeated(block: MessageScope.() -> CardinalityField) {
         val field = this.block()
         require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        val updated = field.copy(cardinality = Cardinality.REPEATED)
-        fields[field.name] = updated
-    }
-
-    @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("repeatedRef")
-    override fun repeated(blockRef: MessageScope.() -> ReferenceField) {
-        val field = this.blockRef()
-        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        val updated = field.copy(cardinality = Cardinality.REPEATED)
+        val updated = when (field) {
+            is ReferenceField -> field.copy(cardinality = Cardinality.REPEATED)
+            is ScalarField -> field.copy(cardinality = Cardinality.REPEATED)
+        }
         fields[field.name] = updated
     }
 

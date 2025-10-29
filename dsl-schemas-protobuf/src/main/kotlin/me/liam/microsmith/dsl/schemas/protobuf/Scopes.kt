@@ -20,7 +20,7 @@ interface ProtobufScope {
 
 interface Reservable {
     fun reserved(vararg indexes: Int)
-    fun reserved(vararg indexRanges: IntRange) = indexRanges.forEach { reserved(*it.toSet().toIntArray()) }
+    fun reserved(vararg indexRanges: IntRange)
     fun reserved(vararg names: String)
     fun reserved(toMax: MaxRange)
     fun reserved(block: ReservedScope.() -> Unit)
@@ -29,16 +29,10 @@ interface Reservable {
 @Suppress("INAPPLICABLE_JVM_NAME")
 @MicrosmithDsl
 interface MessageScope : ScalarFields<ScalarFieldScope, ScalarField>, Reservable {
-    fun optional(field: ScalarField)
-    fun optional(field: ReferenceField)
-    fun optional(block: MessageScope.() -> ScalarField)
-    @JvmName("optionalRef")
-    fun optional(blockRef: MessageScope.() -> ReferenceField)
-    fun repeated(field: ScalarField)
-    fun repeated(field: ReferenceField)
-    fun repeated(block: MessageScope.() -> ScalarField)
-    @JvmName("repeatedRef")
-    fun repeated(blockRef: MessageScope.() -> ReferenceField)
+    fun optional(field: CardinalityField)
+    fun optional(block: MessageScope.() -> CardinalityField)
+    fun repeated(field: CardinalityField)
+    fun repeated(block: MessageScope.() -> CardinalityField)
     fun oneof(name: String, block: OneofScope.() -> Unit)
     fun map(name: String, block: MapFieldScope.() -> Unit): MapField
     fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit = {}): ReferenceField
