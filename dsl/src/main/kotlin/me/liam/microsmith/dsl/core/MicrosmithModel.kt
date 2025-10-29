@@ -25,7 +25,10 @@ class MicrosmithModel internal constructor(
     /**
      * Internal: return a new model with the given extension attached.
      */
-    internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = MicrosmithModel(
+    internal fun <T : MicrosmithExtension> with(
+        type: KClass<T>,
+        value: T
+    ) = MicrosmithModel(
         extensions + (mapOf(type to value))
     )
 

@@ -5,7 +5,9 @@ import me.liam.microsmith.dsl.schemas.core.SchemaType
 import me.liam.microsmith.dsl.schemas.protobuf.types.Enum
 import me.liam.microsmith.dsl.schemas.protobuf.types.Message
 
-enum class ProtobufSchemaType(override val typeName: String) : SchemaType {
+enum class ProtobufSchemaType(
+    override val typeName: String
+) : SchemaType {
     PROTOBUF("protobuf")
 }
 
@@ -14,9 +16,11 @@ sealed interface ProtobufSchema : Schema {
 }
 
 data class ProtobufMessageSchema(
-    override val name: String, val message: Message
+    override val name: String,
+    val message: Message
 ) : ProtobufSchema
 
 data class ProtobufEnumSchema(
-    override val name: String, val enum: Enum
+    override val name: String,
+    val enum: Enum
 ) : ProtobufSchema

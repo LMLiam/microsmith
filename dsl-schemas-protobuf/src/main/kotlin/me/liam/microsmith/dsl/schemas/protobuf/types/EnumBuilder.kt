@@ -7,7 +7,9 @@ import me.liam.microsmith.dsl.schemas.protobuf.reserved.*
 import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
 import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
 
-class EnumBuilder(private val name: String) : EnumScope {
+class EnumBuilder(
+    private val name: String
+) : EnumScope {
     private val allocator = IndexAllocator(0)
     private val nameRegistry = NameRegistry()
 
@@ -19,10 +21,16 @@ class EnumBuilder(private val name: String) : EnumScope {
         }
     }
 
-    override fun value(name: String, block: EnumValueScope.() -> Unit) {
+    override fun value(
+        name: String,
+        block: EnumValueScope.() -> Unit
+    ) {
         nameRegistry.use(name)
 
-        EnumValueBuilder().apply(block).let { allocator.allocate(it.index) }.let { EnumValue(name, it) }
+        EnumValueBuilder()
+            .apply(block)
+            .let { allocator.allocate(it.index) }
+            .let { EnumValue(name, it) }
             .also { values += it }
     }
 
@@ -38,9 +46,15 @@ class EnumBuilder(private val name: String) : EnumScope {
         ReservedBuilder(allocator, nameRegistry).apply(block)
     }
 
-    fun build() = Enum(name = name, values = values.sortedBy { it.index }, reserved = buildList {
-        allocator.reserved().sortedBy { it.first }.mapTo(this, Reserved::fromRange)
+    fun build() =
+        Enum(
+            name = name,
+            values = values.sortedBy { it.index },
+            reserved =
+                buildList {
+                    allocator.reserved().sortedBy { it.first }.mapTo(this, Reserved::fromRange)
 
-        nameRegistry.reserved().sorted().mapTo(this, ::ReservedName)
-    })
+                    nameRegistry.reserved().sorted().mapTo(this, ::ReservedName)
+                }
+        )
 }

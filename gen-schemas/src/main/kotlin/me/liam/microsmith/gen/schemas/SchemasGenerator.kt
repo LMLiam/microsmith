@@ -15,9 +15,12 @@ class SchemasGenerator(
 ) : ModelGenerator<SchemasExtension> {
     override val extension get() = SchemasExtension::class
 
-    override suspend fun SchemasExtension.generate(space: FileSpace) = schemas.map { schema ->
-        val emitter = emitters.firstOrNull { it.type == schema::class }
-            ?: error("No emitter found for schema type: ${schema::class}")
-        @Suppress("UNCHECKED_CAST") (emitter as SchemaEmitter<Schema>).run { schema.emit(space) }
-    }
+    override suspend fun SchemasExtension.generate(space: FileSpace) =
+        schemas.map { schema ->
+            val emitter =
+                emitters.firstOrNull { it.type == schema::class }
+                    ?: error("No emitter found for schema type: ${schema::class}")
+            @Suppress("UNCHECKED_CAST")
+            (emitter as SchemaEmitter<Schema>).run { schema.emit(space) }
+        }
 }

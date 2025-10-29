@@ -1,7 +1,7 @@
 package me.liam.microsmith.dsl.helpers
 
-import me.liam.microsmith.dsl.core.MicrosmithModel
 import me.liam.microsmith.dsl.core.MicrosmithExtension
+import me.liam.microsmith.dsl.core.MicrosmithModel
 
 /**
  * Returns true if the model contains an extension of type [T].
