@@ -14,8 +14,7 @@ class TemporaryDirectory private constructor(override val root: Path) : FileSpac
 
     companion object {
         suspend fun create(
-            prefix: String = ".microsmith-gen-temp-",
-            ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+            prefix: String = ".microsmith-gen-temp-", ioDispatcher: CoroutineDispatcher = Dispatchers.IO
         ) = withContext(ioDispatcher) {
             TemporaryDirectory(Files.createTempDirectory(prefix + System.currentTimeMillis()))
         }

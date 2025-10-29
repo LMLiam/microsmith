@@ -7,8 +7,7 @@ import me.liam.microsmith.dsl.core.MicrosmithExtension
  */
 data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
     // Precompute an index for efficient lookups
-    private val index =
-        schemas.associateBy { it.type to it.name }
+    private val index = schemas.associateBy { it.type to it.name }
 
     /**
      * Find a schema by [type] and [name].
@@ -31,9 +30,7 @@ data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
     fun allOf(type: SchemaType) = schemas.filter { it.type == type }.toSet()
 
     fun merge(other: SchemasExtension): SchemasExtension {
-        val merged = (schemas + other.schemas)
-            .associateBy { it.type to it.name }
-            .values.toSet()
+        val merged = (schemas + other.schemas).associateBy { it.type to it.name }.values.toSet()
         return copy(schemas = merged)
     }
 }

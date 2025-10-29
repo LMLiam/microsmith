@@ -19,14 +19,12 @@ class MicrosmithModelExtensionsTests : StringSpec({
     }
 
     "has() returns true when extension is present" {
-        val model = MicrosmithModel.empty()
-            .with(FooExt("hello"))
+        val model = MicrosmithModel.empty().with(FooExt("hello"))
         model.has<FooExt>().shouldBeTrue()
     }
 
     "require() returns extension if present" {
-        val model = MicrosmithModel.empty()
-            .with(FooExt("hello"))
+        val model = MicrosmithModel.empty().with(FooExt("hello"))
         model.require<FooExt>().foo shouldBe "hello"
     }
 
@@ -38,17 +36,13 @@ class MicrosmithModelExtensionsTests : StringSpec({
     }
 
     "extensions() returns all attached extensions" {
-        val model = MicrosmithModel.empty()
-            .with(FooExt("hello"))
-            .with(BarExt(1))
+        val model = MicrosmithModel.empty().with(FooExt("hello")).with(BarExt(1))
         val exts = model.extensions()
         exts shouldContainExactlyInAnyOrder listOf(FooExt("hello"), BarExt(1))
     }
 
     "extensionTypes() returns the set of extension classes" {
-        val model = MicrosmithModel.empty()
-            .with(FooExt("hello"))
-            .with(BarExt(1))
+        val model = MicrosmithModel.empty().with(FooExt("hello")).with(BarExt(1))
         model.extensionTypes() shouldContainExactlyInAnyOrder setOf(FooExt::class.java, BarExt::class.java)
     }
 })

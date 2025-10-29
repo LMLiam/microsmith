@@ -6,8 +6,7 @@ import kotlin.reflect.KClass
 
 object GeneratorRegistry {
     @PublishedApi
-    internal val generators =
-        mutableMapOf<KClass<out MicrosmithExtension>, ModelGenerator<*>>()
+    internal val generators = mutableMapOf<KClass<out MicrosmithExtension>, ModelGenerator<*>>()
 
     fun <T : MicrosmithExtension> ModelGenerator<T>.register() {
         generators[this.extension] = this

@@ -5,8 +5,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
 private data class FakeSchema(
-    override val type: SchemaType = object : SchemaType { override val typeName = "fake" },
-    override val name: String
+    override val type: SchemaType = object : SchemaType {
+        override val typeName = "fake"
+    }, override val name: String
 ) : Schema
 
 class SchemasBuilderTests : StringSpec({

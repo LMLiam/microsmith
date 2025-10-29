@@ -17,16 +17,14 @@ class MicrosmithModelTests : StringSpec({
     }
 
     "with attaches a new extension" {
-        val model = MicrosmithModel.empty()
-            .with(FooExtension("hello"))
+        val model = MicrosmithModel.empty().with(FooExtension("hello"))
 
         model.get<FooExtension>()?.foo shouldBe "hello"
         model.get<BarExtension>().shouldBeNull()
     }
 
     "with replaces an existing extension of the same type" {
-        val model1 = MicrosmithModel.empty()
-            .with(FooExtension("first"))
+        val model1 = MicrosmithModel.empty().with(FooExtension("first"))
         val model2 = model1.with(FooExtension("second"))
 
         model2 shouldNotBe model1
@@ -35,22 +33,18 @@ class MicrosmithModelTests : StringSpec({
     }
 
     "with can attach multiple different extensions" {
-        val model = MicrosmithModel.empty()
-            .with(FooExtension("first"))
-            .with(BarExtension(1))
+        val model = MicrosmithModel.empty().with(FooExtension("first")).with(BarExtension(1))
 
         model.get<FooExtension>()?.foo shouldBe "first"
         model.get<BarExtension>()?.bar shouldBe 1
 
         model.keys().map { it.simpleName }.toSet() shouldContainExactly setOf(
-            FooExtension::class.simpleName,
-            BarExtension::class.simpleName
+            FooExtension::class.simpleName, BarExtension::class.simpleName
         )
     }
 
     "get by KClass works the same as reified get" {
-        val model = MicrosmithModel.empty()
-            .with(FooExtension("first"))
+        val model = MicrosmithModel.empty().with(FooExtension("first"))
 
         model.get(FooExtension::class)?.foo shouldBe "first"
         model.get<FooExtension>()?.foo shouldBe "first"

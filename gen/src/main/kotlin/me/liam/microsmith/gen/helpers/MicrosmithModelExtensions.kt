@@ -31,20 +31,15 @@ private suspend fun MicrosmithModel.runGenerators(
                 println("⚠️ No generator found for ${ext::class.simpleName}")
                 return@async emptyList()
             }
-            gen.run { ext.generate(tempSpace) }
-                .also {
-                    println("🛠️ Generated ${it.size} files for ${ext::class.simpleName} in ${tempSpace.root}")
-                }
+            gen.run { ext.generate(tempSpace) }.also {
+                println("🛠️ Generated ${it.size} files for ${ext::class.simpleName} in ${tempSpace.root}")
+            }
         }
-    }
-        .awaitAll()
-        .flatten()
+    }.awaitAll().flatten()
 }
 
 private suspend fun writeOutputs(
-    outputs: List<GeneratedFile>,
-    space: FileSpace,
-    ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    outputs: List<GeneratedFile>, space: FileSpace, ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) = withContext(ioDispatcher) {
     outputs.map { out ->
         val target = space.root.resolve(out.relativePath)

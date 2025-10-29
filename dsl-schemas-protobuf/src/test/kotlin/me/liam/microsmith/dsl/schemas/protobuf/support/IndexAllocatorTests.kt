@@ -40,7 +40,7 @@ class IndexAllocatorTests : StringSpec({
     "allocate with explicit request throws if index already used" {
         val allocator = IndexAllocator(min = 1)
         allocator.allocate(5)
-        shouldThrow< IllegalArgumentException> {
+        shouldThrow<IllegalArgumentException> {
             allocator.allocate(5)
         }
     }

@@ -50,50 +50,38 @@ class ProtobufDslIntegrationTests : StringSpec({
         person.name shouldBe "Person"
         person.message.name shouldBe "Person"
         person.message.fields.associate { it.name to it.index } shouldContainExactly mapOf(
-            "id" to 1,
-            "name" to 2,
-            "age" to 3,
-            "tags" to 4,
-            "attrs" to 5,
-            "color" to 8
+            "id" to 1, "name" to 2, "age" to 3, "tags" to 4, "attrs" to 5, "color" to 8
         )
         person.message.fields.first { it.name == "age" }
             .let { it as ScalarField }.cardinality shouldBe Cardinality.OPTIONAL
         person.message.fields.first { it.name == "tags" }
             .let { it as ScalarField }.cardinality shouldBe Cardinality.REPEATED
-        person.message.fields.first { it.name == "attrs" }
-            .let { it as MapField }.type.also {
-                it.key shouldBe PrimitiveType.STRING
-                it.value shouldBe PrimitiveType.STRING
-            }
-        person.message.fields.first { it.name == "color" }
-            .let { it as ReferenceField }
-            .also {
-                it.cardinality shouldBe Cardinality.REQUIRED
-                it.reference.name shouldBe "Color"
-                it.reference.type shouldBe color.enum
-            }
+        person.message.fields.first { it.name == "attrs" }.let { it as MapField }.type.also {
+            it.key shouldBe PrimitiveType.STRING
+            it.value shouldBe PrimitiveType.STRING
+        }
+        person.message.fields.first { it.name == "color" }.let { it as ReferenceField }.also {
+            it.cardinality shouldBe Cardinality.REQUIRED
+            it.reference.name shouldBe "Color"
+            it.reference.type shouldBe color.enum
+        }
         person.message.oneofs.first { it.name == "choice" }.fields.also { fields ->
             fields.associate { it.name to it.index } shouldContainExactly mapOf(
-                "active" to 6,
-                "score" to 7
+                "active" to 6, "score" to 7
             )
             fields.first { it.name == "active" }.fieldType shouldBe PrimitiveType.BOOL
             fields.first { it.name == "score" }.fieldType shouldBe PrimitiveType.INT32
         }
-        person.message.reserved.filterIsInstance<ReservedRange>()
-            .also {
-                it.size shouldBe 1
-                it.first().indexRange shouldBe 9..12
-            }
+        person.message.reserved.filterIsInstance<ReservedRange>().also {
+            it.size shouldBe 1
+            it.first().indexRange shouldBe 9..12
+        }
         person.message.reserved.filterIsInstance<ReservedName>().first().name shouldBe "LEGACY"
 
         color.name shouldBe "Color"
         color.enum.name shouldBe "Color"
         color.enum.values.associate { it.name to it.index } shouldContainExactly mapOf(
-            "UNSPECIFIED" to 0,
-            "RED" to 1,
-            "GREEN" to 2
+            "UNSPECIFIED" to 0, "RED" to 1, "GREEN" to 2
         )
         color.enum.reserved.filterIsInstance<ReservedIndex>().first().index shouldBe 99
         color.enum.reserved.filterIsInstance<ReservedName>().first().name shouldBe "OBSOLETE"

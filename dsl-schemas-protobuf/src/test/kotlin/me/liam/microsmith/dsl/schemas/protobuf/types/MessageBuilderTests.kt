@@ -13,8 +13,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 
 class MessageBuilderTests : StringSpec({
-    fun builder(segments: List<String> = listOf("pkg", "sub")) =
-        MessageBuilder(name = "Msg", segments = segments)
+    fun builder(segments: List<String> = listOf("pkg", "sub")) = MessageBuilder(name = "Msg", segments = segments)
 
     "build returns deterministic sorted fields and oneofs, with reserved collected" {
         val b = builder()
@@ -41,9 +40,7 @@ class MessageBuilderTests : StringSpec({
         msg.oneofs.map { it.name } shouldContainExactly listOf("alpha", "beta")
         msg.oneofs.flatMap { it.fields }.map { it.name } shouldContainExactly listOf("y", "x")
         msg.reserved shouldContainExactly listOf(
-            ReservedRange(100..102),
-            ReservedName("RES1"),
-            ReservedName("RES2")
+            ReservedRange(100..102), ReservedName("RES1"), ReservedName("RES2")
         )
     }
 
@@ -193,7 +190,7 @@ class MessageBuilderTests : StringSpec({
 
     "optional(block) builds, flips cardinality, and stores" {
         val b = builder()
-        b.optional(block = { int32("age") { index(3) }})
+        b.optional(block = { int32("age") { index(3) } })
         val msg = b.build()
         val field = msg.fields.first { it.name == "age" } as ScalarField
         field.cardinality shouldBe Cardinality.OPTIONAL
@@ -232,7 +229,7 @@ class MessageBuilderTests : StringSpec({
 
     "repeated(block) builds scalar, flips cardinality" {
         val b = builder()
-        b.repeated(block = { int32("age") { index(3) }})
+        b.repeated(block = { int32("age") { index(3) } })
         val msg = b.build()
         val field = msg.fields.first { it.name == "age" } as ScalarField
         field.cardinality shouldBe Cardinality.REPEATED
@@ -249,16 +246,16 @@ class MessageBuilderTests : StringSpec({
         field.reference.name shouldBe "pkg.sub.Person"
     }
 
-   "oneof builds and adds to message" {
-       val b = builder()
-       b.oneof("choice") {
-           int32("optA") { index(33) }
-           int32("optB") { index(34) }
-       }
-       val msg = b.build()
-       msg.oneofs.map { it.name } shouldContainExactly listOf("choice")
-       msg.oneofs.first().fields.map { it.name } shouldContainExactly listOf("optA", "optB")
-   }
+    "oneof builds and adds to message" {
+        val b = builder()
+        b.oneof("choice") {
+            int32("optA") { index(33) }
+            int32("optB") { index(34) }
+        }
+        val msg = b.build()
+        msg.oneofs.map { it.name } shouldContainExactly listOf("choice")
+        msg.oneofs.first().fields.map { it.name } shouldContainExactly listOf("optA", "optB")
+    }
 
     "oneof rejects duplicate field names inside oneof" {
         val b = builder()

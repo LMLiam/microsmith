@@ -14,11 +14,9 @@ sealed interface ProtobufSchema : Schema {
 }
 
 data class ProtobufMessageSchema(
-    override val name: String,
-    val message: Message
+    override val name: String, val message: Message
 ) : ProtobufSchema
 
 data class ProtobufEnumSchema(
-    override val name: String,
-    val enum: Enum
+    override val name: String, val enum: Enum
 ) : ProtobufSchema

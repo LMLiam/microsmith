@@ -4,8 +4,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.extensions.merge
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.Max
 
 class IndexAllocator(
-    private val min: Int,
-    private val protoReserved: IntRange? = null
+    private val min: Int, private val protoReserved: IntRange? = null
 ) {
     private val reserved = mutableSetOf<IntRange>()
     fun reserved() = reserved.toSet()
@@ -14,17 +13,13 @@ class IndexAllocator(
     private var next = min
 
     fun allocate(requested: Int? = null): Int = when (requested) {
-        null -> generateSequence(next) { it + 1 }
-            .first { c ->
-                c !in used &&
-                        reserved.none { c in it } &&
-                        protoReserved?.contains(c) != true
-            }
-            .also { candidate ->
-                validate(candidate)
-                used += candidate
-                next = candidate + 1
-            }
+        null -> generateSequence(next) { it + 1 }.first { c ->
+            c !in used && reserved.none { c in it } && protoReserved?.contains(c) != true
+        }.also { candidate ->
+            validate(candidate)
+            used += candidate
+            next = candidate + 1
+        }
 
         else -> requested.also {
             validate(it)

@@ -15,20 +15,15 @@ class OneofBuilder(
     private val fields = mutableMapOf<String, OneofField>()
 
     override fun ref(
-        name: String,
-        target: String,
-        block: OneofReferenceFieldScope.() -> Unit
+        name: String, target: String, block: OneofReferenceFieldScope.() -> Unit
     ): OneofField {
         useName(name)
 
         val fqName = getReferencePath(segments, target).joinToString(".")
 
-        val index = ReferenceFieldBuilder()
-            .apply(block)
-            .let { allocateIndex(it.index) }
+        val index = ReferenceFieldBuilder().apply(block).let { allocateIndex(it.index) }
 
-        return OneofField(name, index, Reference(fqName))
-            .also { fields[name] = it }
+        return OneofField(name, index, Reference(fqName)).also { fields[name] = it }
     }
 
     override fun int32(name: String, block: OneofFieldScope.() -> Unit): OneofField =
@@ -77,19 +72,14 @@ class OneofBuilder(
         addField(name, PrimitiveType.BOOL, block)
 
     private fun addField(
-        name: String,
-        type: PrimitiveType,
-        block: OneofFieldScope.() -> Unit
+        name: String, type: PrimitiveType, block: OneofFieldScope.() -> Unit
     ): OneofField {
         require(name !in fields) { "Duplicate field in oneof: $name" }
         useName(name)
 
-        val index = OneofFieldBuilder()
-            .apply(block)
-            .let { allocateIndex(it.index) }
+        val index = OneofFieldBuilder().apply(block).let { allocateIndex(it.index) }
 
-        return OneofField(name, index, type)
-            .also { fields[name] = it }
+        return OneofField(name, index, type).also { fields[name] = it }
     }
 
     fun build() = Oneof(name, fields.values.sortedBy { it.index })

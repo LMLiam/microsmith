@@ -10,15 +10,13 @@ class ProtobufBuilder(
 
     override fun message(name: String, block: MessageScope.() -> Unit) {
         schemas += ProtobufMessageSchema(
-            (segments + name).joinToString("."),
-            message = MessageBuilder(name, segments).apply(block).build()
+            (segments + name).joinToString("."), message = MessageBuilder(name, segments).apply(block).build()
         )
     }
 
     override fun enum(name: String, block: EnumScope.() -> Unit) {
         schemas += ProtobufEnumSchema(
-            (segments + name).joinToString("."),
-            enum = EnumBuilder(name).apply(block).build()
+            (segments + name).joinToString("."), enum = EnumBuilder(name).apply(block).build()
         )
     }
 

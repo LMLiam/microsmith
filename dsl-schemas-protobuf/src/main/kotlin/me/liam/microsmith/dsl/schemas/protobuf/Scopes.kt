@@ -92,12 +92,16 @@ interface MapFieldScope : FieldScope {
     fun types(keyType: MapKeyType, valueType: ValueType) = types(kvpValue = keyType to valueType)
     fun types(keyType: MapKeyType, target: String) = types(kvpRef = keyType to target)
     fun types(keyType: MapKeyType, target: Reference) = types(kvpValue = keyType to target)
+
     @JvmName("typesStr")
     fun types(kvpRef: Pair<MapKeyType, String>) = types(kvp = kvpRef.first to ref(kvpRef.second))
+
     @JvmName("typesRef")
     fun types(kvp: Pair<MapKeyType, Reference>) = types(kvpValue = kvp)
+
     @JvmName("typesPairRef")
     fun types(block: () -> Pair<MapKeyType, Reference>) = types(kvpValue = block())
+
     @JvmName("typesPairStr")
     fun types(blockRef: () -> Pair<MapKeyType, String>) = types(kvpRef = blockRef())
 
@@ -150,7 +154,5 @@ interface ScalarFields<TFieldScope : FieldScope, TField : Field> {
 
 fun SchemasScope.protobuf(block: ProtobufScope.() -> Unit) {
     val builder = ProtobufBuilder().apply(block)
-    builder.build()
-        .also { resolveReferences(it) }
-        .forEach { (this as SchemasBuilder).register(it) }
+    builder.build().also { resolveReferences(it) }.forEach { (this as SchemasBuilder).register(it) }
 }

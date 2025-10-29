@@ -115,9 +115,7 @@ class EnumBuilderTests : StringSpec({
         builder.reserved("FOO", "BAR")
         val enum = builder.build()
         enum.reserved shouldContainExactly listOf(
-            ReservedRange(1..2),
-            ReservedName("BAR"),
-            ReservedName("FOO")
+            ReservedRange(1..2), ReservedName("BAR"), ReservedName("FOO")
         )
     }
 })

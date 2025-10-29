@@ -14,11 +14,7 @@ class OneofBuilderTests : StringSpec({
         usedNames: MutableList<String> = mutableListOf()
     ): Pair<OneofBuilder, MutableList<String>> {
         val builder = OneofBuilder(
-            name = "TestOneof",
-            segments = segments,
-            allocateIndex = allocateIndex,
-            useName = { usedNames += it }
-        )
+            name = "TestOneof", segments = segments, allocateIndex = allocateIndex, useName = { usedNames += it })
         return builder to usedNames
     }
 
@@ -65,7 +61,7 @@ class OneofBuilderTests : StringSpec({
 
     "index is allocated" {
         var captured: Int? = null
-        val (builder, _) = newBuilder(allocateIndex = { idx -> captured = idx; idx ?: 99})
+        val (builder, _) = newBuilder(allocateIndex = { idx -> captured = idx; idx ?: 99 })
         builder.int64("num") { index(123) }
         captured shouldBe 123
     }
