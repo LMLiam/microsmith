@@ -15,6 +15,7 @@ suspend fun MicrosmithModel.generate(finalDir: FileSpace) = coroutineScope {
     }
 
     runGenerators(finalDir)
+    println("✅ Generated all files in ${finalDir.root}")
 }
 
 private suspend fun MicrosmithModel.runGenerators(
@@ -23,7 +24,13 @@ private suspend fun MicrosmithModel.runGenerators(
     extensions().map { ext ->
         async {
             val gen = ext.getGenerator()
-            gen.run { ext.generate(tempSpace) }
+            if (gen == null) {
+                println("⚠️ No generator found for ${ext::class.simpleName}")
+                return@async emptyList()
+            }
+            gen.run { ext.generate(tempSpace) }.also {
+                println("🛠️ Generated ${it.size} files for ${ext::class.simpleName} in ${tempSpace.root}")
+            }
         }
     }
         .awaitAll()

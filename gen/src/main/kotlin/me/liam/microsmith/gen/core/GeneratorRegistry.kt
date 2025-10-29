@@ -14,5 +14,4 @@ object GeneratorRegistry {
 
     @Suppress("UNCHECKED_CAST")
     fun <T : MicrosmithExtension> T.getGenerator() = generators[this::class] as? ModelGenerator<T>
-        ?: error("No generator registered for ${this::class.simpleName}")
 }
