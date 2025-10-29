@@ -1,16 +1,11 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import me.liam.microsmith.dsl.schemas.core.SchemasBuilder
-import me.liam.microsmith.dsl.schemas.protobuf.field.Cardinality
-import me.liam.microsmith.dsl.schemas.protobuf.field.MapField
-import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
-import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
-import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
+import me.liam.microsmith.dsl.schemas.protobuf.field.*
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
