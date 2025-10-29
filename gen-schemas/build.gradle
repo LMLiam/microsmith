@@ -1,0 +1,5 @@
+dependencies {
+    implementation "me.liam:gen:${version}"
+    api "me.liam:dsl:${version}"
+    implementation "me.liam:dsl-schemas:${version}"
+}
