@@ -19,7 +19,7 @@ inline fun <reified T : MicrosmithExtension> MicrosmithModel.require() =
 /**
  * Returns all extensions currently attached to the model.
  */
-fun MicrosmithModel.extensions(): Collection<MicrosmithExtension> = this.keys().mapNotNull { get(it) }
+fun MicrosmithModel.extensions() = this.keys().mapNotNull { get(it) }
 
 /**
  * Returns the set of extension types present in the model.
