@@ -1,3 +1,5 @@
+package me.liam.microsmith.gen.schemas.protobuf
+
 import com.github.eventhorizonlab.spi.ServiceProvider
 import me.liam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import me.liam.microsmith.gen.files.FileSpace

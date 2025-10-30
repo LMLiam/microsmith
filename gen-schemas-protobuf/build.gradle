@@ -1,12 +1,12 @@
 apply plugin: 'org.jetbrains.kotlin.kapt'
 
 dependencies {
-    api "io.github.eventhorizonlab:spi-tooling-annotations:0.1.20"
-    kapt "io.github.eventhorizonlab:spi-tooling-processor:0.1.20"
     implementation "me.liam.microsmith:gen-schemas:${version}"
     api "me.liam.microsmith:gen:${version}"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
     api "me.liam.microsmith:dsl:${version}"
     api "me.liam.microsmith:dsl-schemas:${version}"
     implementation "me.liam.microsmith:dsl-schemas-protobuf:$version"
+    api "io.github.eventhorizonlab:spi-tooling-annotations:0.1.20"
+    kapt "io.github.eventhorizonlab:spi-tooling-processor:0.1.20"
 }
