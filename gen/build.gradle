@@ -1,5 +1,5 @@
 dependencies {
-    implementation "me.liam:dsl:${version}"
+    implementation "me.liam.microsmith:dsl:${version}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
     implementation "io.github.eventhorizonlab:spi-tooling-annotations:0.1.20"
 }

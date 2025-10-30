@@ -22,7 +22,7 @@ scmVersion {
 version = scmVersion.version
 
 allprojects {
-    group = 'me.liam'
+    group = 'me.liam.microsmith'
     project.version = rootProject.version
 
     repositories {
@@ -31,9 +31,12 @@ allprojects {
 
     configurations.configureEach {
         resolutionStrategy.dependencySubstitution {
-            substitute(module("me.liam:dsl")).using(project(":dsl"))
-            substitute(module("me.liam:dsl-schemas")).using(project(":dsl-schemas"))
-            substitute(module("me.liam:gen")).using(project(":gen"))
+            substitute(module("me.liam.microsmith:dsl")).using(project(":dsl"))
+            substitute(module("me.liam.microsmith:dsl-schemas")).using(project(":dsl-schemas"))
+            substitute(module("me.liam.microsmith:dsl-schemas-protobuf")).using(project(":dsl-schemas-protobuf"))
+            substitute(module("me.liam.microsmith:gen")).using(project(":gen"))
+            substitute(module("me.liam.microsmith:gen-schemas")).using(project(":gen-schemas"))
+            substitute(module("me.liam.microsmith:gen-schemas-protobuf")).using(project(":gen-schemas-protobuf"))
         }
     }
 }
