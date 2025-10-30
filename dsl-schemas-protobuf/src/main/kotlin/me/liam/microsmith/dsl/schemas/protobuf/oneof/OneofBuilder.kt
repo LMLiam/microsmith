@@ -3,7 +3,11 @@ package me.liam.microsmith.dsl.schemas.protobuf.oneof
 import me.liam.microsmith.dsl.schemas.protobuf.OneofFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.OneofReferenceFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
-import me.liam.microsmith.dsl.schemas.protobuf.field.*
+import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
+import me.liam.microsmith.dsl.schemas.protobuf.field.OneofFieldBuilder
+import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
+import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
+import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceFieldBuilder
 import me.liam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 
 class OneofBuilder(
@@ -23,7 +27,7 @@ class OneofBuilder(
 
         val fqName = getReferencePath(segments, target).joinToString(".")
 
-        val index = ReferenceFieldBuilder().apply(block).let { allocateIndex(it.index) }
+        val index = allocateIndex(ReferenceFieldBuilder().apply(block).index)
 
         return OneofField(name, index, Reference(fqName)).also { fields[name] = it }
     }
@@ -111,7 +115,7 @@ class OneofBuilder(
         require(name !in fields) { "Duplicate field in oneof: $name" }
         useName(name)
 
-        val index = OneofFieldBuilder().apply(block).let { allocateIndex(it.index) }
+        val index = allocateIndex(OneofFieldBuilder().apply(block).index)
 
         return OneofField(name, index, type).also { fields[name] = it }
     }
