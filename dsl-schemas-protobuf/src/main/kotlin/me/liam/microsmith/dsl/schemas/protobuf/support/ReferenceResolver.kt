@@ -1,11 +1,10 @@
 package me.liam.microsmith.dsl.schemas.protobuf.support
 
-import me.liam.microsmith.dsl.schemas.protobuf.ProtobufEnumSchema
-import me.liam.microsmith.dsl.schemas.protobuf.ProtobufMessageSchema
 import me.liam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import me.liam.microsmith.dsl.schemas.protobuf.field.MapField
 import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
 import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
+import me.liam.microsmith.dsl.schemas.protobuf.types.Message
 
 fun getReferencePath(
     currentSegments: List<String>,
@@ -32,31 +31,29 @@ fun resolveReferences(schemas: Set<ProtobufSchema>): Set<ProtobufSchema> {
     val messages = schemas.associateBy { it.name }
 
     fun Reference.resolve() {
-        val target =
-            when (val m = messages[name]) {
-                is ProtobufMessageSchema -> m.message
-                is ProtobufEnumSchema -> m.enum
-                else -> null
-            }
+        val target = messages[name]?.schema
         checkNotNull(target) { "Unable to resolve reference: $name" }
         type = target
     }
 
-    messages.values.filterIsInstance<ProtobufMessageSchema>().forEach { schema ->
-        schema.message.fields
-            .filterIsInstance<ReferenceField>()
-            .forEach { it.reference.resolve() }
+    messages.values
+        .map { it.schema }
+        .filterIsInstance<Message>()
+        .forEach { schema ->
+            schema.fields
+                .filterIsInstance<ReferenceField>()
+                .forEach { it.reference.resolve() }
 
-        schema.message.fields
-            .filterIsInstance<MapField>()
-            .mapNotNull { it.type.value as? Reference }
-            .forEach { it.resolve() }
+            schema.fields
+                .filterIsInstance<MapField>()
+                .mapNotNull { it.type.value as? Reference }
+                .forEach { it.resolve() }
 
-        schema.message.oneofs
-            .flatMap { it.fields }
-            .mapNotNull { it.fieldType as? Reference }
-            .forEach { it.resolve() }
-    }
+            schema.oneofs
+                .flatMap { it.fields }
+                .mapNotNull { it.fieldType as? Reference }
+                .forEach { it.resolve() }
+        }
 
     return schemas
 }

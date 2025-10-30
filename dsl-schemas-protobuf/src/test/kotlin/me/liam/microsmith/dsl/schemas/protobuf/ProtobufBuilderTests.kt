@@ -5,6 +5,8 @@ import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
+import me.liam.microsmith.dsl.schemas.protobuf.types.Enum
+import me.liam.microsmith.dsl.schemas.protobuf.types.Message
 
 class ProtobufBuilderTests :
     StringSpec({
@@ -15,10 +17,10 @@ class ProtobufBuilderTests :
                 string("name") { index(2) }
             }
             val schemas = builder.build()
-            val msg = schemas.filterIsInstance<ProtobufMessageSchema>().first()
+            val msg = schemas.first { it.schema is Message }
             msg.name shouldBe "me.liam.Person"
-            msg.message.name shouldBe "Person"
-            msg.message.fields.map { it.name } shouldContainExactly listOf("id", "name")
+            msg.schema.name shouldBe "Person"
+            (msg.schema as Message).fields.map { it.name } shouldContainExactly listOf("id", "name")
         }
 
         "builds a simple enum schema with fully qualified name" {
@@ -28,10 +30,10 @@ class ProtobufBuilderTests :
                 value("FEMALE")
             }
             val schemas = builder.build()
-            val enum = schemas.filterIsInstance<ProtobufEnumSchema>().first()
+            val enum = schemas.first { it.schema is Enum }
             enum.name shouldBe "me.liam.Gender"
-            enum.enum.name shouldBe "Gender"
-            enum.enum.values.map { it.name } shouldContainAll listOf("MALE", "FEMALE")
+            enum.schema.name shouldBe "Gender"
+            (enum.schema as Enum).values.map { it.name } shouldContainAll listOf("MALE", "FEMALE")
         }
 
         "nested package segments via String.invoke build qualified names" {

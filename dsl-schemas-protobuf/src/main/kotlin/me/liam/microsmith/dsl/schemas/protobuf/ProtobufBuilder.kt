@@ -13,9 +13,9 @@ class ProtobufBuilder(
         block: MessageScope.() -> Unit
     ) {
         schemas +=
-            ProtobufMessageSchema(
+            ProtobufSchema(
                 (segments + name).joinToString("."),
-                message = MessageBuilder(name, segments).apply(block).build()
+                schema = MessageBuilder(name, segments).apply(block).build()
             )
     }
 
@@ -24,9 +24,9 @@ class ProtobufBuilder(
         block: EnumScope.() -> Unit
     ) {
         schemas +=
-            ProtobufEnumSchema(
+            ProtobufSchema(
                 (segments + name).joinToString("."),
-                enum = EnumBuilder(name).apply(block).build()
+                schema = EnumBuilder(name).apply(block).build()
             )
     }
 
