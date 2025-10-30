@@ -1,6 +1,11 @@
 package me.liam.microsmith.gen.helpers
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import me.liam.microsmith.dsl.core.MicrosmithModel
 import me.liam.microsmith.dsl.helpers.extensions
 import me.liam.microsmith.gen.core.GeneratorRegistry
@@ -23,7 +28,7 @@ suspend fun MicrosmithModel.generate(finalDir: FileSpace) =
         println("✅ Generated all files in ${finalDir.root}")
     }
 
-private suspend fun MicrosmithModel.runGenerators(tempSpace: FileSpace) =
+private suspend fun MicrosmithModel.runGenerators(space: FileSpace) =
     coroutineScope {
         extensions()
             .map { ext ->
@@ -33,8 +38,8 @@ private suspend fun MicrosmithModel.runGenerators(tempSpace: FileSpace) =
                             println("⚠️ No generator found for ${ext::class.simpleName}")
                             return@async emptyList()
                         }
-                    gen.run { ext.generate(tempSpace) }.also {
-                        println("🛠️ Generated ${it.size} files for ${ext::class.simpleName} in ${tempSpace.root}")
+                    gen.run { ext.generate(space) }.also {
+                        println("🛠️ Generated ${it.size} files for ${ext::class.simpleName} in ${space.root}")
                     }
                 }
             }.awaitAll()
