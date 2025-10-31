@@ -7,7 +7,7 @@ class MapFieldBuilder(
     private val segments: List<String>,
     var index: Int? = null,
     var key: MapKeyType? = null,
-    var value: ValueType? = null,
+    var value: ValueType? = null
 ) : MapFieldScope {
     override fun index(index: Int) {
         this.index = index

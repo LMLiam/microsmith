@@ -6,7 +6,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
 
 class ReservedBuilder(
     private val allocator: IndexAllocator,
-    private val names: NameRegistry,
+    private val names: NameRegistry
 ) : ReservedScope {
     override fun index(index: Int) {
         allocator.reserve(index)

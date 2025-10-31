@@ -8,25 +8,36 @@ class ProtobufBuilder(
 ) : ProtobufScope {
     private val schemas = mutableSetOf<ProtobufSchema>()
 
-    override fun message(name: String, block: MessageScope.() -> Unit) {
-        schemas += ProtobufMessageSchema(
-            (segments + name).joinToString("."),
-            message = MessageBuilder(name, segments).apply(block).build()
-        )
+    override fun message(
+        name: String,
+        block: MessageScope.() -> Unit
+    ) {
+        schemas +=
+            ProtobufSchema(
+                (segments + name).joinToString("."),
+                schema = MessageBuilder(name, segments).apply(block).build()
+            )
     }
 
-    override fun enum(name: String, block: EnumScope.() -> Unit) {
-        schemas += ProtobufEnumSchema(
-            (segments + name).joinToString("."),
-            enum = EnumBuilder(name).apply(block).build()
-        )
+    override fun enum(
+        name: String,
+        block: EnumScope.() -> Unit
+    ) {
+        schemas +=
+            ProtobufSchema(
+                (segments + name).joinToString("."),
+                schema = EnumBuilder(name).apply(block).build()
+            )
     }
 
     override operator fun String.invoke(block: ProtobufScope.() -> Unit) {
         ProtobufBuilder(segments + this.split('.')).apply(block).schemas.forEach { schemas += it }
     }
 
-    override fun version(version: Int, block: ProtobufScope.() -> Unit) {
+    override fun version(
+        version: Int,
+        block: ProtobufScope.() -> Unit
+    ) {
         ProtobufBuilder(segments + "v$version").apply(block).schemas.forEach { schemas += it }
     }
 

@@ -8,29 +8,30 @@ class IndexAllocator(
     private val protoReserved: IntRange? = null
 ) {
     private val reserved = mutableSetOf<IntRange>()
+
     fun reserved() = reserved.toSet()
 
     private val used = mutableSetOf<Int>()
     private var next = min
 
-    fun allocate(requested: Int? = null): Int = when (requested) {
-        null -> generateSequence(next) { it + 1 }
-            .first { c ->
-                c !in used &&
-                        reserved.none { c in it } &&
-                        protoReserved?.contains(c) != true
-            }
-            .also { candidate ->
-                validate(candidate)
-                used += candidate
-                next = candidate + 1
-            }
+    fun allocate(requested: Int? = null): Int =
+        when (requested) {
+            null ->
+                generateSequence(next) { it + 1 }
+                    .first { c ->
+                        c !in used && reserved.none { c in it } && protoReserved?.contains(c) != true
+                    }.also { candidate ->
+                        validate(candidate)
+                        used += candidate
+                        next = candidate + 1
+                    }
 
-        else -> requested.also {
-            validate(it)
-            used += it
+            else ->
+                requested.also {
+                    validate(it)
+                    used += it
+                }
         }
-    }
 
     fun reserve(index: Int) {
         validate(index)
@@ -55,8 +56,10 @@ class IndexAllocator(
         validate(range.first)
         validate(range.last)
         require(used.none { it in range }) { "Range $range overlaps with used indexes" }
-        require(reserved.none { existing ->
-            existing.first <= range.last && range.first <= existing.last
-        }) { "Range $range overlaps with already reserved ranges" }
+        require(
+            reserved.none { existing ->
+                existing.first <= range.last && range.first <= existing.last
+            }
+        ) { "Range $range overlaps with already reserved ranges" }
     }
 }

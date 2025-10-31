@@ -3,7 +3,11 @@ package me.liam.microsmith.dsl.schemas.protobuf.oneof
 import me.liam.microsmith.dsl.schemas.protobuf.OneofFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.OneofReferenceFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.OneofScope
-import me.liam.microsmith.dsl.schemas.protobuf.field.*
+import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
+import me.liam.microsmith.dsl.schemas.protobuf.field.OneofFieldBuilder
+import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
+import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
+import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceFieldBuilder
 import me.liam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 
 class OneofBuilder(
@@ -23,58 +27,85 @@ class OneofBuilder(
 
         val fqName = getReferencePath(segments, target).joinToString(".")
 
-        val index = ReferenceFieldBuilder()
-            .apply(block)
-            .let { allocateIndex(it.index) }
+        val index = allocateIndex(ReferenceFieldBuilder().apply(block).index)
 
-        return OneofField(name, index, Reference(fqName))
-            .also { fields[name] = it }
+        return OneofField(name, index, Reference(fqName)).also { fields[name] = it }
     }
 
-    override fun int32(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.INT32, block)
+    override fun int32(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.INT32, block)
 
-    override fun int64(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.INT64, block)
+    override fun int64(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.INT64, block)
 
-    override fun uint32(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.UINT32, block)
+    override fun uint32(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.UINT32, block)
 
-    override fun uint64(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.UINT64, block)
+    override fun uint64(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.UINT64, block)
 
-    override fun sint32(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.SINT32, block)
+    override fun sint32(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.SINT32, block)
 
-    override fun sint64(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.SINT64, block)
+    override fun sint64(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.SINT64, block)
 
-    override fun fixed32(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.FIXED32, block)
+    override fun fixed32(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.FIXED32, block)
 
-    override fun fixed64(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.FIXED64, block)
+    override fun fixed64(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.FIXED64, block)
 
-    override fun sfixed32(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.SFIXED32, block)
+    override fun sfixed32(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.SFIXED32, block)
 
-    override fun sfixed64(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.SFIXED64, block)
+    override fun sfixed64(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.SFIXED64, block)
 
-    override fun float(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.FLOAT, block)
+    override fun float(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.FLOAT, block)
 
-    override fun double(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.DOUBLE, block)
+    override fun double(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.DOUBLE, block)
 
-    override fun string(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.STRING, block)
+    override fun string(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.STRING, block)
 
-    override fun bytes(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.BYTES, block)
+    override fun bytes(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.BYTES, block)
 
-    override fun bool(name: String, block: OneofFieldScope.() -> Unit): OneofField =
-        addField(name, PrimitiveType.BOOL, block)
+    override fun bool(
+        name: String,
+        block: OneofFieldScope.() -> Unit
+    ): OneofField = addField(name, PrimitiveType.BOOL, block)
 
     private fun addField(
         name: String,
@@ -84,12 +115,9 @@ class OneofBuilder(
         require(name !in fields) { "Duplicate field in oneof: $name" }
         useName(name)
 
-        val index = OneofFieldBuilder()
-            .apply(block)
-            .let { allocateIndex(it.index) }
+        val index = allocateIndex(OneofFieldBuilder().apply(block).index)
 
-        return OneofField(name, index, type)
-            .also { fields[name] = it }
+        return OneofField(name, index, type).also { fields[name] = it }
     }
 
     fun build() = Oneof(name, fields.values.sortedBy { it.index })

@@ -3,7 +3,9 @@ package me.liam.microsmith.dsl.schemas.protobuf.support
 class NameRegistry {
     private val used = mutableSetOf<String>()
     private val reserved = mutableSetOf<String>()
+
     fun reserved() = reserved.toSet()
+
     fun used() = used.toSet()
 
     fun use(name: String) {
