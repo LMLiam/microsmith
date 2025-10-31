@@ -2,8 +2,18 @@ package me.liam.microsmith.gen.schemas.protobuf
 
 import com.github.eventhorizonlab.spi.ServiceProvider
 import me.liam.microsmith.dsl.schemas.protobuf.ProtobufSchema
-import me.liam.microsmith.dsl.schemas.protobuf.field.*
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.*
+import me.liam.microsmith.dsl.schemas.protobuf.field.Cardinality
+import me.liam.microsmith.dsl.schemas.protobuf.field.CardinalityField
+import me.liam.microsmith.dsl.schemas.protobuf.field.Field
+import me.liam.microsmith.dsl.schemas.protobuf.field.MapField
+import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
+import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
+import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.Reserved
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
 import me.liam.microsmith.dsl.schemas.protobuf.types.Enum
 import me.liam.microsmith.dsl.schemas.protobuf.types.Message
 import me.liam.microsmith.gen.files.FileSpace
