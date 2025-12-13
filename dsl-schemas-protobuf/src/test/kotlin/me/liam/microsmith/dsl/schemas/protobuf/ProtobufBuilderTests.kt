@@ -1,6 +1,7 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -70,5 +71,14 @@ class ProtobufBuilderTests :
             }
             val schemas = builder.build()
             schemas.map { it.name } shouldContainExactlyInAnyOrder listOf("Top", "pkg.E")
+        }
+
+        "throws on duplicate fully qualified schema name" {
+            val builder = ProtobufBuilder()
+            builder.message("User") { int32("id") { index(1) } }
+
+            shouldThrow<IllegalArgumentException> {
+                builder.message("User") { int32("id") { index(2) } }
+            }
         }
     })

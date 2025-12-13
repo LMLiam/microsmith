@@ -1,7 +1,10 @@
 package me.liam.microsmith.dsl.schemas.protobuf.field
 
 enum class Cardinality {
-    REQUIRED, // Default in proto3
+    /**
+     * Proto3 "singular" (default). Kept as REQUIRED for backwards compatibility with earlier naming.
+     */
+    REQUIRED,
     OPTIONAL,
     REPEATED
 }
