@@ -1,0 +1,38 @@
+apply plugin: 'application'
+
+application {
+    mainClass = 'me.liam.microsmith.cli.MicrosmithCliKt'
+}
+
+dependencies {
+    implementation project(":scripting")
+    implementation "me.liam.microsmith:dsl:${version}"
+    implementation "me.liam.microsmith:dsl-schemas:${version}"
+    implementation "me.liam.microsmith:dsl-schemas-protobuf:${version}"
+    implementation "me.liam.microsmith:gen:${version}"
+    implementation "me.liam.microsmith:gen-schemas:${version}"
+    implementation "me.liam.microsmith:gen-schemas-protobuf:${version}"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.6"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
+
+    testImplementation project(":kotest")
+}
+
+tasks.named("shadowJar") {
+    archiveBaseName.set("microsmith-cli")
+    archiveClassifier.set("")
+    mergeServiceFiles()
+}
+
+tasks.named("build") {
+    dependsOn(tasks.named("shadowJar"))
+}
+
+publishing {
+    publications {
+        withType(MavenPublication) {
+            artifactId = "microsmith-cli"
+        }
+    }
+}

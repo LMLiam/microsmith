@@ -43,6 +43,9 @@ allprojects {
             substitute(module("me.liam.microsmith:gen")).using(project(":gen"))
             substitute(module("me.liam.microsmith:gen-schemas")).using(project(":gen-schemas"))
             substitute(module("me.liam.microsmith:gen-schemas-protobuf")).using(project(":gen-schemas-protobuf"))
+            substitute(module("me.liam.microsmith:scripting")).using(project(":scripting"))
+            substitute(module("me.liam.microsmith:cli")).using(project(":cli"))
+            substitute(module("me.liam.microsmith:microsmith-cli")).using(project(":cli"))
         }
     }
 }

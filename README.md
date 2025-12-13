@@ -6,18 +6,20 @@ their own dialects (e.g. Protobuf, JSON for schemas).
 
 This repository is a multi-module Gradle project containing:
 
-- `dsl` – Core DSL primitives and helpers (the entrypoint `microsmith { ... }`, model, builder, and extension APIs).
-- `dsl-schemas` – A schema DSL extension which provides `schemas { ... }` block and core schema types.
-- `dsl-schemas-protobuf` – A Protobuf schema dialect built on top of `dsl-schemas`, offering a type-safe Kotlin DSL for defining `.proto`-like models.
-- `kotest` – Project-wide Kotest configuration used by the test suites.
+- `dsl` - Core DSL primitives and helpers (the entrypoint `microsmith { ... }`, model, builder, and extension APIs).
+- `dsl-schemas` - A schema DSL extension which provides `schemas { ... }` block and core schema types.
+- `dsl-schemas-protobuf` - A Protobuf schema dialect built on top of `dsl-schemas`, offering a type-safe Kotlin DSL for defining `.proto`-like models.
+- `scripting` - Kotlin scripting host that evaluates `.microsmith.kts` files into `MicrosmithModel` instances.
+- `cli` - A runnable command-line interface for executing Microsmith scripts and invoking generators.
+- `kotest` - Project-wide Kotest configuration used by the test suites.
 
 ## Key features
 
 - The `microsmith {}` entrypoint produces a minimal, immutable `MicrosmithModel`.
 - Extensions can attach `MicrosmithExtension` implementations, discoverable from the model
 - Schema dialects:
-  - `dsl-schemas` provides a generic schema registry
-  - `dsl-schemas-protobuf` adds a Protobuf-flavoured DSL with messages, enums, fields, oneofs, maps, and reserved ranges.
+- `dsl-schemas` - A schema DSL extension which provides `schemas { ... }` block and core schema types.
+- `dsl-schemas-protobuf` - A Protobuf schema dialect built on top of `dsl-schemas`, offering a type-safe Kotlin DSL for defining `.proto`-like models.
     - Kotlin DSL scopes enforce correct usage (e.g. cardinality, reserved ranges, map key/value types)
     - Cross-message references are validated and resolved after model construction
 - Kotest property-based and DSL-driven specs ensure correctness.
@@ -135,3 +137,23 @@ flowchart TD
     MapField --> FieldIndex
     EnumValue --> FieldIndex
 ```
+
+## Scripting + CLI
+
+Microsmith scripts can be authored as `.microsmith.kts` (or `.kts` with a `// microsmith` marker):
+```kotlin
+// microsmith
+microsmith {
+    schemas {
+        protobuf {
+            message("User") { int32("id") { index(1) } }
+        }
+    }
+}
+```
+- Build the runnable CLI: `./gradlew :cli:shadowJar`
+- Run a script: `java -jar cli/build/libs/microsmith-cli.jar run path/to/microsmith.kts --out build/microsmith-out`
+- Add plugins/generators: pass `--plugin group:artifact:version` (resolved via Maven) and implement `MicrosmithGenerator` (or `ModelGenerator`) with a `META-INF/services` entry so `ServiceLoader` can discover it.
+- Filter generators with `--generator <id>` and emit a machine-readable log with `--json-summary`.
+- Compiled scripts are cached under `~/.cache/microsmith` by default (override via `ScriptOptions.cacheDir`).
+- Scripts execute arbitrary Kotlin code; only run trusted scripts.
