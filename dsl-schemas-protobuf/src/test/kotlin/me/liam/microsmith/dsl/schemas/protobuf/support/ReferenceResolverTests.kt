@@ -82,13 +82,18 @@ class ReferenceResolverTests :
             ) shouldBe targetMsg.schema
         }
 
-        "throws when reference cannot be resolved" {
+        "throws when reference cannot be resolved with context" {
             val ref = Reference("Other")
             val field = ReferenceField("f", 1, ref)
             val schema = ProtobufSchema("Foo", Message("Foo", fields = listOf(field)))
 
-            shouldThrow<IllegalStateException> {
+            val error = shouldThrow<IllegalStateException> {
                 resolveReferences(setOf(schema))
             }
+
+            error.message shouldBe """
+                Unresolved references:
+                - Unresolved reference 'Other' in message Foo field 'f'
+            """.trimIndent()
         }
     })

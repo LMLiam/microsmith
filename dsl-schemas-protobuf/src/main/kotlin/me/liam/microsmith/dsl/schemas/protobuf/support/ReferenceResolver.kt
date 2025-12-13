@@ -29,11 +29,15 @@ fun getReferencePath(
 
 fun resolveReferences(schemas: Set<ProtobufSchema>): Set<ProtobufSchema> {
     val messages = schemas.associateBy { it.name }
+    val errors = mutableListOf<String>()
 
-    fun Reference.resolve() {
+    fun Reference.resolve(context: String) {
         val target = messages[name]?.schema
-        checkNotNull(target) { "Unable to resolve reference: $name" }
-        type = target
+        if (target == null) {
+            errors += "Unresolved reference '$name' in $context"
+        } else {
+            type = target
+        }
     }
 
     messages.values
@@ -42,18 +46,33 @@ fun resolveReferences(schemas: Set<ProtobufSchema>): Set<ProtobufSchema> {
         .forEach { schema ->
             schema.fields
                 .filterIsInstance<ReferenceField>()
-                .forEach { it.reference.resolve() }
+                .forEach { field ->
+                    field.reference.resolve("message ${schema.name} field '${field.name}'")
+                }
 
             schema.fields
                 .filterIsInstance<MapField>()
-                .mapNotNull { it.type.value as? Reference }
-                .forEach { it.resolve() }
+                .forEach { field ->
+                    (field.type.value as? Reference)
+                        ?.resolve("message ${schema.name} map field '${field.name}' value")
+                }
 
             schema.oneofs
                 .flatMap { it.fields }
-                .mapNotNull { it.fieldType as? Reference }
-                .forEach { it.resolve() }
+                .forEach { field ->
+                    (field.fieldType as? Reference)
+                        ?.resolve("message ${schema.name} oneof '${field.name}'")
+                }
         }
+
+    if (errors.isNotEmpty()) {
+        error(
+            buildString {
+                appendLine("Unresolved references:")
+                errors.forEach { appendLine("- $it") }
+            }.trimEnd()
+        )
+    }
 
     return schemas
 }

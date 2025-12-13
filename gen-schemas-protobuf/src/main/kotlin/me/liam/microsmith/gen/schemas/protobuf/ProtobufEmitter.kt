@@ -48,7 +48,7 @@ class ProtobufEmitter(
                 .takeIf { it.isNotEmpty() }
                 ?.let { appendLine("package $it;") }
 
-            val imports = collectImports()
+            val imports = collectImports().sorted()
             if (imports.isNotEmpty()) {
                 imports.forEach { appendLine("""import "${it.replace(".", "/")}.proto";""") }
             }
