@@ -20,7 +20,7 @@ out/
 
 ### Kotlin ###
 .kotlin/
-kotlin/
+kotlin/script/
 
 ### Eclipse ###
 .apt_generated/
