@@ -140,9 +140,11 @@ flowchart TD
 
 ## Scripting + CLI
 
-Microsmith scripts can be authored as `.microsmith.kts` (or `.kts` with a `// microsmith` marker):
+Microsmith scripts are just Kotlin `main.kts` scripts. Use `.microsmith.kts`, `.main.kts`, or a plain `.kts` that contains `// microsmith` as a marker:
 ```kotlin
 // microsmith
+// @file:DependsOn("com.yourco:custom-microsmith-plugin:1.0.0") // optional plugin jars
+
 microsmith {
     schemas {
         protobuf {
@@ -153,7 +155,7 @@ microsmith {
 ```
 - Build the runnable CLI: `./gradlew :cli:shadowJar`
 - Run a script: `java -jar cli/build/libs/microsmith-cli.jar run path/to/microsmith.kts --out build/microsmith-out`
-- Add plugins/generators: pass `--plugin group:artifact:version` (resolved via Maven) and implement `MicrosmithGenerator` (or `ModelGenerator`) with a `META-INF/services` entry so `ServiceLoader` can discover it.
+- Add plugins/generators: pass `--plugin group:artifact:version` (resolved via Maven) or declare `@file:DependsOn` in the script. Implement `MicrosmithGenerator` (or `ModelGenerator`) with a `META-INF/services` entry so `ServiceLoader` can discover it.
 - Filter generators with `--generator <id>` and emit a machine-readable log with `--json-summary`.
 - Compiled scripts are cached under `~/.cache/microsmith` by default (override via `ScriptOptions.cacheDir`).
 - Scripts execute arbitrary Kotlin code; only run trusted scripts.
