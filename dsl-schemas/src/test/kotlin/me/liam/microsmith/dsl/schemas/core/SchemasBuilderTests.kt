@@ -4,11 +4,12 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
+private object FakeSchemaType : SchemaType {
+    override val typeName = "fake"
+}
+
 private data class FakeSchema(
-    override val type: SchemaType =
-        object : SchemaType {
-            override val typeName = "fake"
-        },
+    override val type: SchemaType = FakeSchemaType,
     override val name: String
 ) : Schema
 
@@ -29,6 +30,17 @@ class SchemasBuilderTests :
 
             shouldThrow<IllegalArgumentException> {
                 builder.register(schema)
+            }
+        }
+
+        "register throws for duplicate schema type and name" {
+            val builder = SchemasBuilder()
+            val schema = FakeSchema(name = "User")
+
+            builder.register(schema)
+
+            shouldThrow<IllegalArgumentException> {
+                builder.register(FakeSchema(name = "User"))
             }
         }
 

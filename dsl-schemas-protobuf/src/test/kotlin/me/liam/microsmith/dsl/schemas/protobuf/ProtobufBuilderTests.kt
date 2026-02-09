@@ -81,4 +81,26 @@ class ProtobufBuilderTests :
                 builder.message("User") { int32("id") { index(2) } }
             }
         }
+
+        "throws on namespace with empty segment" {
+            val builder = ProtobufBuilder()
+
+            shouldThrow<IllegalArgumentException> {
+                builder.apply {
+                    "pkg..sub" {
+                        message("User") { int32("id") { index(1) } }
+                    }
+                }
+            }
+        }
+
+        "throws on non-positive version segment" {
+            val builder = ProtobufBuilder()
+
+            shouldThrow<IllegalArgumentException> {
+                builder.version(0) {
+                    message("User") { int32("id") { index(1) } }
+                }
+            }
+        }
     })

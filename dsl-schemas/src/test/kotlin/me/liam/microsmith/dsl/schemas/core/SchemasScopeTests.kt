@@ -1,5 +1,6 @@
 package me.liam.microsmith.dsl.schemas.core
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import me.liam.microsmith.dsl.core.MicrosmithBuilder
@@ -74,5 +75,19 @@ class SchemasScopeTests :
                         ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User")
                     )
                 )
+        }
+
+        "multiple schemas blocks reject duplicate schema keys" {
+            val builder = MicrosmithBuilder()
+
+            builder.schemas {
+                fake(ScopeTestSchemaTypes.PROTOBUF, "User")
+            }
+
+            shouldThrow<IllegalArgumentException> {
+                builder.schemas {
+                    fake(ScopeTestSchemaTypes.PROTOBUF, "User")
+                }
+            }
         }
     })

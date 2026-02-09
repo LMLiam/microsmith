@@ -57,4 +57,13 @@ class SchemasExtensionTests :
             ext.allOf(TestSchemaTypes.PROTOBUF) shouldBe setOf(s1, s2)
             ext.allOf(TestSchemaTypes.JSON) shouldBe setOf(s3)
         }
+
+        "merge throws when duplicate schema key exists across extensions" {
+            val left = SchemasExtension(setOf(ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")))
+            val right = SchemasExtension(setOf(ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")))
+
+            shouldThrow<IllegalArgumentException> {
+                left.merge(right)
+            }
+        }
     })

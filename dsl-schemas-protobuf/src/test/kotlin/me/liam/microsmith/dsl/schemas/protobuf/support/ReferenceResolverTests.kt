@@ -31,6 +31,12 @@ class ReferenceResolverTests :
             getReferencePath(listOf("a", "b", "c"), "..x.Y") shouldBe listOf("a", "x", "Y")
         }
 
+        "reference path rejects empty trailing segments" {
+            shouldThrow<IllegalArgumentException> {
+                getReferencePath(listOf("pkg"), ".")
+            }
+        }
+
         "resolves reference to another message" {
             val targetMsg = ProtobufSchema("package.Other", Message("Other"))
             val ref = Reference("package.Other")

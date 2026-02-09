@@ -44,13 +44,16 @@ class ProtobufBuilder(
     }
 
     override operator fun String.invoke(block: ProtobufScope.() -> Unit) {
-        ProtobufBuilder(segments + this.split('.')).apply(block).build().forEach { register(it.name, it) }
+        val namespaceSegments = split('.')
+        require(namespaceSegments.none { it.isBlank() }) { "Namespace contains empty segments: '$this'" }
+        ProtobufBuilder(segments + namespaceSegments).apply(block).build().forEach { register(it.name, it) }
     }
 
     override fun version(
         version: Int,
         block: ProtobufScope.() -> Unit
     ) {
+        require(version > 0) { "Version must be positive, but was $version." }
         ProtobufBuilder(segments + "v$version").apply(block).build().forEach { register(it.name, it) }
     }
 

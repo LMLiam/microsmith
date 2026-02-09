@@ -14,9 +14,13 @@ class TemporaryDirectory private constructor(
     Closeable {
     override fun close() {
         runCatching {
-            Files.walk(root)
-                .sorted(Comparator.reverseOrder())
-                .forEach { Files.deleteIfExists(it) }
+            Files.walk(root).use { paths ->
+                paths
+                    .sorted(Comparator.reverseOrder())
+                    .forEach { Files.deleteIfExists(it) }
+            }
+        }.onFailure { error ->
+            System.err.println("Failed to cleanup temporary directory '$root': ${error.message}")
         }
     }
 
