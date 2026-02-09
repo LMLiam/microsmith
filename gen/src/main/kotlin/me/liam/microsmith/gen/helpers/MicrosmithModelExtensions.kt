@@ -10,10 +10,12 @@ import me.liam.microsmith.dsl.core.MicrosmithModel
 import me.liam.microsmith.dsl.helpers.extensions
 import me.liam.microsmith.gen.core.GeneratorRegistry
 import me.liam.microsmith.gen.core.GeneratorRegistry.getGenerator
+import me.liam.microsmith.gen.files.DirectorySpace
 import me.liam.microsmith.gen.files.FileSpace
 import me.liam.microsmith.gen.files.GeneratedFile
 import me.liam.microsmith.gen.files.TemporaryDirectory
 import java.nio.file.Files
+import java.nio.file.Path
 
 suspend fun MicrosmithModel.generate(finalDir: FileSpace) =
     coroutineScope {
@@ -30,6 +32,14 @@ suspend fun MicrosmithModel.generate(finalDir: FileSpace) =
         writeOutputs(outputs, finalDir)
         println("Generated all files in ${finalDir.root}")
     }
+
+suspend fun MicrosmithModel.generateTo(
+    outputDir: Path,
+    ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
+    val directorySpace = withContext(ioDispatcher) { DirectorySpace.from(outputDir) }
+    generate(directorySpace)
+}
 
 private fun requireUniqueRelativePaths(outputs: List<GeneratedFile>) {
     val duplicates =
@@ -67,8 +77,27 @@ private suspend fun writeOutputs(
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) = withContext(ioDispatcher) {
     outputs.forEach { out ->
-        val target = space.root.resolve(out.relativePath)
+        val target = resolveTargetPath(space, out.relativePath)
         target.parent?.let(Files::createDirectories)
         Files.write(target, out.contents)
     }
+}
+
+internal fun resolveTargetPath(
+    space: FileSpace,
+    relativePath: Path
+): Path {
+    require(!relativePath.isAbsolute) {
+        "Generated output path must be relative, but was '$relativePath'."
+    }
+
+    val normalizedRoot = space.root.toAbsolutePath().normalize()
+    val normalizedRelativePath = relativePath.normalize()
+    val target = normalizedRoot.resolve(normalizedRelativePath).normalize()
+
+    require(target.startsWith(normalizedRoot)) {
+        "Generated output path '$relativePath' escapes output root '$normalizedRoot'."
+    }
+
+    return target
 }
