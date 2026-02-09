@@ -1,6 +1,5 @@
 package me.liam.microsmith.cli
 
-import me.liam.microsmith.cli.command.CliCommand
 import me.liam.microsmith.cli.command.ErrorCommand
 import me.liam.microsmith.cli.command.HelpCommand
 import me.liam.microsmith.cli.command.RunCommand

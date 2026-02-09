@@ -11,7 +11,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'me.liam.microsmith.cli.MicrosmithCliKt'
+    mainClass = 'me.liam.microsmith.cli.CliKt'
 }
 
 tasks.named("shadowJar") {

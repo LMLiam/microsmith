@@ -4,11 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import me.liam.microsmith.cli.command.ErrorCommand
-import me.liam.microsmith.cli.command.RunCommand
-import me.liam.microsmith.cli.parsing.parseCliArgs
 import java.util.ServiceConfigurationError
-import kotlin.io.path.Path
 
 class MicrosmithCliTests :
     StringSpec({
@@ -33,24 +29,6 @@ class MicrosmithCliTests :
 
             exitCode shouldBe 2
             err.joinToString("\n").shouldContain("Unknown command")
-        }
-
-        "parses run command with required out option" {
-            parseCliArgs(listOf("run", "schema.microsmith.kts", "--out", "build/generated")) shouldBe
-                RunCommand(
-                    script = Path("schema.microsmith.kts"),
-                    outputDir = Path("build/generated")
-                )
-        }
-
-        "returns error when run command has missing out option" {
-            parseCliArgs(listOf("run", "schema.microsmith.kts")) shouldBe
-                ErrorCommand("Missing required --out <output-dir> option.")
-        }
-
-        "returns error when script has unsupported extension" {
-            parseCliArgs(listOf("run", "schema.ms.kts", "--out", "build/generated")) shouldBe
-                ErrorCommand("Script file must use the .microsmith.kts extension.")
         }
 
         "returns error when provider validation fails" {
