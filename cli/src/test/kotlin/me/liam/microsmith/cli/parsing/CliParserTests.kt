@@ -17,7 +17,34 @@ class CliParserTests :
             parseCliArgs(listOf("run", "schema.microsmith.kts", "--out", "build/generated")) shouldBe
                 RunCommand(
                     script = Path("schema.microsmith.kts"),
-                    outputDir = Path("build/generated")
+                    outputDir = Path("build/generated"),
+                    variables = emptyMap(),
+                    flags = emptySet()
+                )
+        }
+
+        "parses run command with vars and flags" {
+            parseCliArgs(
+                listOf(
+                    "run",
+                    "schema.microsmith.kts",
+                    "--out",
+                    "build/generated",
+                    "--var",
+                    "env=prod",
+                    "--var",
+                    "team=platform",
+                    "--flag",
+                    "dry-run",
+                    "--flag",
+                    "verbose"
+                )
+            ) shouldBe
+                RunCommand(
+                    script = Path("schema.microsmith.kts"),
+                    outputDir = Path("build/generated"),
+                    variables = mapOf("env" to "prod", "team" to "platform"),
+                    flags = setOf("dry-run", "verbose")
                 )
         }
 
@@ -34,5 +61,12 @@ class CliParserTests :
         "returns error for unknown option" {
             parseCliArgs(listOf("run", "schema.microsmith.kts", "--bad", "value")) shouldBe
                 ErrorCommand("Unknown option '--bad'.")
+        }
+
+        "returns error for invalid --var value" {
+            parseCliArgs(
+                listOf("run", "schema.microsmith.kts", "--out", "build/generated", "--var", "broken")
+            ) shouldBe
+                ErrorCommand("Invalid --var value 'broken'. Expected key=value.")
         }
     })

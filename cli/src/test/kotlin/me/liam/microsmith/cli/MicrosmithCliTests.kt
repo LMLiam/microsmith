@@ -4,6 +4,8 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import me.liam.microsmith.cli.scripting.ScriptRunFailure
+import me.liam.microsmith.cli.scripting.ScriptRunSuccess
 import java.util.ServiceConfigurationError
 
 class MicrosmithCliTests :
@@ -71,13 +73,38 @@ class MicrosmithCliTests :
                 MicrosmithCli(
                     stdout = out::add,
                     stderr = err::add,
-                    providerValidator = { emptyList() }
+                    providerValidator = { emptyList() },
+                    scriptRunner = {
+                        ScriptRunSuccess(
+                            warnings = emptyList(),
+                            cacheHit = false,
+                            elapsedMillis = 12
+                        )
+                    }
                 )
 
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
 
             exitCode shouldBe 0
-            out.joinToString("\n").shouldContain("Phase 1 scaffold complete")
+            out.joinToString("\n").shouldContain("Generated script")
             err shouldBe emptyList()
+        }
+
+        "returns error when script execution fails" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    providerValidator = { emptyList() },
+                    scriptRunner = { ScriptRunFailure(listOf("[error] schema.microsmith.kts:1:1 broken script")) }
+                )
+
+            val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
+
+            exitCode shouldBe 2
+            err.joinToString("\n").shouldContain("broken script")
+            out shouldBe emptyList()
         }
     })
