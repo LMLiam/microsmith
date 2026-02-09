@@ -43,8 +43,15 @@ subprojects {
         withJavadocJar()
     }
 
-    dependencyLocking {
-        lockAllConfigurations()
+    def lockfiles = fileTree("${rootProject.projectDir}/gradle/dependency-locks") {
+        include("*.lockfile")
+    }
+    if (!lockfiles.isEmpty()) {
+        dependencyLocking {
+            lockAllConfigurations()
+        }
+    } else {
+        logger.lifecycle("Gradle dependency locking is enabled once lockfiles are present in gradle/dependency-locks.")
     }
 
     configurations.configureEach {
