@@ -19,14 +19,29 @@ suspend fun MicrosmithModel.generate(finalDir: FileSpace) =
     coroutineScope {
         GeneratorRegistry.load()
 
-        TemporaryDirectory.create().use { tempSpace ->
-            runGenerators(tempSpace)
-        }
+        val outputs =
+            TemporaryDirectory.create().use { tempSpace ->
+                val generated = runGenerators(tempSpace)
+                requireUniqueRelativePaths(generated)
+                writeOutputs(generated, tempSpace)
+                generated
+            }
 
-        val outputs = runGenerators(finalDir)
         writeOutputs(outputs, finalDir)
-        println("✅ Generated all files in ${finalDir.root}")
+        println("Generated all files in ${finalDir.root}")
     }
+
+private fun requireUniqueRelativePaths(outputs: List<GeneratedFile>) {
+    val duplicates =
+        outputs
+            .groupBy { it.relativePath.normalize().toString() }
+            .filterValues { it.size > 1 }
+
+    require(duplicates.isEmpty()) {
+        val details = duplicates.keys.sorted().joinToString(", ")
+        "Duplicate output file paths detected: $details"
+    }
+}
 
 private suspend fun MicrosmithModel.runGenerators(space: FileSpace) =
     coroutineScope {
@@ -35,11 +50,11 @@ private suspend fun MicrosmithModel.runGenerators(space: FileSpace) =
                 async {
                     val gen =
                         ext.getGenerator() ?: run {
-                            println("⚠️ No generator found for ${ext::class.simpleName}")
+                            println("No generator found for ${ext::class.simpleName}")
                             return@async emptyList()
                         }
                     gen.run { ext.generate(space) }.also {
-                        println("🛠️ Generated ${it.size} files for ${ext::class.simpleName} in ${space.root}")
+                        println("Generated ${it.size} files for ${ext::class.simpleName} in ${space.root}")
                     }
                 }
             }.awaitAll()
@@ -51,10 +66,9 @@ private suspend fun writeOutputs(
     space: FileSpace,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) = withContext(ioDispatcher) {
-    outputs.map { out ->
+    outputs.forEach { out ->
         val target = space.root.resolve(out.relativePath)
-        Files.createDirectories(target.parent)
+        target.parent?.let(Files::createDirectories)
         Files.write(target, out.contents)
-        target
     }
 }
