@@ -1,0 +1,25 @@
+apply plugin: 'application'
+
+dependencies {
+    implementation project(":dsl")
+    implementation project(":dsl-schemas")
+    implementation project(":dsl-schemas-protobuf")
+    implementation project(":gen")
+    implementation project(":gen-schemas")
+    implementation project(":gen-schemas-protobuf")
+    implementation libs.coroutines.core
+}
+
+application {
+    mainClass = 'me.liam.microsmith.cli.CliKt'
+}
+
+tasks.named("shadowJar") {
+    archiveClassifier.set("all")
+    mergeServiceFiles()
+    manifest {
+        attributes(
+            "Main-Class": application.mainClass.get()
+        )
+    }
+}
