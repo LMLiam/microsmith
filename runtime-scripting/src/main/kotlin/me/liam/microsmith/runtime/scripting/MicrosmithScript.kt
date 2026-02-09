@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package me.liam.microsmith.cli.scripting
+package me.liam.microsmith.runtime.scripting
 
 import kotlin.script.experimental.annotations.KotlinScript
 
@@ -9,3 +9,4 @@ import kotlin.script.experimental.annotations.KotlinScript
     compilationConfiguration = MicrosmithScriptCompilationConfiguration::class
 )
 abstract class MicrosmithScript
+

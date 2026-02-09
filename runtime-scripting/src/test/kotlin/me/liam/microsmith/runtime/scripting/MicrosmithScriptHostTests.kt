@@ -1,4 +1,4 @@
-package me.liam.microsmith.cli.scripting
+package me.liam.microsmith.runtime.scripting
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -154,3 +154,4 @@ class MicrosmithScriptHostTests :
             }
         }
     })
+

@@ -4,8 +4,8 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import me.liam.microsmith.cli.scripting.ScriptRunFailure
-import me.liam.microsmith.cli.scripting.ScriptRunSuccess
+import me.liam.microsmith.runtime.scripting.ScriptRunFailure
+import me.liam.microsmith.runtime.scripting.ScriptRunSuccess
 import java.util.ServiceConfigurationError
 
 class MicrosmithCliTests :

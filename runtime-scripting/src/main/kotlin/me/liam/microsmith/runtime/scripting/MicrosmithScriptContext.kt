@@ -1,4 +1,4 @@
-package me.liam.microsmith.cli.scripting
+package me.liam.microsmith.runtime.scripting
 
 import me.liam.microsmith.dsl.core.MicrosmithModel
 import java.nio.file.Path
@@ -27,3 +27,4 @@ class MicrosmithScriptContext(
 
     internal fun emittedAny(): Boolean = emitted
 }
+

@@ -9,7 +9,8 @@ This repository is a multi-module Gradle project containing:
 - `dsl` – Core DSL primitives and helpers (the entrypoint `microsmith { ... }`, model, builder, and extension APIs).
 - `dsl-schemas` – A schema DSL extension which provides `schemas { ... }` block and core schema types.
 - `dsl-schemas-protobuf` – A Protobuf schema dialect built on top of `dsl-schemas`, offering a type-safe Kotlin DSL for defining `.proto`-like models.
-- `cli` – CLI runtime for .microsmith.kts script-driven generation workflows.
+- `runtime-scripting` – Kotlin scripting host/runtime for `.microsmith.kts` execution.
+- `cli` – command-line entrypoint and argument handling for script-driven generation workflows.
 - `kotest` – Project-wide Kotest configuration used by the test suites.
 
 ## Key features
@@ -153,3 +154,5 @@ microsmith run schema.microsmith.kts --out ./generated --var env=prod --flag emi
 Inside .microsmith.kts scripts:
 - Default imports include microsmith {}, schemas {}, and protobuf {}.
 - Scripts can either return a MicrosmithModel or call emit(model) / generate(model).
+- `runtime-scripting` – Kotlin scripting host/runtime for `.microsmith.kts` execution.
+- `cli` – command-line entrypoint and argument handling for script-driven generation workflows.

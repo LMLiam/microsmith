@@ -1,16 +1,13 @@
 apply plugin: 'application'
 
 dependencies {
+    implementation project(":runtime-scripting")
     implementation project(":dsl")
     implementation project(":dsl-schemas")
     implementation project(":dsl-schemas-protobuf")
     implementation project(":gen")
     implementation project(":gen-schemas")
     implementation project(":gen-schemas-protobuf")
-    implementation libs.coroutines.core
-    implementation libs.kotlin.scripting.common
-    implementation libs.kotlin.scripting.jvm
-    implementation libs.kotlin.scripting.jvm.host
 }
 
 application {

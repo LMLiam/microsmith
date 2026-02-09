@@ -1,7 +1,8 @@
-package me.liam.microsmith.cli.scripting
+package me.liam.microsmith.runtime.scripting
 
-internal data class ScriptRunSuccess(
+data class ScriptRunSuccess(
     val warnings: List<String>,
     val cacheHit: Boolean,
     val elapsedMillis: Long
 ) : ScriptRunResult
+

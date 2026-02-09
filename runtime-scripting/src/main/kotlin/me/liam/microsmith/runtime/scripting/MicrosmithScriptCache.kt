@@ -1,4 +1,4 @@
-package me.liam.microsmith.cli.scripting
+package me.liam.microsmith.runtime.scripting
 
 import kotlin.script.experimental.api.CompiledScript
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
@@ -68,3 +68,4 @@ private fun Int.toByteArray() =
         .array()
 
 private fun ByteArray.toHexString() = joinToString(separator = "") { "%02x".format(it) }
+

@@ -1,4 +1,4 @@
-package me.liam.microsmith.cli.scripting
+package me.liam.microsmith.runtime.scripting
 
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.defaultImports
@@ -27,3 +27,4 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
         }
     }
 )
+
