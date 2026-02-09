@@ -120,7 +120,6 @@ private fun Enum.requireUniqueEnumValueIndexes() {
 
 private fun EnumValue.validateForEmission() {
     ProtobufNameValidation.requireIdentifier(name, "Enum value name")
-    require(index >= 0) { "Enum value '$name' index must be non-negative, but was $index." }
 }
 
 private fun Oneof.validateForEmission() {
