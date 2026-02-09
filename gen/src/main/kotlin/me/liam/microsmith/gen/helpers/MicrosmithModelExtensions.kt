@@ -21,7 +21,7 @@ suspend fun MicrosmithModel.generate(finalDir: FileSpace) =
 
         val outputs =
             TemporaryDirectory.create().use { tempSpace ->
-                val generated = runGenerators(tempSpace)
+                val generated = runGenerators(finalDir)
                 requireUniqueRelativePaths(generated)
                 writeOutputs(generated, tempSpace)
                 generated
