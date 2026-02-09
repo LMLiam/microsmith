@@ -45,6 +45,19 @@ class MicrosmithModelExtensionsTests :
             }
         }
 
+        "resolveTargetPath rejects symlink traversal output paths" {
+            val root = Files.createTempDirectory("microsmith-paths-root-")
+            val outside = Files.createTempDirectory("microsmith-paths-outside-")
+            val symlink = root.resolve("link")
+            val linked = runCatching { Files.createSymbolicLink(symlink, outside) }.isSuccess
+            if (linked) {
+                val space = DirectorySpace.from(root)
+                shouldThrow<IllegalArgumentException> {
+                    resolveTargetPath(space, Path("link/secret.proto"))
+                }
+            }
+        }
+
         "generateTo creates output directory when it does not exist" {
             val workspaceRoot = Files.createTempDirectory("microsmith-generate-to-root-")
             val outputDir = workspaceRoot.resolve("generated/proto")

@@ -15,6 +15,7 @@ import me.liam.microsmith.gen.files.FileSpace
 import me.liam.microsmith.gen.files.GeneratedFile
 import me.liam.microsmith.gen.files.TemporaryDirectory
 import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.nio.file.Path
 
 suspend fun MicrosmithModel.generate(finalDir: FileSpace) =
@@ -92,6 +93,7 @@ internal fun resolveTargetPath(
     }
 
     val normalizedRoot = space.root.toAbsolutePath().normalize()
+    ensureOutputRootIsSafe(normalizedRoot)
     val normalizedRelativePath = relativePath.normalize()
     val target = normalizedRoot.resolve(normalizedRelativePath).normalize()
 
@@ -99,5 +101,47 @@ internal fun resolveTargetPath(
         "Generated output path '$relativePath' escapes output root '$normalizedRoot'."
     }
 
+    requireNoSymlinkTraversal(normalizedRoot, normalizedRelativePath)
+
     return target
+}
+
+private fun ensureOutputRootIsSafe(root: Path) {
+    if (Files.exists(root, LinkOption.NOFOLLOW_LINKS)) {
+        require(Files.isDirectory(root, LinkOption.NOFOLLOW_LINKS)) {
+            "Output root '$root' must be a directory."
+        }
+        require(!Files.isSymbolicLink(root)) {
+            "Output root '$root' must not be a symbolic link."
+        }
+        return
+    }
+
+    Files.createDirectories(root)
+}
+
+private fun requireNoSymlinkTraversal(
+    root: Path,
+    relativePath: Path
+) {
+    var current = root
+    val segments = relativePath.toList()
+    segments.forEachIndexed { index, segment ->
+        current = current.resolve(segment.toString())
+
+        if (!Files.exists(current, LinkOption.NOFOLLOW_LINKS)) {
+            return@forEachIndexed
+        }
+
+        require(!Files.isSymbolicLink(current)) {
+            "Generated output path '$relativePath' traverses symbolic link '$current'."
+        }
+
+        val isLastSegment = index == segments.lastIndex
+        if (!isLastSegment) {
+            require(Files.isDirectory(current, LinkOption.NOFOLLOW_LINKS)) {
+                "Generated output path '$relativePath' contains non-directory segment '$current'."
+            }
+        }
+    }
 }
