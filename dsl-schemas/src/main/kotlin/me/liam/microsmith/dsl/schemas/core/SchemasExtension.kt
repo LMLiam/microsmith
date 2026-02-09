@@ -8,6 +8,20 @@ import me.liam.microsmith.dsl.core.MicrosmithExtension
 data class SchemasExtension(
     val schemas: Set<Schema>
 ) : MicrosmithExtension {
+    init {
+        val duplicateKeys =
+            schemas
+                .groupBy { it.type to it.name }
+                .filterValues { it.size > 1 }
+                .keys
+                .map { (type, name) -> "${type.typeName}:$name" }
+                .sorted()
+
+        require(duplicateKeys.isEmpty()) {
+            "SchemasExtension contains duplicate schema keys: ${duplicateKeys.joinToString(", ")}"
+        }
+    }
+
     // Precompute an index for efficient lookups
     private val index = schemas.associateBy { it.type to it.name }
 
@@ -38,7 +52,19 @@ data class SchemasExtension(
     fun allOf(type: SchemaType) = schemas.filter { it.type == type }.toSet()
 
     fun merge(other: SchemasExtension): SchemasExtension {
-        val merged = (schemas + other.schemas).associateBy { it.type to it.name }.values.toSet()
-        return copy(schemas = merged)
+        val existingKeys = schemas.mapTo(mutableSetOf()) { it.type to it.name }
+        val collisions =
+            other.schemas
+                .map { it.type to it.name }
+                .filter { it in existingKeys }
+                .map { (type, name) -> "${type.typeName}:$name" }
+                .distinct()
+                .sorted()
+
+        require(collisions.isEmpty()) {
+            "Duplicate schema keys while merging SchemasExtension: ${collisions.joinToString(", ")}"
+        }
+
+        return copy(schemas = schemas + other.schemas)
     }
 }

@@ -22,7 +22,7 @@ interface SchemasScope
 /**
  * Start a `schemas { ... }` block in your DSL.
  *
- * Inside this block you can declare schemas using dialect‑specific
+ * Inside this block you can declare schemas using dialect-specific
  * functions such as `protobuf("User") { ... }` or `json("Order") { ... }`.
  *
  * **Note:** see dialect specific documentation for more information.
@@ -48,7 +48,9 @@ fun MicrosmithScope.schemas(block: SchemasScope.() -> Unit) {
     val builder = SchemasBuilder().apply(block)
     val newExt = builder.toExtension()
 
-    val msBuilder = this as MicrosmithBuilder
+    val msBuilder =
+        this as? MicrosmithBuilder
+            ?: error("schemas { ... } can only be invoked within a MicrosmithBuilder scope.")
     val existing = msBuilder.model.get<SchemasExtension>()
 
     if (existing != null) {
