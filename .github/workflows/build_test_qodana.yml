@@ -12,6 +12,8 @@ jobs:
   build-and-qodana:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
     permissions:
       contents: read
       pull-requests: write
@@ -39,10 +41,8 @@ jobs:
           path: '**/build/test-results/jvmKotest/*.xml'
           reporter: java-junit
       - name: 'Qodana Scan'
-        if: ${{ secrets.QODANA_TOKEN != '' }}
+        if: ${{ env.QODANA_TOKEN != '' }}
         uses: JetBrains/qodana-action@v2025.2
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
           pr-mode: ${{ github.event_name == 'pull_request' }}
           use-caches: true
@@ -52,6 +52,6 @@ jobs:
           push-fixes: 'none'
       - uses: github/codeql-action/upload-sarif@v3
         name: Upload SARIF
-        if: ${{ always() && secrets.QODANA_TOKEN != '' }}
+        if: ${{ always() && env.QODANA_TOKEN != '' }}
         with:
           sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
