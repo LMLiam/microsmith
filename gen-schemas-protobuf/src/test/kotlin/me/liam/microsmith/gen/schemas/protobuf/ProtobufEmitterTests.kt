@@ -271,6 +271,21 @@ class ProtobufEmitterTests :
             }
         }
 
+        "allows negative enum values after first zero value" {
+            val schema =
+                ProtobufSchema(
+                    "pkg.Code",
+                    Enum(
+                        name = "Code",
+                        values = listOf(EnumValue("UNSPECIFIED", 0), EnumValue("ERROR_UNKNOWN", -1), EnumValue("OK", 1))
+                    )
+                )
+
+            val (_, contents) = emit(schema)
+            contents.shouldContain("ERROR_UNKNOWN = -1;")
+            contents.shouldContain("OK = 1;")
+        }
+
         "resolves unqualified reference imports into current package" {
             val schema =
                 ProtobufSchema(
