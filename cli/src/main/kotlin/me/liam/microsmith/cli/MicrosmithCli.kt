@@ -9,6 +9,11 @@ import java.util.ServiceConfigurationError
 import java.util.ServiceLoader
 import kotlin.system.exitProcess
 
+private const val RUN_COMMAND = "run"
+private const val OUTPUT_OPTION = "--out"
+private const val SCRIPT_EXTENSION = ".microsmith.kts"
+private val HELP_COMMANDS = setOf("--help", "-h", "help")
+
 private const val HELP_TEXT = """
 Microsmith CLI (Phase 1)
 
@@ -43,25 +48,129 @@ class MicrosmithCli(
 
     private fun runCommand(command: CliCommand.Run): Int {
         val providerErrors =
-            try {
-                providerValidator()
-            } catch (error: ServiceConfigurationError) {
-                val message = error.message ?: error::class.simpleName ?: "ServiceConfigurationError"
-                stderr("Failed to load runtime service providers: $message")
-                return 2
+            when (val validation = validateProviders()) {
+                is ProviderValidation.Failed -> listOf(validation.message)
+                is ProviderValidation.Loaded -> validation.errors
             }
-        if (providerErrors.isNotEmpty()) {
+
+        if (providerErrors.isEmpty()) {
+            stdout(
+                "Phase 1 scaffold complete. " +
+                    "Script execution will be added in Phase 2. " +
+                    "script='${command.script}', out='${command.outputDir}'."
+            )
+        } else {
             providerErrors.forEach(stderr)
-            return 2
         }
 
-        stdout(
-            "Phase 1 scaffold complete. " +
-                "Script execution will be added in Phase 2. " +
-                "script='${command.script}', out='${command.outputDir}'."
-        )
-        return 0
+        return if (providerErrors.isEmpty()) 0 else 2
     }
+
+    private fun validateProviders(): ProviderValidation =
+        try {
+            ProviderValidation.Loaded(providerValidator())
+        } catch (error: ServiceConfigurationError) {
+            val message = error.message ?: error::class.simpleName ?: "ServiceConfigurationError"
+            ProviderValidation.Failed("Failed to load runtime service providers: $message")
+        }
+}
+
+private sealed interface ProviderValidation {
+    data class Loaded(
+        val errors: List<String>
+    ) : ProviderValidation
+
+    data class Failed(
+        val message: String
+    ) : ProviderValidation
+}
+
+private sealed interface CliParseResult<out T> {
+    data class Success<T>(
+        val value: T
+    ) : CliParseResult<T>
+
+    data class Failure(
+        val message: String
+    ) : CliParseResult<Nothing>
+}
+
+private data class RunArguments(
+    val script: Path,
+    val outputDir: Path
+)
+
+private fun CliParseResult.Failure.toCliError() = CliCommand.Error(message)
+
+private fun parseRunArgs(args: List<String>): CliParseResult<RunArguments> {
+    val scriptResult = parseScriptArg(args.getOrNull(1))
+    val script =
+        when (scriptResult) {
+            is CliParseResult.Failure -> return scriptResult
+            is CliParseResult.Success -> scriptResult.value
+        }
+
+    return when (val outputDirResult = parseOutputDir(args, startIndex = 2)) {
+        is CliParseResult.Success -> {
+            CliParseResult.Success(RunArguments(script = script, outputDir = outputDirResult.value))
+        }
+        is CliParseResult.Failure -> outputDirResult
+    }
+}
+
+private fun parseScriptArg(scriptArg: String?): CliParseResult<Path> {
+    val result =
+        when {
+            scriptArg == null || scriptArg.startsWith("--") ->
+                CliParseResult.Failure("Missing <script.microsmith.kts> argument for run command.")
+
+            !scriptArg.endsWith(SCRIPT_EXTENSION) ->
+                CliParseResult.Failure("Script file must use the .microsmith.kts extension.")
+
+            else -> CliParseResult.Success(Path.of(scriptArg))
+        }
+    return result
+}
+
+private fun parseOutputDir(
+    args: List<String>,
+    startIndex: Int
+): CliParseResult<Path> {
+    var outputDir: Path? = null
+    var index = startIndex
+    var error: String? = null
+
+    while (index < args.size && error == null) {
+        val token = args[index]
+        if (token == OUTPUT_OPTION) {
+            val value = args.getOrNull(index + 1)
+            error =
+                when {
+                    value == null || value.startsWith("--") -> "Missing value for --out option."
+                    outputDir != null -> "--out option may only be specified once."
+                    else -> null
+                }
+
+            if (error == null && value != null) {
+                outputDir = Path.of(value)
+                index += 2
+            }
+        } else {
+            error = "Unknown option '$token'."
+        }
+
+        if (token != OUTPUT_OPTION || error != null) {
+            index += 1
+        }
+    }
+
+    val result =
+        when {
+            error != null -> CliParseResult.Failure(error)
+            outputDir == null -> CliParseResult.Failure("Missing required --out <output-dir> option.")
+            else -> CliParseResult.Success(outputDir)
+        }
+    return result
 }
 
 internal sealed interface CliCommand {
@@ -78,44 +187,16 @@ internal sealed interface CliCommand {
 }
 
 internal fun parseCliArgs(args: List<String>): CliCommand {
-    if (args.isEmpty() || args[0] in setOf("--help", "-h", "help")) {
-        return CliCommand.Help
-    }
-
-    if (args[0] != "run") {
-        return CliCommand.Error("Unknown command '${args[0]}'.")
-    }
-
-    if (args.size < 2 || args[1].startsWith("--")) {
-        return CliCommand.Error("Missing <script.microsmith.kts> argument for run command.")
-    }
-
-    val script = Path.of(args[1])
-    if (!script.fileName.toString().endsWith(".microsmith.kts")) {
-        return CliCommand.Error("Script file must use the .microsmith.kts extension.")
-    }
-    var outputDir: Path? = null
-    var index = 2
-    while (index < args.size) {
-        val token = args[index]
-        when (token) {
-            "--out" -> {
-                val value = args.getOrNull(index + 1)
-                if (value == null || value.startsWith("--")) {
-                    return CliCommand.Error("Missing value for --out option.")
-                }
-                if (outputDir != null) {
-                    return CliCommand.Error("--out option may only be specified once.")
-                }
-                outputDir = Path.of(value)
-                index += 2
+    val command = args.firstOrNull()
+    return when {
+        command == null || command in HELP_COMMANDS -> CliCommand.Help
+        command != RUN_COMMAND -> CliCommand.Error("Unknown command '$command'.")
+        else ->
+            when (val parsed = parseRunArgs(args)) {
+                is CliParseResult.Success -> CliCommand.Run(script = parsed.value.script, outputDir = parsed.value.outputDir)
+                is CliParseResult.Failure -> parsed.toCliError()
             }
-            else -> return CliCommand.Error("Unknown option '$token'.")
         }
-    }
-
-    val resolvedOutputDir = outputDir ?: return CliCommand.Error("Missing required --out <output-dir> option.")
-    return CliCommand.Run(script = script, outputDir = resolvedOutputDir)
 }
 
 internal fun verifyBuiltinProviders(
