@@ -26,4 +26,4 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Lint GitHub Workflows
-        uses: rhysd/actionlint@v1
+        uses: rhysd/actionlint@v1.7.10
