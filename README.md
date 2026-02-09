@@ -141,15 +141,15 @@ flowchart TD
 ## CLI Scripting Runtime (Phase 2)
 Run generation from a script file without embedding Gradle in the consumer project:
 
-`ash
+```bash
 microsmith run schema.microsmith.kts --out ./generated
-`
+```
 
 Optional script context values:
 
-`ash
+```bash
 microsmith run schema.microsmith.kts --out ./generated --var env=prod --flag emit
-`
+```
 
 Inside .microsmith.kts scripts:
 - Default imports include microsmith {}, schemas {}, and protobuf {}.
