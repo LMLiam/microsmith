@@ -12,7 +12,7 @@ private const val HELP_TEXT = """
 Microsmith CLI (Phase 1)
 
 Usage:
-  microsmith run <script.ms.kts> --out <output-dir>
+  microsmith run <script.microsmith.kts> --out <output-dir>
   microsmith --help
 """
 
@@ -79,10 +79,13 @@ internal fun parseCliArgs(args: List<String>): CliCommand {
     }
 
     if (args.size < 2 || args[1].startsWith("--")) {
-        return CliCommand.Error("Missing <script.ms.kts> argument for run command.")
+        return CliCommand.Error("Missing <script.microsmith.kts> argument for run command.")
     }
 
     val script = Path.of(args[1])
+    if (!script.fileName.toString().endsWith(".microsmith.kts")) {
+        return CliCommand.Error("Script file must use the .microsmith.kts extension.")
+    }
     var outputDir: Path? = null
     var index = 2
     while (index < args.size) {

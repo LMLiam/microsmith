@@ -32,16 +32,21 @@ class MicrosmithCliTests :
         }
 
         "parses run command with required out option" {
-            parseCliArgs(listOf("run", "schema.ms.kts", "--out", "build/generated")) shouldBe
+            parseCliArgs(listOf("run", "schema.microsmith.kts", "--out", "build/generated")) shouldBe
                 CliCommand.Run(
-                    script = Path("schema.ms.kts"),
+                    script = Path("schema.microsmith.kts"),
                     outputDir = Path("build/generated")
                 )
         }
 
         "returns error when run command has missing out option" {
-            parseCliArgs(listOf("run", "schema.ms.kts")) shouldBe
+            parseCliArgs(listOf("run", "schema.microsmith.kts")) shouldBe
                 CliCommand.Error("Missing required --out <output-dir> option.")
+        }
+
+        "returns error when script has unsupported extension" {
+            parseCliArgs(listOf("run", "schema.ms.kts", "--out", "build/generated")) shouldBe
+                CliCommand.Error("Script file must use the .microsmith.kts extension.")
         }
 
         "returns error when provider validation fails" {
@@ -54,7 +59,7 @@ class MicrosmithCliTests :
                     providerValidator = { listOf("missing providers") }
                 )
 
-            val exitCode = cli.run(arrayOf("run", "schema.ms.kts", "--out", "build/generated"))
+            val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
 
             exitCode shouldBe 2
             err.shouldContain("missing providers")
@@ -70,7 +75,7 @@ class MicrosmithCliTests :
                     providerValidator = { emptyList() }
                 )
 
-            val exitCode = cli.run(arrayOf("run", "schema.ms.kts", "--out", "build/generated"))
+            val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
 
             exitCode shouldBe 0
             out.joinToString("\n").shouldContain("Phase 1 scaffold complete")
