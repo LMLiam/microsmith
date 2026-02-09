@@ -286,5 +286,8 @@ interface ScalarFields<TFieldScope : FieldScope, TField : Field> {
 
 fun SchemasScope.protobuf(block: ProtobufScope.() -> Unit) {
     val builder = ProtobufBuilder().apply(block)
-    builder.build().also { resolveReferences(it) }.forEach { (this as SchemasBuilder).register(it) }
+    val schemasBuilder =
+        this as? SchemasBuilder
+            ?: error("protobuf { ... } can only be invoked within a SchemasBuilder scope.")
+    resolveReferences(builder.build()).forEach { schemasBuilder.register(it) }
 }
