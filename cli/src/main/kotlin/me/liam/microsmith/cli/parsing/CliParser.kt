@@ -62,30 +62,28 @@ private fun parseOutputDir(
 ): Pair<Path?, String?> {
     var outputDir: Path? = null
     var index = startIndex
-    var error: String? = null
-
-    while (index < args.size && error == null) {
+    while (index < args.size) {
         val token = args[index]
-        if (token == OUTPUT_OPTION) {
-            val value = args.getOrNull(index + 1)
-            error =
-                when {
-                    value == null || value.startsWith("--") -> "Missing value for --out option."
-                    outputDir != null -> "--out option may only be specified once."
-                    else -> null
-                }
-            if (error == null && value != null) {
-                outputDir = Path.of(value)
-                index += 2
-            }
-        } else {
-            error = "Unknown option '$token'."
+        if (token != OUTPUT_OPTION) {
+            return outputDir to "Unknown option '$token'."
         }
 
-        if (token != OUTPUT_OPTION || error != null) {
-            index += 1
+        val value = args.getOrNull(index + 1)
+        val error = validateOutputValue(value, outputDir != null)
+        if (error != null) {
+            return outputDir to error
         }
+
+        outputDir = Path.of(requireNotNull(value))
+        index += 2
     }
 
-    return outputDir to error
+    return outputDir to null
 }
+
+private fun validateOutputValue(value: String?, outputDirAlreadySet: Boolean): String? =
+    when {
+        value == null || value.startsWith("--") -> "Missing value for --out option."
+        outputDirAlreadySet -> "--out option may only be specified once."
+        else -> null
+    }
