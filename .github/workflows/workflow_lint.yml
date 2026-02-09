@@ -1,0 +1,29 @@
+name: Workflow Lint
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - ".github/actionlint.yaml"
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/**"
+      - ".github/actionlint.yaml"
+
+concurrency:
+  group: workflow-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - name: Lint GitHub Workflows
+        uses: rhysd/actionlint@v1
