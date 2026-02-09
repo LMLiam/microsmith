@@ -5,6 +5,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import me.liam.microsmith.gen.core.ModelGenerator
 import me.liam.microsmith.gen.schemas.SchemaEmitter
 import java.nio.file.Path
+import java.util.ServiceConfigurationError
 import java.util.ServiceLoader
 import kotlin.system.exitProcess
 
@@ -41,7 +42,14 @@ class MicrosmithCli(
         }
 
     private fun runCommand(command: CliCommand.Run): Int {
-        val providerErrors = providerValidator()
+        val providerErrors =
+            try {
+                providerValidator()
+            } catch (error: ServiceConfigurationError) {
+                val message = error.message ?: error::class.simpleName ?: "ServiceConfigurationError"
+                stderr("Failed to load runtime service providers: $message")
+                return 2
+            }
         if (providerErrors.isNotEmpty()) {
             providerErrors.forEach(stderr)
             return 2
