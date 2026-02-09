@@ -1,6 +1,4 @@
 dependencies {
-    api "me.liam.microsmith:dsl:${version}"
-    implementation "me.liam.microsmith:dsl-schemas:${version}"
-
-    testImplementation project(":kotest")
+    api project(":dsl")
+    implementation project(":dsl-schemas")
 }

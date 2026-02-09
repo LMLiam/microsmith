@@ -1,12 +1,17 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.tasks.bundling.AbstractArchiveTask
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '2.2.21' apply false
-    id 'pl.allegro.tech.build.axion-release' version '1.21.0'
+    id 'org.jetbrains.kotlin.jvm' apply false
+    id 'org.jetbrains.kotlin.kapt' apply false
+    id 'pl.allegro.tech.build.axion-release'
     id 'maven-publish'
-    id 'io.kotest' version '6.0.1' apply false
-    id "org.jetbrains.kotlin.kapt" version "2.2.21" apply false
-    id 'com.gradleup.shadow' version '9.2.2'
+    id 'io.kotest' apply false
+    id 'com.gradleup.shadow' apply false
 }
 
 scmVersion {
@@ -19,32 +24,12 @@ scmVersion {
     versionCreator 'versionWithBranch'
 }
 
+group = 'me.liam.microsmith'
 version = scmVersion.version
 
 allprojects {
-    group = 'me.liam.microsmith'
-    project.version = rootProject.version
-
-    repositories {
-        mavenCentral()
-        maven {
-            url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            mavenContent {
-                snapshotsOnly()
-            }
-        }
-    }
-
-    configurations.configureEach {
-        resolutionStrategy.dependencySubstitution {
-            substitute(module("me.liam.microsmith:dsl")).using(project(":dsl"))
-            substitute(module("me.liam.microsmith:dsl-schemas")).using(project(":dsl-schemas"))
-            substitute(module("me.liam.microsmith:dsl-schemas-protobuf")).using(project(":dsl-schemas-protobuf"))
-            substitute(module("me.liam.microsmith:gen")).using(project(":gen"))
-            substitute(module("me.liam.microsmith:gen-schemas")).using(project(":gen-schemas"))
-            substitute(module("me.liam.microsmith:gen-schemas-protobuf")).using(project(":gen-schemas-protobuf"))
-        }
-    }
+    group = rootProject.group
+    version = rootProject.version
 }
 
 subprojects {
@@ -53,17 +38,57 @@ subprojects {
     apply plugin: 'io.kotest'
     apply plugin: 'com.gradleup.shadow'
 
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    def lockfiles = fileTree("${rootProject.projectDir}/gradle/dependency-locks") {
+        include("*.lockfile")
+    }
+    if (!lockfiles.isEmpty()) {
+        dependencyLocking {
+            lockAllConfigurations()
+        }
+    } else {
+        logger.lifecycle("Gradle dependency locking is enabled once lockfiles are present in gradle/dependency-locks.")
+    }
+
+    configurations.configureEach {
+        resolutionStrategy {
+            failOnVersionConflict()
+            preferProjectModules()
+        }
+    }
+
     dependencies {
-        testImplementation 'io.kotest:kotest-framework-engine:6.0.1'
-        testImplementation 'io.kotest:kotest-assertions-core:6.0.1'
-        testImplementation 'io.kotest:kotest-property:6.0.1'
-        testImplementation 'io.kotest:kotest-extensions-junitxml:6.0.1'
+        if (project.name != 'kotest') {
+            testImplementation project(':kotest')
+        }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release.set(24)
+    }
+
+    tasks.withType(KotlinCompile).configureEach {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_24
+            freeCompilerArgs.add('-Xjsr305=strict')
+        }
     }
 
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
         reports {
             junitXml.required.set(false)
+        }
+        testLogging {
+            events "failed", "skipped"
+            exceptionFormat = TestExceptionFormat.FULL
+            showCauses = true
+            showStackTraces = true
         }
         systemProperty("gradle.build.dir", project.buildDir)
     }
@@ -80,6 +105,11 @@ subprojects {
         jvmToolchain(24)
     }
 
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+
     publishing {
         publications {
             gpr(MavenPublication) {
@@ -87,6 +117,23 @@ subprojects {
                 groupId = project.group
                 artifactId = project.name
                 version = project.version
+                pom {
+                    name.set("microsmith-${project.name}")
+                    description.set("Microsmith module '${project.name}'")
+                    url.set("https://github.com/lmliam/microsmith")
+                    licenses {
+                        license {
+                            name.set("Apache License 2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                            distribution.set("repo")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git:git://github.com/lmliam/microsmith.git")
+                        developerConnection.set("scm:git:ssh://git@github.com/lmliam/microsmith.git")
+                        url.set("https://github.com/lmliam/microsmith")
+                    }
+                }
             }
         }
         repositories {
@@ -113,4 +160,6 @@ tasks.register("allJar", ShadowJar) {
     }
     configurations = subprojects.collect { it.configurations.runtimeClasspath }
     mergeServiceFiles()
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }
