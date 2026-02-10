@@ -5,12 +5,27 @@ import me.liam.microsmith.cli.command.HelpCommand
 import me.liam.microsmith.cli.command.RunCommand
 import me.liam.microsmith.cli.parsing.parseCliArgs
 import me.liam.microsmith.cli.provider.verifyBuiltinProviders
+import me.liam.microsmith.runtime.scripting.MicrosmithScriptHost
+import me.liam.microsmith.runtime.scripting.ScriptRunFailure
+import me.liam.microsmith.runtime.scripting.ScriptRunRequest
+import me.liam.microsmith.runtime.scripting.ScriptRunResult
+import me.liam.microsmith.runtime.scripting.ScriptRunSuccess
 import java.util.ServiceConfigurationError
 
-class MicrosmithCli(
+internal class MicrosmithCli(
     private val stdout: (String) -> Unit = ::println,
     private val stderr: (String) -> Unit = { System.err.println(it) },
-    private val providerValidator: () -> List<String> = ::verifyBuiltinProviders
+    private val providerValidator: () -> List<String> = ::verifyBuiltinProviders,
+    private val scriptRunner: (RunCommand) -> ScriptRunResult = { command ->
+        MicrosmithScriptHost().run(
+            ScriptRunRequest(
+                script = command.script,
+                outputDir = command.outputDir,
+                variables = command.variables,
+                flags = command.flags
+            )
+        )
+    }
 ) {
     fun run(args: Array<String>): Int =
         when (val parsed = parseCliArgs(args.toList())) {
@@ -30,17 +45,26 @@ class MicrosmithCli(
     private fun runCommand(command: RunCommand): Int {
         val providerErrors = collectProviderErrors()
 
-        if (providerErrors.isEmpty()) {
-            stdout(
-                "Phase 1 scaffold complete. " +
-                    "Script execution will be added in Phase 2. " +
-                    "script='${command.script}', out='${command.outputDir}'."
-            )
-        } else {
+        if (providerErrors.isNotEmpty()) {
             providerErrors.forEach(stderr)
+            return 2
         }
 
-        return if (providerErrors.isEmpty()) 0 else 2
+        return when (val result = scriptRunner(command)) {
+            is ScriptRunSuccess -> {
+                result.warnings.forEach(stderr)
+                val cacheState = if (result.cacheHit) "hit" else "miss"
+                stdout(
+                    "Generated script '${command.script}' into '${command.outputDir}' " +
+                        "(compile-cache=$cacheState, elapsed=${result.elapsedMillis}ms)."
+                )
+                0
+            }
+            is ScriptRunFailure -> {
+                result.diagnostics.forEach(stderr)
+                2
+            }
+        }
     }
 
     private fun collectProviderErrors(): List<String> =
