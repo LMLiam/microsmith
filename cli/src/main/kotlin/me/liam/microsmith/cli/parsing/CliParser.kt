@@ -6,10 +6,14 @@ import me.liam.microsmith.cli.command.HelpCommand
 import me.liam.microsmith.cli.command.RunCommand
 import java.nio.file.Path
 
-private const val RUN_COMMAND = "run"
-private const val OUTPUT_OPTION = "--out"
-private const val VARIABLE_OPTION = "--var"
-private const val FLAG_OPTION = "--flag"
+internal const val RUN_COMMAND = "run"
+internal const val OUTPUT_OPTION = "--out"
+internal const val VARIABLE_OPTION = "--var"
+internal const val FLAG_OPTION = "--flag"
+internal const val PLUGIN_OPTION = "--plugin"
+internal const val PLUGIN_JAR_OPTION = "--plugin-jar"
+internal const val OFFLINE_OPTION = "--offline"
+internal const val REPOSITORY_OPTION = "--repository"
 private const val SCRIPT_EXTENSION = ".microsmith.kts"
 private val HELP_COMMANDS = setOf("--help", "-h", "help")
 
@@ -27,7 +31,7 @@ private fun parseRunCommand(args: List<String>): CliCommand {
     return when {
         scriptError != null -> ErrorCommand(scriptError)
         script == null -> ErrorCommand("Missing <script.microsmith.kts> argument for run command.")
-        else -> parseOutputCommand(script, args, startIndex = 2)
+        else -> parseRunOptionsCommand(script, args, startIndex = 2)
     }
 }
 
@@ -45,12 +49,12 @@ private fun parseScriptArg(scriptArg: String?): Pair<Path?, String?> {
     return result
 }
 
-private fun parseOutputCommand(
+private fun parseRunOptionsCommand(
     script: Path,
     args: List<String>,
     startIndex: Int
 ): CliCommand {
-    val parsedOptions = parseOutputDir(args, startIndex)
+    val parsedOptions = parseRunOptions(args, startIndex)
     return when {
         parsedOptions.error != null -> ErrorCommand(parsedOptions.error)
         parsedOptions.outputDir == null -> ErrorCommand("Missing required --out <output-dir> option.")
@@ -59,99 +63,11 @@ private fun parseOutputCommand(
                 script = script,
                 outputDir = parsedOptions.outputDir,
                 variables = parsedOptions.variables,
-                flags = parsedOptions.flags
+                flags = parsedOptions.flags,
+                plugins = parsedOptions.plugins,
+                pluginJars = parsedOptions.pluginJars,
+                offline = parsedOptions.offline,
+                repositoryOverride = parsedOptions.repositoryOverride
             )
     }
 }
-
-private fun parseOutputDir(
-    args: List<String>,
-    startIndex: Int
-): ParsedRunOptions {
-    var outputDir: Path? = null
-    val variables = linkedMapOf<String, String>()
-    val flags = linkedSetOf<String>()
-    var error: String? = null
-    var index = startIndex
-    while (index < args.size && error == null) {
-        when (val token = args[index]) {
-            OUTPUT_OPTION -> {
-                val value = args.getOrNull(index + 1)
-                error = validateOutputValue(value, outputDir != null)
-                if (error == null) {
-                    outputDir = Path.of(requireNotNull(value))
-                    index += 2
-                }
-            }
-
-            VARIABLE_OPTION -> {
-                val value = args.getOrNull(index + 1)
-                val parsedVariable = parseVariableValue(value)
-                if (parsedVariable.error != null) {
-                    error = parsedVariable.error
-                } else if (variables.put(parsedVariable.key, parsedVariable.value) != null) {
-                    error = "--var '${parsedVariable.key}' may only be specified once."
-                } else {
-                    index += 2
-                }
-            }
-
-            FLAG_OPTION -> {
-                val value = args.getOrNull(index + 1)
-                val flag = parseFlagValue(value)
-                if (flag == null) {
-                    error = "Missing value for --flag option."
-                } else if (!flags.add(flag)) {
-                    error = "--flag '$flag' may only be specified once."
-                } else {
-                    index += 2
-                }
-            }
-
-            else -> error = "Unknown option '$token'."
-        }
-    }
-
-    return ParsedRunOptions(
-        outputDir = outputDir,
-        variables = variables.toMap(),
-        flags = flags.toSet(),
-        error = error
-    )
-}
-
-private fun validateOutputValue(value: String?, outputDirAlreadySet: Boolean): String? =
-    when {
-        value == null || value.startsWith("--") -> "Missing value for --out option."
-        outputDirAlreadySet -> "--out option may only be specified once."
-        else -> null
-    }
-
-private fun parseVariableValue(value: String?): ParsedVariable =
-    when {
-        value == null || value.startsWith("--") -> ParsedVariable(error = "Missing value for --var option.")
-
-        else -> {
-            val separatorIndex = value.indexOf('=')
-            val key =
-                if (separatorIndex > 0) {
-                    value.take(separatorIndex).trim()
-                } else {
-                    ""
-                }
-            if (separatorIndex <= 0 || key.isBlank()) {
-                ParsedVariable(error = "Invalid --var value '$value'. Expected key=value.")
-            } else {
-                ParsedVariable(
-                    key = key,
-                    value = value.substring(separatorIndex + 1)
-                )
-            }
-        }
-    }
-
-private fun parseFlagValue(value: String?): String? =
-    value
-        ?.takeUnless { it.startsWith("--") }
-        ?.trim()
-        ?.takeIf { it.isNotBlank() }
