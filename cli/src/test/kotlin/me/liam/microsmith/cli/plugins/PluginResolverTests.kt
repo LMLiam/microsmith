@@ -228,4 +228,29 @@ class PluginResolverTests :
                 runCatching { tempDir.deleteRecursively() }
             }
         }
+
+        "rejects plugin coordinates containing lockfile delimiter" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-lock-delimiter")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                script.writeText("// test script")
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf("com.acme:bad|artifact:1.0.0")
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache"))
+                    )
+
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("reserved lockfile delimiter")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
     })

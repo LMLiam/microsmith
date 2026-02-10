@@ -124,4 +124,7 @@ private fun validateCoordinateSegment(
     require(value != "." && value != "..") {
         "Plugin coordinate $label '$value' contains an invalid path segment."
     }
+    require(!value.contains('|')) {
+        "Plugin coordinate $label '$value' contains a reserved lockfile delimiter."
+    }
 }

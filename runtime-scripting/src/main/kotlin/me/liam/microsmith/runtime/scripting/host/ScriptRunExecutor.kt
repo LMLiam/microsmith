@@ -17,9 +17,9 @@ internal class ScriptRunExecutor(
         outputPath: Path
     ): ScriptRunResult {
         val pluginClasspath = request.pluginClasspath.map { it.toAbsolutePath().normalize() }
-        val pluginClasspathFingerprint = RuntimeClasspathFingerprint.calculate(pluginClasspath)
         return PluginClassLoaderScope.withPluginClassLoader(pluginClasspath) { runtimeClassLoader ->
             runCatching {
+                val pluginClasspathFingerprint = RuntimeClasspathFingerprint.calculate(pluginClasspath)
                 Files.createDirectories(cacheDirectory)
                 val cache = MicrosmithScriptCache(cacheDirectory) { listOf(pluginClasspathFingerprint) }
                 val runtimeHostConfiguration =
