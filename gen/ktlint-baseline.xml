@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<baseline version="1.0">
+    <file name="src/main/kotlin/me/liam/microsmith/gen/core/GeneratorRegistry.kt">
+        <error line="12" column="1" source="standard:spacing-between-declarations-with-annotations" />
+        <error line="34" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/gen/files/DirectorySpace.kt">
+        <error line="16" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/gen/files/GeneratedFile.kt">
+        <error line="15" column="86" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/gen/files/TemporaryDirectory.kt">
+        <error line="35" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/gen/helpers/MicrosmithModelExtensions.kt">
+        <error line="21" column="60" source="standard:function-signature" />
+        <error line="38" column="5" source="standard:function-signature" />
+        <error line="39" column="5" source="standard:function-signature" />
+        <error line="39" column="55" source="standard:function-signature" />
+        <error line="57" column="70" source="standard:function-signature" />
+        <error line="88" column="5" source="standard:function-signature" />
+        <error line="89" column="5" source="standard:function-signature" />
+        <error line="89" column="23" source="standard:function-signature" />
+        <error line="124" column="5" source="standard:function-signature" />
+        <error line="125" column="5" source="standard:function-signature" />
+        <error line="125" column="23" source="standard:function-signature" />
+        <error line="147" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/test/kotlin/me/liam/microsmith/gen/helpers/MicrosmithModelExtensionsTests.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+        <error line="70" column="7" source="standard:final-newline" />
+    </file>
+</baseline>

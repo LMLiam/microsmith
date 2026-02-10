@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<baseline version="1.0">
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/cache/CompiledScriptFingerprint.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+        <error line="37" column="32" source="standard:function-signature" />
+        <error line="42" column="89" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/cache/MicrosmithScriptCache.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+        <error line="13" column="1" source="standard:indent" />
+        <error line="14" column="1" source="standard:indent" />
+        <error line="15" column="1" source="standard:indent" />
+        <error line="16" column="1" source="standard:indent" />
+        <error line="17" column="1" source="standard:indent" />
+        <error line="18" column="1" source="standard:indent" />
+        <error line="19" column="1" source="standard:indent" />
+        <error line="20" column="1" source="standard:indent" />
+        <error line="21" column="1" source="standard:indent" />
+        <error line="22" column="1" source="standard:indent" />
+        <error line="23" column="1" source="standard:indent" />
+        <error line="24" column="1" source="standard:indent" />
+        <error line="34" column="25" source="standard:function-signature" />
+        <error line="45" column="2" source="standard:final-newline" />
+        <error line="47" column="1" source="standard:no-consecutive-blank-lines" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/cache/RuntimeClasspathFingerprint.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+        <error line="58" column="65" source="standard:function-signature" />
+        <error line="87" column="32" source="standard:function-signature" />
+        <error line="92" column="89" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/context/MicrosmithScriptContext.kt">
+        <error line="25" column="43" source="standard:function-signature" />
+        <error line="29" column="2" source="standard:final-newline" />
+        <error line="31" column="1" source="standard:no-consecutive-blank-lines" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/definition/MicrosmithScript.kt">
+        <error line="9" column="32" source="standard:final-newline" />
+        <error line="11" column="1" source="standard:no-consecutive-blank-lines" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/definition/MicrosmithScriptCompilationConfiguration.kt">
+        <error line="44" column="5" source="standard:function-signature" />
+        <error line="45" column="5" source="standard:function-signature" />
+        <error line="45" column="25" source="standard:function-signature" />
+        <error line="46" column="13" source="standard:function-signature" />
+        <error line="46" column="55" source="standard:final-newline" />
+        <error line="48" column="1" source="standard:no-consecutive-blank-lines" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/host/MicrosmithScriptHost.kt">
+        <error line="18" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/host/PluginClassLoaderScope.kt">
+        <error line="9" column="9" source="standard:function-signature" />
+        <error line="10" column="9" source="standard:function-signature" />
+        <error line="10" column="34" source="standard:function-signature" />
+        <error line="28" column="9" source="standard:function-signature" />
+        <error line="29" column="9" source="standard:function-signature" />
+        <error line="29" column="23" source="standard:function-signature" />
+        <error line="40" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/host/ScriptContextFactory.kt">
+        <error line="11" column="9" source="standard:function-signature" />
+        <error line="12" column="9" source="standard:function-signature" />
+        <error line="12" column="34" source="standard:function-signature" />
+        <error line="13" column="33" source="standard:function-signature" />
+        <error line="23" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/host/ScriptDiagnosticsFormatter.kt">
+        <error line="6" column="64" source="standard:function-signature" />
+        <error line="28" column="55" source="standard:function-signature" />
+        <error line="34" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/host/ScriptEvaluator.kt">
+        <error line="3" column="1" source="standard:import-ordering" />
+        <error line="50" column="53" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/host/ScriptHostConfigurationFactory.kt">
+        <error line="13" column="9" source="standard:function-signature" />
+        <error line="14" column="9" source="standard:function-signature" />
+        <error line="14" column="40" source="standard:function-signature" />
+        <error line="22" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/host/ScriptHostPaths.kt">
+        <error line="17" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/host/ScriptPathValidator.kt">
+        <error line="8" column="56" source="standard:function-signature" />
+        <error line="14" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/host/ScriptRunExecutor.kt">
+        <error line="15" column="9" source="standard:function-signature" />
+        <error line="16" column="9" source="standard:function-signature" />
+        <error line="17" column="9" source="standard:function-signature" />
+        <error line="17" column="25" source="standard:function-signature" />
+        <error line="47" column="2" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/host/ScriptRunResultMapper.kt">
+        <error line="70" column="9" source="standard:function-signature" />
+        <error line="71" column="9" source="standard:function-signature" />
+        <error line="71" column="47" source="standard:function-signature" />
+        <error line="98" column="85" source="standard:final-newline" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/model/ScriptRunFailure.kt">
+        <error line="5" column="20" source="standard:final-newline" />
+        <error line="7" column="1" source="standard:no-consecutive-blank-lines" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/model/ScriptRunRequest.kt">
+        <error line="11" column="2" source="standard:final-newline" />
+        <error line="13" column="1" source="standard:no-consecutive-blank-lines" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/model/ScriptRunResult.kt">
+        <error line="3" column="33" source="standard:final-newline" />
+        <error line="5" column="1" source="standard:no-consecutive-blank-lines" />
+    </file>
+    <file name="src/main/kotlin/me/liam/microsmith/runtime/scripting/model/ScriptRunSuccess.kt">
+        <error line="7" column="20" source="standard:final-newline" />
+        <error line="9" column="1" source="standard:no-consecutive-blank-lines" />
+    </file>
+    <file name="src/test/kotlin/me/liam/microsmith/runtime/scripting/cache/MicrosmithScriptCacheTests.kt">
+        <error line="88" column="7" source="standard:final-newline" />
+    </file>
+    <file name="src/test/kotlin/me/liam/microsmith/runtime/scripting/host/MicrosmithScriptHostTests.kt">
+        <error line="159" column="7" source="standard:final-newline" />
+        <error line="161" column="1" source="standard:no-consecutive-blank-lines" />
+    </file>
+</baseline>
