@@ -87,54 +87,65 @@ private val runtimeClasspathFingerprint: String by lazy {
 internal fun classpathContentFingerprint(classpathEntries: List<Path>): String {
     val digest = MessageDigest.getInstance("SHA-256")
 
-    fun addChunk(chunk: String) {
-        val chunkBytes = chunk.toByteArray()
-        digest.update(chunkBytes.size.toByteArray())
-        digest.update(chunkBytes)
-    }
-
-    fun addFileDigest(path: Path) {
-        val fileDigest = MessageDigest.getInstance("SHA-256")
-        Files.newInputStream(path).use { input ->
-            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-            while (true) {
-                val read = input.read(buffer)
-                if (read == -1) {
-                    break
-                }
-                fileDigest.update(buffer, 0, read)
-            }
-        }
-        addChunk(fileDigest.digest().toHexString())
-    }
-
     classpathEntries
         .distinct()
         .sortedBy { it.toString() }
         .forEach { entry ->
-            addChunk(entry.toString())
-            when {
-                !Files.exists(entry) -> addChunk("missing")
-                Files.isRegularFile(entry) -> {
-                    addChunk("file")
-                    addFileDigest(entry)
-                }
-                Files.isDirectory(entry) -> {
-                    addChunk("directory")
-                    Files.walk(entry).use { stream ->
-                        stream
-                            .filter { Files.isRegularFile(it) }
-                            .sorted(compareBy { it.toString() })
-                            .forEach { file ->
-                                addChunk(entry.relativize(file).toString().replace('\\', '/'))
-                                addFileDigest(file)
-                            }
-                    }
-                }
-                else -> addChunk("other")
-            }
+            digest.addChunk(entry.toString())
+            digest.addClasspathEntryFingerprint(entry)
         }
 
     return digest.digest().toHexString()
+}
+
+private fun MessageDigest.addClasspathEntryFingerprint(entry: Path) {
+    when {
+        !Files.exists(entry) -> addChunk("missing")
+        Files.isRegularFile(entry) -> {
+            addChunk("file")
+            addFileDigest(entry)
+        }
+        Files.isDirectory(entry) -> {
+            addChunk("directory")
+            addDirectoryFingerprint(entry)
+        }
+        else -> addChunk("other")
+    }
+}
+
+private fun MessageDigest.addDirectoryFingerprint(directory: Path) {
+    directoryRegularFiles(directory).forEach { file ->
+        addChunk(directory.relativize(file).toString().replace('\\', '/'))
+        addFileDigest(file)
+    }
+}
+
+private fun directoryRegularFiles(directory: Path): List<Path> =
+    Files.walk(directory).use { stream ->
+        stream
+            .filter { Files.isRegularFile(it) }
+            .sorted(compareBy { it.toString() })
+            .toList()
+    }
+
+private fun MessageDigest.addFileDigest(path: Path) {
+    val fileDigest = MessageDigest.getInstance("SHA-256")
+    Files.newInputStream(path).use { input ->
+        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+        while (true) {
+            val read = input.read(buffer)
+            if (read == -1) {
+                break
+            }
+            fileDigest.update(buffer, 0, read)
+        }
+    }
+    addChunk(fileDigest.digest().toHexString())
+}
+
+private fun MessageDigest.addChunk(chunk: String) {
+    val chunkBytes = chunk.toByteArray()
+    update(chunkBytes.size.toByteArray())
+    update(chunkBytes)
 }
 
