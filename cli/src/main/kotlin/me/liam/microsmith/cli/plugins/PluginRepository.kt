@@ -72,13 +72,20 @@ private fun validateRepositoryUri(uri: String) {
 private fun cachePathFor(
     cacheDirectory: Path,
     coordinate: Coordinate
-): Path =
-    cacheDirectory
-        .resolve("artifacts")
-        .resolve(coordinate.group.replace('.', '/'))
-        .resolve(coordinate.artifact)
-        .resolve(coordinate.version)
-        .resolve("${coordinate.artifact}-${coordinate.version}.jar")
+): Path {
+    val cacheRoot = cacheDirectory.resolve("artifacts").toAbsolutePath().normalize()
+    val artifactPath =
+        cacheRoot
+            .resolve(coordinate.group.replace('.', '/'))
+            .resolve(coordinate.artifact)
+            .resolve(coordinate.version)
+            .resolve("${coordinate.artifact}-${coordinate.version}.jar")
+            .normalize()
+    require(artifactPath.startsWith(cacheRoot)) {
+        "Plugin coordinate '${coordinate.value}' resolves outside plugin cache directory."
+    }
+    return artifactPath
+}
 
 private fun repositoryArtifactUri(
     repository: String,

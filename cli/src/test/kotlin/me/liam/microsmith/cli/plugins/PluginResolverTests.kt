@@ -203,4 +203,29 @@ class PluginResolverTests :
                 runCatching { tempDir.deleteRecursively() }
             }
         }
+
+        "rejects plugin coordinates with traversal path segments" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-path-traversal")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                script.writeText("// test script")
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf("com.acme:..:1.0.0")
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache"))
+                    )
+
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("invalid path segment")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
     })

@@ -10,7 +10,8 @@ private const val COMPILED_SCRIPT_CACHE_VERSION = 1
 internal object CompiledScriptFingerprint {
     fun uniqueName(
         script: SourceCode,
-        scriptCompilationConfiguration: ScriptCompilationConfiguration
+        scriptCompilationConfiguration: ScriptCompilationConfiguration,
+        additionalFingerprints: List<String> = emptyList()
     ): String {
         val digest = MessageDigest.getInstance("SHA-256")
         digest.update(COMPILED_SCRIPT_CACHE_VERSION.toByteArray())
@@ -22,6 +23,7 @@ internal object CompiledScriptFingerprint {
                 digest.addChunk(entry.key.name)
                 digest.addChunk(entry.value.toString())
             }
+        additionalFingerprints.sorted().forEach(digest::addChunk)
         return digest.digest().toHexString()
     }
 }

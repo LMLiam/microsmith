@@ -50,11 +50,13 @@ internal fun parseCoordinate(raw: String): Coordinate {
             "Use external plugin coordinates only."
     }
 
-    return Coordinate(
-        group = group,
-        artifact = parts[1],
-        version = parts[2]
-    )
+    val artifact = parts[1]
+    val version = parts[2]
+    validateCoordinateGroup(group)
+    validateCoordinateSegment("artifact", artifact)
+    validateCoordinateSegment("version", version)
+
+    return Coordinate(group = group, artifact = artifact, version = version)
 }
 
 internal fun defaultPluginCacheDirectory(): Path {
@@ -101,3 +103,25 @@ internal fun isSha256(value: String): Boolean {
 }
 
 private fun ByteArray.toHexString(): String = joinToString(separator = "") { "%02x".format(it) }
+
+private fun validateCoordinateGroup(group: String) {
+    val segments = group.split('.')
+    require(segments.none(String::isBlank)) {
+        "Plugin coordinate group '$group' contains an empty package segment."
+    }
+    segments.forEach { segment ->
+        validateCoordinateSegment("group", segment)
+    }
+}
+
+private fun validateCoordinateSegment(
+    label: String,
+    value: String
+) {
+    require(!value.contains('/') && !value.contains('\\')) {
+        "Plugin coordinate $label '$value' contains a path separator."
+    }
+    require(value != "." && value != "..") {
+        "Plugin coordinate $label '$value' contains an invalid path segment."
+    }
+}

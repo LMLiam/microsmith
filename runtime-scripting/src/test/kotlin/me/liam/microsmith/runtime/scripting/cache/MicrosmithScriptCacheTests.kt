@@ -7,6 +7,10 @@ import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.writeText
+import kotlin.script.experimental.api.ScriptCompilationConfiguration
+import kotlin.script.experimental.host.FileScriptSource
+import kotlin.script.experimental.jvm.jvm
+import kotlin.script.experimental.jvm.updateClasspath
 
 @OptIn(ExperimentalPathApi::class)
 class MicrosmithScriptCacheTests :
@@ -38,6 +42,45 @@ class MicrosmithScriptCacheTests :
                 val secondFingerprint = RuntimeClasspathFingerprint.calculate(listOf(classpathEntry))
 
                 secondFingerprint shouldBe firstFingerprint
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "compiled script fingerprint changes when plugin classpath bytes change at same path" {
+            val tempDir = createTempDirectory("microsmith-compiled-fingerprint-plugin-change")
+            try {
+                val scriptFile = tempDir.resolve("schema.microsmith.kts")
+                val pluginJar = tempDir.resolve("plugins/custom-plugin.jar")
+                scriptFile.writeText("microsmith { }")
+                pluginJar.parent?.toFile()?.mkdirs()
+                pluginJar.writeText("v1")
+
+                val compilationConfiguration =
+                    ScriptCompilationConfiguration {
+                        jvm {
+                            updateClasspath(listOf(pluginJar.toFile()))
+                        }
+                    }
+                val scriptSource = FileScriptSource(scriptFile.toFile())
+
+                val firstFingerprint =
+                    CompiledScriptFingerprint.uniqueName(
+                        script = scriptSource,
+                        scriptCompilationConfiguration = compilationConfiguration,
+                        additionalFingerprints = listOf(RuntimeClasspathFingerprint.calculate(listOf(pluginJar)))
+                    )
+
+                pluginJar.writeText("v2")
+
+                val secondFingerprint =
+                    CompiledScriptFingerprint.uniqueName(
+                        script = scriptSource,
+                        scriptCompilationConfiguration = compilationConfiguration,
+                        additionalFingerprints = listOf(RuntimeClasspathFingerprint.calculate(listOf(pluginJar)))
+                    )
+
+                secondFingerprint shouldNotBe firstFingerprint
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
