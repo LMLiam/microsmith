@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeTypeOf
 import me.liam.microsmith.cli.command.RunCommand
+import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
@@ -117,6 +118,87 @@ class PluginResolverTests :
                         .shouldBeTypeOf<PluginResolutionResult.Failure>()
 
                 mismatch.diagnostics.joinToString("\n").shouldContain("Checksum mismatch")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "falls back to next repository when first http repository is unavailable" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-http-fallback")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val cache = tempDir.resolve("cache")
+                val repositoryRoot = tempDir.resolve("repo")
+                val coordinate = "com.acme:fallback-test:1.0.0"
+                val repositoryJar =
+                    repositoryRoot.resolve("com/acme/fallback-test/1.0.0/fallback-test-1.0.0.jar")
+                repositoryJar.parent?.toFile()?.mkdirs()
+                repositoryJar.writeBytes("fallback-jar".toByteArray())
+                script.writeText("// test script")
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = output,
+                        plugins = setOf(coordinate)
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                            PluginResolverSettings(
+                                cacheDirectory = cache,
+                                defaultRepositories =
+                                    listOf(
+                                        "http://127.0.0.1:1/repository",
+                                        repositoryRoot.toUri().toString()
+                                    )
+                            )
+                    )
+
+                val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
+                success.classpath.shouldHaveSize(1)
+                success.classpath.first().exists() shouldBe true
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "uses relative plugin jar lock key instead of absolute machine path" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-local-key")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val cache = tempDir.resolve("cache")
+                val localJar = tempDir.resolve("plugins/local-plugin.jar")
+                localJar.parent?.toFile()?.mkdirs()
+                localJar.writeBytes("local-plugin".toByteArray())
+                script.writeText("// test script")
+
+                val workingDirectory = Path.of("").toAbsolutePath().normalize()
+                val relativeJarPath = workingDirectory.relativize(localJar.toAbsolutePath().normalize())
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = output,
+                        pluginJars = setOf(relativeJarPath)
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings = PluginResolverSettings(cacheDirectory = cache)
+                    )
+
+                val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
+                success.classpath.shouldHaveSize(1)
+                val lockfilePath = requireNotNull(success.lockfilePath)
+                val lockContents = lockfilePath.readLines().joinToString("\n")
+                val expectedKey = relativeJarPath.normalize().toString().replace('\\', '/')
+                lockContents.shouldContain("local|$expectedKey|")
+                lockContents.contains("local|${localJar.toAbsolutePath().normalize()}|") shouldBe false
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }

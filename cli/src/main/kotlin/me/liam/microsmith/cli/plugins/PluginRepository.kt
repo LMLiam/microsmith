@@ -8,6 +8,7 @@ import java.net.http.HttpResponse
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import java.io.IOException
 import kotlin.io.path.name
 
 private const val HTTP_STATUS_OK = 200
@@ -43,7 +44,16 @@ internal fun resolveRemoteArtifact(
     repositories.forEach { repository ->
         val artifactUri = repositoryArtifactUri(repository, coordinate.relativeJarPath)
         attemptedUris += artifactUri
-        if (downloadArtifact(artifactUri, cachePath)) {
+        val downloaded =
+            runCatching {
+                downloadArtifact(artifactUri, cachePath)
+            }.getOrElse { error ->
+                if (error is InterruptedException) {
+                    Thread.currentThread().interrupt()
+                }
+                false
+            }
+        if (downloaded) {
             return cachePath
         }
     }
@@ -104,17 +114,33 @@ private fun copyHttpRepositoryArtifact(
     artifactUri: URI,
     destination: Path
 ): Boolean {
-    val request = HttpRequest.newBuilder(artifactUri).GET().build()
-    val response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofByteArray())
-    if (response.statusCode() != HTTP_STATUS_OK) {
-        return false
-    }
+    val response: HttpResponse<ByteArray>? =
+        try {
+            val request = HttpRequest.newBuilder(artifactUri).GET().build()
+            HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofByteArray())
+        } catch (_: IOException) {
+            null
+        } catch (_: InterruptedException) {
+            Thread.currentThread().interrupt()
+            null
+        }
 
-    Files.createDirectories(destination.parent)
-    val tempPath = destination.resolveSibling("${destination.name}.part")
-    Files.write(tempPath, response.body())
-    Files.move(tempPath, destination)
-    return true
+    val downloaded =
+        if (response == null || response.statusCode() != HTTP_STATUS_OK) {
+            false
+        } else {
+            Files.createDirectories(destination.parent)
+            val tempPath = destination.resolveSibling("${destination.name}.part")
+            Files.write(tempPath, response.body())
+            Files.move(tempPath, destination, StandardCopyOption.REPLACE_EXISTING)
+            true
+        }
+
+    if (!downloaded) {
+        val tempPath = destination.resolveSibling("${destination.name}.part")
+        Files.deleteIfExists(tempPath)
+    }
+    return downloaded
 }
 
 private fun copyArtifactToCache(

@@ -43,17 +43,24 @@ private fun resolvePluginsOrThrow(
     val coordinates = command.plugins.toList().sorted().map(::parseCoordinate)
     val localPluginJars =
         command.pluginJars
-            .map { it.toAbsolutePath().normalize() }
-            .sortedBy { it.toString() }
-    localPluginJars.forEach { path ->
-        require(Files.exists(path) && Files.isRegularFile(path)) {
-            "Plugin jar '$path' does not exist or is not a file."
+            .map { requestedPath ->
+                LocalPluginJar(
+                    artifactPath = requestedPath.toAbsolutePath().normalize(),
+                    lockKey = localPluginLockKey(requestedPath)
+                )
+            }.sortedBy(LocalPluginJar::lockKey)
+    localPluginJars.forEach { localJar ->
+        require(Files.exists(localJar.artifactPath) && Files.isRegularFile(localJar.artifactPath)) {
+            "Plugin jar '${localJar.artifactPath}' does not exist or is not a file."
         }
     }
 
     val lockfilePath = settings.lockfilePathOverride ?: defaultLockfilePath(command.script)
     val lockfile = readLockfile(lockfilePath)
-    lockfile?.assertSamePluginSet(buildRequestedLockKeys(coordinates, localPluginJars), lockfilePath)
+    lockfile?.assertSamePluginSet(
+        buildRequestedLockKeys(coordinates, localPluginJars.map(LocalPluginJar::lockKey)),
+        lockfilePath
+    )
 
     val repositories = resolveRepositories(command, settings)
     val cacheDirectory = settings.cacheDirectory.toAbsolutePath().normalize()
@@ -70,12 +77,11 @@ private fun resolvePluginsOrThrow(
         classpath.add(artifactPath)
     }
 
-    localPluginJars.forEach { path ->
-        val checksum = sha256(path)
-        val lockKey = path.toString()
-        lockfile?.verifyChecksum(LOCAL_KIND, lockKey, checksum)
-        lockEntries.add(LockEntry(kind = LOCAL_KIND, key = lockKey, checksum = checksum))
-        classpath.add(path)
+    localPluginJars.forEach { localJar ->
+        val checksum = sha256(localJar.artifactPath)
+        lockfile?.verifyChecksum(LOCAL_KIND, localJar.lockKey, checksum)
+        lockEntries.add(LockEntry(kind = LOCAL_KIND, key = localJar.lockKey, checksum = checksum))
+        classpath.add(localJar.artifactPath)
     }
 
     if (lockfile == null) {
@@ -97,9 +103,20 @@ private fun resolvePluginsOrThrow(
 
 private fun buildRequestedLockKeys(
     coordinates: List<Coordinate>,
-    localPluginJars: List<Path>
+    localPluginLockKeys: List<String>
 ): Set<LockKey> {
     val remoteKeys = coordinates.map { LockKey(kind = REMOTE_KIND, key = it.value) }
-    val localKeys = localPluginJars.map { LockKey(kind = LOCAL_KIND, key = it.toString()) }
+    val localKeys = localPluginLockKeys.map { LockKey(kind = LOCAL_KIND, key = it) }
     return (remoteKeys + localKeys).toSet()
 }
+
+private fun localPluginLockKey(pluginJarPath: Path): String =
+    pluginJarPath
+        .normalize()
+        .toString()
+        .replace('\\', '/')
+
+private data class LocalPluginJar(
+    val artifactPath: Path,
+    val lockKey: String
+)
