@@ -74,8 +74,7 @@ private fun parseOutputDir(
     var error: String? = null
     var index = startIndex
     while (index < args.size && error == null) {
-        val token = args[index]
-        when (token) {
+        when (val token = args[index]) {
             OUTPUT_OPTION -> {
                 val value = args.getOrNull(index + 1)
                 error = validateOutputValue(value, outputDir != null)
@@ -136,7 +135,7 @@ private fun parseVariableValue(value: String?): ParsedVariable =
             val separatorIndex = value.indexOf('=')
             val key =
                 if (separatorIndex > 0) {
-                    value.substring(0, separatorIndex).trim()
+                    value.take(separatorIndex).trim()
                 } else {
                     ""
                 }
