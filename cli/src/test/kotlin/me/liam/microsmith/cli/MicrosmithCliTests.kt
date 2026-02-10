@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import me.liam.microsmith.cli.plugins.PluginResolutionResult
 import me.liam.microsmith.runtime.scripting.ScriptRunFailure
 import me.liam.microsmith.runtime.scripting.ScriptRunSuccess
 import java.util.ServiceConfigurationError
@@ -74,7 +75,7 @@ class MicrosmithCliTests :
                     stdout = out::add,
                     stderr = err::add,
                     providerValidator = { emptyList() },
-                    scriptRunner = {
+                    scriptRunner = { _, _ ->
                         ScriptRunSuccess(
                             warnings = emptyList(),
                             cacheHit = false,
@@ -98,13 +99,47 @@ class MicrosmithCliTests :
                     stdout = out::add,
                     stderr = err::add,
                     providerValidator = { emptyList() },
-                    scriptRunner = { ScriptRunFailure(listOf("[error] schema.microsmith.kts:1:1 broken script")) }
+                    scriptRunner = { _, _ ->
+                        ScriptRunFailure(listOf("[error] schema.microsmith.kts:1:1 broken script"))
+                    }
                 )
 
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
 
             exitCode shouldBe 2
             err.joinToString("\n").shouldContain("broken script")
+            out shouldBe emptyList()
+        }
+
+        "returns error when plugin resolution fails" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    providerValidator = { emptyList() },
+                    pluginResolver = {
+                        PluginResolutionResult.Failure(
+                            diagnostics = listOf("Invalid --plugin value 'broken'.")
+                        )
+                    }
+                )
+
+            val exitCode =
+                cli.run(
+                    arrayOf(
+                        "run",
+                        "schema.microsmith.kts",
+                        "--out",
+                        "build/generated",
+                        "--plugin",
+                        "broken"
+                    )
+                )
+
+            exitCode shouldBe 2
+            err.joinToString("\n").shouldContain("Invalid --plugin value")
             out shouldBe emptyList()
         }
     })
