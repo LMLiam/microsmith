@@ -17,10 +17,10 @@ class MicrosmithScriptCacheTests :
                 val classpathEntry = tempDir.resolve("cli.jar")
                 classpathEntry.writeText("abc")
 
-                val firstFingerprint = classpathContentFingerprint(listOf(classpathEntry))
+                val firstFingerprint = RuntimeClasspathFingerprint.calculate(listOf(classpathEntry))
 
                 classpathEntry.writeText("xyz")
-                val secondFingerprint = classpathContentFingerprint(listOf(classpathEntry))
+                val secondFingerprint = RuntimeClasspathFingerprint.calculate(listOf(classpathEntry))
 
                 secondFingerprint shouldNotBe firstFingerprint
             } finally {
@@ -34,8 +34,8 @@ class MicrosmithScriptCacheTests :
                 val classpathEntry = tempDir.resolve("cli.jar")
                 classpathEntry.writeText("same-content")
 
-                val firstFingerprint = classpathContentFingerprint(listOf(classpathEntry))
-                val secondFingerprint = classpathContentFingerprint(listOf(classpathEntry))
+                val firstFingerprint = RuntimeClasspathFingerprint.calculate(listOf(classpathEntry))
+                val secondFingerprint = RuntimeClasspathFingerprint.calculate(listOf(classpathEntry))
 
                 secondFingerprint shouldBe firstFingerprint
             } finally {
