@@ -30,11 +30,7 @@ class MicrosmithScriptHost(
         val outputPath = request.outputDir.toAbsolutePath().normalize()
         val validationFailure = validateScriptPath(scriptPath)
 
-        return if (validationFailure != null) {
-            validationFailure
-        } else {
-            runScript(request, scriptPath, outputPath)
-        }
+        return validationFailure ?: runScript(request, scriptPath, outputPath)
     }
 
     private fun runScript(
@@ -137,7 +133,7 @@ class MicrosmithScriptHost(
     }
 }
 
-private fun validateScriptPath(scriptPath: Path): ScriptRunFailure? =
+private fun validateScriptPath(scriptPath: Path) =
     when {
         !Files.exists(scriptPath) -> ScriptRunFailure(listOf("Script file '$scriptPath' does not exist."))
         !Files.isRegularFile(scriptPath) -> ScriptRunFailure(listOf("Script path '$scriptPath' is not a file."))
