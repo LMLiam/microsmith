@@ -18,9 +18,11 @@ import kotlin.script.experimental.jvm.baseClassLoader
 import kotlin.script.experimental.jvm.compilationCache
 import kotlin.script.experimental.jvm.defaultJvmScriptingHostConfiguration
 import kotlin.script.experimental.jvm.jvm
+import kotlin.script.experimental.jvm.updateClasspath
 import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost
 import java.nio.file.Files
 import java.nio.file.Path
+import java.net.URLClassLoader
 
 class MicrosmithScriptHost(
     private val cacheDirectory: Path = defaultCacheDirectory()
@@ -37,22 +39,32 @@ class MicrosmithScriptHost(
         request: ScriptRunRequest,
         scriptPath: Path,
         outputPath: Path
-    ): ScriptRunResult =
-        runCatching {
-            Files.createDirectories(cacheDirectory)
-            val cache = MicrosmithScriptCache(cacheDirectory)
-            val runtimeHostConfiguration = createRuntimeHostConfiguration(cache)
-            val scriptContext = createScriptContext(outputPath, request)
-            val (result, elapsedMillis) = evaluateScript(scriptPath, runtimeHostConfiguration, scriptContext)
-            toRunResult(result, elapsedMillis, scriptContext, cache)
-        }.getOrElse { exception ->
-            val message = exception.message ?: exception::class.simpleName ?: "unknown error"
-            ScriptRunFailure(
-                listOf(
-                    "Unhandled script host failure: $message"
+    ): ScriptRunResult {
+        val pluginClasspath = request.pluginClasspath.map { it.toAbsolutePath().normalize() }
+        return withPluginClassLoader(pluginClasspath) { runtimeClassLoader ->
+            runCatching {
+                Files.createDirectories(cacheDirectory)
+                val cache = MicrosmithScriptCache(cacheDirectory)
+                val runtimeHostConfiguration = createRuntimeHostConfiguration(cache, runtimeClassLoader)
+                val scriptContext = createScriptContext(outputPath, request)
+                val (result, elapsedMillis) =
+                    evaluateScript(
+                        scriptPath = scriptPath,
+                        runtimeHostConfiguration = runtimeHostConfiguration,
+                        scriptContext = scriptContext,
+                        pluginClasspath = pluginClasspath
+                    )
+                toRunResult(result, elapsedMillis, scriptContext, cache)
+            }.getOrElse { exception ->
+                val message = exception.message ?: exception::class.simpleName ?: "unknown error"
+                ScriptRunFailure(
+                    listOf(
+                        "Unhandled script host failure: $message"
+                    )
                 )
-            )
+            }
         }
+    }
 
     private fun toRunResult(
         result: ResultWithDiagnostics<EvaluationResult>,
@@ -84,10 +96,13 @@ class MicrosmithScriptHost(
         }
     }
 
-    private fun createRuntimeHostConfiguration(cache: MicrosmithScriptCache): ScriptingHostConfiguration =
+    private fun createRuntimeHostConfiguration(
+        cache: MicrosmithScriptCache,
+        runtimeClassLoader: ClassLoader
+    ): ScriptingHostConfiguration =
         defaultJvmScriptingHostConfiguration.with {
             jvm {
-                baseClassLoader(MicrosmithScript::class.java.classLoader)
+                baseClassLoader(runtimeClassLoader)
                 compilationCache(cache)
             }
         }
@@ -109,12 +124,16 @@ class MicrosmithScriptHost(
     private fun evaluateScript(
         scriptPath: Path,
         runtimeHostConfiguration: ScriptingHostConfiguration,
-        scriptContext: MicrosmithScriptContext
+        scriptContext: MicrosmithScriptContext,
+        pluginClasspath: List<Path>
     ): Pair<ResultWithDiagnostics<EvaluationResult>, Long> {
         val host = BasicJvmScriptingHost(runtimeHostConfiguration)
         val compilationConfiguration =
             ScriptCompilationConfiguration(MicrosmithScriptCompilationConfiguration) {
                 hostConfiguration.update { runtimeHostConfiguration }
+                jvm {
+                    updateClasspath(pluginClasspath.map(Path::toFile))
+                }
             }
         val evaluationConfiguration =
             ScriptEvaluationConfiguration {
@@ -130,6 +149,39 @@ class MicrosmithScriptHost(
             )
         val elapsedMillis = (System.nanoTime() - startNanos) / NANOS_PER_MILLISECOND
         return result to elapsedMillis
+    }
+}
+
+private inline fun <T> withPluginClassLoader(
+    pluginClasspath: List<Path>,
+    block: (ClassLoader) -> T
+): T {
+    val parentClassLoader = MicrosmithScript::class.java.classLoader
+    if (pluginClasspath.isEmpty()) {
+        return withContextClassLoader(parentClassLoader) {
+            block(parentClassLoader)
+        }
+    }
+
+    val urls = pluginClasspath.map { it.toUri().toURL() }.toTypedArray()
+    return URLClassLoader(urls, parentClassLoader).use { pluginClassLoader ->
+        withContextClassLoader(pluginClassLoader) {
+            block(pluginClassLoader)
+        }
+    }
+}
+
+private inline fun <T> withContextClassLoader(
+    classLoader: ClassLoader,
+    block: () -> T
+): T {
+    val thread = Thread.currentThread()
+    val previous = thread.contextClassLoader
+    thread.contextClassLoader = classLoader
+    return try {
+        block()
+    } finally {
+        thread.contextClassLoader = previous
     }
 }
 

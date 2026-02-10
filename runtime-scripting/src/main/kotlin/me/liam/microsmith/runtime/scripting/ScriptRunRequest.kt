@@ -6,6 +6,7 @@ data class ScriptRunRequest(
     val script: Path,
     val outputDir: Path,
     val variables: Map<String, String>,
-    val flags: Set<String>
+    val flags: Set<String>,
+    val pluginClasspath: List<Path> = emptyList()
 )
 
