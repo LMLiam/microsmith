@@ -1,5 +1,6 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.cache
 
+import me.liam.microsmith.runtime.scripting.definition.MicrosmithScript
 import kotlin.script.experimental.jvm.util.classpathFromClassloader
 import java.nio.ByteBuffer
 import java.nio.file.Files

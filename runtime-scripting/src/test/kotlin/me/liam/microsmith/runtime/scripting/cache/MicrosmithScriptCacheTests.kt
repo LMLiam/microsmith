@@ -1,4 +1,4 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.cache
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

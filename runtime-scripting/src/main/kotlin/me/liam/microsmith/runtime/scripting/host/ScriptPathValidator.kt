@@ -1,5 +1,6 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.host
 
+import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
 import java.nio.file.Files
 import java.nio.file.Path
 

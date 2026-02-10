@@ -1,4 +1,4 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.definition
 
 import me.liam.microsmith.dsl.core.MicrosmithScope
 import me.liam.microsmith.dsl.core.microsmith
@@ -6,6 +6,7 @@ import me.liam.microsmith.dsl.schemas.core.SchemasScope
 import me.liam.microsmith.dsl.schemas.core.schemas
 import me.liam.microsmith.dsl.schemas.protobuf.ProtobufScope
 import me.liam.microsmith.dsl.schemas.protobuf.protobuf
+import me.liam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.script.experimental.api.ScriptCompilationConfiguration

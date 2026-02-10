@@ -1,4 +1,4 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.host
 
 import kotlin.script.experimental.api.ScriptDiagnostic
 

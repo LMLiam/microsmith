@@ -1,5 +1,6 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.host
 
+import me.liam.microsmith.runtime.scripting.cache.MicrosmithScriptCache
 import kotlin.script.experimental.host.ScriptingHostConfiguration
 import kotlin.script.experimental.host.with
 import kotlin.script.experimental.jvm.baseClassLoader

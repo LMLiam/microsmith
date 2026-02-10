@@ -1,6 +1,4 @@
-@file:Suppress("unused")
-
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.definition
 
 import kotlin.script.experimental.annotations.KotlinScript
 

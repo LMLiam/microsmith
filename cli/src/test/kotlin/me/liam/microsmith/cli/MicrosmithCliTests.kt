@@ -5,8 +5,8 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import me.liam.microsmith.cli.plugins.PluginResolutionResult
-import me.liam.microsmith.runtime.scripting.ScriptRunFailure
-import me.liam.microsmith.runtime.scripting.ScriptRunSuccess
+import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
+import me.liam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import java.util.ServiceConfigurationError
 
 class MicrosmithCliTests :

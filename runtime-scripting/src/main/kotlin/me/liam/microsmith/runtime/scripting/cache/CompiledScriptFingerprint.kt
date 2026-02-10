@@ -1,4 +1,4 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.cache
 
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.SourceCode

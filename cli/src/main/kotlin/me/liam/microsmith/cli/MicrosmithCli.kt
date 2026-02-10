@@ -7,11 +7,11 @@ import me.liam.microsmith.cli.parsing.parseCliArgs
 import me.liam.microsmith.cli.plugins.PluginResolutionResult
 import me.liam.microsmith.cli.plugins.resolvePlugins
 import me.liam.microsmith.cli.provider.verifyBuiltinProviders
-import me.liam.microsmith.runtime.scripting.MicrosmithScriptHost
-import me.liam.microsmith.runtime.scripting.ScriptRunFailure
-import me.liam.microsmith.runtime.scripting.ScriptRunRequest
-import me.liam.microsmith.runtime.scripting.ScriptRunResult
-import me.liam.microsmith.runtime.scripting.ScriptRunSuccess
+import me.liam.microsmith.runtime.scripting.host.MicrosmithScriptHost
+import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
+import me.liam.microsmith.runtime.scripting.model.ScriptRunRequest
+import me.liam.microsmith.runtime.scripting.model.ScriptRunResult
+import me.liam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import java.nio.file.Path
 import java.util.ServiceConfigurationError
 

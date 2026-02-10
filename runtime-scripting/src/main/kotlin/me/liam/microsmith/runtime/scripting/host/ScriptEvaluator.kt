@@ -1,5 +1,7 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.host
 
+import me.liam.microsmith.runtime.scripting.context.MicrosmithScriptContext
+import me.liam.microsmith.runtime.scripting.definition.MicrosmithScriptCompilationConfiguration
 import kotlin.script.experimental.api.EvaluationResult
 import kotlin.script.experimental.api.ResultWithDiagnostics
 import kotlin.script.experimental.api.ScriptCompilationConfiguration

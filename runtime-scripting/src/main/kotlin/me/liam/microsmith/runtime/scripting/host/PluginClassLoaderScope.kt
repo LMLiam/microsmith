@@ -1,5 +1,6 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.host
 
+import me.liam.microsmith.runtime.scripting.definition.MicrosmithScript
 import java.net.URLClassLoader
 import java.nio.file.Path
 
