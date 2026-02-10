@@ -253,4 +253,54 @@ class PluginResolverTests :
                 runCatching { tempDir.deleteRecursively() }
             }
         }
+
+        "rejects plugin coordinates containing path separators" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-path-separator")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                script.writeText("// test script")
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf("com.acme:bad/path:1.0.0")
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache"))
+                    )
+
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("path separator")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "rejects lockfile delimiter in group segment" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-group-delimiter")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                script.writeText("// test script")
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf("com|acme:plugin:1.0.0")
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache"))
+                    )
+
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("reserved lockfile delimiter")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
     })
