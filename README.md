@@ -38,6 +38,18 @@ To run tests only:
 ./gradlew kotest
 ```
 
+To run static analysis:
+
+```bash
+./gradlew detekt ktlintCheck
+```
+
+To auto-format Kotlin sources:
+
+```bash
+./gradlew ktlintFormat
+```
+
 Notes:
 - Kotlin JVM toolchain is configured to use Java 24 in the root Gradle configuration.
 - Tests use Kotest (v6) and the project defines a `KotestConfig` to emit JUnit XML results into the Gradle build directory.
