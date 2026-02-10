@@ -4,25 +4,30 @@ import me.liam.microsmith.cli.command.ErrorCommand
 import me.liam.microsmith.cli.command.HelpCommand
 import me.liam.microsmith.cli.command.RunCommand
 import me.liam.microsmith.cli.parsing.parseCliArgs
+import me.liam.microsmith.cli.plugins.PluginResolutionResult
+import me.liam.microsmith.cli.plugins.resolvePlugins
 import me.liam.microsmith.cli.provider.verifyBuiltinProviders
-import me.liam.microsmith.runtime.scripting.MicrosmithScriptHost
-import me.liam.microsmith.runtime.scripting.ScriptRunFailure
-import me.liam.microsmith.runtime.scripting.ScriptRunRequest
-import me.liam.microsmith.runtime.scripting.ScriptRunResult
-import me.liam.microsmith.runtime.scripting.ScriptRunSuccess
+import me.liam.microsmith.runtime.scripting.host.MicrosmithScriptHost
+import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
+import me.liam.microsmith.runtime.scripting.model.ScriptRunRequest
+import me.liam.microsmith.runtime.scripting.model.ScriptRunResult
+import me.liam.microsmith.runtime.scripting.model.ScriptRunSuccess
+import java.nio.file.Path
 import java.util.ServiceConfigurationError
 
 internal class MicrosmithCli(
     private val stdout: (String) -> Unit = ::println,
     private val stderr: (String) -> Unit = { System.err.println(it) },
     private val providerValidator: () -> List<String> = ::verifyBuiltinProviders,
-    private val scriptRunner: (RunCommand) -> ScriptRunResult = { command ->
+    private val pluginResolver: (RunCommand) -> PluginResolutionResult = ::resolvePlugins,
+    private val scriptRunner: (RunCommand, List<Path>) -> ScriptRunResult = { command, pluginClasspath ->
         MicrosmithScriptHost().run(
             ScriptRunRequest(
                 script = command.script,
                 outputDir = command.outputDir,
                 variables = command.variables,
-                flags = command.flags
+                flags = command.flags,
+                pluginClasspath = pluginClasspath
             )
         )
     }
@@ -44,24 +49,33 @@ internal class MicrosmithCli(
 
     private fun runCommand(command: RunCommand): Int {
         val providerErrors = collectProviderErrors()
+        val runResult =
+            if (providerErrors.isNotEmpty()) {
+                providerErrors.forEach(stderr)
+                null
+            } else {
+                when (val resolvedPlugins = pluginResolver(command)) {
+                    is PluginResolutionResult.Failure -> {
+                        resolvedPlugins.diagnostics.forEach(stderr)
+                        null
+                    }
+                    is PluginResolutionResult.Success -> scriptRunner(command, resolvedPlugins.classpath)
+                }
+            }
 
-        if (providerErrors.isNotEmpty()) {
-            providerErrors.forEach(stderr)
-            return 2
-        }
-
-        return when (val result = scriptRunner(command)) {
+        return when (runResult) {
+            null -> 2
             is ScriptRunSuccess -> {
-                result.warnings.forEach(stderr)
-                val cacheState = if (result.cacheHit) "hit" else "miss"
+                runResult.warnings.forEach(stderr)
+                val cacheState = if (runResult.cacheHit) "hit" else "miss"
                 stdout(
                     "Generated script '${command.script}' into '${command.outputDir}' " +
-                        "(compile-cache=$cacheState, elapsed=${result.elapsedMillis}ms)."
+                        "(compile-cache=$cacheState, elapsed=${runResult.elapsedMillis}ms)."
                 )
                 0
             }
             is ScriptRunFailure -> {
-                result.diagnostics.forEach(stderr)
+                runResult.diagnostics.forEach(stderr)
                 2
             }
         }

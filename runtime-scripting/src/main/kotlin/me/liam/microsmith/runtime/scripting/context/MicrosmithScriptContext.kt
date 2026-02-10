@@ -1,4 +1,4 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.context
 
 import me.liam.microsmith.dsl.core.MicrosmithModel
 import java.nio.file.Path

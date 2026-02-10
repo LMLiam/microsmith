@@ -1,9 +1,12 @@
-package me.liam.microsmith.runtime.scripting
+package me.liam.microsmith.runtime.scripting.host
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeTypeOf
+import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
+import me.liam.microsmith.runtime.scripting.model.ScriptRunRequest
+import me.liam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import java.nio.file.Files
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
