@@ -65,7 +65,7 @@ internal fun normalizeRepositoryUri(uri: String): String {
             require(!host.isNullOrBlank()) {
                 "Repository URI '$uri' must include a valid host."
             }
-            val path = parsed.path?.ifEmpty { "" } ?: ""
+            val path = parsed.path?.ifEmpty { "" }.orEmpty()
             URI(scheme, parsed.userInfo, host, parsed.port, path, null, null).toString().trimEnd('/')
         }
         else -> error("Unsupported repository URI '$uri'. Use https://, http://, or file://.")
