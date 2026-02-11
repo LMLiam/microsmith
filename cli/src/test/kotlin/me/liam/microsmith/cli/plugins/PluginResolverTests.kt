@@ -44,7 +44,11 @@ class PluginResolverTests :
                 val result =
                     resolvePlugins(
                         command = command,
-                        settings = PluginResolverSettings(cacheDirectory = cache),
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            repositoryPolicy = fileRepositoryAllowedPolicy(),
+                        ),
                     )
 
                 val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
@@ -107,14 +111,28 @@ class PluginResolverTests :
                         repositoryOverride = repositoryRoot.toUri().toString(),
                     )
 
-                resolvePlugins(command = command, settings = PluginResolverSettings(cacheDirectory = cache))
+                resolvePlugins(
+                    command = command,
+                    settings =
+                    PluginResolverSettings(
+                        cacheDirectory = cache,
+                        repositoryPolicy = fileRepositoryAllowedPolicy(),
+                    ),
+                )
 
                 val cachedArtifact =
                     cache.resolve("artifacts/com/acme/lock-test/1.0.0/lock-test-1.0.0.jar")
                 cachedArtifact.writeBytes("tampered".toByteArray())
 
                 val mismatch =
-                    resolvePlugins(command = command, settings = PluginResolverSettings(cacheDirectory = cache))
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            repositoryPolicy = fileRepositoryAllowedPolicy(),
+                        ),
+                    )
                         .shouldBeTypeOf<PluginResolutionResult.Failure>()
 
                 mismatch.diagnostics.joinToString("\n").shouldContain("Checksum mismatch")
@@ -156,13 +174,8 @@ class PluginResolverTests :
                                 repositoryRoot.toUri().toString(),
                             ),
                             repositoryPolicy =
-                            RepositoryAllowlistPolicy(
-                                allowedRepositories =
-                                setOf(
-                                    normalizeRepositoryUri(MAVEN_CENTRAL_REPOSITORY),
-                                    normalizeRepositoryUri("http://127.0.0.1:1/repository"),
-                                ),
-                                allowFileRepositories = true,
+                            fileRepositoryAllowedPolicy(
+                                "http://127.0.0.1:1/repository",
                             ),
                         ),
                     )
@@ -338,6 +351,40 @@ class PluginResolverTests :
             }
         }
 
+        "blocks file repository endpoint by default security policy" {
+            val tempDir = createTempDirectory("microsmith-plugin-repository-file-blocked")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val cache = tempDir.resolve("cache")
+                val repositoryRoot = tempDir.resolve("repo")
+                val coordinate = "com.acme:file-blocked:1.0.0"
+                val repositoryJar =
+                    repositoryRoot.resolve("com/acme/file-blocked/1.0.0/file-blocked-1.0.0.jar")
+                repositoryJar.parent?.toFile()?.mkdirs()
+                repositoryJar.writeBytes("plugin-jar-contents".toByteArray())
+                script.writeText("// test script")
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = output,
+                        plugins = setOf(coordinate),
+                        repositoryOverride = repositoryRoot.toUri().toString(),
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings = PluginResolverSettings(cacheDirectory = cache),
+                    )
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("file:// repositories are not allowed")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
         "fails when plugin checksum allowlist is missing requested plugin entry" {
             val tempDir = createTempDirectory("microsmith-plugin-allowlist-missing-entry")
             try {
@@ -420,3 +467,12 @@ class PluginResolverTests :
             }
         }
     })
+
+private fun fileRepositoryAllowedPolicy(vararg additionalAllowedRepositories: String): RepositoryAllowlistPolicy =
+    RepositoryAllowlistPolicy(
+        allowedRepositories =
+        (listOf(MAVEN_CENTRAL_REPOSITORY) + additionalAllowedRepositories)
+            .map(::normalizeRepositoryUri)
+            .toSet(),
+        allowFileRepositories = true,
+    )
