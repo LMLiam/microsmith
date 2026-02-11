@@ -8,4 +8,5 @@ data class ScriptRunRequest(
     val variables: Map<String, String>,
     val flags: Set<String>,
     val pluginClasspath: List<Path> = emptyList(),
+    val isolationMode: ScriptIsolationMode = ScriptIsolationMode.CLASSLOADER,
 )
