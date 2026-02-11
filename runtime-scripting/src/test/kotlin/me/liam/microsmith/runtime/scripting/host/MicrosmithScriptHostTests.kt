@@ -192,6 +192,43 @@ class MicrosmithScriptHostTests :
             }
         }
 
+        "blocks grouped file directives that attempt dependency injection" {
+            val tempDir = createTempDirectory("microsmith-script-host-grouped-directive-policy")
+            try {
+                val script = tempDir.resolve("directive-grouped.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val cache = tempDir.resolve("cache")
+
+                script.writeText(
+                    """
+                    @file:[
+                        Suppress("unused")
+                        kotlin.script.experimental.dependencies.DependsOn("com.acme:dangerous:1.0.0")
+                    ]
+
+                    microsmith { }
+                    """.trimIndent(),
+                )
+
+                val host = MicrosmithScriptHost(cacheDirectory = cache)
+                val result =
+                    host.run(
+                        ScriptRunRequest(
+                            script = script,
+                            outputDir = output,
+                            variables = emptyMap(),
+                            flags = emptySet(),
+                        ),
+                    )
+
+                val failure = result.shouldBeTypeOf<ScriptRunFailure>()
+                failure.diagnostics.joinToString("\n").shouldContain("dependency directives are blocked")
+                failure.diagnostics.joinToString("\n").shouldContain("@file:DependsOn")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
         "supports optional process isolation mode" {
             val tempDir = createTempDirectory("microsmith-script-host-process-isolation")
             try {
