@@ -19,10 +19,7 @@ class MicrosmithBuilder : MicrosmithScope {
     var model = MicrosmithModel.empty()
         private set
 
-    fun <T : MicrosmithExtension> put(
-        type: KClass<T>,
-        ext: T
-    ) {
+    fun <T : MicrosmithExtension> put(type: KClass<T>, ext: T) {
         model = model.with(type, ext)
     }
 }

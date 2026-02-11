@@ -49,11 +49,7 @@ private fun parseScriptArg(scriptArg: String?): Pair<Path?, String?> {
     return result
 }
 
-private fun parseRunOptionsCommand(
-    script: Path,
-    args: List<String>,
-    startIndex: Int
-): CliCommand {
+private fun parseRunOptionsCommand(script: Path, args: List<String>, startIndex: Int): CliCommand {
     val parsedOptions = parseRunOptions(args, startIndex)
     return when {
         parsedOptions.error != null -> ErrorCommand(parsedOptions.error)
@@ -67,7 +63,7 @@ private fun parseRunOptionsCommand(
                 plugins = parsedOptions.plugins,
                 pluginJars = parsedOptions.pluginJars,
                 offline = parsedOptions.offline,
-                repositoryOverride = parsedOptions.repositoryOverride
+                repositoryOverride = parsedOptions.repositoryOverride,
             )
     }
 }

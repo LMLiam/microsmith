@@ -9,7 +9,7 @@ class KotestConfig : AbstractProjectConfig() {
             JunitXmlReporter(
                 includeContainers = false,
                 useTestPathAsName = false,
-                outputDir = "${System.getProperty("gradle.build.dir")}/test-results/kotest"
-            )
+                outputDir = "${System.getProperty("gradle.build.dir")}/test-results/kotest",
+            ),
         )
 }

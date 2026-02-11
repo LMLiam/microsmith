@@ -10,5 +10,5 @@ internal data class RunCommand(
     val plugins: Set<String> = emptySet(),
     val pluginJars: Set<Path> = emptySet(),
     val offline: Boolean = false,
-    val repositoryOverride: String? = null
+    val repositoryOverride: String? = null,
 ) : CliCommand

@@ -1,6 +1,7 @@
 package me.liam.microsmith.cli.plugins
 
 import me.liam.microsmith.cli.command.RunCommand
+import java.io.IOException
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -8,16 +9,12 @@ import java.net.http.HttpResponse
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
-import java.io.IOException
 import kotlin.io.path.name
 
 private const val HTTP_STATUS_OK = 200
 private val HTTP_CLIENT: HttpClient = HttpClient.newHttpClient()
 
-internal fun resolveRepositories(
-    command: RunCommand,
-    settings: PluginResolverSettings
-): List<String> {
+internal fun resolveRepositories(command: RunCommand, settings: PluginResolverSettings): List<String> {
     val override = command.repositoryOverride?.trim()?.takeIf { it.isNotEmpty() }
     val repositories = (listOfNotNull(override) + settings.defaultRepositories).distinct()
     repositories.forEach(::validateRepositoryUri)
@@ -28,7 +25,7 @@ internal fun resolveRemoteArtifact(
     coordinate: Coordinate,
     repositories: List<String>,
     cacheDirectory: Path,
-    offline: Boolean
+    offline: Boolean,
 ): Path {
     val cachePath = cachePathFor(cacheDirectory, coordinate)
     if (Files.exists(cachePath)) {
@@ -69,10 +66,7 @@ private fun validateRepositoryUri(uri: String) {
     }
 }
 
-private fun cachePathFor(
-    cacheDirectory: Path,
-    coordinate: Coordinate
-): Path {
+private fun cachePathFor(cacheDirectory: Path, coordinate: Coordinate): Path {
     val cacheRoot = cacheDirectory.resolve("artifacts").toAbsolutePath().normalize()
     val artifactPath =
         cacheRoot
@@ -87,15 +81,10 @@ private fun cachePathFor(
     return artifactPath
 }
 
-private fun repositoryArtifactUri(
-    repository: String,
-    relativePath: String
-): String = "${repository.trimEnd('/')}/$relativePath"
+private fun repositoryArtifactUri(repository: String, relativePath: String): String =
+    "${repository.trimEnd('/')}/$relativePath"
 
-private fun downloadArtifact(
-    artifactUri: String,
-    destination: Path
-): Boolean {
+private fun downloadArtifact(artifactUri: String, destination: Path): Boolean {
     val uri = URI.create(artifactUri)
     return when (uri.scheme?.lowercase()) {
         "file" -> copyFileRepositoryArtifact(uri, destination)
@@ -104,10 +93,7 @@ private fun downloadArtifact(
     }
 }
 
-private fun copyFileRepositoryArtifact(
-    artifactUri: URI,
-    destination: Path
-): Boolean {
+private fun copyFileRepositoryArtifact(artifactUri: URI, destination: Path): Boolean {
     val source = Path.of(artifactUri)
     if (!Files.exists(source) || !Files.isRegularFile(source)) {
         return false
@@ -117,10 +103,7 @@ private fun copyFileRepositoryArtifact(
     return true
 }
 
-private fun copyHttpRepositoryArtifact(
-    artifactUri: URI,
-    destination: Path
-): Boolean {
+private fun copyHttpRepositoryArtifact(artifactUri: URI, destination: Path): Boolean {
     val response: HttpResponse<ByteArray>? =
         try {
             val request = HttpRequest.newBuilder(artifactUri).GET().build()
@@ -150,10 +133,7 @@ private fun copyHttpRepositoryArtifact(
     return downloaded
 }
 
-private fun copyArtifactToCache(
-    source: Path,
-    destination: Path
-) {
+private fun copyArtifactToCache(source: Path, destination: Path) {
     Files.createDirectories(destination.parent)
     Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING)
 }

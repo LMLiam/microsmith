@@ -3,7 +3,7 @@ package me.liam.microsmith.dsl.schemas.protobuf.types
 import me.liam.microsmith.dsl.schemas.protobuf.EnumValueScope
 
 class EnumValueBuilder(
-    var index: Int? = null
+    var index: Int? = null,
 ) : EnumValueScope {
     override fun index(index: Int) {
         this.index = index

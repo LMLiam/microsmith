@@ -8,7 +8,7 @@ import java.util.ServiceLoader
 
 internal fun verifyBuiltinProviders(
     modelGenerators: List<ModelGenerator<*>> = loadModelGenerators(),
-    schemaEmitters: List<SchemaEmitter<*>> = loadSchemaEmitters()
+    schemaEmitters: List<SchemaEmitter<*>> = loadSchemaEmitters(),
 ): List<String> {
     val errors = mutableListOf<String>()
 

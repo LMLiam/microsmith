@@ -7,17 +7,13 @@ import me.liam.microsmith.runtime.scripting.model.ScriptRunRequest
 import java.nio.file.Path
 
 internal object ScriptContextFactory {
-    fun create(
-        outputPath: Path,
-        request: ScriptRunRequest
-    ): MicrosmithScriptContext =
-        MicrosmithScriptContext(
-            outDir = outputPath,
-            vars = request.variables,
-            flags = request.flags
-        ) { model ->
-            runBlocking {
-                model.generateTo(outputPath)
-            }
+    fun create(outputPath: Path, request: ScriptRunRequest): MicrosmithScriptContext = MicrosmithScriptContext(
+        outDir = outputPath,
+        vars = request.variables,
+        flags = request.flags,
+    ) { model ->
+        runBlocking {
+            model.generateTo(outputPath)
         }
+    }
 }

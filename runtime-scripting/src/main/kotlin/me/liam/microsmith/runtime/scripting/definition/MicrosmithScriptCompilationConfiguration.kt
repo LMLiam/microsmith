@@ -21,7 +21,7 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
         defaultImports(
             importFromPackageOf(MicrosmithScope::class, ::microsmith),
             importFromPackageOf(SchemasScope::class, MicrosmithScope::schemas),
-            importFromPackageOf(ProtobufScope::class, SchemasScope::protobuf)
+            importFromPackageOf(ProtobufScope::class, SchemasScope::protobuf),
         )
 
         implicitReceivers(MicrosmithScriptContext::class)
@@ -30,18 +30,15 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
             updateClasspath(
                 classpathFromClassloader(
                     MicrosmithScript::class.java.classLoader,
-                    unpackJarCollections = true
-                ).orEmpty()
+                    unpackJarCollections = true,
+                ).orEmpty(),
             )
         }
-    }
+    },
 ) {
     @Suppress("unused")
     private fun readResolve(): Any = MicrosmithScriptCompilationConfiguration
 }
 
-private fun importFromPackageOf(
-    owner: KClass<*>,
-    symbol: KFunction<*>
-): String = "${owner.java.packageName}.${symbol.name}"
-
+private fun importFromPackageOf(owner: KClass<*>, symbol: KFunction<*>): String =
+    "${owner.java.packageName}.${symbol.name}"

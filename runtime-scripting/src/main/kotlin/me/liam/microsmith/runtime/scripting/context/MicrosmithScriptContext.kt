@@ -7,7 +7,7 @@ class MicrosmithScriptContext(
     val outDir: Path,
     val vars: Map<String, String>,
     val flags: Set<String>,
-    private val emitHandler: (MicrosmithModel) -> Unit
+    private val emitHandler: (MicrosmithModel) -> Unit,
 ) {
     private var emitted: Boolean = false
 
@@ -22,9 +22,7 @@ class MicrosmithScriptContext(
 
     fun varOrNull(name: String): String? = vars[name]
 
-    fun requireVar(name: String): String =
-        vars[name] ?: error("Missing required --var '$name'.")
+    fun requireVar(name: String): String = vars[name] ?: error("Missing required --var '$name'.")
 
     internal fun emittedAny(): Boolean = emitted
 }
-

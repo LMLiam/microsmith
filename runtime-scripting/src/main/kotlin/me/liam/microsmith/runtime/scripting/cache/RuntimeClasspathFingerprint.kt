@@ -1,18 +1,18 @@
 package me.liam.microsmith.runtime.scripting.cache
 
 import me.liam.microsmith.runtime.scripting.definition.MicrosmithScript
-import kotlin.script.experimental.jvm.util.classpathFromClassloader
 import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
+import kotlin.script.experimental.jvm.util.classpathFromClassloader
 
 internal object RuntimeClasspathFingerprint {
     private val runtimeFingerprint: String by lazy {
         val classpathEntries =
             classpathFromClassloader(
                 MicrosmithScript::class.java.classLoader,
-                unpackJarCollections = true
+                unpackJarCollections = true,
             ).orEmpty()
                 .map { it.toPath().toAbsolutePath().normalize() }
         calculate(classpathEntries)
@@ -55,13 +55,12 @@ private fun MessageDigest.addDirectoryFingerprint(directory: Path) {
     }
 }
 
-private fun directoryRegularFiles(directory: Path): List<Path> =
-    Files.walk(directory).use { stream ->
-        stream
-            .filter { Files.isRegularFile(it) }
-            .sorted(compareBy { it.toString() })
-            .toList()
-    }
+private fun directoryRegularFiles(directory: Path): List<Path> = Files.walk(directory).use { stream ->
+    stream
+        .filter { Files.isRegularFile(it) }
+        .sorted(compareBy { it.toString() })
+        .toList()
+}
 
 private fun MessageDigest.addFileDigest(path: Path) {
     val fileDigest = MessageDigest.getInstance("SHA-256")
@@ -84,9 +83,8 @@ private fun MessageDigest.addChunk(chunk: String) {
     update(chunkBytes)
 }
 
-private fun Int.toByteArray() =
-    ByteBuffer.allocate(Int.SIZE_BYTES)
-        .also { it.putInt(this) }
-        .array()
+private fun Int.toByteArray() = ByteBuffer.allocate(Int.SIZE_BYTES)
+    .also { it.putInt(this) }
+    .array()
 
 private fun ByteArray.toHexString() = joinToString(separator = "") { "%02x".format(it) }

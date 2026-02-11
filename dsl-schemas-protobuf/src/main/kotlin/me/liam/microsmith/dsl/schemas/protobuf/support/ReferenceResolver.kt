@@ -7,13 +7,11 @@ import me.liam.microsmith.dsl.schemas.protobuf.field.MapType
 import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
 import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
 import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
+import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import me.liam.microsmith.dsl.schemas.protobuf.types.Message
 
-fun getReferencePath(
-    currentSegments: List<String>,
-    target: String
-): List<String> {
+fun getReferencePath(currentSegments: List<String>, target: String): List<String> {
     require(target.isNotBlank()) { "Reference target cannot be blank." }
 
     return when {
@@ -41,11 +39,13 @@ private fun String.validatePathSegments(label: String): List<String> {
     return segments
 }
 
-fun resolveReferences(schemas: Set<ProtobufSchema>): Set<ProtobufSchema> {
-    val schemasByName = schemas.associateBy { it.name }
+private class ReferenceResolutionContext(
+    schemas: Set<ProtobufSchema>,
+) {
+    private val schemasByName = schemas.associateBy { it.name }
     val errors = mutableListOf<String>()
 
-    fun Reference.resolve(context: String): Reference {
+    private fun Reference.resolve(context: String): Reference {
         val target = schemasByName[name]?.schema
         if (target == null) {
             errors += "Unresolved reference '$name' in $context"
@@ -54,53 +54,55 @@ fun resolveReferences(schemas: Set<ProtobufSchema>): Set<ProtobufSchema> {
         return copy(type = target)
     }
 
-    fun Field.resolve(messageName: String): Field =
-        when (this) {
-            is ReferenceField -> copy(reference = reference.resolve("message $messageName field '$name'"))
-            is MapField -> {
-                val resolvedValue =
-                    (type.value as? Reference)?.resolve("message $messageName map field '$name' value") ?: type.value
-                copy(type = MapType(type.key, resolvedValue))
-            }
-            else -> this
+    private fun Field.resolve(messageName: String): Field = when (this) {
+        is ReferenceField -> copy(reference = reference.resolve("message $messageName field '$name'"))
+        is MapField -> {
+            val resolvedValue =
+                (type.value as? Reference)?.resolve("message $messageName map field '$name' value") ?: type.value
+            copy(type = MapType(type.key, resolvedValue))
         }
+        is ScalarField -> this
+        is OneofField -> this
+    }
 
-    fun OneofField.resolve(messageName: String, oneofName: String): OneofField {
+    private fun OneofField.resolve(messageName: String, oneofName: String): OneofField {
         val resolvedFieldType =
             (fieldType as? Reference)?.resolve("message $messageName oneof '$oneofName' field '$name'") ?: fieldType
         return copy(fieldType = resolvedFieldType)
     }
 
-    val resolvedSchemas =
-        schemas.map { schema ->
-            val resolvedType =
-                when (val current = schema.schema) {
-                    is Message ->
-                        current.copy(
-                            fields = current.fields.map { field -> field.resolve(current.name) },
-                            oneofs =
-                                current.oneofs.map { oneof ->
-                                    Oneof(
-                                        name = oneof.name,
-                                        fields = oneof.fields.map { oneofField -> oneofField.resolve(current.name, oneof.name) }
-                                    )
-                                }
-                        )
+    private fun Message.resolveMessage(): Message = copy(
+        fields = fields.map { it.resolve(name) },
+        oneofs = oneofs.map { it.resolve(name) },
+    )
 
-                    else -> current
-                }
+    private fun Oneof.resolve(messageName: String): Oneof = copy(fields = fields.map { it.resolve(messageName, name) })
 
-            schema.copy(schema = resolvedType)
-        }.toSet()
+    fun resolve(schema: ProtobufSchema): ProtobufSchema {
+        val resolvedType =
+            when (val current = schema.schema) {
+                is Message -> current.resolveMessage()
+                else -> current
+            }
+        return schema.copy(schema = resolvedType)
+    }
 
-    if (errors.isNotEmpty()) {
+    fun failOnUnresolvedReferences() {
+        if (errors.isEmpty()) {
+            return
+        }
         error(
             buildString {
                 appendLine("Unresolved references:")
                 errors.forEach { appendLine("- $it") }
-            }.trimEnd()
+            }.trimEnd(),
         )
     }
+}
 
+fun resolveReferences(schemas: Set<ProtobufSchema>): Set<ProtobufSchema> {
+    val resolver = ReferenceResolutionContext(schemas)
+    val resolvedSchemas = schemas.map { resolver.resolve(it) }.toSet()
+    resolver.failOnUnresolvedReferences()
     return resolvedSchemas
 }

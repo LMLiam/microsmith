@@ -27,25 +27,24 @@ internal class MicrosmithCli(
                 outputDir = command.outputDir,
                 variables = command.variables,
                 flags = command.flags,
-                pluginClasspath = pluginClasspath
-            )
+                pluginClasspath = pluginClasspath,
+            ),
         )
-    }
+    },
 ) {
-    fun run(args: Array<String>): Int =
-        when (val parsed = parseCliArgs(args.toList())) {
-            is HelpCommand -> {
-                stdout(HELP_TEXT.trimIndent())
-                0
-            }
-            is ErrorCommand -> {
-                stderr(parsed.message)
-                stderr("")
-                stderr(HELP_TEXT.trimIndent())
-                2
-            }
-            is RunCommand -> runCommand(parsed)
+    fun run(args: Array<String>): Int = when (val parsed = parseCliArgs(args.toList())) {
+        is HelpCommand -> {
+            stdout(HELP_TEXT.trimIndent())
+            0
         }
+        is ErrorCommand -> {
+            stderr(parsed.message)
+            stderr("")
+            stderr(HELP_TEXT.trimIndent())
+            2
+        }
+        is RunCommand -> runCommand(parsed)
+    }
 
     private fun runCommand(command: RunCommand): Int {
         val providerErrors = collectProviderErrors()
@@ -70,7 +69,7 @@ internal class MicrosmithCli(
                 val cacheState = if (runResult.cacheHit) "hit" else "miss"
                 stdout(
                     "Generated script '${command.script}' into '${command.outputDir}' " +
-                        "(compile-cache=$cacheState, elapsed=${runResult.elapsedMillis}ms)."
+                        "(compile-cache=$cacheState, elapsed=${runResult.elapsedMillis}ms).",
                 )
                 0
             }
@@ -81,11 +80,10 @@ internal class MicrosmithCli(
         }
     }
 
-    private fun collectProviderErrors(): List<String> =
-        try {
-            providerValidator()
-        } catch (error: ServiceConfigurationError) {
-            val message = error.message ?: error::class.simpleName ?: "ServiceConfigurationError"
-            listOf("Failed to load runtime service providers: $message")
-        }
+    private fun collectProviderErrors(): List<String> = try {
+        providerValidator()
+    } catch (error: ServiceConfigurationError) {
+        val message = error.message ?: error::class.simpleName ?: "ServiceConfigurationError"
+        listOf("Failed to load runtime service providers: $message")
+    }
 }

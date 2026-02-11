@@ -13,7 +13,7 @@ import kotlin.io.path.Path
 internal data class QualifiedSchemaName(
     val fullyQualifiedName: String,
     val packageName: String?,
-    val typeName: String
+    val typeName: String,
 ) {
     /** Returns the canonical relative output path under `proto/`. */
     internal fun relativePath(): java.nio.file.Path {
@@ -39,7 +39,7 @@ internal data class QualifiedSchemaName(
             return QualifiedSchemaName(
                 fullyQualifiedName = normalized,
                 packageName = packageName,
-                typeName = typeName
+                typeName = typeName,
             )
         }
     }

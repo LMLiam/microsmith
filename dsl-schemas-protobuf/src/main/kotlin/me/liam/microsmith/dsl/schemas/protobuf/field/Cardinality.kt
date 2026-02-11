@@ -6,5 +6,5 @@ enum class Cardinality {
      */
     REQUIRED,
     OPTIONAL,
-    REPEATED
+    REPEATED,
 }

@@ -2,6 +2,7 @@ package me.liam.microsmith.runtime.scripting.host
 
 import me.liam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import me.liam.microsmith.runtime.scripting.definition.MicrosmithScriptCompilationConfiguration
+import java.nio.file.Path
 import kotlin.script.experimental.api.EvaluationResult
 import kotlin.script.experimental.api.ResultWithDiagnostics
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
@@ -13,14 +14,13 @@ import kotlin.script.experimental.host.ScriptingHostConfiguration
 import kotlin.script.experimental.jvm.jvm
 import kotlin.script.experimental.jvm.updateClasspath
 import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost
-import java.nio.file.Path
 
 internal object ScriptEvaluator {
     fun evaluate(
         scriptPath: Path,
         runtimeHostConfiguration: ScriptingHostConfiguration,
         scriptContext: MicrosmithScriptContext,
-        pluginClasspath: List<Path>
+        pluginClasspath: List<Path>,
     ): Pair<ResultWithDiagnostics<EvaluationResult>, Long> {
         val host = BasicJvmScriptingHost(runtimeHostConfiguration)
         val compilationConfiguration =
@@ -40,7 +40,7 @@ internal object ScriptEvaluator {
             host.eval(
                 script = FileScriptSource(scriptPath.toFile()),
                 compilationConfiguration = compilationConfiguration,
-                evaluationConfiguration = evaluationConfiguration
+                evaluationConfiguration = evaluationConfiguration,
             )
         val elapsedMillis = (System.nanoTime() - startNanos) / NANOS_PER_MILLISECOND
         return result to elapsedMillis

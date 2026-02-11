@@ -5,7 +5,7 @@ import me.liam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.nio.file.Path
 
 class MicrosmithScriptHost(
-    private val cacheDirectory: Path = ScriptHostPaths.defaultCacheDirectory()
+    private val cacheDirectory: Path = ScriptHostPaths.defaultCacheDirectory(),
 ) {
     private val runExecutor = ScriptRunExecutor(cacheDirectory)
 

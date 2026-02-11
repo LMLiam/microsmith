@@ -52,7 +52,10 @@ private fun Message.requireUniqueFieldNames() {
                 }
             }
         }
-    val duplicates = usages.groupBy(keySelector = { it.first }, valueTransform = { it.second }).filterValues { it.size > 1 }
+    val duplicates = usages.groupBy(
+        keySelector = { it.first },
+        valueTransform = { it.second },
+    ).filterValues { it.size > 1 }
 
     require(duplicates.isEmpty()) {
         val details =
@@ -76,7 +79,10 @@ private fun Message.requireUniqueFieldNumbers() {
                 }
             }
         }
-    val duplicates = usages.groupBy(keySelector = { it.first }, valueTransform = { it.second }).filterValues { it.size > 1 }
+    val duplicates = usages.groupBy(
+        keySelector = { it.first },
+        valueTransform = { it.second },
+    ).filterValues { it.size > 1 }
 
     require(duplicates.isEmpty()) {
         val details =

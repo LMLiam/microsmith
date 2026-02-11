@@ -5,10 +5,7 @@ import java.net.URLClassLoader
 import java.nio.file.Path
 
 internal object PluginClassLoaderScope {
-    fun <T> withPluginClassLoader(
-        pluginClasspath: List<Path>,
-        block: (ClassLoader) -> T
-    ): T {
+    fun <T> withPluginClassLoader(pluginClasspath: List<Path>, block: (ClassLoader) -> T): T {
         val parentClassLoader = MicrosmithScript::class.java.classLoader
         if (pluginClasspath.isEmpty()) {
             return withContextClassLoader(parentClassLoader) {
@@ -24,10 +21,7 @@ internal object PluginClassLoaderScope {
         }
     }
 
-    private fun <T> withContextClassLoader(
-        classLoader: ClassLoader,
-        block: () -> T
-    ): T {
+    private fun <T> withContextClassLoader(classLoader: ClassLoader, block: () -> T): T {
         val thread = Thread.currentThread()
         val previous = thread.contextClassLoader
         thread.contextClassLoader = classLoader

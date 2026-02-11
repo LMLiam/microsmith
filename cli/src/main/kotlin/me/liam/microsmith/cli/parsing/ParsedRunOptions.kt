@@ -10,5 +10,5 @@ internal data class ParsedRunOptions(
     val pluginJars: Set<Path>,
     val offline: Boolean,
     val repositoryOverride: String?,
-    val error: String?
+    val error: String?,
 )
