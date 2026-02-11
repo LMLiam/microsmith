@@ -154,7 +154,7 @@ flowchart TD
     EnumValue --> FieldIndex
 ```
 
-## CLI Scripting Runtime (Phase 4)
+## CLI Scripting Runtime
 Run generation from a script file without embedding Gradle in the consumer project:
 
 ```bash
@@ -190,3 +190,17 @@ Inside .microsmith.kts scripts:
 - Scripts can either return a MicrosmithModel or call emit(model) / generate(model).
 - `runtime-scripting` – Kotlin scripting host/runtime for `.microsmith.kts` execution.
 - `cli` – command-line entrypoint and argument handling for script-driven generation workflows.
+
+### Distribution artifacts
+- Executable fat jar: `cli/build/libs/microsmith-cli-<version>-all.jar`
+- Cross-platform distribution archives:
+  - `cli/build/distributions/microsmith-cli-<version>-dist.zip`
+  - `cli/build/distributions/microsmith-cli-<version>-dist.tar.gz`
+- Build them with `./gradlew :cli:distArtifacts`
+
+### Adoption docs
+- `docs/cli/README.md`
+- `docs/cli/quickstart-non-gradle.md`
+- `docs/cli/migration-from-gradle.md`
+- `docs/cli/troubleshooting.md`
+- `docs/cli/runtime-bundling-evaluation.md`

@@ -1,0 +1,23 @@
+name: Microsmith Generate (.NET Fixture)
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  generate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 24
+      - name: Download Microsmith
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path tools -Force | Out-Null
+          Invoke-WebRequest -Uri $env:MICROSMITH_DIST_URL -OutFile tools\microsmith.zip
+          Expand-Archive -Path tools\microsmith.zip -DestinationPath tools -Force
+      - name: Generate protobuf
+        shell: pwsh
+        run: .\tools\microsmith-cli-*\bin\microsmith.bat run schema.microsmith.kts --out .\Generated\Proto
