@@ -5,7 +5,11 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import me.liam.microsmith.dsl.schemas.core.SchemasBuilder
-import me.liam.microsmith.dsl.schemas.protobuf.field.*
+import me.liam.microsmith.dsl.schemas.protobuf.field.Cardinality
+import me.liam.microsmith.dsl.schemas.protobuf.field.MapField
+import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
+import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
+import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
@@ -59,7 +63,7 @@ class ProtobufDslIntegrationTests :
                     "age" to 3,
                     "tags" to 4,
                     "attrs" to 5,
-                    "color" to 8
+                    "color" to 8,
                 )
             person.schema.fields
                 .first { it.name == "age" }
@@ -82,7 +86,7 @@ class ProtobufDslIntegrationTests :
                 fields.associate { it.name to it.index } shouldContainExactly
                     mapOf(
                         "active" to 6,
-                        "score" to 7
+                        "score" to 7,
                     )
                 fields.first { it.name == "active" }.fieldType shouldBe PrimitiveType.BOOL
                 fields.first { it.name == "score" }.fieldType shouldBe PrimitiveType.INT32
@@ -102,7 +106,7 @@ class ProtobufDslIntegrationTests :
                 mapOf(
                     "UNSPECIFIED" to 0,
                     "RED" to 1,
-                    "GREEN" to 2
+                    "GREEN" to 2,
                 )
             color.schema.reserved
                 .filterIsInstance<ReservedIndex>()
@@ -132,7 +136,7 @@ class ProtobufDslIntegrationTests :
             schemas.schemas.map { it.name } shouldContainExactlyInAnyOrder
                 listOf(
                     "pkg.sub.Foo",
-                    "pkg.sub.v2.Status"
+                    "pkg.sub.v2.Status",
                 )
         }
     })

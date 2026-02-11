@@ -5,15 +5,15 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
 private enum class TestSchemaTypes(
-    override val typeName: String
+    override val typeName: String,
 ) : SchemaType {
     PROTOBUF("protobuf"),
-    JSON("json")
+    JSON("json"),
 }
 
 private data class ExtFakeSchema(
     override val type: SchemaType,
-    override val name: String
+    override val name: String,
 ) : Schema
 
 class SchemasExtensionTests :

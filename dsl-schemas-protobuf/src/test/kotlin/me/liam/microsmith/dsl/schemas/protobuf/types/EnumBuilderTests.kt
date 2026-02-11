@@ -119,7 +119,7 @@ class EnumBuilderTests :
                 listOf(
                     ReservedRange(1..2),
                     ReservedName("BAR"),
-                    ReservedName("FOO")
+                    ReservedName("FOO"),
                 )
         }
     })

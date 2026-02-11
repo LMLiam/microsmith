@@ -6,21 +6,18 @@ import io.kotest.matchers.shouldBe
 import me.liam.microsmith.dsl.core.MicrosmithBuilder
 
 private enum class ScopeTestSchemaTypes(
-    override val typeName: String
+    override val typeName: String,
 ) : SchemaType {
     PROTOBUF("protobuf"),
-    JSON("json")
+    JSON("json"),
 }
 
 private data class ScopeFakeSchema(
     override val type: SchemaType,
-    override val name: String
+    override val name: String,
 ) : Schema
 
-private fun SchemasScope.fake(
-    type: SchemaType,
-    name: String
-) {
+private fun SchemasScope.fake(type: SchemaType, name: String) {
     val builder = this as SchemasBuilder
     builder.register(ScopeFakeSchema(type, name))
 }
@@ -51,8 +48,8 @@ class SchemasScopeTests :
                 SchemasExtension(
                     setOf(
                         ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User"),
-                        ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User")
-                    )
+                        ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User"),
+                    ),
                 )
         }
 
@@ -72,8 +69,8 @@ class SchemasScopeTests :
                 SchemasExtension(
                     setOf(
                         ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User"),
-                        ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User")
-                    )
+                        ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User"),
+                    ),
                 )
         }
 

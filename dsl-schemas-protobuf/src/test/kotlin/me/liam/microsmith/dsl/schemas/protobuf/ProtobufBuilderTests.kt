@@ -1,7 +1,7 @@
 package me.liam.microsmith.dsl.schemas.protobuf
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder

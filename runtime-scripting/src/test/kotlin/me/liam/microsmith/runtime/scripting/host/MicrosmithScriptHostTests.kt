@@ -38,7 +38,7 @@ class MicrosmithScriptHostTests :
                             }
                         }
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -49,8 +49,8 @@ class MicrosmithScriptHostTests :
                             script = script,
                             outputDir = output,
                             variables = emptyMap(),
-                            flags = emptySet()
-                        )
+                            flags = emptySet(),
+                        ),
                     )
                 val firstSuccess = firstRun.shouldBeTypeOf<ScriptRunSuccess>()
                 firstSuccess.cacheHit shouldBe false
@@ -65,8 +65,8 @@ class MicrosmithScriptHostTests :
                             script = script,
                             outputDir = output,
                             variables = emptyMap(),
-                            flags = emptySet()
-                        )
+                            flags = emptySet(),
+                        ),
                     )
                 val secondSuccess = secondRun.shouldBeTypeOf<ScriptRunSuccess>()
                 secondSuccess.cacheHit shouldBe true
@@ -100,7 +100,7 @@ class MicrosmithScriptHostTests :
                             }
                         }
                     emit(model)
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -110,8 +110,8 @@ class MicrosmithScriptHostTests :
                             script = script,
                             outputDir = output,
                             variables = mapOf("schema" to "AuditRecord"),
-                            flags = setOf("emit")
-                        )
+                            flags = setOf("emit"),
+                        ),
                     )
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
@@ -135,7 +135,7 @@ class MicrosmithScriptHostTests :
                     microsmith {
                         unknownDsl()
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -145,8 +145,8 @@ class MicrosmithScriptHostTests :
                             script = script,
                             outputDir = output,
                             variables = emptyMap(),
-                            flags = emptySet()
-                        )
+                            flags = emptySet(),
+                        ),
                     )
 
                 val failure = result.shouldBeTypeOf<ScriptRunFailure>()
@@ -157,4 +157,3 @@ class MicrosmithScriptHostTests :
             }
         }
     })
-

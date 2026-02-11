@@ -7,11 +7,11 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 
 data class FooExtension(
-    val foo: String
+    val foo: String,
 ) : MicrosmithExtension
 
 data class BarExtension(
-    val bar: Int
+    val bar: Int,
 ) : MicrosmithExtension
 
 class MicrosmithModelTests :
@@ -47,7 +47,7 @@ class MicrosmithModelTests :
             model.keys().map { it.simpleName }.toSet() shouldContainExactly
                 setOf(
                     FooExtension::class.simpleName,
-                    BarExtension::class.simpleName
+                    BarExtension::class.simpleName,
                 )
         }
 

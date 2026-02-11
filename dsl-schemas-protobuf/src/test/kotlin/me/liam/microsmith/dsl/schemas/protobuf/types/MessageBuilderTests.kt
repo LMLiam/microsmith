@@ -44,7 +44,7 @@ class MessageBuilderTests :
                 listOf(
                     ReservedRange(100..102),
                     ReservedName("RES1"),
-                    ReservedName("RES2")
+                    ReservedName("RES2"),
                 )
         }
 
