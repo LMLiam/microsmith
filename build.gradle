@@ -111,19 +111,24 @@ subprojects {
             allRules = false
             parallel = true
             ignoreFailures = false
+            autoCorrect = false
             basePath = rootProject.projectDir.absolutePath
             config.setFrom(files("${rootProject.projectDir}/detekt.yml"))
         }
 
         tasks.withType(io.gitlab.arturbosch.detekt.Detekt).configureEach {
-            jvmTarget = "22"
+            jvmTarget = "22" // Detekt 1.23.x currently supports parsing up to JVM 22.
             reports {
                 html.required.set(true)
-                xml.required.set(false)
+                xml.required.set(true)
                 txt.required.set(false)
                 sarif.required.set(true)
                 md.required.set(false)
             }
+        }
+
+        tasks.withType(io.gitlab.arturbosch.detekt.DetektCreateBaselineTask).configureEach {
+            enabled = false
         }
     }
 
@@ -132,16 +137,21 @@ subprojects {
             android = false
             ignoreFailures = false
             outputToConsole = true
-            baseline = file("${project.projectDir}/ktlint-baseline.xml")
+            verbose = true
             filter {
                 exclude("**/generated/**")
                 exclude("**/build/**")
             }
         }
+
+        tasks.matching { it.name == "ktlintGenerateBaseline" }.configureEach {
+            enabled = false
+        }
     }
 
     tasks.named("check") {
-        dependsOn(tasks.named("detekt"))
+        dependsOn(tasks.named("detektMain"))
+        dependsOn(tasks.named("detektTest"))
         dependsOn(tasks.named("ktlintCheck"))
     }
 
