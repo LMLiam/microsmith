@@ -15,7 +15,7 @@ internal object ScriptRunResultMapper {
         result: ResultWithDiagnostics<EvaluationResult>,
         elapsedMillis: Long,
         scriptContext: MicrosmithScriptContext,
-        cache: MicrosmithScriptCache
+        cache: MicrosmithScriptCache,
     ): ScriptRunResult {
         val formattedReports = ScriptDiagnosticsFormatter.format(result.reports)
         val hasErrors = ScriptDiagnosticsFormatter.containsErrors(formattedReports)
@@ -23,7 +23,7 @@ internal object ScriptRunResultMapper {
         return when (result) {
             is ResultWithDiagnostics.Failure ->
                 ScriptRunFailure(
-                    diagnostics = formattedReports.ifEmpty { listOf("Script compilation failed.") }
+                    diagnostics = formattedReports.ifEmpty { listOf("Script compilation failed.") },
                 )
 
             is ResultWithDiagnostics.Success ->
@@ -35,7 +35,7 @@ internal object ScriptRunResultMapper {
                         scriptContext = scriptContext,
                         warnings = formattedReports,
                         cacheHit = cache.retrievedScripts > 0,
-                        elapsedMillis = elapsedMillis
+                        elapsedMillis = elapsedMillis,
                     )
                 }
         }
@@ -46,7 +46,7 @@ internal object ScriptRunResultMapper {
         scriptContext: MicrosmithScriptContext,
         warnings: List<String>,
         cacheHit: Boolean,
-        elapsedMillis: Long
+        elapsedMillis: Long,
     ): ScriptRunResult {
         val generationResult = runCatching { ensureModelGenerated(evaluationResult, scriptContext) }
         return generationResult.fold(
@@ -54,22 +54,19 @@ internal object ScriptRunResultMapper {
                 ScriptRunSuccess(
                     warnings = warnings,
                     cacheHit = cacheHit,
-                    elapsedMillis = elapsedMillis
+                    elapsedMillis = elapsedMillis,
                 )
             },
             onFailure = { error ->
                 val message = error.message ?: error::class.simpleName ?: "unknown error"
                 ScriptRunFailure(
-                    diagnostics = warnings + listOf("Script evaluation failed: $message")
+                    diagnostics = warnings + listOf("Script evaluation failed: $message"),
                 )
-            }
+            },
         )
     }
 
-    private fun ensureModelGenerated(
-        evaluationResult: EvaluationResult,
-        scriptContext: MicrosmithScriptContext
-    ) {
+    private fun ensureModelGenerated(evaluationResult: EvaluationResult, scriptContext: MicrosmithScriptContext) {
         when (val returnValue = evaluationResult.returnValue) {
             is ResultValue.Error -> rethrow(returnValue.error)
             is ResultValue.Value -> {
@@ -81,7 +78,8 @@ internal object ScriptRunResultMapper {
                 }
             }
             is ResultValue.Unit,
-            ResultValue.NotEvaluated -> {
+            ResultValue.NotEvaluated,
+            -> {
                 if (!scriptContext.emittedAny()) {
                     modelRequiredFailure()
                 }

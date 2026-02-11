@@ -9,6 +9,7 @@ object GeneratorRegistry {
     @PublishedApi
     internal val generators = ConcurrentHashMap<KClass<out MicrosmithExtension>, ModelGenerator<*>>()
     private val loadLock = Any()
+
     @Volatile
     private var loaded = false
 

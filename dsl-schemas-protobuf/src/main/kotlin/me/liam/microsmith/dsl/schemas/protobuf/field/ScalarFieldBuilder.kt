@@ -4,7 +4,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.ScalarFieldScope
 
 class ScalarFieldBuilder(
     var index: Int? = null,
-    var cardinality: Cardinality = Cardinality.REQUIRED
+    var cardinality: Cardinality = Cardinality.REQUIRED,
 ) : ScalarFieldScope {
     override fun optional() {
         require(cardinality == Cardinality.REQUIRED) {

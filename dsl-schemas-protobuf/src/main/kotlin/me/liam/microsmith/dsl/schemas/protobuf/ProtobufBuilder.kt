@@ -4,7 +4,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.types.EnumBuilder
 import me.liam.microsmith.dsl.schemas.protobuf.types.MessageBuilder
 
 class ProtobufBuilder(
-    private val segments: List<String> = emptyList()
+    private val segments: List<String> = emptyList(),
 ) : ProtobufScope {
     private val schemasByName = mutableMapOf<String, ProtobufSchema>()
     private val registeredNames = mutableSetOf<String>()
@@ -15,31 +15,25 @@ class ProtobufBuilder(
         schemasByName[name] = schema
     }
 
-    override fun message(
-        name: String,
-        block: MessageScope.() -> Unit
-    ) {
+    override fun message(name: String, block: MessageScope.() -> Unit) {
         val fqName = (segments + name).joinToString(".")
         register(
             fqName,
             ProtobufSchema(
                 fqName,
-                schema = MessageBuilder(name, segments).apply(block).build()
-            )
+                schema = MessageBuilder(name, segments).apply(block).build(),
+            ),
         )
     }
 
-    override fun enum(
-        name: String,
-        block: EnumScope.() -> Unit
-    ) {
+    override fun enum(name: String, block: EnumScope.() -> Unit) {
         val fqName = (segments + name).joinToString(".")
         register(
             fqName,
             ProtobufSchema(
                 fqName,
-                schema = EnumBuilder(name).apply(block).build()
-            )
+                schema = EnumBuilder(name).apply(block).build(),
+            ),
         )
     }
 
@@ -49,10 +43,7 @@ class ProtobufBuilder(
         ProtobufBuilder(segments + namespaceSegments).apply(block).build().forEach { register(it.name, it) }
     }
 
-    override fun version(
-        version: Int,
-        block: ProtobufScope.() -> Unit
-    ) {
+    override fun version(version: Int, block: ProtobufScope.() -> Unit) {
         require(version > 0) { "Version must be positive, but was $version." }
         ProtobufBuilder(segments + "v$version").apply(block).build().forEach { register(it.name, it) }
     }

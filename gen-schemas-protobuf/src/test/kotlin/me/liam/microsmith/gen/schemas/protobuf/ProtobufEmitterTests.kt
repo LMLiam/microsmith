@@ -23,9 +23,9 @@ import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
 import me.liam.microsmith.dsl.schemas.protobuf.types.Enum
 import me.liam.microsmith.dsl.schemas.protobuf.types.EnumValue
 import me.liam.microsmith.dsl.schemas.protobuf.types.Message
+import me.liam.microsmith.gen.files.TemporaryDirectory
 import me.liam.microsmith.gen.schemas.protobuf.emission.ProtobufEmitter
 import me.liam.microsmith.gen.schemas.protobuf.emission.ProtobufFieldNumbers
-import me.liam.microsmith.gen.files.TemporaryDirectory
 import kotlin.io.use
 
 class ProtobufEmitterTests :
@@ -35,7 +35,10 @@ class ProtobufEmitterTests :
         suspend fun emit(schema: ProtobufSchema): Pair<String, String> {
             TemporaryDirectory.create().use { space ->
                 val generated = with(emitter) { schema.emit(space) }
-                return generated.relativePath.toString().replace("\\", "/") to generated.contents.toString(Charsets.UTF_8)
+                return generated.relativePath.toString().replace(
+                    "\\",
+                    "/",
+                ) to generated.contents.toString(Charsets.UTF_8)
             }
         }
 
@@ -46,11 +49,11 @@ class ProtobufEmitterTests :
                     Message(
                         "Bar",
                         fields =
-                            listOf(
-                                ReferenceField("refB", 1, Reference("zeta.Item")),
-                                MapField("mapRef", 2, MapType(PrimitiveType.STRING, Reference("alpha.Beta")))
-                            )
-                    )
+                        listOf(
+                            ReferenceField("refB", 1, Reference("zeta.Item")),
+                            MapField("mapRef", 2, MapType(PrimitiveType.STRING, Reference("alpha.Beta"))),
+                        ),
+                    ),
                 )
 
             val (_, contents) = emit(schema)
@@ -59,7 +62,7 @@ class ProtobufEmitterTests :
             imports shouldContainExactly
                 listOf(
                     """import "alpha/Beta.proto";""",
-                    """import "zeta/Item.proto";"""
+                    """import "zeta/Item.proto";""",
                 )
         }
 
@@ -69,8 +72,8 @@ class ProtobufEmitterTests :
                     "User",
                     Message(
                         "User",
-                        fields = listOf(ScalarField("id", 1, PrimitiveType.INT32))
-                    )
+                        fields = listOf(ScalarField("id", 1, PrimitiveType.INT32)),
+                    ),
                 )
 
             val (path, contents) = emit(schema)
@@ -87,29 +90,29 @@ class ProtobufEmitterTests :
                     Message(
                         name = "Contact",
                         fields =
-                            listOf(
-                                ScalarField("id", 2, PrimitiveType.INT64),
-                                ReferenceField("status", 3, Reference("pkg.Status"), Cardinality.OPTIONAL),
-                                MapField("labels", 4, MapType(PrimitiveType.STRING, PrimitiveType.STRING))
-                            ),
+                        listOf(
+                            ScalarField("id", 2, PrimitiveType.INT64),
+                            ReferenceField("status", 3, Reference("pkg.Status"), Cardinality.OPTIONAL),
+                            MapField("labels", 4, MapType(PrimitiveType.STRING, PrimitiveType.STRING)),
+                        ),
                         oneofs =
-                            listOf(
-                                Oneof(
-                                    "channel",
-                                    listOf(
-                                        OneofField("email", 5, PrimitiveType.STRING),
-                                        OneofField("phone", 6, Reference("pkg.Phone"))
-                                    )
-                                )
+                        listOf(
+                            Oneof(
+                                "channel",
+                                listOf(
+                                    OneofField("email", 5, PrimitiveType.STRING),
+                                    OneofField("phone", 6, Reference("pkg.Phone")),
+                                ),
                             ),
+                        ),
                         reserved =
-                            listOf(
-                                ReservedName("legacy_name"),
-                                ReservedIndex(1),
-                                ReservedRange(10..20),
-                                ReservedToMax(100)
-                            )
-                    )
+                        listOf(
+                            ReservedName("legacy_name"),
+                            ReservedIndex(1),
+                            ReservedRange(10..20),
+                            ReservedToMax(100),
+                        ),
+                    ),
                 )
 
             val (_, contents) = emit(schema)
@@ -118,7 +121,7 @@ class ProtobufEmitterTests :
             imports shouldContainExactly
                 listOf(
                     """import "pkg/Phone.proto";""",
-                    """import "pkg/Status.proto";"""
+                    """import "pkg/Status.proto";""",
                 )
             contents.shouldContain("reserved \"legacy_name\";")
             contents.shouldContain("reserved 1, 10 to 20, 100 to max;")
@@ -136,21 +139,21 @@ class ProtobufEmitterTests :
                     Message(
                         "User",
                         fields =
-                            listOf(
-                                ReferenceField("selfRef", 1, Reference("pkg.User")),
-                                ReferenceField("address", 2, Reference("pkg.Address")),
-                                MapField("addressMap", 3, MapType(PrimitiveType.STRING, Reference("pkg.Address")))
-                            ),
+                        listOf(
+                            ReferenceField("selfRef", 1, Reference("pkg.User")),
+                            ReferenceField("address", 2, Reference("pkg.Address")),
+                            MapField("addressMap", 3, MapType(PrimitiveType.STRING, Reference("pkg.Address"))),
+                        ),
                         oneofs =
-                            listOf(
-                                Oneof(
-                                    "routing",
-                                    listOf(
-                                        OneofField("selfChoice", 4, Reference("pkg.User"))
-                                    )
-                                )
-                            )
-                    )
+                        listOf(
+                            Oneof(
+                                "routing",
+                                listOf(
+                                    OneofField("selfChoice", 4, Reference("pkg.User")),
+                                ),
+                            ),
+                        ),
+                    ),
                 )
 
             val (_, contents) = emit(schema)
@@ -166,8 +169,8 @@ class ProtobufEmitterTests :
                     Enum(
                         name = "Status",
                         values = listOf(EnumValue("UNSPECIFIED", 0), EnumValue("ACTIVE", 1)),
-                        reserved = listOf(ReservedName("OLD_STATUS"), ReservedIndex(10))
-                    )
+                        reserved = listOf(ReservedName("OLD_STATUS"), ReservedIndex(10)),
+                    ),
                 )
 
             val (path, contents) = emit(schema)
@@ -195,8 +198,8 @@ class ProtobufEmitterTests :
                     "pkg.User",
                     Message(
                         "User",
-                        fields = listOf(ReferenceField("manager", 1, Reference("bad ref")))
-                    )
+                        fields = listOf(ReferenceField("manager", 1, Reference("bad ref"))),
+                    ),
                 )
 
             shouldThrow<IllegalArgumentException> {
@@ -210,8 +213,8 @@ class ProtobufEmitterTests :
                     "pkg.Invalid",
                     Message(
                         "Invalid",
-                        fields = listOf(OneofField("choice", 1, PrimitiveType.STRING))
-                    )
+                        fields = listOf(OneofField("choice", 1, PrimitiveType.STRING)),
+                    ),
                 )
 
             shouldThrow<IllegalStateException> {
@@ -225,8 +228,8 @@ class ProtobufEmitterTests :
                     "pkg.ForbiddenField",
                     Message(
                         "ForbiddenField",
-                        fields = listOf(ScalarField("id", 19_000, PrimitiveType.INT32))
-                    )
+                        fields = listOf(ScalarField("id", 19_000, PrimitiveType.INT32)),
+                    ),
                 )
 
             shouldThrow<IllegalArgumentException> {
@@ -241,14 +244,14 @@ class ProtobufEmitterTests :
                     Message(
                         "TooLargeField",
                         fields =
-                            listOf(
-                                ScalarField(
-                                    "id",
-                                    ProtobufFieldNumbers.MAX_FIELD_NUMBER + 1,
-                                    PrimitiveType.INT32
-                                )
-                            )
-                    )
+                        listOf(
+                            ScalarField(
+                                "id",
+                                ProtobufFieldNumbers.MAX_FIELD_NUMBER + 1,
+                                PrimitiveType.INT32,
+                            ),
+                        ),
+                    ),
                 )
 
             shouldThrow<IllegalArgumentException> {
@@ -262,8 +265,8 @@ class ProtobufEmitterTests :
                     "pkg.BadEnum",
                     Enum(
                         name = "BadEnum",
-                        values = listOf(EnumValue("ACTIVE", 1), EnumValue("UNSPECIFIED", 0))
-                    )
+                        values = listOf(EnumValue("ACTIVE", 1), EnumValue("UNSPECIFIED", 0)),
+                    ),
                 )
 
             shouldThrow<IllegalArgumentException> {
@@ -277,8 +280,12 @@ class ProtobufEmitterTests :
                     "pkg.Code",
                     Enum(
                         name = "Code",
-                        values = listOf(EnumValue("UNSPECIFIED", 0), EnumValue("ERROR_UNKNOWN", -1), EnumValue("OK", 1))
-                    )
+                        values = listOf(
+                            EnumValue("UNSPECIFIED", 0),
+                            EnumValue("ERROR_UNKNOWN", -1),
+                            EnumValue("OK", 1),
+                        ),
+                    ),
                 )
 
             val (_, contents) = emit(schema)
@@ -292,8 +299,8 @@ class ProtobufEmitterTests :
                     "pkg.Order",
                     Message(
                         "Order",
-                        fields = listOf(ReferenceField("customer", 1, Reference("Customer")))
-                    )
+                        fields = listOf(ReferenceField("customer", 1, Reference("Customer"))),
+                    ),
                 )
 
             val (_, contents) = emit(schema)
@@ -309,8 +316,8 @@ class ProtobufEmitterTests :
                     "pkg.InvalidIdentifier",
                     Message(
                         "InvalidIdentifier",
-                        fields = listOf(ScalarField("123bad", 1, PrimitiveType.INT32))
-                    )
+                        fields = listOf(ScalarField("123bad", 1, PrimitiveType.INT32)),
+                    ),
                 )
 
             shouldThrow<IllegalArgumentException> {

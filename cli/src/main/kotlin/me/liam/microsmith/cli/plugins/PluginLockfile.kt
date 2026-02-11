@@ -33,10 +33,7 @@ internal fun readLockfile(lockfilePath: Path): ParsedLockfile? {
     return ParsedLockfile(version = version, entries = entries)
 }
 
-internal fun ParsedLockfile.assertSamePluginSet(
-    requestedKeys: Set<LockKey>,
-    lockfilePath: Path
-) {
+internal fun ParsedLockfile.assertSamePluginSet(requestedKeys: Set<LockKey>, lockfilePath: Path) {
     val lockedKeys = entries.map { LockKey(kind = it.kind, key = it.key) }.toSet()
     val missingFromLock = requestedKeys - lockedKeys
     val extraInLock = lockedKeys - requestedKeys
@@ -55,11 +52,7 @@ internal fun ParsedLockfile.assertSamePluginSet(
     }
 }
 
-internal fun ParsedLockfile.verifyChecksum(
-    kind: String,
-    key: String,
-    actualChecksum: String
-) {
+internal fun ParsedLockfile.verifyChecksum(kind: String, key: String, actualChecksum: String) {
     val expected =
         entries
             .firstOrNull { it.kind == kind && it.key == key }
@@ -71,10 +64,7 @@ internal fun ParsedLockfile.verifyChecksum(
     }
 }
 
-internal fun writeLockfile(
-    lockfilePath: Path,
-    lockfile: ParsedLockfile
-) {
+internal fun writeLockfile(lockfilePath: Path, lockfile: ParsedLockfile) {
     val lines = buildList {
         add("version=${lockfile.version}")
         lockfile.entries

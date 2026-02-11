@@ -27,7 +27,7 @@ class CliProviderValidatorTests :
             val errors =
                 verifyBuiltinProviders(
                     modelGenerators = listOf(SchemasGeneratorStub()),
-                    schemaEmitters = listOf(ProtobufEmitterStub())
+                    schemaEmitters = listOf(ProtobufEmitterStub()),
                 )
 
             errors shouldBe emptyList()
@@ -43,9 +43,8 @@ private class SchemasGeneratorStub : ModelGenerator<SchemasExtension> {
 private class ProtobufEmitterStub : SchemaEmitter<ProtobufSchema> {
     override val type: KClass<ProtobufSchema> = ProtobufSchema::class
 
-    override suspend fun ProtobufSchema.emit(space: FileSpace): GeneratedFile =
-        GeneratedFile(
-            relativePath = Path("proto/fake.proto"),
-            contents = byteArrayOf()
-        )
+    override suspend fun ProtobufSchema.emit(space: FileSpace): GeneratedFile = GeneratedFile(
+        relativePath = Path("proto/fake.proto"),
+        contents = byteArrayOf(),
+    )
 }

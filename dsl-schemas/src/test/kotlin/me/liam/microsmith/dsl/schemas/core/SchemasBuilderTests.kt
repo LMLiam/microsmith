@@ -10,7 +10,7 @@ private object FakeSchemaType : SchemaType {
 
 private data class FakeSchema(
     override val type: SchemaType = FakeSchemaType,
-    override val name: String
+    override val name: String,
 ) : Schema
 
 class SchemasBuilderTests :

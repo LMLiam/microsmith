@@ -28,7 +28,7 @@ class PluginResolverTests :
                 val coordinate = "com.acme:microsmith-emitter-ts:1.4.2"
                 val repositoryJar =
                     repositoryRoot.resolve(
-                        "com/acme/microsmith-emitter-ts/1.4.2/microsmith-emitter-ts-1.4.2.jar"
+                        "com/acme/microsmith-emitter-ts/1.4.2/microsmith-emitter-ts-1.4.2.jar",
                     )
                 repositoryJar.parent?.toFile()?.mkdirs()
                 repositoryJar.writeBytes("plugin-jar-contents".toByteArray())
@@ -39,12 +39,12 @@ class PluginResolverTests :
                         script = script,
                         outputDir = output,
                         plugins = setOf(coordinate),
-                        repositoryOverride = repositoryRoot.toUri().toString()
+                        repositoryOverride = repositoryRoot.toUri().toString(),
                     )
                 val result =
                     resolvePlugins(
                         command = command,
-                        settings = PluginResolverSettings(cacheDirectory = cache)
+                        settings = PluginResolverSettings(cacheDirectory = cache),
                     )
 
                 val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
@@ -69,13 +69,13 @@ class PluginResolverTests :
                         script = script,
                         outputDir = tempDir.resolve("generated"),
                         plugins = setOf("com.acme:missing:1.0.0"),
-                        offline = true
+                        offline = true,
                     )
 
                 val result =
                     resolvePlugins(
                         command = command,
-                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache"))
+                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache")),
                     )
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
@@ -104,7 +104,7 @@ class PluginResolverTests :
                         script = script,
                         outputDir = output,
                         plugins = setOf(coordinate),
-                        repositoryOverride = repositoryRoot.toUri().toString()
+                        repositoryOverride = repositoryRoot.toUri().toString(),
                     )
 
                 resolvePlugins(command = command, settings = PluginResolverSettings(cacheDirectory = cache))
@@ -141,21 +141,21 @@ class PluginResolverTests :
                     RunCommand(
                         script = script,
                         outputDir = output,
-                        plugins = setOf(coordinate)
+                        plugins = setOf(coordinate),
                     )
 
                 val result =
                     resolvePlugins(
                         command = command,
                         settings =
-                            PluginResolverSettings(
-                                cacheDirectory = cache,
-                                defaultRepositories =
-                                    listOf(
-                                        "http://127.0.0.1:1/repository",
-                                        repositoryRoot.toUri().toString()
-                                    )
-                            )
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            defaultRepositories =
+                            listOf(
+                                "http://127.0.0.1:1/repository",
+                                repositoryRoot.toUri().toString(),
+                            ),
+                        ),
                     )
 
                 val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
@@ -183,13 +183,13 @@ class PluginResolverTests :
                     RunCommand(
                         script = script,
                         outputDir = output,
-                        pluginJars = setOf(relativeJarPath)
+                        pluginJars = setOf(relativeJarPath),
                     )
 
                 val result =
                     resolvePlugins(
                         command = command,
-                        settings = PluginResolverSettings(cacheDirectory = cache)
+                        settings = PluginResolverSettings(cacheDirectory = cache),
                     )
 
                 val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
@@ -213,13 +213,13 @@ class PluginResolverTests :
                     RunCommand(
                         script = script,
                         outputDir = tempDir.resolve("generated"),
-                        plugins = setOf("com.acme:..:1.0.0")
+                        plugins = setOf("com.acme:..:1.0.0"),
                     )
 
                 val result =
                     resolvePlugins(
                         command = command,
-                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache"))
+                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache")),
                     )
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
@@ -238,13 +238,13 @@ class PluginResolverTests :
                     RunCommand(
                         script = script,
                         outputDir = tempDir.resolve("generated"),
-                        plugins = setOf("com.acme:bad|artifact:1.0.0")
+                        plugins = setOf("com.acme:bad|artifact:1.0.0"),
                     )
 
                 val result =
                     resolvePlugins(
                         command = command,
-                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache"))
+                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache")),
                     )
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
@@ -263,13 +263,13 @@ class PluginResolverTests :
                     RunCommand(
                         script = script,
                         outputDir = tempDir.resolve("generated"),
-                        plugins = setOf("com.acme:bad/path:1.0.0")
+                        plugins = setOf("com.acme:bad/path:1.0.0"),
                     )
 
                 val result =
                     resolvePlugins(
                         command = command,
-                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache"))
+                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache")),
                     )
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
@@ -288,13 +288,13 @@ class PluginResolverTests :
                     RunCommand(
                         script = script,
                         outputDir = tempDir.resolve("generated"),
-                        plugins = setOf("com|acme:plugin:1.0.0")
+                        plugins = setOf("com|acme:plugin:1.0.0"),
                     )
 
                 val result =
                     resolvePlugins(
                         command = command,
-                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache"))
+                        settings = PluginResolverSettings(cacheDirectory = tempDir.resolve("cache")),
                     )
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()

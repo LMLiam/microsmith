@@ -19,7 +19,7 @@ class CliParserTests :
                     script = Path("schema.microsmith.kts"),
                     outputDir = Path("build/generated"),
                     variables = emptyMap(),
-                    flags = emptySet()
+                    flags = emptySet(),
                 )
         }
 
@@ -37,14 +37,14 @@ class CliParserTests :
                     "--flag",
                     "dry-run",
                     "--flag",
-                    "verbose"
-                )
+                    "verbose",
+                ),
             ) shouldBe
                 RunCommand(
                     script = Path("schema.microsmith.kts"),
                     outputDir = Path("build/generated"),
                     variables = mapOf("env" to "prod", "team" to "platform"),
-                    flags = setOf("dry-run", "verbose")
+                    flags = setOf("dry-run", "verbose"),
                 )
         }
 
@@ -61,8 +61,8 @@ class CliParserTests :
                     "plugins/custom.jar",
                     "--offline",
                     "--repository",
-                    "https://maven.acme.internal/repository/mirror"
-                )
+                    "https://maven.acme.internal/repository/mirror",
+                ),
             ) shouldBe
                 RunCommand(
                     script = Path("schema.microsmith.kts"),
@@ -70,7 +70,7 @@ class CliParserTests :
                     plugins = setOf("com.acme:microsmith-emitter-ts:1.4.2"),
                     pluginJars = setOf(Path("plugins/custom.jar")),
                     offline = true,
-                    repositoryOverride = "https://maven.acme.internal/repository/mirror"
+                    repositoryOverride = "https://maven.acme.internal/repository/mirror",
                 )
         }
 
@@ -91,7 +91,7 @@ class CliParserTests :
 
         "returns error for invalid --var value" {
             parseCliArgs(
-                listOf("run", "schema.microsmith.kts", "--out", "build/generated", "--var", "broken")
+                listOf("run", "schema.microsmith.kts", "--out", "build/generated", "--var", "broken"),
             ) shouldBe
                 ErrorCommand("Invalid --var value 'broken'. Expected key=value.")
         }
@@ -104,11 +104,11 @@ class CliParserTests :
                     "--out",
                     "build/generated",
                     "--plugin",
-                    "com.acme:missing-version"
-                )
+                    "com.acme:missing-version",
+                ),
             ) shouldBe
                 ErrorCommand(
-                    "Invalid --plugin value 'com.acme:missing-version'. Expected group:artifact:version."
+                    "Invalid --plugin value 'com.acme:missing-version'. Expected group:artifact:version.",
                 )
         }
     })

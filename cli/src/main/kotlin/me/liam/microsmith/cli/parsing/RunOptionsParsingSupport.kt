@@ -4,44 +4,38 @@ import java.nio.file.Path
 
 private const val PLUGIN_COORDINATE_PART_COUNT = 3
 
-internal fun validateOutputValue(
-    value: String?,
-    outputDirAlreadySet: Boolean
-): String? =
-    when {
-        value == null || value.startsWith("--") -> "Missing value for --out option."
-        outputDirAlreadySet -> "--out option may only be specified once."
-        else -> null
-    }
+internal fun validateOutputValue(value: String?, outputDirAlreadySet: Boolean): String? = when {
+    value == null || value.startsWith("--") -> "Missing value for --out option."
+    outputDirAlreadySet -> "--out option may only be specified once."
+    else -> null
+}
 
-internal fun parseVariableValue(value: String?): ParsedVariable =
-    when {
-        value == null || value.startsWith("--") -> ParsedVariable(error = "Missing value for --var option.")
+internal fun parseVariableValue(value: String?): ParsedVariable = when {
+    value == null || value.startsWith("--") -> ParsedVariable(error = "Missing value for --var option.")
 
-        else -> {
-            val separatorIndex = value.indexOf('=')
-            val key =
-                if (separatorIndex > 0) {
-                    value.take(separatorIndex).trim()
-                } else {
-                    ""
-                }
-            if (separatorIndex <= 0 || key.isBlank()) {
-                ParsedVariable(error = "Invalid --var value '$value'. Expected key=value.")
+    else -> {
+        val separatorIndex = value.indexOf('=')
+        val key =
+            if (separatorIndex > 0) {
+                value.take(separatorIndex).trim()
             } else {
-                ParsedVariable(
-                    key = key,
-                    value = value.substring(separatorIndex + 1)
-                )
+                ""
             }
+        if (separatorIndex <= 0 || key.isBlank()) {
+            ParsedVariable(error = "Invalid --var value '$value'. Expected key=value.")
+        } else {
+            ParsedVariable(
+                key = key,
+                value = value.substring(separatorIndex + 1),
+            )
         }
     }
+}
 
-internal fun parseFlagValue(value: String?): String? =
-    value
-        ?.takeUnless { it.startsWith("--") }
-        ?.trim()
-        ?.takeIf { it.isNotBlank() }
+internal fun parseFlagValue(value: String?): String? = value
+    ?.takeUnless { it.startsWith("--") }
+    ?.trim()
+    ?.takeIf { it.isNotBlank() }
 
 internal fun parsePluginCoordinate(value: String?): String? {
     val coordinate =
@@ -62,7 +56,7 @@ internal fun parsePluginCoordinate(value: String?): String? {
 
 internal data class ParsedToken(
     val nextIndex: Int,
-    val error: String? = null
+    val error: String? = null,
 )
 
 internal class RunOptionsState {
@@ -75,15 +69,14 @@ internal class RunOptionsState {
     var repositoryOverride: String? = null
     var error: String? = null
 
-    fun toParsedRunOptions(): ParsedRunOptions =
-        ParsedRunOptions(
-            outputDir = outputDir,
-            variables = variables.toMap(),
-            flags = flags.toSet(),
-            plugins = plugins.toSet(),
-            pluginJars = pluginJars.toSet(),
-            offline = offline,
-            repositoryOverride = repositoryOverride,
-            error = error
-        )
+    fun toParsedRunOptions(): ParsedRunOptions = ParsedRunOptions(
+        outputDir = outputDir,
+        variables = variables.toMap(),
+        flags = flags.toSet(),
+        plugins = plugins.toSet(),
+        pluginJars = pluginJars.toSet(),
+        offline = offline,
+        repositoryOverride = repositoryOverride,
+        error = error,
+    )
 }

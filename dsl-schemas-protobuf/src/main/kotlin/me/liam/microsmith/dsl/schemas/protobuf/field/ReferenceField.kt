@@ -4,12 +4,12 @@ import me.liam.microsmith.dsl.schemas.protobuf.types.Type
 
 data class Reference(
     val name: String,
-    val type: Type? = null
+    val type: Type? = null,
 ) : ValueType
 
 data class ReferenceField(
     override val name: String,
     override val index: Int,
     val reference: Reference,
-    override val cardinality: Cardinality = Cardinality.REQUIRED
+    override val cardinality: Cardinality = Cardinality.REQUIRED,
 ) : CardinalityField

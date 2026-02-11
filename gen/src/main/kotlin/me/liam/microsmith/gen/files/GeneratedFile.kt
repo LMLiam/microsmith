@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 class GeneratedFile(
     val relativePath: Path,
-    contents: ByteArray
+    contents: ByteArray,
 ) {
     private val bytes = contents.copyOf()
 

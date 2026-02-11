@@ -4,7 +4,12 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import me.liam.microsmith.dsl.schemas.protobuf.ProtobufSchema
-import me.liam.microsmith.dsl.schemas.protobuf.field.*
+import me.liam.microsmith.dsl.schemas.protobuf.field.MapField
+import me.liam.microsmith.dsl.schemas.protobuf.field.MapType
+import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
+import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
+import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
+import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import me.liam.microsmith.dsl.schemas.protobuf.types.Enum
 import me.liam.microsmith.dsl.schemas.protobuf.types.Message
@@ -44,7 +49,10 @@ class ReferenceResolverTests :
             val schema = ProtobufSchema("Foo", Message("Foo", fields = listOf(field)))
 
             val resolved = resolveReferences(setOf(schema, targetMsg))
-            val root = resolved.firstNotNullOf { schema -> (schema.schema as? Message)?.takeIf { it.name == "Foo" } }
+            val root =
+                resolved.firstNotNullOf { resolvedSchema ->
+                    (resolvedSchema.schema as? Message)?.takeIf { it.name == "Foo" }
+                }
             (root.fields[0] as ReferenceField).reference.type shouldBe targetMsg.schema
         }
 
@@ -55,7 +63,10 @@ class ReferenceResolverTests :
             val schema = ProtobufSchema("Foo", Message("Foo", fields = listOf(field)))
 
             val resolved = resolveReferences(setOf(schema, targetEnum))
-            val root = resolved.firstNotNullOf { schema -> (schema.schema as? Message)?.takeIf { it.name == "Foo" } }
+            val root =
+                resolved.firstNotNullOf { resolvedSchema ->
+                    (resolvedSchema.schema as? Message)?.takeIf { it.name == "Foo" }
+                }
             (root.fields[0] as ReferenceField).reference.type shouldBe targetEnum.schema
         }
 
@@ -79,13 +90,10 @@ class ReferenceResolverTests :
 
             val resolved = resolveReferences(setOf(schema, targetMsg))
             val root = resolved.first { it.name == "Root" }.schema as Message
-            (
-                (
-                    root.oneofs[0]
-                        .fields[0]
-                        .fieldType as Reference
-                ).type as Message
-            ) shouldBe targetMsg.schema
+            val resolvedReferenceType =
+                (root.oneofs[0].fields[0].fieldType as Reference).type
+                    ?: error("Expected oneof field reference to resolve to a concrete schema type.")
+            resolvedReferenceType shouldBe targetMsg.schema
         }
 
         "throws when reference cannot be resolved with context" {

@@ -9,10 +9,7 @@ import kotlin.script.experimental.jvm.defaultJvmScriptingHostConfiguration
 import kotlin.script.experimental.jvm.jvm
 
 internal object ScriptHostConfigurationFactory {
-    fun create(
-        cache: MicrosmithScriptCache,
-        runtimeClassLoader: ClassLoader
-    ): ScriptingHostConfiguration =
+    fun create(cache: MicrosmithScriptCache, runtimeClassLoader: ClassLoader): ScriptingHostConfiguration =
         defaultJvmScriptingHostConfiguration.with {
             jvm {
                 baseClassLoader(runtimeClassLoader)

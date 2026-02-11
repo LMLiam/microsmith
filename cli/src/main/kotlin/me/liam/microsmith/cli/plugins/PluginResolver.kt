@@ -7,34 +7,33 @@ import java.nio.file.Path
 internal sealed interface PluginResolutionResult {
     data class Success(
         val classpath: List<Path>,
-        val lockfilePath: Path?
+        val lockfilePath: Path?,
     ) : PluginResolutionResult
 
     data class Failure(
-        val diagnostics: List<String>
+        val diagnostics: List<String>,
     ) : PluginResolutionResult
 }
 
 internal data class PluginResolverSettings(
     val cacheDirectory: Path = defaultPluginCacheDirectory(),
     val lockfilePathOverride: Path? = null,
-    val defaultRepositories: List<String> = listOf(MAVEN_CENTRAL_REPOSITORY)
+    val defaultRepositories: List<String> = listOf(MAVEN_CENTRAL_REPOSITORY),
 )
 
 internal fun resolvePlugins(
     command: RunCommand,
-    settings: PluginResolverSettings = PluginResolverSettings()
-): PluginResolutionResult =
-    runCatching {
-        resolvePluginsOrThrow(command, settings)
-    }.getOrElse { error ->
-        val message = error.message ?: error::class.simpleName ?: "unknown plugin resolution error"
-        PluginResolutionResult.Failure(listOf(message))
-    }
+    settings: PluginResolverSettings = PluginResolverSettings(),
+): PluginResolutionResult = runCatching {
+    resolvePluginsOrThrow(command, settings)
+}.getOrElse { error ->
+    val message = error.message ?: error::class.simpleName ?: "unknown plugin resolution error"
+    PluginResolutionResult.Failure(listOf(message))
+}
 
 private fun resolvePluginsOrThrow(
     command: RunCommand,
-    settings: PluginResolverSettings
+    settings: PluginResolverSettings,
 ): PluginResolutionResult.Success {
     if (command.plugins.isEmpty() && command.pluginJars.isEmpty()) {
         return PluginResolutionResult.Success(classpath = emptyList(), lockfilePath = null)
@@ -46,7 +45,7 @@ private fun resolvePluginsOrThrow(
             .map { requestedPath ->
                 LocalPluginJar(
                     artifactPath = requestedPath.toAbsolutePath().normalize(),
-                    lockKey = localPluginLockKey(requestedPath)
+                    lockKey = localPluginLockKey(requestedPath),
                 )
             }.sortedBy(LocalPluginJar::lockKey)
     localPluginJars.forEach { localJar ->
@@ -59,7 +58,7 @@ private fun resolvePluginsOrThrow(
     val lockfile = readLockfile(lockfilePath)
     lockfile?.assertSamePluginSet(
         buildRequestedLockKeys(coordinates, localPluginJars.map(LocalPluginJar::lockKey)),
-        lockfilePath
+        lockfilePath,
     )
 
     val repositories = resolveRepositories(command, settings)
@@ -88,35 +87,31 @@ private fun resolvePluginsOrThrow(
         writeLockfile(
             lockfilePath = lockfilePath,
             lockfile =
-                ParsedLockfile(
-                    version = LOCKFILE_VERSION,
-                    entries = lockEntries.sortedWith(compareBy(LockEntry::kind, LockEntry::key))
-                )
+            ParsedLockfile(
+                version = LOCKFILE_VERSION,
+                entries = lockEntries.sortedWith(compareBy(LockEntry::kind, LockEntry::key)),
+            ),
         )
     }
 
     return PluginResolutionResult.Success(
         classpath = classpath.distinct(),
-        lockfilePath = lockfilePath
+        lockfilePath = lockfilePath,
     )
 }
 
-private fun buildRequestedLockKeys(
-    coordinates: List<Coordinate>,
-    localPluginLockKeys: List<String>
-): Set<LockKey> {
+private fun buildRequestedLockKeys(coordinates: List<Coordinate>, localPluginLockKeys: List<String>): Set<LockKey> {
     val remoteKeys = coordinates.map { LockKey(kind = REMOTE_KIND, key = it.value) }
     val localKeys = localPluginLockKeys.map { LockKey(kind = LOCAL_KIND, key = it) }
     return (remoteKeys + localKeys).toSet()
 }
 
-private fun localPluginLockKey(pluginJarPath: Path): String =
-    pluginJarPath
-        .normalize()
-        .toString()
-        .replace('\\', '/')
+private fun localPluginLockKey(pluginJarPath: Path): String = pluginJarPath
+    .normalize()
+    .toString()
+    .replace('\\', '/')
 
 private data class LocalPluginJar(
     val artifactPath: Path,
-    val lockKey: String
+    val lockKey: String,
 )

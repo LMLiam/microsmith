@@ -9,6 +9,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' apply false
     id 'org.jetbrains.kotlin.kapt' apply false
     id 'io.gitlab.arturbosch.detekt' apply false
+    id 'org.jlleitschuh.gradle.ktlint' apply false
     id 'pl.allegro.tech.build.axion-release'
     id 'maven-publish'
     id 'io.kotest' apply false
@@ -38,10 +39,8 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'io.kotest'
     apply plugin: 'com.gradleup.shadow'
-
-    if (project.name in ['cli', 'runtime-scripting']) {
-        apply plugin: 'io.gitlab.arturbosch.detekt'
-    }
+    apply plugin: 'io.gitlab.arturbosch.detekt'
+    apply plugin: 'org.jlleitschuh.gradle.ktlint'
 
     java {
         withSourcesJar()
@@ -112,19 +111,48 @@ subprojects {
             allRules = false
             parallel = true
             ignoreFailures = false
+            autoCorrect = false
             basePath = rootProject.projectDir.absolutePath
+            config.setFrom(files("${rootProject.projectDir}/detekt.yml"))
         }
 
         tasks.withType(io.gitlab.arturbosch.detekt.Detekt).configureEach {
-            jvmTarget = "22"
+            jvmTarget = "22" // Detekt 1.23.x currently supports parsing up to JVM 22.
             reports {
                 html.required.set(true)
-                xml.required.set(false)
+                xml.required.set(true)
                 txt.required.set(false)
-                sarif.required.set(false)
+                sarif.required.set(true)
                 md.required.set(false)
             }
         }
+
+        tasks.withType(io.gitlab.arturbosch.detekt.DetektCreateBaselineTask).configureEach {
+            enabled = false
+        }
+    }
+
+    plugins.withId('org.jlleitschuh.gradle.ktlint') {
+        ktlint {
+            android = false
+            ignoreFailures = false
+            outputToConsole = true
+            verbose = true
+            filter {
+                exclude("**/generated/**")
+                exclude("**/build/**")
+            }
+        }
+
+        tasks.matching { it.name == "ktlintGenerateBaseline" }.configureEach {
+            enabled = false
+        }
+    }
+
+    tasks.named("check") {
+        dependsOn(tasks.named("detektMain"))
+        dependsOn(tasks.named("detektTest"))
+        dependsOn(tasks.named("ktlintCheck"))
     }
 
     kotlin {

@@ -47,19 +47,19 @@ class IndexAllocatorTests :
         }
 
         "reserve single index adds to reserved set" {
-            var allocator = IndexAllocator(min = 1)
+            val allocator = IndexAllocator(min = 1)
             allocator.reserve(1)
             allocator.reserved() shouldBe setOf(1..1)
         }
 
         "reserve range adds to reserved set" {
-            var allocator = IndexAllocator(min = 1)
+            val allocator = IndexAllocator(min = 1)
             allocator.reserve(1..3)
             allocator.reserved() shouldBe setOf(1..3)
         }
 
         "reserve merges overlapping ranges" {
-            var allocator = IndexAllocator(min = 1)
+            val allocator = IndexAllocator(min = 1)
             allocator.reserve(1..3)
             allocator.reserve(4..10)
             allocator.reserved() shouldBe setOf(1..10)

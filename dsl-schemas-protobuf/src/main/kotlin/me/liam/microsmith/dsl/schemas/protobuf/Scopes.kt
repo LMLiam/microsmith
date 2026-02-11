@@ -3,7 +3,16 @@ package me.liam.microsmith.dsl.schemas.protobuf
 import me.liam.microsmith.dsl.core.MicrosmithDsl
 import me.liam.microsmith.dsl.schemas.core.SchemasBuilder
 import me.liam.microsmith.dsl.schemas.core.SchemasScope
-import me.liam.microsmith.dsl.schemas.protobuf.field.*
+import me.liam.microsmith.dsl.schemas.protobuf.field.CardinalityField
+import me.liam.microsmith.dsl.schemas.protobuf.field.Field
+import me.liam.microsmith.dsl.schemas.protobuf.field.MapField
+import me.liam.microsmith.dsl.schemas.protobuf.field.MapKeyType
+import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
+import me.liam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
+import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
+import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
+import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
+import me.liam.microsmith.dsl.schemas.protobuf.field.ValueType
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.Max
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 import me.liam.microsmith.dsl.schemas.protobuf.support.resolveReferences
@@ -14,20 +23,11 @@ interface ProtobufScope {
 
     operator fun Int.invoke(block: ProtobufScope.() -> Unit) = version(this, block)
 
-    fun version(
-        version: Int,
-        block: ProtobufScope.() -> Unit
-    )
+    fun version(version: Int, block: ProtobufScope.() -> Unit)
 
-    fun message(
-        name: String,
-        block: MessageScope.() -> Unit = {}
-    )
+    fun message(name: String, block: MessageScope.() -> Unit = {})
 
-    fun enum(
-        name: String,
-        block: EnumScope.() -> Unit = {}
-    )
+    fun enum(name: String, block: EnumScope.() -> Unit = {})
 }
 
 interface Reservable {
@@ -55,21 +55,11 @@ interface MessageScope :
 
     fun repeated(block: MessageScope.() -> CardinalityField)
 
-    fun oneof(
-        name: String,
-        block: OneofScope.() -> Unit
-    )
+    fun oneof(name: String, block: OneofScope.() -> Unit)
 
-    fun map(
-        name: String,
-        block: MapFieldScope.() -> Unit
-    ): MapField
+    fun map(name: String, block: MapFieldScope.() -> Unit): MapField
 
-    fun ref(
-        name: String,
-        target: String,
-        block: ReferenceFieldScope.() -> Unit = {}
-    ): ReferenceField
+    fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit = {}): ReferenceField
 
     val max get() = Max
 
@@ -88,10 +78,7 @@ interface ReservedScope {
 
     fun range(range: MaxRange)
 
-    fun range(
-        start: Int,
-        end: Int
-    ) = range(start..end)
+    fun range(start: Int, end: Int) = range(start..end)
 
     operator fun String.unaryPlus() = name(this)
 
@@ -104,10 +91,7 @@ interface ReservedScope {
 
 @MicrosmithDsl
 interface EnumScope : Reservable {
-    fun value(
-        name: String,
-        block: EnumValueScope.() -> Unit = {}
-    )
+    fun value(name: String, block: EnumValueScope.() -> Unit = {})
 
     operator fun String.unaryPlus() = value(this)
 }
@@ -117,11 +101,7 @@ interface EnumValueScope : FieldScope
 
 @MicrosmithDsl
 interface OneofScope : ScalarFields<OneofFieldScope, OneofField> {
-    fun ref(
-        name: String,
-        target: String,
-        block: OneofReferenceFieldScope.() -> Unit = {}
-    ): OneofField
+    fun ref(name: String, target: String, block: OneofReferenceFieldScope.() -> Unit = {}): OneofField
 }
 
 @MicrosmithDsl
@@ -149,20 +129,11 @@ interface MapFieldScope : FieldScope {
 
     fun types(kvpValue: Pair<MapKeyType, ValueType>)
 
-    fun types(
-        keyType: MapKeyType,
-        valueType: ValueType
-    ) = types(kvpValue = keyType to valueType)
+    fun types(keyType: MapKeyType, valueType: ValueType) = types(kvpValue = keyType to valueType)
 
-    fun types(
-        keyType: MapKeyType,
-        target: String
-    ) = types(kvpRef = keyType to target)
+    fun types(keyType: MapKeyType, target: String) = types(kvpRef = keyType to target)
 
-    fun types(
-        keyType: MapKeyType,
-        target: Reference
-    ) = types(kvpValue = keyType to target)
+    fun types(keyType: MapKeyType, target: Reference) = types(kvpValue = keyType to target)
 
     @JvmName("typesStr")
     fun types(kvpRef: Pair<MapKeyType, String>) = types(kvp = kvpRef.first to ref(kvpRef.second))
@@ -208,80 +179,35 @@ interface FieldScope {
 }
 
 interface ScalarFields<TFieldScope : FieldScope, TField : Field> {
-    fun int32(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun int32(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun int64(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun int64(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun uint32(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun uint32(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun uint64(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun uint64(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun sint32(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun sint32(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun sint64(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun sint64(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun fixed32(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun fixed32(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun fixed64(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun fixed64(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun sfixed32(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun sfixed32(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun sfixed64(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun sfixed64(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun float(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun float(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun double(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun double(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun string(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun string(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun bytes(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun bytes(name: String, block: TFieldScope.() -> Unit = {}): TField
 
-    fun bool(
-        name: String,
-        block: TFieldScope.() -> Unit = {}
-    ): TField
+    fun bool(name: String, block: TFieldScope.() -> Unit = {}): TField
 }
 
 fun SchemasScope.protobuf(block: ProtobufScope.() -> Unit) {

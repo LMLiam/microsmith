@@ -12,14 +12,14 @@ class OneofBuilderTests :
         fun newBuilder(
             segments: List<String> = listOf("me, liam"),
             allocateIndex: (Int?) -> Int = { it ?: 1 },
-            usedNames: MutableList<String> = mutableListOf()
+            usedNames: MutableList<String> = mutableListOf(),
         ): Pair<OneofBuilder, MutableList<String>> {
             val builder =
                 OneofBuilder(
                     name = "TestOneof",
                     segments = segments,
                     allocateIndex = allocateIndex,
-                    useName = { usedNames += it }
+                    useName = { usedNames += it },
                 )
             return builder to usedNames
         }

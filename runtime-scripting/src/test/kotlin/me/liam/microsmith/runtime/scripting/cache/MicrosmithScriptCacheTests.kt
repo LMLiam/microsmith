@@ -68,7 +68,7 @@ class MicrosmithScriptCacheTests :
                     CompiledScriptFingerprint.uniqueName(
                         script = scriptSource,
                         scriptCompilationConfiguration = compilationConfiguration,
-                        additionalFingerprints = listOf(RuntimeClasspathFingerprint.calculate(listOf(pluginJar)))
+                        additionalFingerprints = listOf(RuntimeClasspathFingerprint.calculate(listOf(pluginJar))),
                     )
 
                 pluginJar.writeText("v2")
@@ -77,7 +77,7 @@ class MicrosmithScriptCacheTests :
                     CompiledScriptFingerprint.uniqueName(
                         script = scriptSource,
                         scriptCompilationConfiguration = compilationConfiguration,
-                        additionalFingerprints = listOf(RuntimeClasspathFingerprint.calculate(listOf(pluginJar)))
+                        additionalFingerprints = listOf(RuntimeClasspathFingerprint.calculate(listOf(pluginJar))),
                     )
 
                 secondFingerprint shouldNotBe firstFingerprint

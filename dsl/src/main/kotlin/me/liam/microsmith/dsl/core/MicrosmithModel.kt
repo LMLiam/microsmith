@@ -9,10 +9,12 @@ import kotlin.reflect.KClass
  * - Plugin authors consume this to read extensions they care about.
  */
 class MicrosmithModel internal constructor(
-    private val extensions: Map<KClass<out MicrosmithExtension>, MicrosmithExtension>
+    private val extensions: Map<KClass<out MicrosmithExtension>, MicrosmithExtension>,
 ) {
     /**
-     * Retrieve an extension of the given type (gets the first if multiple of the same type exist), or null if not present.
+     * Retrieve an extension of the given type.
+     *
+     * Gets the first if multiple of the same type exist, or null if not present.
      */
     @Suppress("UNCHECKED_CAST")
     fun <T : MicrosmithExtension> get(type: KClass<T>) = extensions[type] as? T?
@@ -25,11 +27,8 @@ class MicrosmithModel internal constructor(
     /**
      * Internal: return a new model with the given extension attached.
      */
-    internal fun <T : MicrosmithExtension> with(
-        type: KClass<T>,
-        value: T
-    ) = MicrosmithModel(
-        extensions + (mapOf(type to value))
+    internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = MicrosmithModel(
+        extensions + (mapOf(type to value)),
     )
 
     /**

@@ -41,7 +41,7 @@ class MicrosmithCliTests :
                 MicrosmithCli(
                     stdout = out::add,
                     stderr = err::add,
-                    providerValidator = { listOf("missing providers") }
+                    providerValidator = { listOf("missing providers") },
                 )
 
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
@@ -57,7 +57,7 @@ class MicrosmithCliTests :
                 MicrosmithCli(
                     stdout = out::add,
                     stderr = err::add,
-                    providerValidator = { throw ServiceConfigurationError("bad provider entry") }
+                    providerValidator = { throw ServiceConfigurationError("bad provider entry") },
                 )
 
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
@@ -79,9 +79,9 @@ class MicrosmithCliTests :
                         ScriptRunSuccess(
                             warnings = emptyList(),
                             cacheHit = false,
-                            elapsedMillis = 12
+                            elapsedMillis = 12,
                         )
-                    }
+                    },
                 )
 
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
@@ -101,7 +101,7 @@ class MicrosmithCliTests :
                     providerValidator = { emptyList() },
                     scriptRunner = { _, _ ->
                         ScriptRunFailure(listOf("[error] schema.microsmith.kts:1:1 broken script"))
-                    }
+                    },
                 )
 
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
@@ -121,9 +121,9 @@ class MicrosmithCliTests :
                     providerValidator = { emptyList() },
                     pluginResolver = {
                         PluginResolutionResult.Failure(
-                            diagnostics = listOf("Invalid --plugin value 'broken'.")
+                            diagnostics = listOf("Invalid --plugin value 'broken'."),
                         )
-                    }
+                    },
                 )
 
             val exitCode =
@@ -134,8 +134,8 @@ class MicrosmithCliTests :
                         "--out",
                         "build/generated",
                         "--plugin",
-                        "broken"
-                    )
+                        "broken",
+                    ),
                 )
 
             exitCode shouldBe 2

@@ -10,11 +10,11 @@ import me.liam.microsmith.dsl.core.MicrosmithExtension
 import me.liam.microsmith.dsl.core.MicrosmithModel
 
 data class FooExt(
-    val foo: String
+    val foo: String,
 ) : MicrosmithExtension
 
 data class BarExt(
-    val bar: Int
+    val bar: Int,
 ) : MicrosmithExtension
 
 class MicrosmithModelExtensionsTests :

@@ -4,7 +4,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class DirectorySpace private constructor(
-    override val root: Path
+    override val root: Path,
 ) : FileSpace {
     companion object {
         fun from(path: Path): DirectorySpace {

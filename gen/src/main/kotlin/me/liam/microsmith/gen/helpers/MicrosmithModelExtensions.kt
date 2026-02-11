@@ -18,26 +18,22 @@ import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
 
-suspend fun MicrosmithModel.generate(finalDir: FileSpace) =
-    coroutineScope {
-        GeneratorRegistry.load()
+suspend fun MicrosmithModel.generate(finalDir: FileSpace) = coroutineScope {
+    GeneratorRegistry.load()
 
-        val outputs =
-            TemporaryDirectory.create().use { tempSpace ->
-                val generated = runGenerators(finalDir)
-                requireUniqueRelativePaths(generated)
-                writeOutputs(generated, tempSpace)
-                generated
-            }
+    val outputs =
+        TemporaryDirectory.create().use { tempSpace ->
+            val generated = runGenerators(finalDir)
+            requireUniqueRelativePaths(generated)
+            writeOutputs(generated, tempSpace)
+            generated
+        }
 
-        writeOutputs(outputs, finalDir)
-        println("Generated all files in ${finalDir.root}")
-    }
+    writeOutputs(outputs, finalDir)
+    println("Generated all files in ${finalDir.root}")
+}
 
-suspend fun MicrosmithModel.generateTo(
-    outputDir: Path,
-    ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-) {
+suspend fun MicrosmithModel.generateTo(outputDir: Path, ioDispatcher: CoroutineDispatcher = Dispatchers.IO) {
     val directorySpace = withContext(ioDispatcher) { DirectorySpace.from(outputDir) }
     generate(directorySpace)
 }
@@ -54,28 +50,27 @@ private fun requireUniqueRelativePaths(outputs: List<GeneratedFile>) {
     }
 }
 
-private suspend fun MicrosmithModel.runGenerators(space: FileSpace) =
-    coroutineScope {
-        extensions()
-            .map { ext ->
-                async {
-                    val gen =
-                        ext.getGenerator() ?: run {
-                            println("No generator found for ${ext::class.simpleName}")
-                            return@async emptyList()
-                        }
-                    gen.run { ext.generate(space) }.also {
-                        println("Generated ${it.size} files for ${ext::class.simpleName} in ${space.root}")
+private suspend fun MicrosmithModel.runGenerators(space: FileSpace) = coroutineScope {
+    extensions()
+        .map { ext ->
+            async {
+                val gen =
+                    ext.getGenerator() ?: run {
+                        println("No generator found for ${ext::class.simpleName}")
+                        return@async emptyList()
                     }
+                gen.run { ext.generate(space) }.also {
+                    println("Generated ${it.size} files for ${ext::class.simpleName} in ${space.root}")
                 }
-            }.awaitAll()
-            .flatten()
-    }
+            }
+        }.awaitAll()
+        .flatten()
+}
 
 private suspend fun writeOutputs(
     outputs: List<GeneratedFile>,
     space: FileSpace,
-    ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) = withContext(ioDispatcher) {
     outputs.forEach { out ->
         val target = resolveTargetPath(space, out.relativePath)
@@ -84,10 +79,7 @@ private suspend fun writeOutputs(
     }
 }
 
-internal fun resolveTargetPath(
-    space: FileSpace,
-    relativePath: Path
-): Path {
+internal fun resolveTargetPath(space: FileSpace, relativePath: Path): Path {
     require(!relativePath.isAbsolute) {
         "Generated output path must be relative, but was '$relativePath'."
     }
@@ -120,10 +112,7 @@ private fun ensureOutputRootIsSafe(root: Path) {
     Files.createDirectories(root)
 }
 
-private fun requireNoSymlinkTraversal(
-    root: Path,
-    relativePath: Path
-) {
+private fun requireNoSymlinkTraversal(root: Path, relativePath: Path) {
     var current = root
     val segments = relativePath.toList()
     segments.forEachIndexed { index, segment ->

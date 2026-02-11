@@ -14,7 +14,7 @@ private const val HEX_SHA256_LENGTH = 64
 internal data class Coordinate(
     val group: String,
     val artifact: String,
-    val version: String
+    val version: String,
 ) {
     val value: String
         get() = "$group:$artifact:$version"
@@ -26,17 +26,17 @@ internal data class Coordinate(
 internal data class LockEntry(
     val kind: String,
     val key: String,
-    val checksum: String
+    val checksum: String,
 )
 
 internal data class LockKey(
     val kind: String,
-    val key: String
+    val key: String,
 )
 
 internal data class ParsedLockfile(
     val version: Int,
-    val entries: List<LockEntry>
+    val entries: List<LockEntry>,
 )
 
 internal fun parseCoordinate(raw: String): Coordinate {
@@ -114,10 +114,7 @@ private fun validateCoordinateGroup(group: String) {
     }
 }
 
-private fun validateCoordinateSegment(
-    label: String,
-    value: String
-) {
+private fun validateCoordinateSegment(label: String, value: String) {
     require(!value.contains('/') && !value.contains('\\')) {
         "Plugin coordinate $label '$value' contains a path separator."
     }

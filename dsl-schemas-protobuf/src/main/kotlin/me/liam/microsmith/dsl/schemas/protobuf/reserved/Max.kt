@@ -5,5 +5,5 @@ object Max {
 }
 
 data class MaxRange(
-    val from: Int
+    val from: Int,
 )

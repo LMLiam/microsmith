@@ -2,10 +2,7 @@ package me.liam.microsmith.cli.parsing
 
 import java.nio.file.Path
 
-internal fun parseRunOptions(
-    args: List<String>,
-    startIndex: Int
-): ParsedRunOptions {
+internal fun parseRunOptions(args: List<String>, startIndex: Int): ParsedRunOptions {
     val state = RunOptionsState()
     var index = startIndex
     while (index < args.size && state.error == null) {
@@ -18,11 +15,7 @@ internal fun parseRunOptions(
     return state.toParsedRunOptions()
 }
 
-private fun parseRunOptionToken(
-    args: List<String>,
-    index: Int,
-    state: RunOptionsState
-): ParsedToken {
+private fun parseRunOptionToken(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val token = args[index]
     return when (token) {
         OUTPUT_OPTION -> parseOutputOption(args, index, state)
@@ -36,11 +29,7 @@ private fun parseRunOptionToken(
     }
 }
 
-private fun parseOutputOption(
-    args: List<String>,
-    index: Int,
-    state: RunOptionsState
-): ParsedToken {
+private fun parseOutputOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
     val error = validateOutputValue(value, state.outputDir != null)
     return if (error != null) {
@@ -51,11 +40,7 @@ private fun parseOutputOption(
     }
 }
 
-private fun parseVariableOption(
-    args: List<String>,
-    index: Int,
-    state: RunOptionsState
-): ParsedToken {
+private fun parseVariableOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
     val parsedVariable = parseVariableValue(value)
     val duplicate = parsedVariable.error == null && state.variables.containsKey(parsedVariable.key)
@@ -74,11 +59,7 @@ private fun parseVariableOption(
     }
 }
 
-private fun parseFlagOption(
-    args: List<String>,
-    index: Int,
-    state: RunOptionsState
-): ParsedToken {
+private fun parseFlagOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
     val flag = parseFlagValue(value)
     val duplicate = flag != null && state.flags.contains(flag)
@@ -97,11 +78,7 @@ private fun parseFlagOption(
     }
 }
 
-private fun parsePluginOption(
-    args: List<String>,
-    index: Int,
-    state: RunOptionsState
-): ParsedToken {
+private fun parsePluginOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
     val pluginCoordinate = parsePluginCoordinate(value)
     val duplicate = pluginCoordinate != null && state.plugins.contains(pluginCoordinate)
@@ -110,13 +87,13 @@ private fun parsePluginOption(
         pluginCoordinate == null ->
             ParsedToken(
                 nextIndex = index,
-                error = "Invalid --plugin value '$value'. Expected group:artifact:version."
+                error = "Invalid --plugin value '$value'. Expected group:artifact:version.",
             )
 
         duplicate ->
             ParsedToken(
                 nextIndex = index,
-                error = "--plugin '$pluginCoordinate' may only be specified once."
+                error = "--plugin '$pluginCoordinate' may only be specified once.",
             )
 
         else -> {
@@ -126,11 +103,7 @@ private fun parsePluginOption(
     }
 }
 
-private fun parsePluginJarOption(
-    args: List<String>,
-    index: Int,
-    state: RunOptionsState
-): ParsedToken {
+private fun parsePluginJarOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
     val pluginJar = value?.takeUnless { it.startsWith("--") }?.let(Path::of)
     val duplicate = pluginJar != null && state.pluginJars.contains(pluginJar)
@@ -149,10 +122,7 @@ private fun parsePluginJarOption(
     }
 }
 
-private fun parseOfflineOption(
-    index: Int,
-    state: RunOptionsState
-): ParsedToken {
+private fun parseOfflineOption(index: Int, state: RunOptionsState): ParsedToken {
     val duplicate = state.offline
     return if (duplicate) {
         ParsedToken(nextIndex = index, error = "--offline may only be specified once.")
@@ -162,11 +132,7 @@ private fun parseOfflineOption(
     }
 }
 
-private fun parseRepositoryOption(
-    args: List<String>,
-    index: Int,
-    state: RunOptionsState
-): ParsedToken {
+private fun parseRepositoryOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
     val missingValue = value == null || value.startsWith("--")
     val duplicate = state.repositoryOverride != null
