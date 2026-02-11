@@ -25,6 +25,7 @@ private fun parseRunOptionToken(args: List<String>, index: Int, state: RunOption
         PLUGIN_JAR_OPTION -> parsePluginJarOption(args, index, state)
         OFFLINE_OPTION -> parseOfflineOption(index, state)
         REPOSITORY_OPTION -> parseRepositoryOption(args, index, state)
+        ISOLATION_OPTION -> parseIsolationOption(args, index, state)
         else -> ParsedToken(nextIndex = index, error = "Unknown option '$token'.")
     }
 }
@@ -146,6 +147,32 @@ private fun parseRepositoryOption(args: List<String>, index: Int, state: RunOpti
 
         else -> {
             state.repositoryOverride = value
+            ParsedToken(nextIndex = index + 2)
+        }
+    }
+}
+
+private fun parseIsolationOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
+    val value = args.getOrNull(index + 1)
+    val parsedMode = parseIsolationMode(value)
+    val duplicate = state.isolationModeSpecified
+
+    return when {
+        value == null || value.startsWith("--") ->
+            ParsedToken(nextIndex = index, error = "Missing value for --isolation option.")
+
+        duplicate ->
+            ParsedToken(nextIndex = index, error = "--isolation may only be specified once.")
+
+        parsedMode == null ->
+            ParsedToken(
+                nextIndex = index,
+                error = "Invalid --isolation value '$value'. Expected 'classloader' or 'process'.",
+            )
+
+        else -> {
+            state.isolationMode = parsedMode
+            state.isolationModeSpecified = true
             ParsedToken(nextIndex = index + 2)
         }
     }

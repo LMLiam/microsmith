@@ -155,6 +155,15 @@ class PluginResolverTests :
                                 "http://127.0.0.1:1/repository",
                                 repositoryRoot.toUri().toString(),
                             ),
+                            repositoryPolicy =
+                            RepositoryAllowlistPolicy(
+                                allowedRepositories =
+                                setOf(
+                                    normalizeRepositoryUri(MAVEN_CENTRAL_REPOSITORY),
+                                    normalizeRepositoryUri("http://127.0.0.1:1/repository"),
+                                ),
+                                allowFileRepositories = true,
+                            ),
                         ),
                     )
 
@@ -299,6 +308,113 @@ class PluginResolverTests :
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
                 failure.diagnostics.joinToString("\n").shouldContain("reserved lockfile delimiter")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "blocks unapproved repository endpoint by default allowlist policy" {
+            val tempDir = createTempDirectory("microsmith-plugin-repository-allowlist")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                script.writeText("// test script")
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf("com.acme:plugin:1.0.0"),
+                        repositoryOverride = "https://packages.acme.internal/maven",
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings = PluginResolverSettings(cacheDirectory = tempDir),
+                    )
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("allowed repository allowlist")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "fails when plugin checksum allowlist is missing requested plugin entry" {
+            val tempDir = createTempDirectory("microsmith-plugin-allowlist-missing-entry")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                script.writeText("// test script")
+                val localJar = tempDir.resolve("plugins/custom.jar")
+                localJar.parent?.toFile()?.mkdirs()
+                localJar.writeBytes("allowlist-check".toByteArray())
+
+                val workingDirectory = Path.of("").toAbsolutePath().normalize()
+                val relativeJarPath = workingDirectory.relativize(localJar.toAbsolutePath().normalize())
+                val lockKey = relativeJarPath.normalize().toString().replace('\\', '/')
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        pluginJars = setOf(relativeJarPath),
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = tempDir.resolve("cache"),
+                            checksumAllowlist = PluginChecksumAllowlist(entries = emptyMap()),
+                        ),
+                    )
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("missing required entries")
+                failure.diagnostics.joinToString("\n").shouldContain(lockKey)
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "fails when plugin checksum allowlist hash does not match artifact checksum" {
+            val tempDir = createTempDirectory("microsmith-plugin-allowlist-mismatch")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                script.writeText("// test script")
+                val localJar = tempDir.resolve("plugins/custom.jar")
+                localJar.parent?.toFile()?.mkdirs()
+                localJar.writeBytes("allowlist-check".toByteArray())
+
+                val workingDirectory = Path.of("").toAbsolutePath().normalize()
+                val relativeJarPath = workingDirectory.relativize(localJar.toAbsolutePath().normalize())
+                val lockKey = relativeJarPath.normalize().toString().replace('\\', '/')
+                val invalidChecksum = "0".repeat(64)
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        pluginJars = setOf(relativeJarPath),
+                    )
+
+                val allowlist =
+                    PluginChecksumAllowlist(
+                        entries =
+                        mapOf(
+                            LockKey(kind = LOCAL_KIND, key = lockKey) to invalidChecksum,
+                        ),
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = tempDir.resolve("cache"),
+                            checksumAllowlist = allowlist,
+                        ),
+                    )
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("Allowlist checksum mismatch")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }

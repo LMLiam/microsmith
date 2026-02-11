@@ -1,5 +1,6 @@
 package me.liam.microsmith.cli.command
 
+import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import java.nio.file.Path
 
 internal data class RunCommand(
@@ -11,4 +12,5 @@ internal data class RunCommand(
     val pluginJars: Set<Path> = emptySet(),
     val offline: Boolean = false,
     val repositoryOverride: String? = null,
+    val isolationMode: ScriptIsolationMode = ScriptIsolationMode.CLASSLOADER,
 ) : CliCommand

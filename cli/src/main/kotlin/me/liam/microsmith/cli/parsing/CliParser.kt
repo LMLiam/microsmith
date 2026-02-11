@@ -14,6 +14,7 @@ internal const val PLUGIN_OPTION = "--plugin"
 internal const val PLUGIN_JAR_OPTION = "--plugin-jar"
 internal const val OFFLINE_OPTION = "--offline"
 internal const val REPOSITORY_OPTION = "--repository"
+internal const val ISOLATION_OPTION = "--isolation"
 private const val SCRIPT_EXTENSION = ".microsmith.kts"
 private val HELP_COMMANDS = setOf("--help", "-h", "help")
 
@@ -64,6 +65,7 @@ private fun parseRunOptionsCommand(script: Path, args: List<String>, startIndex:
                 pluginJars = parsedOptions.pluginJars,
                 offline = parsedOptions.offline,
                 repositoryOverride = parsedOptions.repositoryOverride,
+                isolationMode = parsedOptions.isolationMode,
             )
     }
 }

@@ -15,9 +15,17 @@ private const val HTTP_STATUS_OK = 200
 private val HTTP_CLIENT: HttpClient = HttpClient.newHttpClient()
 
 internal fun resolveRepositories(command: RunCommand, settings: PluginResolverSettings): List<String> {
+    return resolveRepositories(command, settings, settings.repositoryPolicy ?: defaultRepositoryAllowlistPolicy())
+}
+
+internal fun resolveRepositories(
+    command: RunCommand,
+    settings: PluginResolverSettings,
+    repositoryPolicy: RepositoryAllowlistPolicy,
+): List<String> {
     val override = command.repositoryOverride?.trim()?.takeIf { it.isNotEmpty() }
     val repositories = (listOfNotNull(override) + settings.defaultRepositories).distinct()
-    repositories.forEach(::validateRepositoryUri)
+    repositories.forEach(repositoryPolicy::validate)
     return repositories
 }
 
@@ -56,14 +64,6 @@ internal fun resolveRemoteArtifact(
     }
 
     error("Could not resolve plugin '${coordinate.value}'. Tried: ${attemptedUris.joinToString(", ")}.")
-}
-
-private fun validateRepositoryUri(uri: String) {
-    val parsed = URI.create(uri)
-    val scheme = parsed.scheme?.lowercase()
-    require(scheme == "https" || scheme == "http" || scheme == "file") {
-        "Unsupported repository URI '$uri'. Use https://, http://, or file://."
-    }
 }
 
 private fun cachePathFor(cacheDirectory: Path, coordinate: Coordinate): Path {

@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import me.liam.microsmith.cli.command.ErrorCommand
 import me.liam.microsmith.cli.command.HelpCommand
 import me.liam.microsmith.cli.command.RunCommand
+import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import kotlin.io.path.Path
 
 class CliParserTests :
@@ -62,6 +63,8 @@ class CliParserTests :
                     "--offline",
                     "--repository",
                     "https://maven.acme.internal/repository/mirror",
+                    "--isolation",
+                    "process",
                 ),
             ) shouldBe
                 RunCommand(
@@ -71,6 +74,7 @@ class CliParserTests :
                     pluginJars = setOf(Path("plugins/custom.jar")),
                     offline = true,
                     repositoryOverride = "https://maven.acme.internal/repository/mirror",
+                    isolationMode = ScriptIsolationMode.PROCESS,
                 )
         }
 
@@ -110,5 +114,19 @@ class CliParserTests :
                 ErrorCommand(
                     "Invalid --plugin value 'com.acme:missing-version'. Expected group:artifact:version.",
                 )
+        }
+
+        "returns error for invalid isolation mode" {
+            parseCliArgs(
+                listOf(
+                    "run",
+                    "schema.microsmith.kts",
+                    "--out",
+                    "build/generated",
+                    "--isolation",
+                    "container",
+                ),
+            ) shouldBe
+                ErrorCommand("Invalid --isolation value 'container'. Expected 'classloader' or 'process'.")
         }
     })
