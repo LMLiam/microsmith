@@ -33,7 +33,7 @@ internal class ProcessIsolatedScriptExecutor(
         } catch (error: SecurityException) {
             failureFromException(error)
         } finally {
-            deleteRecursively(workingDirectory)
+            runCatching { deleteRecursively(workingDirectory) }
         }
     }
 
