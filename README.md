@@ -178,7 +178,7 @@ microsmith run schema.microsmith.kts --out ./generated --isolation process
 - Plugin resolution is endpoint-restricted by a repository allowlist:
   - Built-in allowlist: `https://repo1.maven.org/maven2`
   - Additional allowed endpoints via `MICROSMITH_REPOSITORY_ALLOWLIST` (comma-separated base URIs)
-  - `file://` repositories are allowed by default for local development/test workflows.
+  - `file://` repositories are denied by default and can be explicitly enabled with `MICROSMITH_ALLOW_FILE_REPOSITORIES=true`.
 - Plugin artifacts are SHA-256 checked against the script lockfile when present.
 - Optional plugin checksum allowlist can be enforced with `MICROSMITH_PLUGIN_ALLOWLIST_FILE`:
   - Entry format: `<kind>|<key>|<sha256>` where `kind` is `remote` or `local`.

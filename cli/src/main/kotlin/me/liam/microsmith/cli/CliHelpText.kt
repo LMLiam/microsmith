@@ -11,5 +11,6 @@ Usage:
 
 Security policy env vars:
   MICROSMITH_REPOSITORY_ALLOWLIST   Comma-separated additional allowed repository base URIs.
+  MICROSMITH_ALLOW_FILE_REPOSITORIES Set to true to allow file:// repositories for plugin coordinates.
   MICROSMITH_PLUGIN_ALLOWLIST_FILE  Path to checksum allowlist file (<kind>|<key>|<sha256>).
 """
