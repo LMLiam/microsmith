@@ -35,13 +35,13 @@ microsmith run schema.microsmith.kts --out ./generated
 If using the unpacked distribution:
 
 ```bash
-./tools/microsmith/bin/microsmith run schema.microsmith.kts --out ./generated
+./tools/microsmith-cli-*/bin/microsmith run schema.microsmith.kts --out ./generated
 ```
 
 Windows:
 
 ```powershell
-.\tools\microsmith\bin\microsmith.bat run schema.microsmith.kts --out .\generated
+.\tools\microsmith-cli-*\bin\microsmith.bat run schema.microsmith.kts --out .\generated
 ```
 
 ## Plugin extension workflow

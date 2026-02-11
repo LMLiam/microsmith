@@ -4,6 +4,16 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 MICROSMITH_HOME=$(cd "$SCRIPT_DIR/.." && pwd)
 
+if [ -z "${MICROSMITH_SCRIPT_CACHE_DIR:-}" ]; then
+  MICROSMITH_SCRIPT_CACHE_DIR="$MICROSMITH_HOME/cache/scripts"
+  export MICROSMITH_SCRIPT_CACHE_DIR
+fi
+
+if [ -z "${MICROSMITH_PLUGIN_CACHE_DIR:-}" ]; then
+  MICROSMITH_PLUGIN_CACHE_DIR="$MICROSMITH_HOME/cache/plugins"
+  export MICROSMITH_PLUGIN_CACHE_DIR
+fi
+
 if [ -n "${JAVA_HOME:-}" ]; then
   JAVA_CMD="$JAVA_HOME/bin/java"
 else
