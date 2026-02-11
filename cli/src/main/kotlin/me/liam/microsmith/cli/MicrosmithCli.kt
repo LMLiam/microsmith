@@ -28,6 +28,7 @@ internal class MicrosmithCli(
                 variables = command.variables,
                 flags = command.flags,
                 pluginClasspath = pluginClasspath,
+                isolationMode = command.isolationMode,
             ),
         )
     },

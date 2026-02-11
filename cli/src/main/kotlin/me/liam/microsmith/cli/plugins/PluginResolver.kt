@@ -19,6 +19,8 @@ internal data class PluginResolverSettings(
     val cacheDirectory: Path = defaultPluginCacheDirectory(),
     val lockfilePathOverride: Path? = null,
     val defaultRepositories: List<String> = listOf(MAVEN_CENTRAL_REPOSITORY),
+    val repositoryPolicy: RepositoryAllowlistPolicy? = null,
+    val checksumAllowlist: PluginChecksumAllowlist? = null,
 )
 
 internal fun resolvePlugins(
@@ -56,12 +58,13 @@ private fun resolvePluginsOrThrow(
 
     val lockfilePath = settings.lockfilePathOverride ?: defaultLockfilePath(command.script)
     val lockfile = readLockfile(lockfilePath)
-    lockfile?.assertSamePluginSet(
-        buildRequestedLockKeys(coordinates, localPluginJars.map(LocalPluginJar::lockKey)),
-        lockfilePath,
-    )
+    val repositoryPolicy = settings.repositoryPolicy ?: defaultRepositoryAllowlistPolicy()
+    val checksumAllowlist = settings.checksumAllowlist ?: loadPluginChecksumAllowlistFromEnvironment()
+    val requestedLockKeys = buildRequestedLockKeys(coordinates, localPluginJars.map(LocalPluginJar::lockKey))
+    checksumAllowlist?.assertCovers(requestedLockKeys)
+    lockfile?.assertSamePluginSet(requestedLockKeys, lockfilePath)
 
-    val repositories = resolveRepositories(command, settings)
+    val repositories = resolveRepositories(command, settings, repositoryPolicy)
     val cacheDirectory = settings.cacheDirectory.toAbsolutePath().normalize()
     Files.createDirectories(cacheDirectory)
 
@@ -72,6 +75,7 @@ private fun resolvePluginsOrThrow(
         val artifactPath = resolveRemoteArtifact(coordinate, repositories, cacheDirectory, command.offline)
         val checksum = sha256(artifactPath)
         lockfile?.verifyChecksum(REMOTE_KIND, coordinate.value, checksum)
+        checksumAllowlist?.verifyChecksum(REMOTE_KIND, coordinate.value, checksum)
         lockEntries.add(LockEntry(kind = REMOTE_KIND, key = coordinate.value, checksum = checksum))
         classpath.add(artifactPath)
     }
@@ -79,6 +83,7 @@ private fun resolvePluginsOrThrow(
     localPluginJars.forEach { localJar ->
         val checksum = sha256(localJar.artifactPath)
         lockfile?.verifyChecksum(LOCAL_KIND, localJar.lockKey, checksum)
+        checksumAllowlist?.verifyChecksum(LOCAL_KIND, localJar.lockKey, checksum)
         lockEntries.add(LockEntry(kind = LOCAL_KIND, key = localJar.lockKey, checksum = checksum))
         classpath.add(localJar.artifactPath)
     }

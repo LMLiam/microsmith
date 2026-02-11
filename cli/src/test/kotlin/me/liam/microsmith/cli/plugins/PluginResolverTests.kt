@@ -44,7 +44,11 @@ class PluginResolverTests :
                 val result =
                     resolvePlugins(
                         command = command,
-                        settings = PluginResolverSettings(cacheDirectory = cache),
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            repositoryPolicy = fileRepositoryAllowedPolicy(),
+                        ),
                     )
 
                 val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
@@ -107,14 +111,28 @@ class PluginResolverTests :
                         repositoryOverride = repositoryRoot.toUri().toString(),
                     )
 
-                resolvePlugins(command = command, settings = PluginResolverSettings(cacheDirectory = cache))
+                resolvePlugins(
+                    command = command,
+                    settings =
+                    PluginResolverSettings(
+                        cacheDirectory = cache,
+                        repositoryPolicy = fileRepositoryAllowedPolicy(),
+                    ),
+                )
 
                 val cachedArtifact =
                     cache.resolve("artifacts/com/acme/lock-test/1.0.0/lock-test-1.0.0.jar")
                 cachedArtifact.writeBytes("tampered".toByteArray())
 
                 val mismatch =
-                    resolvePlugins(command = command, settings = PluginResolverSettings(cacheDirectory = cache))
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            repositoryPolicy = fileRepositoryAllowedPolicy(),
+                        ),
+                    )
                         .shouldBeTypeOf<PluginResolutionResult.Failure>()
 
                 mismatch.diagnostics.joinToString("\n").shouldContain("Checksum mismatch")
@@ -154,6 +172,10 @@ class PluginResolverTests :
                             listOf(
                                 "http://127.0.0.1:1/repository",
                                 repositoryRoot.toUri().toString(),
+                            ),
+                            repositoryPolicy =
+                            fileRepositoryAllowedPolicy(
+                                "http://127.0.0.1:1/repository",
                             ),
                         ),
                     )
@@ -303,4 +325,154 @@ class PluginResolverTests :
                 runCatching { tempDir.deleteRecursively() }
             }
         }
+
+        "blocks unapproved repository endpoint by default allowlist policy" {
+            val tempDir = createTempDirectory("microsmith-plugin-repository-allowlist")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                script.writeText("// test script")
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf("com.acme:plugin:1.0.0"),
+                        repositoryOverride = "https://packages.acme.internal/maven",
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings = PluginResolverSettings(cacheDirectory = tempDir),
+                    )
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("allowed repository allowlist")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "blocks file repository endpoint by default security policy" {
+            val tempDir = createTempDirectory("microsmith-plugin-repository-file-blocked")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val cache = tempDir.resolve("cache")
+                val repositoryRoot = tempDir.resolve("repo")
+                val coordinate = "com.acme:file-blocked:1.0.0"
+                val repositoryJar =
+                    repositoryRoot.resolve("com/acme/file-blocked/1.0.0/file-blocked-1.0.0.jar")
+                repositoryJar.parent?.toFile()?.mkdirs()
+                repositoryJar.writeBytes("plugin-jar-contents".toByteArray())
+                script.writeText("// test script")
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = output,
+                        plugins = setOf(coordinate),
+                        repositoryOverride = repositoryRoot.toUri().toString(),
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings = PluginResolverSettings(cacheDirectory = cache),
+                    )
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("file:// repositories are not allowed")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "fails when plugin checksum allowlist is missing requested plugin entry" {
+            val tempDir = createTempDirectory("microsmith-plugin-allowlist-missing-entry")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                script.writeText("// test script")
+                val localJar = tempDir.resolve("plugins/custom.jar")
+                localJar.parent?.toFile()?.mkdirs()
+                localJar.writeBytes("allowlist-check".toByteArray())
+
+                val workingDirectory = Path.of("").toAbsolutePath().normalize()
+                val relativeJarPath = workingDirectory.relativize(localJar.toAbsolutePath().normalize())
+                val lockKey = relativeJarPath.normalize().toString().replace('\\', '/')
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        pluginJars = setOf(relativeJarPath),
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = tempDir.resolve("cache"),
+                            checksumAllowlist = PluginChecksumAllowlist(entries = emptyMap()),
+                        ),
+                    )
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("missing required entries")
+                failure.diagnostics.joinToString("\n").shouldContain(lockKey)
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "fails when plugin checksum allowlist hash does not match artifact checksum" {
+            val tempDir = createTempDirectory("microsmith-plugin-allowlist-mismatch")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                script.writeText("// test script")
+                val localJar = tempDir.resolve("plugins/custom.jar")
+                localJar.parent?.toFile()?.mkdirs()
+                localJar.writeBytes("allowlist-check".toByteArray())
+
+                val workingDirectory = Path.of("").toAbsolutePath().normalize()
+                val relativeJarPath = workingDirectory.relativize(localJar.toAbsolutePath().normalize())
+                val lockKey = relativeJarPath.normalize().toString().replace('\\', '/')
+                val invalidChecksum = "0".repeat(64)
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        pluginJars = setOf(relativeJarPath),
+                    )
+
+                val allowlist =
+                    PluginChecksumAllowlist(
+                        entries =
+                        mapOf(
+                            LockKey(kind = LOCAL_KIND, key = lockKey) to invalidChecksum,
+                        ),
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = tempDir.resolve("cache"),
+                            checksumAllowlist = allowlist,
+                        ),
+                    )
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("Allowlist checksum mismatch")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
     })
+
+private fun fileRepositoryAllowedPolicy(vararg additionalAllowedRepositories: String): RepositoryAllowlistPolicy =
+    RepositoryAllowlistPolicy(
+        allowedRepositories =
+        (listOf(MAVEN_CENTRAL_REPOSITORY) + additionalAllowedRepositories)
+            .map(::normalizeRepositoryUri)
+            .toSet(),
+        allowFileRepositories = true,
+    )

@@ -2,6 +2,7 @@ package me.liam.microsmith.runtime.scripting.host
 
 import me.liam.microsmith.runtime.scripting.cache.MicrosmithScriptCache
 import me.liam.microsmith.runtime.scripting.cache.RuntimeClasspathFingerprint
+import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
 import me.liam.microsmith.runtime.scripting.model.ScriptRunRequest
 import me.liam.microsmith.runtime.scripting.model.ScriptRunResult
@@ -12,6 +13,26 @@ internal class ScriptRunExecutor(
     private val cacheDirectory: Path,
 ) {
     fun execute(request: ScriptRunRequest, scriptPath: Path, outputPath: Path): ScriptRunResult {
+        val normalizedPluginClasspath = request.pluginClasspath.map { it.toAbsolutePath().normalize() }
+        return when (request.isolationMode) {
+            ScriptIsolationMode.CLASSLOADER ->
+                executeInClassloader(
+                    request = request.copy(pluginClasspath = normalizedPluginClasspath),
+                    scriptPath = scriptPath,
+                    outputPath = outputPath,
+                )
+
+            ScriptIsolationMode.PROCESS ->
+                ProcessIsolatedScriptExecutor(cacheDirectory)
+                    .execute(
+                        request = request.copy(pluginClasspath = normalizedPluginClasspath),
+                        scriptPath = scriptPath,
+                        outputPath = outputPath,
+                    )
+        }
+    }
+
+    private fun executeInClassloader(request: ScriptRunRequest, scriptPath: Path, outputPath: Path): ScriptRunResult {
         val pluginClasspath = request.pluginClasspath.map { it.toAbsolutePath().normalize() }
         return PluginClassLoaderScope.withPluginClassLoader(pluginClasspath) { runtimeClassLoader ->
             runCatching {

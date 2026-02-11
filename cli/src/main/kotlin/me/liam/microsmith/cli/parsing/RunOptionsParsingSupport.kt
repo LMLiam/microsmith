@@ -1,5 +1,6 @@
 package me.liam.microsmith.cli.parsing
 
+import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import java.nio.file.Path
 
 private const val PLUGIN_COORDINATE_PART_COUNT = 3
@@ -54,6 +55,17 @@ internal fun parsePluginCoordinate(value: String?): String? {
     return coordinate.takeIf { isValid }
 }
 
+internal fun parseIsolationMode(value: String?): ScriptIsolationMode? {
+    val normalized =
+        value
+            ?.takeUnless { it.startsWith("--") }
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: return null
+
+    return ScriptIsolationMode.fromCliValue(normalized)
+}
+
 internal data class ParsedToken(
     val nextIndex: Int,
     val error: String? = null,
@@ -67,6 +79,8 @@ internal class RunOptionsState {
     val pluginJars = linkedSetOf<Path>()
     var offline: Boolean = false
     var repositoryOverride: String? = null
+    var isolationModeSpecified: Boolean = false
+    var isolationMode: ScriptIsolationMode = ScriptIsolationMode.CLASSLOADER
     var error: String? = null
 
     fun toParsedRunOptions(): ParsedRunOptions = ParsedRunOptions(
@@ -77,6 +91,7 @@ internal class RunOptionsState {
         pluginJars = pluginJars.toSet(),
         offline = offline,
         repositoryOverride = repositoryOverride,
+        isolationMode = isolationMode,
         error = error,
     )
 }
