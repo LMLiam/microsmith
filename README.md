@@ -154,7 +154,7 @@ flowchart TD
     EnumValue --> FieldIndex
 ```
 
-## CLI Scripting Runtime (Phase 2)
+## CLI Scripting Runtime (Phase 4)
 Run generation from a script file without embedding Gradle in the consumer project:
 
 ```bash
@@ -166,6 +166,24 @@ Optional script context values:
 ```bash
 microsmith run schema.microsmith.kts --out ./generated --var env=prod --flag emit
 ```
+
+Isolation mode:
+
+```bash
+microsmith run schema.microsmith.kts --out ./generated --isolation process
+```
+
+### Security boundaries and defaults
+- Script-time dependency directives (for example `@file:DependsOn` and `@file:Repository`) are denied by default.
+- Plugin resolution is endpoint-restricted by a repository allowlist:
+  - Built-in allowlist: `https://repo1.maven.org/maven2`
+  - Additional allowed endpoints via `MICROSMITH_REPOSITORY_ALLOWLIST` (comma-separated base URIs)
+  - `file://` repositories are allowed by default for local development/test workflows.
+- Plugin artifacts are SHA-256 checked against the script lockfile when present.
+- Optional plugin checksum allowlist can be enforced with `MICROSMITH_PLUGIN_ALLOWLIST_FILE`:
+  - Entry format: `<kind>|<key>|<sha256>` where `kind` is `remote` or `local`.
+- Generated output writes are constrained to the configured output root and reject traversal/symlink escapes.
+- Default isolation executes each run in an isolated per-run classloader; `--isolation process` executes in a separate JVM.
 
 Inside .microsmith.kts scripts:
 - Default imports include microsmith {}, schemas {}, and protobuf {}.
