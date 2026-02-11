@@ -82,6 +82,7 @@ jobs:
         run: ./gradlew :cli:distArtifacts --stacktrace
       - name: Build CLI distribution artifacts (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: .\gradlew.bat :cli:distArtifacts --stacktrace
       - name: Smoke test launcher (Unix)
         if: runner.os != 'Windows'
