@@ -105,6 +105,13 @@ jobs:
           EOF
           ./cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --out generated
           test -f generated/proto/CiSmoke.proto
+          ./cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --out generated-process --isolation process
+          test -f generated-process/proto/CiSmoke.proto
+      - name: Smoke test doctor diagnostics mode (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          ./cli/build/microsmith-cli-dist/bin/microsmith doctor --diagnostics json > cli-doctor.json
+          grep -q "Doctor checks passed." cli-doctor.json
       - name: Smoke test launcher (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -140,5 +147,27 @@ jobs:
           }
           if (-not (Test-Path .\generated\proto\CiSmoke.proto)) {
             Write-Error "Expected generated\\proto\\CiSmoke.proto to exist."
+            exit 1
+          }
+          & .\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated-process --isolation process
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          if (-not (Test-Path .\generated-process\proto\CiSmoke.proto)) {
+            Write-Error "Expected generated-process\\proto\\CiSmoke.proto to exist."
+            exit 1
+          }
+      - name: Smoke test doctor diagnostics mode (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $doctor = & .\cli\build\microsmith-cli-dist\bin\microsmith.bat doctor --diagnostics json 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Output $doctor
+            exit $LASTEXITCODE
+          }
+          if (($doctor -join "`n") -notmatch "Doctor checks passed.") {
+            Write-Error "Doctor command output did not contain success marker."
+            Write-Output $doctor
             exit 1
           }
