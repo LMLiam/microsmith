@@ -1,3 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.tasks.bundling.Compression
+import org.apache.tools.ant.filters.ReplaceTokens
+import java.nio.charset.StandardCharsets
+import java.util.jar.JarFile
+
 apply plugin: 'application'
 
 dependencies {
@@ -15,6 +21,7 @@ application {
 }
 
 tasks.named("shadowJar") {
+    archiveBaseName.set("microsmith-cli")
     archiveClassifier.set("all")
     mergeServiceFiles()
     manifest {
@@ -22,4 +29,106 @@ tasks.named("shadowJar") {
             "Main-Class": application.mainClass.get()
         )
     }
+}
+
+def expectedServiceProviders = [
+    "META-INF/services/me.liam.microsmith.gen.core.ModelGenerator" : "me.liam.microsmith.gen.schemas.SchemasGenerator",
+    "META-INF/services/me.liam.microsmith.gen.schemas.SchemaEmitter": "me.liam.microsmith.gen.schemas.protobuf.emission.ProtobufEmitter",
+]
+
+def shadowJarTask = tasks.named("shadowJar", ShadowJar)
+def shadowJarArchive = shadowJarTask.flatMap { it.archiveFile }
+def shadowJarArchiveName = "microsmith-cli-${project.version}-all.jar".toString()
+def distRootName = "microsmith-cli-${project.version}"
+
+tasks.register("verifyShadowJarServices") {
+    dependsOn(shadowJarTask)
+    inputs.file(shadowJarArchive)
+    doLast {
+        File shadedJar = shadowJarArchive.get().asFile
+        JarFile jarFile = new JarFile(shadedJar)
+        try {
+            expectedServiceProviders.each { servicePath, provider ->
+                def entry = jarFile.getJarEntry(servicePath)
+                if (entry == null) {
+                    throw new GradleException("Missing merged service descriptor '${servicePath}' in ${shadedJar.name}.")
+                }
+                def contents = jarFile.getInputStream(entry).getText(StandardCharsets.UTF_8.name())
+                def providers =
+                    contents
+                        .readLines()
+                        .collect { it.trim() }
+                        .findAll { !it.isEmpty() && !it.startsWith("#") }
+                if (!providers.contains(provider)) {
+                    throw new GradleException(
+                        "Service '${servicePath}' is missing expected provider '${provider}' in ${shadedJar.name}.",
+                    )
+                }
+            }
+        } finally {
+            jarFile.close()
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn(tasks.named("verifyShadowJarServices"))
+}
+
+tasks.register("prepareDist", Sync) {
+    dependsOn(shadowJarTask)
+    into(layout.buildDirectory.dir("microsmith-cli-dist"))
+
+    from(shadowJarArchive) {
+        into("lib")
+    }
+
+    from("src/dist/launcher/microsmith") {
+        into("bin")
+        filter(ReplaceTokens, tokens: [CLI_JAR: shadowJarArchiveName])
+        filePermissions {
+            unix("rwxr-xr-x")
+        }
+    }
+
+    from("src/dist/launcher/microsmith.bat") {
+        into("bin")
+        filter(ReplaceTokens, tokens: [CLI_JAR: shadowJarArchiveName])
+    }
+
+    from("src/dist/README.txt") {
+        into(".")
+    }
+}
+
+tasks.register("cliDistZip", Zip) {
+    dependsOn(tasks.named("prepareDist"))
+    archiveBaseName.set("microsmith-cli")
+    archiveVersion.set(project.version.toString())
+    archiveClassifier.set("dist")
+    destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+    from(layout.buildDirectory.dir("microsmith-cli-dist")) {
+        into(distRootName)
+    }
+}
+
+tasks.register("cliDistTar", Tar) {
+    dependsOn(tasks.named("prepareDist"))
+    compression = Compression.GZIP
+    archiveBaseName.set("microsmith-cli")
+    archiveVersion.set(project.version.toString())
+    archiveClassifier.set("dist")
+    archiveExtension.set("tar.gz")
+    destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+    from(layout.buildDirectory.dir("microsmith-cli-dist")) {
+        into(distRootName)
+    }
+}
+
+tasks.register("distArtifacts", Sync) {
+    dependsOn(tasks.named("verifyShadowJarServices"), tasks.named("cliDistZip"), tasks.named("cliDistTar"))
+    into(layout.buildDirectory.dir("release-assets"))
+    from(shadowJarArchive)
+    from(tasks.named("cliDistZip"))
+    from(tasks.named("cliDistTar"))
 }

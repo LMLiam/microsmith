@@ -55,3 +55,90 @@ jobs:
         if: ${{ always() && env.QODANA_TOKEN != '' }}
         with:
           sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+
+  cli-dist-smoke:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 24
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Build CLI distribution artifacts (Unix)
+        if: runner.os != 'Windows'
+        run: ./gradlew :cli:distArtifacts --stacktrace
+      - name: Build CLI distribution artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: .\gradlew.bat :cli:distArtifacts --stacktrace
+      - name: Smoke test launcher (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          ./cli/build/microsmith-cli-dist/bin/microsmith --help > cli-help.txt
+          grep -q "Usage:" cli-help.txt
+      - name: Smoke test generation and provider discovery (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cat > schema.microsmith.kts <<'EOF'
+          microsmith {
+              schemas {
+                  protobuf {
+                      message("CiSmoke") {
+                          int32("id") { index(1) }
+                      }
+                  }
+              }
+          }
+          EOF
+          ./cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --out generated
+          test -f generated/proto/CiSmoke.proto
+      - name: Smoke test launcher (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $help = & .\cli\build\microsmith-cli-dist\bin\microsmith.bat --help 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Output $help
+            exit $LASTEXITCODE
+          }
+          if (($help -join "`n") -notmatch "Usage:") {
+            Write-Error "CLI help output did not contain expected Usage block."
+            Write-Output $help
+            exit 1
+          }
+      - name: Smoke test generation and provider discovery (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          @'
+          microsmith {
+              schemas {
+                  protobuf {
+                      message("CiSmoke") {
+                          int32("id") { index(1) }
+                      }
+                  }
+              }
+          }
+          '@ | Set-Content -Path schema.microsmith.kts -Encoding UTF8
+          & .\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          if (-not (Test-Path .\generated\proto\CiSmoke.proto)) {
+            Write-Error "Expected generated\\proto\\CiSmoke.proto to exist."
+            exit 1
+          }

@@ -1,7 +1,7 @@
 package me.liam.microsmith.cli
 
 internal const val HELP_TEXT = """
-Microsmith CLI (Phase 4)
+Microsmith CLI
 
 Usage:
   microsmith run <script.microsmith.kts> --out <output-dir> [--var <name=value>]... [--flag <name>]...
