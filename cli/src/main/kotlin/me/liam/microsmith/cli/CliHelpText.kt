@@ -7,7 +7,7 @@ Usage:
   microsmith run <script.microsmith.kts> --out <output-dir> [--var <name=value>]... [--flag <name>]...
                  [--plugin <group:artifact:version>]... [--plugin-jar <path>]...
                  [--offline] [--repository <uri>] [--isolation <classloader|process>]
-                 [--diagnostics <text|json>] [--verbose] [--audit-log <path>]
+                 [--diagnostics <text|json>] [--verbose] [--event-log <path>]
   microsmith doctor [--diagnostics <text|json>] [--verbose]
   microsmith --help
 

@@ -16,5 +16,5 @@ internal data class RunCommand(
     val isolationMode: ScriptIsolationMode = ScriptIsolationMode.CLASSLOADER,
     val diagnosticsFormat: DiagnosticFormat = DiagnosticFormat.TEXT,
     val verbose: Boolean = false,
-    val auditLog: Path? = null,
+    val eventLog: Path? = null,
 ) : CliCommand

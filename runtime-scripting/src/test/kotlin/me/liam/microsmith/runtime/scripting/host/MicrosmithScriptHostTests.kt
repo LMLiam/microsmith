@@ -110,15 +110,15 @@ class MicrosmithScriptHostTests :
                         ScriptRunRequest(
                             script = script,
                             outputDir = output,
-                            variables = mapOf("schema" to "AuditRecord"),
+                            variables = mapOf("schema" to "EventRecord"),
                             flags = setOf("emit"),
                         ),
                     )
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
-                val generatedFile = output.resolve("proto/AuditRecord.proto")
+                val generatedFile = output.resolve("proto/EventRecord.proto")
                 Files.exists(generatedFile) shouldBe true
-                generatedFile.readText().shouldContain("message AuditRecord")
+                generatedFile.readText().shouldContain("message EventRecord")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }

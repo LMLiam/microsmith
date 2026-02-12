@@ -15,6 +15,6 @@ internal data class ParsedRunOptions(
     val isolationMode: ScriptIsolationMode,
     val diagnosticsFormat: DiagnosticFormat,
     val verbose: Boolean,
-    val auditLog: Path?,
+    val eventLog: Path?,
     val error: String?,
 )

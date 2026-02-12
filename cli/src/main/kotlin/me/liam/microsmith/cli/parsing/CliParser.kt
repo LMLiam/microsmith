@@ -20,7 +20,7 @@ internal const val REPOSITORY_OPTION = "--repository"
 internal const val ISOLATION_OPTION = "--isolation"
 internal const val DIAGNOSTICS_OPTION = "--diagnostics"
 internal const val VERBOSE_OPTION = "--verbose"
-internal const val AUDIT_LOG_OPTION = "--audit-log"
+internal const val EVENT_LOG_OPTION = "--event-log"
 private const val SCRIPT_EXTENSION = ".microsmith.kts"
 private val HELP_COMMANDS = setOf("--help", "-h", "help")
 
@@ -75,7 +75,7 @@ private fun parseRunOptionsCommand(script: Path, args: List<String>, startIndex:
                 isolationMode = parsedOptions.isolationMode,
                 diagnosticsFormat = parsedOptions.diagnosticsFormat,
                 verbose = parsedOptions.verbose,
-                auditLog = parsedOptions.auditLog,
+                eventLog = parsedOptions.eventLog,
             )
     }
 }
