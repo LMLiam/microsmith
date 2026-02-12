@@ -1,7 +1,5 @@
 package me.liam.microsmith.cli
 
-import me.liam.microsmith.cli.audit.AuditLogWriter
-import me.liam.microsmith.cli.audit.RunAuditEvent
 import me.liam.microsmith.cli.command.DoctorCommand
 import me.liam.microsmith.cli.command.ErrorCommand
 import me.liam.microsmith.cli.command.HelpCommand
@@ -12,6 +10,8 @@ import me.liam.microsmith.cli.diagnostics.DiagnosticFormat
 import me.liam.microsmith.cli.doctor.DoctorCheckStatus
 import me.liam.microsmith.cli.doctor.DoctorResult
 import me.liam.microsmith.cli.doctor.runDoctorChecks
+import me.liam.microsmith.cli.eventlog.EventLogWriter
+import me.liam.microsmith.cli.eventlog.RunEventLogEntry
 import me.liam.microsmith.cli.parsing.parseCliArgs
 import me.liam.microsmith.cli.plugins.PluginResolutionResult
 import me.liam.microsmith.cli.plugins.resolvePlugins
@@ -48,7 +48,7 @@ internal class MicrosmithCli(
     private val doctorRunner: ((() -> List<String>) -> DoctorResult) = { validator ->
         runDoctorChecks(providerValidator = validator)
     },
-    private val auditWriter: (Path, RunAuditEvent) -> Unit = AuditLogWriter::writeAuditEvent,
+    private val eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,
 ) {
     fun run(args: Array<String>): Int = when (val parsed = parseCliArgs(args.toList())) {
         is HelpCommand -> {
@@ -243,11 +243,11 @@ internal class MicrosmithCli(
         cacheHit: Boolean? = null,
         elapsedMillis: Long? = null,
     ): Int {
-        command.auditLog?.let { auditLogPath ->
+        command.eventLog?.let { eventLogPath ->
             runCatching {
-                auditWriter(
-                    auditLogPath,
-                    RunAuditEvent(
+                eventLogWriter(
+                    eventLogPath,
+                    RunEventLogEntry(
                         scriptPath = command.script,
                         outputPath = command.outputDir,
                         pluginCoordinates = command.plugins,
@@ -265,8 +265,8 @@ internal class MicrosmithCli(
                 )
             }.onFailure { error ->
                 emitter.warn(
-                    "Audit log write failed: ${error.message ?: error::class.simpleName ?: "unknown error"}",
-                    details = mapOf("auditLog" to auditLogPath.toAbsolutePath().normalize().toString()),
+                    "Event log write failed: ${error.message ?: error::class.simpleName ?: "unknown error"}",
+                    details = mapOf("eventLog" to eventLogPath.toAbsolutePath().normalize().toString()),
                 )
             }
         }

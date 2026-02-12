@@ -1,4 +1,4 @@
-package me.liam.microsmith.cli.audit
+package me.liam.microsmith.cli.eventlog
 
 import me.liam.microsmith.cli.diagnostics.CliFailureCode
 import me.liam.microsmith.cli.diagnostics.toJsonValue
@@ -8,7 +8,7 @@ import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 import java.time.Instant
 
-internal data class RunAuditEvent(
+internal data class RunEventLogEntry(
     val scriptPath: Path,
     val outputPath: Path,
     val pluginCoordinates: Set<String>,
@@ -24,8 +24,8 @@ internal data class RunAuditEvent(
     val elapsedMillis: Long? = null,
 )
 
-internal object AuditLogWriter {
-    fun writeAuditEvent(path: Path, event: RunAuditEvent) {
+internal object EventLogWriter {
+    fun writeEventLog(path: Path, event: RunEventLogEntry) {
         val payload =
             linkedMapOf(
                 "timestamp" to Instant.now().toString(),

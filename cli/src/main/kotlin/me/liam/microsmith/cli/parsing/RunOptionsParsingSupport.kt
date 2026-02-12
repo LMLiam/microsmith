@@ -96,7 +96,7 @@ internal class RunOptionsState {
     var diagnosticsFormatSpecified: Boolean = false
     var diagnosticsFormat: DiagnosticFormat = DiagnosticFormat.TEXT
     var verbose: Boolean = false
-    var auditLog: Path? = null
+    var eventLog: Path? = null
     var error: String? = null
 
     fun toParsedRunOptions(): ParsedRunOptions = ParsedRunOptions(
@@ -110,7 +110,7 @@ internal class RunOptionsState {
         isolationMode = isolationMode,
         diagnosticsFormat = diagnosticsFormat,
         verbose = verbose,
-        auditLog = auditLog,
+        eventLog = eventLog,
         error = error,
     )
 }

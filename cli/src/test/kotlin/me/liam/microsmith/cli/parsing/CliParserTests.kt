@@ -92,7 +92,7 @@ class CliParserTests :
                 )
         }
 
-        "parses run command diagnostics, verbose mode, and audit log options" {
+        "parses run command diagnostics, verbose mode, and event log options" {
             parseCliArgs(
                 listOf(
                     "run",
@@ -102,8 +102,8 @@ class CliParserTests :
                     "--diagnostics",
                     "json",
                     "--verbose",
-                    "--audit-log",
-                    "build/audit.jsonl",
+                    "--event-log",
+                    "build/event-log.jsonl",
                 ),
             ) shouldBe
                 RunCommand(
@@ -111,7 +111,7 @@ class CliParserTests :
                     outputDir = Path("build/generated"),
                     diagnosticsFormat = DiagnosticFormat.JSON,
                     verbose = true,
-                    auditLog = Path("build/audit.jsonl"),
+                    eventLog = Path("build/event-log.jsonl"),
                 )
         }
 
@@ -182,7 +182,7 @@ class CliParserTests :
         }
 
         "returns error for unknown doctor option" {
-            parseCliArgs(listOf("doctor", "--audit-log", "build/audit.jsonl")) shouldBe
-                ErrorCommand("Unknown option '--audit-log'.")
+            parseCliArgs(listOf("doctor", "--event-log", "build/event-log.jsonl")) shouldBe
+                ErrorCommand("Unknown option '--event-log'.")
         }
     })

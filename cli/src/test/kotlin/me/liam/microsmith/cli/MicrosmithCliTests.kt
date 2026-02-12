@@ -192,12 +192,12 @@ class MicrosmithCliTests :
             err.joinToString("\n").shouldContain("\"level\":\"error\"")
         }
 
-        "writes audit log event for successful run when audit path is configured" {
-            val tempDir = createTempDirectory("microsmith-cli-audit-success")
+        "writes event log entry for successful run when event log path is configured" {
+            val tempDir = createTempDirectory("microsmith-cli-event-log-success")
             try {
                 val script = tempDir.resolve("schema.microsmith.kts")
                 val outputDir = tempDir.resolve("generated")
-                val auditPath = tempDir.resolve("logs/audit.jsonl")
+                val eventLogPath = tempDir.resolve("logs/event-log.jsonl")
                 script.writeText("microsmith { }")
 
                 val cli =
@@ -219,17 +219,17 @@ class MicrosmithCliTests :
                             script.toString(),
                             "--out",
                             outputDir.toString(),
-                            "--audit-log",
-                            auditPath.toString(),
+                            "--event-log",
+                            eventLogPath.toString(),
                         ),
                     )
 
                 exitCode shouldBe 0
-                auditPath.exists() shouldBe true
-                val auditLine = auditPath.readLines().single()
-                auditLine.shouldContain("\"event\":\"microsmith.run\"")
-                auditLine.shouldContain("\"status\":\"success\"")
-                auditLine.shouldContain("\"cacheHit\":true")
+                eventLogPath.exists() shouldBe true
+                val eventLogLine = eventLogPath.readLines().single()
+                eventLogLine.shouldContain("\"event\":\"microsmith.run\"")
+                eventLogLine.shouldContain("\"status\":\"success\"")
+                eventLogLine.shouldContain("\"cacheHit\":true")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
