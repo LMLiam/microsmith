@@ -1,14 +1,24 @@
 package me.liam.microsmith.cli
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import me.liam.microsmith.cli.doctor.DoctorCheckResult
+import me.liam.microsmith.cli.doctor.DoctorCheckStatus
+import me.liam.microsmith.cli.doctor.DoctorResult
 import me.liam.microsmith.cli.plugins.PluginResolutionResult
+import me.liam.microsmith.runtime.scripting.model.ScriptFailureType
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
 import me.liam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import java.util.ServiceConfigurationError
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.deleteRecursively
+import kotlin.io.path.exists
+import kotlin.io.path.readLines
+import kotlin.io.path.writeText
 
+@OptIn(ExperimentalPathApi::class)
 class MicrosmithCliTests :
     StringSpec({
         "returns help for empty args" {
@@ -32,9 +42,10 @@ class MicrosmithCliTests :
 
             exitCode shouldBe 2
             err.joinToString("\n").shouldContain("Unknown command")
+            err.joinToString("\n").shouldContain("MS-CLI-0001")
         }
 
-        "returns error when provider validation fails" {
+        "returns provider validation exit code when provider validation fails" {
             val out = mutableListOf<String>()
             val err = mutableListOf<String>()
             val cli =
@@ -46,11 +57,12 @@ class MicrosmithCliTests :
 
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
 
-            exitCode shouldBe 2
-            err.shouldContain("missing providers")
+            exitCode shouldBe 10
+            err.joinToString("\n").shouldContain("missing providers")
+            err.joinToString("\n").shouldContain("MS-CLI-1001")
         }
 
-        "returns structured error when service provider loading fails" {
+        "returns provider validation exit code when service provider loading fails" {
             val out = mutableListOf<String>()
             val err = mutableListOf<String>()
             val cli =
@@ -62,7 +74,7 @@ class MicrosmithCliTests :
 
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
 
-            exitCode shouldBe 2
+            exitCode shouldBe 10
             err.joinToString("\n").shouldContain("Failed to load runtime service providers")
             err.joinToString("\n").shouldContain("bad provider entry")
         }
@@ -91,7 +103,7 @@ class MicrosmithCliTests :
             err shouldBe emptyList()
         }
 
-        "returns error when script execution fails" {
+        "returns deterministic script compilation exit code when script execution fails" {
             val out = mutableListOf<String>()
             val err = mutableListOf<String>()
             val cli =
@@ -100,18 +112,22 @@ class MicrosmithCliTests :
                     stderr = err::add,
                     providerValidator = { emptyList() },
                     scriptRunner = { _, _ ->
-                        ScriptRunFailure(listOf("[error] schema.microsmith.kts:1:1 broken script"))
+                        ScriptRunFailure(
+                            diagnostics = listOf("[error] schema.microsmith.kts:1:1 broken script"),
+                            type = ScriptFailureType.COMPILATION,
+                        )
                     },
                 )
 
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
 
-            exitCode shouldBe 2
+            exitCode shouldBe 21
             err.joinToString("\n").shouldContain("broken script")
+            err.joinToString("\n").shouldContain("MS-CLI-2002")
             out shouldBe emptyList()
         }
 
-        "returns error when plugin resolution fails" {
+        "returns deterministic plugin resolution exit code when plugin resolution fails" {
             val out = mutableListOf<String>()
             val err = mutableListOf<String>()
             val cli =
@@ -121,7 +137,7 @@ class MicrosmithCliTests :
                     providerValidator = { emptyList() },
                     pluginResolver = {
                         PluginResolutionResult.Failure(
-                            diagnostics = listOf("Invalid --plugin value 'broken'."),
+                            diagnostics = listOf("Failed to resolve plugin from repository mirror."),
                         )
                     },
                 )
@@ -134,12 +150,145 @@ class MicrosmithCliTests :
                         "--out",
                         "build/generated",
                         "--plugin",
-                        "broken",
+                        "com.acme:test-emitter:1.0.0",
                     ),
                 )
 
-            exitCode shouldBe 2
-            err.joinToString("\n").shouldContain("Invalid --plugin value")
+            exitCode shouldBe 11
+            err.joinToString("\n").shouldContain("Failed to resolve plugin from repository mirror.")
+            err.joinToString("\n").shouldContain("MS-CLI-1101")
+            out shouldBe emptyList()
+        }
+
+        "emits machine readable diagnostics when json mode is requested" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    providerValidator = { emptyList() },
+                    pluginResolver = {
+                        PluginResolutionResult.Failure(
+                            diagnostics = listOf("Plugin repository policy blocked endpoint."),
+                        )
+                    },
+                )
+
+            val exitCode =
+                cli.run(
+                    arrayOf(
+                        "run",
+                        "schema.microsmith.kts",
+                        "--out",
+                        "build/generated",
+                        "--diagnostics",
+                        "json",
+                    ),
+                )
+
+            exitCode shouldBe 11
+            err.joinToString("\n").shouldContain("\"code\":\"MS-CLI-1101\"")
+            err.joinToString("\n").shouldContain("\"level\":\"error\"")
+        }
+
+        "writes audit log event for successful run when audit path is configured" {
+            val tempDir = createTempDirectory("microsmith-cli-audit-success")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val outputDir = tempDir.resolve("generated")
+                val auditPath = tempDir.resolve("logs/audit.jsonl")
+                script.writeText("microsmith { }")
+
+                val cli =
+                    MicrosmithCli(
+                        providerValidator = { emptyList() },
+                        scriptRunner = { _, _ ->
+                            ScriptRunSuccess(
+                                warnings = emptyList(),
+                                cacheHit = true,
+                                elapsedMillis = 7,
+                            )
+                        },
+                    )
+
+                val exitCode =
+                    cli.run(
+                        arrayOf(
+                            "run",
+                            script.toString(),
+                            "--out",
+                            outputDir.toString(),
+                            "--audit-log",
+                            auditPath.toString(),
+                        ),
+                    )
+
+                exitCode shouldBe 0
+                auditPath.exists() shouldBe true
+                val auditLine = auditPath.readLines().single()
+                auditLine.shouldContain("\"event\":\"microsmith.run\"")
+                auditLine.shouldContain("\"status\":\"success\"")
+                auditLine.shouldContain("\"cacheHit\":true")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "doctor command returns success when checks pass" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    doctorRunner = {
+                        DoctorResult(
+                            checks =
+                            listOf(
+                                DoctorCheckResult(
+                                    id = "provider-discovery",
+                                    status = DoctorCheckStatus.PASS,
+                                    message = "Required providers available.",
+                                ),
+                            ),
+                        )
+                    },
+                )
+
+            val exitCode = cli.run(arrayOf("doctor"))
+
+            exitCode shouldBe 0
+            out.joinToString("\n").shouldContain("Doctor checks passed")
+            err shouldBe emptyList()
+        }
+
+        "doctor command returns deterministic failure exit code when checks fail" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    doctorRunner = {
+                        DoctorResult(
+                            checks =
+                            listOf(
+                                DoctorCheckResult(
+                                    id = "provider-discovery",
+                                    status = DoctorCheckStatus.FAIL,
+                                    message = "Provider loading failed.",
+                                ),
+                            ),
+                        )
+                    },
+                )
+
+            val exitCode = cli.run(arrayOf("doctor"))
+
+            exitCode shouldBe 30
+            err.joinToString("\n").shouldContain("MS-CLI-3001")
+            err.joinToString("\n").shouldContain("Doctor detected environment issues.")
             out shouldBe emptyList()
         }
     })

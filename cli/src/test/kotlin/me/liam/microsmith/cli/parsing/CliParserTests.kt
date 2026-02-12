@@ -2,9 +2,11 @@ package me.liam.microsmith.cli.parsing
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import me.liam.microsmith.cli.command.DoctorCommand
 import me.liam.microsmith.cli.command.ErrorCommand
 import me.liam.microsmith.cli.command.HelpCommand
 import me.liam.microsmith.cli.command.RunCommand
+import me.liam.microsmith.cli.diagnostics.DiagnosticFormat
 import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import kotlin.io.path.Path
 
@@ -12,6 +14,18 @@ class CliParserTests :
     StringSpec({
         "returns help command for empty args" {
             parseCliArgs(emptyList()) shouldBe HelpCommand
+        }
+
+        "parses doctor command with defaults" {
+            parseCliArgs(listOf("doctor")) shouldBe DoctorCommand()
+        }
+
+        "parses doctor command options" {
+            parseCliArgs(listOf("doctor", "--diagnostics", "json", "--verbose")) shouldBe
+                DoctorCommand(
+                    diagnosticsFormat = DiagnosticFormat.JSON,
+                    verbose = true,
+                )
         }
 
         "parses run command with required out option" {
@@ -78,6 +92,29 @@ class CliParserTests :
                 )
         }
 
+        "parses run command diagnostics, verbose mode, and audit log options" {
+            parseCliArgs(
+                listOf(
+                    "run",
+                    "schema.microsmith.kts",
+                    "--out",
+                    "build/generated",
+                    "--diagnostics",
+                    "json",
+                    "--verbose",
+                    "--audit-log",
+                    "build/audit.jsonl",
+                ),
+            ) shouldBe
+                RunCommand(
+                    script = Path("schema.microsmith.kts"),
+                    outputDir = Path("build/generated"),
+                    diagnosticsFormat = DiagnosticFormat.JSON,
+                    verbose = true,
+                    auditLog = Path("build/audit.jsonl"),
+                )
+        }
+
         "returns error when run command has missing out option" {
             parseCliArgs(listOf("run", "schema.microsmith.kts")) shouldBe
                 ErrorCommand("Missing required --out <output-dir> option.")
@@ -128,5 +165,24 @@ class CliParserTests :
                 ),
             ) shouldBe
                 ErrorCommand("Invalid --isolation value 'container'. Expected 'classloader' or 'process'.")
+        }
+
+        "returns error for invalid diagnostics mode" {
+            parseCliArgs(
+                listOf(
+                    "run",
+                    "schema.microsmith.kts",
+                    "--out",
+                    "build/generated",
+                    "--diagnostics",
+                    "yaml",
+                ),
+            ) shouldBe
+                ErrorCommand("Invalid --diagnostics value 'yaml'. Expected 'text' or 'json'.")
+        }
+
+        "returns error for unknown doctor option" {
+            parseCliArgs(listOf("doctor", "--audit-log", "build/audit.jsonl")) shouldBe
+                ErrorCommand("Unknown option '--audit-log'.")
         }
     })

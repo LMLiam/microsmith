@@ -2,6 +2,7 @@ package me.liam.microsmith.runtime.scripting.host
 
 import me.liam.microsmith.runtime.scripting.cache.MicrosmithScriptCache
 import me.liam.microsmith.runtime.scripting.cache.RuntimeClasspathFingerprint
+import me.liam.microsmith.runtime.scripting.model.ScriptFailureType
 import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
 import me.liam.microsmith.runtime.scripting.model.ScriptRunRequest
@@ -57,6 +58,7 @@ internal class ScriptRunExecutor(
                 val message = exception.message ?: exception::class.simpleName ?: "unknown error"
                 ScriptRunFailure(
                     diagnostics = listOf("Unhandled script host failure: $message"),
+                    type = ScriptFailureType.HOST,
                 )
             }
         }

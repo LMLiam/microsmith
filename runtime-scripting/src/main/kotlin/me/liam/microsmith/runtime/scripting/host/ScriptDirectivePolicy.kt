@@ -1,5 +1,6 @@
 package me.liam.microsmith.runtime.scripting.host
 
+import me.liam.microsmith.runtime.scripting.model.ScriptFailureType
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
 import java.nio.file.Files
 import java.nio.file.Path
@@ -23,9 +24,11 @@ internal object ScriptDirectivePolicy {
             null
         } else {
             ScriptRunFailure(
+                diagnostics =
                 listOf(
                     "Script dependency directives are blocked by default for security hardening.",
                 ) + violations,
+                type = ScriptFailureType.VALIDATION,
             )
         }
     }

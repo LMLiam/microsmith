@@ -1,5 +1,6 @@
 package me.liam.microsmith.runtime.scripting.host
 
+import me.liam.microsmith.runtime.scripting.model.ScriptFailureType
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
 import me.liam.microsmith.runtime.scripting.model.ScriptRunRequest
 import me.liam.microsmith.runtime.scripting.model.ScriptRunResult
@@ -79,18 +80,25 @@ internal class ProcessIsolatedScriptExecutor(
     private fun unknownFailure(exitCode: Int, processOutput: String): ScriptRunFailure {
         if (processOutput.isNotEmpty()) {
             return ScriptRunFailure(
-                listOf(
+                diagnostics = listOf(
                     "Process isolation execution failed with exit code $exitCode.",
                     "Process stderr/stdout: $processOutput",
                 ),
+                type = ScriptFailureType.HOST,
             )
         }
-        return ScriptRunFailure(listOf("Process isolation execution failed with exit code $exitCode."))
+        return ScriptRunFailure(
+            diagnostics = listOf("Process isolation execution failed with exit code $exitCode."),
+            type = ScriptFailureType.HOST,
+        )
     }
 
     private fun failureFromException(error: Exception): ScriptRunFailure {
         val message = error.message ?: error::class.simpleName ?: "unknown process isolation error"
-        return ScriptRunFailure(listOf("Process isolation execution failed: $message"))
+        return ScriptRunFailure(
+            diagnostics = listOf("Process isolation execution failed: $message"),
+            type = ScriptFailureType.HOST,
+        )
     }
 
     private fun buildCommand(requestFile: Path, resultFile: Path): List<String> {

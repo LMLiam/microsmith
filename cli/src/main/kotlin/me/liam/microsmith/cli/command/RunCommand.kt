@@ -1,5 +1,6 @@
 package me.liam.microsmith.cli.command
 
+import me.liam.microsmith.cli.diagnostics.DiagnosticFormat
 import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import java.nio.file.Path
 
@@ -13,4 +14,7 @@ internal data class RunCommand(
     val offline: Boolean = false,
     val repositoryOverride: String? = null,
     val isolationMode: ScriptIsolationMode = ScriptIsolationMode.CLASSLOADER,
+    val diagnosticsFormat: DiagnosticFormat = DiagnosticFormat.TEXT,
+    val verbose: Boolean = false,
+    val auditLog: Path? = null,
 ) : CliCommand

@@ -1,5 +1,6 @@
 package me.liam.microsmith.cli.parsing
 
+import me.liam.microsmith.cli.diagnostics.DiagnosticFormat
 import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import java.nio.file.Path
 
@@ -12,5 +13,8 @@ internal data class ParsedRunOptions(
     val offline: Boolean,
     val repositoryOverride: String?,
     val isolationMode: ScriptIsolationMode,
+    val diagnosticsFormat: DiagnosticFormat,
+    val verbose: Boolean,
+    val auditLog: Path?,
     val error: String?,
 )

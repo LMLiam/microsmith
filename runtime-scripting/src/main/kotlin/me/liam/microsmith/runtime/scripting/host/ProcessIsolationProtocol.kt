@@ -1,5 +1,6 @@
 package me.liam.microsmith.runtime.scripting.host
 
+import me.liam.microsmith.runtime.scripting.model.ScriptFailureType
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
 import me.liam.microsmith.runtime.scripting.model.ScriptRunRequest
 import me.liam.microsmith.runtime.scripting.model.ScriptRunResult
@@ -28,6 +29,7 @@ private const val RESULT_WARNING_COUNT = "result.warnings.count"
 private const val RESULT_WARNING_PREFIX = "result.warnings."
 private const val RESULT_DIAGNOSTIC_COUNT = "result.diagnostics.count"
 private const val RESULT_DIAGNOSTIC_PREFIX = "result.diagnostics."
+private const val RESULT_FAILURE_TYPE = "result.failure.type"
 
 internal data class ProcessIsolationRequest(
     val request: ScriptRunRequest,
@@ -131,6 +133,7 @@ internal object ProcessIsolationProtocol {
             is ScriptRunFailure -> {
                 properties[RESULT_STATUS] = RESULT_STATUS_FAILURE
                 properties[RESULT_DIAGNOSTIC_COUNT] = result.diagnostics.size.toString()
+                properties[RESULT_FAILURE_TYPE] = result.type.name
                 result.diagnostics.forEachIndexed { index, diagnostic ->
                     properties["$RESULT_DIAGNOSTIC_PREFIX$index"] = diagnostic
                 }
@@ -175,12 +178,20 @@ internal object ProcessIsolationProtocol {
                         countKey = RESULT_DIAGNOSTIC_COUNT,
                         keyPrefix = RESULT_DIAGNOSTIC_PREFIX,
                     )
-                ScriptRunFailure(diagnostics = diagnostics)
+                val failureType = parseFailureType(properties.getProperty(RESULT_FAILURE_TYPE))
+                ScriptRunFailure(
+                    diagnostics = diagnostics,
+                    type = failureType,
+                )
             }
             else -> error("Missing or invalid '$RESULT_STATUS' in process isolation result.")
         }
     }
 }
+
+private fun parseFailureType(raw: String?): ScriptFailureType = runCatching {
+    raw?.trim()?.takeIf { it.isNotEmpty() }?.let(ScriptFailureType::valueOf)
+}.getOrNull() ?: ScriptFailureType.HOST
 
 private fun readIndexedList(properties: Properties, countKey: String, keyPrefix: String): List<String> {
     val count =

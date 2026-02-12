@@ -1,5 +1,6 @@
 package me.liam.microsmith.runtime.scripting.host
 
+import me.liam.microsmith.runtime.scripting.model.ScriptFailureType
 import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
 import java.nio.file.Path
@@ -28,6 +29,7 @@ internal object ProcessIsolatedScriptMain {
                 val message = error.message ?: error::class.simpleName ?: "unknown process worker error"
                 ScriptRunFailure(
                     diagnostics = listOf("Process-isolated worker failure: $message"),
+                    type = ScriptFailureType.HOST,
                 )
             }
 

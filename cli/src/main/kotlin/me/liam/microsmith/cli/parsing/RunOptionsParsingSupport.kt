@@ -1,5 +1,6 @@
 package me.liam.microsmith.cli.parsing
 
+import me.liam.microsmith.cli.diagnostics.DiagnosticFormat
 import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import java.nio.file.Path
 
@@ -66,6 +67,17 @@ internal fun parseIsolationMode(value: String?): ScriptIsolationMode? {
     return ScriptIsolationMode.fromCliValue(normalized)
 }
 
+internal fun parseDiagnosticFormat(value: String?): DiagnosticFormat? {
+    val normalized =
+        value
+            ?.takeUnless { it.startsWith("--") }
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.lowercase()
+            ?: return null
+    return DiagnosticFormat.parse(normalized)
+}
+
 internal data class ParsedToken(
     val nextIndex: Int,
     val error: String? = null,
@@ -81,6 +93,10 @@ internal class RunOptionsState {
     var repositoryOverride: String? = null
     var isolationModeSpecified: Boolean = false
     var isolationMode: ScriptIsolationMode = ScriptIsolationMode.CLASSLOADER
+    var diagnosticsFormatSpecified: Boolean = false
+    var diagnosticsFormat: DiagnosticFormat = DiagnosticFormat.TEXT
+    var verbose: Boolean = false
+    var auditLog: Path? = null
     var error: String? = null
 
     fun toParsedRunOptions(): ParsedRunOptions = ParsedRunOptions(
@@ -92,6 +108,9 @@ internal class RunOptionsState {
         offline = offline,
         repositoryOverride = repositoryOverride,
         isolationMode = isolationMode,
+        diagnosticsFormat = diagnosticsFormat,
+        verbose = verbose,
+        auditLog = auditLog,
         error = error,
     )
 }
