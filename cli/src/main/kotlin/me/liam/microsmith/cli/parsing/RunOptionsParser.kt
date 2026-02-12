@@ -26,6 +26,9 @@ private fun parseRunOptionToken(args: List<String>, index: Int, state: RunOption
         OFFLINE_OPTION -> parseOfflineOption(index, state)
         REPOSITORY_OPTION -> parseRepositoryOption(args, index, state)
         ISOLATION_OPTION -> parseIsolationOption(args, index, state)
+        DIAGNOSTICS_OPTION -> parseDiagnosticsOption(args, index, state)
+        VERBOSE_OPTION -> parseVerboseOption(index, state)
+        EVENT_LOG_OPTION -> parseEventLogOption(args, index, state)
         else -> ParsedToken(nextIndex = index, error = "Unknown option '$token'.")
     }
 }
@@ -173,6 +176,53 @@ private fun parseIsolationOption(args: List<String>, index: Int, state: RunOptio
         else -> {
             state.isolationMode = parsedMode
             state.isolationModeSpecified = true
+            ParsedToken(nextIndex = index + 2)
+        }
+    }
+}
+
+private fun parseDiagnosticsOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
+    val value = args.getOrNull(index + 1)
+    val parsedFormat = parseDiagnosticFormat(value)
+    val duplicate = state.diagnosticsFormatSpecified
+
+    return when {
+        value == null || value.startsWith("--") ->
+            ParsedToken(nextIndex = index, error = "Missing value for --diagnostics option.")
+
+        duplicate ->
+            ParsedToken(nextIndex = index, error = "--diagnostics may only be specified once.")
+
+        parsedFormat == null ->
+            ParsedToken(nextIndex = index, error = "Invalid --diagnostics value '$value'. Expected 'text' or 'json'.")
+
+        else -> {
+            state.diagnosticsFormat = parsedFormat
+            state.diagnosticsFormatSpecified = true
+            ParsedToken(nextIndex = index + 2)
+        }
+    }
+}
+
+private fun parseVerboseOption(index: Int, state: RunOptionsState): ParsedToken {
+    return if (state.verbose) {
+        ParsedToken(nextIndex = index, error = "--verbose may only be specified once.")
+    } else {
+        state.verbose = true
+        ParsedToken(nextIndex = index + 1)
+    }
+}
+
+private fun parseEventLogOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
+    val value = args.getOrNull(index + 1)
+    val missingValue = value == null || value.startsWith("--")
+    val duplicate = state.eventLog != null
+
+    return when {
+        missingValue -> ParsedToken(nextIndex = index, error = "Missing value for --event-log option.")
+        duplicate -> ParsedToken(nextIndex = index, error = "--event-log may only be specified once.")
+        else -> {
+            state.eventLog = Path.of(value)
             ParsedToken(nextIndex = index + 2)
         }
     }

@@ -3,6 +3,7 @@ package me.liam.microsmith.runtime.scripting.host
 import me.liam.microsmith.dsl.core.MicrosmithModel
 import me.liam.microsmith.runtime.scripting.cache.MicrosmithScriptCache
 import me.liam.microsmith.runtime.scripting.context.MicrosmithScriptContext
+import me.liam.microsmith.runtime.scripting.model.ScriptFailureType
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
 import me.liam.microsmith.runtime.scripting.model.ScriptRunResult
 import me.liam.microsmith.runtime.scripting.model.ScriptRunSuccess
@@ -24,11 +25,15 @@ internal object ScriptRunResultMapper {
             is ResultWithDiagnostics.Failure ->
                 ScriptRunFailure(
                     diagnostics = formattedReports.ifEmpty { listOf("Script compilation failed.") },
+                    type = ScriptFailureType.COMPILATION,
                 )
 
             is ResultWithDiagnostics.Success ->
                 if (hasErrors) {
-                    ScriptRunFailure(formattedReports)
+                    ScriptRunFailure(
+                        diagnostics = formattedReports,
+                        type = ScriptFailureType.COMPILATION,
+                    )
                 } else {
                     finalizeSuccess(
                         evaluationResult = result.value,
@@ -61,6 +66,7 @@ internal object ScriptRunResultMapper {
                 val message = error.message ?: error::class.simpleName ?: "unknown error"
                 ScriptRunFailure(
                     diagnostics = warnings + listOf("Script evaluation failed: $message"),
+                    type = ScriptFailureType.EVALUATION,
                 )
             },
         )
