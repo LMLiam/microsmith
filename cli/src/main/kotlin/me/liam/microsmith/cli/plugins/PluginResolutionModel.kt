@@ -4,9 +4,11 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
 
-internal const val LOCKFILE_VERSION = 1
+internal const val LOCKFILE_VERSION = 2
+internal const val LOCKFILE_VERSION_V1 = 1
 internal const val MAVEN_CENTRAL_REPOSITORY = "https://repo1.maven.org/maven2"
 internal const val REMOTE_KIND = "remote"
+internal const val REMOTE_ARTIFACT_KIND = "remote-artifact"
 internal const val LOCAL_KIND = "local"
 private const val COORDINATE_PART_COUNT = 3
 private const val HEX_SHA256_LENGTH = 64

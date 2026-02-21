@@ -63,13 +63,67 @@ private fun resolvePluginsOrThrow(
     }
 
     val coordinates = command.plugins.toList().sorted().map(::parseCoordinate)
-    val localPluginJars = resolveLocalPluginJars(command.pluginJars)
-    localPluginJars.forEach { localJar ->
-        require(Files.exists(localJar.artifactPath) && Files.isRegularFile(localJar.artifactPath)) {
-            "Plugin jar '${localJar.artifactPath}' does not exist or is not a file."
-        }
+    val localPluginJars = resolveAndValidateLocalPluginJars(command.pluginJars)
+    val context =
+        buildResolutionContext(
+            command = command,
+            settings = settings,
+            coordinates = coordinates,
+            localPluginJars = localPluginJars,
+        )
+    Files.createDirectories(context.cacheDirectory)
+
+    val remoteResolution =
+        resolveRemotePlugins(
+            coordinates = coordinates,
+            command = command,
+            context = context,
+            settings = settings,
+        )
+    val localResolution =
+        resolveLocalPlugins(
+            localPluginJars = localPluginJars,
+            lockfile = context.lockfile,
+            checksumAllowlist = context.checksumAllowlist,
+        )
+
+    context.lockfile?.assertSameRemoteArtifactSet(
+        remoteResolution.remoteArtifactChecksums.keys.toSet(),
+        context.lockfilePath,
+    )
+
+    val lockEntries =
+        buildList {
+            addAll(remoteResolution.rootRemoteLockEntries)
+            addAll(remoteResolution.remoteArtifactChecksums.toLockEntries())
+            addAll(localResolution.lockEntries)
+        }.sortedWith(compareBy(LockEntry::kind, LockEntry::key))
+
+    context.checksumAllowlist?.assertCovers(lockEntries.toLockKeys())
+
+    if (context.lockfile == null || context.lockfile.version < LOCKFILE_VERSION) {
+        writeLockfile(
+            lockfilePath = context.lockfilePath,
+            lockfile =
+            ParsedLockfile(
+                version = LOCKFILE_VERSION,
+                entries = lockEntries,
+            ),
+        )
     }
 
+    return PluginResolutionResult.Success(
+        classpath = normalizeClasspath(remoteResolution.classpath + localResolution.classpath),
+        lockfilePath = context.lockfilePath,
+    )
+}
+
+private fun buildResolutionContext(
+    command: RunCommand,
+    settings: PluginResolverSettings,
+    coordinates: List<Coordinate>,
+    localPluginJars: List<LocalPluginJar>,
+): ResolutionContext {
     val lockfilePath = settings.lockfilePathOverride ?: defaultLockfilePath(command.script)
     val lockfile = readLockfile(lockfilePath)
     val checksumAllowlist = settings.checksumAllowlist ?: loadPluginChecksumAllowlistFromEnvironment()
@@ -77,41 +131,107 @@ private fun resolvePluginsOrThrow(
     checksumAllowlist?.assertCovers(requestedLockKeys)
     lockfile?.assertSamePluginSet(requestedLockKeys, lockfilePath)
 
-    val repositories =
-        if (coordinates.isEmpty()) {
-            emptyList()
-        } else {
-            try {
-                val repositoryPolicy = settings.repositoryPolicy ?: defaultRepositoryAllowlistPolicy()
-                resolveRepositoryEndpoints(command, settings, repositoryPolicy, settings.repositoryCredentialsResolver)
-            } catch (error: IllegalArgumentException) {
-                throw PluginResolutionDiagnosticException(
-                    category = PluginResolverErrorCategory.REPOSITORY_POLICY,
-                    message = error.message ?: "Repository configuration was rejected by policy.",
-                    cause = error,
-                )
-            }
-        }
     val cacheDirectory = settings.cacheDirectory.toAbsolutePath().normalize()
-    Files.createDirectories(cacheDirectory)
+    if (command.offline && coordinates.isNotEmpty()) {
+        assertOfflineGraphReadiness(
+            lockfile = lockfile,
+            lockfilePath = lockfilePath,
+            cacheRoot = pluginArtifactCacheRoot(cacheDirectory),
+        )
+    }
 
+    return ResolutionContext(
+        lockfilePath = lockfilePath,
+        lockfile = lockfile,
+        checksumAllowlist = checksumAllowlist,
+        cacheDirectory = cacheDirectory,
+        repositories = resolveRepositoryEndpointsForCommand(command, settings, coordinates),
+    )
+}
+
+private fun resolveRepositoryEndpointsForCommand(
+    command: RunCommand,
+    settings: PluginResolverSettings,
+    coordinates: List<Coordinate>,
+): List<RepositoryEndpoint> {
+    if (coordinates.isEmpty()) {
+        return emptyList()
+    }
+
+    return try {
+        val repositoryPolicy = settings.repositoryPolicy ?: defaultRepositoryAllowlistPolicy()
+        resolveRepositoryEndpoints(command, settings, repositoryPolicy, settings.repositoryCredentialsResolver)
+    } catch (error: IllegalArgumentException) {
+        throw PluginResolutionDiagnosticException(
+            category = PluginResolverErrorCategory.REPOSITORY_POLICY,
+            message = error.message ?: "Repository configuration was rejected by policy.",
+            cause = error,
+        )
+    }
+}
+
+private fun resolveRemotePlugins(
+    coordinates: List<Coordinate>,
+    command: RunCommand,
+    context: ResolutionContext,
+    settings: PluginResolverSettings,
+): RemoteResolutionSummary {
     val classpath = mutableListOf<Path>()
-    val lockEntries = mutableListOf<LockEntry>()
+    val rootRemoteLockEntries = mutableListOf<LockEntry>()
+    val remoteArtifactChecksums = linkedMapOf<String, String>()
 
     coordinates.forEach { coordinate ->
         val resolvedRemotePlugin =
             settings.remotePluginResolver.resolve(
                 coordinate = coordinate,
-                repositories = repositories,
-                cacheDirectory = cacheDirectory,
+                repositories = context.repositories,
+                cacheDirectory = context.cacheDirectory,
                 offline = command.offline,
             )
-        val checksum = sha256(resolvedRemotePlugin.rootArtifactPath)
-        lockfile?.verifyChecksum(REMOTE_KIND, coordinate.value, checksum)
-        checksumAllowlist?.verifyChecksum(REMOTE_KIND, coordinate.value, checksum)
-        lockEntries.add(LockEntry(kind = REMOTE_KIND, key = coordinate.value, checksum = checksum))
+        val rootChecksum = sha256(resolvedRemotePlugin.rootArtifactPath)
+        context.lockfile?.verifyChecksum(REMOTE_KIND, coordinate.value, rootChecksum)
+        context.checksumAllowlist?.verifyChecksum(REMOTE_KIND, coordinate.value, rootChecksum)
+        rootRemoteLockEntries.add(LockEntry(kind = REMOTE_KIND, key = coordinate.value, checksum = rootChecksum))
+        mergeRemoteArtifactChecksums(
+            checksums = remoteArtifactChecksums,
+            artifacts = resolvedRemotePlugin.artifacts,
+            lockfile = context.lockfile,
+            checksumAllowlist = context.checksumAllowlist,
+        )
         classpath.addAll(resolvedRemotePlugin.classpath)
     }
+
+    return RemoteResolutionSummary(
+        classpath = classpath,
+        rootRemoteLockEntries = rootRemoteLockEntries,
+        remoteArtifactChecksums = remoteArtifactChecksums,
+    )
+}
+
+private fun mergeRemoteArtifactChecksums(
+    checksums: MutableMap<String, String>,
+    artifacts: List<ResolvedRemoteArtifact>,
+    lockfile: ParsedLockfile?,
+    checksumAllowlist: PluginChecksumAllowlist?,
+) {
+    artifacts.forEach { artifact ->
+        val checksum = sha256(artifact.artifactPath)
+        lockfile?.verifyChecksum(REMOTE_ARTIFACT_KIND, artifact.lockKey, checksum)
+        checksumAllowlist?.verifyChecksum(REMOTE_ARTIFACT_KIND, artifact.lockKey, checksum)
+        val previous = checksums.putIfAbsent(artifact.lockKey, checksum)
+        require(previous == null || previous == checksum) {
+            "Resolved remote artifact '${artifact.lockKey}' produced inconsistent checksums."
+        }
+    }
+}
+
+private fun resolveLocalPlugins(
+    localPluginJars: List<LocalPluginJar>,
+    lockfile: ParsedLockfile?,
+    checksumAllowlist: PluginChecksumAllowlist?,
+): LocalResolutionSummary {
+    val classpath = mutableListOf<Path>()
+    val lockEntries = mutableListOf<LockEntry>()
 
     localPluginJars.forEach { localJar ->
         val checksum = sha256(localJar.artifactPath)
@@ -121,21 +241,7 @@ private fun resolvePluginsOrThrow(
         classpath.add(localJar.artifactPath)
     }
 
-    if (lockfile == null) {
-        writeLockfile(
-            lockfilePath = lockfilePath,
-            lockfile =
-            ParsedLockfile(
-                version = LOCKFILE_VERSION,
-                entries = lockEntries.sortedWith(compareBy(LockEntry::kind, LockEntry::key)),
-            ),
-        )
-    }
-
-    return PluginResolutionResult.Success(
-        classpath = normalizeClasspath(classpath),
-        lockfilePath = lockfilePath,
-    )
+    return LocalResolutionSummary(classpath = classpath, lockEntries = lockEntries)
 }
 
 private fun buildRequestedLockKeys(coordinates: List<Coordinate>, localPluginLockKeys: List<String>): Set<LockKey> {
@@ -143,6 +249,57 @@ private fun buildRequestedLockKeys(coordinates: List<Coordinate>, localPluginLoc
     val localKeys = localPluginLockKeys.map { lockKey -> LockKey(kind = LOCAL_KIND, key = lockKey) }
     return (remoteKeys + localKeys).toSet()
 }
+
+private fun assertOfflineGraphReadiness(lockfile: ParsedLockfile?, lockfilePath: Path, cacheRoot: Path) {
+    val errorMessage =
+        when {
+            lockfile == null ->
+                "Offline mode requires a plugin lockfile. Generate '$lockfilePath' by running once without --offline."
+
+            lockfile.version < LOCKFILE_VERSION ->
+                "Offline mode requires lockfile version $LOCKFILE_VERSION for full dependency-graph validation. " +
+                    "Regenerate '$lockfilePath' by running once without --offline."
+
+            else -> {
+                val remoteArtifactEntries = lockfile.entries.filter { entry -> entry.kind == REMOTE_ARTIFACT_KIND }
+                when {
+                    remoteArtifactEntries.isEmpty() ->
+                        "Offline mode requires locked remote dependency graph entries in '$lockfilePath'. " +
+                            "Regenerate the lockfile by running once without --offline."
+
+                    else -> {
+                        val missingArtifacts = findMissingOfflineArtifacts(remoteArtifactEntries, cacheRoot)
+                        if (missingArtifacts.isNotEmpty()) {
+                            "Offline mode is enabled but plugin cache is missing locked dependency graph artifacts: " +
+                                missingArtifacts.sorted().joinToString(", ") +
+                                ". Run once without --offline to restore the cache."
+                        } else {
+                            null
+                        }
+                    }
+                }
+            }
+        }
+
+    if (errorMessage != null) {
+        failOfflineCacheReadiness(errorMessage)
+    }
+}
+
+private fun findMissingOfflineArtifacts(entries: List<LockEntry>, cacheRoot: Path): List<String> = entries
+    .map { entry -> entry.key to cacheRoot.resolve(entry.key).normalize() }
+    .mapNotNull { (key, path) ->
+        when {
+            !path.startsWith(cacheRoot) -> key
+            !Files.exists(path) || !Files.isRegularFile(path) -> key
+            else -> null
+        }
+    }
+
+private fun failOfflineCacheReadiness(message: String): Nothing = throw PluginResolutionDiagnosticException(
+    category = PluginResolverErrorCategory.OFFLINE_CACHE_MISS,
+    message = message,
+)
 
 private fun localPluginLockKey(pluginJarPath: Path): String = pluginJarPath
     .normalize()
@@ -157,6 +314,16 @@ private fun resolveLocalPluginJars(pluginJars: Set<Path>): List<LocalPluginJar> 
         )
     }.sortedBy(LocalPluginJar::lockKey)
 
+private fun resolveAndValidateLocalPluginJars(pluginJars: Set<Path>): List<LocalPluginJar> {
+    val localPluginJars = resolveLocalPluginJars(pluginJars)
+    localPluginJars.forEach { localJar ->
+        require(Files.exists(localJar.artifactPath) && Files.isRegularFile(localJar.artifactPath)) {
+            "Plugin jar '${localJar.artifactPath}' does not exist or is not a file."
+        }
+    }
+    return localPluginJars
+}
+
 private fun Throwable.toResolutionDiagnostic(sensitiveValues: Set<String>): String = when (this) {
     is PluginResolutionDiagnosticException ->
         "[${category.code}] ${(message ?: "plugin resolution failed").redactSensitiveValues(sensitiveValues)}"
@@ -170,5 +337,29 @@ private fun Throwable.toResolutionDiagnostic(sensitiveValues: Set<String>): Stri
 private fun normalizeClasspath(rawClasspath: List<Path>): List<Path> = rawClasspath
     .map { it.toAbsolutePath().normalize() }
     .distinct()
+
+private fun Map<String, String>.toLockEntries(): List<LockEntry> = entries.map { (key, checksum) ->
+    LockEntry(kind = REMOTE_ARTIFACT_KIND, key = key, checksum = checksum)
+}
+
+private fun List<LockEntry>.toLockKeys(): Set<LockKey> = map { entry ->
+    LockKey(kind = entry.kind, key = entry.key)
+}.toSet()
+
+private data class ResolutionContext(
+    val lockfilePath: Path,
+    val lockfile: ParsedLockfile?,
+    val checksumAllowlist: PluginChecksumAllowlist?,
+    val cacheDirectory: Path,
+    val repositories: List<RepositoryEndpoint>,
+)
+
+private data class RemoteResolutionSummary(
+    val classpath: List<Path>,
+    val rootRemoteLockEntries: List<LockEntry>,
+    val remoteArtifactChecksums: Map<String, String>,
+)
+
+private data class LocalResolutionSummary(val classpath: List<Path>, val lockEntries: List<LockEntry>)
 
 private data class LocalPluginJar(val artifactPath: Path, val lockKey: String)

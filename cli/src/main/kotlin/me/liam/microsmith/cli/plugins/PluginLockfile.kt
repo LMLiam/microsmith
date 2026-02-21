@@ -4,6 +4,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 private const val LOCKFILE_ENTRY_PARTS = 3
+private val SUPPORTED_LOCKFILE_VERSIONS = setOf(LOCKFILE_VERSION_V1, LOCKFILE_VERSION)
 
 internal fun readLockfile(lockfilePath: Path): ParsedLockfile? {
     if (!Files.exists(lockfilePath)) {
@@ -20,21 +21,27 @@ internal fun readLockfile(lockfilePath: Path): ParsedLockfile? {
         "Plugin lockfile '$lockfilePath' is invalid. Missing version line."
     }
     val version = versionLine.substringAfter("version=").toIntOrNull()
-    require(version == LOCKFILE_VERSION) {
-        "Plugin lockfile '$lockfilePath' has unsupported version '$version'. Expected '$LOCKFILE_VERSION'."
+    require(version != null && version in SUPPORTED_LOCKFILE_VERSIONS) {
+        "Plugin lockfile '$lockfilePath' has unsupported version '$version'. " +
+            "Expected one of: ${SUPPORTED_LOCKFILE_VERSIONS.sorted().joinToString()}."
     }
 
     val entries =
         nonBlankLines
             .drop(1)
-            .map(::parseLockEntry)
+            .map { line -> parseLockEntry(line = line, version = version) }
             .distinctBy { it.kind to it.key }
 
     return ParsedLockfile(version = version, entries = entries)
 }
 
 internal fun ParsedLockfile.assertSamePluginSet(requestedKeys: Set<LockKey>, lockfilePath: Path) {
-    val lockedKeys = entries.map { LockKey(kind = it.kind, key = it.key) }.toSet()
+    val lockedKeys =
+        entries
+            .asSequence()
+            .filter(::isRequestedPluginEntry)
+            .map { entry -> LockKey(kind = entry.kind, key = entry.key) }
+            .toSet()
     val missingFromLock = requestedKeys - lockedKeys
     val extraInLock = lockedKeys - requestedKeys
 
@@ -48,6 +55,34 @@ internal fun ParsedLockfile.assertSamePluginSet(requestedKeys: Set<LockKey>, loc
                 append(" Not requested by CLI: ${extraInLock.joinToString { "${it.kind}:${it.key}" }}.")
             }
             append(" Update plugin flags or regenerate the lockfile.")
+        }
+    }
+}
+
+internal fun ParsedLockfile.assertSameRemoteArtifactSet(resolvedKeys: Set<String>, lockfilePath: Path) {
+    if (version < LOCKFILE_VERSION) {
+        return
+    }
+
+    val lockedKeys =
+        entries
+            .asSequence()
+            .filter { entry -> entry.kind == REMOTE_ARTIFACT_KIND }
+            .map(LockEntry::key)
+            .toSet()
+    val missingFromLock = resolvedKeys - lockedKeys
+    val extraInLock = lockedKeys - resolvedKeys
+
+    require(missingFromLock.isEmpty() && extraInLock.isEmpty()) {
+        buildString {
+            append("Resolved remote dependency graph does not match lockfile '$lockfilePath'.")
+            if (missingFromLock.isNotEmpty()) {
+                append(" Missing from lockfile: ${missingFromLock.sorted().joinToString()}.")
+            }
+            if (extraInLock.isNotEmpty()) {
+                append(" Not present in resolved graph: ${extraInLock.sorted().joinToString()}.")
+            }
+            append(" Regenerate the lockfile after reviewing dependency changes.")
         }
     }
 }
@@ -78,7 +113,7 @@ internal fun writeLockfile(lockfilePath: Path, lockfile: ParsedLockfile) {
     Files.write(lockfilePath, lines)
 }
 
-private fun parseLockEntry(line: String): LockEntry {
+private fun parseLockEntry(line: String, version: Int): LockEntry {
     val parts = line.split('|')
     require(parts.size == LOCKFILE_ENTRY_PARTS) {
         "Invalid plugin lockfile entry '$line'. Expected <kind>|<key>|<sha256>."
@@ -87,7 +122,12 @@ private fun parseLockEntry(line: String): LockEntry {
     val kind = parts[0]
     val key = parts[1]
     val checksum = parts[2]
-    require(kind == REMOTE_KIND || kind == LOCAL_KIND) {
+    val allowedKinds =
+        when {
+            version >= LOCKFILE_VERSION -> setOf(REMOTE_KIND, REMOTE_ARTIFACT_KIND, LOCAL_KIND)
+            else -> setOf(REMOTE_KIND, LOCAL_KIND)
+        }
+    require(kind in allowedKinds) {
         "Invalid plugin lockfile entry kind '$kind'."
     }
     require(key.isNotBlank()) { "Plugin lockfile entry key must not be blank." }
@@ -97,3 +137,5 @@ private fun parseLockEntry(line: String): LockEntry {
 
     return LockEntry(kind = kind, key = key, checksum = checksum)
 }
+
+private fun isRequestedPluginEntry(entry: LockEntry): Boolean = entry.kind == REMOTE_KIND || entry.kind == LOCAL_KIND

@@ -19,7 +19,7 @@ Security policy env vars:
   MICROSMITH_REPOSITORY_PASSWORD    Default password/token for authenticated repository access.
   MICROSMITH_GITHUB_PACKAGES_USER   Username for https://maven.pkg.github.com access.
   MICROSMITH_GITHUB_PACKAGES_TOKEN  Token for https://maven.pkg.github.com access.
-  MICROSMITH_PLUGIN_ALLOWLIST_FILE  Path to checksum allowlist file (<kind>|<key>|<sha256>).
+  MICROSMITH_PLUGIN_ALLOWLIST_FILE  Path to checksum allowlist file (<kind>|<key>|<sha256>; kind=remote|remote-artifact|local).
   MICROSMITH_SCRIPT_CACHE_DIR       Override script compilation cache directory.
   MICROSMITH_PLUGIN_CACHE_DIR       Override plugin resolution cache directory.
 """

@@ -66,7 +66,7 @@ private fun parseAllowlistEntry(line: String): LockEntry {
     val kind = parts[0]
     val key = parts[1]
     val checksum = parts[2]
-    require(kind == REMOTE_KIND || kind == LOCAL_KIND) {
+    require(kind == REMOTE_KIND || kind == REMOTE_ARTIFACT_KIND || kind == LOCAL_KIND) {
         "Invalid plugin allowlist entry kind '$kind'."
     }
     require(key.isNotBlank()) { "Plugin allowlist entry key must not be blank." }

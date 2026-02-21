@@ -35,7 +35,13 @@ internal interface RemotePluginResolver {
     ): ResolvedRemotePlugin
 }
 
-internal data class ResolvedRemotePlugin(val rootArtifactPath: Path, val classpath: List<Path>)
+internal data class ResolvedRemoteArtifact(val lockKey: String, val artifactPath: Path)
+
+internal data class ResolvedRemotePlugin(
+    val rootArtifactPath: Path,
+    val classpath: List<Path>,
+    val artifacts: List<ResolvedRemoteArtifact>,
+)
 
 internal enum class PluginResolverErrorCategory(val code: String) {
     OFFLINE_CACHE_MISS("offline-cache-miss"),
@@ -88,8 +94,19 @@ internal class MavenRemotePluginResolver(
                 expectedRootArtifactPath = expectedRootArtifactPath,
                 artifactResults = dependencyResult.artifactResults,
             )
+        val artifacts =
+            resolveArtifacts(
+                coordinate = coordinate,
+                artifactResults = dependencyResult.artifactResults,
+                localRepositoryRoot = localRepositoryRoot,
+                rootArtifactPath = rootArtifactPath,
+            )
 
-        return ResolvedRemotePlugin(rootArtifactPath = rootArtifactPath, classpath = classpath)
+        return ResolvedRemotePlugin(
+            rootArtifactPath = rootArtifactPath,
+            classpath = classpath,
+            artifacts = artifacts,
+        )
     }
 }
 
@@ -205,6 +222,57 @@ private fun resolveRootArtifactPath(
         "Plugin '${coordinate.value}' resolved but no root jar was produced in cache at " +
             "'$expectedRootArtifactPath'.",
     )
+
+private fun resolveArtifacts(
+    coordinate: Coordinate,
+    artifactResults: List<ArtifactResult>,
+    localRepositoryRoot: Path,
+    rootArtifactPath: Path,
+): List<ResolvedRemoteArtifact> {
+    val resolved =
+        artifactResults
+            .asSequence()
+            .mapNotNull { result -> result.artifact?.file?.toPath() }
+            .map { path -> path.toAbsolutePath().normalize() }
+            .filter(Files::exists)
+            .map { artifactPath ->
+                ResolvedRemoteArtifact(
+                    lockKey =
+                    toRemoteArtifactLockKey(
+                        coordinate = coordinate,
+                        localRepositoryRoot = localRepositoryRoot,
+                        artifactPath = artifactPath,
+                    ),
+                    artifactPath = artifactPath,
+                )
+            }.distinctBy(ResolvedRemoteArtifact::lockKey)
+            .toMutableList()
+
+    val rootLockKey =
+        toRemoteArtifactLockKey(
+            coordinate = coordinate,
+            localRepositoryRoot = localRepositoryRoot,
+            artifactPath = rootArtifactPath,
+        )
+    if (resolved.none { artifact -> artifact.lockKey == rootLockKey }) {
+        resolved.add(
+            0,
+            ResolvedRemoteArtifact(
+                lockKey = rootLockKey,
+                artifactPath = rootArtifactPath,
+            ),
+        )
+    }
+
+    return resolved
+}
+
+private fun toRemoteArtifactLockKey(coordinate: Coordinate, localRepositoryRoot: Path, artifactPath: Path): String {
+    require(artifactPath.startsWith(localRepositoryRoot)) {
+        "Resolved artifact for plugin '${coordinate.value}' escapes plugin cache root: '$artifactPath'."
+    }
+    return localRepositoryRoot.relativize(artifactPath).toString().replace('\\', '/')
+}
 
 private fun Artifact.matchesCoordinate(coordinate: Coordinate): Boolean =
     groupId == coordinate.group && artifactId == coordinate.artifact && version == coordinate.version

@@ -187,9 +187,10 @@ microsmith run schema.microsmith.kts --out ./generated --isolation process
     (fallbacks: `GITHUB_ACTOR` + `GITHUB_TOKEN`)
   - Global default credentials via `MICROSMITH_REPOSITORY_USERNAME` + `MICROSMITH_REPOSITORY_PASSWORD`
   - Sensitive values are redacted in resolver diagnostics.
-- Plugin artifacts are SHA-256 checked against the script lockfile when present.
+- Plugin artifacts are SHA-256 checked against the script lockfile, including transitive dependency graph artifacts in lockfile v2.
 - Optional plugin checksum allowlist can be enforced with `MICROSMITH_PLUGIN_ALLOWLIST_FILE`:
-  - Entry format: `<kind>|<key>|<sha256>` where `kind` is `remote` or `local`.
+  - Entry format: `<kind>|<key>|<sha256>` where `kind` is `remote`, `remote-artifact`, or `local`.
+- `--offline` for remote plugins requires lockfile v2 metadata and a complete cached dependency graph.
 - Generated output writes are constrained to the configured output root and reject traversal/symlink escapes.
 - Default isolation executes each run in an isolated per-run classloader; `--isolation process` executes in a separate JVM.
 

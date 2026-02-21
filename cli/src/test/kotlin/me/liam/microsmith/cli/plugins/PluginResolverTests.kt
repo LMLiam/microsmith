@@ -54,8 +54,10 @@ class PluginResolverTests :
                 success.classpath.first().exists() shouldBe true
                 val lockfilePath = requireNotNull(success.lockfilePath)
                 lockfilePath.exists() shouldBe true
-                lockfilePath.readLines().joinToString("\n").shouldContain("version=1")
-                lockfilePath.readLines().joinToString("\n").shouldContain("remote|$coordinate|")
+                val lockContents = lockfilePath.readLines().joinToString("\n")
+                lockContents.shouldContain("version=2")
+                lockContents.shouldContain("remote|$coordinate|")
+                lockContents.shouldContain("remote-artifact|${parseCoordinate(coordinate).relativeJarPath}|")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -95,6 +97,11 @@ class PluginResolverTests :
                 success.classpath.shouldHaveSize(2)
                 success.classpath.map { path -> path.fileName.toString() }.toSet() shouldBe
                     setOf("plugin-root-1.0.0.jar", "plugin-shared-2.1.0.jar")
+                val lockfilePath = requireNotNull(success.lockfilePath)
+                val lockContents = lockfilePath.readLines().joinToString("\n")
+                lockContents.shouldContain("remote|$rootCoordinate|")
+                lockContents.shouldContain("remote-artifact|${parseCoordinate(rootCoordinate).relativeJarPath}|")
+                lockContents.shouldContain("remote-artifact|${parseCoordinate(transitiveCoordinate).relativeJarPath}|")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -207,7 +214,7 @@ class PluginResolverTests :
             }
         }
 
-        "fails with remediation message when offline plugin artifact is missing from cache" {
+        "fails with remediation message when offline mode is used without lockfile metadata" {
             val tempDir = createTempDirectory("microsmith-plugin-resolver-offline")
             try {
                 val script = tempDir.resolve("schema.microsmith.kts")
@@ -228,7 +235,7 @@ class PluginResolverTests :
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
                 failure.diagnostics.joinToString("\n").shouldContain("[offline-cache-miss]")
-                failure.diagnostics.joinToString("\n").shouldContain("Offline mode is enabled")
+                failure.diagnostics.joinToString("\n").shouldContain("Offline mode requires a plugin lockfile")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -699,7 +706,7 @@ class PluginResolverTests :
         }
     })
 
-private fun fileRepositoryAllowedPolicy(vararg additionalAllowedRepositories: String): RepositoryAllowlistPolicy =
+internal fun fileRepositoryAllowedPolicy(vararg additionalAllowedRepositories: String): RepositoryAllowlistPolicy =
     RepositoryAllowlistPolicy(
         allowedRepositories =
         (listOf(MAVEN_CENTRAL_REPOSITORY) + additionalAllowedRepositories)
@@ -708,7 +715,7 @@ private fun fileRepositoryAllowedPolicy(vararg additionalAllowedRepositories: St
         allowFileRepositories = true,
     )
 
-private fun publishMavenArtifact(
+internal fun publishMavenArtifact(
     repositoryRoot: Path,
     coordinate: String,
     dependencies: List<String> = emptyList(),

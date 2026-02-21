@@ -39,6 +39,7 @@ Actions:
   - `MICROSMITH_GITHUB_PACKAGES_USER` + `MICROSMITH_GITHUB_PACKAGES_TOKEN`
     (fallback: `GITHUB_ACTOR` + `GITHUB_TOKEN`)
 - update or regenerate lock/checksum metadata when plugin versions change
+- for strict allowlist mode, include transitive graph entries (`remote-artifact|<cache-relative-path>|<sha256>`) in the allowlist file
 - verify diagnostics do not contain secret material; Microsmith redacts configured tokens/passwords by default
 
 ## Offline mode failures
@@ -47,8 +48,9 @@ Symptom:
 - `--offline` run cannot resolve plugins
 
 Actions:
-- run once online to prime cache and lock metadata
-- ensure plugin artifacts exist in cache directory
+- ensure lockfile metadata exists and is on version 2
+- run once online to prime cache and upgrade lock metadata when needed
+- ensure the full locked dependency graph exists in plugin cache directory
 - rerun with `--offline` after cache warmup
 
 ## Built-in provider discovery failures
