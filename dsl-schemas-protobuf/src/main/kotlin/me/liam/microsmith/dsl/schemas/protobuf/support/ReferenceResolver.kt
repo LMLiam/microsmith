@@ -39,9 +39,7 @@ private fun String.validatePathSegments(label: String): List<String> {
     return segments
 }
 
-private class ReferenceResolutionContext(
-    schemas: Set<ProtobufSchema>,
-) {
+private class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) {
     private val schemasByName = schemas.associateBy { it.name }
     val errors = mutableListOf<String>()
 
@@ -56,12 +54,15 @@ private class ReferenceResolutionContext(
 
     private fun Field.resolve(messageName: String): Field = when (this) {
         is ReferenceField -> copy(reference = reference.resolve("message $messageName field '$name'"))
+
         is MapField -> {
             val resolvedValue =
                 (type.value as? Reference)?.resolve("message $messageName map field '$name' value") ?: type.value
             copy(type = MapType(type.key, resolvedValue))
         }
+
         is ScalarField -> this
+
         is OneofField -> this
     }
 

@@ -14,9 +14,8 @@ import kotlin.io.path.name
 private const val HTTP_STATUS_OK = 200
 private val HTTP_CLIENT: HttpClient = HttpClient.newHttpClient()
 
-internal fun resolveRepositories(command: RunCommand, settings: PluginResolverSettings): List<String> {
-    return resolveRepositories(command, settings, settings.repositoryPolicy ?: defaultRepositoryAllowlistPolicy())
-}
+internal fun resolveRepositories(command: RunCommand, settings: PluginResolverSettings): List<String> =
+    resolveRepositories(command, settings, settings.repositoryPolicy ?: defaultRepositoryAllowlistPolicy())
 
 internal fun resolveRepositories(
     command: RunCommand,

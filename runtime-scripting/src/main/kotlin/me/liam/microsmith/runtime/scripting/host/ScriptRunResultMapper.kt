@@ -75,6 +75,7 @@ internal object ScriptRunResultMapper {
     private fun ensureModelGenerated(evaluationResult: EvaluationResult, scriptContext: MicrosmithScriptContext) {
         when (val returnValue = evaluationResult.returnValue) {
             is ResultValue.Error -> rethrow(returnValue.error)
+
             is ResultValue.Value -> {
                 val returnedModel = returnValue.value as? MicrosmithModel
                 when {
@@ -83,6 +84,7 @@ internal object ScriptRunResultMapper {
                     else -> modelRequiredFailure()
                 }
             }
+
             is ResultValue.Unit,
             ResultValue.NotEvaluated,
             -> {

@@ -4,6 +4,4 @@ object Max {
     internal const val VALUE = 536_870_911
 }
 
-data class MaxRange(
-    val from: Int,
-)
+data class MaxRange(val from: Int)

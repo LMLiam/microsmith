@@ -19,9 +19,7 @@ internal data class DoctorCheckResult(
     val details: Map<String, String> = emptyMap(),
 )
 
-internal data class DoctorResult(
-    val checks: List<DoctorCheckResult>,
-) {
+internal data class DoctorResult(val checks: List<DoctorCheckResult>) {
     val hasFailures: Boolean
         get() = checks.any { it.status == DoctorCheckStatus.FAIL }
 }
@@ -63,75 +61,69 @@ private fun checkJavaRuntime(): DoctorCheckResult {
     }
 }
 
-private fun checkProviderDiscovery(providerValidator: () -> List<String>): DoctorCheckResult {
-    return try {
-        val errors = providerValidator()
-        if (errors.isEmpty()) {
-            DoctorCheckResult(
-                id = "provider-discovery",
-                status = DoctorCheckStatus.PASS,
-                message = "Required built-in service providers are available.",
-            )
-        } else {
-            DoctorCheckResult(
-                id = "provider-discovery",
-                status = DoctorCheckStatus.FAIL,
-                message = "Required built-in service providers are missing.",
-                details = mapOf("errors" to errors.joinToString(" | ")),
-            )
-        }
-    } catch (error: ServiceConfigurationError) {
+private fun checkProviderDiscovery(providerValidator: () -> List<String>): DoctorCheckResult = try {
+    val errors = providerValidator()
+    if (errors.isEmpty()) {
+        DoctorCheckResult(
+            id = "provider-discovery",
+            status = DoctorCheckStatus.PASS,
+            message = "Required built-in service providers are available.",
+        )
+    } else {
         DoctorCheckResult(
             id = "provider-discovery",
             status = DoctorCheckStatus.FAIL,
-            message = "Service provider loading failed.",
-            details = mapOf("error" to (error.message ?: error::class.simpleName.orEmpty())),
+            message = "Required built-in service providers are missing.",
+            details = mapOf("errors" to errors.joinToString(" | ")),
         )
     }
+} catch (error: ServiceConfigurationError) {
+    DoctorCheckResult(
+        id = "provider-discovery",
+        status = DoctorCheckStatus.FAIL,
+        message = "Service provider loading failed.",
+        details = mapOf("error" to (error.message ?: error::class.simpleName.orEmpty())),
+    )
 }
 
-private fun checkDirectoryWritable(id: String, directory: Path): DoctorCheckResult {
-    return runCatching {
-        Files.createDirectories(directory)
-        val probe = Files.createTempFile(directory, "microsmith-doctor-", ".tmp")
-        probe.deleteIfExists()
-        DoctorCheckResult(
-            id = id,
-            status = DoctorCheckStatus.PASS,
-            message = "Directory is writable.",
-            details = mapOf("path" to directory.toAbsolutePath().normalize().toString()),
-        )
-    }.getOrElse { error ->
-        DoctorCheckResult(
-            id = id,
-            status = DoctorCheckStatus.FAIL,
-            message = "Directory is not writable.",
-            details =
-            mapOf(
-                "path" to directory.toAbsolutePath().normalize().toString(),
-                "error" to (error.message ?: error::class.simpleName.orEmpty()),
-            ),
-        )
-    }
+private fun checkDirectoryWritable(id: String, directory: Path): DoctorCheckResult = runCatching {
+    Files.createDirectories(directory)
+    val probe = Files.createTempFile(directory, "microsmith-doctor-", ".tmp")
+    probe.deleteIfExists()
+    DoctorCheckResult(
+        id = id,
+        status = DoctorCheckStatus.PASS,
+        message = "Directory is writable.",
+        details = mapOf("path" to directory.toAbsolutePath().normalize().toString()),
+    )
+}.getOrElse { error ->
+    DoctorCheckResult(
+        id = id,
+        status = DoctorCheckStatus.FAIL,
+        message = "Directory is not writable.",
+        details =
+        mapOf(
+            "path" to directory.toAbsolutePath().normalize().toString(),
+            "error" to (error.message ?: error::class.simpleName.orEmpty()),
+        ),
+    )
 }
 
-private fun checkRepositoryPolicy(): DoctorCheckResult {
-    return runCatching {
-        val policy = defaultRepositoryAllowlistPolicy()
-        DoctorCheckResult(
-            id = "repository-policy",
-            status = DoctorCheckStatus.PASS,
-            message = "Repository allowlist policy initialized successfully.",
-            details = mapOf("allowFileRepositories" to policy.allowFileRepositories.toString()),
-        )
-    }.getOrElse { error ->
-        DoctorCheckResult(
-            id = "repository-policy",
-            status = DoctorCheckStatus.FAIL,
-            message = "Repository allowlist policy could not be initialized.",
-            details = mapOf("error" to (error.message ?: error::class.simpleName.orEmpty())),
-        )
-    }
+private fun checkRepositoryPolicy(): DoctorCheckResult = runCatching {
+    val policy = defaultRepositoryAllowlistPolicy()
+    DoctorCheckResult(
+        id = "repository-policy",
+        status = DoctorCheckStatus.PASS,
+        message = "Repository allowlist policy initialized successfully.",
+        details = mapOf("allowFileRepositories" to policy.allowFileRepositories.toString()),
+    )
+}.getOrElse { error ->
+    DoctorCheckResult(
+        id = "repository-policy",
+        status = DoctorCheckStatus.FAIL,
+        message = "Repository allowlist policy could not be initialized.",
+        details = mapOf("error" to (error.message ?: error::class.simpleName.orEmpty())),
+    )
 }
 
 private fun defaultScriptCacheDirectory(): Path {

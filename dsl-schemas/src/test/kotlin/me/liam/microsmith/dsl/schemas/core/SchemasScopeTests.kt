@@ -5,17 +5,12 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import me.liam.microsmith.dsl.core.MicrosmithBuilder
 
-private enum class ScopeTestSchemaTypes(
-    override val typeName: String,
-) : SchemaType {
+private enum class ScopeTestSchemaTypes(override val typeName: String) : SchemaType {
     PROTOBUF("protobuf"),
     JSON("json"),
 }
 
-private data class ScopeFakeSchema(
-    override val type: SchemaType,
-    override val name: String,
-) : Schema
+private data class ScopeFakeSchema(override val type: SchemaType, override val name: String) : Schema
 
 private fun SchemasScope.fake(type: SchemaType, name: String) {
     val builder = this as SchemasBuilder

@@ -3,10 +3,7 @@ package me.liam.microsmith.dsl.schemas.protobuf.support
 import me.liam.microsmith.dsl.schemas.protobuf.extensions.merge
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.Max
 
-class IndexAllocator(
-    private val min: Int,
-    private val protoReserved: IntRange? = null,
-) {
+class IndexAllocator(private val min: Int, private val protoReserved: IntRange? = null) {
     private val reserved = mutableSetOf<IntRange>()
 
     fun reserved() = reserved.toSet()

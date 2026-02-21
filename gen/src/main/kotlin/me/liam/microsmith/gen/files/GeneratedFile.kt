@@ -2,10 +2,7 @@ package me.liam.microsmith.gen.files
 
 import java.nio.file.Path
 
-class GeneratedFile(
-    val relativePath: Path,
-    contents: ByteArray,
-) {
+class GeneratedFile(val relativePath: Path, contents: ByteArray) {
     private val bytes = contents.copyOf()
 
     val contents: ByteArray

@@ -4,17 +4,12 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-private enum class TestSchemaTypes(
-    override val typeName: String,
-) : SchemaType {
+private enum class TestSchemaTypes(override val typeName: String) : SchemaType {
     PROTOBUF("protobuf"),
     JSON("json"),
 }
 
-private data class ExtFakeSchema(
-    override val type: SchemaType,
-    override val name: String,
-) : Schema
+private data class ExtFakeSchema(override val type: SchemaType, override val name: String) : Schema
 
 class SchemasExtensionTests :
     StringSpec({

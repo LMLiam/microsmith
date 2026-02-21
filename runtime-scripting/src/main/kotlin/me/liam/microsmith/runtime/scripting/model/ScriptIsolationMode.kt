@@ -1,8 +1,6 @@
 package me.liam.microsmith.runtime.scripting.model
 
-enum class ScriptIsolationMode(
-    val cliValue: String,
-) {
+enum class ScriptIsolationMode(val cliValue: String) {
     CLASSLOADER("classloader"),
     PROCESS("process"),
     ;

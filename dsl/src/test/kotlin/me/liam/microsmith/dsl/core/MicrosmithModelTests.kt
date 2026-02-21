@@ -6,13 +6,9 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 
-data class FooExtension(
-    val foo: String,
-) : MicrosmithExtension
+data class FooExtension(val foo: String) : MicrosmithExtension
 
-data class BarExtension(
-    val bar: Int,
-) : MicrosmithExtension
+data class BarExtension(val bar: Int) : MicrosmithExtension
 
 class MicrosmithModelTests :
     StringSpec({

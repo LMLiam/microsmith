@@ -55,6 +55,7 @@ internal class MicrosmithCli(
             stdout(HELP_TEXT.trimIndent())
             0
         }
+
         is ErrorCommand -> {
             val emitter =
                 CliDiagnosticEmitter(
@@ -68,16 +69,17 @@ internal class MicrosmithCli(
             stderr(HELP_TEXT.trimIndent())
             CliFailureCode.USAGE_ERROR.exitCode
         }
+
         is RunCommand -> runCommand(parsed)
+
         is DoctorCommand -> runDoctor(parsed)
     }
 
     private fun runCommand(command: RunCommand): Int {
         val emitter = createEmitter(command.diagnosticsFormat, command.verbose)
         val context = RunExecutionContext()
-        val prepared = prepareRun(command, emitter, context)
 
-        return when (prepared) {
+        return when (val prepared = prepareRun(command, emitter, context)) {
             is PreparedRun.Failure ->
                 completeRun(
                     command = command,
@@ -296,16 +298,9 @@ internal class MicrosmithCli(
 }
 
 private sealed interface PreparedRun {
-    data class Ready(
-        val result: ScriptRunResult,
-    ) : PreparedRun
+    data class Ready(val result: ScriptRunResult) : PreparedRun
 
-    data class Failure(
-        val code: CliFailureCode,
-    ) : PreparedRun
+    data class Failure(val code: CliFailureCode) : PreparedRun
 }
 
-private data class RunExecutionContext(
-    var resolverStatus: String = "skipped",
-    var lockfilePath: Path? = null,
-)
+private data class RunExecutionContext(var resolverStatus: String = "skipped", var lockfilePath: Path? = null)

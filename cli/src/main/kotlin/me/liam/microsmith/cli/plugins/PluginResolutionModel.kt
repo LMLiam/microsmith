@@ -11,11 +11,7 @@ internal const val LOCAL_KIND = "local"
 private const val COORDINATE_PART_COUNT = 3
 private const val HEX_SHA256_LENGTH = 64
 
-internal data class Coordinate(
-    val group: String,
-    val artifact: String,
-    val version: String,
-) {
+internal data class Coordinate(val group: String, val artifact: String, val version: String) {
     val value: String
         get() = "$group:$artifact:$version"
 
@@ -23,21 +19,11 @@ internal data class Coordinate(
         get() = "${group.replace('.', '/')}/$artifact/$version/$artifact-$version.jar"
 }
 
-internal data class LockEntry(
-    val kind: String,
-    val key: String,
-    val checksum: String,
-)
+internal data class LockEntry(val kind: String, val key: String, val checksum: String)
 
-internal data class LockKey(
-    val kind: String,
-    val key: String,
-)
+internal data class LockKey(val kind: String, val key: String)
 
-internal data class ParsedLockfile(
-    val version: Int,
-    val entries: List<LockEntry>,
-)
+internal data class ParsedLockfile(val version: Int, val entries: List<LockEntry>)
 
 internal fun parseCoordinate(raw: String): Coordinate {
     val parts = raw.split(':')
@@ -98,9 +84,7 @@ internal fun sha256(path: Path): String {
     return digest.digest().toHexString()
 }
 
-internal fun isSha256(value: String): Boolean {
-    return value.length == HEX_SHA256_LENGTH && value.matches(Regex("^[a-f0-9]+$"))
-}
+internal fun isSha256(value: String): Boolean = value.length == HEX_SHA256_LENGTH && value.matches(Regex("^[a-f0-9]+$"))
 
 private fun ByteArray.toHexString(): String = joinToString(separator = "") { "%02x".format(it) }
 

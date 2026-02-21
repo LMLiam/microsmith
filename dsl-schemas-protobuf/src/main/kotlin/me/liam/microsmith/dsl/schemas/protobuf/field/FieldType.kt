@@ -38,7 +38,4 @@ sealed interface PrimitiveType : ValueType {
 
 sealed interface MapKeyType : PrimitiveType
 
-data class MapType(
-    val key: MapKeyType,
-    val value: ValueType,
-) : FieldType
+data class MapType(val key: MapKeyType, val value: ValueType) : FieldType
