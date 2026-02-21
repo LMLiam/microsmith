@@ -16,10 +16,12 @@ class PluginRepositoryCredentialsTests :
         "repository credentials file entries take precedence over global credentials" {
             val tempDir = createTempDirectory("microsmith-plugin-credentials-precedence")
             try {
+                val fileCredential = "example-file-credential"
+                val globalCredential = "example-global-credential"
                 val credentialsFile = tempDir.resolve("repository-credentials.txt")
                 credentialsFile.writeText(
                     """
-                    https://repo1.maven.org/maven2|file-user|file-secret
+                    https://repo1.maven.org/maven2|file-user|$fileCredential
                     """.trimIndent(),
                 )
 
@@ -27,39 +29,41 @@ class PluginRepositoryCredentialsTests :
                     defaultRepositoryCredentialsResolver(
                         repositoryCredentialsFileEnv = credentialsFile.toString(),
                         repositoryUsernameEnv = "global-user",
-                        repositoryPasswordEnv = "global-secret",
+                        repositoryPasswordEnv = globalCredential,
                     )
 
                 resolver.resolve("https://repo1.maven.org/maven2") shouldBe
-                    RepositoryCredentials(username = "file-user", password = "file-secret")
+                    RepositoryCredentials(username = "file-user", password = fileCredential)
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
         }
 
         "github packages credentials use github actor fallback and only apply to github packages host" {
+            val githubCredential = "example-github-credential"
             val resolver =
                 defaultRepositoryCredentialsResolver(
                     githubPackagesUsernameEnv = null,
                     githubPackagesTokenEnv = null,
                     githubActorEnv = "octocat",
-                    githubTokenEnv = "gh-token",
+                    githubTokenEnv = githubCredential,
                 )
 
             resolver.resolve("https://maven.pkg.github.com/acme/microsmith") shouldBe
-                RepositoryCredentials(username = "octocat", password = "gh-token")
+                RepositoryCredentials(username = "octocat", password = githubCredential)
             resolver.resolve("https://repo1.maven.org/maven2") shouldBe null
         }
 
         "global repository credentials are used for non-github repositories" {
+            val globalCredential = "example-global-credential"
             val resolver =
                 defaultRepositoryCredentialsResolver(
                     repositoryUsernameEnv = "ci-user",
-                    repositoryPasswordEnv = "ci-pass",
+                    repositoryPasswordEnv = globalCredential,
                 )
 
             resolver.resolve("https://packages.acme.internal/maven") shouldBe
-                RepositoryCredentials(username = "ci-user", password = "ci-pass")
+                RepositoryCredentials(username = "ci-user", password = globalCredential)
         }
 
         "fails when only one global credential environment variable is configured" {
@@ -74,11 +78,13 @@ class PluginRepositoryCredentialsTests :
         "fails when repository credentials file has duplicate repository entries" {
             val tempDir = createTempDirectory("microsmith-plugin-credentials-duplicate")
             try {
+                val firstCredential = "example-first-credential"
+                val secondCredential = "example-second-credential"
                 val credentialsFile = tempDir.resolve("repository-credentials.txt")
                 credentialsFile.writeText(
                     """
-                    https://repo1.maven.org/maven2|first|secret-one
-                    https://repo1.maven.org/maven2|second|secret-two
+                    https://repo1.maven.org/maven2|first|$firstCredential
+                    https://repo1.maven.org/maven2|second|$secondCredential
                     """.trimIndent(),
                 )
 
@@ -95,10 +101,13 @@ class PluginRepositoryCredentialsTests :
         "sensitive values includes secrets but excludes usernames" {
             val tempDir = createTempDirectory("microsmith-plugin-credentials-sensitive-values")
             try {
+                val fileCredential = "example-file-credential"
+                val globalCredential = "example-global-credential"
+                val githubCredential = "example-github-credential"
                 val credentialsFile = tempDir.resolve("repository-credentials.txt")
                 credentialsFile.writeText(
                     """
-                    https://repo1.maven.org/maven2|file-user|file-secret
+                    https://repo1.maven.org/maven2|file-user|$fileCredential
                     """.trimIndent(),
                 )
 
@@ -106,19 +115,28 @@ class PluginRepositoryCredentialsTests :
                     defaultRepositoryCredentialsResolver(
                         repositoryCredentialsFileEnv = credentialsFile.toString(),
                         repositoryUsernameEnv = "global-user",
-                        repositoryPasswordEnv = "global-secret",
+                        repositoryPasswordEnv = globalCredential,
                         githubPackagesUsernameEnv = "gh-user",
-                        githubPackagesTokenEnv = "gh-secret",
+                        githubPackagesTokenEnv = githubCredential,
                     )
 
                 val sensitiveValues = resolver.sensitiveValues()
-                sensitiveValues shouldContain "file-secret"
-                sensitiveValues shouldContain "global-secret"
-                sensitiveValues shouldContain "gh-secret"
+                sensitiveValues shouldContain fileCredential
+                sensitiveValues shouldContain globalCredential
+                sensitiveValues shouldContain githubCredential
                 sensitiveValues.contains("gh-user") shouldBe false
                 sensitiveValues.contains("global-user") shouldBe false
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
+        }
+
+        "redacts overlapping secrets using longest-first replacement" {
+            val sanitized =
+                "token=alphabet".redactSensitiveValues(
+                    setOf("alpha", "alphabet"),
+                )
+
+            sanitized shouldBe "token=<redacted>"
         }
     })

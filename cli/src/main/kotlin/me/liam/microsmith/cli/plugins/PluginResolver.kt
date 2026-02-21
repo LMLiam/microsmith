@@ -20,12 +20,18 @@ internal data class PluginResolverSettings(
     val remotePluginResolver: RemotePluginResolver = MavenRemotePluginResolver(),
 )
 
-internal fun resolvePlugins(command: RunCommand, settings: PluginResolverSettings? = null): PluginResolutionResult {
-    var sensitiveValues: Set<String> = emptySet()
+internal fun resolvePlugins(command: RunCommand): PluginResolutionResult {
+    if (command.plugins.isEmpty() && command.pluginJars.isEmpty()) {
+        return PluginResolutionResult.Success(classpath = emptyList(), lockfilePath = null)
+    }
+
+    return resolvePlugins(command = command, settings = PluginResolverSettings())
+}
+
+internal fun resolvePlugins(command: RunCommand, settings: PluginResolverSettings): PluginResolutionResult {
+    val sensitiveValues = settings.repositoryCredentialsResolver.sensitiveValues()
     return runCatching {
-        val effectiveSettings = settings ?: PluginResolverSettings()
-        sensitiveValues = effectiveSettings.repositoryCredentialsResolver.sensitiveValues()
-        resolvePluginsOrThrow(command, effectiveSettings)
+        resolvePluginsOrThrow(command, settings)
     }.fold(
         onSuccess = { success -> success },
         onFailure = { error ->

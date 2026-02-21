@@ -143,4 +143,5 @@ internal fun String.redactSensitiveValues(sensitiveValues: Set<String>): String 
     .map(String::trim)
     .filter(String::isNotEmpty)
     .distinct()
+    .sortedWith(compareByDescending<String> { secret -> secret.length }.thenBy { secret -> secret })
     .fold(this) { sanitized, secret -> sanitized.replace(secret, REDACTED_SECRET) }
