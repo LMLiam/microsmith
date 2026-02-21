@@ -99,6 +99,62 @@ class PluginResolverTests :
             }
         }
 
+        "excludes test and provided transitive dependencies from runtime classpath" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-runtime-scope")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val cache = tempDir.resolve("cache")
+                val repositoryRoot = tempDir.resolve("repo")
+                val rootCoordinate = "com.acme:plugin-root:1.0.0"
+                val runtimeCoordinate = "com.acme:runtime-dep:2.0.0"
+                val testCoordinate = "com.acme:test-dep:2.0.0"
+                val providedCoordinate = "com.acme:provided-dep:2.0.0"
+
+                publishMavenArtifact(repositoryRoot, runtimeCoordinate)
+                publishMavenArtifact(repositoryRoot, testCoordinate)
+                publishMavenArtifact(repositoryRoot, providedCoordinate)
+                publishMavenArtifact(
+                    repositoryRoot = repositoryRoot,
+                    coordinate = rootCoordinate,
+                    dependencies = listOf(runtimeCoordinate, testCoordinate, providedCoordinate),
+                    dependencyScopes =
+                    mapOf(
+                        testCoordinate to "test",
+                        providedCoordinate to "provided",
+                    ),
+                )
+                script.writeText("// test script")
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf(rootCoordinate),
+                        repositoryOverride = repositoryRoot.toUri().toString(),
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            repositoryPolicy = fileRepositoryAllowedPolicy(),
+                        ),
+                    )
+
+                val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
+                val classpathNames = success.classpath.map { path -> path.fileName.toString() }.toSet()
+                classpathNames shouldBe
+                    setOf(
+                        "plugin-root-1.0.0.jar",
+                        "runtime-dep-2.0.0.jar",
+                    )
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
         "deduplicates shared transitive dependencies deterministically" {
             val tempDir = createTempDirectory("microsmith-plugin-resolver-deterministic")
             try {
@@ -598,6 +654,7 @@ private fun publishMavenArtifact(
     repositoryRoot: Path,
     coordinate: String,
     dependencies: List<String> = emptyList(),
+    dependencyScopes: Map<String, String> = emptyMap(),
     jarContents: ByteArray = "plugin-jar-contents".toByteArray(),
 ) {
     val parsed = parseCoordinate(coordinate)
@@ -619,11 +676,18 @@ private fun publishMavenArtifact(
                 postfix = "\n</dependencies>",
             ) { dependency ->
                 val dep = parseCoordinate(dependency)
+                val scopeXml =
+                    dependencyScopes[dependency]
+                        ?.trim()
+                        ?.takeIf(String::isNotEmpty)
+                        ?.let { scope -> "\n  <scope>$scope</scope>" }
+                        .orEmpty()
                 """
                 <dependency>
                   <groupId>${dep.group}</groupId>
                   <artifactId>${dep.artifact}</artifactId>
                   <version>${dep.version}</version>
+                  $scopeXml
                 </dependency>
                 """.trimIndent()
             }

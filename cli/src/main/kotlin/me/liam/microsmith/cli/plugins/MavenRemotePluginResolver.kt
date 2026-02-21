@@ -17,6 +17,7 @@ import org.eclipse.aether.resolution.DependencyResult
 import org.eclipse.aether.supplier.RepositorySystemSupplier
 import org.eclipse.aether.transfer.ArtifactNotFoundException
 import org.eclipse.aether.util.artifact.JavaScopes
+import org.eclipse.aether.util.filter.DependencyFilterUtils
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator
 import java.nio.file.Files
 import java.nio.file.Path
@@ -117,13 +118,14 @@ private fun resolveDependencyGraph(
         )
 
     val remoteRepositories = repositories.mapIndexed(::toRemoteRepository)
+    val runtimeClasspathFilter = DependencyFilterUtils.classpathFilter(JavaScopes.RUNTIME)
     val dependencyRequest =
         DependencyRequest(
             CollectRequest(
                 Dependency(DefaultArtifact(coordinate.value), JavaScopes.RUNTIME),
                 remoteRepositories,
             ),
-            null,
+            runtimeClasspathFilter,
         )
 
     return try {
