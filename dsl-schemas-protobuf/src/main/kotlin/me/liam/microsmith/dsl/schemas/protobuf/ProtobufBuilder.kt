@@ -3,9 +3,7 @@ package me.liam.microsmith.dsl.schemas.protobuf
 import me.liam.microsmith.dsl.schemas.protobuf.types.EnumBuilder
 import me.liam.microsmith.dsl.schemas.protobuf.types.MessageBuilder
 
-class ProtobufBuilder(
-    private val segments: List<String> = emptyList(),
-) : ProtobufScope {
+class ProtobufBuilder(private val segments: List<String> = emptyList()) : ProtobufScope {
     private val schemasByName = mutableMapOf<String, ProtobufSchema>()
     private val registeredNames = mutableSetOf<String>()
 

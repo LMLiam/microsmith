@@ -5,9 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import me.liam.microsmith.dsl.helpers.put
 
-data class DummyExtension(
-    val value: String,
-) : MicrosmithExtension
+data class DummyExtension(val value: String) : MicrosmithExtension
 
 class MicrosmithBuilderTests :
     StringSpec({

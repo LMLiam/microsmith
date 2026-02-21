@@ -130,6 +130,7 @@ internal object ProcessIsolationProtocol {
                     properties["$RESULT_WARNING_PREFIX$index"] = warning
                 }
             }
+
             is ScriptRunFailure -> {
                 properties[RESULT_STATUS] = RESULT_STATUS_FAILURE
                 properties[RESULT_DIAGNOSTIC_COUNT] = result.diagnostics.size.toString()
@@ -171,6 +172,7 @@ internal object ProcessIsolationProtocol {
                     )
                 ScriptRunSuccess(warnings = warnings, cacheHit = cacheHit, elapsedMillis = elapsedMillis)
             }
+
             RESULT_STATUS_FAILURE -> {
                 val diagnostics =
                     readIndexedList(
@@ -184,6 +186,7 @@ internal object ProcessIsolationProtocol {
                     type = failureType,
                 )
             }
+
             else -> error("Missing or invalid '$RESULT_STATUS' in process isolation result.")
         }
     }

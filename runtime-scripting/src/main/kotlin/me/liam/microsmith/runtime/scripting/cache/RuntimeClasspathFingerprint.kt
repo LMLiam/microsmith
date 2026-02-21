@@ -36,14 +36,17 @@ internal object RuntimeClasspathFingerprint {
 private fun MessageDigest.addClasspathEntryFingerprint(entry: Path) {
     when {
         !Files.exists(entry) -> addChunk("missing")
+
         Files.isRegularFile(entry) -> {
             addChunk("file")
             addFileDigest(entry)
         }
+
         Files.isDirectory(entry) -> {
             addChunk("directory")
             addDirectoryFingerprint(entry)
         }
+
         else -> addChunk("other")
     }
 }

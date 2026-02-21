@@ -6,9 +6,7 @@ import java.nio.file.Path
 private const val CHECKSUM_ALLOWLIST_PATH_ENV = "MICROSMITH_PLUGIN_ALLOWLIST_FILE"
 private const val ALLOWLIST_ENTRY_PARTS = 3
 
-internal data class PluginChecksumAllowlist(
-    val entries: Map<LockKey, String>,
-) {
+internal data class PluginChecksumAllowlist(val entries: Map<LockKey, String>) {
     fun assertCovers(requestedKeys: Set<LockKey>) {
         val missing = requestedKeys - entries.keys
         require(missing.isEmpty()) {

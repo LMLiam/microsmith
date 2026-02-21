@@ -78,10 +78,7 @@ internal fun parseDiagnosticFormat(value: String?): DiagnosticFormat? {
     return DiagnosticFormat.parse(normalized)
 }
 
-internal data class ParsedToken(
-    val nextIndex: Int,
-    val error: String? = null,
-)
+internal data class ParsedToken(val nextIndex: Int, val error: String? = null)
 
 internal class RunOptionsState {
     var outputDir: Path? = null

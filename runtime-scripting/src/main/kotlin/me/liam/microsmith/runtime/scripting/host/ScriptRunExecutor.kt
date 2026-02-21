@@ -10,9 +10,7 @@ import me.liam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.nio.file.Files
 import java.nio.file.Path
 
-internal class ScriptRunExecutor(
-    private val cacheDirectory: Path,
-) {
+internal class ScriptRunExecutor(private val cacheDirectory: Path) {
     fun execute(request: ScriptRunRequest, scriptPath: Path, outputPath: Path): ScriptRunResult {
         val normalizedPluginClasspath = request.pluginClasspath.map { it.toAbsolutePath().normalize() }
         return when (request.isolationMode) {

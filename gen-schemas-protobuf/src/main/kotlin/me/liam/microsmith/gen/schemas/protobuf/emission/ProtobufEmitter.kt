@@ -21,9 +21,8 @@ import kotlin.reflect.KClass
  * This emitter is stateless and therefore safe for concurrent use.
  */
 @ServiceProvider(SchemaEmitter::class)
-class ProtobufEmitter(
-    override val type: KClass<ProtobufSchema> = ProtobufSchema::class,
-) : SchemaEmitter<ProtobufSchema> {
+class ProtobufEmitter(override val type: KClass<ProtobufSchema> = ProtobufSchema::class) :
+    SchemaEmitter<ProtobufSchema> {
     /**
      * Converts the receiving schema into a deterministic protobuf source file.
      *

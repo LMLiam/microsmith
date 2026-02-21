@@ -17,11 +17,13 @@ internal data class RepositoryAllowlistPolicy(
                 "Repository '$repositoryUri' is blocked by policy: file:// repositories are not allowed. " +
                     "Set $ALLOW_FILE_REPOSITORIES_ENV=true to explicitly enable file repositories."
             }
+
             "http", "https" ->
                 require(allowedRepositories.contains(normalized)) {
                     "Repository '$repositoryUri' is not in the allowed repository allowlist. " +
                         "Configure $REPOSITORY_ALLOWLIST_ENV to permit additional endpoints."
                 }
+
             else -> error("Unsupported repository URI '$repositoryUri'. Use https://, http://, or file://.")
         }
     }
@@ -67,6 +69,7 @@ internal fun normalizeRepositoryUri(uri: String): String {
             val path = parsed.path?.ifEmpty { "/" } ?: "/"
             URI("file", null, path, null).toString().trimEnd('/')
         }
+
         "http", "https" -> {
             require(parsed.userInfo == null) {
                 "Repository URI '$uri' must not include userinfo credentials."
@@ -78,6 +81,7 @@ internal fun normalizeRepositoryUri(uri: String): String {
             val path = parsed.path?.ifEmpty { "" }.orEmpty()
             URI(scheme, parsed.userInfo, host, parsed.port, path, null, null).toString().trimEnd('/')
         }
+
         else -> error("Unsupported repository URI '$uri'. Use https://, http://, or file://.")
     }
 }

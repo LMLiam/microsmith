@@ -5,14 +5,9 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 internal sealed interface PluginResolutionResult {
-    data class Success(
-        val classpath: List<Path>,
-        val lockfilePath: Path?,
-    ) : PluginResolutionResult
+    data class Success(val classpath: List<Path>, val lockfilePath: Path?) : PluginResolutionResult
 
-    data class Failure(
-        val diagnostics: List<String>,
-    ) : PluginResolutionResult
+    data class Failure(val diagnostics: List<String>) : PluginResolutionResult
 }
 
 internal data class PluginResolverSettings(
@@ -116,7 +111,4 @@ private fun localPluginLockKey(pluginJarPath: Path): String = pluginJarPath
     .toString()
     .replace('\\', '/')
 
-private data class LocalPluginJar(
-    val artifactPath: Path,
-    val lockKey: String,
-)
+private data class LocalPluginJar(val artifactPath: Path, val lockKey: String)

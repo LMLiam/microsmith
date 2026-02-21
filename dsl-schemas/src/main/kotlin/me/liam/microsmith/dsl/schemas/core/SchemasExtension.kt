@@ -5,9 +5,7 @@ import me.liam.microsmith.dsl.core.MicrosmithExtension
 /**
  * Root extension that holds all declared schemas.
  */
-data class SchemasExtension(
-    val schemas: Set<Schema>,
-) : MicrosmithExtension {
+data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
     init {
         val duplicateKeys =
             schemas

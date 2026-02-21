@@ -2,9 +2,7 @@ package me.liam.microsmith.cli.diagnostics
 
 import java.time.Instant
 
-internal enum class DiagnosticFormat(
-    val cliValue: String,
-) {
+internal enum class DiagnosticFormat(val cliValue: String) {
     TEXT("text"),
     JSON("json"),
     ;
@@ -14,10 +12,7 @@ internal enum class DiagnosticFormat(
     }
 }
 
-internal enum class CliFailureCode(
-    val id: String,
-    val exitCode: Int,
-) {
+internal enum class CliFailureCode(val id: String, val exitCode: Int) {
     USAGE_ERROR(id = "MS-CLI-0001", exitCode = 2),
     PROVIDER_VALIDATION_FAILED(id = "MS-CLI-1001", exitCode = 10),
     PLUGIN_RESOLUTION_FAILED(id = "MS-CLI-1101", exitCode = 11),
@@ -110,9 +105,13 @@ internal class CliDiagnosticEmitter(
 
 internal fun toJsonValue(value: Any?): String = when (value) {
     null -> "null"
+
     is String -> "\"${value.escapeJson()}\""
+
     is Number -> value.toString()
+
     is Boolean -> value.toString()
+
     is Map<*, *> ->
         value.entries.joinToString(
             prefix = "{",
@@ -121,7 +120,9 @@ internal fun toJsonValue(value: Any?): String = when (value) {
         ) { (key, mapValue) ->
             "\"${key.toString().escapeJson()}\":${toJsonValue(mapValue)}"
         }
+
     is Iterable<*> -> value.joinToString(prefix = "[", postfix = "]", separator = ",") { entry -> toJsonValue(entry) }
+
     else -> "\"${value.toString().escapeJson()}\""
 }
 
@@ -130,12 +131,19 @@ private fun String.escapeJson(): String {
     for (char in this) {
         when (char) {
             '\\' -> builder.append("\\\\")
+
             '"' -> builder.append("\\\"")
+
             '\b' -> builder.append("\\b")
+
             '\u000C' -> builder.append("\\f")
+
             '\n' -> builder.append("\\n")
+
             '\r' -> builder.append("\\r")
+
             '\t' -> builder.append("\\t")
+
             else -> {
                 if (char.code <= MAX_JSON_CONTROL_CHAR_CODE) {
                     builder.append("\\u%04x".format(char.code))

@@ -9,9 +9,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Comparator
 
-internal class ProcessIsolatedScriptExecutor(
-    private val cacheDirectory: Path,
-) {
+internal class ProcessIsolatedScriptExecutor(private val cacheDirectory: Path) {
     fun execute(request: ScriptRunRequest, scriptPath: Path, outputPath: Path): ScriptRunResult {
         Files.createDirectories(cacheDirectory)
         val workingDirectory = Files.createTempDirectory(cacheDirectory, "process-isolation-")
@@ -142,9 +140,5 @@ internal class ProcessIsolatedScriptExecutor(
         }
     }
 
-    private data class ProcessOutcome(
-        val exitCode: Int,
-        val processOutput: String,
-        val parsedResult: ScriptRunResult?,
-    )
+    private data class ProcessOutcome(val exitCode: Int, val processOutput: String, val parsedResult: ScriptRunResult?)
 }

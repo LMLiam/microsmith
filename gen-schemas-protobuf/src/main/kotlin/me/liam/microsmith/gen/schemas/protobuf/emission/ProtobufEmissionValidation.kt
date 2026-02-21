@@ -158,6 +158,7 @@ private fun Reference.validateForEmission() {
 private fun Reserved.validateForEmission() {
     when (this) {
         is ReservedIndex -> ProtobufFieldNumbers.requireValidFieldNumber(index, "Reserved index")
+
         is ReservedRange -> {
             require(indexRange.first <= indexRange.last) {
                 "Reserved range must be ascending, but was $indexRange."
@@ -165,7 +166,9 @@ private fun Reserved.validateForEmission() {
             ProtobufFieldNumbers.requireValidFieldNumber(indexRange.first, "Reserved range start")
             ProtobufFieldNumbers.requireValidFieldNumber(indexRange.last, "Reserved range end")
         }
+
         is ReservedToMax -> ProtobufFieldNumbers.requireValidFieldNumber(from, "Reserved-to-max start")
+
         is ReservedName -> ProtobufNameValidation.requireIdentifier(name, "Reserved name")
     }
 }

@@ -15,9 +15,8 @@ internal fun parseRunOptions(args: List<String>, startIndex: Int): ParsedRunOpti
     return state.toParsedRunOptions()
 }
 
-private fun parseRunOptionToken(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
-    val token = args[index]
-    return when (token) {
+private fun parseRunOptionToken(args: List<String>, index: Int, state: RunOptionsState): ParsedToken =
+    when (val token = args[index]) {
         OUTPUT_OPTION -> parseOutputOption(args, index, state)
         VARIABLE_OPTION -> parseVariableOption(args, index, state)
         FLAG_OPTION -> parseFlagOption(args, index, state)
@@ -31,7 +30,6 @@ private fun parseRunOptionToken(args: List<String>, index: Int, state: RunOption
         EVENT_LOG_OPTION -> parseEventLogOption(args, index, state)
         else -> ParsedToken(nextIndex = index, error = "Unknown option '$token'.")
     }
-}
 
 private fun parseOutputOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
@@ -204,13 +202,11 @@ private fun parseDiagnosticsOption(args: List<String>, index: Int, state: RunOpt
     }
 }
 
-private fun parseVerboseOption(index: Int, state: RunOptionsState): ParsedToken {
-    return if (state.verbose) {
-        ParsedToken(nextIndex = index, error = "--verbose may only be specified once.")
-    } else {
-        state.verbose = true
-        ParsedToken(nextIndex = index + 1)
-    }
+private fun parseVerboseOption(index: Int, state: RunOptionsState): ParsedToken = if (state.verbose) {
+    ParsedToken(nextIndex = index, error = "--verbose may only be specified once.")
+} else {
+    state.verbose = true
+    ParsedToken(nextIndex = index + 1)
 }
 
 private fun parseEventLogOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
@@ -220,7 +216,9 @@ private fun parseEventLogOption(args: List<String>, index: Int, state: RunOption
 
     return when {
         missingValue -> ParsedToken(nextIndex = index, error = "Missing value for --event-log option.")
+
         duplicate -> ParsedToken(nextIndex = index, error = "--event-log may only be specified once.")
+
         else -> {
             state.eventLog = Path.of(value)
             ParsedToken(nextIndex = index + 2)

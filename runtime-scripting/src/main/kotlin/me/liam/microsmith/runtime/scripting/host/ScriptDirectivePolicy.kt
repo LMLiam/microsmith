@@ -51,7 +51,7 @@ internal object ScriptDirectivePolicy {
                     groupStartLine = index + 1
                     groupBuffer += line
                     if (GROUP_FILE_DIRECTIVE_END.containsMatchIn(line)) {
-                        val start = requireNotNull(groupStartLine)
+                        val start = groupStartLine
                         violations += collectGroupedViolations(groupBuffer.joinToString("\n"), start)
                         groupStartLine = null
                         groupBuffer.clear()
@@ -61,7 +61,7 @@ internal object ScriptDirectivePolicy {
                 groupStartLine != null -> {
                     groupBuffer += line
                     if (GROUP_FILE_DIRECTIVE_END.containsMatchIn(line)) {
-                        val start = requireNotNull(groupStartLine)
+                        val start = groupStartLine
                         violations += collectGroupedViolations(groupBuffer.joinToString("\n"), start)
                         groupStartLine = null
                         groupBuffer.clear()
@@ -77,7 +77,7 @@ internal object ScriptDirectivePolicy {
         val matches = GROUP_FORBIDDEN_DIRECTIVE.findAll(groupText)
         return matches
             .map { match ->
-                val newlineCountBeforeMatch = groupText.substring(0, match.range.first).count { it == '\n' }
+                val newlineCountBeforeMatch = groupText.take(match.range.first).count { it == '\n' }
                 val lineNumber = startLine + newlineCountBeforeMatch
                 val directive = match.groupValues[1]
                 violationMessage(lineNumber, directive)

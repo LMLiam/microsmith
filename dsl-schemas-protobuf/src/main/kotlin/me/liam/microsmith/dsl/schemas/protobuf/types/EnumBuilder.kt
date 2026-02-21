@@ -11,9 +11,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
 import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
 
-class EnumBuilder(
-    private val name: String,
-) : EnumScope {
+class EnumBuilder(private val name: String) : EnumScope {
     private val allocator = IndexAllocator(0)
     private val nameRegistry = NameRegistry()
 

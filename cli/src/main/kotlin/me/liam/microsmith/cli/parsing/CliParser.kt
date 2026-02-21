@@ -24,14 +24,11 @@ internal const val EVENT_LOG_OPTION = "--event-log"
 private const val SCRIPT_EXTENSION = ".microsmith.kts"
 private val HELP_COMMANDS = setOf("--help", "-h", "help")
 
-internal fun parseCliArgs(args: List<String>): CliCommand {
-    val command = args.firstOrNull()
-    return when {
-        command == null || command in HELP_COMMANDS -> HelpCommand
-        command == RUN_COMMAND -> parseRunCommand(args)
-        command == DOCTOR_COMMAND -> parseDoctorCommand(args)
-        else -> ErrorCommand("Unknown command '$command'.")
-    }
+internal fun parseCliArgs(args: List<String>): CliCommand = when (val command = args.firstOrNull()) {
+    null, in HELP_COMMANDS -> HelpCommand
+    RUN_COMMAND -> parseRunCommand(args)
+    DOCTOR_COMMAND -> parseDoctorCommand(args)
+    else -> ErrorCommand("Unknown command '$command'.")
 }
 
 private fun parseRunCommand(args: List<String>): CliCommand {
@@ -61,7 +58,9 @@ private fun parseRunOptionsCommand(script: Path, args: List<String>, startIndex:
     val parsedOptions = parseRunOptions(args, startIndex)
     return when {
         parsedOptions.error != null -> ErrorCommand(parsedOptions.error)
+
         parsedOptions.outputDir == null -> ErrorCommand("Missing required --out <output-dir> option.")
+
         else ->
             RunCommand(
                 script = script,
@@ -107,9 +106,12 @@ private fun parseDoctorOptions(args: List<String>, startIndex: Int): ParsedDocto
                 error =
                     when {
                         value == null || value.startsWith("--") -> "Missing value for --diagnostics option."
+
                         diagnosticsSpecified -> "--diagnostics may only be specified once."
+
                         parsedFormat == null ->
                             "Invalid --diagnostics value '$value'. Expected 'text' or 'json'."
+
                         else -> null
                     }
                 if (error == null) {

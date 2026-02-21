@@ -29,10 +29,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
 import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
 import me.liam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 
-class MessageBuilder(
-    private val name: String,
-    private val segments: List<String>,
-) : MessageScope {
+class MessageBuilder(private val name: String, private val segments: List<String>) : MessageScope {
     private val allocator = IndexAllocator(1, protoReservedIndexes)
     private val nameRegistry = NameRegistry()
 
