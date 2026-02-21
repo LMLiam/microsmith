@@ -3,6 +3,7 @@ package me.liam.microsmith.cli.plugins
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.LazyThreadSafetyMode
 
 internal const val REPOSITORY_CREDENTIALS_FILE_ENV = "MICROSMITH_REPOSITORY_CREDENTIALS_FILE"
 internal const val REPOSITORY_USERNAME_ENV = "MICROSMITH_REPOSITORY_USERNAME"
@@ -24,6 +25,20 @@ internal interface RepositoryCredentialsResolver {
 
     fun sensitiveValues(): Set<String> = emptySet()
 }
+
+private class LazyRepositoryCredentialsResolver(
+    resolverFactory: () -> RepositoryCredentialsResolver,
+) : RepositoryCredentialsResolver {
+    private val delegate: RepositoryCredentialsResolver by lazy(LazyThreadSafetyMode.NONE, resolverFactory)
+
+    override fun resolve(repositoryUri: String): RepositoryCredentials? = delegate.resolve(repositoryUri)
+
+    override fun sensitiveValues(): Set<String> = delegate.sensitiveValues()
+}
+
+internal fun lazyDefaultRepositoryCredentialsResolver(
+    resolverFactory: () -> RepositoryCredentialsResolver = ::defaultRepositoryCredentialsResolver,
+): RepositoryCredentialsResolver = LazyRepositoryCredentialsResolver(resolverFactory)
 
 internal class DefaultRepositoryCredentialsResolver(
     private val fileCredentialsByRepository: Map<String, RepositoryCredentials>,
