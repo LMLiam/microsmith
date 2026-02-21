@@ -16,6 +16,7 @@ internal data class PluginResolverSettings(
     val defaultRepositories: List<String> = listOf(MAVEN_CENTRAL_REPOSITORY),
     val repositoryPolicy: RepositoryAllowlistPolicy? = null,
     val checksumAllowlist: PluginChecksumAllowlist? = null,
+    val remotePluginResolver: RemotePluginResolver = MavenRemotePluginResolver(),
 )
 
 internal fun resolvePlugins(
@@ -24,7 +25,11 @@ internal fun resolvePlugins(
 ): PluginResolutionResult = runCatching {
     resolvePluginsOrThrow(command, settings)
 }.getOrElse { error ->
-    val message = error.message ?: error::class.simpleName ?: "unknown plugin resolution error"
+    val message =
+        when (error) {
+            is PluginResolutionDiagnosticException -> "[${error.category.code}] ${error.message}"
+            else -> "[unexpected] ${error.message ?: error::class.simpleName ?: "unknown plugin resolution error"}"
+        }
     PluginResolutionResult.Failure(listOf(message))
 }
 
@@ -67,12 +72,18 @@ private fun resolvePluginsOrThrow(
     val lockEntries = mutableListOf<LockEntry>()
 
     coordinates.forEach { coordinate ->
-        val artifactPath = resolveRemoteArtifact(coordinate, repositories, cacheDirectory, command.offline)
-        val checksum = sha256(artifactPath)
+        val resolvedRemotePlugin =
+            settings.remotePluginResolver.resolve(
+                coordinate = coordinate,
+                repositories = repositories,
+                cacheDirectory = cacheDirectory,
+                offline = command.offline,
+            )
+        val checksum = sha256(resolvedRemotePlugin.rootArtifactPath)
         lockfile?.verifyChecksum(REMOTE_KIND, coordinate.value, checksum)
         checksumAllowlist?.verifyChecksum(REMOTE_KIND, coordinate.value, checksum)
         lockEntries.add(LockEntry(kind = REMOTE_KIND, key = coordinate.value, checksum = checksum))
-        classpath.add(artifactPath)
+        classpath.addAll(resolvedRemotePlugin.classpath)
     }
 
     localPluginJars.forEach { localJar ->
@@ -95,7 +106,7 @@ private fun resolvePluginsOrThrow(
     }
 
     return PluginResolutionResult.Success(
-        classpath = classpath.distinct(),
+        classpath = normalizeClasspath(classpath),
         lockfilePath = lockfilePath,
     )
 }
@@ -110,5 +121,9 @@ private fun localPluginLockKey(pluginJarPath: Path): String = pluginJarPath
     .normalize()
     .toString()
     .replace('\\', '/')
+
+private fun normalizeClasspath(rawClasspath: List<Path>): List<Path> = rawClasspath
+    .map { it.toAbsolutePath().normalize() }
+    .distinct()
 
 private data class LocalPluginJar(val artifactPath: Path, val lockKey: String)

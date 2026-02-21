@@ -14,6 +14,14 @@ dependencies {
     implementation project(":gen")
     implementation project(":gen-schemas")
     implementation project(":gen-schemas-protobuf")
+    implementation libs.maven.resolver.api
+    implementation libs.maven.resolver.spi
+    implementation libs.maven.resolver.util
+    implementation libs.maven.resolver.impl
+    implementation libs.maven.resolver.supplier
+    implementation libs.maven.resolver.connector.basic
+    implementation libs.maven.resolver.transport.file
+    implementation libs.maven.resolver.transport.http
 }
 
 application {
