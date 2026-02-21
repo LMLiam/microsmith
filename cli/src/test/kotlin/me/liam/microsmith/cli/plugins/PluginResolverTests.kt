@@ -1,6 +1,7 @@
 package me.liam.microsmith.cli.plugins
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -8,6 +9,7 @@ import io.kotest.matchers.types.shouldBeTypeOf
 import me.liam.microsmith.cli.command.RunCommand
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
@@ -26,12 +28,7 @@ class PluginResolverTests :
                 val cache = tempDir.resolve("cache")
                 val repositoryRoot = tempDir.resolve("repo")
                 val coordinate = "com.acme:microsmith-emitter-ts:1.4.2"
-                val repositoryJar =
-                    repositoryRoot.resolve(
-                        "com/acme/microsmith-emitter-ts/1.4.2/microsmith-emitter-ts-1.4.2.jar",
-                    )
-                repositoryJar.parent?.toFile()?.mkdirs()
-                repositoryJar.writeBytes("plugin-jar-contents".toByteArray())
+                publishMavenArtifact(repositoryRoot, coordinate)
                 script.writeText("// test script")
 
                 val command =
@@ -63,6 +60,152 @@ class PluginResolverTests :
             }
         }
 
+        "resolves transitive dependencies for plugin coordinates" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-transitive")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val cache = tempDir.resolve("cache")
+                val repositoryRoot = tempDir.resolve("repo")
+                val rootCoordinate = "com.acme:plugin-root:1.0.0"
+                val transitiveCoordinate = "com.acme:plugin-shared:2.1.0"
+                publishMavenArtifact(repositoryRoot, transitiveCoordinate)
+                publishMavenArtifact(repositoryRoot, rootCoordinate, dependencies = listOf(transitiveCoordinate))
+                script.writeText("// test script")
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf(rootCoordinate),
+                        repositoryOverride = repositoryRoot.toUri().toString(),
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            repositoryPolicy = fileRepositoryAllowedPolicy(),
+                        ),
+                    )
+
+                val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
+                success.classpath.shouldHaveSize(2)
+                success.classpath.map { path -> path.fileName.toString() }.toSet() shouldBe
+                    setOf("plugin-root-1.0.0.jar", "plugin-shared-2.1.0.jar")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "excludes test and provided transitive dependencies from runtime classpath" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-runtime-scope")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val cache = tempDir.resolve("cache")
+                val repositoryRoot = tempDir.resolve("repo")
+                val rootCoordinate = "com.acme:plugin-root:1.0.0"
+                val runtimeCoordinate = "com.acme:runtime-dep:2.0.0"
+                val testCoordinate = "com.acme:test-dep:2.0.0"
+                val providedCoordinate = "com.acme:provided-dep:2.0.0"
+
+                publishMavenArtifact(repositoryRoot, runtimeCoordinate)
+                publishMavenArtifact(repositoryRoot, testCoordinate)
+                publishMavenArtifact(repositoryRoot, providedCoordinate)
+                publishMavenArtifact(
+                    repositoryRoot = repositoryRoot,
+                    coordinate = rootCoordinate,
+                    dependencies = listOf(runtimeCoordinate, testCoordinate, providedCoordinate),
+                    dependencyScopes =
+                    mapOf(
+                        testCoordinate to "test",
+                        providedCoordinate to "provided",
+                    ),
+                )
+                script.writeText("// test script")
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf(rootCoordinate),
+                        repositoryOverride = repositoryRoot.toUri().toString(),
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            repositoryPolicy = fileRepositoryAllowedPolicy(),
+                        ),
+                    )
+
+                val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
+                val classpathNames = success.classpath.map { path -> path.fileName.toString() }.toSet()
+                classpathNames shouldBe
+                    setOf(
+                        "plugin-root-1.0.0.jar",
+                        "runtime-dep-2.0.0.jar",
+                    )
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "deduplicates shared transitive dependencies deterministically" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-deterministic")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val cache = tempDir.resolve("cache")
+                val repositoryRoot = tempDir.resolve("repo")
+                val coordinateA = "com.acme:plugin-a:1.0.0"
+                val coordinateB = "com.acme:plugin-b:1.0.0"
+                val shared = "com.acme:plugin-shared:1.1.0"
+
+                publishMavenArtifact(repositoryRoot, shared)
+                publishMavenArtifact(repositoryRoot, coordinateA, dependencies = listOf(shared))
+                publishMavenArtifact(repositoryRoot, coordinateB, dependencies = listOf(shared))
+                script.writeText("// test script")
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf(coordinateA, coordinateB),
+                        repositoryOverride = repositoryRoot.toUri().toString(),
+                    )
+
+                val settings =
+                    PluginResolverSettings(
+                        cacheDirectory = cache,
+                        repositoryPolicy = fileRepositoryAllowedPolicy(),
+                    )
+
+                val first =
+                    resolvePlugins(command = command, settings = settings)
+                        .shouldBeTypeOf<PluginResolutionResult.Success>()
+                val second =
+                    resolvePlugins(command = command, settings = settings)
+                        .shouldBeTypeOf<PluginResolutionResult.Success>()
+
+                val firstNames = first.classpath.map { path -> path.fileName.toString() }
+                val secondNames = second.classpath.map { path -> path.fileName.toString() }
+                firstNames shouldContainExactly secondNames
+                firstNames.toSet() shouldBe
+                    setOf(
+                        "plugin-a-1.0.0.jar",
+                        "plugin-b-1.0.0.jar",
+                        "plugin-shared-1.1.0.jar",
+                    )
+                firstNames.size shouldBe 3
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
         "fails with remediation message when offline plugin artifact is missing from cache" {
             val tempDir = createTempDirectory("microsmith-plugin-resolver-offline")
             try {
@@ -83,7 +226,47 @@ class PluginResolverTests :
                     )
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("[offline-cache-miss]")
                 failure.diagnostics.joinToString("\n").shouldContain("Offline mode is enabled")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "fails with categorized diagnostics when transitive dependency cannot be resolved" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-transitive-failure")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val cache = tempDir.resolve("cache")
+                val repositoryRoot = tempDir.resolve("repo")
+                val coordinate = "com.acme:plugin-root:1.0.0"
+                val missing = "com.acme:missing-transitive:9.9.9"
+                publishMavenArtifact(repositoryRoot, coordinate, dependencies = listOf(missing))
+                script.writeText("// test script")
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf(coordinate),
+                        repositoryOverride = repositoryRoot.toUri().toString(),
+                    )
+
+                val result =
+                    resolvePlugins(
+                        command = command,
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            repositoryPolicy = fileRepositoryAllowedPolicy(),
+                        ),
+                    )
+
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                val message = failure.diagnostics.joinToString("\n")
+                message.shouldContain("[dependency-resolution]")
+                message.shouldContain("Could not resolve plugin 'com.acme:plugin-root:1.0.0'")
+                message.shouldContain("Verify plugin coordinates and repository availability")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -97,10 +280,7 @@ class PluginResolverTests :
                 val cache = tempDir.resolve("cache")
                 val repositoryRoot = tempDir.resolve("repo")
                 val coordinate = "com.acme:lock-test:1.0.0"
-                val repositoryJar =
-                    repositoryRoot.resolve("com/acme/lock-test/1.0.0/lock-test-1.0.0.jar")
-                repositoryJar.parent?.toFile()?.mkdirs()
-                repositoryJar.writeBytes("initial".toByteArray())
+                publishMavenArtifact(repositoryRoot, coordinate, jarContents = "initial".toByteArray())
                 script.writeText("// test script")
 
                 val command =
@@ -120,8 +300,7 @@ class PluginResolverTests :
                     ),
                 )
 
-                val cachedArtifact =
-                    cache.resolve("artifacts/com/acme/lock-test/1.0.0/lock-test-1.0.0.jar")
+                val cachedArtifact = cachePathFor(pluginArtifactCacheRoot(cache), parseCoordinate(coordinate))
                 cachedArtifact.writeBytes("tampered".toByteArray())
 
                 val mismatch =
@@ -149,10 +328,7 @@ class PluginResolverTests :
                 val cache = tempDir.resolve("cache")
                 val repositoryRoot = tempDir.resolve("repo")
                 val coordinate = "com.acme:fallback-test:1.0.0"
-                val repositoryJar =
-                    repositoryRoot.resolve("com/acme/fallback-test/1.0.0/fallback-test-1.0.0.jar")
-                repositoryJar.parent?.toFile()?.mkdirs()
-                repositoryJar.writeBytes("fallback-jar".toByteArray())
+                publishMavenArtifact(repositoryRoot, coordinate)
                 script.writeText("// test script")
 
                 val command =
@@ -359,10 +535,7 @@ class PluginResolverTests :
                 val cache = tempDir.resolve("cache")
                 val repositoryRoot = tempDir.resolve("repo")
                 val coordinate = "com.acme:file-blocked:1.0.0"
-                val repositoryJar =
-                    repositoryRoot.resolve("com/acme/file-blocked/1.0.0/file-blocked-1.0.0.jar")
-                repositoryJar.parent?.toFile()?.mkdirs()
-                repositoryJar.writeBytes("plugin-jar-contents".toByteArray())
+                publishMavenArtifact(repositoryRoot, coordinate)
                 script.writeText("// test script")
 
                 val command =
@@ -476,3 +649,64 @@ private fun fileRepositoryAllowedPolicy(vararg additionalAllowedRepositories: St
             .toSet(),
         allowFileRepositories = true,
     )
+
+private fun publishMavenArtifact(
+    repositoryRoot: Path,
+    coordinate: String,
+    dependencies: List<String> = emptyList(),
+    dependencyScopes: Map<String, String> = emptyMap(),
+    jarContents: ByteArray = "plugin-jar-contents".toByteArray(),
+) {
+    val parsed = parseCoordinate(coordinate)
+    val base =
+        repositoryRoot
+            .resolve(parsed.group.replace('.', '/'))
+            .resolve(parsed.artifact)
+            .resolve(parsed.version)
+    base.createDirectories()
+
+    val pomPath = base.resolve("${parsed.artifact}-${parsed.version}.pom")
+    val dependenciesBlock =
+        if (dependencies.isEmpty()) {
+            ""
+        } else {
+            dependencies.joinToString(
+                separator = "\n",
+                prefix = "<dependencies>\n",
+                postfix = "\n</dependencies>",
+            ) { dependency ->
+                val dep = parseCoordinate(dependency)
+                val scopeXml =
+                    dependencyScopes[dependency]
+                        ?.trim()
+                        ?.takeIf(String::isNotEmpty)
+                        ?.let { scope -> "\n  <scope>$scope</scope>" }
+                        .orEmpty()
+                """
+                <dependency>
+                  <groupId>${dep.group}</groupId>
+                  <artifactId>${dep.artifact}</artifactId>
+                  <version>${dep.version}</version>
+                  $scopeXml
+                </dependency>
+                """.trimIndent()
+            }
+        }
+    val pomXml =
+        """
+        <project xmlns="http://maven.apache.org/POM/4.0.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+          <modelVersion>4.0.0</modelVersion>
+          <groupId>${parsed.group}</groupId>
+          <artifactId>${parsed.artifact}</artifactId>
+          <version>${parsed.version}</version>
+          <packaging>jar</packaging>
+          $dependenciesBlock
+        </project>
+        """.trimIndent()
+    pomPath.writeText(pomXml)
+
+    val jarPath = base.resolve("${parsed.artifact}-${parsed.version}.jar")
+    jarPath.writeBytes(jarContents)
+}
