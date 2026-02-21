@@ -160,6 +160,27 @@ class MicrosmithCliTests :
             out shouldBe emptyList()
         }
 
+        "returns deterministic plugin resolution exit code when plugin resolver throws unexpectedly" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    providerValidator = { emptyList() },
+                    pluginResolver = {
+                        throw IllegalStateException("simulated resolver crash")
+                    },
+                )
+
+            val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
+
+            exitCode shouldBe 11
+            err.joinToString("\n").shouldContain("Plugin resolution failed unexpectedly")
+            err.joinToString("\n").shouldContain("MS-CLI-1101")
+            out shouldBe emptyList()
+        }
+
         "emits machine readable diagnostics when json mode is requested" {
             val out = mutableListOf<String>()
             val err = mutableListOf<String>()

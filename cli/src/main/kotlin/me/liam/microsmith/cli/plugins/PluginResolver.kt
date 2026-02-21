@@ -25,12 +25,24 @@ internal fun resolvePlugins(command: RunCommand): PluginResolutionResult {
         return PluginResolutionResult.Success(classpath = emptyList(), lockfilePath = null)
     }
 
-    return resolvePlugins(command = command, settings = PluginResolverSettings())
+    return runCatching {
+        PluginResolverSettings()
+    }.fold(
+        onSuccess = { settings -> resolvePlugins(command = command, settings = settings) },
+        onFailure = { error ->
+            PluginResolutionResult.Failure(listOf(error.toResolutionDiagnostic(emptySet())))
+        },
+    )
 }
 
 internal fun resolvePlugins(command: RunCommand, settings: PluginResolverSettings): PluginResolutionResult {
-    val sensitiveValues = settings.repositoryCredentialsResolver.sensitiveValues()
+    if (command.plugins.isEmpty() && command.pluginJars.isEmpty()) {
+        return PluginResolutionResult.Success(classpath = emptyList(), lockfilePath = null)
+    }
+
+    var sensitiveValues: Set<String> = emptySet()
     return runCatching {
+        sensitiveValues = settings.repositoryCredentialsResolver.sensitiveValues()
         resolvePluginsOrThrow(command, settings)
     }.fold(
         onSuccess = { success -> success },
