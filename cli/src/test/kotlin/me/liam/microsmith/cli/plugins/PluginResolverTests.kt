@@ -5,6 +5,7 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import io.kotest.matchers.types.shouldBeTypeOf
 import me.liam.microsmith.cli.command.RunCommand
 import java.nio.file.Path
@@ -272,6 +273,61 @@ class PluginResolverTests :
             }
         }
 
+        "categorizes repository authentication failures and redacts sensitive values" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-auth-redaction")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val secretToken = "ghp_super_secret_token_12345"
+                script.writeText("// test script")
+
+                val command =
+                    RunCommand(
+                        script = script,
+                        outputDir = output,
+                        plugins = setOf("com.acme:secured-plugin:1.0.0"),
+                    )
+
+                val settings =
+                    PluginResolverSettings(
+                        cacheDirectory = tempDir.resolve("cache"),
+                        repositoryCredentialsResolver =
+                        object : RepositoryCredentialsResolver {
+                            override fun resolve(repositoryUri: String): RepositoryCredentials = RepositoryCredentials(
+                                username = "ci-user",
+                                password = secretToken,
+                            )
+
+                            override fun sensitiveValues(): Set<String> = setOf(secretToken)
+                        },
+                        remotePluginResolver =
+                        object : RemotePluginResolver {
+                            override fun resolve(
+                                coordinate: Coordinate,
+                                repositories: List<RepositoryEndpoint>,
+                                cacheDirectory: Path,
+                                offline: Boolean,
+                            ): ResolvedRemotePlugin {
+                                repositories.first().credentials?.password shouldBe secretToken
+                                throw PluginResolutionDiagnosticException(
+                                    category = PluginResolverErrorCategory.AUTHENTICATION,
+                                    message = "Unauthorized while using token '$secretToken'.",
+                                )
+                            }
+                        },
+                    )
+
+                val result = resolvePlugins(command = command, settings = settings)
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                val message = failure.diagnostics.joinToString("\n")
+                message.shouldContain("[authentication]")
+                message.shouldContain("<redacted>")
+                message.shouldNotContain(secretToken)
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
         "fails when cached artifact checksum does not match existing lockfile" {
             val tempDir = createTempDirectory("microsmith-plugin-resolver-lock-mismatch")
             try {
@@ -521,6 +577,7 @@ class PluginResolverTests :
                         settings = PluginResolverSettings(cacheDirectory = tempDir),
                     )
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("[repository-policy]")
                 failure.diagnostics.joinToString("\n").shouldContain("allowed repository allowlist")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
@@ -552,6 +609,7 @@ class PluginResolverTests :
                         settings = PluginResolverSettings(cacheDirectory = cache),
                     )
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                failure.diagnostics.joinToString("\n").shouldContain("[repository-policy]")
                 failure.diagnostics.joinToString("\n").shouldContain("file:// repositories are not allowed")
             } finally {
                 runCatching { tempDir.deleteRecursively() }

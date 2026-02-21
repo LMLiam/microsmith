@@ -179,6 +179,14 @@ microsmith run schema.microsmith.kts --out ./generated --isolation process
   - Built-in allowlist: `https://repo1.maven.org/maven2`
   - Additional allowed endpoints via `MICROSMITH_REPOSITORY_ALLOWLIST` (comma-separated base URIs)
   - `file://` repositories are denied by default and can be explicitly enabled with `MICROSMITH_ALLOW_FILE_REPOSITORIES=true`.
+- Private repository credentials are optional and resolved with deterministic precedence:
+  - Per-endpoint credentials file via `MICROSMITH_REPOSITORY_CREDENTIALS_FILE` with entries:
+    - `<repository-uri>|<username>|<password>`
+  - GitHub Packages credentials for `https://maven.pkg.github.com` via
+    `MICROSMITH_GITHUB_PACKAGES_USER` + `MICROSMITH_GITHUB_PACKAGES_TOKEN`
+    (fallbacks: `GITHUB_ACTOR` + `GITHUB_TOKEN`)
+  - Global default credentials via `MICROSMITH_REPOSITORY_USERNAME` + `MICROSMITH_REPOSITORY_PASSWORD`
+  - Sensitive values are redacted in resolver diagnostics.
 - Plugin artifacts are SHA-256 checked against the script lockfile when present.
 - Optional plugin checksum allowlist can be enforced with `MICROSMITH_PLUGIN_ALLOWLIST_FILE`:
   - Entry format: `<kind>|<key>|<sha256>` where `kind` is `remote` or `local`.

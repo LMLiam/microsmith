@@ -27,11 +27,19 @@ Symptom:
 - plugin coordinate cannot be resolved
 - repository URI rejected
 - checksum mismatch
+- authentication errors (`[authentication]`)
+- repository policy blocks (`[repository-policy]`)
 
 Actions:
 - validate coordinate syntax: `group:artifact:version`
 - confirm repository is in allowed endpoints
+- for private repositories, configure credentials using one of:
+  - `MICROSMITH_REPOSITORY_CREDENTIALS_FILE`
+  - `MICROSMITH_REPOSITORY_USERNAME` + `MICROSMITH_REPOSITORY_PASSWORD`
+  - `MICROSMITH_GITHUB_PACKAGES_USER` + `MICROSMITH_GITHUB_PACKAGES_TOKEN`
+    (fallback: `GITHUB_ACTOR` + `GITHUB_TOKEN`)
 - update or regenerate lock/checksum metadata when plugin versions change
+- verify diagnostics do not contain secret material; Microsmith redacts configured tokens/passwords by default
 
 ## Offline mode failures
 

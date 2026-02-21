@@ -134,7 +134,20 @@ internal class MicrosmithCli(
             return PreparedRun.Failure(CliFailureCode.PROVIDER_VALIDATION_FAILED)
         }
 
-        return when (val resolvedPlugins = pluginResolver(command)) {
+        val resolvedPlugins =
+            runCatching {
+                pluginResolver(command)
+            }.getOrElse { error ->
+                context.resolverStatus = RUN_STATUS_FAILURE
+                emitter.error(
+                    CliFailureCode.PLUGIN_RESOLUTION_FAILED,
+                    "[unexpected] Plugin resolution failed unexpectedly.",
+                    details = mapOf("exceptionType" to (error::class.simpleName ?: "unknown")),
+                )
+                return PreparedRun.Failure(CliFailureCode.PLUGIN_RESOLUTION_FAILED)
+            }
+
+        return when (resolvedPlugins) {
             is PluginResolutionResult.Failure -> {
                 context.resolverStatus = RUN_STATUS_FAILURE
                 resolvedPlugins.diagnostics.forEach { diagnostic ->
