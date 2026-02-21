@@ -20,6 +20,19 @@ internal fun resolveRepositories(
     return repositories
 }
 
+internal fun resolveRepositoryEndpoints(
+    command: RunCommand,
+    settings: PluginResolverSettings,
+    repositoryPolicy: RepositoryAllowlistPolicy,
+    credentialsResolver: RepositoryCredentialsResolver,
+): List<RepositoryEndpoint> = resolveRepositories(command, settings, repositoryPolicy)
+    .map { repositoryUri ->
+        RepositoryEndpoint(
+            uri = repositoryUri,
+            credentials = credentialsResolver.resolve(repositoryUri),
+        )
+    }
+
 internal fun pluginArtifactCacheRoot(cacheDirectory: Path): Path = cacheDirectory
     .resolve("artifacts")
     .toAbsolutePath()

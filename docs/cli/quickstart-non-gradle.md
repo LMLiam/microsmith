@@ -64,6 +64,30 @@ Offline mode:
 microsmith run schema.microsmith.kts --out ./generated --offline
 ```
 
+Authenticated private repository (global credentials):
+
+```bash
+export MICROSMITH_REPOSITORY_ALLOWLIST="https://maven.pkg.github.com/acme/microsmith"
+export MICROSMITH_REPOSITORY_USERNAME="octocat"
+export MICROSMITH_REPOSITORY_PASSWORD="$GITHUB_TOKEN"
+microsmith run schema.microsmith.kts --out ./generated \
+  --repository https://maven.pkg.github.com/acme/microsmith \
+  --plugin com.acme:private-emitter:1.2.3
+```
+
+Per-repository credentials file:
+
+```text
+# ~/.microsmith/repository-credentials.txt
+https://maven.pkg.github.com/acme/microsmith|octocat|ghp_xxx
+https://packages.acme.internal/maven|svc-microsmith|token-123
+```
+
+```bash
+export MICROSMITH_REPOSITORY_CREDENTIALS_FILE="$HOME/.microsmith/repository-credentials.txt"
+microsmith run schema.microsmith.kts --out ./generated --plugin com.acme:private-emitter:1.2.3
+```
+
 Security defaults are enabled by default:
 
 - script dependency directives are blocked

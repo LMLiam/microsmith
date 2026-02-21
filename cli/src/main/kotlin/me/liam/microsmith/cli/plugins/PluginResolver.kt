@@ -15,19 +15,24 @@ internal data class PluginResolverSettings(
     val lockfilePathOverride: Path? = null,
     val defaultRepositories: List<String> = listOf(MAVEN_CENTRAL_REPOSITORY),
     val repositoryPolicy: RepositoryAllowlistPolicy? = null,
+    val repositoryCredentialsResolver: RepositoryCredentialsResolver = defaultRepositoryCredentialsResolver(),
     val checksumAllowlist: PluginChecksumAllowlist? = null,
     val remotePluginResolver: RemotePluginResolver = MavenRemotePluginResolver(),
 )
 
-internal fun resolvePlugins(
-    command: RunCommand,
-    settings: PluginResolverSettings = PluginResolverSettings(),
-): PluginResolutionResult = runCatching {
-    resolvePluginsOrThrow(command, settings)
-}.fold(
-    onSuccess = { success -> success },
-    onFailure = { error -> PluginResolutionResult.Failure(listOf(error.toResolutionDiagnostic())) },
-)
+internal fun resolvePlugins(command: RunCommand, settings: PluginResolverSettings? = null): PluginResolutionResult {
+    var sensitiveValues: Set<String> = emptySet()
+    return runCatching {
+        val effectiveSettings = settings ?: PluginResolverSettings()
+        sensitiveValues = effectiveSettings.repositoryCredentialsResolver.sensitiveValues()
+        resolvePluginsOrThrow(command, effectiveSettings)
+    }.fold(
+        onSuccess = { success -> success },
+        onFailure = { error ->
+            PluginResolutionResult.Failure(listOf(error.toResolutionDiagnostic(sensitiveValues)))
+        },
+    )
+}
 
 private fun resolvePluginsOrThrow(
     command: RunCommand,
@@ -48,12 +53,22 @@ private fun resolvePluginsOrThrow(
     val lockfilePath = settings.lockfilePathOverride ?: defaultLockfilePath(command.script)
     val lockfile = readLockfile(lockfilePath)
     val repositoryPolicy = settings.repositoryPolicy ?: defaultRepositoryAllowlistPolicy()
+    val repositoryCredentialsResolver = settings.repositoryCredentialsResolver
     val checksumAllowlist = settings.checksumAllowlist ?: loadPluginChecksumAllowlistFromEnvironment()
     val requestedLockKeys = buildRequestedLockKeys(coordinates, localPluginJars.map(LocalPluginJar::lockKey))
     checksumAllowlist?.assertCovers(requestedLockKeys)
     lockfile?.assertSamePluginSet(requestedLockKeys, lockfilePath)
 
-    val repositories = resolveRepositories(command, settings, repositoryPolicy)
+    val repositories =
+        try {
+            resolveRepositoryEndpoints(command, settings, repositoryPolicy, repositoryCredentialsResolver)
+        } catch (error: IllegalArgumentException) {
+            throw PluginResolutionDiagnosticException(
+                category = PluginResolverErrorCategory.REPOSITORY_POLICY,
+                message = error.message ?: "Repository configuration was rejected by policy.",
+                cause = error,
+            )
+        }
     val cacheDirectory = settings.cacheDirectory.toAbsolutePath().normalize()
     Files.createDirectories(cacheDirectory)
 
@@ -119,11 +134,14 @@ private fun resolveLocalPluginJars(pluginJars: Set<Path>): List<LocalPluginJar> 
         )
     }.sortedBy(LocalPluginJar::lockKey)
 
-private fun Throwable.toResolutionDiagnostic(): String = when (this) {
+private fun Throwable.toResolutionDiagnostic(sensitiveValues: Set<String>): String = when (this) {
     is PluginResolutionDiagnosticException ->
-        "[${category.code}] ${message ?: "plugin resolution failed"}"
+        "[${category.code}] ${(message ?: "plugin resolution failed").redactSensitiveValues(sensitiveValues)}"
 
-    else -> "[unexpected] ${message ?: this::class.simpleName ?: "unknown plugin resolution error"}"
+    else -> {
+        val unexpectedMessage = message ?: this::class.simpleName ?: "unknown plugin resolution error"
+        "[unexpected] ${unexpectedMessage.redactSensitiveValues(sensitiveValues)}"
+    }
 }
 
 private fun normalizeClasspath(rawClasspath: List<Path>): List<Path> = rawClasspath

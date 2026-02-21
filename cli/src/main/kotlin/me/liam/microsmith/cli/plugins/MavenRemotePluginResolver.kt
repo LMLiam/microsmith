@@ -19,6 +19,7 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException
 import org.eclipse.aether.util.artifact.JavaScopes
 import org.eclipse.aether.util.filter.DependencyFilterUtils
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator
+import org.eclipse.aether.util.repository.AuthenticationBuilder
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -28,7 +29,7 @@ private const val REMOTE_REPOSITORY_TYPE_DEFAULT = "default"
 internal interface RemotePluginResolver {
     fun resolve(
         coordinate: Coordinate,
-        repositories: List<String>,
+        repositories: List<RepositoryEndpoint>,
         cacheDirectory: Path,
         offline: Boolean,
     ): ResolvedRemotePlugin
@@ -38,7 +39,9 @@ internal data class ResolvedRemotePlugin(val rootArtifactPath: Path, val classpa
 
 internal enum class PluginResolverErrorCategory(val code: String) {
     OFFLINE_CACHE_MISS("offline-cache-miss"),
+    AUTHENTICATION("authentication"),
     DEPENDENCY_RESOLUTION("dependency-resolution"),
+    REPOSITORY_POLICY("repository-policy"),
     ROOT_ARTIFACT_MISSING("root-artifact-missing"),
 }
 
@@ -53,7 +56,7 @@ internal class MavenRemotePluginResolver(
 ) : RemotePluginResolver {
     override fun resolve(
         coordinate: Coordinate,
-        repositories: List<String>,
+        repositories: List<RepositoryEndpoint>,
         cacheDirectory: Path,
         offline: Boolean,
     ): ResolvedRemotePlugin {
@@ -106,7 +109,7 @@ private fun ensureOfflineRootAvailability(coordinate: Coordinate, expectedRootAr
 private fun resolveDependencyGraph(
     repositorySystem: RepositorySystem,
     coordinate: Coordinate,
-    repositories: List<String>,
+    repositories: List<RepositoryEndpoint>,
     localRepositoryRoot: Path,
     offline: Boolean,
 ): DependencyResult {
@@ -131,7 +134,13 @@ private fun resolveDependencyGraph(
     return try {
         repositorySystem.resolveDependencies(session, dependencyRequest)
     } catch (error: DependencyResolutionException) {
-        throw toDiagnostic(coordinate, localRepositoryRoot, repositories, offline, error)
+        throw toDiagnostic(
+            coordinate = coordinate,
+            localRepositoryRoot = localRepositoryRoot,
+            repositories = repositories.map(RepositoryEndpoint::uri),
+            offline = offline,
+            error = error,
+        )
     }
 }
 
@@ -149,9 +158,22 @@ private fun buildSession(
     return sessionBuilder
 }
 
-private fun toRemoteRepository(index: Int, repository: String): RemoteRepository = RemoteRepository
-    .Builder("$REMOTE_REPOSITORY_ID_PREFIX-$index", REMOTE_REPOSITORY_TYPE_DEFAULT, repository)
-    .build()
+private fun toRemoteRepository(index: Int, repository: RepositoryEndpoint): RemoteRepository {
+    val builder = RemoteRepository.Builder(
+        "$REMOTE_REPOSITORY_ID_PREFIX-$index",
+        REMOTE_REPOSITORY_TYPE_DEFAULT,
+        repository.uri,
+    )
+    repository.credentials?.let { credentials ->
+        builder.setAuthentication(
+            AuthenticationBuilder()
+                .addUsername(credentials.username)
+                .addPassword(credentials.password)
+                .build(),
+        )
+    }
+    return builder.build()
+}
 
 private fun resolveClasspath(artifactResults: List<ArtifactResult>, root: DependencyNode?): List<Path> {
     val visitor = PreorderNodeListGenerator()
@@ -196,6 +218,7 @@ private fun toDiagnostic(
 ): PluginResolutionDiagnosticException {
     val cause: Throwable? = error.primaryResolutionCause()
     val repositoryList = repositories.joinToString(", ")
+    val authenticationFailure = isAuthenticationFailure(cause)
     val reason =
         when (cause) {
             is ArtifactNotFoundException ->
@@ -205,20 +228,50 @@ private fun toDiagnostic(
         }
 
     val remediation =
-        if (offline) {
+        if (authenticationFailure) {
+            "Verify repository credentials. Configure per-endpoint credentials via " +
+                "$REPOSITORY_CREDENTIALS_FILE_ENV, global credentials via " +
+                "$REPOSITORY_USERNAME_ENV/$REPOSITORY_PASSWORD_ENV, or GitHub Packages via " +
+                "$GITHUB_PACKAGES_USERNAME_ENV/$GITHUB_PACKAGES_TOKEN_ENV."
+        } else if (offline) {
             "Offline mode is enabled. Ensure the full dependency graph is cached under " +
                 "'$localRepositoryRoot' by running once without --offline."
         } else {
             "Verify plugin coordinates and repository availability."
         }
 
+    val category =
+        if (authenticationFailure) {
+            PluginResolverErrorCategory.AUTHENTICATION
+        } else {
+            PluginResolverErrorCategory.DEPENDENCY_RESOLUTION
+        }
+
     return PluginResolutionDiagnosticException(
-        category = PluginResolverErrorCategory.DEPENDENCY_RESOLUTION,
+        category = category,
         message =
         "Could not resolve plugin '${coordinate.value}' with transitive dependencies. " +
             "Repositories: $repositoryList. $reason $remediation",
         cause = error,
     )
+}
+
+private fun isAuthenticationFailure(cause: Throwable?): Boolean {
+    if (cause == null) {
+        return false
+    }
+
+    return generateSequence(cause) { throwable -> throwable.cause }
+        .mapNotNull(Throwable::message)
+        .map(String::lowercase)
+        .any { message ->
+            message.contains("status code: 401") ||
+                message.contains("status code: 403") ||
+                message.contains("unauthorized") ||
+                message.contains("forbidden") ||
+                message.contains("authentication failed") ||
+                message.contains("not authorized")
+        }
 }
 
 private fun DependencyResolutionException.primaryResolutionCause(): Throwable? = result.collectExceptions.firstOrNull()
