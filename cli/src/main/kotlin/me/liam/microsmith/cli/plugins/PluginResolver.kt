@@ -120,7 +120,9 @@ private fun resolveLocalPluginJars(pluginJars: Set<Path>): List<LocalPluginJar> 
     }.sortedBy(LocalPluginJar::lockKey)
 
 private fun Throwable.toResolutionDiagnostic(): String = when (this) {
-    is PluginResolutionDiagnosticException -> "[${category.code}] $message"
+    is PluginResolutionDiagnosticException ->
+        "[${category.code}] ${message ?: "plugin resolution failed"}"
+
     else -> "[unexpected] ${message ?: this::class.simpleName ?: "unknown plugin resolution error"}"
 }
 

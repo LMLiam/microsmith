@@ -83,7 +83,6 @@ internal class MavenRemotePluginResolver(
                 coordinate = coordinate,
                 expectedRootArtifactPath = expectedRootArtifactPath,
                 artifactResults = dependencyResult.artifactResults,
-                classpath = classpath,
             )
 
         return ResolvedRemotePlugin(rootArtifactPath = rootArtifactPath, classpath = classpath)
@@ -167,7 +166,6 @@ private fun resolveRootArtifactPath(
     coordinate: Coordinate,
     expectedRootArtifactPath: Path,
     artifactResults: List<ArtifactResult>,
-    classpath: List<Path>,
 ): Path = expectedRootArtifactPath.takeIf(Files::exists)
     ?: artifactResults
         .asSequence()
@@ -177,7 +175,6 @@ private fun resolveRootArtifactPath(
         ?.toPath()
         ?.toAbsolutePath()
         ?.normalize()
-    ?: classpath.firstOrNull()
     ?: throw PluginResolutionDiagnosticException(
         category = PluginResolverErrorCategory.ROOT_ARTIFACT_MISSING,
         message =
