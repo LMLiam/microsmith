@@ -70,7 +70,10 @@ internal class MavenRemotePluginResolver(
                 offline = offline,
             )
 
-        val remoteRepositories = repositories.map { repository -> toRemoteRepository(repository) }
+        val remoteRepositories =
+            repositories.mapIndexed { index, repository ->
+                toRemoteRepository(index, repository)
+            }
         val dependencyRequest =
             DependencyRequest(
                 CollectRequest(
@@ -116,8 +119,8 @@ private fun buildSession(
     return sessionBuilder
 }
 
-private fun toRemoteRepository(repository: String): RemoteRepository = RemoteRepository
-    .Builder(repository, "default", repository)
+private fun toRemoteRepository(index: Int, repository: String): RemoteRepository = RemoteRepository
+    .Builder("repo-$index", "default", repository)
     .build()
 
 private fun resolveClasspath(
