@@ -24,14 +24,10 @@ internal fun resolvePlugins(
     settings: PluginResolverSettings = PluginResolverSettings(),
 ): PluginResolutionResult = runCatching {
     resolvePluginsOrThrow(command, settings)
-}.getOrElse { error ->
-    val message =
-        when (error) {
-            is PluginResolutionDiagnosticException -> "[${error.category.code}] ${error.message}"
-            else -> "[unexpected] ${error.message ?: error::class.simpleName ?: "unknown plugin resolution error"}"
-        }
-    PluginResolutionResult.Failure(listOf(message))
-}
+}.fold(
+    onSuccess = { success -> success },
+    onFailure = { error -> PluginResolutionResult.Failure(listOf(error.toResolutionDiagnostic())) },
+)
 
 private fun resolvePluginsOrThrow(
     command: RunCommand,
@@ -42,14 +38,7 @@ private fun resolvePluginsOrThrow(
     }
 
     val coordinates = command.plugins.toList().sorted().map(::parseCoordinate)
-    val localPluginJars =
-        command.pluginJars
-            .map { requestedPath ->
-                LocalPluginJar(
-                    artifactPath = requestedPath.toAbsolutePath().normalize(),
-                    lockKey = localPluginLockKey(requestedPath),
-                )
-            }.sortedBy(LocalPluginJar::lockKey)
+    val localPluginJars = resolveLocalPluginJars(command.pluginJars)
     localPluginJars.forEach { localJar ->
         require(Files.exists(localJar.artifactPath) && Files.isRegularFile(localJar.artifactPath)) {
             "Plugin jar '${localJar.artifactPath}' does not exist or is not a file."
@@ -112,8 +101,8 @@ private fun resolvePluginsOrThrow(
 }
 
 private fun buildRequestedLockKeys(coordinates: List<Coordinate>, localPluginLockKeys: List<String>): Set<LockKey> {
-    val remoteKeys = coordinates.map { LockKey(kind = REMOTE_KIND, key = it.value) }
-    val localKeys = localPluginLockKeys.map { LockKey(kind = LOCAL_KIND, key = it) }
+    val remoteKeys = coordinates.map { coordinate -> LockKey(kind = REMOTE_KIND, key = coordinate.value) }
+    val localKeys = localPluginLockKeys.map { lockKey -> LockKey(kind = LOCAL_KIND, key = lockKey) }
     return (remoteKeys + localKeys).toSet()
 }
 
@@ -121,6 +110,19 @@ private fun localPluginLockKey(pluginJarPath: Path): String = pluginJarPath
     .normalize()
     .toString()
     .replace('\\', '/')
+
+private fun resolveLocalPluginJars(pluginJars: Set<Path>): List<LocalPluginJar> = pluginJars
+    .map { requestedPath ->
+        LocalPluginJar(
+            artifactPath = requestedPath.toAbsolutePath().normalize(),
+            lockKey = localPluginLockKey(requestedPath),
+        )
+    }.sortedBy(LocalPluginJar::lockKey)
+
+private fun Throwable.toResolutionDiagnostic(): String = when (this) {
+    is PluginResolutionDiagnosticException -> "[${category.code}] $message"
+    else -> "[unexpected] ${message ?: this::class.simpleName ?: "unknown plugin resolution error"}"
+}
 
 private fun normalizeClasspath(rawClasspath: List<Path>): List<Path> = rawClasspath
     .map { it.toAbsolutePath().normalize() }

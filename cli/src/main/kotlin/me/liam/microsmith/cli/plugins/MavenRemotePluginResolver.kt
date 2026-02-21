@@ -3,20 +3,26 @@ package me.liam.microsmith.cli.plugins
 import org.eclipse.aether.DefaultRepositorySystemSession
 import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.RepositorySystemSession
+import org.eclipse.aether.artifact.Artifact
 import org.eclipse.aether.artifact.DefaultArtifact
 import org.eclipse.aether.collection.CollectRequest
 import org.eclipse.aether.graph.Dependency
+import org.eclipse.aether.graph.DependencyNode
 import org.eclipse.aether.repository.LocalRepository
 import org.eclipse.aether.repository.RemoteRepository
 import org.eclipse.aether.resolution.ArtifactResult
 import org.eclipse.aether.resolution.DependencyRequest
 import org.eclipse.aether.resolution.DependencyResolutionException
+import org.eclipse.aether.resolution.DependencyResult
 import org.eclipse.aether.supplier.RepositorySystemSupplier
 import org.eclipse.aether.transfer.ArtifactNotFoundException
 import org.eclipse.aether.util.artifact.JavaScopes
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator
 import java.nio.file.Files
 import java.nio.file.Path
+
+private const val REMOTE_REPOSITORY_ID_PREFIX = "repo"
+private const val REMOTE_REPOSITORY_TYPE_DEFAULT = "default"
 
 internal interface RemotePluginResolver {
     fun resolve(
@@ -50,58 +56,81 @@ internal class MavenRemotePluginResolver(
         cacheDirectory: Path,
         offline: Boolean,
     ): ResolvedRemotePlugin {
-        val localRepositoryRoot = pluginArtifactCacheRoot(cacheDirectory)
-        Files.createDirectories(localRepositoryRoot)
+        val localRepositoryRoot =
+            pluginArtifactCacheRoot(cacheDirectory).also { root ->
+                Files.createDirectories(root)
+            }
 
         val expectedRootArtifactPath = cachePathFor(localRepositoryRoot, coordinate)
-        if (offline && !Files.exists(expectedRootArtifactPath)) {
-            throw PluginResolutionDiagnosticException(
-                category = PluginResolverErrorCategory.OFFLINE_CACHE_MISS,
-                message =
-                "Offline mode is enabled and plugin '${coordinate.value}' is not in cache at " +
-                    "'$expectedRootArtifactPath'. Run once without --offline to populate the cache.",
-            )
-        }
+        ensureOfflineRootAvailability(
+            coordinate = coordinate,
+            expectedRootArtifactPath = expectedRootArtifactPath,
+            offline = offline,
+        )
 
-        val session =
-            buildSession(
+        val dependencyResult =
+            resolveDependencyGraph(
                 repositorySystem = repositorySystem,
+                coordinate = coordinate,
+                repositories = repositories,
                 localRepositoryRoot = localRepositoryRoot,
                 offline = offline,
             )
 
-        val remoteRepositories =
-            repositories.mapIndexed { index, repository ->
-                toRemoteRepository(index, repository)
-            }
-        val dependencyRequest =
-            DependencyRequest(
-                CollectRequest(
-                    Dependency(DefaultArtifact(coordinate.value), JavaScopes.RUNTIME),
-                    remoteRepositories,
-                ),
-                null,
-            )
-
-        val dependencyResult =
-            try {
-                repositorySystem.resolveDependencies(session, dependencyRequest)
-            } catch (error: DependencyResolutionException) {
-                throw toDiagnostic(coordinate, localRepositoryRoot, repositories, offline, error)
-            }
-
         val classpath = resolveClasspath(dependencyResult.artifactResults, dependencyResult.root)
         val rootArtifactPath =
-            expectedRootArtifactPath.takeIf(Files::exists)
-                ?: classpath.firstOrNull()
-                ?: throw PluginResolutionDiagnosticException(
-                    category = PluginResolverErrorCategory.ROOT_ARTIFACT_MISSING,
-                    message =
-                    "Plugin '${coordinate.value}' resolved but no root jar was produced in cache at " +
-                        "'$expectedRootArtifactPath'.",
-                )
+            resolveRootArtifactPath(
+                coordinate = coordinate,
+                expectedRootArtifactPath = expectedRootArtifactPath,
+                artifactResults = dependencyResult.artifactResults,
+                classpath = classpath,
+            )
 
         return ResolvedRemotePlugin(rootArtifactPath = rootArtifactPath, classpath = classpath)
+    }
+}
+
+private fun ensureOfflineRootAvailability(coordinate: Coordinate, expectedRootArtifactPath: Path, offline: Boolean) {
+    if (!offline || Files.exists(expectedRootArtifactPath)) {
+        return
+    }
+
+    throw PluginResolutionDiagnosticException(
+        category = PluginResolverErrorCategory.OFFLINE_CACHE_MISS,
+        message =
+        "Offline mode is enabled and plugin '${coordinate.value}' is not in cache at " +
+            "'$expectedRootArtifactPath'. Run once without --offline to populate the cache.",
+    )
+}
+
+private fun resolveDependencyGraph(
+    repositorySystem: RepositorySystem,
+    coordinate: Coordinate,
+    repositories: List<String>,
+    localRepositoryRoot: Path,
+    offline: Boolean,
+): DependencyResult {
+    val session =
+        buildSession(
+            repositorySystem = repositorySystem,
+            localRepositoryRoot = localRepositoryRoot,
+            offline = offline,
+        )
+
+    val remoteRepositories = repositories.mapIndexed(::toRemoteRepository)
+    val dependencyRequest =
+        DependencyRequest(
+            CollectRequest(
+                Dependency(DefaultArtifact(coordinate.value), JavaScopes.RUNTIME),
+                remoteRepositories,
+            ),
+            null,
+        )
+
+    return try {
+        repositorySystem.resolveDependencies(session, dependencyRequest)
+    } catch (error: DependencyResolutionException) {
+        throw toDiagnostic(coordinate, localRepositoryRoot, repositories, offline, error)
     }
 }
 
@@ -120,13 +149,10 @@ private fun buildSession(
 }
 
 private fun toRemoteRepository(index: Int, repository: String): RemoteRepository = RemoteRepository
-    .Builder("repo-$index", "default", repository)
+    .Builder("$REMOTE_REPOSITORY_ID_PREFIX-$index", REMOTE_REPOSITORY_TYPE_DEFAULT, repository)
     .build()
 
-private fun resolveClasspath(
-    artifactResults: List<ArtifactResult>,
-    root: org.eclipse.aether.graph.DependencyNode?,
-): List<Path> {
+private fun resolveClasspath(artifactResults: List<ArtifactResult>, root: DependencyNode?): List<Path> {
     val visitor = PreorderNodeListGenerator()
     root?.accept(visitor)
     val visited = visitor.files.map { file -> file.toPath().toAbsolutePath().normalize() }
@@ -137,6 +163,31 @@ private fun resolveClasspath(
     return (visited + fallback).distinct()
 }
 
+private fun resolveRootArtifactPath(
+    coordinate: Coordinate,
+    expectedRootArtifactPath: Path,
+    artifactResults: List<ArtifactResult>,
+    classpath: List<Path>,
+): Path = expectedRootArtifactPath.takeIf(Files::exists)
+    ?: artifactResults
+        .asSequence()
+        .mapNotNull { result -> result.artifact }
+        .firstOrNull { artifact -> artifact.matchesCoordinate(coordinate) }
+        ?.file
+        ?.toPath()
+        ?.toAbsolutePath()
+        ?.normalize()
+    ?: classpath.firstOrNull()
+    ?: throw PluginResolutionDiagnosticException(
+        category = PluginResolverErrorCategory.ROOT_ARTIFACT_MISSING,
+        message =
+        "Plugin '${coordinate.value}' resolved but no root jar was produced in cache at " +
+            "'$expectedRootArtifactPath'.",
+    )
+
+private fun Artifact.matchesCoordinate(coordinate: Coordinate): Boolean =
+    groupId == coordinate.group && artifactId == coordinate.artifact && version == coordinate.version
+
 private fun toDiagnostic(
     coordinate: Coordinate,
     localRepositoryRoot: Path,
@@ -144,7 +195,7 @@ private fun toDiagnostic(
     offline: Boolean,
     error: DependencyResolutionException,
 ): PluginResolutionDiagnosticException {
-    val cause: Throwable? = error.result.collectExceptions.firstOrNull() ?: error.cause
+    val cause: Throwable? = error.primaryResolutionCause()
     val repositoryList = repositories.joinToString(", ")
     val reason =
         when (cause) {
@@ -170,3 +221,10 @@ private fun toDiagnostic(
         cause = error,
     )
 }
+
+private fun DependencyResolutionException.primaryResolutionCause(): Throwable? = result.collectExceptions.firstOrNull()
+    ?: result.artifactResults
+        .asSequence()
+        .flatMap { artifactResult -> artifactResult.exceptions.asSequence() }
+        .firstOrNull()
+    ?: cause

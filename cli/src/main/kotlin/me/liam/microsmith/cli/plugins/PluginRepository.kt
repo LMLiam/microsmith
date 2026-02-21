@@ -12,7 +12,10 @@ internal fun resolveRepositories(
     repositoryPolicy: RepositoryAllowlistPolicy,
 ): List<String> {
     val override = command.repositoryOverride?.trim()?.takeIf { it.isNotEmpty() }
-    val repositories = (listOfNotNull(override) + settings.defaultRepositories).map(::normalizeRepositoryUri).distinct()
+    val repositories =
+        (listOfNotNull(override) + settings.defaultRepositories)
+            .map(::normalizeRepositoryUri)
+            .distinct()
     repositories.forEach(repositoryPolicy::validate)
     return repositories
 }
