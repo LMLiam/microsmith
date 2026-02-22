@@ -63,4 +63,6 @@ Symptom:
 Actions:
 - use official CLI distribution/fat jar
 - run build integrity task in this repository: `./gradlew :cli:verifyShadowJarServices`
+- run distribution integrity task when validating release assets: `./gradlew :cli:verifyDistLayout`
+- inspect `bundled-plugins.lock` in the unpacked distribution and confirm it lists expected bundled providers
 - avoid manually repackaging runtime jars without merged service descriptors

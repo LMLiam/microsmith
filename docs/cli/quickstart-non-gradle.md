@@ -46,6 +46,15 @@ Windows:
 
 ## Plugin extension workflow
 
+Bundled plugin workflow (no network required):
+
+```bash
+microsmith run schema.microsmith.kts --out ./generated --offline
+```
+
+The official distribution includes a pinned bundled plugin profile in `bundled-plugins.lock`.
+It contains the built-in providers required for schema/protobuf generation and is versioned with the CLI release.
+
 Remote plugin coordinate:
 
 ```bash
@@ -65,6 +74,7 @@ microsmith run schema.microsmith.kts --out ./generated --offline
 ```
 
 Notes:
+- Bundled plugin workflows do not require repository access.
 - Run once without `--offline` first to generate lockfile metadata and warm the plugin cache.
 - Offline remote plugin resolution requires lockfile v2 and a complete cached dependency graph.
 
