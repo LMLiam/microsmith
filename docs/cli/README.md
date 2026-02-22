@@ -9,8 +9,10 @@ Phase 5 documentation for distribution and adoption lives in this folder.
 
 Distribution build outputs:
 
+- `:cli:generateBundledPluginCatalog` -> `cli/build/generated/microsmith/bundled-plugins.lock`
 - `:cli:shadowJar` -> `cli/build/libs/microsmith-cli-<version>-all.jar`
 - `:cli:prepareDist` -> `cli/build/microsmith-cli-dist/`
 - `:cli:cliDistZip` -> `cli/build/distributions/microsmith-cli-<version>-dist.zip`
 - `:cli:cliDistTar` -> `cli/build/distributions/microsmith-cli-<version>-dist.tar.gz`
+- `:cli:verifyDistLayout` -> validates bundled profile + launcher wiring in directory/zip/tar artifacts
 - `:cli:distArtifacts` -> `cli/build/release-assets/`

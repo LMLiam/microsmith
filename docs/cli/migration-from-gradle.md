@@ -12,6 +12,7 @@ This guide helps teams move generation workflows from Gradle tasks to the standa
 
 - No project-local Gradle wrapper required in consuming repositories
 - Generation entrypoint becomes `microsmith run <script.microsmith.kts> --out <dir>`
+- Common built-in plugins are bundled/pinned in official distributions (`bundled-plugins.lock`)
 - plugin dependency resolution is explicit (`--plugin`, `--plugin-jar`)
 
 ## Command mapping
