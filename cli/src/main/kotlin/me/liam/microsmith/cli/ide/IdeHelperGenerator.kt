@@ -78,19 +78,19 @@ private fun renderBuildGradle(classpathEntries: List<Path>): String {
             "            \"${entry.toKotlinPathLiteral()}\""
         }
 
-    return """
-        plugins {
-            id("java-library")
-        }
-
-        dependencies {
-            implementation(
-                files(
-$dependencyEntries
-                )
-            )
-        }
-    """.trimIndent() + "\n"
+    return buildString {
+        appendLine("plugins {")
+        appendLine("    id(\"java-library\")")
+        appendLine("}")
+        appendLine()
+        appendLine("dependencies {")
+        appendLine("    implementation(")
+        appendLine("        files(")
+        appendLine(dependencyEntries)
+        appendLine("        )")
+        appendLine("    )")
+        appendLine("}")
+    }
 }
 
 private fun renderReadme(): String = """
@@ -130,10 +130,25 @@ private fun Path.toKotlinPathLiteral(): String = toAbsolutePath()
     .normalize()
     .toString()
     .replace('\\', '/')
-    .replace("$", "\\$")
-    .replace("\"", "\\\"")
+    .toKotlinStringLiteralContent()
+
+private fun String.toKotlinStringLiteralContent(): String {
+    val builder = StringBuilder(length + KOTLIN_ESCAPE_BUFFER_PADDING)
+    for (char in this) {
+        when (char) {
+            '$' -> builder.append("\\$")
+            '"' -> builder.append("\\\"")
+            '\n' -> builder.append("\\n")
+            '\r' -> builder.append("\\r")
+            '\t' -> builder.append("\\t")
+            else -> builder.append(char)
+        }
+    }
+    return builder.toString()
+}
 
 private const val IDE_HELPER_DIRECTORY = ".microsmith/ide"
 private const val SETTINGS_FILE_NAME = "settings.gradle.kts"
 private const val BUILD_FILE_NAME = "build.gradle.kts"
 private const val README_FILE_NAME = "README.md"
+private const val KOTLIN_ESCAPE_BUFFER_PADDING = 8

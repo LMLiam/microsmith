@@ -46,9 +46,11 @@ class IdeHelperGeneratorTests :
                 buildFile.exists() shouldBe true
                 readmeFile.exists() shouldBe true
 
+                val buildContent = buildFile.readText()
                 val runtimeJarLiteral = runtimeJar.toAbsolutePath().normalize().toString().replace('\\', '/')
-                buildFile.readText().shouldContain("id(\"java-library\")")
-                buildFile.readText().shouldContain(runtimeJarLiteral)
+                buildContent.shouldContain("id(\"java-library\")")
+                buildContent.shouldContain("files(\n            \"")
+                buildContent.shouldContain(runtimeJarLiteral)
                 readmeFile.readText().shouldContain("microsmith ide refresh")
             } finally {
                 runCatching { repoRoot.deleteRecursively() }
