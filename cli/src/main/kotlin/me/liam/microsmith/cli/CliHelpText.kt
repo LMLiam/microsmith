@@ -8,6 +8,7 @@ Usage:
                  [--plugin <group:artifact:version>]... [--plugin-jar <path>]...
                  [--offline] [--repository <uri>] [--isolation <classloader|process>]
                  [--diagnostics <text|json>] [--verbose] [--event-log <path>]
+  microsmith ide refresh [--repo-root <path>] [--diagnostics <text|json>] [--verbose]
   microsmith doctor [--diagnostics <text|json>] [--verbose]
   microsmith --help
 

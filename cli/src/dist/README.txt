@@ -13,6 +13,7 @@ Runtime requirements:
 Quick checks:
 - bin/microsmith --help
 - bin/microsmith run schema.microsmith.kts --out ./generated
+- bin/microsmith ide refresh
 - cat bundled-plugins.lock
 
 Bundled vs external plugins:

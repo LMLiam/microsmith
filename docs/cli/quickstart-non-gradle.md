@@ -44,6 +44,22 @@ Windows:
 .\tools\microsmith-cli-*\bin\microsmith.bat run schema.microsmith.kts --out .\generated
 ```
 
+## JetBrains IDE helper
+
+Generate helper project metadata for JetBrains IDE indexing:
+
+```bash
+microsmith ide refresh
+```
+
+If your repository root is not the current working directory:
+
+```bash
+microsmith ide refresh --repo-root ./path/to/repo
+```
+
+See `jetbrains-ide-helper.md` for full setup and troubleshooting details.
+
 ## Plugin extension workflow
 
 Bundled plugin workflow (no network required):

@@ -3,6 +3,7 @@ package me.liam.microsmith.cli
 import me.liam.microsmith.cli.command.DoctorCommand
 import me.liam.microsmith.cli.command.ErrorCommand
 import me.liam.microsmith.cli.command.HelpCommand
+import me.liam.microsmith.cli.command.IdeRefreshCommand
 import me.liam.microsmith.cli.command.RunCommand
 import me.liam.microsmith.cli.diagnostics.CliDiagnosticEmitter
 import me.liam.microsmith.cli.diagnostics.CliFailureCode
@@ -12,6 +13,8 @@ import me.liam.microsmith.cli.doctor.DoctorResult
 import me.liam.microsmith.cli.doctor.runDoctorChecks
 import me.liam.microsmith.cli.eventlog.EventLogWriter
 import me.liam.microsmith.cli.eventlog.RunEventLogEntry
+import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
+import me.liam.microsmith.cli.ide.refreshIdeHelperProject
 import me.liam.microsmith.cli.parsing.parseCliArgs
 import me.liam.microsmith.cli.plugins.PluginResolutionResult
 import me.liam.microsmith.cli.plugins.resolvePlugins
@@ -48,6 +51,7 @@ internal class MicrosmithCli(
     private val doctorRunner: ((() -> List<String>) -> DoctorResult) = { validator ->
         runDoctorChecks(providerValidator = validator)
     },
+    private val ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult = ::refreshIdeHelperProject,
     private val eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,
 ) {
     fun run(args: Array<String>): Int = when (val parsed = parseCliArgs(args.toList())) {
@@ -73,6 +77,8 @@ internal class MicrosmithCli(
         is RunCommand -> runCommand(parsed)
 
         is DoctorCommand -> runDoctor(parsed)
+
+        is IdeRefreshCommand -> runIdeRefresh(parsed)
     }
 
     private fun runCommand(command: RunCommand): Int {
@@ -119,6 +125,38 @@ internal class MicrosmithCli(
             emitter.info("Doctor checks passed.")
             0
         }
+    }
+
+    private fun runIdeRefresh(command: IdeRefreshCommand): Int {
+        val emitter = createEmitter(command.diagnosticsFormat, command.verbose)
+        val result =
+            runCatching {
+                ideRefreshRunner(command)
+            }.getOrElse { error ->
+                emitter.error(
+                    CliFailureCode.IDE_HELPER_FAILED,
+                    error.message ?: "JetBrains IDE helper generation failed.",
+                )
+                return CliFailureCode.IDE_HELPER_FAILED.exitCode
+            }
+
+        val helperRoot = result.helperRoot.toAbsolutePath().normalize()
+        val refreshed = result.updatedFiles.size
+        val state = if (refreshed == 0) "unchanged" else "updated"
+        emitter.info(
+            "JetBrains IDE helper is $state at '$helperRoot'.",
+            details =
+            mapOf(
+                "projectRoot" to result.projectRoot.toAbsolutePath().normalize().toString(),
+                "helperRoot" to helperRoot.toString(),
+                "updatedFiles" to refreshed.toString(),
+                "classpathEntries" to result.classpathEntries.size.toString(),
+            ),
+        )
+        emitter.info(
+            "Import '${helperRoot.resolve("build.gradle.kts")}' as a Gradle project in JetBrains IDEs.",
+        )
+        return 0
     }
 
     private fun prepareRun(

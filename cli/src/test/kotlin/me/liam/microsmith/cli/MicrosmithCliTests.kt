@@ -3,9 +3,11 @@ package me.liam.microsmith.cli
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import me.liam.microsmith.cli.command.IdeRefreshCommand
 import me.liam.microsmith.cli.doctor.DoctorCheckResult
 import me.liam.microsmith.cli.doctor.DoctorCheckStatus
 import me.liam.microsmith.cli.doctor.DoctorResult
+import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
 import me.liam.microsmith.cli.plugins.PluginResolutionResult
 import me.liam.microsmith.runtime.scripting.model.ScriptFailureType
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
@@ -310,6 +312,57 @@ class MicrosmithCliTests :
             exitCode shouldBe 30
             err.joinToString("\n").shouldContain("MS-CLI-3001")
             err.joinToString("\n").shouldContain("Doctor detected environment issues.")
+            out shouldBe emptyList()
+        }
+
+        "ide refresh command returns success when helper generation succeeds" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val tempDir = createTempDirectory("microsmith-cli-ide-refresh")
+            try {
+                val helperRoot = tempDir.resolve(".microsmith/ide")
+                val cli =
+                    MicrosmithCli(
+                        stdout = out::add,
+                        stderr = err::add,
+                        ideRefreshRunner = { command: IdeRefreshCommand ->
+                            IdeHelperRefreshResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                helperRoot = helperRoot,
+                                updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
+                                classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                            )
+                        },
+                    )
+
+                val exitCode = cli.run(arrayOf("ide", "refresh", "--repo-root", tempDir.toString()))
+
+                exitCode shouldBe 0
+                out.joinToString("\n").shouldContain("JetBrains IDE helper is updated")
+                out.joinToString("\n").shouldContain("Import")
+                err shouldBe emptyList()
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "ide refresh command returns deterministic failure code when helper generation fails" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    ideRefreshRunner = {
+                        error("simulated helper generation failure")
+                    },
+                )
+
+            val exitCode = cli.run(arrayOf("ide", "refresh"))
+
+            exitCode shouldBe 40
+            err.joinToString("\n").shouldContain("MS-CLI-4001")
+            err.joinToString("\n").shouldContain("simulated helper generation failure")
             out shouldBe emptyList()
         }
     })

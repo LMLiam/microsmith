@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import me.liam.microsmith.cli.command.DoctorCommand
 import me.liam.microsmith.cli.command.ErrorCommand
 import me.liam.microsmith.cli.command.HelpCommand
+import me.liam.microsmith.cli.command.IdeRefreshCommand
 import me.liam.microsmith.cli.command.RunCommand
 import me.liam.microsmith.cli.diagnostics.DiagnosticFormat
 import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
@@ -23,6 +24,29 @@ class CliParserTests :
         "parses doctor command options" {
             parseCliArgs(listOf("doctor", "--diagnostics", "json", "--verbose")) shouldBe
                 DoctorCommand(
+                    diagnosticsFormat = DiagnosticFormat.JSON,
+                    verbose = true,
+                )
+        }
+
+        "parses ide refresh command with defaults" {
+            parseCliArgs(listOf("ide", "refresh")) shouldBe IdeRefreshCommand()
+        }
+
+        "parses ide refresh command options" {
+            parseCliArgs(
+                listOf(
+                    "ide",
+                    "refresh",
+                    "--repo-root",
+                    "examples/go-service",
+                    "--diagnostics",
+                    "json",
+                    "--verbose",
+                ),
+            ) shouldBe
+                IdeRefreshCommand(
+                    projectRoot = Path("examples/go-service"),
                     diagnosticsFormat = DiagnosticFormat.JSON,
                     verbose = true,
                 )
@@ -179,6 +203,48 @@ class CliParserTests :
                 ),
             ) shouldBe
                 ErrorCommand("Invalid --diagnostics value 'yaml'. Expected 'text' or 'json'.")
+        }
+
+        "returns error when ide subcommand is missing" {
+            parseCliArgs(listOf("ide")) shouldBe ErrorCommand("Missing <refresh> subcommand for ide command.")
+        }
+
+        "returns error for unknown ide subcommand" {
+            parseCliArgs(listOf("ide", "doctor")) shouldBe
+                ErrorCommand("Unknown ide subcommand 'doctor'. Expected 'refresh'.")
+        }
+
+        "returns error for unknown ide option" {
+            parseCliArgs(listOf("ide", "refresh", "--event-log", "build/event-log.jsonl")) shouldBe
+                ErrorCommand("Unknown option '--event-log'.")
+        }
+
+        "returns error when ide repo-root value is missing" {
+            parseCliArgs(listOf("ide", "refresh", "--repo-root")) shouldBe
+                ErrorCommand("Missing value for --repo-root option.")
+        }
+
+        "returns error when ide repo-root is specified multiple times" {
+            parseCliArgs(
+                listOf(
+                    "ide",
+                    "refresh",
+                    "--repo-root",
+                    "repo-one",
+                    "--repo-root",
+                    "repo-two",
+                ),
+            ) shouldBe ErrorCommand("--repo-root may only be specified once.")
+        }
+
+        "returns error when ide diagnostics format is invalid" {
+            parseCliArgs(listOf("ide", "refresh", "--diagnostics", "yaml")) shouldBe
+                ErrorCommand("Invalid --diagnostics value 'yaml'. Expected 'text' or 'json'.")
+        }
+
+        "returns error when ide verbose is specified multiple times" {
+            parseCliArgs(listOf("ide", "refresh", "--verbose", "--verbose")) shouldBe
+                ErrorCommand("--verbose may only be specified once.")
         }
 
         "returns error for unknown doctor option" {

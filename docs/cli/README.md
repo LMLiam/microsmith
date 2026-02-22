@@ -3,6 +3,7 @@
 Phase 5 documentation for distribution and adoption lives in this folder.
 
 - `quickstart-non-gradle.md`: fast setup for Node, Go, and .NET repositories, including CI snippets.
+- `jetbrains-ide-helper.md`: `.microsmith/ide` helper generation and indexing guidance for JetBrains IDEs.
 - `migration-from-gradle.md`: migration guide for existing Gradle-centric users.
 - `troubleshooting.md`: common runtime, resolver, and diagnostics issues.
 - `runtime-bundling-evaluation.md`: bundled Java runtime options and rollout recommendation.
