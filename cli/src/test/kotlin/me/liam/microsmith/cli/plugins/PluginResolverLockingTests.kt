@@ -100,6 +100,52 @@ class PluginResolverLockingTests :
             }
         }
 
+        "fails offline when locked transitive descriptor is missing from cache" {
+            val tempDir = createTempDirectory("microsmith-plugin-resolver-offline-descriptor-missing")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val cache = tempDir.resolve("cache")
+                val repositoryRoot = tempDir.resolve("repo")
+                val rootCoordinate = "com.acme:plugin-root:1.0.0"
+                val transitiveCoordinate = "com.acme:plugin-shared:2.1.0"
+                publishMavenArtifact(repositoryRoot, transitiveCoordinate)
+                publishMavenArtifact(repositoryRoot, rootCoordinate, dependencies = listOf(transitiveCoordinate))
+                script.writeText("// test script")
+
+                val baseCommand =
+                    RunCommand(
+                        script = script,
+                        outputDir = tempDir.resolve("generated"),
+                        plugins = setOf(rootCoordinate),
+                        repositoryOverride = repositoryRoot.toUri().toString(),
+                    )
+                val settings =
+                    PluginResolverSettings(
+                        cacheDirectory = cache,
+                        repositoryPolicy = fileRepositoryAllowedPolicy(),
+                    )
+
+                resolvePlugins(command = baseCommand, settings = settings)
+                    .shouldBeTypeOf<PluginResolutionResult.Success>()
+
+                val parsedTransitive = parseCoordinate(transitiveCoordinate)
+                val cachedTransitiveJar = cachePathFor(pluginArtifactCacheRoot(cache), parsedTransitive)
+                val cachedTransitivePom =
+                    cachedTransitiveJar.resolveSibling("${parsedTransitive.artifact}-${parsedTransitive.version}.pom")
+                cachedTransitivePom.toFile().delete()
+
+                val failure =
+                    resolvePlugins(command = baseCommand.copy(offline = true), settings = settings)
+                        .shouldBeTypeOf<PluginResolutionResult.Failure>()
+                val message = failure.diagnostics.joinToString("\n")
+                val descriptorLockKey = parsedTransitive.relativeJarPath.removeSuffix(".jar") + ".pom"
+                message.shouldContain("[offline-cache-miss]")
+                message.shouldContain(descriptorLockKey)
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
         "fails when transitive cached artifact checksum does not match existing lockfile" {
             val tempDir = createTempDirectory("microsmith-plugin-resolver-transitive-lock-mismatch")
             try {

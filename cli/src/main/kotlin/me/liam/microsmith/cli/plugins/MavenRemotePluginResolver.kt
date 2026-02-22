@@ -229,49 +229,83 @@ private fun resolveArtifacts(
     localRepositoryRoot: Path,
     rootArtifactPath: Path,
 ): List<ResolvedRemoteArtifact> {
-    val resolved =
+    val resolvedRuntimeArtifacts =
         artifactResults
             .asSequence()
             .mapNotNull { result -> result.artifact?.file?.toPath() }
             .map { path -> path.toAbsolutePath().normalize() }
             .filter(Files::exists)
-            .map { artifactPath ->
-                ResolvedRemoteArtifact(
-                    lockKey =
-                    toRemoteArtifactLockKey(
-                        coordinate = coordinate,
-                        localRepositoryRoot = localRepositoryRoot,
-                        artifactPath = artifactPath,
-                    ),
-                    artifactPath = artifactPath,
+            .toList()
+    val resolvedDescriptorArtifacts =
+        artifactResults
+            .asSequence()
+            .mapNotNull { result -> result.artifact }
+            .map { artifact ->
+                resolveDescriptorPath(
+                    coordinate = coordinate,
+                    localRepositoryRoot = localRepositoryRoot,
+                    artifact = artifact,
                 )
-            }.distinctBy(ResolvedRemoteArtifact::lockKey)
-            .toMutableList()
+            }.toList()
 
-    val rootLockKey =
-        toRemoteArtifactLockKey(
-            coordinate = coordinate,
-            localRepositoryRoot = localRepositoryRoot,
-            artifactPath = rootArtifactPath,
-        )
-    if (resolved.none { artifact -> artifact.lockKey == rootLockKey }) {
-        resolved.add(
-            0,
+    return (resolvedRuntimeArtifacts + listOf(rootArtifactPath) + resolvedDescriptorArtifacts)
+        .distinct()
+        .map { artifactPath ->
             ResolvedRemoteArtifact(
-                lockKey = rootLockKey,
-                artifactPath = rootArtifactPath,
-            ),
-        )
-    }
+                lockKey =
+                toRemoteArtifactLockKey(
+                    coordinate = coordinate,
+                    localRepositoryRoot = localRepositoryRoot,
+                    artifactPath = artifactPath,
+                ),
+                artifactPath = artifactPath,
+            )
+        }.sortedBy(ResolvedRemoteArtifact::lockKey)
+}
 
-    return resolved
+private fun resolveDescriptorPath(coordinate: Coordinate, localRepositoryRoot: Path, artifact: Artifact): Path {
+    val fromArtifactFile =
+        artifact.file
+            ?.toPath()
+            ?.toAbsolutePath()
+            ?.normalize()
+            ?.let(::toPomSiblingPath)
+    val fromArtifactCoordinates =
+        localRepositoryRoot
+            .resolve(artifact.groupId.replace('.', '/'))
+            .resolve(artifact.artifactId)
+            .resolve(artifact.version)
+            .resolve("${artifact.artifactId}-${artifact.version}.pom")
+            .toAbsolutePath()
+            .normalize()
+    val candidates = listOfNotNull(fromArtifactFile, fromArtifactCoordinates).distinct()
+    val resolvedPath = candidates.firstOrNull(Files::exists) ?: candidates.first()
+    require(Files.exists(resolvedPath) && Files.isRegularFile(resolvedPath)) {
+        "Dependency descriptor for '${artifact.groupId}:${artifact.artifactId}:${artifact.version}' " +
+            "is missing from cache at '$resolvedPath'."
+    }
+    require(resolvedPath.startsWith(localRepositoryRoot)) {
+        "Resolved descriptor for plugin '${coordinate.value}' escapes plugin cache root: '$resolvedPath'."
+    }
+    return resolvedPath
+}
+
+private fun toPomSiblingPath(artifactPath: Path): Path? {
+    val fileName = artifactPath.fileName?.toString() ?: return null
+    val extensionSeparator = fileName.lastIndexOf('.')
+    if (extensionSeparator <= 0) {
+        return null
+    }
+    val pomName = fileName.substring(0, extensionSeparator) + ".pom"
+    return artifactPath.resolveSibling(pomName).toAbsolutePath().normalize()
 }
 
 private fun toRemoteArtifactLockKey(coordinate: Coordinate, localRepositoryRoot: Path, artifactPath: Path): String {
-    require(artifactPath.startsWith(localRepositoryRoot)) {
+    val normalizedArtifactPath = artifactPath.toAbsolutePath().normalize()
+    require(normalizedArtifactPath.startsWith(localRepositoryRoot)) {
         "Resolved artifact for plugin '${coordinate.value}' escapes plugin cache root: '$artifactPath'."
     }
-    return localRepositoryRoot.relativize(artifactPath).toString().replace('\\', '/')
+    return localRepositoryRoot.relativize(normalizedArtifactPath).toString().replace('\\', '/')
 }
 
 private fun Artifact.matchesCoordinate(coordinate: Coordinate): Boolean =
