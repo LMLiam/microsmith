@@ -27,6 +27,7 @@ Symptom:
 - plugin coordinate cannot be resolved
 - repository URI rejected
 - checksum mismatch
+- lockfile validation errors (`[lockfile]`)
 - authentication errors (`[authentication]`)
 - repository policy blocks (`[repository-policy]`)
 
@@ -39,6 +40,7 @@ Actions:
   - `MICROSMITH_GITHUB_PACKAGES_USER` + `MICROSMITH_GITHUB_PACKAGES_TOKEN`
     (fallback: `GITHUB_ACTOR` + `GITHUB_TOKEN`)
 - update or regenerate lock/checksum metadata when plugin versions change
+- if lockfile diagnostics are reported, regenerate lock metadata with a non-offline run
 - for strict allowlist mode, include transitive graph entries (`remote-artifact|<cache-relative-path>|<sha256>`) in the allowlist file
 - verify diagnostics do not contain secret material; Microsmith redacts configured tokens/passwords by default
 
