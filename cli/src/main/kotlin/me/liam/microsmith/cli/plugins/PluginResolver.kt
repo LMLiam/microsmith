@@ -101,7 +101,7 @@ private fun resolvePluginsOrThrow(
 
     context.checksumAllowlist?.assertCovers(lockEntries.toLockKeys())
 
-    if (context.lockfile == null || context.lockfile.version < LOCKFILE_VERSION) {
+    if (context.lockfile == null) {
         writeLockfile(
             lockfilePath = context.lockfilePath,
             lockfile =
@@ -255,10 +255,6 @@ private fun assertOfflineGraphReadiness(lockfile: ParsedLockfile?, lockfilePath:
         when {
             lockfile == null ->
                 "Offline mode requires a plugin lockfile. Generate '$lockfilePath' by running once without --offline."
-
-            lockfile.version < LOCKFILE_VERSION ->
-                "Offline mode requires lockfile version $LOCKFILE_VERSION for full dependency-graph validation. " +
-                    "Regenerate '$lockfilePath' by running once without --offline."
 
             else -> {
                 val remoteArtifactEntries = lockfile.entries.filter { entry -> entry.kind == REMOTE_ARTIFACT_KIND }

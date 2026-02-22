@@ -49,7 +49,7 @@ Symptom:
 
 Actions:
 - ensure lockfile metadata exists and is on version 2
-- run once online to prime cache and upgrade lock metadata when needed
+- run once online to prime cache and generate lock metadata when missing
 - ensure the full locked dependency graph exists in plugin cache directory
 - rerun with `--offline` after cache warmup
 

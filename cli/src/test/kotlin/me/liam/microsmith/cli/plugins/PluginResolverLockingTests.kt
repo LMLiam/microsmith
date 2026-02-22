@@ -7,62 +7,13 @@ import me.liam.microsmith.cli.command.RunCommand
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
-import kotlin.io.path.readLines
 import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
 
 @OptIn(ExperimentalPathApi::class)
 class PluginResolverLockingTests :
     StringSpec({
-        "migrates existing v1 lockfile to graph-aware v2 format" {
-            val tempDir = createTempDirectory("microsmith-plugin-resolver-lockfile-migration")
-            try {
-                val script = tempDir.resolve("schema.microsmith.kts")
-                val cache = tempDir.resolve("cache")
-                val repositoryRoot = tempDir.resolve("repo")
-                val rootCoordinate = "com.acme:plugin-root:1.0.0"
-                val transitiveCoordinate = "com.acme:plugin-shared:2.1.0"
-                publishMavenArtifact(repositoryRoot, transitiveCoordinate)
-                publishMavenArtifact(repositoryRoot, rootCoordinate, dependencies = listOf(transitiveCoordinate))
-                script.writeText("// test script")
-
-                val v1LockfilePath = defaultLockfilePath(script)
-                val rootJar = repositoryRoot.resolve(parseCoordinate(rootCoordinate).relativeJarPath)
-                v1LockfilePath.writeText(
-                    """
-                    version=1
-                    remote|$rootCoordinate|${sha256(rootJar)}
-                    """.trimIndent(),
-                )
-
-                val command =
-                    RunCommand(
-                        script = script,
-                        outputDir = tempDir.resolve("generated"),
-                        plugins = setOf(rootCoordinate),
-                        repositoryOverride = repositoryRoot.toUri().toString(),
-                    )
-                val settings =
-                    PluginResolverSettings(
-                        cacheDirectory = cache,
-                        repositoryPolicy = fileRepositoryAllowedPolicy(),
-                    )
-
-                val success =
-                    resolvePlugins(command = command, settings = settings)
-                        .shouldBeTypeOf<PluginResolutionResult.Success>()
-                val lockfilePath = requireNotNull(success.lockfilePath)
-                val lockContents = lockfilePath.readLines().joinToString("\n")
-                lockContents.shouldContain("version=2")
-                lockContents.shouldContain("remote|$rootCoordinate|")
-                lockContents.shouldContain("remote-artifact|${parseCoordinate(rootCoordinate).relativeJarPath}|")
-                lockContents.shouldContain("remote-artifact|${parseCoordinate(transitiveCoordinate).relativeJarPath}|")
-            } finally {
-                runCatching { tempDir.deleteRecursively() }
-            }
-        }
-
-        "fails offline when lockfile is v1 and cannot validate full graph" {
+        "fails when lockfile version is unsupported" {
             val tempDir = createTempDirectory("microsmith-plugin-resolver-offline-v1-lock")
             try {
                 val script = tempDir.resolve("schema.microsmith.kts")
@@ -89,7 +40,6 @@ class PluginResolverLockingTests :
                             outputDir = tempDir.resolve("generated"),
                             plugins = setOf(coordinate),
                             repositoryOverride = repositoryRoot.toUri().toString(),
-                            offline = true,
                         ),
                         settings =
                         PluginResolverSettings(
@@ -100,8 +50,8 @@ class PluginResolverLockingTests :
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
                 val message = failure.diagnostics.joinToString("\n")
-                message.shouldContain("[offline-cache-miss]")
-                message.shouldContain("requires lockfile version 2")
+                message.shouldContain("[unexpected]")
+                message.shouldContain("unsupported version '1'")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }

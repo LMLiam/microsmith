@@ -65,7 +65,7 @@ microsmith run schema.microsmith.kts --out ./generated --offline
 ```
 
 Notes:
-- Run once without `--offline` first to generate/upgrade lockfile metadata and warm the plugin cache.
+- Run once without `--offline` first to generate lockfile metadata and warm the plugin cache.
 - Offline remote plugin resolution requires lockfile v2 and a complete cached dependency graph.
 
 Authenticated private repository (global credentials):
