@@ -157,6 +157,21 @@ flowchart TD
 ## CLI Scripting Runtime
 Run generation from a script file without embedding Gradle in the consumer project:
 
+One-command bootstrap (recommended):
+
+```bash
+microsmith init
+microsmith run build.microsmith.kts --out ./generated
+```
+
+CI-safe bootstrap:
+
+```bash
+microsmith init --non-interactive --yes --diagnostics json --verbose
+```
+
+Direct script execution:
+
 ```bash
 microsmith run schema.microsmith.kts --out ./generated
 ```
@@ -177,6 +192,12 @@ JetBrains IDE helper refresh:
 
 ```bash
 microsmith ide refresh
+```
+
+JetBrains IDE helper health check:
+
+```bash
+microsmith ide doctor --diagnostics json --verbose
 ```
 
 ### Security boundaries and defaults
@@ -219,6 +240,7 @@ Inside .microsmith.kts scripts:
 
 ### Adoption docs
 - `docs/cli/README.md`
+- `docs/cli/command-contract.md`
 - `docs/cli/quickstart-non-gradle.md`
 - `docs/cli/jetbrains-ide-helper.md`
 - `docs/cli/migration-from-gradle.md`

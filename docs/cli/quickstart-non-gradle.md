@@ -9,7 +9,27 @@ This guide shows how to run Microsmith CLI from repositories that do not use Gra
   - `microsmith-cli-<version>-all.jar`, or
   - `microsmith-cli-<version>-dist.zip` / `microsmith-cli-<version>-dist.tar.gz`.
 
-## Minimal script
+## Recommended bootstrap path
+
+Initialize repository defaults and IDE helper metadata:
+
+```bash
+microsmith init
+```
+
+Then run generation from the default bootstrap script:
+
+```bash
+microsmith run build.microsmith.kts --out ./generated
+```
+
+For CI:
+
+```bash
+microsmith init --non-interactive --yes --diagnostics json --verbose
+```
+
+## Manual script path
 
 Create `schema.microsmith.kts`:
 
@@ -50,6 +70,12 @@ Generate helper project metadata for JetBrains IDE indexing:
 
 ```bash
 microsmith ide refresh
+```
+
+Validate helper state and detect stale classpath metadata:
+
+```bash
+microsmith ide doctor --diagnostics json --verbose
 ```
 
 If your repository root is not the current working directory:

@@ -3,11 +3,17 @@ package me.liam.microsmith.cli
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import me.liam.microsmith.cli.command.IdeDoctorCommand
 import me.liam.microsmith.cli.command.IdeRefreshCommand
+import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.doctor.DoctorCheckResult
 import me.liam.microsmith.cli.doctor.DoctorCheckStatus
 import me.liam.microsmith.cli.doctor.DoctorResult
+import me.liam.microsmith.cli.ide.IdeDoctorCheckResult
+import me.liam.microsmith.cli.ide.IdeDoctorResult
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
+import me.liam.microsmith.cli.init.InitBootstrapResult
+import me.liam.microsmith.cli.init.InitConflictException
 import me.liam.microsmith.cli.plugins.PluginResolutionResult
 import me.liam.microsmith.runtime.scripting.model.ScriptFailureType
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
@@ -364,5 +370,275 @@ class MicrosmithCliTests :
             err.joinToString("\n").shouldContain("MS-CLI-4001")
             err.joinToString("\n").shouldContain("simulated helper generation failure")
             out shouldBe emptyList()
+        }
+
+        "ide doctor command returns success when checks pass" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val tempDir = createTempDirectory("microsmith-cli-ide-doctor-success")
+            try {
+                val helperRoot = tempDir.resolve(".microsmith/ide")
+                val cli =
+                    MicrosmithCli(
+                        stdout = out::add,
+                        stderr = err::add,
+                        ideDoctorRunner = { command: IdeDoctorCommand ->
+                            IdeDoctorResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                helperRoot = helperRoot,
+                                checks =
+                                listOf(
+                                    IdeDoctorCheckResult(
+                                        id = "helper-directory",
+                                        passed = true,
+                                        message = "IDE helper directory exists.",
+                                    ),
+                                ),
+                            )
+                        },
+                    )
+
+                val exitCode = cli.run(arrayOf("ide", "doctor", "--repo-root", tempDir.toString()))
+
+                exitCode shouldBe 0
+                out.joinToString("\n").shouldContain("JetBrains IDE helper doctor checks passed")
+                err shouldBe emptyList()
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "ide doctor command returns deterministic failure code when checks fail" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val projectRoot = createTempDirectory("microsmith-cli-ide-doctor-failure")
+            val helperRoot = createTempDirectory("microsmith-cli-ide-doctor-helper")
+            try {
+                val cli =
+                    MicrosmithCli(
+                        stdout = out::add,
+                        stderr = err::add,
+                        ideDoctorRunner = {
+                            IdeDoctorResult(
+                                projectRoot = projectRoot,
+                                helperRoot = helperRoot,
+                                checks =
+                                listOf(
+                                    IdeDoctorCheckResult(
+                                        id = "classpath-sync",
+                                        passed = false,
+                                        message = "IDE helper build file is stale.",
+                                    ),
+                                ),
+                            )
+                        },
+                    )
+
+                val exitCode = cli.run(arrayOf("ide", "doctor"))
+
+                exitCode shouldBe 41
+                err.joinToString("\n").shouldContain("MS-CLI-4101")
+                err.joinToString("\n").shouldContain("JetBrains IDE helper doctor detected issues")
+                out shouldBe emptyList()
+            } finally {
+                runCatching { projectRoot.deleteRecursively() }
+                runCatching { helperRoot.deleteRecursively() }
+            }
+        }
+
+        "init command returns success and emits next run command when bootstrap succeeds" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val tempDir = createTempDirectory("microsmith-cli-init-success")
+            try {
+                val helperRoot = tempDir.resolve(".microsmith/ide")
+                val cli =
+                    MicrosmithCli(
+                        stdout = out::add,
+                        stderr = err::add,
+                        initRunner = { command: InitCommand ->
+                            InitBootstrapResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                createdFiles =
+                                listOf(
+                                    tempDir.resolve("build.microsmith.kts"),
+                                    tempDir.resolve("settings.microsmith.kts"),
+                                ),
+                                preservedFiles = emptyList(),
+                                ideHelperResult =
+                                IdeHelperRefreshResult(
+                                    projectRoot = tempDir,
+                                    helperRoot = helperRoot,
+                                    updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
+                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                ),
+                            )
+                        },
+                    )
+
+                val exitCode = cli.run(arrayOf("init", "--repo-root", tempDir.toString()))
+
+                exitCode shouldBe 0
+                out.joinToString("\n").shouldContain("Microsmith init completed")
+                out.joinToString("\n").shouldContain("build.microsmith.kts")
+                out.joinToString("\n").shouldContain("microsmith run build.microsmith.kts --out ./generated")
+                err shouldBe emptyList()
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "init command returns deterministic conflict failure code when bootstrap detects conflicting path" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    initRunner = {
+                        throw InitConflictException("Bootstrap path is not a regular file.")
+                    },
+                )
+
+            val exitCode = cli.run(arrayOf("init"))
+
+            exitCode shouldBe 50
+            err.joinToString("\n").shouldContain("MS-CLI-5001")
+            err.joinToString("\n").shouldContain("Bootstrap path is not a regular file")
+            out shouldBe emptyList()
+        }
+
+        "init command returns deterministic validation failure code when bootstrap validation fails" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    initRunner = {
+                        throw IllegalArgumentException("Repository root does not exist.")
+                    },
+                )
+
+            val exitCode = cli.run(arrayOf("init", "--repo-root", "/path/does/not/exist"))
+
+            exitCode shouldBe 51
+            err.joinToString("\n").shouldContain("MS-CLI-5002")
+            err.joinToString("\n").shouldContain("Repository root does not exist.")
+            out shouldBe emptyList()
+        }
+
+        "init command returns deterministic runtime failure code for unexpected bootstrap errors" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    initRunner = {
+                        throw IllegalStateException("Unexpected init failure.")
+                    },
+                )
+
+            val exitCode = cli.run(arrayOf("init"))
+
+            exitCode shouldBe 52
+            err.joinToString("\n").shouldContain("MS-CLI-5003")
+            err.joinToString("\n").shouldContain("Unexpected init failure.")
+            out shouldBe emptyList()
+        }
+
+        "init command emits json diagnostics payload when requested" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val tempDir = createTempDirectory("microsmith-cli-init-json")
+            try {
+                val helperRoot = tempDir.resolve(".microsmith/ide")
+                val cli =
+                    MicrosmithCli(
+                        stdout = out::add,
+                        stderr = err::add,
+                        initRunner = { command: InitCommand ->
+                            InitBootstrapResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
+                                preservedFiles = listOf(tempDir.resolve("settings.microsmith.kts")),
+                                ideHelperResult =
+                                IdeHelperRefreshResult(
+                                    projectRoot = tempDir,
+                                    helperRoot = helperRoot,
+                                    updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
+                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                ),
+                            )
+                        },
+                    )
+
+                val exitCode =
+                    cli.run(
+                        arrayOf(
+                            "init",
+                            "--repo-root",
+                            tempDir.toString(),
+                            "--diagnostics",
+                            "json",
+                            "--verbose",
+                        ),
+                    )
+
+                exitCode shouldBe 0
+                out.joinToString("\n").shouldContain("\"level\":\"info\"")
+                out.joinToString("\n").shouldContain("Microsmith init completed")
+                out.joinToString("\n").shouldContain("\"details\"")
+                err shouldBe emptyList()
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "ide doctor command emits json error diagnostics payload when checks fail" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val tempDir = createTempDirectory("microsmith-cli-ide-doctor-json-failure")
+            try {
+                val cli =
+                    MicrosmithCli(
+                        stdout = out::add,
+                        stderr = err::add,
+                        ideDoctorRunner = { command ->
+                            IdeDoctorResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                helperRoot = tempDir.resolve(".microsmith/ide"),
+                                checks =
+                                listOf(
+                                    IdeDoctorCheckResult(
+                                        id = "classpath-sync",
+                                        passed = false,
+                                        message = "IDE helper build file is stale.",
+                                    ),
+                                ),
+                            )
+                        },
+                    )
+
+                val exitCode =
+                    cli.run(
+                        arrayOf(
+                            "ide",
+                            "doctor",
+                            "--repo-root",
+                            tempDir.toString(),
+                            "--diagnostics",
+                            "json",
+                        ),
+                    )
+
+                exitCode shouldBe 41
+                err.joinToString("\n").shouldContain("\"code\":\"MS-CLI-4101\"")
+                err.joinToString("\n").shouldContain("\"level\":\"error\"")
+                out shouldBe emptyList()
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
         }
     })

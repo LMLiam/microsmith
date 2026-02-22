@@ -8,7 +8,9 @@
 - Installation options:
   - run fat jar directly: `java -jar microsmith-cli-<version>-all.jar --help`
   - unpack distribution archive and run launcher script
+  - bootstrap repository defaults: `microsmith init`
   - generate JetBrains IDE helper metadata: `microsmith ide refresh`
+  - validate JetBrains IDE helper health: `microsmith ide doctor`
 - Bundled plugin policy:
   - bundled plugin coordinates are pinned to the CLI release version
   - bundled profile content must stay checksum-verifiable and deterministic across artifacts

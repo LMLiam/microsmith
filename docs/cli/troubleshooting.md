@@ -21,6 +21,18 @@ Actions:
 - use deterministic diagnostics in CLI output (`[error] file:line:column`)
 - fix unknown DSL calls and missing imports
 
+## Init/bootstrap issues
+
+Symptom:
+- `microsmith init` exits non-zero
+- expected bootstrap files are not created
+
+Actions:
+- run `microsmith init --diagnostics json --verbose` and inspect the `code` field
+- verify repository root path (or pass `--repo-root <path>`)
+- resolve filesystem conflicts (for example, `build.microsmith.kts` exists as a directory)
+- rerun `microsmith init` after conflict cleanup
+
 ## Resolver and plugin failures
 
 Symptom:
@@ -75,6 +87,7 @@ Symptom:
 
 Actions:
 - run `microsmith ide refresh` from repository root
+- run `microsmith ide doctor --diagnostics json --verbose` to validate helper health
 - in JetBrains IDE, re-import or refresh `.microsmith/ide/build.gradle.kts`
 - verify helper files exist under `.microsmith/ide/` and were updated
 - if repository root is non-standard, rerun with `--repo-root <path>`
