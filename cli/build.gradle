@@ -231,6 +231,9 @@ def bundledPluginCatalogText = bundledPluginCatalogLines.join("\n") + "\n"
 
 def generateBundledPluginCatalogTask =
     tasks.register("generateBundledPluginCatalog") {
+        inputs.property("cliVersion", cliVersion)
+        inputs.property("catalogFormatVersion", bundledPluginCatalogFormatVersion)
+        inputs.property("catalogText", bundledPluginCatalogText)
         outputs.file(bundledPluginCatalogOutput)
         doLast {
             def outputFile = bundledPluginCatalogOutput.get().asFile
@@ -259,8 +262,8 @@ tasks.named("shadowJar") {
 
 def shadowJarTask = tasks.named("shadowJar", ShadowJar)
 def shadowJarArchive = shadowJarTask.flatMap { it.archiveFile }
-def shadowJarArchiveName = "microsmith-cli-${cliVersion}-all.jar"
-def distRootName = "microsmith-cli-${cliVersion}"
+def shadowJarArchiveName = "microsmith-cli-${cliVersion}-all.jar".toString()
+def distRootName = "microsmith-cli-${cliVersion}".toString()
 def distDirectory = layout.buildDirectory.dir("microsmith-cli-dist")
 
 tasks.register("verifyShadowJarServices") {
@@ -341,7 +344,7 @@ tasks.register("prepareDist", Sync) {
 
     from("src/dist/launcher/microsmith") {
         into("bin")
-        filter(ReplaceTokens, tokens: [CLI_JAR: shadowJarArchiveName])
+        filter(ReplaceTokens, tokens: [CLI_JAR: shadowJarArchiveName.toString()])
         filePermissions {
             unix("rwxr-xr-x")
         }
@@ -349,7 +352,7 @@ tasks.register("prepareDist", Sync) {
 
     from("src/dist/launcher/microsmith.bat") {
         into("bin")
-        filter(ReplaceTokens, tokens: [CLI_JAR: shadowJarArchiveName])
+        filter(ReplaceTokens, tokens: [CLI_JAR: shadowJarArchiveName.toString()])
     }
 
     from("src/dist/README.txt") {
