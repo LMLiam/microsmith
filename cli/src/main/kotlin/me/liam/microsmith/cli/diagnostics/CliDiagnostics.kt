@@ -21,6 +21,7 @@ internal enum class CliFailureCode(val id: String, val exitCode: Int) {
     SCRIPT_EVALUATION_FAILED(id = "MS-CLI-2003", exitCode = 22),
     SCRIPT_HOST_FAILED(id = "MS-CLI-2004", exitCode = 23),
     DOCTOR_FAILED(id = "MS-CLI-3001", exitCode = 30),
+    IDE_HELPER_FAILED(id = "MS-CLI-4001", exitCode = 40),
 }
 
 internal enum class DiagnosticLevel {

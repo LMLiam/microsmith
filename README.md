@@ -173,6 +173,12 @@ Isolation mode:
 microsmith run schema.microsmith.kts --out ./generated --isolation process
 ```
 
+JetBrains IDE helper refresh:
+
+```bash
+microsmith ide refresh
+```
+
 ### Security boundaries and defaults
 - Script-time dependency directives (for example `@file:DependsOn` and `@file:Repository`) are denied by default.
 - Plugin resolution is endpoint-restricted by a repository allowlist:
@@ -214,6 +220,7 @@ Inside .microsmith.kts scripts:
 ### Adoption docs
 - `docs/cli/README.md`
 - `docs/cli/quickstart-non-gradle.md`
+- `docs/cli/jetbrains-ide-helper.md`
 - `docs/cli/migration-from-gradle.md`
 - `docs/cli/troubleshooting.md`
 - `docs/cli/runtime-bundling-evaluation.md`

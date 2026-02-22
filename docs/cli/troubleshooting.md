@@ -66,3 +66,15 @@ Actions:
 - run distribution integrity task when validating release assets: `./gradlew :cli:verifyDistLayout`
 - inspect `bundled-plugins.lock` in the unpacked distribution and confirm it lists expected bundled providers
 - avoid manually repackaging runtime jars without merged service descriptors
+
+## JetBrains IDE helper issues
+
+Symptom:
+- `.microsmith.kts` files still show unresolved Microsmith symbols in JetBrains IDEs
+- helper project appears stale after CLI upgrade
+
+Actions:
+- run `microsmith ide refresh` from repository root
+- in JetBrains IDE, re-import or refresh `.microsmith/ide/build.gradle.kts`
+- verify helper files exist under `.microsmith/ide/` and were updated
+- if repository root is non-standard, rerun with `--repo-root <path>`
