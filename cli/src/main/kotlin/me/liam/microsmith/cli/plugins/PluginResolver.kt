@@ -87,10 +87,12 @@ private fun resolvePluginsOrThrow(
             checksumAllowlist = context.checksumAllowlist,
         )
 
-    context.lockfile?.assertSameRemoteArtifactSet(
-        remoteResolution.remoteArtifactChecksums.keys.toSet(),
-        context.lockfilePath,
-    )
+    withLockfileDiagnostics {
+        context.lockfile?.assertSameRemoteArtifactSet(
+            remoteResolution.remoteArtifactChecksums.keys.toSet(),
+            context.lockfilePath,
+        )
+    }
 
     val lockEntries =
         buildList {
@@ -125,11 +127,11 @@ private fun buildResolutionContext(
     localPluginJars: List<LocalPluginJar>,
 ): ResolutionContext {
     val lockfilePath = settings.lockfilePathOverride ?: defaultLockfilePath(command.script)
-    val lockfile = readLockfile(lockfilePath)
+    val lockfile = withLockfileDiagnostics { readLockfile(lockfilePath) }
     val checksumAllowlist = settings.checksumAllowlist ?: loadPluginChecksumAllowlistFromEnvironment()
     val requestedLockKeys = buildRequestedLockKeys(coordinates, localPluginJars.map(LocalPluginJar::lockKey))
     checksumAllowlist?.assertCovers(requestedLockKeys)
-    lockfile?.assertSamePluginSet(requestedLockKeys, lockfilePath)
+    withLockfileDiagnostics { lockfile?.assertSamePluginSet(requestedLockKeys, lockfilePath) }
 
     val cacheDirectory = settings.cacheDirectory.toAbsolutePath().normalize()
     if (command.offline && coordinates.isNotEmpty()) {
@@ -189,7 +191,9 @@ private fun resolveRemotePlugins(
                 offline = command.offline,
             )
         val rootChecksum = sha256(resolvedRemotePlugin.rootArtifactPath)
-        context.lockfile?.verifyChecksum(REMOTE_KIND, coordinate.value, rootChecksum)
+        withLockfileDiagnostics {
+            context.lockfile?.verifyChecksum(REMOTE_KIND, coordinate.value, rootChecksum)
+        }
         context.checksumAllowlist?.verifyChecksum(REMOTE_KIND, coordinate.value, rootChecksum)
         rootRemoteLockEntries.add(LockEntry(kind = REMOTE_KIND, key = coordinate.value, checksum = rootChecksum))
         mergeRemoteArtifactChecksums(
@@ -216,7 +220,9 @@ private fun mergeRemoteArtifactChecksums(
 ) {
     artifacts.forEach { artifact ->
         val checksum = sha256(artifact.artifactPath)
-        lockfile?.verifyChecksum(REMOTE_ARTIFACT_KIND, artifact.lockKey, checksum)
+        withLockfileDiagnostics {
+            lockfile?.verifyChecksum(REMOTE_ARTIFACT_KIND, artifact.lockKey, checksum)
+        }
         checksumAllowlist?.verifyChecksum(REMOTE_ARTIFACT_KIND, artifact.lockKey, checksum)
         val previous = checksums.putIfAbsent(artifact.lockKey, checksum)
         require(previous == null || previous == checksum) {
@@ -235,7 +241,9 @@ private fun resolveLocalPlugins(
 
     localPluginJars.forEach { localJar ->
         val checksum = sha256(localJar.artifactPath)
-        lockfile?.verifyChecksum(LOCAL_KIND, localJar.lockKey, checksum)
+        withLockfileDiagnostics {
+            lockfile?.verifyChecksum(LOCAL_KIND, localJar.lockKey, checksum)
+        }
         checksumAllowlist?.verifyChecksum(LOCAL_KIND, localJar.lockKey, checksum)
         lockEntries.add(LockEntry(kind = LOCAL_KIND, key = localJar.lockKey, checksum = checksum))
         classpath.add(localJar.artifactPath)
@@ -318,6 +326,16 @@ private fun resolveAndValidateLocalPluginJars(pluginJars: Set<Path>): List<Local
         }
     }
     return localPluginJars
+}
+
+private inline fun <T> withLockfileDiagnostics(block: () -> T): T = try {
+    block()
+} catch (error: IllegalArgumentException) {
+    throw PluginResolutionDiagnosticException(
+        category = PluginResolverErrorCategory.LOCKFILE,
+        message = error.message ?: "Plugin lockfile validation failed.",
+        cause = error,
+    )
 }
 
 private fun Throwable.toResolutionDiagnostic(sensitiveValues: Set<String>): String = when (this) {

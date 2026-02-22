@@ -50,7 +50,7 @@ class PluginResolverLockingTests :
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
                 val message = failure.diagnostics.joinToString("\n")
-                message.shouldContain("[unexpected]")
+                message.shouldContain("[lockfile]")
                 message.shouldContain("unsupported version '1'")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
