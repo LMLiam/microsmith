@@ -35,12 +35,19 @@ internal interface RemotePluginResolver {
     ): ResolvedRemotePlugin
 }
 
-internal data class ResolvedRemotePlugin(val rootArtifactPath: Path, val classpath: List<Path>)
+internal data class ResolvedRemoteArtifact(val lockKey: String, val artifactPath: Path)
+
+internal data class ResolvedRemotePlugin(
+    val rootArtifactPath: Path,
+    val classpath: List<Path>,
+    val artifacts: List<ResolvedRemoteArtifact>,
+)
 
 internal enum class PluginResolverErrorCategory(val code: String) {
     OFFLINE_CACHE_MISS("offline-cache-miss"),
     AUTHENTICATION("authentication"),
     DEPENDENCY_RESOLUTION("dependency-resolution"),
+    LOCKFILE("lockfile"),
     REPOSITORY_POLICY("repository-policy"),
     ROOT_ARTIFACT_MISSING("root-artifact-missing"),
 }
@@ -88,8 +95,19 @@ internal class MavenRemotePluginResolver(
                 expectedRootArtifactPath = expectedRootArtifactPath,
                 artifactResults = dependencyResult.artifactResults,
             )
+        val artifacts =
+            resolveArtifacts(
+                coordinate = coordinate,
+                artifactResults = dependencyResult.artifactResults,
+                localRepositoryRoot = localRepositoryRoot,
+                rootArtifactPath = rootArtifactPath,
+            )
 
-        return ResolvedRemotePlugin(rootArtifactPath = rootArtifactPath, classpath = classpath)
+        return ResolvedRemotePlugin(
+            rootArtifactPath = rootArtifactPath,
+            classpath = classpath,
+            artifacts = artifacts,
+        )
     }
 }
 
@@ -205,6 +223,91 @@ private fun resolveRootArtifactPath(
         "Plugin '${coordinate.value}' resolved but no root jar was produced in cache at " +
             "'$expectedRootArtifactPath'.",
     )
+
+private fun resolveArtifacts(
+    coordinate: Coordinate,
+    artifactResults: List<ArtifactResult>,
+    localRepositoryRoot: Path,
+    rootArtifactPath: Path,
+): List<ResolvedRemoteArtifact> {
+    val resolvedRuntimeArtifacts =
+        artifactResults
+            .asSequence()
+            .mapNotNull { result -> result.artifact?.file?.toPath() }
+            .map { path -> path.toAbsolutePath().normalize() }
+            .filter(Files::exists)
+            .toList()
+    val resolvedDescriptorArtifacts =
+        artifactResults
+            .asSequence()
+            .mapNotNull { result -> result.artifact }
+            .map { artifact ->
+                resolveDescriptorPath(
+                    coordinate = coordinate,
+                    localRepositoryRoot = localRepositoryRoot,
+                    artifact = artifact,
+                )
+            }.toList()
+
+    return (resolvedRuntimeArtifacts + listOf(rootArtifactPath) + resolvedDescriptorArtifacts)
+        .distinct()
+        .map { artifactPath ->
+            ResolvedRemoteArtifact(
+                lockKey =
+                toRemoteArtifactLockKey(
+                    coordinate = coordinate,
+                    localRepositoryRoot = localRepositoryRoot,
+                    artifactPath = artifactPath,
+                ),
+                artifactPath = artifactPath,
+            )
+        }.sortedBy(ResolvedRemoteArtifact::lockKey)
+}
+
+private fun resolveDescriptorPath(coordinate: Coordinate, localRepositoryRoot: Path, artifact: Artifact): Path {
+    val fromArtifactFile =
+        artifact.file
+            ?.toPath()
+            ?.toAbsolutePath()
+            ?.normalize()
+            ?.let(::toPomSiblingPath)
+    val fromArtifactCoordinates =
+        localRepositoryRoot
+            .resolve(artifact.groupId.replace('.', '/'))
+            .resolve(artifact.artifactId)
+            .resolve(artifact.version)
+            .resolve("${artifact.artifactId}-${artifact.version}.pom")
+            .toAbsolutePath()
+            .normalize()
+    val candidates = listOfNotNull(fromArtifactFile, fromArtifactCoordinates).distinct()
+    val resolvedPath = candidates.firstOrNull(Files::exists) ?: candidates.first()
+    require(Files.exists(resolvedPath) && Files.isRegularFile(resolvedPath)) {
+        "Dependency descriptor for '${artifact.groupId}:${artifact.artifactId}:${artifact.version}' " +
+            "is missing from cache at '$resolvedPath'."
+    }
+    require(resolvedPath.startsWith(localRepositoryRoot)) {
+        "Resolved descriptor for plugin '${coordinate.value}' escapes plugin cache root: '$resolvedPath'."
+    }
+    return resolvedPath
+}
+
+private fun toPomSiblingPath(artifactPath: Path): Path? {
+    val fileName = artifactPath.fileName?.toString() ?: return null
+    val extensionSeparator = fileName.lastIndexOf('.')
+    if (extensionSeparator <= 0) {
+        return null
+    }
+    val pomName = fileName.substring(0, extensionSeparator) + ".pom"
+    return artifactPath.resolveSibling(pomName).toAbsolutePath().normalize()
+}
+
+private fun toRemoteArtifactLockKey(coordinate: Coordinate, localRepositoryRoot: Path, artifactPath: Path): String {
+    val normalizedArtifactPath = artifactPath.toAbsolutePath().normalize()
+    require(normalizedArtifactPath.startsWith(localRepositoryRoot)) {
+        "Resolved artifact for plugin '${coordinate.value}' escapes plugin cache root: '$artifactPath'."
+    }
+    return localRepositoryRoot.relativize(normalizedArtifactPath).toString().replace('\\', '/')
+}
 
 private fun Artifact.matchesCoordinate(coordinate: Coordinate): Boolean =
     groupId == coordinate.group && artifactId == coordinate.artifact && version == coordinate.version

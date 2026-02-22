@@ -34,7 +34,12 @@ internal fun readLockfile(lockfilePath: Path): ParsedLockfile? {
 }
 
 internal fun ParsedLockfile.assertSamePluginSet(requestedKeys: Set<LockKey>, lockfilePath: Path) {
-    val lockedKeys = entries.map { LockKey(kind = it.kind, key = it.key) }.toSet()
+    val lockedKeys =
+        entries
+            .asSequence()
+            .filter(::isRequestedPluginEntry)
+            .map { entry -> LockKey(kind = entry.kind, key = entry.key) }
+            .toSet()
     val missingFromLock = requestedKeys - lockedKeys
     val extraInLock = lockedKeys - requestedKeys
 
@@ -48,6 +53,30 @@ internal fun ParsedLockfile.assertSamePluginSet(requestedKeys: Set<LockKey>, loc
                 append(" Not requested by CLI: ${extraInLock.joinToString { "${it.kind}:${it.key}" }}.")
             }
             append(" Update plugin flags or regenerate the lockfile.")
+        }
+    }
+}
+
+internal fun ParsedLockfile.assertSameRemoteArtifactSet(resolvedKeys: Set<String>, lockfilePath: Path) {
+    val lockedKeys =
+        entries
+            .asSequence()
+            .filter { entry -> entry.kind == REMOTE_ARTIFACT_KIND }
+            .map(LockEntry::key)
+            .toSet()
+    val missingFromLock = resolvedKeys - lockedKeys
+    val extraInLock = lockedKeys - resolvedKeys
+
+    require(missingFromLock.isEmpty() && extraInLock.isEmpty()) {
+        buildString {
+            append("Resolved remote dependency graph does not match lockfile '$lockfilePath'.")
+            if (missingFromLock.isNotEmpty()) {
+                append(" Missing from lockfile: ${missingFromLock.sorted().joinToString()}.")
+            }
+            if (extraInLock.isNotEmpty()) {
+                append(" Not present in resolved graph: ${extraInLock.sorted().joinToString()}.")
+            }
+            append(" Regenerate the lockfile after reviewing dependency changes.")
         }
     }
 }
@@ -87,7 +116,8 @@ private fun parseLockEntry(line: String): LockEntry {
     val kind = parts[0]
     val key = parts[1]
     val checksum = parts[2]
-    require(kind == REMOTE_KIND || kind == LOCAL_KIND) {
+    val allowedKinds = setOf(REMOTE_KIND, REMOTE_ARTIFACT_KIND, LOCAL_KIND)
+    require(kind in allowedKinds) {
         "Invalid plugin lockfile entry kind '$kind'."
     }
     require(key.isNotBlank()) { "Plugin lockfile entry key must not be blank." }
@@ -97,3 +127,5 @@ private fun parseLockEntry(line: String): LockEntry {
 
     return LockEntry(kind = kind, key = key, checksum = checksum)
 }
+
+private fun isRequestedPluginEntry(entry: LockEntry): Boolean = entry.kind == REMOTE_KIND || entry.kind == LOCAL_KIND
