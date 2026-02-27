@@ -8,6 +8,7 @@ import me.liam.microsmith.cli.command.IdeDoctorCommand
 import me.liam.microsmith.cli.command.IdeRefreshCommand
 import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.command.RunCommand
+import me.liam.microsmith.cli.command.VersionCommand
 import me.liam.microsmith.cli.diagnostics.DiagnosticFormat
 import java.nio.file.Path
 
@@ -33,15 +34,20 @@ internal const val NON_INTERACTIVE_OPTION = "--non-interactive"
 internal const val YES_OPTION = "--yes"
 private const val SCRIPT_EXTENSION = ".microsmith.kts"
 private val HELP_COMMANDS = setOf("--help", "-h", "help")
+private val VERSION_COMMANDS = setOf("--version", "version")
 
 internal fun parseCliArgs(args: List<String>): CliCommand = when (val command = args.firstOrNull()) {
     null, in HELP_COMMANDS -> HelpCommand
+    in VERSION_COMMANDS -> parseVersionCommand(args)
     INIT_COMMAND -> parseInitCommand(args)
     RUN_COMMAND -> parseRunCommand(args)
     DOCTOR_COMMAND -> parseDoctorCommand(args)
     IDE_COMMAND -> parseIdeCommand(args)
     else -> ErrorCommand("Unknown command '$command'.")
 }
+
+private fun parseVersionCommand(args: List<String>): CliCommand =
+    if (args.size > 1) ErrorCommand("The --version command does not accept additional arguments.") else VersionCommand
 
 private fun parseRunCommand(args: List<String>): CliCommand {
     val (script, scriptError) = parseScriptArg(args.getOrNull(1))

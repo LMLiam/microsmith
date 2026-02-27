@@ -4,12 +4,16 @@ This guide shows how to run Microsmith CLI from repositories that do not use Gra
 
 ## Prerequisites
 
-- Java 24 or newer on `PATH` (or set `JAVA_HOME`).
-- A Microsmith CLI distribution artifact:
-  - `microsmith-cli-<version>-all.jar`, or
-  - `microsmith-cli-<version>-dist.zip` / `microsmith-cli-<version>-dist.tar.gz`.
+- Install Microsmith using the canonical OS installer path from `install.md`.
+- If using manual channels instead of installer scripts, Java 24+ is required.
 
 ## Recommended bootstrap path
+
+Install check:
+
+```bash
+microsmith --version
+```
 
 Initialize repository defaults and IDE helper metadata:
 
@@ -153,6 +157,12 @@ Security defaults are enabled by default:
 
 ## GitHub Actions snippets
 
+Set repository/environment variables:
+
+- `MICROSMITH_VERSION` (for example, `1.2.3`)
+- `MICROSMITH_INSTALLER_SH_URL`: `https://github.com/LMLiam/microsmith/releases/download/v<version>/microsmith-install.sh`
+- `MICROSMITH_INSTALLER_PS1_URL`: `https://github.com/LMLiam/microsmith/releases/download/v<version>/microsmith-install.ps1`
+
 ### Node repository
 
 ```yaml
@@ -166,17 +176,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 24
-      - name: Download Microsmith CLI
+      - name: Install Microsmith CLI
         run: |
-          mkdir -p tools
-          curl -sSL -o tools/microsmith.zip "$MICROSMITH_DIST_URL"
-          unzip -q tools/microsmith.zip -d tools
+          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
+          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
       - name: Run Microsmith
-        run: ./tools/microsmith-cli-*/bin/microsmith run schema.microsmith.kts --out generated/proto
+        run: microsmith run schema.microsmith.kts --out generated/proto
 ```
 
 ### Go repository
@@ -190,14 +195,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 24
-      - name: Fetch CLI jar
-        run: curl -sSL -o microsmith-cli.jar "$MICROSMITH_CLI_JAR_URL"
+      - name: Install Microsmith CLI
+        run: |
+          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
+          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
       - name: Generate protobuf
-        run: java -jar microsmith-cli.jar run schema.microsmith.kts --out internal/gen/proto
+        run: microsmith run schema.microsmith.kts --out internal/gen/proto
 ```
 
 ### .NET repository
@@ -211,19 +214,14 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 24
-      - name: Download CLI distribution
+      - name: Install Microsmith CLI
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Path tools -Force | Out-Null
-          Invoke-WebRequest -Uri $env:MICROSMITH_DIST_URL -OutFile tools\microsmith.zip
-          Expand-Archive -Path tools\microsmith.zip -DestinationPath tools -Force
+          Invoke-WebRequest -Uri $env:MICROSMITH_INSTALLER_PS1_URL -OutFile microsmith-install.ps1
+          .\microsmith-install.ps1 -Version $env:MICROSMITH_VERSION
       - name: Run Microsmith
         shell: pwsh
-        run: .\tools\microsmith-cli-*\bin\microsmith.bat run schema.microsmith.kts --out .\Generated\Proto
+        run: microsmith run schema.microsmith.kts --out .\Generated\Proto
 ```
 
 See `troubleshooting.md` for resolver, offline mode, and diagnostics details.

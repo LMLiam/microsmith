@@ -9,6 +9,7 @@ import me.liam.microsmith.cli.command.IdeDoctorCommand
 import me.liam.microsmith.cli.command.IdeRefreshCommand
 import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.command.RunCommand
+import me.liam.microsmith.cli.command.VersionCommand
 import me.liam.microsmith.cli.diagnostics.DiagnosticFormat
 import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import kotlin.io.path.Path
@@ -17,6 +18,19 @@ class CliParserTests :
     StringSpec({
         "returns help command for empty args" {
             parseCliArgs(emptyList()) shouldBe HelpCommand
+        }
+
+        "parses --version command" {
+            parseCliArgs(listOf("--version")) shouldBe VersionCommand
+        }
+
+        "parses version command alias" {
+            parseCliArgs(listOf("version")) shouldBe VersionCommand
+        }
+
+        "returns error when --version has extra arguments" {
+            parseCliArgs(listOf("--version", "--verbose")) shouldBe
+                ErrorCommand("The --version command does not accept additional arguments.")
         }
 
         "parses doctor command with defaults" {

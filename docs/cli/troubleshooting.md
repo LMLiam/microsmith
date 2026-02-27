@@ -7,9 +7,23 @@ Symptom:
 - unsupported class version / runtime mismatch
 
 Actions:
-- install Java 24+
-- set `JAVA_HOME` to the Java 24 installation
-- rerun `microsmith --help` to verify launcher/runtime path
+- run the canonical installer from `install.md` (it provisions Java 24 when needed)
+- if using manual channels, install Java 24+ and set `JAVA_HOME`
+- rerun `microsmith --version` and `microsmith --help` to validate runtime wiring
+
+## Installer failures
+
+Symptom:
+- install script exits non-zero
+- checksum mismatch during installation
+- runtime provisioning fails
+
+Actions:
+- verify download integrity (`*.sha256`) and rerun installer
+- rerun installer with explicit archive/checksum flags:
+  - `--dist-file`, `--dist-sha256`
+  - `--runtime-file`, `--runtime-sha256`
+- inspect installer output for missing prerequisite tools (`curl`, `tar`, `unzip`)
 
 ## Script diagnostics
 

@@ -53,6 +53,23 @@ class MicrosmithCliTests :
             err.joinToString("\n").shouldContain("MS-CLI-0001")
         }
 
+        "returns version string for --version command" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    versionProvider = { "9.9.9-test" },
+                )
+
+            val exitCode = cli.run(arrayOf("--version"))
+
+            exitCode shouldBe 0
+            out shouldBe listOf("microsmith 9.9.9-test")
+            err shouldBe emptyList()
+        }
+
         "returns provider validation exit code when provider validation fails" {
             val out = mutableListOf<String>()
             val err = mutableListOf<String>()

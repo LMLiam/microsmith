@@ -13,6 +13,7 @@ Usage:
   microsmith ide refresh [--repo-root <path>] [--diagnostics <text|json>] [--verbose]
   microsmith ide doctor [--repo-root <path>] [--diagnostics <text|json>] [--verbose]
   microsmith doctor [--diagnostics <text|json>] [--verbose]
+  microsmith --version
   microsmith --help
 
 Security policy env vars:

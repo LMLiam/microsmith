@@ -7,6 +7,7 @@ import me.liam.microsmith.cli.command.IdeDoctorCommand
 import me.liam.microsmith.cli.command.IdeRefreshCommand
 import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.command.RunCommand
+import me.liam.microsmith.cli.command.VersionCommand
 import me.liam.microsmith.cli.diagnostics.CliDiagnosticEmitter
 import me.liam.microsmith.cli.diagnostics.CliFailureCode
 import me.liam.microsmith.cli.diagnostics.DiagnosticFormat
@@ -58,6 +59,7 @@ internal class MicrosmithCli(
     private val doctorRunner: ((() -> List<String>) -> DoctorResult) = { validator ->
         runDoctorChecks(providerValidator = validator)
     },
+    private val versionProvider: () -> String = ::resolveCliVersion,
     private val initRunner: (InitCommand) -> InitBootstrapResult = ::runInitBootstrap,
     private val ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult = ::refreshIdeHelperProject,
     private val ideDoctorRunner: (IdeDoctorCommand) -> IdeDoctorResult = ::runIdeHelperDoctor,
@@ -86,6 +88,11 @@ internal class MicrosmithCli(
         is RunCommand -> runCommand(parsed)
 
         is DoctorCommand -> runDoctor(parsed)
+
+        is VersionCommand -> {
+            stdout("microsmith ${versionProvider()}")
+            0
+        }
 
         is InitCommand -> runInit(parsed)
 

@@ -7,6 +7,7 @@ This document is the source of truth for setup and IDE workflow command behavior
 - `microsmith init [--repo-root <path>] [--non-interactive] [--yes] [--diagnostics <text|json>] [--verbose]`
 - `microsmith ide refresh [--repo-root <path>] [--diagnostics <text|json>] [--verbose]`
 - `microsmith ide doctor [--repo-root <path>] [--diagnostics <text|json>] [--verbose]`
+- `microsmith --version`
 
 ## Default `init` behavior
 

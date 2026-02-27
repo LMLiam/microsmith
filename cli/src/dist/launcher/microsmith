@@ -14,10 +14,39 @@ if [ -z "${MICROSMITH_PLUGIN_CACHE_DIR:-}" ]; then
   export MICROSMITH_PLUGIN_CACHE_DIR
 fi
 
-if [ -n "${JAVA_HOME:-}" ]; then
+if [ -n "${MICROSMITH_JAVA_CMD:-}" ]; then
+  JAVA_CMD="$MICROSMITH_JAVA_CMD"
+elif [ -x "$MICROSMITH_HOME/runtime/bin/java" ]; then
+  JAVA_CMD="$MICROSMITH_HOME/runtime/bin/java"
+elif [ -n "${JAVA_HOME:-}" ] && [ -x "$JAVA_HOME/bin/java" ]; then
   JAVA_CMD="$JAVA_HOME/bin/java"
 else
   JAVA_CMD="java"
+fi
+
+if [ "$JAVA_CMD" = "java" ]; then
+  if ! command -v java >/dev/null 2>&1; then
+    echo "Microsmith CLI could not find a Java runtime (Java 24+ required)." >&2
+    echo "Install via the official installer or set JAVA_HOME/MICROSMITH_JAVA_CMD." >&2
+    exit 127
+  fi
+else
+  if [ ! -x "$JAVA_CMD" ]; then
+    echo "Microsmith CLI Java command is not executable: '$JAVA_CMD'." >&2
+    echo "Install via the official installer or set JAVA_HOME/MICROSMITH_JAVA_CMD." >&2
+    exit 127
+  fi
+fi
+
+JAVA_VERSION_LINE=$("$JAVA_CMD" -version 2>&1 | awk 'NR==1 {print; exit}')
+JAVA_VERSION_RAW=$(printf '%s\n' "$JAVA_VERSION_LINE" | sed -n 's/.*version "\(.*\)".*/\1/p')
+if [ -n "$JAVA_VERSION_RAW" ]; then
+  JAVA_FEATURE=$(printf '%s\n' "$JAVA_VERSION_RAW" | awk -F. '{if ($1 == "1") print $2; else print $1}' | sed 's/[^0-9].*$//')
+  if [ -n "$JAVA_FEATURE" ] && [ "$JAVA_FEATURE" -lt 24 ]; then
+    echo "Microsmith CLI requires Java 24 or newer; found '$JAVA_VERSION_RAW'." >&2
+    echo "Install via the official installer or update JAVA_HOME/MICROSMITH_JAVA_CMD." >&2
+    exit 78
+  fi
 fi
 
 exec "$JAVA_CMD" -jar "$MICROSMITH_HOME/lib/@CLI_JAR@" "$@"

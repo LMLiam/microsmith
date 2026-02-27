@@ -157,6 +157,15 @@ flowchart TD
 ## CLI Scripting Runtime
 Run generation from a script file without embedding Gradle in the consumer project:
 
+Installation (recommended):
+
+```bash
+VERSION=<microsmith-version>
+curl -fsSL -o microsmith-install.sh "https://github.com/LMLiam/microsmith/releases/download/v${VERSION}/microsmith-install.sh"
+sh microsmith-install.sh --version "${VERSION}"
+microsmith --version
+```
+
 One-command bootstrap (recommended):
 
 ```bash
@@ -236,10 +245,11 @@ Inside .microsmith.kts scripts:
 - Distribution metadata:
   - `cli/build/generated/microsmith/bundled-plugins.lock` (generated bundled plugin catalog, pinned to CLI version)
   - packaged as `META-INF/microsmith/bundled-plugins.lock` in the fat jar and `bundled-plugins.lock` in dist archives
-- Build them with `./gradlew :cli:distArtifacts`
+- Build them with `./gradlew :cli:releaseArtifacts`
 
 ### Adoption docs
 - `docs/cli/README.md`
+- `docs/cli/install.md`
 - `docs/cli/command-contract.md`
 - `docs/cli/quickstart-non-gradle.md`
 - `docs/cli/jetbrains-ide-helper.md`
