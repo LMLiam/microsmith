@@ -5,7 +5,9 @@ import io.kotest.matchers.shouldBe
 import me.liam.microsmith.cli.command.DoctorCommand
 import me.liam.microsmith.cli.command.ErrorCommand
 import me.liam.microsmith.cli.command.HelpCommand
+import me.liam.microsmith.cli.command.IdeDoctorCommand
 import me.liam.microsmith.cli.command.IdeRefreshCommand
+import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.command.RunCommand
 import me.liam.microsmith.cli.diagnostics.DiagnosticFormat
 import me.liam.microsmith.runtime.scripting.model.ScriptIsolationMode
@@ -29,6 +31,32 @@ class CliParserTests :
                 )
         }
 
+        "parses init command with defaults" {
+            parseCliArgs(listOf("init")) shouldBe InitCommand()
+        }
+
+        "parses init command options" {
+            parseCliArgs(
+                listOf(
+                    "init",
+                    "--repo-root",
+                    "examples/go-service",
+                    "--non-interactive",
+                    "--yes",
+                    "--diagnostics",
+                    "json",
+                    "--verbose",
+                ),
+            ) shouldBe
+                InitCommand(
+                    projectRoot = Path("examples/go-service"),
+                    diagnosticsFormat = DiagnosticFormat.JSON,
+                    verbose = true,
+                    nonInteractive = true,
+                    assumeYes = true,
+                )
+        }
+
         "parses ide refresh command with defaults" {
             parseCliArgs(listOf("ide", "refresh")) shouldBe IdeRefreshCommand()
         }
@@ -47,6 +75,25 @@ class CliParserTests :
             ) shouldBe
                 IdeRefreshCommand(
                     projectRoot = Path("examples/go-service"),
+                    diagnosticsFormat = DiagnosticFormat.JSON,
+                    verbose = true,
+                )
+        }
+
+        "parses ide doctor command options" {
+            parseCliArgs(
+                listOf(
+                    "ide",
+                    "doctor",
+                    "--repo-root",
+                    "examples/dotnet-service",
+                    "--diagnostics",
+                    "json",
+                    "--verbose",
+                ),
+            ) shouldBe
+                IdeDoctorCommand(
+                    projectRoot = Path("examples/dotnet-service"),
                     diagnosticsFormat = DiagnosticFormat.JSON,
                     verbose = true,
                 )
@@ -206,12 +253,12 @@ class CliParserTests :
         }
 
         "returns error when ide subcommand is missing" {
-            parseCliArgs(listOf("ide")) shouldBe ErrorCommand("Missing <refresh> subcommand for ide command.")
+            parseCliArgs(listOf("ide")) shouldBe ErrorCommand("Missing <refresh|doctor> subcommand for ide command.")
         }
 
         "returns error for unknown ide subcommand" {
-            parseCliArgs(listOf("ide", "doctor")) shouldBe
-                ErrorCommand("Unknown ide subcommand 'doctor'. Expected 'refresh'.")
+            parseCliArgs(listOf("ide", "lint")) shouldBe
+                ErrorCommand("Unknown ide subcommand 'lint'. Expected 'refresh' or 'doctor'.")
         }
 
         "returns error for unknown ide option" {
@@ -245,6 +292,42 @@ class CliParserTests :
         "returns error when ide verbose is specified multiple times" {
             parseCliArgs(listOf("ide", "refresh", "--verbose", "--verbose")) shouldBe
                 ErrorCommand("--verbose may only be specified once.")
+        }
+
+        "returns error for unknown ide doctor option" {
+            parseCliArgs(listOf("ide", "doctor", "--event-log", "build/event-log.jsonl")) shouldBe
+                ErrorCommand("Unknown option '--event-log'.")
+        }
+
+        "returns error for unknown init option" {
+            parseCliArgs(listOf("init", "--event-log", "build/event-log.jsonl")) shouldBe
+                ErrorCommand("Unknown option '--event-log'.")
+        }
+
+        "returns error when init diagnostics format is invalid" {
+            parseCliArgs(listOf("init", "--diagnostics", "yaml")) shouldBe
+                ErrorCommand("Invalid --diagnostics value 'yaml'. Expected 'text' or 'json'.")
+        }
+
+        "returns error when init repo-root value is missing" {
+            parseCliArgs(listOf("init", "--repo-root")) shouldBe
+                ErrorCommand("Missing value for --repo-root option.")
+        }
+
+        "returns error when init repo-root is specified multiple times" {
+            parseCliArgs(
+                listOf("init", "--repo-root", "one", "--repo-root", "two"),
+            ) shouldBe ErrorCommand("--repo-root may only be specified once.")
+        }
+
+        "returns error when init non-interactive is specified multiple times" {
+            parseCliArgs(listOf("init", "--non-interactive", "--non-interactive")) shouldBe
+                ErrorCommand("--non-interactive may only be specified once.")
+        }
+
+        "returns error when init yes is specified multiple times" {
+            parseCliArgs(listOf("init", "--yes", "--yes")) shouldBe
+                ErrorCommand("--yes may only be specified once.")
         }
 
         "returns error for unknown doctor option" {

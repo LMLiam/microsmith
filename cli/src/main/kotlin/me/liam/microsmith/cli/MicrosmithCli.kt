@@ -3,7 +3,9 @@ package me.liam.microsmith.cli
 import me.liam.microsmith.cli.command.DoctorCommand
 import me.liam.microsmith.cli.command.ErrorCommand
 import me.liam.microsmith.cli.command.HelpCommand
+import me.liam.microsmith.cli.command.IdeDoctorCommand
 import me.liam.microsmith.cli.command.IdeRefreshCommand
+import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.command.RunCommand
 import me.liam.microsmith.cli.diagnostics.CliDiagnosticEmitter
 import me.liam.microsmith.cli.diagnostics.CliFailureCode
@@ -13,8 +15,13 @@ import me.liam.microsmith.cli.doctor.DoctorResult
 import me.liam.microsmith.cli.doctor.runDoctorChecks
 import me.liam.microsmith.cli.eventlog.EventLogWriter
 import me.liam.microsmith.cli.eventlog.RunEventLogEntry
+import me.liam.microsmith.cli.ide.IdeDoctorResult
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
 import me.liam.microsmith.cli.ide.refreshIdeHelperProject
+import me.liam.microsmith.cli.ide.runIdeHelperDoctor
+import me.liam.microsmith.cli.init.InitBootstrapResult
+import me.liam.microsmith.cli.init.InitConflictException
+import me.liam.microsmith.cli.init.runInitBootstrap
 import me.liam.microsmith.cli.parsing.parseCliArgs
 import me.liam.microsmith.cli.plugins.PluginResolutionResult
 import me.liam.microsmith.cli.plugins.resolvePlugins
@@ -51,7 +58,9 @@ internal class MicrosmithCli(
     private val doctorRunner: ((() -> List<String>) -> DoctorResult) = { validator ->
         runDoctorChecks(providerValidator = validator)
     },
+    private val initRunner: (InitCommand) -> InitBootstrapResult = ::runInitBootstrap,
     private val ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult = ::refreshIdeHelperProject,
+    private val ideDoctorRunner: (IdeDoctorCommand) -> IdeDoctorResult = ::runIdeHelperDoctor,
     private val eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,
 ) {
     fun run(args: Array<String>): Int = when (val parsed = parseCliArgs(args.toList())) {
@@ -78,7 +87,11 @@ internal class MicrosmithCli(
 
         is DoctorCommand -> runDoctor(parsed)
 
+        is InitCommand -> runInit(parsed)
+
         is IdeRefreshCommand -> runIdeRefresh(parsed)
+
+        is IdeDoctorCommand -> runIdeDoctor(parsed)
     }
 
     private fun runCommand(command: RunCommand): Int {
@@ -156,6 +169,73 @@ internal class MicrosmithCli(
         emitter.info(
             "Import '${helperRoot.resolve("build.gradle.kts")}' as a Gradle project in JetBrains IDEs.",
         )
+        return 0
+    }
+
+    private fun runIdeDoctor(command: IdeDoctorCommand): Int {
+        val emitter = createEmitter(command.diagnosticsFormat, command.verbose)
+        val result =
+            runCatching {
+                ideDoctorRunner(command)
+            }.getOrElse { error ->
+                emitter.error(
+                    CliFailureCode.IDE_DOCTOR_FAILED,
+                    error.message ?: "JetBrains IDE helper doctor failed unexpectedly.",
+                )
+                return CliFailureCode.IDE_DOCTOR_FAILED.exitCode
+            }
+
+        result.checks.forEach { check ->
+            if (check.passed) {
+                emitter.info("ide-doctor/${check.id}: ${check.message}", check.details)
+            } else {
+                emitter.error(
+                    CliFailureCode.IDE_DOCTOR_FAILED,
+                    "ide-doctor/${check.id}: ${check.message}",
+                    check.details,
+                )
+            }
+        }
+
+        return if (result.hasFailures) {
+            emitter.error(CliFailureCode.IDE_DOCTOR_FAILED, "JetBrains IDE helper doctor detected issues.")
+            CliFailureCode.IDE_DOCTOR_FAILED.exitCode
+        } else {
+            emitter.info("JetBrains IDE helper doctor checks passed.")
+            0
+        }
+    }
+
+    private fun runInit(command: InitCommand): Int {
+        val emitter = createEmitter(command.diagnosticsFormat, command.verbose)
+        val result =
+            runCatching {
+                initRunner(command)
+            }.getOrElse { error ->
+                val code =
+                    when (error) {
+                        is InitConflictException -> CliFailureCode.INIT_CONFLICT
+                        is IllegalArgumentException -> CliFailureCode.INIT_VALIDATION_FAILED
+                        else -> CliFailureCode.INIT_RUNTIME_FAILED
+                    }
+                emitter.error(code, error.message ?: "Microsmith init failed.")
+                return code.exitCode
+            }
+
+        val projectRoot = result.projectRoot.toAbsolutePath().normalize()
+        emitter.info(
+            "Microsmith init completed at '$projectRoot'.",
+            details =
+            mapOf(
+                "projectRoot" to projectRoot.toString(),
+                "createdFiles" to result.createdFiles.size.toString(),
+                "preservedFiles" to result.preservedFiles.size.toString(),
+                "ideHelperUpdatedFiles" to result.ideHelperResult.updatedFiles.size.toString(),
+                "nonInteractive" to command.nonInteractive.toString(),
+                "assumeYes" to command.assumeYes.toString(),
+            ),
+        )
+        emitter.info("Next: microsmith run build.microsmith.kts --out ./generated")
         return 0
     }
 

@@ -12,8 +12,11 @@ Runtime requirements:
 
 Quick checks:
 - bin/microsmith --help
+- bin/microsmith init
+- bin/microsmith run build.microsmith.kts --out ./generated
 - bin/microsmith run schema.microsmith.kts --out ./generated
 - bin/microsmith ide refresh
+- bin/microsmith ide doctor
 - cat bundled-plugins.lock
 
 Bundled vs external plugins:

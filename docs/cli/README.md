@@ -2,6 +2,7 @@
 
 Phase 5 documentation for distribution and adoption lives in this folder.
 
+- `command-contract.md`: canonical setup/IDE command behavior, non-interactive contract, and exit-code table.
 - `quickstart-non-gradle.md`: fast setup for Node, Go, and .NET repositories, including CI snippets.
 - `jetbrains-ide-helper.md`: `.microsmith/ide` helper generation and indexing guidance for JetBrains IDEs.
 - `migration-from-gradle.md`: migration guide for existing Gradle-centric users.

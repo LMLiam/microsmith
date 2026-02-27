@@ -32,9 +32,9 @@ internal fun refreshIdeHelperProject(
 
     val targetFiles =
         linkedMapOf(
-            helperRoot.resolve(SETTINGS_FILE_NAME) to renderSettingsGradle(),
-            helperRoot.resolve(BUILD_FILE_NAME) to renderBuildGradle(classpathEntries),
-            helperRoot.resolve(README_FILE_NAME) to renderReadme(),
+            helperRoot.resolve(IDE_HELPER_SETTINGS_FILE_NAME) to renderSettingsGradle(),
+            helperRoot.resolve(IDE_HELPER_BUILD_FILE_NAME) to renderBuildGradle(classpathEntries),
+            helperRoot.resolve(IDE_HELPER_README_FILE_NAME) to renderReadme(),
         )
 
     val updatedFiles =
@@ -126,7 +126,7 @@ private fun writeFileIfChanged(path: Path, content: String): Boolean {
     return true
 }
 
-private fun Path.toKotlinPathLiteral(): String = toAbsolutePath()
+internal fun Path.toKotlinPathLiteral(): String = toAbsolutePath()
     .normalize()
     .toString()
     .replace('\\', '/')
@@ -147,8 +147,8 @@ private fun String.toKotlinStringLiteralContent(): String {
     return builder.toString()
 }
 
-private const val IDE_HELPER_DIRECTORY = ".microsmith/ide"
-private const val SETTINGS_FILE_NAME = "settings.gradle.kts"
-private const val BUILD_FILE_NAME = "build.gradle.kts"
-private const val README_FILE_NAME = "README.md"
+internal const val IDE_HELPER_DIRECTORY = ".microsmith/ide"
+internal const val IDE_HELPER_SETTINGS_FILE_NAME = "settings.gradle.kts"
+internal const val IDE_HELPER_BUILD_FILE_NAME = "build.gradle.kts"
+internal const val IDE_HELPER_README_FILE_NAME = "README.md"
 private const val KOTLIN_ESCAPE_BUFFER_PADDING = 8

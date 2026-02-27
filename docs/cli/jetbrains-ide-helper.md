@@ -17,6 +17,15 @@ Optional flags:
 - `--diagnostics <text|json>`: choose output format.
 - `--verbose`: include additional diagnostic details.
 
+## Validate helper health
+
+```bash
+microsmith ide doctor --diagnostics json --verbose
+```
+
+`ide doctor` validates helper directory/file presence and classpath synchronization, then reports
+actionable remediation when helper metadata is stale.
+
 ## Generated files
 
 Command output is constrained to `.microsmith/ide`:
