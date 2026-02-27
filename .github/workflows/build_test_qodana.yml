@@ -204,8 +204,8 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           set -eu
-          CLI_VERSION="$(ls cli/build/release-assets/microsmith-cli-*-dist.tar.gz | sed -E 's#.*microsmith-cli-(.*)-dist.tar.gz#\1#' | head -n 1)"
-          DIST_FILE="cli/build/release-assets/microsmith-cli-${CLI_VERSION}-dist.tar.gz"
+          DIST_FILE="$(find cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
+          CLI_VERSION="$(printf '%s\n' "$DIST_FILE" | sed -E 's#.*microsmith-cli-(.*)-dist.tar.gz#\1#')"
           DIST_SHA="$(awk '{print $1}' "${DIST_FILE}.sha256")"
           sh cli/build/release-assets/microsmith-install.sh \
             --version "$CLI_VERSION" \
