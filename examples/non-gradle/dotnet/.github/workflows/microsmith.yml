@@ -17,7 +17,7 @@ jobs:
       - name: Bootstrap Microsmith
         shell: pwsh
         working-directory: examples/non-gradle/dotnet
-        run: microsmith init --non-interactive --yes
+        run: microsmith init
       - name: Generate protobuf
         shell: pwsh
         working-directory: examples/non-gradle/dotnet
