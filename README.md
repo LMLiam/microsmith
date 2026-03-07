@@ -133,16 +133,26 @@ microsmith run build.microsmith.kts --out ./generated
 
 `microsmith init` is deterministic and non-destructive by default:
 
+- it detects Node, Go, and .NET repositories from `package.json`, `go.mod`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
 - it creates `settings.microsmith.kts` when missing
 - it creates `build.microsmith.kts` when missing
-- it preserves existing bootstrap files instead of overwriting them
-- it refreshes `.microsmith/ide/*` helper metadata
-- it prints the next generation command to run
+- it preserves existing regular bootstrap files instead of overwriting them
+- it refreshes `.microsmith/ide/*` helper metadata by default
+- it prints configured assets and the exact next generation command to run
 
 Important behavior:
 
 - if you pass `--repo-root <path>`, that directory must already exist
+- pass `--force` when you want the managed bootstrap scripts to replace existing regular files
+- pass `--skip-ide-helper` when you do not want `.microsmith/ide/*` generated during `init`
+- if you skip IDE helper generation, `microsmith doctor` will continue to report bootstrap as incomplete until you run `microsmith ide refresh`
 - after a successful `init`, no additional IDE command is required for the default path
+
+After the canonical first run succeeds, you can switch to a repository-native output layout if you prefer:
+
+- Node: `microsmith run build.microsmith.kts --out ./generated`
+- Go: `microsmith run build.microsmith.kts --out ./internal/gen`
+- .NET: `microsmith run build.microsmith.kts --out ./Generated`
 
 ### Direct script execution
 
@@ -203,12 +213,16 @@ Use the installed shim path before opening a new shell:
 
 ```bash
 "$HOME/.microsmith/bin/microsmith" --version
-"$HOME/.microsmith/bin/microsmith" init --non-interactive --yes
+mkdir -p ./microsmith-smoke
+"$HOME/.microsmith/bin/microsmith" init --repo-root ./microsmith-smoke --non-interactive --yes
+"$HOME/.microsmith/bin/microsmith" run ./microsmith-smoke/build.microsmith.kts --out ./microsmith-smoke/generated
 ```
 
 ```powershell
 & (Join-Path $HOME ".microsmith\bin\microsmith.cmd") --version
-& (Join-Path $HOME ".microsmith\bin\microsmith.cmd") init --non-interactive --yes
+New-Item -ItemType Directory -Path .\microsmith-smoke -Force | Out-Null
+& (Join-Path $HOME ".microsmith\bin\microsmith.cmd") init --repo-root .\microsmith-smoke --non-interactive --yes
+& (Join-Path $HOME ".microsmith\bin\microsmith.cmd") run .\microsmith-smoke\build.microsmith.kts --out .\microsmith-smoke\generated
 ```
 
 After opening a new shell, the bare `microsmith` command is available on `PATH`.
@@ -271,8 +285,8 @@ Current CLI usage:
 Microsmith CLI
 
 Usage:
-  microsmith init [--repo-root <path>] [--non-interactive] [--yes]
-                 [--diagnostics <text|json>] [--verbose]
+  microsmith init [--repo-root <path>] [--non-interactive] [--yes] [--force]
+                 [--skip-ide-helper] [--diagnostics <text|json>] [--verbose]
   microsmith run <script.microsmith.kts> --out <output-dir> [--var <name=value>]... [--flag <name>]...
                  [--plugin <group:artifact:version>]... [--plugin-jar <path>]...
                  [--offline] [--repository <uri>] [--isolation <classloader|process>]
@@ -313,8 +327,10 @@ microsmith ide refresh
 `microsmith init`
 
 - bootstraps `settings.microsmith.kts` and `build.microsmith.kts`
-- refreshes `.microsmith/ide`
-- supports `--repo-root`, `--non-interactive`, `--yes`, `--diagnostics`, and `--verbose`
+- detects Node, Go, .NET, or generic repository shape and emits a matching starter script
+- refreshes `.microsmith/ide` by default
+- preserves existing regular bootstrap files unless `--force` is provided
+- supports `--repo-root`, `--non-interactive`, `--yes`, `--force`, `--skip-ide-helper`, `--diagnostics`, and `--verbose`
 
 `microsmith run`
 
@@ -325,7 +341,7 @@ microsmith ide refresh
 `microsmith doctor`
 
 - validates the runtime environment
-- checks Java runtime availability, built-in provider discovery, script cache writability, plugin cache writability, and repository policy initialization
+- checks Java runtime availability, built-in provider discovery, script cache writability, plugin cache writability, repository policy initialization, and incomplete bootstrap state in the current working directory
 
 `microsmith ide refresh`
 
@@ -369,6 +385,8 @@ When `--diagnostics json` is used, each event is emitted as one JSON line with:
 
 Use the helper project when your repository is not Gradle-based and you want stronger `.microsmith.kts` type resolution in JetBrains IDEs such as IntelliJ IDEA, GoLand, and Rider.
 
+`microsmith init` already refreshes the helper by default. Use `microsmith ide refresh` when you skipped helper generation during init or need to repair or resynchronize the helper later.
+
 Generate or refresh the helper:
 
 ```bash
@@ -395,7 +413,7 @@ Generated files:
 
 JetBrains workflow:
 
-1. Run `microsmith ide refresh` from the repository root.
+1. Run `microsmith init` from the repository root, or `microsmith ide refresh` if helper generation was skipped earlier.
 2. Link or import `.microsmith/ide/build.gradle.kts` as a Gradle project in the IDE.
 3. Refresh Gradle indexing.
 4. Rerun `microsmith ide refresh` after upgrading the Microsmith CLI or changing plugin dependencies.
@@ -516,8 +534,10 @@ jobs:
           curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
           sh microsmith-install.sh --version "$MICROSMITH_VERSION"
           echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
+      - name: Bootstrap Microsmith
+        run: microsmith init --non-interactive --yes
       - name: Run Microsmith
-        run: microsmith run schema.microsmith.kts --out generated/proto
+        run: microsmith run build.microsmith.kts --out generated
 ```
 
 ### Go repository
@@ -536,8 +556,10 @@ jobs:
           curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
           sh microsmith-install.sh --version "$MICROSMITH_VERSION"
           echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
+      - name: Bootstrap Microsmith
+        run: microsmith init --non-interactive --yes
       - name: Generate protobuf
-        run: microsmith run schema.microsmith.kts --out internal/gen/proto
+        run: microsmith run build.microsmith.kts --out internal/gen
 ```
 
 ### .NET repository
@@ -557,21 +579,24 @@ jobs:
           Invoke-WebRequest -Uri $env:MICROSMITH_INSTALLER_PS1_URL -OutFile microsmith-install.ps1
           .\microsmith-install.ps1 -Version $env:MICROSMITH_VERSION
           Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $HOME ".microsmith\bin")
+      - name: Bootstrap Microsmith
+        shell: pwsh
+        run: microsmith init --non-interactive --yes
       - name: Run Microsmith
         shell: pwsh
-        run: microsmith run schema.microsmith.kts --out .\Generated\Proto
+        run: microsmith run build.microsmith.kts --out .\Generated
 ```
 
 ## Example fixtures
 
 The repository includes non-Gradle fixture repositories under `examples/non-gradle/`.
-Each fixture contains a `schema.microsmith.kts` and a GitHub Actions example.
+Each fixture contains a repo marker used by `microsmith init`, a legacy `schema.microsmith.kts` manual example, and a GitHub Actions example that exercises the init-first path.
 
 | Fixture | Directory | Local command from fixture root | CI workflow |
 | --- | --- | --- | --- |
-| Node | `examples/non-gradle/node` | `microsmith run schema.microsmith.kts --out ./generated/proto` | `examples/non-gradle/node/.github/workflows/microsmith.yml` |
-| Go | `examples/non-gradle/go` | `microsmith run schema.microsmith.kts --out ./internal/gen/proto` | `examples/non-gradle/go/.github/workflows/microsmith.yml` |
-| .NET | `examples/non-gradle/dotnet` | `microsmith run schema.microsmith.kts --out .\Generated\Proto` | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
+| Node | `examples/non-gradle/node` | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated` | `examples/non-gradle/node/.github/workflows/microsmith.yml` |
+| Go | `examples/non-gradle/go` | `microsmith init` then `microsmith run build.microsmith.kts --out ./internal/gen` | `examples/non-gradle/go/.github/workflows/microsmith.yml` |
+| .NET | `examples/non-gradle/dotnet` | `microsmith init` then `microsmith run build.microsmith.kts --out .\Generated` | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
 
 ## Troubleshooting
 
@@ -616,7 +641,10 @@ What to do:
 - confirm the script file ends with `.microsmith.kts`
 - rerun with `--diagnostics json --verbose`
 - ensure `--repo-root` points to an existing directory
+- run `microsmith doctor --diagnostics json --verbose` to detect incomplete bootstrap state
 - resolve filesystem conflicts such as a directory already existing at `build.microsmith.kts`
+- rerun `microsmith init --force` if you want the managed bootstrap scripts to replace existing regular files
+- if helper generation was skipped earlier, run `microsmith ide refresh` before importing `.microsmith/ide` into JetBrains IDEs
 
 ### Resolver, credentials, and offline failures
 
