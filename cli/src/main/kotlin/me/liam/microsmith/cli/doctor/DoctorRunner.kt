@@ -1,5 +1,9 @@
 package me.liam.microsmith.cli.doctor
 
+import me.liam.microsmith.cli.ide.IDE_HELPER_BUILD_FILE_NAME
+import me.liam.microsmith.cli.ide.IDE_HELPER_DIRECTORY
+import me.liam.microsmith.cli.ide.IDE_HELPER_README_FILE_NAME
+import me.liam.microsmith.cli.ide.IDE_HELPER_SETTINGS_FILE_NAME
 import me.liam.microsmith.cli.plugins.defaultPluginCacheDirectory
 import me.liam.microsmith.cli.plugins.defaultRepositoryAllowlistPolicy
 import java.nio.file.Files
@@ -28,6 +32,7 @@ internal fun runDoctorChecks(
     providerValidator: () -> List<String>,
     scriptCacheDirectory: Path = defaultScriptCacheDirectory(),
     pluginCacheDirectory: Path = defaultPluginCacheDirectory(),
+    projectRoot: Path = Path.of(".").toAbsolutePath().normalize(),
 ): DoctorResult {
     val checks =
         listOf(
@@ -36,6 +41,7 @@ internal fun runDoctorChecks(
             checkDirectoryWritable(id = "script-cache", directory = scriptCacheDirectory),
             checkDirectoryWritable(id = "plugin-cache", directory = pluginCacheDirectory),
             checkRepositoryPolicy(),
+            checkBootstrapState(projectRoot),
         )
     return DoctorResult(checks)
 }
@@ -126,6 +132,115 @@ private fun checkRepositoryPolicy(): DoctorCheckResult = runCatching {
     )
 }
 
+private fun checkBootstrapState(projectRoot: Path): DoctorCheckResult {
+    val buildScript = projectRoot.resolve(INIT_BUILD_FILE_NAME)
+    val settingsScript = projectRoot.resolve(INIT_SETTINGS_FILE_NAME)
+    val helperRoot = projectRoot.resolve(IDE_HELPER_DIRECTORY)
+    validateBootstrapSurface(
+        projectRoot = projectRoot,
+        buildScript = buildScript,
+        settingsScript = settingsScript,
+        helperRoot = helperRoot,
+    )?.let { return it }
+    val missingHelperFiles = missingIdeHelperFiles(projectRoot = projectRoot, helperRoot = helperRoot)
+
+    return when {
+        missingHelperFiles.isNotEmpty() ->
+            DoctorCheckResult(
+                id = "bootstrap-state",
+                status = DoctorCheckStatus.FAIL,
+                message = "JetBrains IDE helper is incomplete. Run 'microsmith ide refresh' to repair it.",
+                details =
+                mapOf(
+                    "missingIdeHelperFiles" to missingHelperFiles.joinToString(separator = ","),
+                ),
+            )
+
+        Files.isDirectory(helperRoot) ->
+            DoctorCheckResult(
+                id = "bootstrap-state",
+                status = DoctorCheckStatus.PASS,
+                message = "Bootstrap files and JetBrains IDE helper are present.",
+                details = mapOf("projectRoot" to projectRoot.toString()),
+            )
+
+        else ->
+            DoctorCheckResult(
+                id = "bootstrap-state",
+                status = DoctorCheckStatus.FAIL,
+                message =
+                "Bootstrap files are present, but the JetBrains IDE helper is missing. " +
+                    "Run 'microsmith ide refresh' to restore the default onboarding surface.",
+                details = mapOf("projectRoot" to projectRoot.toString()),
+            )
+    }
+}
+
+private fun validateBootstrapSurface(
+    projectRoot: Path,
+    buildScript: Path,
+    settingsScript: Path,
+    helperRoot: Path,
+): DoctorCheckResult? {
+    val hasManagedSurface =
+        Files.exists(buildScript) ||
+            Files.exists(settingsScript) ||
+            Files.exists(helperRoot)
+    if (!hasManagedSurface) {
+        return DoctorCheckResult(
+            id = "bootstrap-state",
+            status = DoctorCheckStatus.PASS,
+            message = "Bootstrap files were not detected in the current working directory.",
+            details = mapOf("projectRoot" to projectRoot.toString()),
+        )
+    }
+
+    val missingBootstrapFiles =
+        listOf(buildScript, settingsScript)
+            .filterNot(Files::isRegularFile)
+            .map(projectRoot::relativize)
+            .map(Path::toString)
+            .sorted()
+    if (missingBootstrapFiles.isNotEmpty()) {
+        return DoctorCheckResult(
+            id = "bootstrap-state",
+            status = DoctorCheckStatus.FAIL,
+            message = "Bootstrap state is incomplete. Run 'microsmith init' to repair it.",
+            details =
+            mapOf(
+                "missingBootstrapFiles" to missingBootstrapFiles.joinToString(separator = ","),
+            ),
+        )
+    }
+
+    return if (Files.exists(helperRoot) && !Files.isDirectory(helperRoot)) {
+        DoctorCheckResult(
+            id = "bootstrap-state",
+            status = DoctorCheckStatus.FAIL,
+            message =
+            "JetBrains IDE helper path is invalid. " +
+                "Run 'microsmith ide refresh' after removing the conflicting path.",
+            details = mapOf("helperRoot" to helperRoot.toString()),
+        )
+    } else {
+        null
+    }
+}
+
+private fun missingIdeHelperFiles(projectRoot: Path, helperRoot: Path): List<String> =
+    if (Files.isDirectory(helperRoot)) {
+        listOf(
+            helperRoot.resolve(IDE_HELPER_SETTINGS_FILE_NAME),
+            helperRoot.resolve(IDE_HELPER_BUILD_FILE_NAME),
+            helperRoot.resolve(IDE_HELPER_README_FILE_NAME),
+        ).filterNot(Files::isRegularFile)
+            .map(projectRoot::relativize)
+            .map(Path::toString)
+            .sorted()
+    } else {
+        emptyList()
+    }
+
 private fun defaultScriptCacheDirectory(): Path {
     val envPath = System.getenv("MICROSMITH_SCRIPT_CACHE_DIR")?.trim()?.takeIf { it.isNotEmpty() }
     return if (envPath != null) {
@@ -135,4 +250,6 @@ private fun defaultScriptCacheDirectory(): Path {
     }
 }
 
+private const val INIT_BUILD_FILE_NAME = "build.microsmith.kts"
+private const val INIT_SETTINGS_FILE_NAME = "settings.microsmith.kts"
 private const val MIN_SUPPORTED_JAVA_FEATURE = 24
