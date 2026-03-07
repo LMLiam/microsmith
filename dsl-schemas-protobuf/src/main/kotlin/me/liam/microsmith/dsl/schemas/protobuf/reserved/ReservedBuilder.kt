@@ -4,7 +4,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.ReservedScope
 import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
 import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
 
-class ReservedBuilder(private val allocator: IndexAllocator, private val names: NameRegistry) : ReservedScope {
+internal class ReservedBuilder(private val allocator: IndexAllocator, private val names: NameRegistry) : ReservedScope {
     override fun index(index: Int) {
         allocator.reserve(index)
     }

@@ -64,7 +64,7 @@ class ProtobufBuilderTests :
         "nested and top-level schemas coexist" {
             val builder = ProtobufBuilder()
             builder.message("Top") { int32("id") { index(1) } }
-            builder.apply {
+            with(builder) {
                 "pkg" {
                     enum("E") { value("X") { index(1) } }
                 }

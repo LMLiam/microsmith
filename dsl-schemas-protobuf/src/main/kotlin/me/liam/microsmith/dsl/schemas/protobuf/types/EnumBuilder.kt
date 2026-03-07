@@ -5,13 +5,12 @@ import me.liam.microsmith.dsl.schemas.protobuf.EnumValueScope
 import me.liam.microsmith.dsl.schemas.protobuf.ReservedScope
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.Max
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.Reserved
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedBuilder
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.buildReservedDeclarations
 import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
 import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
 
-class EnumBuilder(private val name: String) : EnumScope {
+internal class EnumBuilder(private val name: String) : EnumScope {
     private val allocator = IndexAllocator(0)
     private val nameRegistry = NameRegistry()
 
@@ -48,11 +47,6 @@ class EnumBuilder(private val name: String) : EnumScope {
     fun build() = Enum(
         name = name,
         values = values.sortedBy { it.index },
-        reserved =
-        buildList {
-            allocator.reserved().sortedBy { it.first }.mapTo(this, Reserved::fromRange)
-
-            nameRegistry.reserved().sorted().mapTo(this, ::ReservedName)
-        },
+        reserved = buildReservedDeclarations(allocator, nameRegistry),
     )
 }
