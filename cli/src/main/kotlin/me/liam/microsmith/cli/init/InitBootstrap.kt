@@ -2,10 +2,12 @@ package me.liam.microsmith.cli.init
 
 import me.liam.microsmith.cli.command.IdeRefreshCommand
 import me.liam.microsmith.cli.command.InitCommand
+import me.liam.microsmith.cli.ide.IdeHelperConflictException
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
 import me.liam.microsmith.cli.ide.refreshIdeHelperProject
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.nio.file.Path
 
 internal data class InitBootstrapResult(
@@ -18,16 +20,17 @@ internal data class InitBootstrapResult(
 )
 
 internal class InitConflictException(message: String) : IllegalStateException(message)
+internal class InitValidationException(message: String) : IllegalArgumentException(message)
 
 internal fun runInitBootstrap(
     command: InitCommand,
     ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult = ::refreshIdeHelperProject,
 ): InitBootstrapResult {
     val projectRoot = command.projectRoot.toAbsolutePath().normalize()
-    require(Files.exists(projectRoot)) {
+    requireInit(Files.exists(projectRoot)) {
         "Repository root '$projectRoot' does not exist."
     }
-    require(Files.isDirectory(projectRoot)) {
+    requireInit(Files.isDirectory(projectRoot)) {
         "Repository root '$projectRoot' is not a directory."
     }
 
@@ -39,7 +42,7 @@ internal fun runInitBootstrap(
     bootstrapFilesFor(repositoryDetection).forEach { (relativePath, content) ->
         val path = projectRoot.resolve(relativePath)
         when {
-            Files.exists(path) && Files.isRegularFile(path) -> {
+            Files.exists(path, LinkOption.NOFOLLOW_LINKS) && Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) -> {
                 val existingContent = Files.readString(path, StandardCharsets.UTF_8)
                 if (command.force && existingContent.normalizeLineEndings() != content.normalizeLineEndings()) {
                     Files.writeString(path, content, StandardCharsets.UTF_8)
@@ -49,7 +52,7 @@ internal fun runInitBootstrap(
                 }
             }
 
-            Files.exists(path) ->
+            Files.exists(path, LinkOption.NOFOLLOW_LINKS) ->
                 throw InitConflictException("Bootstrap path '$path' exists but is not a regular file.")
 
             else -> {
@@ -64,13 +67,20 @@ internal fun runInitBootstrap(
         if (command.skipIdeHelper) {
             null
         } else {
-            ideRefreshRunner(
-                IdeRefreshCommand(
-                    projectRoot = projectRoot,
-                    diagnosticsFormat = command.diagnosticsFormat,
-                    verbose = command.verbose,
-                ),
-            )
+            runCatching {
+                ideRefreshRunner(
+                    IdeRefreshCommand(
+                        projectRoot = projectRoot,
+                        diagnosticsFormat = command.diagnosticsFormat,
+                        verbose = command.verbose,
+                    ),
+                )
+            }.getOrElse { error ->
+                when (error) {
+                    is IdeHelperConflictException -> throw InitConflictException(error.message ?: "IDE helper path is invalid.")
+                    else -> throw error
+                }
+            }
         }
 
     return InitBootstrapResult(
@@ -125,3 +135,9 @@ private fun renderDefaultBuildScript(repositoryType: OnboardingRepositoryType): 
 }
 
 private fun String.normalizeLineEndings(): String = replace("\r\n", "\n")
+
+private inline fun requireInit(value: Boolean, lazyMessage: () -> String) {
+    if (!value) {
+        throw InitValidationException(lazyMessage())
+    }
+}

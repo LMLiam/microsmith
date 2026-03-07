@@ -7,6 +7,7 @@ import me.liam.microsmith.cli.ide.IDE_HELPER_SETTINGS_FILE_NAME
 import me.liam.microsmith.cli.plugins.defaultPluginCacheDirectory
 import me.liam.microsmith.cli.plugins.defaultRepositoryAllowlistPolicy
 import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.nio.file.Path
 import java.util.ServiceConfigurationError
 import kotlin.io.path.deleteIfExists
@@ -142,9 +143,23 @@ private fun checkBootstrapState(projectRoot: Path): DoctorCheckResult {
         settingsScript = settingsScript,
         helperRoot = helperRoot,
     )?.let { return it }
+    val invalidHelperFiles = invalidIdeHelperFiles(projectRoot = projectRoot, helperRoot = helperRoot)
     val missingHelperFiles = missingIdeHelperFiles(projectRoot = projectRoot, helperRoot = helperRoot)
 
     return when {
+        invalidHelperFiles.isNotEmpty() ->
+            DoctorCheckResult(
+                id = "bootstrap-state",
+                status = DoctorCheckStatus.FAIL,
+                message =
+                "JetBrains IDE helper contains conflicting managed paths. " +
+                    "Remove them and run 'microsmith ide refresh' to repair it.",
+                details =
+                mapOf(
+                    "invalidIdeHelperFiles" to invalidHelperFiles.joinToString(separator = ","),
+                ),
+            )
+
         missingHelperFiles.isNotEmpty() ->
             DoctorCheckResult(
                 id = "bootstrap-state",
@@ -156,7 +171,7 @@ private fun checkBootstrapState(projectRoot: Path): DoctorCheckResult {
                 ),
             )
 
-        Files.isDirectory(helperRoot) ->
+        Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) ->
             DoctorCheckResult(
                 id = "bootstrap-state",
                 status = DoctorCheckStatus.PASS,
@@ -183,9 +198,9 @@ private fun validateBootstrapSurface(
     helperRoot: Path,
 ): DoctorCheckResult? {
     val hasManagedSurface =
-        Files.exists(buildScript) ||
-            Files.exists(settingsScript) ||
-            Files.exists(helperRoot)
+        Files.exists(buildScript, LinkOption.NOFOLLOW_LINKS) ||
+            Files.exists(settingsScript, LinkOption.NOFOLLOW_LINKS) ||
+            Files.exists(helperRoot, LinkOption.NOFOLLOW_LINKS)
     if (!hasManagedSurface) {
         return DoctorCheckResult(
             id = "bootstrap-state",
@@ -195,12 +210,22 @@ private fun validateBootstrapSurface(
         )
     }
 
-    val missingBootstrapFiles =
-        listOf(buildScript, settingsScript)
-            .filterNot(Files::isRegularFile)
-            .map(projectRoot::relativize)
-            .map(Path::toString)
-            .sorted()
+    val bootstrapFiles = listOf(buildScript, settingsScript)
+    val invalidBootstrapFiles = invalidManagedFiles(projectRoot = projectRoot, managedFiles = bootstrapFiles)
+    if (invalidBootstrapFiles.isNotEmpty()) {
+        return DoctorCheckResult(
+            id = "bootstrap-state",
+            status = DoctorCheckStatus.FAIL,
+            message =
+            "Bootstrap paths are invalid. Remove the conflicting paths and run 'microsmith init' to repair them.",
+            details =
+            mapOf(
+                "invalidBootstrapFiles" to invalidBootstrapFiles.joinToString(separator = ","),
+            ),
+        )
+    }
+
+    val missingBootstrapFiles = missingManagedFiles(projectRoot = projectRoot, managedFiles = bootstrapFiles)
     if (missingBootstrapFiles.isNotEmpty()) {
         return DoctorCheckResult(
             id = "bootstrap-state",
@@ -213,7 +238,10 @@ private fun validateBootstrapSurface(
         )
     }
 
-    return if (Files.exists(helperRoot) && !Files.isDirectory(helperRoot)) {
+    return if (
+        Files.exists(helperRoot, LinkOption.NOFOLLOW_LINKS) &&
+        !Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS)
+    ) {
         DoctorCheckResult(
             id = "bootstrap-state",
             status = DoctorCheckStatus.FAIL,
@@ -228,18 +256,41 @@ private fun validateBootstrapSurface(
 }
 
 private fun missingIdeHelperFiles(projectRoot: Path, helperRoot: Path): List<String> =
-    if (Files.isDirectory(helperRoot)) {
-        listOf(
-            helperRoot.resolve(IDE_HELPER_SETTINGS_FILE_NAME),
-            helperRoot.resolve(IDE_HELPER_BUILD_FILE_NAME),
-            helperRoot.resolve(IDE_HELPER_README_FILE_NAME),
-        ).filterNot(Files::isRegularFile)
-            .map(projectRoot::relativize)
-            .map(Path::toString)
-            .sorted()
-    } else {
-        emptyList()
-    }
+    requiredIdeHelperFiles(helperRoot)
+        .takeIf { Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) }
+        ?.let { managedFiles ->
+            missingManagedFiles(projectRoot = projectRoot, managedFiles = managedFiles)
+        } ?: emptyList()
+
+private fun invalidIdeHelperFiles(projectRoot: Path, helperRoot: Path): List<String> =
+    requiredIdeHelperFiles(helperRoot)
+        .takeIf { Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) }
+        ?.let { managedFiles ->
+            invalidManagedFiles(projectRoot = projectRoot, managedFiles = managedFiles)
+        } ?: emptyList()
+
+private fun requiredIdeHelperFiles(helperRoot: Path): List<Path> = listOf(
+    helperRoot.resolve(IDE_HELPER_SETTINGS_FILE_NAME),
+    helperRoot.resolve(IDE_HELPER_BUILD_FILE_NAME),
+    helperRoot.resolve(IDE_HELPER_README_FILE_NAME),
+)
+
+private fun missingManagedFiles(projectRoot: Path, managedFiles: List<Path>): List<String> = managedFiles
+    .filterNot(::managedPathExists)
+    .map(projectRoot::relativize)
+    .map(Path::toString)
+    .sorted()
+
+private fun invalidManagedFiles(projectRoot: Path, managedFiles: List<Path>): List<String> = managedFiles
+    .filter(::managedPathExists)
+    .filterNot(::isManagedRegularFile)
+    .map(projectRoot::relativize)
+    .map(Path::toString)
+    .sorted()
+
+private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
+
+private fun isManagedRegularFile(path: Path): Boolean = Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)
 
 private fun defaultScriptCacheDirectory(): Path {
     val envPath = System.getenv("MICROSMITH_SCRIPT_CACHE_DIR")?.trim()?.takeIf { it.isNotEmpty() }

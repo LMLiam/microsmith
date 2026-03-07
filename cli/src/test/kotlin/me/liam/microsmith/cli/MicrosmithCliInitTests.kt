@@ -7,6 +7,7 @@ import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
 import me.liam.microsmith.cli.init.InitBootstrapResult
 import me.liam.microsmith.cli.init.InitConflictException
+import me.liam.microsmith.cli.init.InitValidationException
 import me.liam.microsmith.cli.init.OnboardingRepositoryDetection
 import me.liam.microsmith.cli.init.OnboardingRepositoryType
 import kotlin.io.path.ExperimentalPathApi
@@ -95,7 +96,7 @@ class MicrosmithCliInitTests :
                     stdout = out::add,
                     stderr = err::add,
                     initRunner = {
-                        throw IllegalArgumentException("Repository root does not exist.")
+                        throw InitValidationException("Repository root does not exist.")
                     },
                 )
 
@@ -104,6 +105,26 @@ class MicrosmithCliInitTests :
             exitCode shouldBe 51
             err.joinToString("\n").shouldContain("MS-CLI-5002")
             err.joinToString("\n").shouldContain("Repository root does not exist.")
+            out shouldBe emptyList()
+        }
+
+        "init command treats unexpected illegal arguments as runtime failures" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    initRunner = {
+                        throw IllegalArgumentException("IDE helper refresh failed.")
+                    },
+                )
+
+            val exitCode = cli.run(arrayOf("init"))
+
+            exitCode shouldBe 52
+            err.joinToString("\n").shouldContain("MS-CLI-5003")
+            err.joinToString("\n").shouldContain("IDE helper refresh failed.")
             out shouldBe emptyList()
         }
 

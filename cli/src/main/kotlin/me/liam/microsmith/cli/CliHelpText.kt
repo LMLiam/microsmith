@@ -4,8 +4,8 @@ internal const val HELP_TEXT = """
 Microsmith CLI
 
 Usage:
-  microsmith init [--repo-root <path>] [--non-interactive] [--yes] [--force]
-                 [--skip-ide-helper] [--diagnostics <text|json>] [--verbose]
+  microsmith init [--repo-root <path>] [--force] [--skip-ide-helper]
+                 [--diagnostics <text|json>] [--verbose]
   microsmith run <script.microsmith.kts> --out <output-dir> [--var <name=value>]... [--flag <name>]...
                  [--plugin <group:artifact:version>]... [--plugin-jar <path>]...
                  [--offline] [--repository <uri>] [--isolation <classloader|process>]

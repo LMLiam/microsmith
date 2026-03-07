@@ -8,7 +8,9 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import me.liam.microsmith.cli.command.InitCommand
+import me.liam.microsmith.cli.ide.IdeHelperConflictException
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
+import java.nio.file.Files
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
@@ -137,6 +139,25 @@ class InitBootstrapTests :
             }
         }
 
+        "rethrows IDE helper conflicts as init conflicts" {
+            val repoRoot = createTempDirectory("microsmith-init-bootstrap-ide-conflict")
+            try {
+                val error =
+                    shouldThrow<InitConflictException> {
+                        runInitBootstrap(
+                            command = InitCommand(projectRoot = repoRoot),
+                            ideRefreshRunner = {
+                                throw IdeHelperConflictException("IDE helper path is invalid.")
+                            },
+                        )
+                    }
+
+                error.message shouldBe "IDE helper path is invalid."
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
         "detects Node, Go, and .NET repositories and falls back to Other for mixed markers" {
             val nodeRoot = createTempDirectory("microsmith-init-detect-node")
             val goRoot = createTempDirectory("microsmith-init-detect-go")
@@ -197,12 +218,34 @@ class InitBootstrapTests :
             }
         }
 
+        "throws conflict when bootstrap path exists as a symlink".config(enabled = !runningOnWindows()) {
+            val repoRoot = createTempDirectory("microsmith-init-bootstrap-symlink")
+            val targetFile = createTempDirectory("microsmith-init-bootstrap-symlink-target")
+                .resolve("external-build.microsmith.kts")
+            targetFile.writeText("// external build script")
+            Files.createSymbolicLink(repoRoot.resolve("build.microsmith.kts"), targetFile)
+            try {
+                val error =
+                    shouldThrow<InitConflictException> {
+                        runInitBootstrap(
+                            command = InitCommand(projectRoot = repoRoot, force = true),
+                            ideRefreshRunner = { error("should not refresh IDE helper when conflict exists") },
+                        )
+                    }
+
+                error.message.shouldContain("exists but is not a regular file")
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+                runCatching { targetFile.parent.deleteRecursively() }
+            }
+        }
+
         "throws validation error when repository root does not exist" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-missing")
             repoRoot.deleteRecursively()
 
             val error =
-                shouldThrow<IllegalArgumentException> {
+                shouldThrow<InitValidationException> {
                     runInitBootstrap(
                         command = InitCommand(projectRoot = repoRoot),
                         ideRefreshRunner = { error("should not refresh IDE helper when root is missing") },
@@ -213,3 +256,5 @@ class InitBootstrapTests :
             repoRoot.exists() shouldBe false
         }
     })
+
+private fun runningOnWindows(): Boolean = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)

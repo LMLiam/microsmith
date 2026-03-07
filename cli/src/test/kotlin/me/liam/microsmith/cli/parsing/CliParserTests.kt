@@ -55,8 +55,6 @@ class CliParserTests :
                     "init",
                     "--repo-root",
                     "examples/go-service",
-                    "--non-interactive",
-                    "--yes",
                     "--force",
                     "--skip-ide-helper",
                     "--diagnostics",
@@ -68,8 +66,6 @@ class CliParserTests :
                     projectRoot = Path("examples/go-service"),
                     diagnosticsFormat = DiagnosticFormat.JSON,
                     verbose = true,
-                    nonInteractive = true,
-                    assumeYes = true,
                     force = true,
                     skipIdeHelper = true,
                 )
@@ -338,14 +334,14 @@ class CliParserTests :
             ) shouldBe ErrorCommand("--repo-root may only be specified once.")
         }
 
-        "returns error when init non-interactive is specified multiple times" {
-            parseCliArgs(listOf("init", "--non-interactive", "--non-interactive")) shouldBe
-                ErrorCommand("--non-interactive may only be specified once.")
+        "returns error for removed init non-interactive option" {
+            parseCliArgs(listOf("init", "--non-interactive")) shouldBe
+                ErrorCommand("Unknown option '--non-interactive'.")
         }
 
-        "returns error when init yes is specified multiple times" {
-            parseCliArgs(listOf("init", "--yes", "--yes")) shouldBe
-                ErrorCommand("--yes may only be specified once.")
+        "returns error for removed init yes option" {
+            parseCliArgs(listOf("init", "--yes")) shouldBe
+                ErrorCommand("Unknown option '--yes'.")
         }
 
         "returns error when init force is specified multiple times" {

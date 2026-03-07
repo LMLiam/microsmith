@@ -22,6 +22,7 @@ import me.liam.microsmith.cli.ide.refreshIdeHelperProject
 import me.liam.microsmith.cli.ide.runIdeHelperDoctor
 import me.liam.microsmith.cli.init.InitBootstrapResult
 import me.liam.microsmith.cli.init.InitConflictException
+import me.liam.microsmith.cli.init.InitValidationException
 import me.liam.microsmith.cli.init.describeForSummary
 import me.liam.microsmith.cli.init.runInitBootstrap
 import me.liam.microsmith.cli.parsing.parseCliArgs
@@ -223,7 +224,7 @@ internal class MicrosmithCli(
                 val code =
                     when (error) {
                         is InitConflictException -> CliFailureCode.INIT_CONFLICT
-                        is IllegalArgumentException -> CliFailureCode.INIT_VALIDATION_FAILED
+                        is InitValidationException -> CliFailureCode.INIT_VALIDATION_FAILED
                         else -> CliFailureCode.INIT_RUNTIME_FAILED
                     }
                 emitter.error(code, error.message ?: "Microsmith init failed.")
@@ -243,8 +244,6 @@ internal class MicrosmithCli(
                 "preservedFiles" to result.preservedFiles.size.toString(),
                 "ideHelperUpdatedFiles" to (result.ideHelperResult?.updatedFiles?.size ?: 0).toString(),
                 "ideHelperSkipped" to command.skipIdeHelper.toString(),
-                "nonInteractive" to command.nonInteractive.toString(),
-                "assumeYes" to command.assumeYes.toString(),
                 "force" to command.force.toString(),
             ),
         )
