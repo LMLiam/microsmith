@@ -222,6 +222,24 @@ jobs:
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts --out install-smoke-repo/generated
           test -f install-smoke-repo/generated/proto/UserCreated.proto
+      - name: Smoke test Node and Go onboarding fixtures (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          set -eu
+          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/node
+          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/node --non-interactive --yes
+          test -f examples/non-gradle/node/build.microsmith.kts
+          test -f examples/non-gradle/node/settings.microsmith.kts
+          test -f examples/non-gradle/node/.microsmith/ide/build.gradle.kts
+          ./.microsmith-bin/microsmith run examples/non-gradle/node/build.microsmith.kts --out examples/non-gradle/node/generated
+          test -f examples/non-gradle/node/generated/proto/NodeUserCreated.proto
+          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/go --non-interactive --yes
+          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/go
+          test -f examples/non-gradle/go/build.microsmith.kts
+          test -f examples/non-gradle/go/settings.microsmith.kts
+          test -f examples/non-gradle/go/.microsmith/ide/build.gradle.kts
+          ./.microsmith-bin/microsmith run examples/non-gradle/go/build.microsmith.kts --out examples/non-gradle/go/internal/gen
+          test -f examples/non-gradle/go/internal/gen/proto/GoUserCreated.proto
       - name: Install and verify from installer (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -272,5 +290,37 @@ jobs:
           }
           if (-not (Test-Path .\install-smoke-repo\generated\proto\UserCreated.proto)) {
             Write-Error "Expected generated\\proto\\UserCreated.proto to exist after run."
+            exit 1
+          }
+      - name: Smoke test .NET onboarding fixture (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          & .\.microsmith-bin\microsmith.cmd init --repo-root examples/non-gradle/dotnet
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          & .\.microsmith-bin\microsmith.cmd init --repo-root examples/non-gradle/dotnet --non-interactive --yes
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          if (-not (Test-Path .\examples\non-gradle\dotnet\build.microsmith.kts)) {
+            Write-Error "Expected build.microsmith.kts to exist for the .NET fixture."
+            exit 1
+          }
+          if (-not (Test-Path .\examples\non-gradle\dotnet\settings.microsmith.kts)) {
+            Write-Error "Expected settings.microsmith.kts to exist for the .NET fixture."
+            exit 1
+          }
+          if (-not (Test-Path .\examples\non-gradle\dotnet\.microsmith\ide\build.gradle.kts)) {
+            Write-Error "Expected IDE helper build.gradle.kts to exist for the .NET fixture."
+            exit 1
+          }
+          & .\.microsmith-bin\microsmith.cmd run examples/non-gradle/dotnet/build.microsmith.kts --out examples/non-gradle/dotnet/Generated
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          if (-not (Test-Path .\examples\non-gradle\dotnet\Generated\proto\DotnetUserCreated.proto)) {
+            Write-Error "Expected Generated\\proto\\DotnetUserCreated.proto to exist for the .NET fixture."
             exit 1
           }
