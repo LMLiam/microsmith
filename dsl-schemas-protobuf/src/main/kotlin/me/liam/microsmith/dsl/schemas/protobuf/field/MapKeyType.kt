@@ -1,3 +1,3 @@
 package me.liam.microsmith.dsl.schemas.protobuf.field
 
-sealed interface FieldType
+sealed interface MapKeyType : PrimitiveType
