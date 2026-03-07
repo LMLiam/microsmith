@@ -1,0 +1,44 @@
+package me.liam.microsmith.cli.parsing
+
+import me.liam.microsmith.cli.command.CliCommand
+import me.liam.microsmith.cli.command.DoctorCommand
+import me.liam.microsmith.cli.command.ErrorCommand
+
+internal fun parseDoctorCommand(args: List<String>): CliCommand {
+    val parsed = parseDoctorOptions(args = args, startIndex = 1)
+    return if (parsed.error != null) {
+        ErrorCommand(parsed.error)
+    } else {
+        DoctorCommand(
+            diagnosticsFormat = parsed.diagnosticsFormat,
+            verbose = parsed.verbose,
+        )
+    }
+}
+
+private fun parseDoctorOptions(args: List<String>, startIndex: Int): ParsedDoctorOptions {
+    val state = DiagnosticOptionsState()
+    var index = startIndex
+
+    while (index < args.size && state.error == null) {
+        val consumed =
+            when (val token = args[index]) {
+                DIAGNOSTICS_OPTION -> state.consumeDiagnostics(args = args, index = index)
+                VERBOSE_OPTION -> state.consumeVerbose()
+                else -> {
+                    state.consumeUnknownOption(token)
+                    0
+                }
+            }
+        if (consumed <= 0) {
+            break
+        }
+        index += consumed
+    }
+
+    return ParsedDoctorOptions(
+        diagnosticsFormat = state.diagnosticsFormat,
+        verbose = state.verbose,
+        error = state.error,
+    )
+}

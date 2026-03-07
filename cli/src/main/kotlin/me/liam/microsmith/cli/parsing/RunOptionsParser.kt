@@ -42,18 +42,20 @@ private fun parseOutputOption(args: List<String>, index: Int, state: RunOptionsS
     }
 }
 
+private fun validateOutputValue(value: String?, outputDirAlreadySet: Boolean): String? = when {
+    value == null || value.startsWith("--") -> "Missing value for --out option."
+    outputDirAlreadySet -> "--out option may only be specified once."
+    else -> null
+}
+
 private fun parseVariableOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
     val parsedVariable = parseVariableValue(value)
     val duplicate = parsedVariable.error == null && state.variables.containsKey(parsedVariable.key)
 
     return when {
-        parsedVariable.error != null ->
-            ParsedToken(nextIndex = index, error = parsedVariable.error)
-
-        duplicate ->
-            ParsedToken(nextIndex = index, error = "--var '${parsedVariable.key}' may only be specified once.")
-
+        parsedVariable.error != null -> ParsedToken(nextIndex = index, error = parsedVariable.error)
+        duplicate -> ParsedToken(nextIndex = index, error = "--var '${parsedVariable.key}' may only be specified once.")
         else -> {
             state.variables[parsedVariable.key] = parsedVariable.value
             ParsedToken(nextIndex = index + 2)
@@ -67,12 +69,8 @@ private fun parseFlagOption(args: List<String>, index: Int, state: RunOptionsSta
     val duplicate = flag != null && state.flags.contains(flag)
 
     return when {
-        flag == null ->
-            ParsedToken(nextIndex = index, error = "Missing value for --flag option.")
-
-        duplicate ->
-            ParsedToken(nextIndex = index, error = "--flag '$flag' may only be specified once.")
-
+        flag == null -> ParsedToken(nextIndex = index, error = "Missing value for --flag option.")
+        duplicate -> ParsedToken(nextIndex = index, error = "--flag '$flag' may only be specified once.")
         else -> {
             state.flags.add(flag)
             ParsedToken(nextIndex = index + 2)
@@ -111,12 +109,8 @@ private fun parsePluginJarOption(args: List<String>, index: Int, state: RunOptio
     val duplicate = pluginJar != null && state.pluginJars.contains(pluginJar)
 
     return when {
-        pluginJar == null ->
-            ParsedToken(nextIndex = index, error = "Missing value for --plugin-jar option.")
-
-        duplicate ->
-            ParsedToken(nextIndex = index, error = "--plugin-jar '$pluginJar' may only be specified once.")
-
+        pluginJar == null -> ParsedToken(nextIndex = index, error = "Missing value for --plugin-jar option.")
+        duplicate -> ParsedToken(nextIndex = index, error = "--plugin-jar '$pluginJar' may only be specified once.")
         else -> {
             state.pluginJars.add(pluginJar)
             ParsedToken(nextIndex = index + 2)
@@ -124,14 +118,11 @@ private fun parsePluginJarOption(args: List<String>, index: Int, state: RunOptio
     }
 }
 
-private fun parseOfflineOption(index: Int, state: RunOptionsState): ParsedToken {
-    val duplicate = state.offline
-    return if (duplicate) {
-        ParsedToken(nextIndex = index, error = "--offline may only be specified once.")
-    } else {
-        state.offline = true
-        ParsedToken(nextIndex = index + 1)
-    }
+private fun parseOfflineOption(index: Int, state: RunOptionsState): ParsedToken = if (state.offline) {
+    ParsedToken(nextIndex = index, error = "--offline may only be specified once.")
+} else {
+    state.offline = true
+    ParsedToken(nextIndex = index + 1)
 }
 
 private fun parseRepositoryOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
@@ -140,12 +131,8 @@ private fun parseRepositoryOption(args: List<String>, index: Int, state: RunOpti
     val duplicate = state.repositoryOverride != null
 
     return when {
-        missingValue ->
-            ParsedToken(nextIndex = index, error = "Missing value for --repository option.")
-
-        duplicate ->
-            ParsedToken(nextIndex = index, error = "--repository may only be specified once.")
-
+        missingValue -> ParsedToken(nextIndex = index, error = "Missing value for --repository option.")
+        duplicate -> ParsedToken(nextIndex = index, error = "--repository may only be specified once.")
         else -> {
             state.repositoryOverride = value
             ParsedToken(nextIndex = index + 2)
@@ -162,9 +149,7 @@ private fun parseIsolationOption(args: List<String>, index: Int, state: RunOptio
         value == null || value.startsWith("--") ->
             ParsedToken(nextIndex = index, error = "Missing value for --isolation option.")
 
-        duplicate ->
-            ParsedToken(nextIndex = index, error = "--isolation may only be specified once.")
-
+        duplicate -> ParsedToken(nextIndex = index, error = "--isolation may only be specified once.")
         parsedMode == null ->
             ParsedToken(
                 nextIndex = index,
@@ -188,9 +173,7 @@ private fun parseDiagnosticsOption(args: List<String>, index: Int, state: RunOpt
         value == null || value.startsWith("--") ->
             ParsedToken(nextIndex = index, error = "Missing value for --diagnostics option.")
 
-        duplicate ->
-            ParsedToken(nextIndex = index, error = "--diagnostics may only be specified once.")
-
+        duplicate -> ParsedToken(nextIndex = index, error = "--diagnostics may only be specified once.")
         parsedFormat == null ->
             ParsedToken(nextIndex = index, error = "Invalid --diagnostics value '$value'. Expected 'text' or 'json'.")
 
@@ -216,9 +199,7 @@ private fun parseEventLogOption(args: List<String>, index: Int, state: RunOption
 
     return when {
         missingValue -> ParsedToken(nextIndex = index, error = "Missing value for --event-log option.")
-
         duplicate -> ParsedToken(nextIndex = index, error = "--event-log may only be specified once.")
-
         else -> {
             state.eventLog = Path.of(value)
             ParsedToken(nextIndex = index + 2)

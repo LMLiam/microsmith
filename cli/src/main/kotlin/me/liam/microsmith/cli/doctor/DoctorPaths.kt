@@ -1,0 +1,12 @@
+package me.liam.microsmith.cli.doctor
+
+import java.nio.file.Path
+
+internal fun defaultScriptCacheDirectory(): Path {
+    val envPath = System.getenv("MICROSMITH_SCRIPT_CACHE_DIR")?.trim()?.takeIf { it.isNotEmpty() }
+    return if (envPath != null) {
+        Path.of(envPath)
+    } else {
+        Path.of(System.getProperty("user.home"), ".microsmith", "cache", "scripts")
+    }
+}
