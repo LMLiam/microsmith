@@ -2,8 +2,10 @@ package me.liam.microsmith.cli.ide
 
 import me.liam.microsmith.cli.command.IdeRefreshCommand
 import java.io.File
+import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.nio.file.Path
 
 internal fun refreshIdeHelperProject(
@@ -29,6 +31,9 @@ internal fun refreshIdeHelperProject(
     require(classpathEntries.isNotEmpty()) {
         "Could not resolve runtime classpath entries for IDE helper generation."
     }
+
+    ensureManagedDirectory(projectRoot.resolve(".microsmith").toAbsolutePath().normalize())
+    ensureManagedDirectory(helperRoot)
 
     val targetFiles =
         linkedMapOf(
@@ -113,18 +118,47 @@ Regeneration:
 """.trimIndent() + "\n"
 
 private fun writeFileIfChanged(path: Path, content: String): Boolean {
-    Files.createDirectories(path.parent)
     val normalizedContent = content.replace("\r\n", "\n")
-    if (Files.exists(path)) {
-        val existing = Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n")
-        if (existing == normalizedContent) {
-            return false
-        }
+    when {
+        managedPathExists(path) && !isManagedRegularFile(path) ->
+            throw IdeHelperConflictException("IDE helper path '$path' exists but is not a regular file.")
+
+        managedFileContentMatches(path, normalizedContent) -> return false
     }
 
     Files.writeString(path, normalizedContent, StandardCharsets.UTF_8)
     return true
 }
+
+private fun ensureManagedDirectory(path: Path) {
+    when {
+        managedPathExists(path) && isManagedDirectory(path) -> return
+        managedPathExists(path) ->
+            throw IdeHelperConflictException("IDE helper directory '$path' exists but is not a directory.")
+
+        else -> Files.createDirectory(path)
+    }
+}
+
+private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
+
+private fun managedFileContentMatches(path: Path, normalizedContent: String): Boolean {
+    return try {
+        if (!isManagedRegularFile(path)) {
+            false
+        } else {
+            Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n") == normalizedContent
+        }
+    } catch (_: IOException) {
+        false
+    } catch (_: SecurityException) {
+        false
+    }
+}
+
+private fun isManagedDirectory(path: Path): Boolean = Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)
+
+private fun isManagedRegularFile(path: Path): Boolean = Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)
 
 internal fun Path.toKotlinPathLiteral(): String = toAbsolutePath()
     .normalize()

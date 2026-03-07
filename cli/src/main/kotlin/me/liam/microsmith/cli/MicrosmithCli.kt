@@ -22,6 +22,8 @@ import me.liam.microsmith.cli.ide.refreshIdeHelperProject
 import me.liam.microsmith.cli.ide.runIdeHelperDoctor
 import me.liam.microsmith.cli.init.InitBootstrapResult
 import me.liam.microsmith.cli.init.InitConflictException
+import me.liam.microsmith.cli.init.InitValidationException
+import me.liam.microsmith.cli.init.describeForSummary
 import me.liam.microsmith.cli.init.runInitBootstrap
 import me.liam.microsmith.cli.parsing.parseCliArgs
 import me.liam.microsmith.cli.plugins.PluginResolutionResult
@@ -222,7 +224,7 @@ internal class MicrosmithCli(
                 val code =
                     when (error) {
                         is InitConflictException -> CliFailureCode.INIT_CONFLICT
-                        is IllegalArgumentException -> CliFailureCode.INIT_VALIDATION_FAILED
+                        is InitValidationException -> CliFailureCode.INIT_VALIDATION_FAILED
                         else -> CliFailureCode.INIT_RUNTIME_FAILED
                     }
                 emitter.error(code, error.message ?: "Microsmith init failed.")
@@ -235,15 +237,82 @@ internal class MicrosmithCli(
             details =
             mapOf(
                 "projectRoot" to projectRoot.toString(),
+                "repositoryType" to result.repositoryDetection.type.displayName,
+                "matchedMarkers" to result.repositoryDetection.matchedMarkers.joinToString(separator = ","),
                 "createdFiles" to result.createdFiles.size.toString(),
+                "overwrittenFiles" to result.overwrittenFiles.size.toString(),
                 "preservedFiles" to result.preservedFiles.size.toString(),
-                "ideHelperUpdatedFiles" to result.ideHelperResult.updatedFiles.size.toString(),
-                "nonInteractive" to command.nonInteractive.toString(),
-                "assumeYes" to command.assumeYes.toString(),
+                "ideHelperUpdatedFiles" to (result.ideHelperResult?.updatedFiles?.size ?: 0).toString(),
+                "ideHelperSkipped" to command.skipIdeHelper.toString(),
+                "force" to command.force.toString(),
             ),
         )
+        emitter.info("Detected repository type: ${result.repositoryDetection.describeForSummary()}.")
+        emitInitBootstrapSummary(emitter = emitter, command = command, result = result)
+        emitIdeHelperSummary(emitter = emitter, result = result)
         emitter.info("Next: microsmith run build.microsmith.kts --out ./generated")
+        result.repositoryDetection.type.repoNativeOutputDirectory?.let { outputDirectory ->
+            emitter.info(
+                "Optional repository-native output path: " +
+                    "microsmith run build.microsmith.kts --out $outputDirectory",
+            )
+        }
         return 0
+    }
+
+    private fun emitInitBootstrapSummary(
+        emitter: CliDiagnosticEmitter,
+        command: InitCommand,
+        result: InitBootstrapResult,
+    ) {
+        if (result.createdFiles.isNotEmpty()) {
+            emitter.info(
+                "Created bootstrap files: ${result.createdFiles.formatForDisplay(result.projectRoot)}",
+            )
+        }
+        if (result.overwrittenFiles.isNotEmpty()) {
+            emitter.info(
+                "Overwrote bootstrap files: ${result.overwrittenFiles.formatForDisplay(result.projectRoot)}",
+            )
+        }
+        if (result.preservedFiles.isNotEmpty()) {
+            val message =
+                if (command.force) {
+                    "Preserved bootstrap files already matching the managed templates"
+                } else {
+                    "Preserved existing bootstrap files"
+                }
+            emitter.info("$message: ${result.preservedFiles.formatForDisplay(result.projectRoot)}")
+            if (!command.force) {
+                emitter.info(
+                    "Re-run with --force to replace existing regular bootstrap files " +
+                        "with the managed templates.",
+                )
+            }
+        }
+        if (
+            result.createdFiles.isEmpty() &&
+            result.overwrittenFiles.isEmpty() &&
+            result.preservedFiles.isEmpty()
+        ) {
+            emitter.info("Bootstrap completed with no managed file changes.")
+        }
+    }
+
+    private fun emitIdeHelperSummary(emitter: CliDiagnosticEmitter, result: InitBootstrapResult) {
+        val ideHelperResult = result.ideHelperResult
+        if (ideHelperResult == null) {
+            emitter.info(
+                "JetBrains IDE helper generation was skipped. " +
+                    "Run 'microsmith ide refresh' when you want IDE indexing.",
+            )
+            return
+        }
+
+        val helperRoot = ideHelperResult.helperRoot.toAbsolutePath().normalize()
+        val state = if (ideHelperResult.updatedFiles.isEmpty()) "already current" else "updated"
+        emitter.info("JetBrains IDE helper is $state at '$helperRoot'.")
+        emitter.info("Import '${helperRoot.resolve("build.gradle.kts")}' as a Gradle project in JetBrains IDEs.")
     }
 
     private fun prepareRun(
@@ -433,6 +502,10 @@ internal class MicrosmithCli(
         ScriptFailureType.EVALUATION -> CliFailureCode.SCRIPT_EVALUATION_FAILED
         ScriptFailureType.HOST -> CliFailureCode.SCRIPT_HOST_FAILED
     }
+}
+
+private fun List<Path>.formatForDisplay(projectRoot: Path): String = joinToString(separator = ", ") { path ->
+    projectRoot.relativize(path.toAbsolutePath().normalize()).toString()
 }
 
 private sealed interface PreparedRun {

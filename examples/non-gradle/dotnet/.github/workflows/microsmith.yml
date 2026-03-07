@@ -14,6 +14,16 @@ jobs:
           Invoke-WebRequest -Uri $env:MICROSMITH_INSTALLER_PS1_URL -OutFile microsmith-install.ps1
           .\microsmith-install.ps1 -Version $env:MICROSMITH_VERSION
           Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $HOME ".microsmith\bin")
+      - name: Bootstrap Microsmith
+        shell: pwsh
+        working-directory: examples/non-gradle/dotnet
+        run: microsmith init
       - name: Generate protobuf
         shell: pwsh
-        run: microsmith run schema.microsmith.kts --out .\Generated\Proto
+        working-directory: examples/non-gradle/dotnet
+        run: |
+          microsmith run build.microsmith.kts --out .\Generated
+          if (-not (Test-Path .\Generated\proto\DotnetUserCreated.proto)) {
+            Write-Error "Expected Generated\\proto\\DotnetUserCreated.proto to exist."
+            exit 1
+          }

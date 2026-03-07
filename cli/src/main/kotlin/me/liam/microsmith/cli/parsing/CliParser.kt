@@ -30,8 +30,8 @@ internal const val DIAGNOSTICS_OPTION = "--diagnostics"
 internal const val VERBOSE_OPTION = "--verbose"
 internal const val EVENT_LOG_OPTION = "--event-log"
 internal const val REPO_ROOT_OPTION = "--repo-root"
-internal const val NON_INTERACTIVE_OPTION = "--non-interactive"
-internal const val YES_OPTION = "--yes"
+internal const val FORCE_OPTION = "--force"
+internal const val SKIP_IDE_HELPER_OPTION = "--skip-ide-helper"
 private const val SCRIPT_EXTENSION = ".microsmith.kts"
 private val HELP_COMMANDS = setOf("--help", "-h", "help")
 private val VERSION_COMMANDS = setOf("--version")
@@ -183,8 +183,8 @@ private fun parseInitCommand(args: List<String>): CliCommand {
             projectRoot = parsed.projectRoot,
             diagnosticsFormat = parsed.diagnosticsFormat,
             verbose = parsed.verbose,
-            nonInteractive = parsed.nonInteractive,
-            assumeYes = parsed.assumeYes,
+            force = parsed.force,
+            skipIdeHelper = parsed.skipIdeHelper,
         )
     }
 }
@@ -199,8 +199,8 @@ private fun parseInitOptions(args: List<String>, startIndex: Int): ParsedInitOpt
                 DIAGNOSTICS_OPTION -> state.consumeDiagnostics(args = args, index = index)
                 VERBOSE_OPTION -> state.consumeVerbose()
                 REPO_ROOT_OPTION -> state.consumeRepoRoot(args = args, index = index)
-                NON_INTERACTIVE_OPTION -> state.consumeNonInteractive()
-                YES_OPTION -> state.consumeAssumeYes()
+                FORCE_OPTION -> state.consumeForce()
+                SKIP_IDE_HELPER_OPTION -> state.consumeSkipIdeHelper()
                 else -> {
                     state.consumeUnknownOption(token)
                     0
@@ -347,8 +347,8 @@ private class InitOptionsState {
     private var diagnosticsFormat = DiagnosticFormat.TEXT
     private var diagnosticsSpecified = false
     private var verbose = false
-    private var nonInteractive = false
-    private var assumeYes = false
+    private var force = false
+    private var skipIdeHelper = false
     private var projectRoot = Path.of(".")
     private var projectRootSpecified = false
 
@@ -403,23 +403,23 @@ private class InitOptionsState {
         return 2
     }
 
-    fun consumeNonInteractive(): Int {
-        if (nonInteractive) {
-            error = "--non-interactive may only be specified once."
+    fun consumeForce(): Int {
+        if (force) {
+            error = "--force may only be specified once."
             return 0
         }
 
-        nonInteractive = true
+        force = true
         return 1
     }
 
-    fun consumeAssumeYes(): Int {
-        if (assumeYes) {
-            error = "--yes may only be specified once."
+    fun consumeSkipIdeHelper(): Int {
+        if (skipIdeHelper) {
+            error = "--skip-ide-helper may only be specified once."
             return 0
         }
 
-        assumeYes = true
+        skipIdeHelper = true
         return 1
     }
 
@@ -432,8 +432,8 @@ private class InitOptionsState {
             projectRoot = projectRoot,
             diagnosticsFormat = diagnosticsFormat,
             verbose = verbose,
-            nonInteractive = nonInteractive,
-            assumeYes = assumeYes,
+            force = force,
+            skipIdeHelper = skipIdeHelper,
             error = error,
         )
     }
@@ -450,7 +450,7 @@ private data class ParsedInitOptions(
     val projectRoot: Path,
     val diagnosticsFormat: DiagnosticFormat,
     val verbose: Boolean,
-    val nonInteractive: Boolean,
-    val assumeYes: Boolean,
+    val force: Boolean,
+    val skipIdeHelper: Boolean,
     val error: String?,
 )

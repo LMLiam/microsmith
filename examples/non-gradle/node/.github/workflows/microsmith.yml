@@ -13,5 +13,11 @@ jobs:
           curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
           sh microsmith-install.sh --version "$MICROSMITH_VERSION"
           echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
+      - name: Bootstrap Microsmith
+        working-directory: examples/non-gradle/node
+        run: microsmith init
       - name: Generate protobuf
-        run: microsmith run schema.microsmith.kts --out generated/proto
+        working-directory: examples/non-gradle/node
+        run: |
+          microsmith run build.microsmith.kts --out generated
+          test -f generated/proto/NodeUserCreated.proto

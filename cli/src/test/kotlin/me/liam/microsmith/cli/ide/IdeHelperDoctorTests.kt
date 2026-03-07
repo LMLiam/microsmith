@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import me.liam.microsmith.cli.command.IdeDoctorCommand
 import me.liam.microsmith.cli.command.IdeRefreshCommand
+import java.nio.file.Files
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
@@ -73,6 +74,62 @@ class IdeHelperDoctorTests :
                     runIdeHelperDoctor(
                         command = IdeDoctorCommand(projectRoot = repoRoot),
                         classpathResolver = { listOf(runtimeJarV2) },
+                    )
+
+                result.hasFailures shouldBe true
+                val classpathSyncCheck = result.checks.first { check -> check.id == "classpath-sync" }
+                classpathSyncCheck.passed shouldBe false
+                classpathSyncCheck.message.shouldContain("stale")
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
+        "reports conflicting managed helper files" {
+            val repoRoot = createTempDirectory("microsmith-ide-doctor-conflicting-helper")
+            val runtimeJar = repoRoot.resolve("runtime/microsmith-cli-all.jar")
+            val helperRoot = repoRoot.resolve(".microsmith/ide")
+            runtimeJar.parent.createDirectories()
+            helperRoot.createDirectories()
+            runtimeJar.writeText("jar-binary-placeholder")
+            helperRoot.resolve("settings.gradle.kts").writeText("rootProject.name = \"microsmith-ide-helper\"")
+            helperRoot.resolve("README.md").writeText("# helper")
+            helperRoot.resolve("build.gradle.kts").createDirectories()
+            try {
+                val result =
+                    runIdeHelperDoctor(
+                        command = IdeDoctorCommand(projectRoot = repoRoot),
+                        classpathResolver = { listOf(runtimeJar) },
+                    )
+
+                result.hasFailures shouldBe true
+                val requiredFilesCheck = result.checks.first { check -> check.id == "required-files" }
+                requiredFilesCheck.passed shouldBe false
+                requiredFilesCheck.message.shouldContain("conflicting managed paths")
+                requiredFilesCheck.details["invalidFiles"]
+                    .shouldContain(helperRoot.resolve("build.gradle.kts").toString())
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
+        "reports stale helper build file when managed file is undecodable" {
+            val repoRoot = createTempDirectory("microsmith-ide-doctor-invalid-bytes")
+            val runtimeJar = repoRoot.resolve("runtime/microsmith-cli-all.jar")
+            val helperRoot = repoRoot.resolve(".microsmith/ide")
+            runtimeJar.parent.createDirectories()
+            runtimeJar.writeText("jar-binary-placeholder")
+            try {
+                refreshIdeHelperProject(
+                    command = IdeRefreshCommand(projectRoot = repoRoot),
+                    classpathResolver = { listOf(runtimeJar) },
+                )
+                Files.write(helperRoot.resolve("build.gradle.kts"), byteArrayOf(0xC3.toByte(), 0x28))
+
+                val result =
+                    runIdeHelperDoctor(
+                        command = IdeDoctorCommand(projectRoot = repoRoot),
+                        classpathResolver = { listOf(runtimeJar) },
                     )
 
                 result.hasFailures shouldBe true
