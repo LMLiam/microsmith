@@ -1,5 +1,7 @@
 package me.liam.microsmith.cli.plugins
 
+import java.io.IOException
+import java.io.UncheckedIOException
 import java.nio.file.Path
 
 /** Centralizes checksum, allowlist, and lockfile enforcement so orchestration stays behavior-focused. */
@@ -55,10 +57,19 @@ internal class PluginResolutionIntegrityVerifier {
     private inline fun <T> withLockfileDiagnostics(block: () -> T): T = try {
         block()
     } catch (error: IllegalArgumentException) {
-        throw PluginResolutionDiagnosticException(
-            category = PluginResolverErrorCategory.LOCKFILE,
-            message = error.message ?: "Plugin lockfile validation failed.",
-            cause = error,
-        )
+        throw error.toLockfileDiagnostic()
+    } catch (error: IOException) {
+        throw error.toLockfileDiagnostic()
+    } catch (error: UncheckedIOException) {
+        throw error.toLockfileDiagnostic()
+    } catch (error: SecurityException) {
+        throw error.toLockfileDiagnostic()
     }
+
+    private fun Throwable.toLockfileDiagnostic(): PluginResolutionDiagnosticException =
+        PluginResolutionDiagnosticException(
+            category = PluginResolverErrorCategory.LOCKFILE,
+            message = message ?: "Plugin lockfile validation failed.",
+            cause = this,
+        )
 }
