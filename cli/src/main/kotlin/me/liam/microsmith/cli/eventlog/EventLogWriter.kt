@@ -1,6 +1,5 @@
 package me.liam.microsmith.cli.eventlog
 
-import me.liam.microsmith.cli.diagnostics.CliFailureCode
 import me.liam.microsmith.cli.diagnostics.toJsonValue
 import java.nio.file.Files
 import java.nio.file.Path
@@ -8,29 +7,13 @@ import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 import java.time.Instant
 
-internal data class RunEventLogEntry(
-    val scriptPath: Path,
-    val outputPath: Path,
-    val pluginCoordinates: Set<String>,
-    val pluginJars: Set<Path>,
-    val offline: Boolean,
-    val isolationMode: String,
-    val status: String,
-    val exitCode: Int,
-    val failureCode: CliFailureCode? = null,
-    val resolverStatus: String,
-    val lockfilePath: Path? = null,
-    val cacheHit: Boolean? = null,
-    val elapsedMillis: Long? = null,
-)
-
 internal object EventLogWriter {
     fun writeEventLog(path: Path, event: RunEventLogEntry) {
         val payload =
             linkedMapOf(
                 "timestamp" to Instant.now().toString(),
                 "event" to "microsmith.run",
-                "status" to event.status,
+                "status" to event.status.wireValue,
                 "exitCode" to event.exitCode,
                 "scriptPath" to event.scriptPath.toAbsolutePath().normalize().toString(),
                 "scriptSha256" to sha256IfPresent(event.scriptPath),
@@ -39,7 +22,7 @@ internal object EventLogWriter {
                 "pluginJars" to event.pluginJars.map { it.toAbsolutePath().normalize().toString() }.sorted(),
                 "offline" to event.offline,
                 "isolationMode" to event.isolationMode,
-                "resolverStatus" to event.resolverStatus,
+                "resolverStatus" to event.resolverStatus.wireValue,
                 "lockfilePath" to event.lockfilePath?.toAbsolutePath()?.normalize()?.toString(),
                 "cacheHit" to event.cacheHit,
                 "elapsedMillis" to event.elapsedMillis,

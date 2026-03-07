@@ -6,12 +6,6 @@ import java.nio.file.Path
 
 private const val PLUGIN_COORDINATE_PART_COUNT = 3
 
-internal fun validateOutputValue(value: String?, outputDirAlreadySet: Boolean): String? = when {
-    value == null || value.startsWith("--") -> "Missing value for --out option."
-    outputDirAlreadySet -> "--out option may only be specified once."
-    else -> null
-}
-
 internal fun parseVariableValue(value: String?): ParsedVariable = when {
     value == null || value.startsWith("--") -> ParsedVariable(error = "Missing value for --var option.")
 
@@ -78,36 +72,37 @@ internal fun parseDiagnosticFormat(value: String?): DiagnosticFormat? {
     return DiagnosticFormat.parse(normalized)
 }
 
-internal data class ParsedToken(val nextIndex: Int, val error: String? = null)
+internal inline fun parseSingleOccurrenceFlag(
+    index: Int,
+    alreadySpecified: Boolean,
+    optionName: String,
+    onSuccess: () -> Unit,
+): ParsedToken {
+    if (alreadySpecified) {
+        return ParsedToken(nextIndex = index, error = "$optionName may only be specified once.")
+    }
 
-internal class RunOptionsState {
-    var outputDir: Path? = null
-    val variables = linkedMapOf<String, String>()
-    val flags = linkedSetOf<String>()
-    val plugins = linkedSetOf<String>()
-    val pluginJars = linkedSetOf<Path>()
-    var offline: Boolean = false
-    var repositoryOverride: String? = null
-    var isolationModeSpecified: Boolean = false
-    var isolationMode: ScriptIsolationMode = ScriptIsolationMode.CLASSLOADER
-    var diagnosticsFormatSpecified: Boolean = false
-    var diagnosticsFormat: DiagnosticFormat = DiagnosticFormat.TEXT
-    var verbose: Boolean = false
-    var eventLog: Path? = null
-    var error: String? = null
+    onSuccess()
+    return ParsedToken(nextIndex = index + 1)
+}
 
-    fun toParsedRunOptions(): ParsedRunOptions = ParsedRunOptions(
-        outputDir = outputDir,
-        variables = variables.toMap(),
-        flags = flags.toSet(),
-        plugins = plugins.toSet(),
-        pluginJars = pluginJars.toSet(),
-        offline = offline,
-        repositoryOverride = repositoryOverride,
-        isolationMode = isolationMode,
-        diagnosticsFormat = diagnosticsFormat,
-        verbose = verbose,
-        eventLog = eventLog,
-        error = error,
-    )
+internal inline fun parseRepoRootOption(
+    args: List<String>,
+    index: Int,
+    alreadySpecified: Boolean,
+    onSuccess: (Path) -> Unit,
+): ParsedToken {
+    val value = args.getOrNull(index + 1)
+    val error =
+        when {
+            value == null || value.startsWith("--") -> "Missing value for --repo-root option."
+            alreadySpecified -> "--repo-root may only be specified once."
+            else -> null
+        }
+    if (error != null) {
+        return ParsedToken(nextIndex = index, error = error)
+    }
+
+    onSuccess(Path.of(value))
+    return ParsedToken(nextIndex = index + 2)
 }

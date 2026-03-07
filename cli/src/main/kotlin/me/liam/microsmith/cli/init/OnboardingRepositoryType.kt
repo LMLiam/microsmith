@@ -2,10 +2,12 @@ package me.liam.microsmith.cli.init
 
 import java.io.IOException
 import java.io.UncheckedIOException
+import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.attribute.BasicFileAttributes
 import kotlin.io.path.isRegularFile
-import kotlin.streams.asSequence
 
 internal enum class OnboardingRepositoryType(
     val displayName: String,
@@ -32,27 +34,6 @@ internal enum class OnboardingRepositoryType(
         sampleMessageName = "UserCreated",
         repoNativeOutputDirectory = null,
     ),
-}
-
-internal data class OnboardingRepositoryDetection(
-    val type: OnboardingRepositoryType,
-    val matchedMarkers: List<String>,
-)
-
-internal fun OnboardingRepositoryDetection.describeForComment(): String = buildString {
-    append("Detected repository type: ${type.displayName}")
-    if (matchedMarkers.isEmpty()) {
-        append(" (no repo markers matched)")
-    } else {
-        append(" via ${matchedMarkers.joinToString(separator = ", ")}")
-    }
-}
-
-internal fun OnboardingRepositoryDetection.describeForSummary(): String = buildString {
-    append(type.displayName)
-    if (matchedMarkers.isNotEmpty()) {
-        append(" (matched ${matchedMarkers.joinToString(separator = ", ")})")
-    }
 }
 
 internal fun detectOnboardingRepositoryType(
@@ -95,18 +76,30 @@ private fun safeFindDotnetMarker(projectRoot: Path, dotnetMarkerFinder: (Path) -
     null
 }
 
-private fun findDotnetMarker(projectRoot: Path): String? =
-    Files.walk(projectRoot, DOTNET_MARKER_SEARCH_DEPTH).use { stream ->
-        stream
-            .asSequence()
-            .filter(Files::isRegularFile)
-            .map(projectRoot::relativize)
-            .map(Path::toString)
-            .filter { relativePath ->
-                relativePath.endsWith(".sln") || relativePath.endsWith(".csproj")
+private fun findDotnetMarker(projectRoot: Path): String? {
+    val matchedMarkers = mutableListOf<String>()
+    Files.walkFileTree(
+        projectRoot,
+        emptySet(),
+        DOTNET_MARKER_SEARCH_DEPTH,
+        object : SimpleFileVisitor<Path>() {
+            override fun visitFile(file: Path, attributes: BasicFileAttributes): FileVisitResult {
+                if (attributes.isRegularFile) {
+                    val relativePath = projectRoot.relativize(file).toString()
+                    if (relativePath.endsWith(".sln") || relativePath.endsWith(".csproj")) {
+                        matchedMarkers += relativePath
+                    }
+                }
+                return FileVisitResult.CONTINUE
             }
-            .sorted()
-            .firstOrNull()
-    }
+
+            override fun visitFileFailed(file: Path, exception: IOException): FileVisitResult = FileVisitResult.CONTINUE
+
+            override fun postVisitDirectory(directory: Path, exception: IOException?): FileVisitResult =
+                FileVisitResult.CONTINUE
+        },
+    )
+    return matchedMarkers.sorted().firstOrNull()
+}
 
 private const val DOTNET_MARKER_SEARCH_DEPTH = 6
