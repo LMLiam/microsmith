@@ -3,6 +3,7 @@ package me.liam.microsmith.cli.ide
 import me.liam.microsmith.cli.command.IdeDoctorCommand
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.nio.file.Path
 
 internal data class IdeDoctorCheckResult(
@@ -75,20 +76,30 @@ private fun validateRepoRoot(projectRoot: Path, helperRoot: Path): IdeDoctorResu
     return null
 }
 
-private fun helperDirectoryCheck(helperRoot: Path): IdeDoctorCheckResult = if (Files.isDirectory(helperRoot)) {
-    IdeDoctorCheckResult(
-        id = "helper-directory",
-        passed = true,
-        message = "IDE helper directory exists.",
-        details = mapOf("helperRoot" to helperRoot.toString()),
-    )
-} else {
-    IdeDoctorCheckResult(
-        id = "helper-directory",
-        passed = false,
-        message = "IDE helper directory is missing. Run 'microsmith ide refresh'.",
-        details = mapOf("helperRoot" to helperRoot.toString()),
-    )
+private fun helperDirectoryCheck(helperRoot: Path): IdeDoctorCheckResult = when {
+    managedPathExists(helperRoot) && Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) ->
+        IdeDoctorCheckResult(
+            id = "helper-directory",
+            passed = true,
+            message = "IDE helper directory exists.",
+            details = mapOf("helperRoot" to helperRoot.toString()),
+        )
+
+    managedPathExists(helperRoot) ->
+        IdeDoctorCheckResult(
+            id = "helper-directory",
+            passed = false,
+            message = "IDE helper path is invalid. Remove the conflicting path and run 'microsmith ide refresh'.",
+            details = mapOf("helperRoot" to helperRoot.toString()),
+        )
+
+    else ->
+        IdeDoctorCheckResult(
+            id = "helper-directory",
+            passed = false,
+            message = "IDE helper directory is missing. Run 'microsmith ide refresh'.",
+            details = mapOf("helperRoot" to helperRoot.toString()),
+        )
 }
 
 private fun requiredFilesCheck(helperRoot: Path): IdeDoctorCheckResult {
@@ -98,25 +109,45 @@ private fun requiredFilesCheck(helperRoot: Path): IdeDoctorCheckResult {
             helperRoot.resolve(IDE_HELPER_BUILD_FILE_NAME),
             helperRoot.resolve(IDE_HELPER_README_FILE_NAME),
         )
-    val missingFiles = requiredFiles.filterNot(Files::isRegularFile).sortedBy(Path::toString)
-    return if (missingFiles.isEmpty()) {
-        IdeDoctorCheckResult(
-            id = "required-files",
-            passed = true,
-            message = "All required IDE helper files are present.",
-            details = mapOf("fileCount" to requiredFiles.size.toString()),
-        )
-    } else {
-        IdeDoctorCheckResult(
-            id = "required-files",
-            passed = false,
-            message = "IDE helper files are missing. Run 'microsmith ide refresh'.",
-            details =
-            mapOf(
-                "missingCount" to missingFiles.size.toString(),
-                "missingFiles" to missingFiles.joinToString(separator = ","),
-            ),
-        )
+    val invalidFiles =
+        requiredFiles
+            .filter(::managedPathExists)
+            .filterNot(::isManagedRegularFile)
+            .sortedBy(Path::toString)
+    val missingFiles = requiredFiles.filterNot(::managedPathExists).sortedBy(Path::toString)
+    return when {
+        invalidFiles.isNotEmpty() ->
+            IdeDoctorCheckResult(
+                id = "required-files",
+                passed = false,
+                message =
+                "IDE helper contains conflicting managed paths. Remove them and run 'microsmith ide refresh'.",
+                details =
+                mapOf(
+                    "invalidCount" to invalidFiles.size.toString(),
+                    "invalidFiles" to invalidFiles.joinToString(separator = ","),
+                ),
+            )
+
+        missingFiles.isEmpty() ->
+            IdeDoctorCheckResult(
+                id = "required-files",
+                passed = true,
+                message = "All required IDE helper files are present.",
+                details = mapOf("fileCount" to requiredFiles.size.toString()),
+            )
+
+        else ->
+            IdeDoctorCheckResult(
+                id = "required-files",
+                passed = false,
+                message = "IDE helper files are missing. Run 'microsmith ide refresh'.",
+                details =
+                mapOf(
+                    "missingCount" to missingFiles.size.toString(),
+                    "missingFiles" to missingFiles.joinToString(separator = ","),
+                ),
+            )
     }
 }
 
@@ -145,7 +176,7 @@ private fun runtimeClasspathCheck(classpathEntries: List<Path>): IdeDoctorCheckR
 private fun classpathSyncCheck(helperRoot: Path, classpathEntries: List<Path>): IdeDoctorCheckResult {
     val buildFile = helperRoot.resolve(IDE_HELPER_BUILD_FILE_NAME)
     val buildFileContent =
-        if (Files.isRegularFile(buildFile)) {
+        if (isManagedRegularFile(buildFile)) {
             Files.readString(buildFile, StandardCharsets.UTF_8).replace("\r\n", "\n")
         } else {
             null
@@ -175,3 +206,7 @@ private fun classpathSyncCheck(helperRoot: Path, classpathEntries: List<Path>): 
         )
     }
 }
+
+private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
+
+private fun isManagedRegularFile(path: Path): Boolean = Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)

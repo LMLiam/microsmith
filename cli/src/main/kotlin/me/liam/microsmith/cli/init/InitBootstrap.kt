@@ -27,12 +27,7 @@ internal fun runInitBootstrap(
     ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult = ::refreshIdeHelperProject,
 ): InitBootstrapResult {
     val projectRoot = command.projectRoot.toAbsolutePath().normalize()
-    requireInit(Files.exists(projectRoot)) {
-        "Repository root '$projectRoot' does not exist."
-    }
-    requireInit(Files.isDirectory(projectRoot)) {
-        "Repository root '$projectRoot' is not a directory."
-    }
+    validateProjectRoot(projectRoot)
 
     val repositoryDetection = detectOnboardingRepositoryType(projectRoot)
     val createdFiles = mutableListOf<Path>()
@@ -40,48 +35,20 @@ internal fun runInitBootstrap(
     val preservedFiles = mutableListOf<Path>()
 
     bootstrapFilesFor(repositoryDetection).forEach { (relativePath, content) ->
-        val path = projectRoot.resolve(relativePath)
-        when {
-            Files.exists(path, LinkOption.NOFOLLOW_LINKS) && Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) -> {
-                val existingContent = Files.readString(path, StandardCharsets.UTF_8)
-                if (command.force && existingContent.normalizeLineEndings() != content.normalizeLineEndings()) {
-                    Files.writeString(path, content, StandardCharsets.UTF_8)
-                    overwrittenFiles.add(path)
-                } else {
-                    preservedFiles.add(path)
-                }
-            }
-
-            Files.exists(path, LinkOption.NOFOLLOW_LINKS) ->
-                throw InitConflictException("Bootstrap path '$path' exists but is not a regular file.")
-
-            else -> {
-                Files.createDirectories(path.parent)
-                Files.writeString(path, content, StandardCharsets.UTF_8)
-                createdFiles.add(path)
-            }
+        val fileWriteResult =
+            writeBootstrapFile(
+                path = projectRoot.resolve(relativePath),
+                content = content,
+                force = command.force,
+            )
+        when (fileWriteResult) {
+            is BootstrapFileWriteResult.Created -> createdFiles.add(fileWriteResult.path)
+            is BootstrapFileWriteResult.Overwritten -> overwrittenFiles.add(fileWriteResult.path)
+            is BootstrapFileWriteResult.Preserved -> preservedFiles.add(fileWriteResult.path)
         }
     }
 
-    val ideHelperResult =
-        if (command.skipIdeHelper) {
-            null
-        } else {
-            runCatching {
-                ideRefreshRunner(
-                    IdeRefreshCommand(
-                        projectRoot = projectRoot,
-                        diagnosticsFormat = command.diagnosticsFormat,
-                        verbose = command.verbose,
-                    ),
-                )
-            }.getOrElse { error ->
-                when (error) {
-                    is IdeHelperConflictException -> throw InitConflictException(error.message ?: "IDE helper path is invalid.")
-                    else -> throw error
-                }
-            }
-        }
+    val ideHelperResult = refreshIdeHelperIfEnabled(command, projectRoot, ideRefreshRunner)
 
     return InitBootstrapResult(
         projectRoot = projectRoot,
@@ -135,6 +102,77 @@ private fun renderDefaultBuildScript(repositoryType: OnboardingRepositoryType): 
 }
 
 private fun String.normalizeLineEndings(): String = replace("\r\n", "\n")
+
+private fun validateProjectRoot(projectRoot: Path) {
+    requireInit(Files.exists(projectRoot)) {
+        "Repository root '$projectRoot' does not exist."
+    }
+    requireInit(Files.isDirectory(projectRoot)) {
+        "Repository root '$projectRoot' is not a directory."
+    }
+}
+
+private fun writeBootstrapFile(path: Path, content: String, force: Boolean): BootstrapFileWriteResult = when {
+    managedPathExists(path) && Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) -> {
+        if (force && managedFileContentDiffers(path, content)) {
+            Files.writeString(path, content, StandardCharsets.UTF_8)
+            BootstrapFileWriteResult.Overwritten(path)
+        } else {
+            BootstrapFileWriteResult.Preserved(path)
+        }
+    }
+
+    managedPathExists(path) ->
+        throw InitConflictException("Bootstrap path '$path' exists but is not a regular file.")
+
+    else -> {
+        Files.createDirectories(path.parent)
+        Files.writeString(path, content, StandardCharsets.UTF_8)
+        BootstrapFileWriteResult.Created(path)
+    }
+}
+
+private fun refreshIdeHelperIfEnabled(
+    command: InitCommand,
+    projectRoot: Path,
+    ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult,
+): IdeHelperRefreshResult? {
+    if (command.skipIdeHelper) {
+        return null
+    }
+
+    return runCatching {
+        ideRefreshRunner(
+            IdeRefreshCommand(
+                projectRoot = projectRoot,
+                diagnosticsFormat = command.diagnosticsFormat,
+                verbose = command.verbose,
+            ),
+        )
+    }.getOrElse { error ->
+        when (error) {
+            is IdeHelperConflictException ->
+                throw InitConflictException(error.message ?: "IDE helper path is invalid.")
+
+            else -> throw error
+        }
+    }
+}
+
+private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
+
+private fun managedFileContentDiffers(path: Path, expectedContent: String): Boolean {
+    val existingContent = Files.readString(path, StandardCharsets.UTF_8)
+    return existingContent.normalizeLineEndings() != expectedContent.normalizeLineEndings()
+}
+
+private sealed interface BootstrapFileWriteResult {
+    data class Created(val path: Path) : BootstrapFileWriteResult
+
+    data class Overwritten(val path: Path) : BootstrapFileWriteResult
+
+    data class Preserved(val path: Path) : BootstrapFileWriteResult
+}
 
 private inline fun requireInit(value: Boolean, lazyMessage: () -> String) {
     if (!value) {

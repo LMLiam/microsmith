@@ -83,4 +83,32 @@ class IdeHelperDoctorTests :
                 runCatching { repoRoot.deleteRecursively() }
             }
         }
+
+        "reports conflicting managed helper files" {
+            val repoRoot = createTempDirectory("microsmith-ide-doctor-conflicting-helper")
+            val runtimeJar = repoRoot.resolve("runtime/microsmith-cli-all.jar")
+            val helperRoot = repoRoot.resolve(".microsmith/ide")
+            runtimeJar.parent.createDirectories()
+            helperRoot.createDirectories()
+            runtimeJar.writeText("jar-binary-placeholder")
+            helperRoot.resolve("settings.gradle.kts").writeText("rootProject.name = \"microsmith-ide-helper\"")
+            helperRoot.resolve("README.md").writeText("# helper")
+            helperRoot.resolve("build.gradle.kts").createDirectories()
+            try {
+                val result =
+                    runIdeHelperDoctor(
+                        command = IdeDoctorCommand(projectRoot = repoRoot),
+                        classpathResolver = { listOf(runtimeJar) },
+                    )
+
+                result.hasFailures shouldBe true
+                val requiredFilesCheck = result.checks.first { check -> check.id == "required-files" }
+                requiredFilesCheck.passed shouldBe false
+                requiredFilesCheck.message.shouldContain("conflicting managed paths")
+                requiredFilesCheck.details["invalidFiles"]
+                    .shouldContain(helperRoot.resolve("build.gradle.kts").toString())
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
     })

@@ -1,5 +1,6 @@
 package me.liam.microsmith.cli.init
 
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.isRegularFile
@@ -53,7 +54,10 @@ internal fun OnboardingRepositoryDetection.describeForSummary(): String = buildS
     }
 }
 
-internal fun detectOnboardingRepositoryType(projectRoot: Path): OnboardingRepositoryDetection {
+internal fun detectOnboardingRepositoryType(
+    projectRoot: Path,
+    dotnetMarkerFinder: (Path) -> String? = ::findDotnetMarker,
+): OnboardingRepositoryDetection {
     val matchedDetections = buildList {
         if (projectRoot.resolve("package.json").isRegularFile()) {
             add(OnboardingRepositoryType.NODE to "package.json")
@@ -61,7 +65,7 @@ internal fun detectOnboardingRepositoryType(projectRoot: Path): OnboardingReposi
         if (projectRoot.resolve("go.mod").isRegularFile()) {
             add(OnboardingRepositoryType.GO to "go.mod")
         }
-        findDotnetMarker(projectRoot)?.let { marker ->
+        safeFindDotnetMarker(projectRoot, dotnetMarkerFinder)?.let { marker ->
             add(OnboardingRepositoryType.DOTNET to marker)
         }
     }
@@ -78,6 +82,14 @@ internal fun detectOnboardingRepositoryType(projectRoot: Path): OnboardingReposi
         type = resolvedType,
         matchedMarkers = matchedDetections.map { (_, marker) -> marker }.sorted(),
     )
+}
+
+private fun safeFindDotnetMarker(projectRoot: Path, dotnetMarkerFinder: (Path) -> String?): String? = try {
+    dotnetMarkerFinder(projectRoot)
+} catch (_: IOException) {
+    null
+} catch (_: SecurityException) {
+    null
 }
 
 private fun findDotnetMarker(projectRoot: Path): String? =

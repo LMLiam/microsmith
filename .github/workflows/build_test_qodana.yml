@@ -217,7 +217,7 @@ jobs:
             --no-profile-update
           ./.microsmith-bin/microsmith --version
           mkdir -p install-smoke-repo
-          ./.microsmith-bin/microsmith init --repo-root install-smoke-repo --non-interactive --yes
+          ./.microsmith-bin/microsmith init --repo-root install-smoke-repo
           test -f install-smoke-repo/build.microsmith.kts
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts --out install-smoke-repo/generated
@@ -227,13 +227,13 @@ jobs:
         run: |
           set -eu
           ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/node
-          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/node --non-interactive --yes
+          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/node
           test -f examples/non-gradle/node/build.microsmith.kts
           test -f examples/non-gradle/node/settings.microsmith.kts
           test -f examples/non-gradle/node/.microsmith/ide/build.gradle.kts
           ./.microsmith-bin/microsmith run examples/non-gradle/node/build.microsmith.kts --out examples/non-gradle/node/generated
           test -f examples/non-gradle/node/generated/proto/NodeUserCreated.proto
-          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/go --non-interactive --yes
+          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/go
           ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/go
           test -f examples/non-gradle/go/build.microsmith.kts
           test -f examples/non-gradle/go/settings.microsmith.kts
@@ -272,7 +272,7 @@ jobs:
             exit $LASTEXITCODE
           }
           New-Item -ItemType Directory -Path install-smoke-repo -Force | Out-Null
-          & .\.microsmith-bin\microsmith.cmd init --repo-root install-smoke-repo --non-interactive --yes
+          & .\.microsmith-bin\microsmith.cmd init --repo-root install-smoke-repo
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
@@ -300,7 +300,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
-          & .\.microsmith-bin\microsmith.cmd init --repo-root examples/non-gradle/dotnet --non-interactive --yes
+          & .\.microsmith-bin\microsmith.cmd init --repo-root examples/non-gradle/dotnet
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }

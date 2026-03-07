@@ -194,7 +194,7 @@ class DoctorRunnerTests :
                 val bootstrapCheck = result.checks.single { it.id == "bootstrap-state" }
                 bootstrapCheck.status shouldBe DoctorCheckStatus.FAIL
                 bootstrapCheck.message.shouldContain("Run 'microsmith init'")
-                bootstrapCheck.details["missingBootstrapFiles"] shouldBe "build.microsmith.kts"
+                bootstrapCheck.details["invalidBootstrapFiles"] shouldBe "build.microsmith.kts"
             } finally {
                 runCatching { repoRoot.deleteRecursively() }
                 runCatching { targetRoot.deleteRecursively() }

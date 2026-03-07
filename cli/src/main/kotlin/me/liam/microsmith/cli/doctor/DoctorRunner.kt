@@ -212,46 +212,43 @@ private fun validateBootstrapSurface(
 
     val bootstrapFiles = listOf(buildScript, settingsScript)
     val invalidBootstrapFiles = invalidManagedFiles(projectRoot = projectRoot, managedFiles = bootstrapFiles)
-    if (invalidBootstrapFiles.isNotEmpty()) {
-        return DoctorCheckResult(
-            id = "bootstrap-state",
-            status = DoctorCheckStatus.FAIL,
-            message =
-            "Bootstrap paths are invalid. Remove the conflicting paths and run 'microsmith init' to repair them.",
-            details =
-            mapOf(
-                "invalidBootstrapFiles" to invalidBootstrapFiles.joinToString(separator = ","),
-            ),
-        )
-    }
-
     val missingBootstrapFiles = missingManagedFiles(projectRoot = projectRoot, managedFiles = bootstrapFiles)
-    if (missingBootstrapFiles.isNotEmpty()) {
-        return DoctorCheckResult(
-            id = "bootstrap-state",
-            status = DoctorCheckStatus.FAIL,
-            message = "Bootstrap state is incomplete. Run 'microsmith init' to repair it.",
-            details =
-            mapOf(
-                "missingBootstrapFiles" to missingBootstrapFiles.joinToString(separator = ","),
-            ),
-        )
-    }
+    return when {
+        invalidBootstrapFiles.isNotEmpty() ->
+            DoctorCheckResult(
+                id = "bootstrap-state",
+                status = DoctorCheckStatus.FAIL,
+                message =
+                "Bootstrap paths are invalid. Remove the conflicting paths. " +
+                    "Run 'microsmith init' to repair them.",
+                details =
+                mapOf(
+                    "invalidBootstrapFiles" to invalidBootstrapFiles.joinToString(separator = ","),
+                ),
+            )
 
-    return if (
-        Files.exists(helperRoot, LinkOption.NOFOLLOW_LINKS) &&
-        !Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS)
-    ) {
-        DoctorCheckResult(
-            id = "bootstrap-state",
-            status = DoctorCheckStatus.FAIL,
-            message =
-            "JetBrains IDE helper path is invalid. " +
-                "Run 'microsmith ide refresh' after removing the conflicting path.",
-            details = mapOf("helperRoot" to helperRoot.toString()),
-        )
-    } else {
-        null
+        missingBootstrapFiles.isNotEmpty() ->
+            DoctorCheckResult(
+                id = "bootstrap-state",
+                status = DoctorCheckStatus.FAIL,
+                message = "Bootstrap state is incomplete. Run 'microsmith init' to repair it.",
+                details =
+                mapOf(
+                    "missingBootstrapFiles" to missingBootstrapFiles.joinToString(separator = ","),
+                ),
+            )
+
+        managedPathExists(helperRoot) && !Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) ->
+            DoctorCheckResult(
+                id = "bootstrap-state",
+                status = DoctorCheckStatus.FAIL,
+                message =
+                "JetBrains IDE helper path is invalid. " +
+                    "Run 'microsmith ide refresh' after removing the conflicting path.",
+                details = mapOf("helperRoot" to helperRoot.toString()),
+            )
+
+        else -> null
     }
 }
 
@@ -260,14 +257,14 @@ private fun missingIdeHelperFiles(projectRoot: Path, helperRoot: Path): List<Str
         .takeIf { Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) }
         ?.let { managedFiles ->
             missingManagedFiles(projectRoot = projectRoot, managedFiles = managedFiles)
-        } ?: emptyList()
+        }.orEmpty()
 
 private fun invalidIdeHelperFiles(projectRoot: Path, helperRoot: Path): List<String> =
     requiredIdeHelperFiles(helperRoot)
         .takeIf { Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) }
         ?.let { managedFiles ->
             invalidManagedFiles(projectRoot = projectRoot, managedFiles = managedFiles)
-        } ?: emptyList()
+        }.orEmpty()
 
 private fun requiredIdeHelperFiles(helperRoot: Path): List<Path> = listOf(
     helperRoot.resolve(IDE_HELPER_SETTINGS_FILE_NAME),

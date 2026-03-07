@@ -10,6 +10,7 @@ import io.kotest.matchers.string.shouldContain
 import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.ide.IdeHelperConflictException
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
+import java.io.IOException
 import java.nio.file.Files
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
@@ -90,6 +91,26 @@ class InitBootstrapTests :
             }
         }
 
+        "preserves existing regular bootstrap files without reading content when force is disabled" {
+            val repoRoot = createTempDirectory("microsmith-init-bootstrap-preserve-bytes")
+            val buildScript = repoRoot.resolve("build.microsmith.kts")
+            val originalBytes = byteArrayOf(0xC3.toByte(), 0x28)
+            Files.write(buildScript, originalBytes)
+            try {
+                val result =
+                    runInitBootstrap(
+                        command = InitCommand(projectRoot = repoRoot, skipIdeHelper = true),
+                    )
+
+                result.createdFiles.shouldContainExactly(listOf(repoRoot.resolve("settings.microsmith.kts")))
+                result.overwrittenFiles shouldBe emptyList()
+                result.preservedFiles.shouldContainExactly(listOf(buildScript))
+                Files.readAllBytes(buildScript).contentEquals(originalBytes) shouldBe true
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
         "overwrites existing regular bootstrap files when force is enabled" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-force")
             val buildScript = repoRoot.resolve("build.microsmith.kts")
@@ -155,6 +176,24 @@ class InitBootstrapTests :
                 error.message shouldBe "IDE helper path is invalid."
             } finally {
                 runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
+        "ignores .NET marker traversal failures while detecting other repository markers" {
+            val nodeRoot = createTempDirectory("microsmith-init-detect-node-traversal-failure")
+            try {
+                nodeRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
+
+                detectOnboardingRepositoryType(
+                    projectRoot = nodeRoot,
+                    dotnetMarkerFinder = { throw IOException("permission denied") },
+                ) shouldBe
+                    OnboardingRepositoryDetection(
+                        type = OnboardingRepositoryType.NODE,
+                        matchedMarkers = listOf("package.json"),
+                    )
+            } finally {
+                runCatching { nodeRoot.deleteRecursively() }
             }
         }
 

@@ -214,14 +214,14 @@ Use the installed shim path before opening a new shell:
 ```bash
 "$HOME/.microsmith/bin/microsmith" --version
 mkdir -p ./microsmith-smoke
-"$HOME/.microsmith/bin/microsmith" init --repo-root ./microsmith-smoke --non-interactive --yes
+"$HOME/.microsmith/bin/microsmith" init --repo-root ./microsmith-smoke
 "$HOME/.microsmith/bin/microsmith" run ./microsmith-smoke/build.microsmith.kts --out ./microsmith-smoke/generated
 ```
 
 ```powershell
 & (Join-Path $HOME ".microsmith\bin\microsmith.cmd") --version
 New-Item -ItemType Directory -Path .\microsmith-smoke -Force | Out-Null
-& (Join-Path $HOME ".microsmith\bin\microsmith.cmd") init --repo-root .\microsmith-smoke --non-interactive --yes
+& (Join-Path $HOME ".microsmith\bin\microsmith.cmd") init --repo-root .\microsmith-smoke
 & (Join-Path $HOME ".microsmith\bin\microsmith.cmd") run .\microsmith-smoke\build.microsmith.kts --out .\microsmith-smoke\generated
 ```
 
@@ -285,8 +285,8 @@ Current CLI usage:
 Microsmith CLI
 
 Usage:
-  microsmith init [--repo-root <path>] [--non-interactive] [--yes] [--force]
-                 [--skip-ide-helper] [--diagnostics <text|json>] [--verbose]
+  microsmith init [--repo-root <path>] [--force] [--skip-ide-helper]
+                 [--diagnostics <text|json>] [--verbose]
   microsmith run <script.microsmith.kts> --out <output-dir> [--var <name=value>]... [--flag <name>]...
                  [--plugin <group:artifact:version>]... [--plugin-jar <path>]...
                  [--offline] [--repository <uri>] [--isolation <classloader|process>]
@@ -310,7 +310,7 @@ microsmith run build.microsmith.kts --out ./generated
 CI:
 
 ```bash
-microsmith init --non-interactive --yes --diagnostics json --verbose
+microsmith init --diagnostics json --verbose
 microsmith run build.microsmith.kts --out ./generated --diagnostics json --verbose
 ```
 
@@ -330,7 +330,7 @@ microsmith ide refresh
 - detects Node, Go, .NET, or generic repository shape and emits a matching starter script
 - refreshes `.microsmith/ide` by default
 - preserves existing regular bootstrap files unless `--force` is provided
-- supports `--repo-root`, `--non-interactive`, `--yes`, `--force`, `--skip-ide-helper`, `--diagnostics`, and `--verbose`
+- supports `--repo-root`, `--force`, `--skip-ide-helper`, `--diagnostics`, and `--verbose`
 
 `microsmith run`
 
@@ -535,7 +535,7 @@ jobs:
           sh microsmith-install.sh --version "$MICROSMITH_VERSION"
           echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
       - name: Bootstrap Microsmith
-        run: microsmith init --non-interactive --yes
+        run: microsmith init
       - name: Run Microsmith
         run: microsmith run build.microsmith.kts --out generated
 ```
@@ -557,7 +557,7 @@ jobs:
           sh microsmith-install.sh --version "$MICROSMITH_VERSION"
           echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
       - name: Bootstrap Microsmith
-        run: microsmith init --non-interactive --yes
+        run: microsmith init
       - name: Generate protobuf
         run: microsmith run build.microsmith.kts --out internal/gen
 ```
@@ -581,7 +581,7 @@ jobs:
           Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $HOME ".microsmith\bin")
       - name: Bootstrap Microsmith
         shell: pwsh
-        run: microsmith init --non-interactive --yes
+        run: microsmith init
       - name: Run Microsmith
         shell: pwsh
         run: microsmith run build.microsmith.kts --out .\Generated
