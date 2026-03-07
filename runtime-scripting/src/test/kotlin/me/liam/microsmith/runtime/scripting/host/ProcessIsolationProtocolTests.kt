@@ -5,6 +5,8 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import me.liam.microsmith.runtime.scripting.model.ScriptFailureType
 import me.liam.microsmith.runtime.scripting.model.ScriptRunFailure
+import me.liam.microsmith.runtime.scripting.model.ScriptRunRequest
+import me.liam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import java.nio.file.Files
 import java.util.Properties
 import kotlin.io.path.ExperimentalPathApi
@@ -14,6 +16,50 @@ import kotlin.io.path.deleteRecursively
 @OptIn(ExperimentalPathApi::class)
 class ProcessIsolationProtocolTests :
     StringSpec({
+        "round-trips request payloads" {
+            val tempDir = createTempDirectory("microsmith-process-request-protocol")
+            try {
+                val requestFile = tempDir.resolve("request.properties")
+                val request =
+                    ProcessIsolationRequest(
+                        request =
+                        ScriptRunRequest(
+                            script = tempDir.resolve("schema.microsmith.kts"),
+                            outputDir = tempDir.resolve("generated"),
+                            variables = mapOf("schema" to "User", "package" to "pkg"),
+                            flags = setOf("emit", "strict"),
+                            pluginClasspath = listOf(tempDir.resolve("plugins/custom.jar")),
+                        ),
+                        scriptPath = tempDir.resolve("schema.microsmith.kts"),
+                        outputPath = tempDir.resolve("generated"),
+                        cacheDirectory = tempDir.resolve("cache"),
+                    )
+
+                ProcessIsolationProtocol.writeRequest(requestFile, request)
+                ProcessIsolationProtocol.readRequest(requestFile) shouldBe request
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "round-trips success payloads with long elapsed millis" {
+            val tempDir = createTempDirectory("microsmith-process-success-protocol")
+            try {
+                val resultFile = tempDir.resolve("result.properties")
+                val success =
+                    ScriptRunSuccess(
+                        warnings = listOf("warning"),
+                        cacheHit = true,
+                        elapsedMillis = Int.MAX_VALUE.toLong() + 1,
+                    )
+
+                ProcessIsolationProtocol.writeResult(resultFile, success)
+                ProcessIsolationProtocol.readResult(resultFile).shouldBeInstanceOf<ScriptRunSuccess>() shouldBe success
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
         "round-trips failure diagnostics and failure type" {
             val tempDir = createTempDirectory("microsmith-process-protocol")
             try {
