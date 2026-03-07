@@ -57,11 +57,6 @@ Environment overrides:
 EOF
 }
 
-require_commands() {
-  command_exists curl || fail "curl is required."
-  command_exists tar || fail "tar is required."
-}
-
 sha256_file() {
   target="$1"
   if command_exists sha256sum; then
@@ -86,6 +81,7 @@ source_text() {
   source_ref="$1"
   case "$source_ref" in
     http://*|https://*)
+      command_exists curl || fail "curl is required to download '${source_ref}'."
       curl -fsSL "$source_ref"
       ;;
     file://*)
@@ -103,6 +99,7 @@ copy_or_download() {
 
   case "$source_ref" in
     http://*|https://*)
+      command_exists curl || fail "curl is required to download '${source_ref}'."
       curl -fsSL "$source_ref" -o "$destination"
       ;;
     file://*)
@@ -133,6 +130,7 @@ extract_archive() {
   mkdir -p "$output_dir"
   case "$archive_path" in
     *.tar.gz|*.tgz)
+      command_exists tar || fail "tar is required to extract '$archive_path'."
       tar -xzf "$archive_path" -C "$output_dir"
       ;;
     *.zip)
@@ -234,7 +232,7 @@ parse_runtime_metadata() {
     fail "python3 is required for runtime metadata parsing when no explicit runtime URL/file is provided."
   fi
 
-  python3 - <<'PY'
+  python3 -c '
 import json
 import sys
 
@@ -250,7 +248,7 @@ if not link:
 
 print(link)
 print(checksum)
-PY
+'
 }
 
 update_profile_path() {
@@ -379,7 +377,9 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-require_commands
+if [ "$FORCE_RUNTIME_PROVISION" = "true" ] && [ "$SKIP_RUNTIME_PROVISION" = "true" ]; then
+  fail "--force-runtime-provision and --skip-runtime-provision cannot be used together."
+fi
 
 [ -n "$BIN_DIR" ] || BIN_DIR="${INSTALL_ROOT}/bin"
 mkdir -p "$INSTALL_ROOT"
@@ -401,8 +401,16 @@ if [ -z "$DIST_URL" ] && [ -z "$DIST_FILE" ]; then
 fi
 
 tmp_dir="$(mktemp -d)"
+staged_install_dir=""
+backup_install_dir=""
 cleanup() {
   rm -rf "$tmp_dir"
+  if [ -n "${staged_install_dir:-}" ] && [ -e "$staged_install_dir" ]; then
+    rm -rf "$staged_install_dir"
+  fi
+  if [ -n "${backup_install_dir:-}" ] && [ -e "$backup_install_dir" ]; then
+    rm -rf "$backup_install_dir"
+  fi
 }
 trap cleanup EXIT INT TERM
 
@@ -447,12 +455,10 @@ dist_root="$(find "$dist_extract_dir" -mindepth 1 -maxdepth 1 -type d | head -n 
 [ -n "$dist_root" ] || fail "Could not locate extracted distribution root."
 
 install_dir="${INSTALL_ROOT}/installs/microsmith-cli-${VERSION}"
+staged_install_dir="${INSTALL_ROOT}/installs/.microsmith-cli-${VERSION}.staging.$$"
 mkdir -p "${INSTALL_ROOT}/installs"
-rm -rf "$install_dir"
-mv "$dist_root" "$install_dir"
-
-rm -rf "${INSTALL_ROOT}/current"
-ln -s "$install_dir" "${INSTALL_ROOT}/current"
+rm -rf "$staged_install_dir"
+mv "$dist_root" "$staged_install_dir"
 
 system_java_cmd="$(resolve_system_java_cmd)"
 system_java_feature=0
@@ -482,11 +488,11 @@ if [ "$should_provision_runtime" = "true" ]; then
     runtime_checksum="$(printf '%s\n' "$metadata_values" | awk 'NR==2 {print}')"
   fi
 
-  rm -rf "${install_dir}/runtime"
+  rm -rf "${staged_install_dir}/runtime"
   if [ -n "$runtime_source_file" ] && [ -d "$runtime_source_file" ]; then
     runtime_source_dir="$(CDPATH= cd -- "$runtime_source_file" && pwd -P)"
     info "Using local runtime directory: ${runtime_source_dir}"
-    cp -R "$runtime_source_dir" "${install_dir}/runtime"
+    cp -R "$runtime_source_dir" "${staged_install_dir}/runtime"
   else
     runtime_source_ref="$runtime_source_url"
     if [ -n "$runtime_source_file" ]; then
@@ -521,12 +527,12 @@ if [ "$should_provision_runtime" = "true" ]; then
     [ -n "$runtime_java_path" ] || fail "Unable to locate runtime java binary in extracted archive."
 
     runtime_home="$(CDPATH= cd -- "$(dirname "$runtime_java_path")/.." && pwd)"
-    mv "$runtime_home" "${install_dir}/runtime"
+    mv "$runtime_home" "${staged_install_dir}/runtime"
   fi
 fi
 
-if [ -x "${install_dir}/runtime/bin/java" ]; then
-  final_java_feature="$(java_feature_for "${install_dir}/runtime/bin/java")"
+if [ -x "${staged_install_dir}/runtime/bin/java" ]; then
+  final_java_feature="$(java_feature_for "${staged_install_dir}/runtime/bin/java")"
 elif [ -n "$system_java_cmd" ]; then
   final_java_feature="$system_java_feature"
 else
@@ -534,6 +540,41 @@ else
 fi
 [ "$final_java_feature" -ge "$MINIMUM_JAVA_FEATURE" ] ||
   fail "No usable Java ${MINIMUM_JAVA_FEATURE}+ runtime available after install."
+
+if ! version_output="$("${staged_install_dir}/bin/microsmith" --version 2>&1)"; then
+  if [ -z "$version_output" ]; then
+    fail "Installed CLI failed health check (--version) with no output."
+  fi
+  fail "Installed CLI failed health check (--version): ${version_output}"
+fi
+[ -n "$version_output" ] || fail "Installed CLI failed health check (--version) with no output."
+
+if [ -e "$install_dir" ]; then
+  backup_install_dir="${INSTALL_ROOT}/installs/.microsmith-cli-${VERSION}.backup.$$"
+  rm -rf "$backup_install_dir"
+  mv "$install_dir" "$backup_install_dir"
+fi
+
+if mv "$staged_install_dir" "$install_dir"; then
+  staged_install_dir=""
+else
+  if [ -n "$backup_install_dir" ] && [ -e "$backup_install_dir" ] && [ ! -e "$install_dir" ]; then
+    mv "$backup_install_dir" "$install_dir" || true
+    backup_install_dir=""
+  fi
+  fail "Unable to promote staged install into '${install_dir}'."
+fi
+
+if [ -n "$backup_install_dir" ] && [ -e "$backup_install_dir" ]; then
+  rm -rf "$backup_install_dir"
+  backup_install_dir=""
+fi
+
+current_link="${INSTALL_ROOT}/current"
+current_link_tmp="${INSTALL_ROOT}/current.tmp.$$"
+rm -f "$current_link_tmp"
+ln -s "$install_dir" "$current_link_tmp"
+mv -f "$current_link_tmp" "$current_link"
 
 mkdir -p "$BIN_DIR"
 shim_path="${BIN_DIR}/microsmith"
@@ -546,16 +587,16 @@ chmod +x "$shim_path"
 
 update_profile_path
 
-version_output="$("$shim_path" --version 2>/dev/null || true)"
-[ -n "$version_output" ] || fail "Installed CLI failed health check (--version)."
-
 info "Installed ${version_output} at ${INSTALL_ROOT}."
 if command_exists microsmith; then
-  global_version="$(microsmith --version 2>/dev/null || true)"
-  if [ -n "$global_version" ]; then
-    info "Global command available: ${global_version}"
+  if global_version="$(microsmith --version 2>/dev/null)"; then
+    if [ -n "$global_version" ]; then
+      info "Global command available: ${global_version}"
+    else
+      info "Global command is present but returned no version output in current shell."
+    fi
   else
-    info "Global command is present but returned no version output in current shell."
+    info "Global command is present but failed version check in current shell."
   fi
 else
   info "Use '${shim_path}' directly, or reload your shell to pick up PATH updates."

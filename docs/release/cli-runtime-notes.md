@@ -11,7 +11,7 @@
   - unpack distribution archive and run launcher script
   - install through canonical OS installer scripts (`docs/cli/install.md`)
   - bootstrap repository defaults: `microsmith init`
-  - verify install/runtime health: `microsmith --version`
+  - verify install/runtime health: run the installed shim directly (for example, `~/.microsmith/bin/microsmith --version`) or open a new shell and use `microsmith --version`
   - generate JetBrains IDE helper metadata: `microsmith ide refresh`
   - validate JetBrains IDE helper health: `microsmith ide doctor`
 - Bundled plugin policy:

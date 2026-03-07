@@ -12,13 +12,23 @@ if not defined MICROSMITH_PLUGIN_CACHE_DIR (
   set "MICROSMITH_PLUGIN_CACHE_DIR=%MICROSMITH_HOME%\cache\plugins"
 )
 
+set "JAVA_CMD="
+
 if defined MICROSMITH_JAVA_CMD (
   set "JAVA_CMD=%MICROSMITH_JAVA_CMD%"
-) else if exist "%MICROSMITH_HOME%\runtime\bin\java.exe" (
+)
+
+if not defined JAVA_CMD if exist "%MICROSMITH_HOME%\runtime\bin\java.exe" (
   set "JAVA_CMD=%MICROSMITH_HOME%\runtime\bin\java.exe"
-) else if defined JAVA_HOME (
-  set "JAVA_CMD=%JAVA_HOME%\bin\java.exe"
-) else (
+)
+
+if not defined JAVA_CMD (
+  if defined JAVA_HOME if exist "%JAVA_HOME%\bin\java.exe" (
+    set "JAVA_CMD=%JAVA_HOME%\bin\java.exe"
+  )
+)
+
+if not defined JAVA_CMD (
   set "JAVA_CMD=java"
 )
 

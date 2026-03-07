@@ -263,6 +263,7 @@ tasks.named("shadowJar") {
 }
 
 tasks.named("shadowJar", ShadowJar) {
+    // Large CLI archives have hit unreliable task-output cache packing locally; keep this task uncached for now.
     outputs.cacheIf { false }
 }
 

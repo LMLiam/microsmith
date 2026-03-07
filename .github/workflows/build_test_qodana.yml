@@ -213,7 +213,6 @@ jobs:
             --bin-dir "$PWD/.microsmith-bin" \
             --dist-file "$DIST_FILE" \
             --dist-sha256 "$DIST_SHA" \
-            --runtime-file "$JAVA_HOME" \
             --force-runtime-provision \
             --no-profile-update
           ./.microsmith-bin/microsmith --version
@@ -221,6 +220,8 @@ jobs:
           ./.microsmith-bin/microsmith init --repo-root install-smoke-repo --non-interactive --yes
           test -f install-smoke-repo/build.microsmith.kts
           test -f install-smoke-repo/settings.microsmith.kts
+          ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts --out install-smoke-repo/generated
+          test -f install-smoke-repo/generated/proto/UserCreated.proto
       - name: Install and verify from installer (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -243,7 +244,6 @@ jobs:
             -BinDir "$pwd\.microsmith-bin" `
             -DistFile $distAsset.FullName `
             -DistSha256 $distSha `
-            -RuntimeFile $env:JAVA_HOME `
             -ForceRuntimeProvision `
             -NoProfileUpdate
           if ($LASTEXITCODE -ne 0) {
@@ -264,5 +264,13 @@ jobs:
           }
           if (-not (Test-Path .\install-smoke-repo\settings.microsmith.kts)) {
             Write-Error "Expected settings.microsmith.kts to exist after init."
+            exit 1
+          }
+          & .\.microsmith-bin\microsmith.cmd run install-smoke-repo\build.microsmith.kts --out install-smoke-repo\generated
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          if (-not (Test-Path .\install-smoke-repo\generated\proto\UserCreated.proto)) {
+            Write-Error "Expected generated\\proto\\UserCreated.proto to exist after run."
             exit 1
           }

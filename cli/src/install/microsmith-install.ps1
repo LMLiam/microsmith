@@ -16,6 +16,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 $MinimumJavaFeature = 24
+$stagedInstallDir = $null
+$backupInstallDir = $null
 
 function Write-Info {
     param([string]$Message)
@@ -187,6 +189,10 @@ if ([string]::IsNullOrWhiteSpace($BinDir)) {
     $BinDir = Join-Path $InstallRoot "bin"
 }
 
+if ($ForceRuntimeProvision.IsPresent -and $SkipRuntimeProvision.IsPresent) {
+    Fail "--force-runtime-provision and --skip-runtime-provision cannot be used together."
+}
+
 if ([string]::IsNullOrWhiteSpace($Version)) {
     if ($DistFile) {
         $Version = Infer-VersionFromText $DistFile
@@ -250,11 +256,12 @@ try {
     }
 
     $installDir = Join-Path $InstallRoot "installs\microsmith-cli-$Version"
-    if (Test-Path $installDir) {
-        Remove-Item -Path $installDir -Recurse -Force
+    $stagedInstallDir = Join-Path $InstallRoot ("installs\.microsmith-cli-$Version.staging-" + [System.Guid]::NewGuid().ToString("N"))
+    if (Test-Path $stagedInstallDir) {
+        Remove-Item -Path $stagedInstallDir -Recurse -Force
     }
     New-Item -ItemType Directory -Path (Split-Path $installDir -Parent) -Force | Out-Null
-    Move-Item -Path $distRoot.FullName -Destination $installDir
+    Move-Item -Path $distRoot.FullName -Destination $stagedInstallDir
 
     $systemJavaCommand = Resolve-SystemJavaCommand
     $systemJavaFeature = if ($systemJavaCommand) { Get-JavaFeature -JavaCommand $systemJavaCommand } else { 0 }
@@ -279,7 +286,7 @@ try {
             }
         }
 
-        $runtimeTarget = Join-Path $installDir "runtime"
+        $runtimeTarget = Join-Path $stagedInstallDir "runtime"
         if (Test-Path $runtimeTarget) {
             Remove-Item -Path $runtimeTarget -Recurse -Force
         }
@@ -332,7 +339,7 @@ try {
         }
     }
 
-    $runtimeJava = Join-Path $installDir "runtime\bin\java.exe"
+    $runtimeJava = Join-Path $stagedInstallDir "runtime\bin\java.exe"
     $finalJavaFeature = if (Test-Path $runtimeJava) {
         Get-JavaFeature -JavaCommand $runtimeJava
     } elseif ($systemJavaCommand) {
@@ -342,6 +349,41 @@ try {
     }
     if ($finalJavaFeature -lt $MinimumJavaFeature) {
         Fail "No usable Java $MinimumJavaFeature+ runtime available after install."
+    }
+
+    $stagedLauncher = Join-Path $stagedInstallDir "bin\microsmith.bat"
+    $versionOutput = (& $stagedLauncher --version 2>&1 | Out-String).Trim()
+    $versionExitCode = $LASTEXITCODE
+    if ($versionExitCode -ne 0) {
+        $healthFailure = if ([string]::IsNullOrWhiteSpace($versionOutput)) { "no output" } else { $versionOutput }
+        Fail "Installed CLI failed health check (--version): $healthFailure"
+    }
+    if ([string]::IsNullOrWhiteSpace($versionOutput)) {
+        Fail "Installed CLI failed health check (--version) with no output."
+    }
+
+    if (Test-Path $installDir) {
+        $backupInstallDir = Join-Path $InstallRoot ("installs\.microsmith-cli-$Version.backup-" + [System.Guid]::NewGuid().ToString("N"))
+        if (Test-Path $backupInstallDir) {
+            Remove-Item -Path $backupInstallDir -Recurse -Force
+        }
+        Move-Item -Path $installDir -Destination $backupInstallDir
+    }
+
+    try {
+        Move-Item -Path $stagedInstallDir -Destination $installDir
+        $stagedInstallDir = $null
+    } catch {
+        if ($backupInstallDir -and (Test-Path $backupInstallDir) -and -not (Test-Path $installDir)) {
+            Move-Item -Path $backupInstallDir -Destination $installDir
+            $backupInstallDir = $null
+        }
+        throw
+    }
+
+    if ($backupInstallDir -and (Test-Path $backupInstallDir)) {
+        Remove-Item -Path $backupInstallDir -Recurse -Force
+        $backupInstallDir = $null
     }
 
     New-Item -Path $BinDir -ItemType Directory -Force | Out-Null
@@ -357,22 +399,16 @@ exit /b %ERRORLEVEL%
     Update-UserPath -BinDirectory $BinDir
     $env:Path = "$BinDir;$env:Path"
 
-    $versionOutput = (& $shimPath --version 2>&1 | Out-String).Trim()
-    if ([string]::IsNullOrWhiteSpace($versionOutput)) {
-        Fail "Installed CLI failed health check (--version)."
-    }
-
     Write-Info "Installed $versionOutput at $InstallRoot."
     if (Get-Command microsmith -ErrorAction SilentlyContinue) {
-        try {
-            $globalVersion = (& microsmith --version 2>&1 | Out-String).Trim()
-            if ([string]::IsNullOrWhiteSpace($globalVersion)) {
-                Write-Info "Global command is present but returned no version output in current shell."
-            } else {
-                Write-Info "Global command available: $globalVersion"
-            }
-        } catch {
+        $globalVersion = (& microsmith --version 2>&1 | Out-String).Trim()
+        $globalExitCode = $LASTEXITCODE
+        if ($globalExitCode -ne 0) {
             Write-Info "Global command is present but failed version check in current shell."
+        } elseif ([string]::IsNullOrWhiteSpace($globalVersion)) {
+            Write-Info "Global command is present but returned no version output in current shell."
+        } else {
+            Write-Info "Global command available: $globalVersion"
         }
     } else {
         Write-Info "Use '$shimPath' directly, or open a new shell to pick up PATH updates."
@@ -380,5 +416,11 @@ exit /b %ERRORLEVEL%
 } finally {
     if (Test-Path $tempRoot) {
         Remove-Item -Path $tempRoot -Recurse -Force
+    }
+    if ($stagedInstallDir -and (Test-Path $stagedInstallDir)) {
+        Remove-Item -Path $stagedInstallDir -Recurse -Force
+    }
+    if ($backupInstallDir -and (Test-Path $backupInstallDir)) {
+        Remove-Item -Path $backupInstallDir -Recurse -Force
     }
 }

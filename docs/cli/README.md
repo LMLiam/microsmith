@@ -18,6 +18,6 @@ Distribution build outputs:
 - `:cli:cliDistZip` -> `cli/build/distributions/microsmith-cli-<version>-dist.zip`
 - `:cli:cliDistTar` -> `cli/build/distributions/microsmith-cli-<version>-dist.tar.gz`
 - `:cli:verifyDistLayout` -> validates bundled profile + launcher wiring in directory/zip/tar artifacts
-- `:cli:distArtifacts` -> `cli/build/release-assets/`
+- `:cli:distArtifacts` -> internal staging task for `:cli:releaseArtifacts`
 - `:cli:generateReleaseChecksums` -> writes `<asset>.sha256` files in `cli/build/release-assets/`
 - `:cli:releaseArtifacts` -> distribution artifacts + installer scripts + checksums

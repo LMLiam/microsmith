@@ -24,8 +24,8 @@ class CliParserTests :
             parseCliArgs(listOf("--version")) shouldBe VersionCommand
         }
 
-        "parses version command alias" {
-            parseCliArgs(listOf("version")) shouldBe VersionCommand
+        "returns error for version alias command" {
+            parseCliArgs(listOf("version")) shouldBe ErrorCommand("Unknown command 'version'.")
         }
 
         "returns error when --version has extra arguments" {

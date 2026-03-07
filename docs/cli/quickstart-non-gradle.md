@@ -11,6 +11,9 @@ This guide shows how to run Microsmith CLI from repositories that do not use Gra
 
 Install check:
 
+If you are verifying immediately after installation, use the direct shim path from `install.md`.
+After opening a new shell, the bare `microsmith` command is available on `PATH`.
+
 ```bash
 microsmith --version
 ```
@@ -180,6 +183,7 @@ jobs:
         run: |
           curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
           sh microsmith-install.sh --version "$MICROSMITH_VERSION"
+          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
       - name: Run Microsmith
         run: microsmith run schema.microsmith.kts --out generated/proto
 ```
@@ -199,6 +203,7 @@ jobs:
         run: |
           curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
           sh microsmith-install.sh --version "$MICROSMITH_VERSION"
+          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
       - name: Generate protobuf
         run: microsmith run schema.microsmith.kts --out internal/gen/proto
 ```
@@ -219,6 +224,7 @@ jobs:
         run: |
           Invoke-WebRequest -Uri $env:MICROSMITH_INSTALLER_PS1_URL -OutFile microsmith-install.ps1
           .\microsmith-install.ps1 -Version $env:MICROSMITH_VERSION
+          Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $HOME ".microsmith\\bin")
       - name: Run Microsmith
         shell: pwsh
         run: microsmith run schema.microsmith.kts --out .\Generated\Proto

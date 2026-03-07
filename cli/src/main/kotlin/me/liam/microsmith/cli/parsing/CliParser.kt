@@ -34,7 +34,7 @@ internal const val NON_INTERACTIVE_OPTION = "--non-interactive"
 internal const val YES_OPTION = "--yes"
 private const val SCRIPT_EXTENSION = ".microsmith.kts"
 private val HELP_COMMANDS = setOf("--help", "-h", "help")
-private val VERSION_COMMANDS = setOf("--version", "version")
+private val VERSION_COMMANDS = setOf("--version")
 
 internal fun parseCliArgs(args: List<String>): CliCommand = when (val command = args.firstOrNull()) {
     null, in HELP_COMMANDS -> HelpCommand

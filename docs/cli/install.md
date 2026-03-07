@@ -33,14 +33,16 @@ powershell -ExecutionPolicy Bypass -NoProfile -File .\microsmith-install.ps1 -Ve
 Post-install checks:
 
 ```bash
-microsmith --version
-microsmith init --non-interactive --yes
+"$HOME/.microsmith/bin/microsmith" --version
+"$HOME/.microsmith/bin/microsmith" init --non-interactive --yes
 ```
 
 ```powershell
-microsmith --version
-microsmith init --non-interactive --yes
+& "$HOME\.microsmith\bin\microsmith.cmd" --version
+& "$HOME\.microsmith\bin\microsmith.cmd" init --non-interactive --yes
 ```
+
+The bare `microsmith` command becomes available after opening a new shell so the updated `PATH` is reloaded.
 
 ## Integrity verification guidance
 
@@ -91,7 +93,7 @@ Use these channels for air-gapped workflows or custom packaging constraints.
 
 Installer scripts emit explicit diagnostics for:
 
-- missing required tools (`curl`, `tar`, `unzip` where applicable)
+- missing required tools (`curl`, `tar`, `unzip`, and `python3` when automatic runtime metadata resolution is used)
 - checksum mismatch for CLI/runtime archives
 - unsupported OS/architecture
 - runtime provisioning failures

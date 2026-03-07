@@ -163,10 +163,12 @@ Installation (recommended):
 VERSION=<microsmith-version>
 curl -fsSL -o microsmith-install.sh "https://github.com/LMLiam/microsmith/releases/download/v${VERSION}/microsmith-install.sh"
 sh microsmith-install.sh --version "${VERSION}"
-microsmith --version
+"$HOME/.microsmith/bin/microsmith" --version
 ```
 
 One-command bootstrap (recommended):
+
+Open a new shell first so `microsmith` is on `PATH`, or keep using `"$HOME/.microsmith/bin/microsmith"` directly.
 
 ```bash
 microsmith init

@@ -23,7 +23,7 @@ Actions:
 - rerun installer with explicit archive/checksum flags:
   - `--dist-file`, `--dist-sha256`
   - `--runtime-file`, `--runtime-sha256`
-- inspect installer output for missing prerequisite tools (`curl`, `tar`, `unzip`)
+- inspect installer output for missing prerequisite tools (`curl`, `tar`, `unzip`, and `python3` when automatic runtime metadata resolution is used)
 
 ## Script diagnostics
 
