@@ -12,6 +12,7 @@ import me.liam.microsmith.cli.ide.IdeHelperConflictException
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
 import java.io.IOException
 import java.io.UncheckedIOException
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
@@ -237,6 +238,32 @@ class InitBootstrapTests :
             }
         }
 
+        ".NET detection skips unreadable directories".config(enabled = supportsPosixPermissions()) {
+            val dotnetRoot = createTempDirectory("microsmith-init-detect-dotnet-unreadable-directory")
+            val unreadableDirectory = dotnetRoot.resolve("restricted")
+            val readableProject = dotnetRoot.resolve("src/apps/service/Fixture.csproj")
+            val unreadableProject = unreadableDirectory.resolve("Ignored.csproj")
+            readableProject.parent.createDirectories()
+            unreadableDirectory.createDirectories()
+            readableProject.writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
+            unreadableProject.writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
+
+            val originalPermissions = Files.getPosixFilePermissions(unreadableDirectory)
+            Files.setPosixFilePermissions(unreadableDirectory, emptySet())
+            try {
+                detectOnboardingRepositoryType(dotnetRoot) shouldBe
+                    OnboardingRepositoryDetection(
+                        type = OnboardingRepositoryType.DOTNET,
+                        matchedMarkers = listOf("src/apps/service/Fixture.csproj"),
+                    )
+            } finally {
+                runCatching {
+                    Files.setPosixFilePermissions(unreadableDirectory, originalPermissions)
+                }
+                runCatching { dotnetRoot.deleteRecursively() }
+            }
+        }
+
         "detects Node, Go, and .NET repositories and falls back to Other for mixed markers" {
             val nodeRoot = createTempDirectory("microsmith-init-detect-node")
             val goRoot = createTempDirectory("microsmith-init-detect-go")
@@ -337,3 +364,6 @@ class InitBootstrapTests :
     })
 
 private fun runningOnWindows(): Boolean = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
+
+private fun supportsPosixPermissions(): Boolean =
+    !runningOnWindows() && FileSystems.getDefault().supportedFileAttributeViews().contains("posix")
