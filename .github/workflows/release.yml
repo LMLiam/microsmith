@@ -48,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build CLI release assets
-        run: ./gradlew :cli:distArtifacts --stacktrace
+        run: ./gradlew :cli:releaseArtifacts --stacktrace
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -61,5 +61,8 @@ jobs:
             cli/build/release-assets/microsmith-cli-*-all.jar
             cli/build/release-assets/microsmith-cli-*-dist.zip
             cli/build/release-assets/microsmith-cli-*-dist.tar.gz
+            cli/build/release-assets/microsmith-install.sh
+            cli/build/release-assets/microsmith-install.ps1
+            cli/build/release-assets/*.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

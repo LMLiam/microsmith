@@ -171,3 +171,106 @@ jobs:
             Write-Output $doctor
             exit 1
           }
+
+  cli-install-smoke:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 24
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Build CLI release assets (Unix)
+        if: runner.os != 'Windows'
+        run: ./gradlew :cli:releaseArtifacts --stacktrace
+      - name: Build CLI release assets (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: .\gradlew.bat :cli:releaseArtifacts --stacktrace
+      - name: Install and verify from installer (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          set -eu
+          DIST_FILE="$(find cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
+          CLI_VERSION="$(printf '%s\n' "$DIST_FILE" | sed -E 's#.*microsmith-cli-(.*)-dist.tar.gz#\1#')"
+          DIST_SHA="$(awk '{print $1}' "${DIST_FILE}.sha256")"
+          sh cli/build/release-assets/microsmith-install.sh \
+            --version "$CLI_VERSION" \
+            --install-root "$PWD/.microsmith-home" \
+            --bin-dir "$PWD/.microsmith-bin" \
+            --dist-file "$DIST_FILE" \
+            --dist-sha256 "$DIST_SHA" \
+            --force-runtime-provision \
+            --no-profile-update
+          ./.microsmith-bin/microsmith --version
+          mkdir -p install-smoke-repo
+          ./.microsmith-bin/microsmith init --repo-root install-smoke-repo --non-interactive --yes
+          test -f install-smoke-repo/build.microsmith.kts
+          test -f install-smoke-repo/settings.microsmith.kts
+          ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts --out install-smoke-repo/generated
+          test -f install-smoke-repo/generated/proto/UserCreated.proto
+      - name: Install and verify from installer (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $distAsset = Get-ChildItem -Path .\cli\build\release-assets\microsmith-cli-*-dist.zip | Select-Object -First 1
+          if (-not $distAsset) {
+            Write-Error "Unable to locate CLI dist zip asset."
+            exit 1
+          }
+          $version = [regex]::Match($distAsset.Name, 'microsmith-cli-(.+)-dist\.zip').Groups[1].Value
+          $distShaPath = "$($distAsset.FullName).sha256"
+          if (-not (Test-Path $distShaPath)) {
+            Write-Error "Missing dist checksum file: $distShaPath"
+            exit 1
+          }
+          $distSha = (Get-Content -Path $distShaPath -Raw).Split(' ', [System.StringSplitOptions]::RemoveEmptyEntries)[0]
+          & .\cli\build\release-assets\microsmith-install.ps1 `
+            -Version $version `
+            -InstallRoot "$pwd\.microsmith-home" `
+            -BinDir "$pwd\.microsmith-bin" `
+            -DistFile $distAsset.FullName `
+            -DistSha256 $distSha `
+            -ForceRuntimeProvision `
+            -NoProfileUpdate
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          & .\.microsmith-bin\microsmith.cmd --version
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          New-Item -ItemType Directory -Path install-smoke-repo -Force | Out-Null
+          & .\.microsmith-bin\microsmith.cmd init --repo-root install-smoke-repo --non-interactive --yes
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          if (-not (Test-Path .\install-smoke-repo\build.microsmith.kts)) {
+            Write-Error "Expected build.microsmith.kts to exist after init."
+            exit 1
+          }
+          if (-not (Test-Path .\install-smoke-repo\settings.microsmith.kts)) {
+            Write-Error "Expected settings.microsmith.kts to exist after init."
+            exit 1
+          }
+          & .\.microsmith-bin\microsmith.cmd run install-smoke-repo\build.microsmith.kts --out install-smoke-repo\generated
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          if (-not (Test-Path .\install-smoke-repo\generated\proto\UserCreated.proto)) {
+            Write-Error "Expected generated\\proto\\UserCreated.proto to exist after run."
+            exit 1
+          }
