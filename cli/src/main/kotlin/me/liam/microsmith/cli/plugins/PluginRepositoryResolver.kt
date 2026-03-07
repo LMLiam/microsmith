@@ -13,20 +13,12 @@ internal class PluginRepositoryResolver {
             return emptyList()
         }
 
-        return try {
-            val repositoryPolicy = settings.repositoryPolicy ?: defaultRepositoryAllowlistPolicy()
-            resolveRepositoryUris(command, settings, repositoryPolicy)
-                .map { repositoryUri ->
-                    RepositoryEndpoint(
-                        uri = repositoryUri,
-                        credentials = settings.repositoryCredentialsResolver.resolve(repositoryUri),
-                    )
-                }
-        } catch (error: IllegalArgumentException) {
-            throw PluginResolutionDiagnosticException(
-                category = PluginResolverErrorCategory.REPOSITORY_POLICY,
-                message = error.message ?: "Repository configuration was rejected by policy.",
-                cause = error,
+        val repositoryPolicy = settings.repositoryPolicy ?: defaultRepositoryAllowlistPolicy()
+        val repositoryUris = resolveRepositoryUris(command, settings, repositoryPolicy)
+        return repositoryUris.map { repositoryUri ->
+            RepositoryEndpoint(
+                uri = repositoryUri,
+                credentials = settings.repositoryCredentialsResolver.resolveWithDiagnostics(repositoryUri),
             )
         }
     }
@@ -35,13 +27,19 @@ internal class PluginRepositoryResolver {
         command: RunCommand,
         settings: PluginResolverSettings,
         repositoryPolicy: RepositoryAllowlistPolicy,
-    ): List<String> {
+    ): List<String> = try {
         val override = command.repositoryOverride?.trim()?.takeIf(String::isNotEmpty)
         val repositories =
             (listOfNotNull(override) + settings.defaultRepositories)
                 .map(::normalizeRepositoryUri)
                 .distinct()
         repositories.forEach(repositoryPolicy::validate)
-        return repositories
+        repositories
+    } catch (error: IllegalArgumentException) {
+        throw PluginResolutionDiagnosticException(
+            category = PluginResolverErrorCategory.REPOSITORY_POLICY,
+            message = error.message ?: "Repository configuration was rejected by policy.",
+            cause = error,
+        )
     }
 }

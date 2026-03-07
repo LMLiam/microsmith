@@ -24,14 +24,12 @@ internal fun resolvePlugins(command: RunCommand, settings: PluginResolverSetting
     }
 
     val diagnostics = PluginResolutionDiagnostics()
-    val sensitiveValues =
-        if (command.plugins.isNotEmpty()) {
-            settings.repositoryCredentialsResolver.sensitiveValues()
-        } else {
-            emptySet()
-        }
+    var sensitiveValues: Set<String> = emptySet()
 
     return runCatching {
+        if (command.plugins.isNotEmpty()) {
+            sensitiveValues = settings.repositoryCredentialsResolver.sensitiveValuesWithDiagnostics()
+        }
         PluginResolutionService(settings = settings).resolve(command)
     }.fold(
         onSuccess = { success -> success },
