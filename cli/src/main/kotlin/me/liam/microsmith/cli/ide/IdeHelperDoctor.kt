@@ -1,6 +1,7 @@
 package me.liam.microsmith.cli.ide
 
 import me.liam.microsmith.cli.command.IdeDoctorCommand
+import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.LinkOption
@@ -175,12 +176,7 @@ private fun runtimeClasspathCheck(classpathEntries: List<Path>): IdeDoctorCheckR
 
 private fun classpathSyncCheck(helperRoot: Path, classpathEntries: List<Path>): IdeDoctorCheckResult {
     val buildFile = helperRoot.resolve(IDE_HELPER_BUILD_FILE_NAME)
-    val buildFileContent =
-        if (isManagedRegularFile(buildFile)) {
-            Files.readString(buildFile, StandardCharsets.UTF_8).replace("\r\n", "\n")
-        } else {
-            null
-        }
+    val buildFileContent = readManagedUtf8TextOrNull(buildFile)
     val missingClasspathEntries =
         if (buildFileContent == null) {
             classpathEntries
@@ -210,3 +206,17 @@ private fun classpathSyncCheck(helperRoot: Path, classpathEntries: List<Path>): 
 private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
 
 private fun isManagedRegularFile(path: Path): Boolean = Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)
+
+private fun readManagedUtf8TextOrNull(path: Path): String? {
+    return try {
+        if (!isManagedRegularFile(path)) {
+            null
+        } else {
+            Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n")
+        }
+    } catch (_: IOException) {
+        null
+    } catch (_: SecurityException) {
+        null
+    }
+}

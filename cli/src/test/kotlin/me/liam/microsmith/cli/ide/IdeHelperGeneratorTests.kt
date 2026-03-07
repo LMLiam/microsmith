@@ -128,6 +128,29 @@ class IdeHelperGeneratorTests :
             }
         }
 
+        "overwrites undecodable managed helper files" {
+            val repoRoot = createTempDirectory("microsmith-ide-helper-invalid-bytes")
+            val runtimeJar = repoRoot.resolve("runtime/microsmith-cli-all.jar")
+            val helperRoot = repoRoot.resolve(".microsmith/ide")
+            runtimeJar.parent.createDirectories()
+            helperRoot.createDirectories()
+            runtimeJar.writeText("jar-binary-placeholder")
+            Files.write(helperRoot.resolve("build.gradle.kts"), byteArrayOf(0xC3.toByte(), 0x28))
+
+            try {
+                val result =
+                    refreshIdeHelperProject(
+                        command = IdeRefreshCommand(projectRoot = repoRoot),
+                        classpathResolver = { listOf(runtimeJar) },
+                    )
+
+                result.updatedFiles.shouldContain(helperRoot.resolve("build.gradle.kts"))
+                helperRoot.resolve("build.gradle.kts").readText().shouldContain("java-library")
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
         "fails when managed helper root exists as a symlink".config(enabled = !runningOnWindows()) {
             val repoRoot = createTempDirectory("microsmith-ide-helper-root-symlink")
             val externalRoot = createTempDirectory("microsmith-ide-helper-root-symlink-target")

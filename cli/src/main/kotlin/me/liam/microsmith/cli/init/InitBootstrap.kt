@@ -5,6 +5,7 @@ import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.ide.IdeHelperConflictException
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
 import me.liam.microsmith.cli.ide.refreshIdeHelperProject
+import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.LinkOption
@@ -161,9 +162,13 @@ private fun refreshIdeHelperIfEnabled(
 
 private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
 
-private fun managedFileContentDiffers(path: Path, expectedContent: String): Boolean {
+private fun managedFileContentDiffers(path: Path, expectedContent: String): Boolean = try {
     val existingContent = Files.readString(path, StandardCharsets.UTF_8)
-    return existingContent.normalizeLineEndings() != expectedContent.normalizeLineEndings()
+    existingContent.normalizeLineEndings() != expectedContent.normalizeLineEndings()
+} catch (_: IOException) {
+    true
+} catch (_: SecurityException) {
+    true
 }
 
 private sealed interface BootstrapFileWriteResult {

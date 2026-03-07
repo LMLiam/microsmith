@@ -11,6 +11,7 @@ import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.ide.IdeHelperConflictException
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
 import java.io.IOException
+import java.io.UncheckedIOException
 import java.nio.file.Files
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
@@ -144,6 +145,25 @@ class InitBootstrapTests :
             }
         }
 
+        "overwrites undecodable bootstrap files when force is enabled" {
+            val repoRoot = createTempDirectory("microsmith-init-bootstrap-force-invalid-bytes")
+            val buildScript = repoRoot.resolve("build.microsmith.kts")
+            Files.write(buildScript, byteArrayOf(0xC3.toByte(), 0x28))
+            try {
+                val result =
+                    runInitBootstrap(
+                        command = InitCommand(projectRoot = repoRoot, force = true, skipIdeHelper = true),
+                    )
+
+                result.createdFiles.shouldContainExactly(listOf(repoRoot.resolve("settings.microsmith.kts")))
+                result.overwrittenFiles.shouldContainExactly(listOf(buildScript))
+                result.preservedFiles shouldBe emptyList()
+                buildScript.readText().shouldContain("UserCreated")
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
         "skips IDE helper refresh when explicitly disabled" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-skip-ide")
             try {
@@ -187,6 +207,26 @@ class InitBootstrapTests :
                 detectOnboardingRepositoryType(
                     projectRoot = nodeRoot,
                     dotnetMarkerFinder = { throw IOException("permission denied") },
+                ) shouldBe
+                    OnboardingRepositoryDetection(
+                        type = OnboardingRepositoryType.NODE,
+                        matchedMarkers = listOf("package.json"),
+                    )
+            } finally {
+                runCatching { nodeRoot.deleteRecursively() }
+            }
+        }
+
+        "ignores unchecked .NET marker traversal failures while detecting other repository markers" {
+            val nodeRoot = createTempDirectory("microsmith-init-detect-node-unchecked-traversal-failure")
+            try {
+                nodeRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
+
+                detectOnboardingRepositoryType(
+                    projectRoot = nodeRoot,
+                    dotnetMarkerFinder = {
+                        throw UncheckedIOException(IOException("permission denied"))
+                    },
                 ) shouldBe
                     OnboardingRepositoryDetection(
                         type = OnboardingRepositoryType.NODE,

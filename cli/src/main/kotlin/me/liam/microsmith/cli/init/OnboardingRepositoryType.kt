@@ -1,6 +1,7 @@
 package me.liam.microsmith.cli.init
 
 import java.io.IOException
+import java.io.UncheckedIOException
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.isRegularFile
@@ -87,6 +88,8 @@ internal fun detectOnboardingRepositoryType(
 private fun safeFindDotnetMarker(projectRoot: Path, dotnetMarkerFinder: (Path) -> String?): String? = try {
     dotnetMarkerFinder(projectRoot)
 } catch (_: IOException) {
+    null
+} catch (_: UncheckedIOException) {
     null
 } catch (_: SecurityException) {
     null
