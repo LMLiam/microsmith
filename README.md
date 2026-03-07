@@ -9,6 +9,7 @@ This README is the canonical repository documentation.
 
 - Overview
 - Repository modules
+- Repository Kotlin standards
 - Build, test, and quality gates
 - DSL usage
 - Standalone CLI for non-Gradle repositories
@@ -37,9 +38,100 @@ Microsmith provides:
 - `dsl`: core DSL primitives, builders, model types, and extension APIs
 - `dsl-schemas`: generic schema registry and schema-oriented DSL surface
 - `dsl-schemas-protobuf`: protobuf-flavoured schema DSL on top of `dsl-schemas`
+- `gen`: generator contracts, model traversal, and shared generation helpers
+- `gen-schemas`: schema-aware generation support on top of `gen`
+- `gen-schemas-protobuf`: protobuf emitters, rendering, and protobuf-specific generation support
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution
 - `cli`: command-line entrypoint, diagnostics, installer packaging, and IDE helper support
 - `kotest`: shared Kotest configuration used by repository test suites
+
+### Module boundary map
+
+- `dsl` is the foundational model and DSL layer. It should stay free of CLI, scripting-host, installer, resolver, and generation-application concerns.
+- `dsl-schemas` extends `dsl` with schema registration and schema-oriented DSL concepts. It should not absorb CLI or runtime concerns.
+- `dsl-schemas-protobuf` adds protobuf-specific schema modeling on top of `dsl` and `dsl-schemas`. Keep protobuf domain types, builders, and DSL entrypoints here rather than leaking them into application layers.
+- `gen` owns generator contracts and shared generation abstractions. It should not contain CLI command handling, repository bootstrapping, or scripting host orchestration.
+- `gen-schemas` and `gen-schemas-protobuf` own schema-aware emission, rendering, and validation. They should depend downward on model and generator layers, not upward on CLI or installer behavior.
+- `runtime-scripting` is the scripting host and execution boundary. It may depend on DSL and generation layers, but it must not absorb CLI parsing, onboarding, or distribution concerns.
+- `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
+- `kotest` is test support only and should not become a production dependency surface.
+
+### Current architecture snapshot
+
+- The current production-source audit covers `123` Kotlin files across `cli`, `runtime-scripting`, `dsl*`, and `gen*`, with roughly `7,700` lines of main-source Kotlin in those modules.
+- The largest current hotspots are:
+  - `cli/src/main/kotlin/me/liam/microsmith/cli/MicrosmithCli.kt`
+  - `cli/src/main/kotlin/me/liam/microsmith/cli/parsing/CliParser.kt`
+  - `cli/src/main/kotlin/me/liam/microsmith/cli/plugins/MavenRemotePluginResolver.kt`
+  - `cli/src/main/kotlin/me/liam/microsmith/cli/plugins/PluginResolver.kt`
+  - `cli/src/main/kotlin/me/liam/microsmith/cli/doctor/DoctorRunner.kt`
+  - `runtime-scripting/src/main/kotlin/me/liam/microsmith/runtime/scripting/host/ProcessIsolationProtocol.kt`
+  - `dsl-schemas-protobuf/src/main/kotlin/me/liam/microsmith/dsl/schemas/protobuf/Scopes.kt`
+- The most obvious multi-declaration hotspot files today include:
+  - `dsl-schemas-protobuf/src/main/kotlin/me/liam/microsmith/dsl/schemas/protobuf/Scopes.kt`
+  - `cli/src/main/kotlin/me/liam/microsmith/cli/plugins/PluginResolver.kt`
+  - `cli/src/main/kotlin/me/liam/microsmith/cli/plugins/MavenRemotePluginResolver.kt`
+  - `cli/src/main/kotlin/me/liam/microsmith/cli/parsing/CliParser.kt`
+  - `cli/src/main/kotlin/me/liam/microsmith/cli/diagnostics/CliDiagnostics.kt`
+- The repository-quality execution order is:
+  1. `#66` define standards and boundaries
+  2. `#67` through `#71` refactor module workstreams in focused PRs
+  3. `#72` codify enforcement once the structure is materially aligned
+
+## Repository Kotlin standards
+
+### File and type structure
+
+- Default to one top-level production type per file.
+- Name each production file after its primary type or responsibility.
+- The default exception bar is high. Only keep multiple production declarations together when the declarations are tightly coupled, locally obvious, and splitting them would reduce clarity rather than improve it.
+- Keep file-private helpers and top-level declarations narrow and obviously coupled to the owning file. If the relationship is not immediate, move the type to its own file.
+- Split files once they begin mixing orchestration, parsing, validation, rendering, diagnostics, policy, or I/O concerns.
+- Avoid `util`, `misc`, and catch-all helper files. Prefer domain-led packages and names.
+
+### Responsibility boundaries
+
+- Keep orchestration separate from parsing, validation, rendering, diagnostics, and side-effecting I/O.
+- Keep pure transformations separate from filesystem, process, environment, network, or resolver access.
+- Model domain states and failure modes with Kotlin types instead of loosely coupled strings, maps, and boolean combinations.
+- Prefer constructor injection for required collaborators and keep side-effecting dependencies explicit.
+- Prefer composition over inheritance and keep collaborators explicit.
+- Apply single-responsibility rigor to both files and classes. If a reviewer cannot summarize the unit in one sentence, the unit is probably too broad.
+
+### Kotlin idioms
+
+- Prefer immutable data, `val`, and expression-oriented control flow by default.
+- Default to the narrowest visibility that keeps the API honest. Widen visibility only when a real caller or extension point requires it.
+- Use `sealed interface`, `data object`, `value class`, exhaustive `when`, and null-safety where they make state and invariants clearer.
+- Use extension functions when they improve discoverability for a well-scoped domain operation and avoid creating utility dumping grounds.
+- Use infix functions only for DSL-facing APIs when readability is clearly better than the non-infix equivalent.
+- Use `object` and `companion object` only when singleton semantics, namespaced factories, or constants are genuinely clearer than top-level declarations or regular types.
+- Avoid Java-style static utility patterns, unnecessary mutable state, and scope-function chains that hide control flow.
+
+### Interfaces and ports
+
+- Introduce interfaces at meaningful boundaries such as filesystem access, process execution, environment access, diagnostics emission, dependency resolution, or other external integrations.
+- Use interfaces when multiple implementations or isolation in tests materially improve design clarity.
+- Do not add interfaces for trivial data holders or single concrete types where the extra indirection adds no value.
+
+### Comments and KDoc
+
+- Document invariants, contracts, ordering guarantees, and non-obvious behavior.
+- Keep comments concise and durable. If a comment merely restates the code, remove it.
+- Add KDoc for public DSL surfaces, scripting contracts, and non-obvious extension points where contributor intent would otherwise be unclear.
+
+### Review and PR slicing rules
+
+- Keep quality refactors behavior-preserving. If a change affects user-visible behavior or a public contract, split it into a separate issue and PR.
+- Slice PRs by module or responsibility boundary, not by repository-wide search-and-replace.
+- Move and rename types first, then simplify logic, then tighten tests. Do not blend unrelated cleanup into one diff.
+- Add or update regression coverage next to the boundary being extracted.
+- Reviewers should check:
+  - file ownership and package placement are obvious
+  - one-top-level-production-type-per-file remains the default
+  - orchestration and side effects are separated from pure logic
+  - Kotlin features improve clarity rather than novelty
+  - `detekt`, `ktlintCheck`, and relevant tests remain green
 
 ## Build, test, and quality gates
 
