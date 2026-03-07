@@ -3,6 +3,7 @@ package me.liam.microsmith.cli.init
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -20,8 +21,9 @@ import kotlin.io.path.writeText
 @OptIn(ExperimentalPathApi::class)
 class InitBootstrapTests :
     StringSpec({
-        "creates default bootstrap files and invokes IDE helper refresh" {
+        "creates repo-aware bootstrap files and invokes IDE helper refresh" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-create")
+            repoRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
             try {
                 val helperRoot = repoRoot.resolve(".microsmith/ide")
                 val result =
@@ -37,19 +39,28 @@ class InitBootstrapTests :
                         },
                     )
 
-                result.createdFiles.shouldHaveSize(2)
-                result.createdFiles.shouldContain(repoRoot.resolve("build.microsmith.kts"))
-                result.createdFiles.shouldContain(repoRoot.resolve("settings.microsmith.kts"))
+                result.repositoryDetection.type shouldBe OnboardingRepositoryType.NODE
+                result.repositoryDetection.matchedMarkers shouldBe listOf("package.json")
+                result.createdFiles.shouldContainExactly(
+                    listOf(
+                        repoRoot.resolve("build.microsmith.kts"),
+                        repoRoot.resolve("settings.microsmith.kts"),
+                    ),
+                )
+                result.overwrittenFiles shouldBe emptyList()
                 result.preservedFiles shouldBe emptyList()
+                result.ideHelperResult?.helperRoot shouldBe helperRoot
                 repoRoot.resolve("build.microsmith.kts").isRegularFile() shouldBe true
                 repoRoot.resolve("settings.microsmith.kts").isRegularFile() shouldBe true
-                repoRoot.resolve("build.microsmith.kts").readText().shouldContain("microsmith {")
+                repoRoot.resolve("build.microsmith.kts").readText().shouldContain("NodeUserCreated")
+                repoRoot.resolve("build.microsmith.kts").readText().shouldContain("./generated")
+                repoRoot.resolve("settings.microsmith.kts").readText().shouldContain("Detected repository type: Node")
             } finally {
                 runCatching { repoRoot.deleteRecursively() }
             }
         }
 
-        "preserves existing bootstrap files on repeated init runs" {
+        "preserves existing bootstrap files on repeated init runs by default" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-idempotent")
             val existingBuild = repoRoot.resolve("build.microsmith.kts")
             existingBuild.writeText("// existing build script")
@@ -68,12 +79,103 @@ class InitBootstrapTests :
                         },
                     )
 
-                result.createdFiles.shouldHaveSize(1)
-                result.createdFiles.single() shouldBe repoRoot.resolve("settings.microsmith.kts")
-                result.preservedFiles.shouldContain(existingBuild)
+                result.createdFiles.shouldContainExactly(listOf(repoRoot.resolve("settings.microsmith.kts")))
+                result.overwrittenFiles shouldBe emptyList()
+                result.preservedFiles.shouldContainExactly(listOf(existingBuild))
                 existingBuild.readText() shouldBe "// existing build script"
             } finally {
                 runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
+        "overwrites existing regular bootstrap files when force is enabled" {
+            val repoRoot = createTempDirectory("microsmith-init-bootstrap-force")
+            val buildScript = repoRoot.resolve("build.microsmith.kts")
+            val settingsScript = repoRoot.resolve("settings.microsmith.kts")
+            buildScript.writeText("// stale build script")
+            settingsScript.writeText("// stale settings")
+            repoRoot.resolve("go.mod").writeText("module example.com/microsmith/fixture\n")
+            try {
+                val helperRoot = repoRoot.resolve(".microsmith/ide")
+                val result =
+                    runInitBootstrap(
+                        command = InitCommand(projectRoot = repoRoot, force = true),
+                        ideRefreshRunner = { command ->
+                            IdeHelperRefreshResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                helperRoot = helperRoot,
+                                updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
+                                classpathEntries = listOf(repoRoot.resolve("runtime/microsmith-cli-all.jar")),
+                            )
+                        },
+                    )
+
+                result.repositoryDetection.type shouldBe OnboardingRepositoryType.GO
+                result.createdFiles shouldBe emptyList()
+                result.overwrittenFiles.shouldContainExactly(listOf(buildScript, settingsScript))
+                result.preservedFiles shouldBe emptyList()
+                buildScript.readText().shouldContain("GoUserCreated")
+                settingsScript.readText().shouldContain("go.mod")
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
+        "skips IDE helper refresh when explicitly disabled" {
+            val repoRoot = createTempDirectory("microsmith-init-bootstrap-skip-ide")
+            try {
+                val result =
+                    runInitBootstrap(
+                        command = InitCommand(projectRoot = repoRoot, skipIdeHelper = true),
+                        ideRefreshRunner = { error("IDE helper refresh should be skipped when disabled") },
+                    )
+
+                result.createdFiles.shouldHaveSize(2)
+                result.ideHelperResult shouldBe null
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
+        "detects Node, Go, and .NET repositories and falls back to Other for mixed markers" {
+            val nodeRoot = createTempDirectory("microsmith-init-detect-node")
+            val goRoot = createTempDirectory("microsmith-init-detect-go")
+            val dotnetRoot = createTempDirectory("microsmith-init-detect-dotnet")
+            val mixedRoot = createTempDirectory("microsmith-init-detect-mixed")
+            try {
+                nodeRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
+                goRoot.resolve("go.mod").writeText("module example.com/microsmith/fixture\n")
+                dotnetRoot.resolve("src/apps/service").createDirectories()
+                dotnetRoot.resolve("src/apps/service/Fixture.csproj")
+                    .writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
+                mixedRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
+                mixedRoot.resolve("go.mod").writeText("module example.com/microsmith/fixture\n")
+
+                detectOnboardingRepositoryType(nodeRoot) shouldBe
+                    OnboardingRepositoryDetection(
+                        type = OnboardingRepositoryType.NODE,
+                        matchedMarkers = listOf("package.json"),
+                    )
+                detectOnboardingRepositoryType(goRoot) shouldBe
+                    OnboardingRepositoryDetection(
+                        type = OnboardingRepositoryType.GO,
+                        matchedMarkers = listOf("go.mod"),
+                    )
+                detectOnboardingRepositoryType(dotnetRoot) shouldBe
+                    OnboardingRepositoryDetection(
+                        type = OnboardingRepositoryType.DOTNET,
+                        matchedMarkers = listOf("src/apps/service/Fixture.csproj"),
+                    )
+                detectOnboardingRepositoryType(mixedRoot) shouldBe
+                    OnboardingRepositoryDetection(
+                        type = OnboardingRepositoryType.OTHER,
+                        matchedMarkers = listOf("go.mod", "package.json"),
+                    )
+            } finally {
+                runCatching { nodeRoot.deleteRecursively() }
+                runCatching { goRoot.deleteRecursively() }
+                runCatching { dotnetRoot.deleteRecursively() }
+                runCatching { mixedRoot.deleteRecursively() }
             }
         }
 

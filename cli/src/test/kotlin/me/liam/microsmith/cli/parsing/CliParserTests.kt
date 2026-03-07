@@ -57,6 +57,8 @@ class CliParserTests :
                     "examples/go-service",
                     "--non-interactive",
                     "--yes",
+                    "--force",
+                    "--skip-ide-helper",
                     "--diagnostics",
                     "json",
                     "--verbose",
@@ -68,6 +70,8 @@ class CliParserTests :
                     verbose = true,
                     nonInteractive = true,
                     assumeYes = true,
+                    force = true,
+                    skipIdeHelper = true,
                 )
         }
 
@@ -342,6 +346,16 @@ class CliParserTests :
         "returns error when init yes is specified multiple times" {
             parseCliArgs(listOf("init", "--yes", "--yes")) shouldBe
                 ErrorCommand("--yes may only be specified once.")
+        }
+
+        "returns error when init force is specified multiple times" {
+            parseCliArgs(listOf("init", "--force", "--force")) shouldBe
+                ErrorCommand("--force may only be specified once.")
+        }
+
+        "returns error when init skip-ide-helper is specified multiple times" {
+            parseCliArgs(listOf("init", "--skip-ide-helper", "--skip-ide-helper")) shouldBe
+                ErrorCommand("--skip-ide-helper may only be specified once.")
         }
 
         "returns error for unknown doctor option" {

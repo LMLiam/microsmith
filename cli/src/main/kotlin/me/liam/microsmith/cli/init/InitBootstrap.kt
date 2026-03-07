@@ -10,9 +10,11 @@ import java.nio.file.Path
 
 internal data class InitBootstrapResult(
     val projectRoot: Path,
+    val repositoryDetection: OnboardingRepositoryDetection,
     val createdFiles: List<Path>,
+    val overwrittenFiles: List<Path>,
     val preservedFiles: List<Path>,
-    val ideHelperResult: IdeHelperRefreshResult,
+    val ideHelperResult: IdeHelperRefreshResult?,
 )
 
 internal class InitConflictException(message: String) : IllegalStateException(message)
@@ -29,12 +31,24 @@ internal fun runInitBootstrap(
         "Repository root '$projectRoot' is not a directory."
     }
 
+    val repositoryDetection = detectOnboardingRepositoryType(projectRoot)
     val createdFiles = mutableListOf<Path>()
+    val overwrittenFiles = mutableListOf<Path>()
     val preservedFiles = mutableListOf<Path>()
-    DEFAULT_BOOTSTRAP_FILES.forEach { (relativePath, content) ->
+
+    bootstrapFilesFor(repositoryDetection).forEach { (relativePath, content) ->
         val path = projectRoot.resolve(relativePath)
         when {
-            Files.exists(path) && Files.isRegularFile(path) -> preservedFiles.add(path)
+            Files.exists(path) && Files.isRegularFile(path) -> {
+                val existingContent = Files.readString(path, StandardCharsets.UTF_8)
+                if (command.force && existingContent.normalizeLineEndings() != content.normalizeLineEndings()) {
+                    Files.writeString(path, content, StandardCharsets.UTF_8)
+                    overwrittenFiles.add(path)
+                } else {
+                    preservedFiles.add(path)
+                }
+            }
+
             Files.exists(path) ->
                 throw InitConflictException("Bootstrap path '$path' exists but is not a regular file.")
 
@@ -47,42 +61,67 @@ internal fun runInitBootstrap(
     }
 
     val ideHelperResult =
-        ideRefreshRunner(
-            IdeRefreshCommand(
-                projectRoot = projectRoot,
-                diagnosticsFormat = command.diagnosticsFormat,
-                verbose = command.verbose,
-            ),
-        )
+        if (command.skipIdeHelper) {
+            null
+        } else {
+            ideRefreshRunner(
+                IdeRefreshCommand(
+                    projectRoot = projectRoot,
+                    diagnosticsFormat = command.diagnosticsFormat,
+                    verbose = command.verbose,
+                ),
+            )
+        }
 
     return InitBootstrapResult(
         projectRoot = projectRoot,
+        repositoryDetection = repositoryDetection,
         createdFiles = createdFiles.sortedBy(Path::toString),
+        overwrittenFiles = overwrittenFiles.sortedBy(Path::toString),
         preservedFiles = preservedFiles.sortedBy(Path::toString),
         ideHelperResult = ideHelperResult,
     )
 }
 
-private val DEFAULT_BOOTSTRAP_FILES =
-    linkedMapOf(
-        "settings.microsmith.kts" to renderDefaultSettingsScript(),
-        "build.microsmith.kts" to renderDefaultBuildScript(),
-    )
+private fun bootstrapFilesFor(repositoryDetection: OnboardingRepositoryDetection): Map<String, String> = linkedMapOf(
+    "settings.microsmith.kts" to renderDefaultSettingsScript(repositoryDetection),
+    "build.microsmith.kts" to renderDefaultBuildScript(repositoryDetection.type),
+)
 
-private fun renderDefaultSettingsScript(): String = """
-// Microsmith repository settings.
-// Add shared script configuration here as your repository grows.
-""".trimIndent() + "\n"
+private fun renderDefaultSettingsScript(repositoryDetection: OnboardingRepositoryDetection): String = buildString {
+    appendLine("// Microsmith repository settings.")
+    appendLine("// ${repositoryDetection.describeForComment()}.")
+    appendLine("// Add shared script configuration here as your repository grows.")
+}
 
-private fun renderDefaultBuildScript(): String = """
-microsmith {
-    schemas {
-        protobuf {
-            message("UserCreated") {
-                int32("id") { index(1) }
-                string("email") { index(2) }
+private fun renderDefaultBuildScript(repositoryType: OnboardingRepositoryType): String = buildString {
+    val displayName =
+        if (repositoryType == OnboardingRepositoryType.OTHER) {
+            "repository"
+        } else {
+            "${repositoryType.displayName} repository"
+        }
+    appendLine("// Bootstrapped Microsmith schema for this $displayName.")
+    appendLine("// Canonical first run:")
+    appendLine("// microsmith run build.microsmith.kts --out ./generated")
+    repositoryType.repoNativeOutputDirectory?.let { outputDirectory ->
+        appendLine("// Common repository-native output path:")
+        appendLine("// microsmith run build.microsmith.kts --out $outputDirectory")
+    }
+    appendLine(
+        """
+        microsmith {
+            schemas {
+                protobuf {
+                    message("${repositoryType.sampleMessageName}") {
+                        int32("id") { index(1) }
+                        string("email") { index(2) }
+                    }
+                }
             }
         }
-    }
+        """.trimIndent(),
+    )
 }
-""".trimIndent() + "\n"
+
+private fun String.normalizeLineEndings(): String = replace("\r\n", "\n")
