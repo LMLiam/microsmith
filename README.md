@@ -56,28 +56,6 @@ Microsmith provides:
 - `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
 - `kotest` is test support only and should not become a production dependency surface.
 
-### Current architecture snapshot
-
-- The current production-source audit covers `123` Kotlin files across `cli`, `runtime-scripting`, `dsl*`, and `gen*`, with roughly `7,700` lines of main-source Kotlin in those modules.
-- The largest current hotspots are:
-  - `cli/src/main/kotlin/me/liam/microsmith/cli/MicrosmithCli.kt`
-  - `cli/src/main/kotlin/me/liam/microsmith/cli/parsing/CliParser.kt`
-  - `cli/src/main/kotlin/me/liam/microsmith/cli/plugins/MavenRemotePluginResolver.kt`
-  - `cli/src/main/kotlin/me/liam/microsmith/cli/plugins/PluginResolver.kt`
-  - `cli/src/main/kotlin/me/liam/microsmith/cli/doctor/DoctorRunner.kt`
-  - `runtime-scripting/src/main/kotlin/me/liam/microsmith/runtime/scripting/host/ProcessIsolationProtocol.kt`
-  - `dsl-schemas-protobuf/src/main/kotlin/me/liam/microsmith/dsl/schemas/protobuf/Scopes.kt`
-- The most obvious multi-declaration hotspot files today include:
-  - `dsl-schemas-protobuf/src/main/kotlin/me/liam/microsmith/dsl/schemas/protobuf/Scopes.kt`
-  - `cli/src/main/kotlin/me/liam/microsmith/cli/plugins/PluginResolver.kt`
-  - `cli/src/main/kotlin/me/liam/microsmith/cli/plugins/MavenRemotePluginResolver.kt`
-  - `cli/src/main/kotlin/me/liam/microsmith/cli/parsing/CliParser.kt`
-  - `cli/src/main/kotlin/me/liam/microsmith/cli/diagnostics/CliDiagnostics.kt`
-- The repository-quality execution order is:
-  1. `#66` define standards and boundaries
-  2. `#67` through `#71` refactor module workstreams in focused PRs
-  3. `#72` codify enforcement once the structure is materially aligned
-
 ## Repository Kotlin standards
 
 ### File and type structure
