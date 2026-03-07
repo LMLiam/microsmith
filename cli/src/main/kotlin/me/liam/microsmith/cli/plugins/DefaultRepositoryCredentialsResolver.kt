@@ -3,7 +3,6 @@ package me.liam.microsmith.cli.plugins
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.LazyThreadSafetyMode
 
 internal const val REPOSITORY_CREDENTIALS_FILE_ENV = "MICROSMITH_REPOSITORY_CREDENTIALS_FILE"
 internal const val REPOSITORY_USERNAME_ENV = "MICROSMITH_REPOSITORY_USERNAME"
@@ -16,29 +15,6 @@ internal const val GITHUB_TOKEN_ENV = "GITHUB_TOKEN"
 private const val CREDENTIALS_FILE_ENTRY_PARTS = 3
 private const val DEFAULT_GITHUB_PACKAGES_USERNAME = "x-access-token"
 private const val GITHUB_PACKAGES_HOST = "maven.pkg.github.com"
-private const val REDACTED_SECRET = "<redacted>"
-
-internal data class RepositoryCredentials(val username: String, val password: String)
-
-internal interface RepositoryCredentialsResolver {
-    fun resolve(repositoryUri: String): RepositoryCredentials?
-
-    fun sensitiveValues(): Set<String> = emptySet()
-}
-
-private class LazyRepositoryCredentialsResolver(
-    resolverFactory: () -> RepositoryCredentialsResolver,
-) : RepositoryCredentialsResolver {
-    private val delegate: RepositoryCredentialsResolver by lazy(LazyThreadSafetyMode.NONE, resolverFactory)
-
-    override fun resolve(repositoryUri: String): RepositoryCredentials? = delegate.resolve(repositoryUri)
-
-    override fun sensitiveValues(): Set<String> = delegate.sensitiveValues()
-}
-
-internal fun lazyDefaultRepositoryCredentialsResolver(
-    resolverFactory: () -> RepositoryCredentialsResolver = ::defaultRepositoryCredentialsResolver,
-): RepositoryCredentialsResolver = LazyRepositoryCredentialsResolver(resolverFactory)
 
 internal class DefaultRepositoryCredentialsResolver(
     private val fileCredentialsByRepository: Map<String, RepositoryCredentials>,
@@ -152,11 +128,3 @@ private fun readRepositoryCredentialsFile(credentialsFilePath: Path): Map<String
 
     return credentialsByRepository.toMap()
 }
-
-internal fun String.redactSensitiveValues(sensitiveValues: Set<String>): String = sensitiveValues
-    .asSequence()
-    .map(String::trim)
-    .filter(String::isNotEmpty)
-    .distinct()
-    .sortedWith(compareByDescending<String> { secret -> secret.length }.thenBy { secret -> secret })
-    .fold(this) { sanitized, secret -> sanitized.replace(secret, REDACTED_SECRET) }
