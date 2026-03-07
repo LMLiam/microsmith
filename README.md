@@ -1,260 +1,719 @@
 # Microsmith
 
-Microsmith is a Kotlin DSL framework for declaring and composing domain-specific models (schemas, services, etc.).
-It produces a lightweight, immutable model from DSL blocks, and provides extension points for plugin authors to add
-their own dialects (e.g. Protobuf, JSON for schemas).
+Microsmith is a Kotlin DSL and standalone CLI for declaring domain-specific models and generating artifacts from `.microsmith.kts` scripts.
+It is designed to work both inside this Gradle repository and from consumer repositories that do not use Gradle, including Go, .NET, and Node projects.
 
-This repository is a multi-module Gradle project containing:
+This README is the canonical repository documentation.
 
-- `dsl` – Core DSL primitives and helpers (the entrypoint `microsmith { ... }`, model, builder, and extension APIs).
-- `dsl-schemas` – A schema DSL extension which provides `schemas { ... }` block and core schema types.
-- `dsl-schemas-protobuf` – A Protobuf schema dialect built on top of `dsl-schemas`, offering a type-safe Kotlin DSL for defining `.proto`-like models.
-- `runtime-scripting` – Kotlin scripting host/runtime for `.microsmith.kts` execution.
-- `cli` – command-line entrypoint and argument handling for script-driven generation workflows.
-- `kotest` – Project-wide Kotest configuration used by the test suites.
+## Contents
 
-## Key features
+- Overview
+- Repository modules
+- Build, test, and quality gates
+- DSL usage
+- Standalone CLI for non-Gradle repositories
+- Installation and verification
+- Command reference
+- JetBrains IDE helper
+- Plugin resolution and security model
+- CI examples
+- Example fixtures
+- Troubleshooting
+- Migration from Gradle
+- Distribution and release artifacts
 
-- The `microsmith {}` entrypoint produces a minimal, immutable `MicrosmithModel`.
-- Extensions can attach `MicrosmithExtension` implementations, discoverable from the model
-- Schema dialects:
-  - `dsl-schemas` provides a generic schema registry
-  - `dsl-schemas-protobuf` adds a Protobuf-flavoured DSL with messages, enums, fields, oneofs, maps, and reserved ranges.
-    - Kotlin DSL scopes enforce correct usage (e.g. cardinality, reserved ranges, map key/value types)
-    - Cross-message references are validated and resolved after model construction
-- Kotest property-based and DSL-driven specs ensure correctness.
+## Overview
 
-## Quickstart — build & test
+Microsmith provides:
 
-This project uses the Gradle wrapper. From the repository root run:
+- a core immutable model built from `microsmith { ... }`
+- extension points for schema and generation dialects
+- a standalone CLI for running `.microsmith.kts` scripts without embedding Gradle in consumer repositories
+- bundled built-in providers for the default schema and protobuf workflows
+- a JetBrains IDE helper workflow for stronger type resolution in non-Gradle repositories
+
+## Repository modules
+
+- `dsl`: core DSL primitives, builders, model types, and extension APIs
+- `dsl-schemas`: generic schema registry and schema-oriented DSL surface
+- `dsl-schemas-protobuf`: protobuf-flavoured schema DSL on top of `dsl-schemas`
+- `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution
+- `cli`: command-line entrypoint, diagnostics, installer packaging, and IDE helper support
+- `kotest`: shared Kotest configuration used by repository test suites
+
+## Build, test, and quality gates
+
+Build the repository:
 
 ```bash
 ./gradlew clean build
 ```
 
-To run tests only:
+Run tests:
 
 ```bash
 ./gradlew kotest
 ```
 
-To run static analysis:
+Run static analysis:
 
 ```bash
 ./gradlew detekt ktlintCheck
 ```
 
-To auto-format Kotlin sources:
+Auto-format Kotlin sources:
 
 ```bash
 ./gradlew ktlintFormat
 ```
 
-Common fixes:
-- If `ktlintCheck` fails, run `./gradlew ktlintFormat` and re-run checks.
-- If `detekt` fails, inspect module reports under `build/reports/detekt/detekt.html` and address the flagged rules.
+Useful notes:
 
-Notes:
-- Kotlin JVM toolchain is configured to use Java 24 in the root Gradle configuration.
-- Tests use Kotest (v6) and the project defines a `KotestConfig` to emit JUnit XML results into the Gradle build directory.
+- the Gradle build is configured for Java 24
+- if `ktlintCheck` fails, run `./gradlew ktlintFormat` and rerun checks
+- if `detekt` fails, inspect the generated report under `build/reports/detekt/`
 
-## Publishing
-Artifacts are published to GitHub Packages at:
-```
-https://maven.pkg.github.com/lmliam/microsmith
-```
-
-## Usage example
+## DSL usage
 
 ### Core DSL
 
 ```kotlin
 val model = microsmith {
-    // DSL blocks go here, e.g.:
-    // schemas { ... } 
+    // schemas { ... }
 }
 
-// Read an extension:
-val ext = model.get<YourExtensionType>()
-// Read all:
-val extensions = model.extensions()
-// Read all of type:
-val exts = model.extensions().filterIsInstance<YourExtension>()
+val extension = model.get<YourExtensionType>()
+val allExtensions = model.extensions()
+val typedExtensions = model.extensions().filterIsInstance<YourExtensionType>()
 ```
 
-### Protobuf DSL (`dsl-schemas-protobuf`)
-The Protobuf extension adds a `protobuf {}` block inside `schemas {}`:
+### Protobuf schema DSL
+
 ```kotlin
 microsmith {
     schemas {
         protobuf {
-            message("User") {
-                reserved(8..15)
+            message("UserCreated") {
                 int32("id") { index(1) }
-                string("name") { index(2); optional() }
-                repeated { string("tags") }
-                oneof("contact") {
-                    string("phone")
-                    string("slack")
-                }
-                sfixed64("created_at") { optional() }
-                ref("status", "package.Status")
+                string("email") { index(2) }
             }
-            
-            "package" {
-                enum("Status") {
-                    +"ACTIVE"
-                    value("INACTIVE") { index(5) }
-                    reserved(3)
-                }
+
+            enum("UserStatus") {
+                +"ACTIVE"
+                +"DISABLED"
             }
         }
     }
 }
 ```
-```mermaid
-flowchart TD
 
-    Protobuf["Protobuf (entrypoint)"]
-    Message["Message (defines fields, oneofs, maps, references, reserved)"]
-    Enum["Enum (defines values, reserved)"]
-    Reserved["Reserved (indexes, ranges, names)"]
-    ScalarFields["Scalar Fields (int32, string, bool, etc.)"]
-    ScalarField["Scalar Field (with cardinality)"]
-    ReferenceField["Reference Field"]
-    Oneof["Oneof (group of alternative fields)"]
-    OneofField["Oneof Field"]
-    OneofReferenceField["Oneof Reference Field"]
-    MapField["Map Field (key/value)"]
-    EnumValue["Enum Value"]
-    FieldIndex["Field Index (index assignment)"]
+### Script defaults
 
-    Protobuf --> Message
-    Protobuf --> Enum
+Inside `.microsmith.kts` scripts:
 
-    Message --> ScalarFields
-    Message --> Oneof
-    Message --> MapField
-    Message --> ReferenceField
-    Message --> Reserved
+- default imports include `microsmith {}`, `schemas {}`, and `protobuf {}`
+- a script can return a `MicrosmithModel`
+- a script can also call `emit(model)` or `generate(model)`
 
-    Enum --> EnumValue
-    Enum --> Reserved
+## Standalone CLI for non-Gradle repositories
 
-    Oneof --> ScalarFields
-    Oneof --> OneofField
-    Oneof --> OneofReferenceField
+The CLI is the recommended entrypoint for Go, .NET, Node, and other repositories that do not use Gradle.
+The official installer scripts are self-contained and provision a Java 24 runtime automatically when the machine does not already provide one.
 
-    ScalarField --> FieldIndex
-    ReferenceField --> ScalarField
-    ReferenceField --> OneofReferenceField
-    OneofField --> FieldIndex
-    OneofReferenceField --> FieldIndex
-    MapField --> FieldIndex
-    EnumValue --> FieldIndex
-```
+Manual channels remain available, but they require Java 24 or newer.
 
-## CLI Scripting Runtime
-Run generation from a script file without embedding Gradle in the consumer project:
+### Recommended bootstrap flow
 
-Installation (recommended):
-
-```bash
-VERSION=<microsmith-version>
-curl -fsSL -o microsmith-install.sh "https://github.com/LMLiam/microsmith/releases/download/v${VERSION}/microsmith-install.sh"
-sh microsmith-install.sh --version "${VERSION}"
-"$HOME/.microsmith/bin/microsmith" --version
-```
-
-One-command bootstrap (recommended):
-
-Open a new shell first so `microsmith` is on `PATH`, or keep using `"$HOME/.microsmith/bin/microsmith"` directly.
+Install Microsmith, then initialize the repository and run generation:
 
 ```bash
 microsmith init
 microsmith run build.microsmith.kts --out ./generated
 ```
 
-CI-safe bootstrap:
+`microsmith init` is deterministic and non-destructive by default:
 
-```bash
-microsmith init --non-interactive --yes --diagnostics json --verbose
+- it creates `settings.microsmith.kts` when missing
+- it creates `build.microsmith.kts` when missing
+- it preserves existing bootstrap files instead of overwriting them
+- it refreshes `.microsmith/ide/*` helper metadata
+- it prints the next generation command to run
+
+Important behavior:
+
+- if you pass `--repo-root <path>`, that directory must already exist
+- after a successful `init`, no additional IDE command is required for the default path
+
+### Direct script execution
+
+Create a script such as `schema.microsmith.kts`:
+
+```kotlin
+microsmith {
+    schemas {
+        protobuf {
+            message("UserCreated") {
+                int32("id") { index(1) }
+                string("email") { index(2) }
+            }
+        }
+    }
+}
 ```
 
-Direct script execution:
+Run generation:
 
 ```bash
 microsmith run schema.microsmith.kts --out ./generated
 ```
 
-Optional script context values:
+Pass script context values when needed:
 
 ```bash
 microsmith run schema.microsmith.kts --out ./generated --var env=prod --flag emit
 ```
 
-Isolation mode:
+Run in a separate JVM for stronger isolation:
 
 ```bash
 microsmith run schema.microsmith.kts --out ./generated --isolation process
 ```
 
-JetBrains IDE helper refresh:
+## Installation and verification
+
+### macOS and Linux
+
+```bash
+VERSION=<microsmith-version>
+curl -fsSL -o microsmith-install.sh "https://github.com/LMLiam/microsmith/releases/download/v${VERSION}/microsmith-install.sh"
+sh microsmith-install.sh --version "${VERSION}"
+```
+
+### Windows (PowerShell)
+
+```powershell
+$Version = "<microsmith-version>"
+Invoke-WebRequest -Uri "https://github.com/LMLiam/microsmith/releases/download/v$Version/microsmith-install.ps1" -OutFile microsmith-install.ps1
+powershell -ExecutionPolicy Bypass -NoProfile -File .\microsmith-install.ps1 -Version $Version
+```
+
+### Verify immediately after installation
+
+Use the installed shim path before opening a new shell:
+
+```bash
+"$HOME/.microsmith/bin/microsmith" --version
+"$HOME/.microsmith/bin/microsmith" init --non-interactive --yes
+```
+
+```powershell
+& (Join-Path $HOME ".microsmith\bin\microsmith.cmd") --version
+& (Join-Path $HOME ".microsmith\bin\microsmith.cmd") init --non-interactive --yes
+```
+
+After opening a new shell, the bare `microsmith` command is available on `PATH`.
+
+### Integrity verification
+
+Release assets include SHA-256 sidecar files for:
+
+- `microsmith-cli-<version>-all.jar`
+- `microsmith-cli-<version>-dist.zip`
+- `microsmith-cli-<version>-dist.tar.gz`
+- `microsmith-install.sh`
+- `microsmith-install.ps1`
+
+Manual verification examples:
+
+```bash
+shasum -a 256 microsmith-install.sh
+cat microsmith-install.sh.sha256
+```
+
+```bash
+shasum -a 256 microsmith-cli-<version>-dist.tar.gz
+cat microsmith-cli-<version>-dist.tar.gz.sha256
+```
+
+```powershell
+Get-FileHash .\microsmith-install.ps1 -Algorithm SHA256
+Get-Content .\microsmith-install.ps1.sha256
+```
+
+```powershell
+Get-FileHash .\microsmith-cli-<version>-dist.zip -Algorithm SHA256
+Get-Content .\microsmith-cli-<version>-dist.zip.sha256
+```
+
+Installer diagnostics explicitly cover:
+
+- missing required tools such as `curl`, `tar`, `unzip`, and `python3` when automatic runtime metadata resolution is used
+- checksum mismatch for CLI or runtime archives
+- unsupported operating systems or architectures
+- runtime provisioning failures
+- missing Java 24+ when runtime provisioning is disabled
+
+### Manual channels
+
+The canonical onboarding path is the installer, but manual channels remain supported:
+
+- fat jar: `java -jar microsmith-cli-<version>-all.jar --help`
+- unpacked Unix distribution: `./microsmith-cli-<version>/bin/microsmith --help`
+- unpacked Windows distribution: `.\microsmith-cli-<version>\bin\microsmith.bat --help`
+
+Manual channels require Java 24 or newer.
+
+## Command reference
+
+Current CLI usage:
+
+```text
+Microsmith CLI
+
+Usage:
+  microsmith init [--repo-root <path>] [--non-interactive] [--yes]
+                 [--diagnostics <text|json>] [--verbose]
+  microsmith run <script.microsmith.kts> --out <output-dir> [--var <name=value>]... [--flag <name>]...
+                 [--plugin <group:artifact:version>]... [--plugin-jar <path>]...
+                 [--offline] [--repository <uri>] [--isolation <classloader|process>]
+                 [--diagnostics <text|json>] [--verbose] [--event-log <path>]
+  microsmith ide refresh [--repo-root <path>] [--diagnostics <text|json>] [--verbose]
+  microsmith ide doctor [--repo-root <path>] [--diagnostics <text|json>] [--verbose]
+  microsmith doctor [--diagnostics <text|json>] [--verbose]
+  microsmith --version
+  microsmith --help
+```
+
+### Canonical happy paths
+
+Local:
+
+```bash
+microsmith init
+microsmith run build.microsmith.kts --out ./generated
+```
+
+CI:
+
+```bash
+microsmith init --non-interactive --yes --diagnostics json --verbose
+microsmith run build.microsmith.kts --out ./generated --diagnostics json --verbose
+```
+
+Maintenance:
+
+```bash
+microsmith doctor --diagnostics json --verbose
+microsmith ide doctor --diagnostics json --verbose
+microsmith ide refresh
+```
+
+### What each command does
+
+`microsmith init`
+
+- bootstraps `settings.microsmith.kts` and `build.microsmith.kts`
+- refreshes `.microsmith/ide`
+- supports `--repo-root`, `--non-interactive`, `--yes`, `--diagnostics`, and `--verbose`
+
+`microsmith run`
+
+- executes a `.microsmith.kts` script and writes generated files under `--out`
+- requires the script file to use the `.microsmith.kts` extension
+- supports `--var`, `--flag`, `--plugin`, `--plugin-jar`, `--offline`, `--repository`, `--isolation`, `--diagnostics`, `--verbose`, and `--event-log`
+
+`microsmith doctor`
+
+- validates the runtime environment
+- checks Java runtime availability, built-in provider discovery, script cache writability, plugin cache writability, and repository policy initialization
+
+`microsmith ide refresh`
+
+- generates or refreshes `.microsmith/ide`
+- is idempotent and only manages files under `.microsmith/ide`
+
+`microsmith ide doctor`
+
+- validates that the IDE helper exists and matches the active runtime classpath
+- checks repository root validity, helper directory presence, required helper files, runtime classpath resolution, and helper classpath synchronization
+
+### Diagnostics contract
+
+When `--diagnostics json` is used, each event is emitted as one JSON line with:
+
+- `timestamp`
+- `level`
+- `message`
+- `code` for error events
+- `details` when `--verbose` is enabled and details are available
+
+### Exit codes
+
+| Category | Code | Exit | Meaning |
+| --- | --- | ---: | --- |
+| Usage | `MS-CLI-0001` | `2` | Invalid command or flags. |
+| Provider validation | `MS-CLI-1001` | `10` | Built-in provider validation failed. |
+| Plugin resolution | `MS-CLI-1101` | `11` | Plugin resolution failed. |
+| Script validation | `MS-CLI-2001` | `20` | Script input validation failed. |
+| Script compilation | `MS-CLI-2002` | `21` | Script compilation failed. |
+| Script evaluation | `MS-CLI-2003` | `22` | Script evaluation failed. |
+| Script host | `MS-CLI-2004` | `23` | Script host failed unexpectedly. |
+| Doctor | `MS-CLI-3001` | `30` | `doctor` detected environment issues. |
+| IDE refresh | `MS-CLI-4001` | `40` | `ide refresh` failed. |
+| IDE doctor | `MS-CLI-4101` | `41` | `ide doctor` detected issues or failed. |
+| Init conflict | `MS-CLI-5001` | `50` | `init` detected conflicting filesystem state. |
+| Init validation | `MS-CLI-5002` | `51` | `init` input or environment validation failed. |
+| Init runtime | `MS-CLI-5003` | `52` | `init` failed unexpectedly at runtime. |
+
+## JetBrains IDE helper
+
+Use the helper project when your repository is not Gradle-based and you want stronger `.microsmith.kts` type resolution in JetBrains IDEs such as IntelliJ IDEA, GoLand, and Rider.
+
+Generate or refresh the helper:
 
 ```bash
 microsmith ide refresh
 ```
 
-JetBrains IDE helper health check:
+Validate helper health:
 
 ```bash
 microsmith ide doctor --diagnostics json --verbose
 ```
 
-### Security boundaries and defaults
-- Script-time dependency directives (for example `@file:DependsOn` and `@file:Repository`) are denied by default.
-- Plugin resolution is endpoint-restricted by a repository allowlist:
-  - Built-in allowlist: `https://repo1.maven.org/maven2`
-  - Additional allowed endpoints via `MICROSMITH_REPOSITORY_ALLOWLIST` (comma-separated base URIs)
-  - `file://` repositories are denied by default and can be explicitly enabled with `MICROSMITH_ALLOW_FILE_REPOSITORIES=true`.
-- Private repository credentials are optional and resolved with deterministic precedence:
-  - Per-endpoint credentials file via `MICROSMITH_REPOSITORY_CREDENTIALS_FILE` with entries:
-    - `<repository-uri>|<username>|<password>`
-  - GitHub Packages credentials for `https://maven.pkg.github.com` via
-    `MICROSMITH_GITHUB_PACKAGES_USER` + `MICROSMITH_GITHUB_PACKAGES_TOKEN`
-    (fallbacks: `GITHUB_ACTOR` + `GITHUB_TOKEN`)
-  - Global default credentials via `MICROSMITH_REPOSITORY_USERNAME` + `MICROSMITH_REPOSITORY_PASSWORD`
-  - Sensitive values are redacted in resolver diagnostics.
-- Plugin artifacts are SHA-256 checked against the script lockfile, including transitive dependency graph artifacts in lockfile v2.
-- Optional plugin checksum allowlist can be enforced with `MICROSMITH_PLUGIN_ALLOWLIST_FILE`:
-  - Entry format: `<kind>|<key>|<sha256>` where `kind` is `remote`, `remote-artifact`, or `local`.
-- `--offline` for remote plugins requires lockfile v2 metadata and a complete cached dependency graph.
-- Official CLI distributions include a pinned bundled plugin profile (`bundled-plugins.lock`) for built-in workflows.
-- Generated output writes are constrained to the configured output root and reject traversal/symlink escapes.
-- Default isolation executes each run in an isolated per-run classloader; `--isolation process` executes in a separate JVM.
+Optional flags:
 
-Inside .microsmith.kts scripts:
-- Default imports include microsmith {}, schemas {}, and protobuf {}.
-- Scripts can either return a MicrosmithModel or call emit(model) / generate(model).
-- `runtime-scripting` – Kotlin scripting host/runtime for `.microsmith.kts` execution.
-- `cli` – command-line entrypoint and argument handling for script-driven generation workflows.
+- `--repo-root <path>`
+- `--diagnostics <text|json>`
+- `--verbose`
 
-### Distribution artifacts
-- Executable fat jar: `cli/build/libs/microsmith-cli-<version>-all.jar`
-- Cross-platform distribution archives:
-  - `cli/build/distributions/microsmith-cli-<version>-dist.zip`
-  - `cli/build/distributions/microsmith-cli-<version>-dist.tar.gz`
-- Distribution metadata:
-  - `cli/build/generated/microsmith/bundled-plugins.lock` (generated bundled plugin catalog, pinned to CLI version)
-  - packaged as `META-INF/microsmith/bundled-plugins.lock` in the fat jar and `bundled-plugins.lock` in dist archives
-- Build them with `./gradlew :cli:releaseArtifacts`
+Generated files:
 
-### Adoption docs
-- `docs/cli/README.md`
-- `docs/cli/install.md`
-- `docs/cli/command-contract.md`
-- `docs/cli/quickstart-non-gradle.md`
-- `docs/cli/jetbrains-ide-helper.md`
-- `docs/cli/migration-from-gradle.md`
-- `docs/cli/troubleshooting.md`
-- `docs/cli/runtime-bundling-evaluation.md`
+- `.microsmith/ide/settings.gradle.kts`
+- `.microsmith/ide/build.gradle.kts`
+- `.microsmith/ide/README.md`
+
+JetBrains workflow:
+
+1. Run `microsmith ide refresh` from the repository root.
+2. Link or import `.microsmith/ide/build.gradle.kts` as a Gradle project in the IDE.
+3. Refresh Gradle indexing.
+4. Rerun `microsmith ide refresh` after upgrading the Microsmith CLI or changing plugin dependencies.
+
+Important constraints:
+
+- runtime generation does not depend on the IDE helper
+- the helper build uses local file dependencies only
+- repeated refreshes only rewrite files when content changes
+
+## Plugin resolution and security model
+
+### Plugin inputs
+
+Use remote plugin coordinates:
+
+```bash
+microsmith run schema.microsmith.kts --out ./generated --plugin com.acme:microsmith-emitter-ts:1.4.2
+```
+
+Use local plugin jars:
+
+```bash
+microsmith run schema.microsmith.kts --out ./generated --plugin-jar ./plugins/emitter.jar
+```
+
+Run offline after cache warmup and lock generation:
+
+```bash
+microsmith run schema.microsmith.kts --out ./generated --offline
+```
+
+### Security defaults
+
+Microsmith enforces the following defaults:
+
+- script-time dependency directives such as `@file:DependsOn` and `@file:Repository` are blocked by default
+- repository access is constrained by an allowlist policy
+- the built-in allowed remote repository is Maven Central: `https://repo1.maven.org/maven2`
+- additional allowed repositories can be configured with `MICROSMITH_REPOSITORY_ALLOWLIST`
+- `file://` repositories are blocked by default and can be explicitly enabled with `MICROSMITH_ALLOW_FILE_REPOSITORIES=true`
+- generated output writes are constrained to the configured `--out` root and reject traversal or symlink escapes
+- the default execution mode is isolated per run; `--isolation process` moves execution into a separate JVM
+- official CLI distributions include a pinned bundled plugin profile in `bundled-plugins.lock`
+
+### Credentials and repository authentication
+
+Credential precedence is deterministic:
+
+1. `MICROSMITH_REPOSITORY_CREDENTIALS_FILE` with entries in the form `<repository-uri>|<username>|<password>`
+2. GitHub Packages credentials for `https://maven.pkg.github.com` via `MICROSMITH_GITHUB_PACKAGES_USER` and `MICROSMITH_GITHUB_PACKAGES_TOKEN`, with fallback to `GITHUB_ACTOR` and `GITHUB_TOKEN`
+3. global repository credentials via `MICROSMITH_REPOSITORY_USERNAME` and `MICROSMITH_REPOSITORY_PASSWORD`
+
+Example using GitHub Packages:
+
+```bash
+export MICROSMITH_REPOSITORY_ALLOWLIST="https://maven.pkg.github.com/acme/microsmith"
+export MICROSMITH_REPOSITORY_USERNAME="octocat"
+export MICROSMITH_REPOSITORY_PASSWORD="$GITHUB_TOKEN"
+microsmith run schema.microsmith.kts --out ./generated \
+  --repository https://maven.pkg.github.com/acme/microsmith \
+  --plugin com.acme:private-emitter:1.2.3
+```
+
+Example credentials file:
+
+```text
+# ~/.microsmith/repository-credentials.txt
+https://maven.pkg.github.com/acme/microsmith|octocat|ghp_xxx
+https://packages.acme.internal/maven|svc-microsmith|token-123
+```
+
+Use that file:
+
+```bash
+export MICROSMITH_REPOSITORY_CREDENTIALS_FILE="$HOME/.microsmith/repository-credentials.txt"
+microsmith run schema.microsmith.kts --out ./generated --plugin com.acme:private-emitter:1.2.3
+```
+
+### Environment variables
+
+| Variable | Purpose |
+| --- | --- |
+| `MICROSMITH_REPOSITORY_ALLOWLIST` | Comma-separated additional allowed repository base URIs. |
+| `MICROSMITH_ALLOW_FILE_REPOSITORIES` | Set to `true` to allow `file://` repositories for plugin coordinates. |
+| `MICROSMITH_REPOSITORY_CREDENTIALS_FILE` | Path to a repository credentials file. |
+| `MICROSMITH_REPOSITORY_USERNAME` | Default username for authenticated repository access. |
+| `MICROSMITH_REPOSITORY_PASSWORD` | Default password or token for authenticated repository access. |
+| `MICROSMITH_GITHUB_PACKAGES_USER` | Username for GitHub Packages repository access. |
+| `MICROSMITH_GITHUB_PACKAGES_TOKEN` | Token for GitHub Packages repository access. |
+| `MICROSMITH_PLUGIN_ALLOWLIST_FILE` | Path to checksum allowlist file entries in the form `<kind>|<key>|<sha256>`. |
+| `MICROSMITH_SCRIPT_CACHE_DIR` | Override the script compilation cache directory. |
+| `MICROSMITH_PLUGIN_CACHE_DIR` | Override the plugin resolution cache directory. |
+
+## CI examples
+
+Set repository or environment variables:
+
+- `MICROSMITH_VERSION`
+- `MICROSMITH_INSTALLER_SH_URL`, for example `https://github.com/LMLiam/microsmith/releases/download/v<version>/microsmith-install.sh`
+- `MICROSMITH_INSTALLER_PS1_URL`, for example `https://github.com/LMLiam/microsmith/releases/download/v<version>/microsmith-install.ps1`
+
+### Node repository
+
+```yaml
+name: Microsmith Generate
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Microsmith CLI
+        run: |
+          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
+          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
+          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
+      - name: Run Microsmith
+        run: microsmith run schema.microsmith.kts --out generated/proto
+```
+
+### Go repository
+
+```yaml
+name: Microsmith Generate
+on:
+  pull_request:
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Microsmith CLI
+        run: |
+          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
+          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
+          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
+      - name: Generate protobuf
+        run: microsmith run schema.microsmith.kts --out internal/gen/proto
+```
+
+### .NET repository
+
+```yaml
+name: Microsmith Generate
+on:
+  pull_request:
+jobs:
+  generate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Microsmith CLI
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri $env:MICROSMITH_INSTALLER_PS1_URL -OutFile microsmith-install.ps1
+          .\microsmith-install.ps1 -Version $env:MICROSMITH_VERSION
+          Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $HOME ".microsmith\bin")
+      - name: Run Microsmith
+        shell: pwsh
+        run: microsmith run schema.microsmith.kts --out .\Generated\Proto
+```
+
+## Example fixtures
+
+The repository includes non-Gradle fixture repositories under `examples/non-gradle/`.
+Each fixture contains a `schema.microsmith.kts` and a GitHub Actions example.
+
+| Fixture | Directory | Local command from fixture root | CI workflow |
+| --- | --- | --- | --- |
+| Node | `examples/non-gradle/node` | `microsmith run schema.microsmith.kts --out ./generated/proto` | `examples/non-gradle/node/.github/workflows/microsmith.yml` |
+| Go | `examples/non-gradle/go` | `microsmith run schema.microsmith.kts --out ./internal/gen/proto` | `examples/non-gradle/go/.github/workflows/microsmith.yml` |
+| .NET | `examples/non-gradle/dotnet` | `microsmith run schema.microsmith.kts --out .\Generated\Proto` | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
+
+## Troubleshooting
+
+### Java runtime issues
+
+Symptoms:
+
+- `java` not found
+- unsupported class version or runtime mismatch
+
+What to do:
+
+- use the canonical installer path so Java 24 is provisioned automatically when needed
+- if you are using a manual channel, install Java 24+ and set `JAVA_HOME`
+- rerun `microsmith --version` and `microsmith --help`
+
+### Installer failures
+
+Symptoms:
+
+- installer exits non-zero
+- checksum mismatch during installation
+- runtime provisioning fails
+
+What to do:
+
+- verify the relevant `*.sha256` file and rerun the installer
+- use explicit archive and checksum flags when diagnosing a specific asset
+- inspect installer output for missing prerequisites such as `curl`, `tar`, `unzip`, or `python3`
+- do not combine `--force-runtime-provision` and `--skip-runtime-provision`
+
+### Script and init failures
+
+Symptoms:
+
+- `microsmith run` exits with compile or evaluation errors
+- `microsmith init` exits non-zero
+- expected bootstrap files are missing
+
+What to do:
+
+- confirm the script file ends with `.microsmith.kts`
+- rerun with `--diagnostics json --verbose`
+- ensure `--repo-root` points to an existing directory
+- resolve filesystem conflicts such as a directory already existing at `build.microsmith.kts`
+
+### Resolver, credentials, and offline failures
+
+Symptoms:
+
+- plugin coordinate cannot be resolved
+- repository URI is rejected
+- authentication fails
+- checksum or lockfile validation fails
+- `--offline` cannot resolve plugins
+
+What to do:
+
+- validate coordinate syntax: `group:artifact:version`
+- confirm the repository is in the allowlist
+- configure credentials using the precedence described above
+- run once without `--offline` to warm the cache and write lock metadata
+- ensure the complete locked dependency graph exists in the plugin cache
+- if strict checksum allowlisting is enabled, include transitive entries such as `remote-artifact|<cache-relative-path>|<sha256>`
+
+### Built-in provider or IDE helper failures
+
+Symptoms:
+
+- built-in generators or emitters are reported missing
+- `.microsmith.kts` files still show unresolved Microsmith symbols in JetBrains IDEs
+- helper project appears stale after a CLI upgrade
+
+What to do:
+
+- use the official CLI distribution or installer
+- run `microsmith doctor --diagnostics json --verbose`
+- run `microsmith ide doctor --diagnostics json --verbose`
+- rerun `microsmith ide refresh`
+- in JetBrains IDEs, re-import or refresh `.microsmith/ide/build.gradle.kts`
+- if you are validating release assets in this repository, run `./gradlew :cli:verifyShadowJarServices` and `./gradlew :cli:verifyDistLayout`
+
+## Migration from Gradle
+
+Use the CLI when you want generation in repositories that do not carry a Gradle wrapper.
+The DSL surface and plugin architecture stay the same; the execution model changes.
+
+### Command mapping
+
+| Previous pattern | CLI replacement |
+| --- | --- |
+| Gradle task invoking generation | `microsmith run schema.microsmith.kts --out ./generated` |
+| Gradle-managed plugin dependency | `--plugin group:artifact:version` |
+| local classpath jar wiring | `--plugin-jar ./path/to/plugin.jar` |
+| Gradle offline mode | `--offline` |
+
+### Recommended migration sequence
+
+1. Move the DSL into `*.microsmith.kts` files.
+2. Replace Gradle-based generation commands in CI with `microsmith run`.
+3. Pin plugin coordinates and validate lock or checksum behavior for reproducibility.
+4. Enable the relevant security controls for your environment.
+5. Remove obsolete Gradle generation tasks after parity is proven.
+
+## Distribution and release artifacts
+
+### Release asset contents
+
+`./gradlew :cli:releaseArtifacts` produces:
+
+- `cli/build/libs/microsmith-cli-<version>-all.jar`
+- `cli/build/distributions/microsmith-cli-<version>-dist.zip`
+- `cli/build/distributions/microsmith-cli-<version>-dist.tar.gz`
+- `cli/build/release-assets/microsmith-install.sh`
+- `cli/build/release-assets/microsmith-install.ps1`
+- `cli/build/release-assets/*.sha256`
+- `cli/build/generated/microsmith/bundled-plugins.lock`
+
+The bundled plugin catalog is packaged into the official artifacts and pinned to the CLI version.
+Published packages are available from:
+
+```text
+https://maven.pkg.github.com/lmliam/microsmith
+```
+
+### Useful build tasks
+
+- `:cli:generateBundledPluginCatalog`
+- `:cli:shadowJar`
+- `:cli:prepareDist`
+- `:cli:cliDistZip`
+- `:cli:cliDistTar`
+- `:cli:verifyDistLayout`
+- `:cli:distArtifacts` for internal staging into `cli/build/release-assets/`
+- `:cli:generateReleaseChecksums`
+- `:cli:releaseArtifacts`
+
+### Current packaging model
+
+Microsmith currently ships with:
+
+- installer scripts that provision Java 24 automatically when needed
+- manual fat jar and unpacked distribution channels for teams that want explicit runtime management
+- checksum sidecars for release verification
+- no requirement for Gradle or Maven in consuming repositories

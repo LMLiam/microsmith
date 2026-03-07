@@ -8,16 +8,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 24
-      - name: Download Microsmith
+      - name: Install Microsmith
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Path tools -Force | Out-Null
-          Invoke-WebRequest -Uri $env:MICROSMITH_DIST_URL -OutFile tools\microsmith.zip
-          Expand-Archive -Path tools\microsmith.zip -DestinationPath tools -Force
+          Invoke-WebRequest -Uri $env:MICROSMITH_INSTALLER_PS1_URL -OutFile microsmith-install.ps1
+          .\microsmith-install.ps1 -Version $env:MICROSMITH_VERSION
+          Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $HOME ".microsmith\bin")
       - name: Generate protobuf
         shell: pwsh
-        run: .\tools\microsmith-cli-*\bin\microsmith.bat run schema.microsmith.kts --out .\Generated\Proto
+        run: microsmith run schema.microsmith.kts --out .\Generated\Proto

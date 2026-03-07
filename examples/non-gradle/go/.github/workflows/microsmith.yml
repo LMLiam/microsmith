@@ -8,11 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 24
-      - name: Download Microsmith CLI jar
-        run: curl -sSL -o microsmith-cli.jar "$MICROSMITH_CLI_JAR_URL"
+      - name: Install Microsmith
+        run: |
+          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
+          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
+          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
       - name: Generate protobuf
-        run: java -jar microsmith-cli.jar run schema.microsmith.kts --out internal/gen/proto
+        run: microsmith run schema.microsmith.kts --out internal/gen/proto
