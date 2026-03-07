@@ -2,6 +2,7 @@ package me.liam.microsmith.cli.plugins
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import io.kotest.matchers.types.shouldBeTypeOf
 import me.liam.microsmith.cli.command.RunCommand
 import kotlin.io.path.ExperimentalPathApi
@@ -13,6 +14,43 @@ import kotlin.io.path.writeText
 @OptIn(ExperimentalPathApi::class)
 class PluginResolverLockingTests :
     StringSpec({
+        "fails with lockfile diagnostics when lockfile bytes are undecodable" {
+            val tempDir = createWorkingDirectoryTempDirectory("microsmith-plugin-resolver-undecodable-lockfile")
+            try {
+                val script = tempDir.resolve("schema.microsmith.kts")
+                val cache = tempDir.resolve("cache")
+                val output = tempDir.resolve("generated")
+                val localJar = tempDir.resolve("plugins/local-plugin.jar")
+                val lockfilePath = tempDir.resolve("plugins.microsmith.lock")
+                script.writeText("// test script")
+                localJar.parent?.toFile()?.mkdirs()
+                localJar.writeBytes("local-plugin".toByteArray())
+                lockfilePath.writeBytes(byteArrayOf(0xC3.toByte(), 0x28))
+
+                val result =
+                    resolvePlugins(
+                        command =
+                        RunCommand(
+                            script = script,
+                            outputDir = output,
+                            pluginJars = setOf(relativizeFromWorkingDirectory(localJar)),
+                        ),
+                        settings =
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            lockfilePathOverride = lockfilePath,
+                        ),
+                    )
+
+                val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
+                val message = failure.diagnostics.joinToString("\n")
+                message.shouldContain("[lockfile]")
+                message.shouldNotContain("[unexpected]")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
         "fails when lockfile version is unsupported" {
             val tempDir = createTempDirectory("microsmith-plugin-resolver-offline-v1-lock")
             try {
