@@ -544,6 +544,35 @@ Important constraints:
 - the helper build uses local file dependencies only
 - repeated refreshes only rewrite files when content changes
 
+### Script-definition fallback
+
+Use the fallback only when you explicitly do not want the generated `.microsmith/ide` helper project.
+
+Choose between the two paths like this:
+
+- prefer the helper when you want the strongest JetBrains IDE experience and automatic synchronization with the local Microsmith runtime classpath
+- use the fallback when you want a smaller repository footprint and are willing to attach a library manually
+
+Fallback artifact sources:
+
+- GitHub Release asset: `microsmith-script-definition-<version>-all.jar`
+- local build: `./gradlew :runtime-scripting:ideFallbackArtifacts`
+- published package: `me.liam.microsmith:runtime-scripting:<version>:all`
+
+Manual JetBrains setup:
+
+1. Download the fallback jar that matches your Microsmith version, or build it locally.
+2. In IntelliJ IDEA, GoLand, or Rider, add the jar as a project library from the IDE project settings.
+3. Reopen or reindex `.microsmith.kts` files.
+4. Replace the jar after upgrading Microsmith.
+
+Limitations versus the helper path:
+
+- fallback setup is manual and more IDE-version-sensitive
+- the fallback jar does not keep project-local plugin classpaths synchronized automatically
+- plugin-provided types from `--plugin` or `--plugin-jar` are not exposed automatically through this fallback
+- if symbols remain unresolved after attaching the jar, prefer the helper workflow instead
+
 ## Plugin resolution and security model
 
 ### Plugin inputs
@@ -828,7 +857,7 @@ The DSL surface and plugin architecture stay the same; the execution model chang
 
 ### Release asset contents
 
-`./gradlew :cli:releaseArtifacts` produces:
+`./gradlew :cli:releaseArtifacts :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums` produces:
 
 - `cli/build/libs/microsmith-cli-<version>-all.jar`
 - `cli/build/distributions/microsmith-cli-<version>-dist.zip`
@@ -837,6 +866,8 @@ The DSL surface and plugin architecture stay the same; the execution model chang
 - `cli/build/release-assets/microsmith-install.ps1`
 - `cli/build/release-assets/*.sha256`
 - `cli/build/generated/microsmith/bundled-plugins.lock`
+- `runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar`
+- `runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar.sha256`
 
 The bundled plugin catalog is packaged into the official artifacts and pinned to the CLI version.
 Published packages are available from:
@@ -856,6 +887,9 @@ https://maven.pkg.github.com/lmliam/microsmith
 - `:cli:distArtifacts` for internal staging into `cli/build/release-assets/`
 - `:cli:generateReleaseChecksums`
 - `:cli:releaseArtifacts`
+- `:runtime-scripting:verifyIdeFallbackShadowJar`
+- `:runtime-scripting:ideFallbackArtifacts`
+- `:runtime-scripting:generateIdeFallbackChecksums`
 
 ### Current packaging model
 
