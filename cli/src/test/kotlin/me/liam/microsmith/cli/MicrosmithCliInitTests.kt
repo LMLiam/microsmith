@@ -5,11 +5,14 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
+import me.liam.microsmith.cli.init.GenericOnboardingProfile
+import me.liam.microsmith.cli.init.GoOnboardingProfile
 import me.liam.microsmith.cli.init.InitBootstrapResult
 import me.liam.microsmith.cli.init.InitConflictException
 import me.liam.microsmith.cli.init.InitValidationException
-import me.liam.microsmith.cli.init.OnboardingRepositoryDetection
-import me.liam.microsmith.cli.init.OnboardingRepositoryType
+import me.liam.microsmith.cli.init.NodeOnboardingProfile
+import me.liam.microsmith.cli.init.OnboardingProfileDetection
+import me.liam.microsmith.cli.init.OnboardingProfileSelectionReason
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
@@ -31,8 +34,9 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingRepositoryDetection(
-                                    type = OnboardingRepositoryType.GO,
+                                OnboardingProfileDetection(
+                                    profile = GoOnboardingProfile,
+                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                                     matchedMarkers = listOf("go.mod"),
                                 ),
                                 createdFiles =
@@ -57,7 +61,7 @@ class MicrosmithCliInitTests :
 
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("Microsmith init completed")
-                out.joinToString("\n").shouldContain("Detected repository type: Go")
+                out.joinToString("\n").shouldContain("Detected repository profile: Go")
                 out.joinToString("\n").shouldContain("build.microsmith.kts")
                 out.joinToString("\n").shouldContain("JetBrains IDE helper is updated")
                 out.joinToString("\n").shouldContain("microsmith run build.microsmith.kts --out ./generated")
@@ -162,8 +166,9 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingRepositoryDetection(
-                                    type = OnboardingRepositoryType.NODE,
+                                OnboardingProfileDetection(
+                                    profile = NodeOnboardingProfile,
+                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                                     matchedMarkers = listOf("package.json"),
                                 ),
                                 createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
@@ -195,8 +200,10 @@ class MicrosmithCliInitTests :
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("\"level\":\"info\"")
                 out.joinToString("\n").shouldContain("Microsmith init completed")
-                out.joinToString("\n").shouldContain("Detected repository type: Node")
+                out.joinToString("\n").shouldContain("Detected repository profile: Node")
                 out.joinToString("\n").shouldContain("\"details\"")
+                out.joinToString("\n").shouldContain("\"repositoryProfile\":\"node\"")
+                out.joinToString("\n").shouldContain("\"repositoryProfileDisplayName\":\"Node\"")
                 err shouldBe emptyList()
             } finally {
                 runCatching { tempDir.deleteRecursively() }
@@ -217,8 +224,9 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingRepositoryDetection(
-                                    type = OnboardingRepositoryType.OTHER,
+                                OnboardingProfileDetection(
+                                    profile = GenericOnboardingProfile,
+                                    selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
                                     matchedMarkers = emptyList(),
                                 ),
                                 createdFiles = emptyList(),

@@ -9,7 +9,7 @@ internal object InitSummaryEmitter {
         emitBootstrapSummary(emitter, command, result)
         emitIdeHelperSummary(emitter, result)
         emitter.info("Next: microsmith run build.microsmith.kts --out ./generated")
-        result.repositoryDetection.type.repoNativeOutputDirectory?.let { outputDirectory ->
+        result.repositoryDetection.profile.recommendedOutputDirectory?.let { outputDirectory ->
             emitter.info(
                 "Optional repository-native output path: microsmith run build.microsmith.kts --out $outputDirectory",
             )

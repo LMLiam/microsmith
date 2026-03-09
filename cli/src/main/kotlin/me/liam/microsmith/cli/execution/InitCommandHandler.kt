@@ -33,7 +33,8 @@ internal class InitCommandHandler(
             details =
             mapOf(
                 "projectRoot" to projectRoot.toString(),
-                "repositoryType" to result.repositoryDetection.type.displayName,
+                "repositoryProfile" to result.repositoryDetection.profile.id.toString(),
+                "repositoryProfileDisplayName" to result.repositoryDetection.profile.displayName,
                 "matchedMarkers" to result.repositoryDetection.matchedMarkers.joinToString(separator = ","),
                 "createdFiles" to result.createdFiles.size.toString(),
                 "overwrittenFiles" to result.overwrittenFiles.size.toString(),
@@ -43,7 +44,7 @@ internal class InitCommandHandler(
                 "force" to command.force.toString(),
             ),
         )
-        emitter.info("Detected repository type: ${result.repositoryDetection.describeForSummary()}.")
+        emitter.info("Detected repository profile: ${result.repositoryDetection.describeForSummary()}.")
         InitSummaryEmitter.emit(emitter = emitter, command = command, result = result)
         return 0
     }

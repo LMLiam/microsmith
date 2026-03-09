@@ -5,7 +5,7 @@ import java.nio.file.Path
 
 internal data class InitBootstrapResult(
     val projectRoot: Path,
-    val repositoryDetection: OnboardingRepositoryDetection,
+    val repositoryDetection: OnboardingProfileDetection,
     val createdFiles: List<Path>,
     val overwrittenFiles: List<Path>,
     val preservedFiles: List<Path>,
