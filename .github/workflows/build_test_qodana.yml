@@ -172,7 +172,8 @@ jobs:
             exit 1
           }
       - name: Install and verify from installer (Unix)
-        if: runner.os != 'Windows'
+        id: install-unix
+        if: ${{ always() && runner.os != 'Windows' }}
         run: |
           set -eu
           DIST_FILE="$(find cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
@@ -194,7 +195,7 @@ jobs:
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts --out install-smoke-repo/generated
           test -f install-smoke-repo/generated/proto/UserCreated.proto
       - name: Smoke test Node and Go onboarding fixtures (Linux)
-        if: matrix.os == 'ubuntu-latest'
+        if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
         run: |
           set -eu
           ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/node
@@ -212,7 +213,8 @@ jobs:
           ./.microsmith-bin/microsmith run examples/non-gradle/go/build.microsmith.kts --out examples/non-gradle/go/internal/gen
           test -f examples/non-gradle/go/internal/gen/proto/GoUserCreated.proto
       - name: Install and verify from installer (Windows)
-        if: runner.os == 'Windows'
+        id: install-windows
+        if: ${{ always() && runner.os == 'Windows' }}
         shell: pwsh
         run: |
           $distAsset = Get-ChildItem -Path .\cli\build\release-assets\microsmith-cli-*-dist.zip | Select-Object -First 1
@@ -264,7 +266,7 @@ jobs:
             exit 1
           }
       - name: Smoke test .NET onboarding fixture (Windows)
-        if: matrix.os == 'windows-latest'
+        if: ${{ always() && matrix.os == 'windows-latest' && steps.install-windows.outcome == 'success' }}
         shell: pwsh
         run: |
           & .\.microsmith-bin\microsmith.cmd init --repo-root examples/non-gradle/dotnet
