@@ -143,30 +143,45 @@ internal class RepositoryQualityValidator(private val policy: RepositoryQualityP
 
     private fun String.isTopLevelProductionDeclaration(): Boolean {
         val line = trimEnd()
-        if (line.isBlank() || line.first().isWhitespace() || line.startsWith("private ")) {
+        if (line.isBlank() || line.first().isWhitespace()) {
             return false
         }
 
-        return topLevelTypeDeclarationPattern.containsMatchIn(line) ||
-            topLevelFunInterfacePattern.containsMatchIn(line) ||
-            topLevelTypeAliasPattern.containsMatchIn(line)
+        val declarationLine = line.removeLeadingInlineAnnotations()
+        if (declarationLine.startsWith("private ")) {
+            return false
+        }
+
+        return topLevelTypeDeclarationPattern.containsMatchIn(declarationLine) ||
+            topLevelFunInterfacePattern.containsMatchIn(declarationLine) ||
+            topLevelTypeAliasPattern.containsMatchIn(declarationLine)
     }
 
     private fun String.topLevelProductionDeclarationNameOrNull(): String? {
         val line = trimEnd()
-        if (line.isBlank() || line.first().isWhitespace() || line.startsWith("private ")) {
+        if (line.isBlank() || line.first().isWhitespace()) {
             return null
         }
 
-        return topLevelTypeDeclarationNamePattern.find(line)?.groupValues?.get(1)
-            ?: topLevelFunInterfaceNamePattern.find(line)?.groupValues?.get(1)
-            ?: topLevelTypeAliasNamePattern.find(line)?.groupValues?.get(1)
+        val declarationLine = line.removeLeadingInlineAnnotations()
+        if (declarationLine.startsWith("private ")) {
+            return null
+        }
+
+        return topLevelTypeDeclarationNamePattern.find(declarationLine)?.groupValues?.get(1)
+            ?: topLevelFunInterfaceNamePattern.find(declarationLine)?.groupValues?.get(1)
+            ?: topLevelTypeAliasNamePattern.find(declarationLine)?.groupValues?.get(1)
     }
+
+    private fun String.removeLeadingInlineAnnotations(): String = replaceFirst(leadingInlineAnnotationsPattern, "")
 
     private companion object {
         private const val sourceRootRelativePrefix = "src/main/kotlin/"
         private const val sourceRootRelativeMarker = "/src/main/kotlin/"
         private val packageDeclarationPattern = Regex("^package\\s+([A-Za-z0-9_.]+)$")
+        private const val inlineAnnotationPattern =
+            "@(?:[A-Za-z_][A-Za-z0-9_]*:)?[A-Za-z_][A-Za-z0-9_.]*(?:\\([^)]*\\))?\\s+"
+        private val leadingInlineAnnotationsPattern = Regex("^(?:$inlineAnnotationPattern)*")
         private const val declarationModifierPattern =
             "(?:(?:public|internal|open|abstract|final|sealed|data|value|enum|annotation|expect|actual)\\s+)*"
         private val topLevelTypeDeclarationPattern = Regex(

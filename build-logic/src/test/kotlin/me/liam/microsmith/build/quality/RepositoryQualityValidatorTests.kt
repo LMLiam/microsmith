@@ -54,13 +54,35 @@ class RepositoryQualityValidatorTests : StringSpec() {
             )
         }
 
+        "validate counts inline annotated top level declarations" {
+            val source = productionSource(
+                path = "module/src/main/kotlin/example/AnnotatedDeclarations.kt",
+                contents = """
+                package example
+
+                @Serializable data class Alpha(val value: String)
+                class Bravo
+                """.trimIndent(),
+            )
+
+            val violations = defaultValidator.validate(source.repositoryRoot, listOf(source.file))
+
+            violations shouldContainExactly listOf(
+                RepositoryQualityViolation(
+                    rule = "multiple-production-types",
+                    path = "module/src/main/kotlin/example/AnnotatedDeclarations.kt",
+                    message = multipleProductionTypesMessage(2),
+                ),
+            )
+        }
+
         "validate ignores private and nested declarations" {
             val source = productionSource(
                 path = "module/src/main/kotlin/example/Visible.kt",
                 contents = """
                 package example
 
-                private class Hidden
+                @Deprecated("test") private class Hidden
 
                 class Visible {
                     class Nested
@@ -220,6 +242,30 @@ class RepositoryQualityValidatorTests : StringSpec() {
                     path = "module/src/main/kotlin/example/TypeAliasFile.kt",
                     message = primaryTypeFileNameMessage(
                         fileNameWithoutExtension = "TypeAliasFile",
+                        declarationName = "ActualName",
+                    ),
+                ),
+            )
+        }
+
+        "validate reports file name mismatches for inline annotated declarations" {
+            val source = productionSource(
+                path = "module/src/main/kotlin/example/AnnotatedTypeFile.kt",
+                contents = """
+                package example
+
+                @JvmInline value class ActualName(val value: String)
+                """.trimIndent(),
+            )
+
+            val violations = defaultValidator.validate(source.repositoryRoot, listOf(source.file))
+
+            violations shouldContainExactly listOf(
+                RepositoryQualityViolation(
+                    rule = "primary-type-file-name",
+                    path = "module/src/main/kotlin/example/AnnotatedTypeFile.kt",
+                    message = primaryTypeFileNameMessage(
+                        fileNameWithoutExtension = "AnnotatedTypeFile",
                         declarationName = "ActualName",
                     ),
                 ),
