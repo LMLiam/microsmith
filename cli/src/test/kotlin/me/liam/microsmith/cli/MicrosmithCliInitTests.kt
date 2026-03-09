@@ -202,6 +202,8 @@ class MicrosmithCliInitTests :
                 out.joinToString("\n").shouldContain("Microsmith init completed")
                 out.joinToString("\n").shouldContain("Detected repository profile: Node")
                 out.joinToString("\n").shouldContain("\"details\"")
+                out.joinToString("\n").shouldContain("\"repositoryProfile\":\"node\"")
+                out.joinToString("\n").shouldContain("\"repositoryProfileDisplayName\":\"Node\"")
                 err shouldBe emptyList()
             } finally {
                 runCatching { tempDir.deleteRecursively() }

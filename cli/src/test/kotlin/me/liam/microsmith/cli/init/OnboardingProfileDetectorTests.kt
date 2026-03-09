@@ -138,6 +138,33 @@ class OnboardingProfileDetectorTests :
 
             error.message.shouldContain("python")
         }
+
+        "rejects fallback profile definitions that reuse a matcher stable id" {
+            val primaryProfile =
+                object : OnboardingProfile {
+                    override val id: OnboardingProfileId = OnboardingProfileId("python")
+                    override val displayName: String = "Python"
+                    override val sampleMessageName: String = "PythonUserCreated"
+                    override val recommendedOutputDirectory: String? = "./generated"
+                }
+            val conflictingFallback =
+                object : OnboardingProfile {
+                    override val id: OnboardingProfileId = OnboardingProfileId("python")
+                    override val displayName: String = "Python Fallback"
+                    override val sampleMessageName: String = "PythonFallbackUserCreated"
+                    override val recommendedOutputDirectory: String? = "./generated"
+                }
+
+            val error =
+                io.kotest.assertions.throwables.shouldThrow<IllegalArgumentException> {
+                    OnboardingProfileDetector(
+                        matchers = listOf(OnboardingProfileMatcher(primaryProfile) { listOf("pyproject.toml") }),
+                        fallbackProfile = conflictingFallback,
+                    )
+                }
+
+            error.message.shouldContain("python")
+        }
     })
 
 private val UNUSED_PROJECT_ROOT: Path = Path.of(".")

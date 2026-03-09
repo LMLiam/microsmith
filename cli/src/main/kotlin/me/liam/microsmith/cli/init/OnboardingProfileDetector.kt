@@ -7,8 +7,8 @@ internal class OnboardingProfileDetector(
     private val fallbackProfile: OnboardingProfile = GenericOnboardingProfile,
 ) {
     init {
-        require(conflictingProfileIds(matchers).isEmpty()) {
-            val conflictingIds = conflictingProfileIds(matchers).joinToString(separator = ", ")
+        require(conflictingProfileIds(matchers, fallbackProfile).isEmpty()) {
+            val conflictingIds = conflictingProfileIds(matchers, fallbackProfile).joinToString(separator = ", ")
             "Onboarding profile ids must map to exactly one profile definition: $conflictingIds"
         }
     }
@@ -52,12 +52,15 @@ internal fun detectOnboardingProfile(
     detector: OnboardingProfileDetector = OnboardingProfileDetector(),
 ): OnboardingProfileDetection = detector.detect(projectRoot)
 
-private fun conflictingProfileIds(matchers: List<OnboardingProfileMatcher>): List<OnboardingProfileId> {
+private fun conflictingProfileIds(
+    matchers: List<OnboardingProfileMatcher>,
+    fallbackProfile: OnboardingProfile,
+): List<OnboardingProfileId> {
     return matchers
-        .groupBy { it.profile.id }
-        .filterValues { groupedMatchers ->
-            groupedMatchers.map(OnboardingProfileMatcher::profile).distinct().size > 1
-        }
+        .map(OnboardingProfileMatcher::profile)
+        .plus(fallbackProfile)
+        .groupBy(OnboardingProfile::id)
+        .filterValues { groupedProfiles -> groupedProfiles.distinct().size > 1 }
         .keys
         .sortedBy(OnboardingProfileId::value)
 }
