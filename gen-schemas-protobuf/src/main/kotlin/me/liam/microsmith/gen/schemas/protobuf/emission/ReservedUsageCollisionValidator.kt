@@ -97,8 +97,3 @@ internal object ReservedUsageCollisionValidator {
         is ReservedName -> error("Reserved names do not produce numeric spans.")
     }
 }
-
-private data class ReservedSpan(
-    val description: String,
-    val range: IntRange,
-)

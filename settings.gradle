@@ -1,6 +1,7 @@
 import org.gradle.caching.http.HttpBuildCache
 
 pluginManagement {
+    includeBuild('build-logic')
     repositories {
         gradlePluginPortal()
         mavenCentral()

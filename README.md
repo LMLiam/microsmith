@@ -104,12 +104,21 @@ Microsmith provides:
 - Slice PRs by module or responsibility boundary, not by repository-wide search-and-replace.
 - Move and rename types first, then simplify logic, then tighten tests. Do not blend unrelated cleanup into one diff.
 - Add or update regression coverage next to the boundary being extracted.
+- Automated structural guardrails are intentionally narrow and high-signal:
+  - default to one non-private top-level production declaration per file
+  - keep production Kotlin files at or below the configured line thresholds
+  - require explicit package declarations for production Kotlin sources
+  - keep package declarations aligned with `src/main/kotlin` directory paths
+  - keep single top-level production declaration files named after the owning declaration
+  - do not introduce `util`, `utils`, or `misc` package segments in production code
+- If a structural exception is genuinely clearer than splitting the code, encode the exception in `build-logic/src/main/kotlin/me/liam/microsmith/build/quality/RepositoryQualityPolicy.kt` with a narrow path-specific rationale and call it out in the PR description.
+- Broader architecture and layering decisions remain review-gated. If a rule cannot be automated without becoming brittle, explain the boundary explicitly in review.
 - Reviewers should check:
   - file ownership and package placement are obvious
   - one-top-level-production-type-per-file remains the default
   - orchestration and side effects are separated from pure logic
   - Kotlin features improve clarity rather than novelty
-  - `detekt`, `ktlintCheck`, and relevant tests remain green
+  - `verifyRepositoryStandards`, `detekt`, `ktlintCheck`, and relevant tests remain green
 
 ## Build, test, and quality gates
 
@@ -131,6 +140,12 @@ Run static analysis:
 ./gradlew detekt ktlintCheck
 ```
 
+Run repository structural guardrails directly:
+
+```bash
+./gradlew verifyRepositoryStandards
+```
+
 Auto-format Kotlin sources:
 
 ```bash
@@ -140,8 +155,15 @@ Auto-format Kotlin sources:
 Useful notes:
 
 - the Gradle build is configured for Java 24
+- `./gradlew build` now includes the root `check` lifecycle and therefore runs `verifyRepositoryStandards`
 - if `ktlintCheck` fails, run `./gradlew ktlintFormat` and rerun checks
 - if `detekt` fails, inspect the generated report under `build/reports/detekt/`
+- if `verifyRepositoryStandards` fails:
+  - split extra production types into their own files or make tightly coupled helpers private
+  - split large production files by responsibility before raising any threshold
+  - add or correct explicit package declarations and keep them aligned with `src/main/kotlin` paths
+  - rename single-type files so the file name matches the owning declaration
+  - only add a path-specific exception in `build-logic/src/main/kotlin/me/liam/microsmith/build/quality/RepositoryQualityPolicy.kt` when the split would genuinely reduce clarity, and explain that exception in the PR
 
 ## DSL usage
 
