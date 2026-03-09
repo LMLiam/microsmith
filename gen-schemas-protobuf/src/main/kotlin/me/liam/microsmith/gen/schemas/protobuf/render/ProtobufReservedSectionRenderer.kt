@@ -21,27 +21,25 @@ internal object ProtobufReservedSectionRenderer {
             return null
         }
 
-        val namesLine =
-            entries
-                .filterIsInstance<ReservedName>()
-                .takeIf { it.isNotEmpty() }
-                ?.joinToString(", ") { "\"${it.name}\"" }
-                ?.let { "reserved $it;" }
-
-        val indexesLine =
-            entries
-                .filterNot { it is ReservedName }
-                .takeIf { it.isNotEmpty() }
-                ?.joinToString(", ") { render(it) }
-                ?.let { "reserved $it;" }
-
-        return listOfNotNull(namesLine, indexesLine).joinToString("\n")
+        return listOfNotNull(renderReservedNames(entries), renderNumericReservedEntries(entries)).joinToString("\n")
     }
 
-    private fun render(reserved: Reserved): String = when (reserved) {
+    private fun renderReservedNames(entries: List<Reserved>): String? = entries
+        .filterIsInstance<ReservedName>()
+        .takeIf { it.isNotEmpty() }
+        ?.joinToString(", ") { "\"${it.name}\"" }
+        ?.let { "reserved $it;" }
+
+    private fun renderNumericReservedEntries(entries: List<Reserved>): String? = entries
+        .filterNot { it is ReservedName }
+        .takeIf { it.isNotEmpty() }
+        ?.joinToString(", ", transform = ::renderNumericReserved)
+        ?.let { "reserved $it;" }
+
+    private fun renderNumericReserved(reserved: Reserved): String = when (reserved) {
         is ReservedIndex -> reserved.index.toString()
         is ReservedRange -> "${reserved.indexRange.first} to ${reserved.indexRange.last}"
         is ReservedToMax -> "${reserved.from} to max"
-        is ReservedName -> invariantViolation("Reserved names are rendered separately from reserved indexes.")
+        is ReservedName -> invariantViolation("Reserved names are rendered by renderReservedNames().")
     }
 }
