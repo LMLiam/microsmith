@@ -23,11 +23,11 @@ internal object ProductionKotlinSourceReader {
     private fun Path.toNormalizedPathString(): String = toString().replace('\\', '/')
 
     private fun String.toSourceRootRelativePath(): String = when {
-        startsWith(sourceRootRelativePrefix) -> removePrefix(sourceRootRelativePrefix)
-        contains(sourceRootRelativeMarker) -> substringAfter(sourceRootRelativeMarker)
+        startsWith(SOURCE_ROOT_RELATIVE_PREFIX) -> removePrefix(SOURCE_ROOT_RELATIVE_PREFIX)
+        contains(SOURCE_ROOT_RELATIVE_MARKER) -> substringAfter(SOURCE_ROOT_RELATIVE_MARKER)
         else -> this
     }
 
-    private const val sourceRootRelativePrefix = "src/main/kotlin/"
-    private const val sourceRootRelativeMarker = "/src/main/kotlin/"
+    private const val SOURCE_ROOT_RELATIVE_PREFIX = "src/main/kotlin/"
+    private const val SOURCE_ROOT_RELATIVE_MARKER = "/src/main/kotlin/"
 }

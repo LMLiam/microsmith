@@ -9,6 +9,7 @@ import me.liam.microsmith.cli.command.RunCommand
 import java.io.IOException
 import java.io.UncheckedIOException
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
@@ -54,7 +55,7 @@ class PluginResolverGuardrailTests :
                 val script = tempDir.resolve("schema.microsmith.kts")
                 script.writeText("// test script")
                 val localJar = tempDir.resolve("plugins/local-plugin.jar")
-                localJar.parent?.toFile()?.mkdirs()
+                localJar.parent.createDirectories()
                 localJar.writeBytes("local-plugin".toByteArray())
 
                 val relativeJarPath = relativizeFromWorkingDirectory(localJar)

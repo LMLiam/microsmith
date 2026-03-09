@@ -143,7 +143,7 @@ internal class ResolvedRemotePluginFactory {
         if (extensionSeparator <= 0) {
             return null
         }
-        val pomName = fileName.substring(0, extensionSeparator) + ".pom"
+        val pomName = fileName.take(extensionSeparator) + ".pom"
         return artifactPath.resolveSibling(pomName).toAbsolutePath().normalize()
     }
 

@@ -6,16 +6,11 @@ import me.liam.microsmith.cli.command.IdeDoctorCommand
 import me.liam.microsmith.cli.command.IdeRefreshCommand
 import java.nio.file.Path
 
-internal fun parseIdeCommand(args: List<String>): CliCommand {
-    val subcommand = args.getOrNull(1)
-    return when {
-        subcommand == null || subcommand in HELP_COMMANDS ->
-            ErrorCommand("Missing <refresh|doctor> subcommand for ide command.")
-
-        subcommand == IDE_REFRESH_SUBCOMMAND -> parseIdeRefreshCommand(args = args, startIndex = 2)
-        subcommand == IDE_DOCTOR_SUBCOMMAND -> parseIdeDoctorCommand(args = args, startIndex = 2)
-        else -> ErrorCommand("Unknown ide subcommand '$subcommand'. Expected 'refresh' or 'doctor'.")
-    }
+internal fun parseIdeCommand(args: List<String>): CliCommand = when (val subcommand = args.getOrNull(1)) {
+    null, in HELP_COMMANDS -> ErrorCommand("Missing <refresh|doctor> subcommand for ide command.")
+    IDE_REFRESH_SUBCOMMAND -> parseIdeRefreshCommand(args = args, startIndex = 2)
+    IDE_DOCTOR_SUBCOMMAND -> parseIdeDoctorCommand(args = args, startIndex = 2)
+    else -> ErrorCommand("Unknown ide subcommand '$subcommand'. Expected 'refresh' or 'doctor'.")
 }
 
 private fun parseIdeRefreshCommand(args: List<String>, startIndex: Int): CliCommand {
@@ -57,10 +52,12 @@ private fun parseIdeOptions(args: List<String>, startIndex: Int): ParsedIdeOptio
                 DIAGNOSTICS_OPTION -> ParsedToken(
                     index + diagnosticOptions.consumeDiagnostics(args = args, index = index),
                 )
+
                 VERBOSE_OPTION ->
                     ParsedToken(
                         index + diagnosticOptions.consumeVerbose(),
                     )
+
                 REPO_ROOT_OPTION ->
                     parseRepoRootOption(
                         args = args,
@@ -70,6 +67,7 @@ private fun parseIdeOptions(args: List<String>, startIndex: Int): ParsedIdeOptio
                         projectRoot = parsedProjectRoot
                         projectRootSpecified = true
                     }
+
                 else -> ParsedToken(nextIndex = index, error = "Unknown option '$token'.")
             }
         if (parsedToken.error != null) {

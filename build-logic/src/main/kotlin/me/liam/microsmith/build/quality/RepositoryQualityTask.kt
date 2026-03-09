@@ -31,30 +31,30 @@ abstract class RepositoryQualityTask : DefaultTask() {
         val sourceFiles = productionSources.files.map { file -> file.toPath() }
         val violations = RepositoryQualityValidator(policy).validate(repositoryRoot.asFile.get().toPath(), sourceFiles)
         if (violations.isEmpty()) {
-            logger.lifecycle(successMessage)
+            logger.lifecycle(SUCCESS_MESSAGE)
             return
         }
 
         val report = buildString {
-            appendLine(failureHeader)
+            appendLine(FAILURE_HEADER)
             violations.forEach { violation ->
                 appendLine("- [${violation.rule}] ${violation.path}: ${violation.message}")
             }
             appendLine()
-            appendLine(policyExceptionRemediation)
-            appendLine(reviewGatedArchitectureGuidance)
+            appendLine(POLICY_EXCEPTION_REMEDIATION)
+            appendLine(REVIEW_GATED_ARCHITECTURE_GUIDANCE)
         }
         throw GradleException(report)
     }
 
     private companion object {
-        private const val successMessage = "Repository structural Kotlin quality guardrails passed."
-        private const val failureHeader = "Repository structural Kotlin quality guardrails failed:"
-        private const val policyExceptionRemediation =
+        private const val SUCCESS_MESSAGE = "Repository structural Kotlin quality guardrails passed."
+        private const val FAILURE_HEADER = "Repository structural Kotlin quality guardrails failed:"
+        private const val POLICY_EXCEPTION_REMEDIATION =
             "Fix the structural issue, or if the exception is truly justified, " +
                 "update RepositoryQualityPolicy with a narrow path-specific rationale " +
                 "and mention it in the PR description."
-        private const val reviewGatedArchitectureGuidance =
+        private const val REVIEW_GATED_ARCHITECTURE_GUIDANCE =
             "Broader architecture and layering decisions remain review-gated in README.md."
     }
 }

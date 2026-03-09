@@ -75,7 +75,7 @@ internal class RepositoryQualityValidator(private val policy: RepositoryQualityP
         return RepositoryQualityViolation(
             rule = "missing-package-declaration",
             path = source.relativePath,
-            message = missingPackageDeclarationMessage,
+            message = MISSING_PACKAGE_DECLARATION_MESSAGE,
         )
     }
 
@@ -127,7 +127,7 @@ internal class RepositoryQualityValidator(private val policy: RepositoryQualityP
             "Package '$packageName' contains forbidden segment '$forbiddenSegment'. " +
                 "Use a domain-led package name instead of util/utils/misc."
 
-        private const val missingPackageDeclarationMessage =
+        private const val MISSING_PACKAGE_DECLARATION_MESSAGE =
             "Production Kotlin files must declare an explicit package. " +
                 "Use a domain-led package that matches the src/main/kotlin directory."
 

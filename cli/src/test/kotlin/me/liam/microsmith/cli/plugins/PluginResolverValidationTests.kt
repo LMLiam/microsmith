@@ -8,6 +8,7 @@ import io.kotest.matchers.types.shouldBeTypeOf
 import me.liam.microsmith.cli.command.RunCommand
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.readLines
@@ -24,7 +25,7 @@ class PluginResolverValidationTests :
                 val output = tempDir.resolve("generated")
                 val cache = tempDir.resolve("cache")
                 val localJar = tempDir.resolve("plugins/local-plugin.jar")
-                localJar.parent?.toFile()?.mkdirs()
+                localJar.parent.createDirectories()
                 localJar.writeBytes("local-plugin".toByteArray())
                 script.writeText("// test script")
 
@@ -269,7 +270,7 @@ class PluginResolverValidationTests :
                 val script = tempDir.resolve("schema.microsmith.kts")
                 script.writeText("// test script")
                 val localJar = tempDir.resolve("plugins/custom.jar")
-                localJar.parent?.toFile()?.mkdirs()
+                localJar.parent.createDirectories()
                 localJar.writeBytes("allowlist-check".toByteArray())
 
                 val relativeJarPath = relativizeFromWorkingDirectory(localJar)
@@ -305,7 +306,7 @@ class PluginResolverValidationTests :
                 val script = tempDir.resolve("schema.microsmith.kts")
                 script.writeText("// test script")
                 val localJar = tempDir.resolve("plugins/custom.jar")
-                localJar.parent?.toFile()?.mkdirs()
+                localJar.parent.createDirectories()
                 localJar.writeBytes("allowlist-check".toByteArray())
 
                 val relativeJarPath = relativizeFromWorkingDirectory(localJar)

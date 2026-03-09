@@ -457,21 +457,21 @@ When `--diagnostics json` is used, each event is emitted as one JSON line with:
 
 ### Exit codes
 
-| Category | Code | Exit | Meaning |
-| --- | --- | ---: | --- |
-| Usage | `MS-CLI-0001` | `2` | Invalid command or flags. |
-| Provider validation | `MS-CLI-1001` | `10` | Built-in provider validation failed. |
-| Plugin resolution | `MS-CLI-1101` | `11` | Plugin resolution failed. |
-| Script validation | `MS-CLI-2001` | `20` | Script input validation failed. |
-| Script compilation | `MS-CLI-2002` | `21` | Script compilation failed. |
-| Script evaluation | `MS-CLI-2003` | `22` | Script evaluation failed. |
-| Script host | `MS-CLI-2004` | `23` | Script host failed unexpectedly. |
-| Doctor | `MS-CLI-3001` | `30` | `doctor` detected environment issues. |
-| IDE refresh | `MS-CLI-4001` | `40` | `ide refresh` failed. |
-| IDE doctor | `MS-CLI-4101` | `41` | `ide doctor` detected issues or failed. |
-| Init conflict | `MS-CLI-5001` | `50` | `init` detected conflicting filesystem state. |
-| Init validation | `MS-CLI-5002` | `51` | `init` input or environment validation failed. |
-| Init runtime | `MS-CLI-5003` | `52` | `init` failed unexpectedly at runtime. |
+| Category            | Code          | Exit | Meaning                                        |
+|---------------------|---------------|-----:|------------------------------------------------|
+| Usage               | `MS-CLI-0001` |  `2` | Invalid command or flags.                      |
+| Provider validation | `MS-CLI-1001` | `10` | Built-in provider validation failed.           |
+| Plugin resolution   | `MS-CLI-1101` | `11` | Plugin resolution failed.                      |
+| Script validation   | `MS-CLI-2001` | `20` | Script input validation failed.                |
+| Script compilation  | `MS-CLI-2002` | `21` | Script compilation failed.                     |
+| Script evaluation   | `MS-CLI-2003` | `22` | Script evaluation failed.                      |
+| Script host         | `MS-CLI-2004` | `23` | Script host failed unexpectedly.               |
+| Doctor              | `MS-CLI-3001` | `30` | `doctor` detected environment issues.          |
+| IDE refresh         | `MS-CLI-4001` | `40` | `ide refresh` failed.                          |
+| IDE doctor          | `MS-CLI-4101` | `41` | `ide doctor` detected issues or failed.        |
+| Init conflict       | `MS-CLI-5001` | `50` | `init` detected conflicting filesystem state.  |
+| Init validation     | `MS-CLI-5002` | `51` | `init` input or environment validation failed. |
+| Init runtime        | `MS-CLI-5003` | `52` | `init` failed unexpectedly at runtime.         |
 
 ## JetBrains IDE helper
 
@@ -587,18 +587,18 @@ microsmith run schema.microsmith.kts --out ./generated --plugin com.acme:private
 
 ### Environment variables
 
-| Variable | Purpose |
-| --- | --- |
-| `MICROSMITH_REPOSITORY_ALLOWLIST` | Comma-separated additional allowed repository base URIs. |
-| `MICROSMITH_ALLOW_FILE_REPOSITORIES` | Set to `true` to allow `file://` repositories for plugin coordinates. |
-| `MICROSMITH_REPOSITORY_CREDENTIALS_FILE` | Path to a repository credentials file. |
-| `MICROSMITH_REPOSITORY_USERNAME` | Default username for authenticated repository access. |
-| `MICROSMITH_REPOSITORY_PASSWORD` | Default password or token for authenticated repository access. |
-| `MICROSMITH_GITHUB_PACKAGES_USER` | Username for GitHub Packages repository access. |
-| `MICROSMITH_GITHUB_PACKAGES_TOKEN` | Token for GitHub Packages repository access. |
-| `MICROSMITH_PLUGIN_ALLOWLIST_FILE` | Path to checksum allowlist file entries in the form `<kind>|<key>|<sha256>`. |
-| `MICROSMITH_SCRIPT_CACHE_DIR` | Override the script compilation cache directory. |
-| `MICROSMITH_PLUGIN_CACHE_DIR` | Override the plugin resolution cache directory. |
+| Variable                                 | Purpose                                                               |
+|------------------------------------------|-----------------------------------------------------------------------|
+| `MICROSMITH_REPOSITORY_ALLOWLIST`        | Comma-separated additional allowed repository base URIs.              |
+| `MICROSMITH_ALLOW_FILE_REPOSITORIES`     | Set to `true` to allow `file://` repositories for plugin coordinates. |
+| `MICROSMITH_REPOSITORY_CREDENTIALS_FILE` | Path to a repository credentials file.                                |
+| `MICROSMITH_REPOSITORY_USERNAME`         | Default username for authenticated repository access.                 |
+| `MICROSMITH_REPOSITORY_PASSWORD`         | Default password or token for authenticated repository access.        |
+| `MICROSMITH_GITHUB_PACKAGES_USER`        | Username for GitHub Packages repository access.                       |
+| `MICROSMITH_GITHUB_PACKAGES_TOKEN`       | Token for GitHub Packages repository access.                          |
+| `MICROSMITH_PLUGIN_ALLOWLIST_FILE`       | Path to checksum allowlist file entries in the form `<code>&lt;kind&gt;&#124;&lt;key&gt;&#124;&lt;sha256&gt;</code>`. |
+| `MICROSMITH_SCRIPT_CACHE_DIR`            | Override the script compilation cache directory.                      |
+| `MICROSMITH_PLUGIN_CACHE_DIR`            | Override the plugin resolution cache directory.                       |
 
 ## CI examples
 
@@ -684,11 +684,11 @@ jobs:
 The repository includes non-Gradle fixture repositories under `examples/non-gradle/`.
 Each fixture contains a repo marker used by `microsmith init`, a legacy `schema.microsmith.kts` manual example, and a GitHub Actions example that exercises the init-first path.
 
-| Fixture | Directory | Local command from fixture root | CI workflow |
-| --- | --- | --- | --- |
-| Node | `examples/non-gradle/node` | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated` | `examples/non-gradle/node/.github/workflows/microsmith.yml` |
-| Go | `examples/non-gradle/go` | `microsmith init` then `microsmith run build.microsmith.kts --out ./internal/gen` | `examples/non-gradle/go/.github/workflows/microsmith.yml` |
-| .NET | `examples/non-gradle/dotnet` | `microsmith init` then `microsmith run build.microsmith.kts --out .\Generated` | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
+| Fixture | Directory                    | Local command from fixture root                                                   | CI workflow                                                   |
+|---------|------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------|
+| Node    | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
+| Go      | `examples/non-gradle/go`     | `microsmith init` then `microsmith run build.microsmith.kts --out ./internal/gen` | `examples/non-gradle/go/.github/workflows/microsmith.yml`     |
+| .NET    | `examples/non-gradle/dotnet` | `microsmith init` then `microsmith run build.microsmith.kts --out .\Generated`    | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
 
 ## Troubleshooting
 
@@ -781,12 +781,12 @@ The DSL surface and plugin architecture stay the same; the execution model chang
 
 ### Command mapping
 
-| Previous pattern | CLI replacement |
-| --- | --- |
-| Gradle task invoking generation | `microsmith run schema.microsmith.kts --out ./generated` |
-| Gradle-managed plugin dependency | `--plugin group:artifact:version` |
-| local classpath jar wiring | `--plugin-jar ./path/to/plugin.jar` |
-| Gradle offline mode | `--offline` |
+| Previous pattern                 | CLI replacement                                          |
+|----------------------------------|----------------------------------------------------------|
+| Gradle task invoking generation  | `microsmith run schema.microsmith.kts --out ./generated` |
+| Gradle-managed plugin dependency | `--plugin group:artifact:version`                        |
+| local classpath jar wiring       | `--plugin-jar ./path/to/plugin.jar`                      |
+| Gradle offline mode              | `--offline`                                              |
 
 ### Recommended migration sequence
 
