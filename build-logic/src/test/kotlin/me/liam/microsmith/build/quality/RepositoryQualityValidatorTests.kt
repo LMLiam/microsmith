@@ -10,6 +10,21 @@ class RepositoryQualityValidatorTests : StringSpec() {
     private val defaultValidator = RepositoryQualityValidator(RepositoryQualityPolicy.default())
 
     init {
+        "validate accepts package declarations with trailing comments" {
+            val source = productionSource(
+                path = "module/src/main/kotlin/example/Alpha.kt",
+                contents = """
+                package example // comment
+
+                class Alpha
+                """.trimIndent(),
+            )
+
+            val violations = defaultValidator.validate(source.repositoryRoot, listOf(source.file))
+
+            violations.shouldBeEmpty()
+        }
+
         "validate counts abstract and open top level declarations" {
             val source = productionSource(
                 path = "module/src/main/kotlin/example/MixedDeclarations.kt",
@@ -54,6 +69,28 @@ class RepositoryQualityValidatorTests : StringSpec() {
             )
         }
 
+        "validate counts indented top level declarations" {
+            val source = productionSource(
+                path = "module/src/main/kotlin/example/IndentedDeclarations.kt",
+                contents = """
+                package example
+
+                  class Alpha
+                  class Bravo
+                """.trimIndent(),
+            )
+
+            val violations = defaultValidator.validate(source.repositoryRoot, listOf(source.file))
+
+            violations shouldContainExactly listOf(
+                RepositoryQualityViolation(
+                    rule = "multiple-production-types",
+                    path = "module/src/main/kotlin/example/IndentedDeclarations.kt",
+                    message = multipleProductionTypesMessage(2),
+                ),
+            )
+        }
+
         "validate counts inline annotated top level declarations" {
             val source = productionSource(
                 path = "module/src/main/kotlin/example/AnnotatedDeclarations.kt",
@@ -72,6 +109,30 @@ class RepositoryQualityValidatorTests : StringSpec() {
                     rule = "multiple-production-types",
                     path = "module/src/main/kotlin/example/AnnotatedDeclarations.kt",
                     message = multipleProductionTypesMessage(2),
+                ),
+            )
+        }
+
+        "validate reports file name mismatches for annotations with nested call arguments" {
+            val source = productionSource(
+                path = "module/src/main/kotlin/example/WrongName.kt",
+                contents = """
+                package example
+
+                @Deprecated("use something else", ReplaceWith("replacement()")) class ActualName
+                """.trimIndent(),
+            )
+
+            val violations = defaultValidator.validate(source.repositoryRoot, listOf(source.file))
+
+            violations shouldContainExactly listOf(
+                RepositoryQualityViolation(
+                    rule = "primary-type-file-name",
+                    path = "module/src/main/kotlin/example/WrongName.kt",
+                    message = primaryTypeFileNameMessage(
+                        fileNameWithoutExtension = "WrongName",
+                        declarationName = "ActualName",
+                    ),
                 ),
             )
         }

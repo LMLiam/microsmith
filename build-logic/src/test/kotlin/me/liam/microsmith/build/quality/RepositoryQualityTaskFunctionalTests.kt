@@ -88,6 +88,23 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             result.output shouldContain missingPackageDeclarationRemediation
         }
 
+        "verifyRepositoryStandards accepts package declarations with trailing comments" {
+            val project = RepositoryQualityFunctionalTestProject.rootProject("repository-quality-package-comment")
+            project.writeFile(
+                "src/main/kotlin/example/Alpha.kt",
+                """
+                package example // comment
+
+                class Alpha
+                """.trimIndent(),
+            )
+
+            val result = project.build("verifyRepositoryStandards")
+
+            result.task(":verifyRepositoryStandards")?.outcome shouldBe TaskOutcome.SUCCESS
+            result.output shouldContain "Repository structural Kotlin quality guardrails passed."
+        }
+
         "verifyRepositoryStandards fails for package path mismatches" {
             val project = RepositoryQualityFunctionalTestProject.rootProject("repository-quality-package-path")
             project.writeFile(
@@ -120,6 +137,57 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
 
             result.output shouldContain "[primary-type-file-name] src/main/kotlin/example/TypeAliasFile.kt"
             result.output shouldContain primaryTypeFileNamePrefix
+        }
+
+        "verifyRepositoryStandards fails for file name mismatches on inline annotated declarations" {
+            val project = RepositoryQualityFunctionalTestProject.rootProject(
+                "repository-quality-inline-annotation-file-name",
+            )
+            project.writeFile(
+                "src/main/kotlin/example/WrongName.kt",
+                """
+                package example
+
+                @Deprecated("use something else", ReplaceWith("replacement()")) class ActualName
+                """.trimIndent(),
+            )
+
+            val result = project.buildAndFail("verifyRepositoryStandards")
+
+            result.output shouldContain "[primary-type-file-name] src/main/kotlin/example/WrongName.kt"
+            result.output shouldContain "WrongName.kt"
+            result.output shouldContain "ActualName"
+        }
+
+        "verifyRepositoryStandards fails for indented top level declarations" {
+            val project = RepositoryQualityFunctionalTestProject.rootProject("repository-quality-indented-top-level")
+            project.writeFile(
+                "src/main/kotlin/example/IndentedDeclarations.kt",
+                """
+                package example
+
+                  class Alpha
+                  class Bravo
+                """.trimIndent(),
+            )
+
+            val result = project.buildAndFail("verifyRepositoryStandards")
+
+            result.output shouldContain "[multiple-production-types] src/main/kotlin/example/IndentedDeclarations.kt"
+            result.output shouldContain multipleProductionTypesRemediation
+        }
+
+        "verifyRepositoryStandards scans build-logic production sources" {
+            val project = RepositoryQualityFunctionalTestProject.rootProject("repository-quality-build-logic-scan")
+            project.writeFile(
+                "build-logic/src/main/kotlin/example/TooLong.kt",
+                buildLongSource(fileName = "TooLong"),
+            )
+
+            val result = project.buildAndFail("verifyRepositoryStandards")
+
+            result.output shouldContain "[production-file-lines] build-logic/src/main/kotlin/example/TooLong.kt"
+            result.output shouldContain lineLimitRemediation
         }
 
         "verifyRepositoryStandards ignores files under build directories" {
