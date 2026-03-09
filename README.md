@@ -510,6 +510,34 @@ JetBrains workflow:
 3. Refresh Gradle indexing.
 4. Rerun `microsmith ide refresh` after upgrading the Microsmith CLI or changing plugin dependencies.
 
+### When to use each command
+
+- First-time setup in a non-Gradle repository: `microsmith init`
+- Helper was skipped, removed, or needs regeneration after CLI or plugin changes: `microsmith ide refresh`
+- Symbols are still unresolved or the helper appears stale: `microsmith ide doctor --diagnostics json --verbose`
+
+### Repository hygiene
+
+Treat `.microsmith/ide/` as local generated IDE state.
+
+Why:
+- the generated helper build uses local file dependencies that resolve against the current Microsmith runtime installation
+- `microsmith ide refresh` owns the helper files and will rewrite them when the managed content changes
+- runtime generation does not depend on the IDE helper being present
+
+Recommended policy for consumer repositories:
+
+```gitignore
+.microsmith/ide/
+```
+
+Ownership and overwrite rules:
+
+- Microsmith manages only `.microsmith/ide/settings.gradle.kts`, `.microsmith/ide/build.gradle.kts`, and `.microsmith/ide/README.md`
+- do not hand-edit those managed files; rerun `microsmith ide refresh` instead
+- rerun `microsmith ide refresh` after upgrading the Microsmith CLI or changing plugin dependencies
+- if `microsmith ide doctor` reports missing or stale helper state, repair it with `microsmith ide refresh`
+
 Important constraints:
 
 - runtime generation does not depend on the IDE helper
