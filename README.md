@@ -108,7 +108,7 @@ Microsmith provides:
   - default to one non-private top-level production declaration per file
   - keep production Kotlin files at or below the configured line thresholds
   - do not introduce `util`, `utils`, or `misc` package segments in production code
-- If a structural exception is genuinely clearer than splitting the code, encode the exception in `buildSrc/src/main/kotlin/me/liam/microsmith/build/quality/RepositoryQualityPolicy.kt` with a narrow path-specific rationale and call it out in the PR description.
+- If a structural exception is genuinely clearer than splitting the code, encode the exception in `build-logic/src/main/kotlin/me/liam/microsmith/build/quality/RepositoryQualityPolicy.kt` with a narrow path-specific rationale and call it out in the PR description.
 - Broader architecture and layering decisions remain review-gated. If a rule cannot be automated without becoming brittle, explain the boundary explicitly in review.
 - Reviewers should check:
   - file ownership and package placement are obvious
@@ -158,7 +158,7 @@ Useful notes:
 - if `verifyRepositoryStandards` fails:
   - split extra production types into their own files or make tightly coupled helpers private
   - split large production files by responsibility before raising any threshold
-  - only add a path-specific exception in `buildSrc/src/main/kotlin/me/liam/microsmith/build/quality/RepositoryQualityPolicy.kt` when the split would genuinely reduce clarity, and explain that exception in the PR
+  - only add a path-specific exception in `build-logic/src/main/kotlin/me/liam/microsmith/build/quality/RepositoryQualityPolicy.kt` when the split would genuinely reduce clarity, and explain that exception in the PR
 
 ## DSL usage
 
