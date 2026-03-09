@@ -1,62 +1,56 @@
 package me.liam.microsmith.build.quality
 
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainExactly
 import java.nio.file.Files
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
-class RepositoryQualityValidatorTests {
+class RepositoryQualityValidatorTests : StringSpec() {
     private val validator = RepositoryQualityValidator(RepositoryQualityPolicy.default())
 
-    @Test
-    fun `validate counts abstract and open top level declarations`() {
-        val source = productionSource(
-            path = "module/src/main/kotlin/example/MixedDeclarations.kt",
-            contents = """
-            package example
+    init {
+        "validate counts abstract and open top level declarations" {
+            val source = productionSource(
+                path = "module/src/main/kotlin/example/MixedDeclarations.kt",
+                contents = """
+                package example
 
-            abstract class Alpha
-            open class Bravo
-            """.trimIndent(),
-        )
+                abstract class Alpha
+                open class Bravo
+                """.trimIndent(),
+            )
 
-        val violations = validator.validate(source.repositoryRoot, listOf(source.file))
+            val violations = validator.validate(source.repositoryRoot, listOf(source.file))
 
-        assertEquals(
-            listOf(
+            violations shouldContainExactly listOf(
                 RepositoryQualityViolation(
                     rule = "multiple-production-types",
                     path = "module/src/main/kotlin/example/MixedDeclarations.kt",
                     message = "2 non-private top-level production declarations found. Split extra production types into their own files or make tightly coupled helpers private.",
                 ),
-            ),
-            violations,
-        )
-    }
+            )
+        }
 
-    @Test
-    fun `validate counts expect actual and typealias modifiers`() {
-        val source = productionSource(
-            path = "module/src/main/kotlin/example/PlatformTypes.kt",
-            contents = """
-            package example
+        "validate counts expect actual and typealias modifiers" {
+            val source = productionSource(
+                path = "module/src/main/kotlin/example/PlatformTypes.kt",
+                contents = """
+                package example
 
-            expect class Alpha
-            actual typealias Bravo = String
-            """.trimIndent(),
-        )
+                expect class Alpha
+                actual typealias Bravo = String
+                """.trimIndent(),
+            )
 
-        val violations = validator.validate(source.repositoryRoot, listOf(source.file))
+            val violations = validator.validate(source.repositoryRoot, listOf(source.file))
 
-        assertEquals(
-            listOf(
+            violations shouldContainExactly listOf(
                 RepositoryQualityViolation(
                     rule = "multiple-production-types",
                     path = "module/src/main/kotlin/example/PlatformTypes.kt",
                     message = "2 non-private top-level production declarations found. Split extra production types into their own files or make tightly coupled helpers private.",
                 ),
-            ),
-            violations,
-        )
+            )
+        }
     }
 
     private fun productionSource(path: String, contents: String): TestProductionSource {
