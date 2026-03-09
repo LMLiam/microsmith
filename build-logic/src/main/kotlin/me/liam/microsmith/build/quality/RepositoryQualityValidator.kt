@@ -1,37 +1,35 @@
 package me.liam.microsmith.build.quality
 
-import java.nio.file.Files
 import java.nio.file.Path
 
 internal class RepositoryQualityValidator(private val policy: RepositoryQualityPolicy) {
     fun validate(repositoryRoot: Path, sourceFiles: Iterable<Path>): List<RepositoryQualityViolation> = sourceFiles
-        .map { sourceFile -> sourceFile.toProductionKotlinSource(repositoryRoot) }
-        .flatMap { source ->
-            listOfNotNull(
-                validateTopLevelProductionDeclarations(source),
-                validateLineCount(source),
-                validateMissingPackageDeclaration(source),
-                validatePackageSegments(source),
-                validatePackagePath(source),
-                validatePrimaryTypeFileName(source),
-            )
-        }
+        .map { sourceFile -> ProductionKotlinSourceReader.read(repositoryRoot, sourceFile) }
+        .flatMap(::validateSource)
         .sortedWith(compareBy(RepositoryQualityViolation::rule, RepositoryQualityViolation::path))
+
+    private fun validateSource(source: ProductionKotlinSource): List<RepositoryQualityViolation> = listOfNotNull(
+        validateTopLevelProductionDeclarations(source),
+        validateLineCount(source),
+        validateMissingPackageDeclaration(source),
+        validatePackageSegments(source),
+        validatePackagePath(source),
+        validatePrimaryTypeFileName(source),
+    )
 
     private fun validateTopLevelProductionDeclarations(source: ProductionKotlinSource): RepositoryQualityViolation? {
         if (policy.multiDeclarationExemptionFor(source.relativePath) != null) {
             return null
         }
 
-        val declarationCount = source.lines.count { line -> line.isTopLevelProductionDeclaration() }
-        if (declarationCount <= 1) {
+        if (source.topLevelProductionDeclarationCount <= 1) {
             return null
         }
 
         return RepositoryQualityViolation(
             rule = "multiple-production-types",
             path = source.relativePath,
-            message = multipleProductionTypesMessage(declarationCount),
+            message = multipleProductionTypesMessage(source.topLevelProductionDeclarationCount),
         )
     }
 
@@ -115,90 +113,7 @@ internal class RepositoryQualityValidator(private val policy: RepositoryQualityP
         )
     }
 
-    private fun Path.toProductionKotlinSource(repositoryRoot: Path): ProductionKotlinSource {
-        val absolutePath = toAbsolutePath().normalize()
-        val relativePath = repositoryRoot.relativize(absolutePath).toNormalizedPathString()
-        val lines = Files.readAllLines(absolutePath)
-        return ProductionKotlinSource(
-            path = absolutePath,
-            relativePath = relativePath,
-            sourceRootRelativePath = relativePath.toSourceRootRelativePath(),
-            lines = lines,
-            packageName = lines.firstNotNullOfOrNull { line -> line.packageNameOrNull() },
-            topLevelProductionDeclarationNames = lines.mapNotNull { line ->
-                line.topLevelProductionDeclarationNameOrNull()
-            },
-        )
-    }
-
-    private fun Path.toNormalizedPathString(): String = toString().replace('\\', '/')
-
-    private fun String.toSourceRootRelativePath(): String = when {
-        startsWith(sourceRootRelativePrefix) -> removePrefix(sourceRootRelativePrefix)
-        contains(sourceRootRelativeMarker) -> substringAfter(sourceRootRelativeMarker)
-        else -> this
-    }
-
-    private fun String.packageNameOrNull(): String? = packageDeclarationPattern.matchEntire(trim())?.groupValues?.get(1)
-
-    private fun String.isTopLevelProductionDeclaration(): Boolean {
-        val line = trimEnd()
-        if (line.isBlank() || line.first().isWhitespace()) {
-            return false
-        }
-
-        val declarationLine = line.removeLeadingInlineAnnotations()
-        if (declarationLine.startsWith("private ")) {
-            return false
-        }
-
-        return topLevelTypeDeclarationPattern.containsMatchIn(declarationLine) ||
-            topLevelFunInterfacePattern.containsMatchIn(declarationLine) ||
-            topLevelTypeAliasPattern.containsMatchIn(declarationLine)
-    }
-
-    private fun String.topLevelProductionDeclarationNameOrNull(): String? {
-        val line = trimEnd()
-        if (line.isBlank() || line.first().isWhitespace()) {
-            return null
-        }
-
-        val declarationLine = line.removeLeadingInlineAnnotations()
-        if (declarationLine.startsWith("private ")) {
-            return null
-        }
-
-        return topLevelTypeDeclarationNamePattern.find(declarationLine)?.groupValues?.get(1)
-            ?: topLevelFunInterfaceNamePattern.find(declarationLine)?.groupValues?.get(1)
-            ?: topLevelTypeAliasNamePattern.find(declarationLine)?.groupValues?.get(1)
-    }
-
-    private fun String.removeLeadingInlineAnnotations(): String = replaceFirst(leadingInlineAnnotationsPattern, "")
-
     private companion object {
-        private const val sourceRootRelativePrefix = "src/main/kotlin/"
-        private const val sourceRootRelativeMarker = "/src/main/kotlin/"
-        private val packageDeclarationPattern = Regex("^package\\s+([A-Za-z0-9_.]+)$")
-        private const val inlineAnnotationPattern =
-            "@(?:[A-Za-z_][A-Za-z0-9_]*:)?[A-Za-z_][A-Za-z0-9_.]*(?:\\([^)]*\\))?\\s+"
-        private val leadingInlineAnnotationsPattern = Regex("^(?:$inlineAnnotationPattern)*")
-        private const val declarationModifierPattern =
-            "(?:(?:public|internal|open|abstract|final|sealed|data|value|enum|annotation|expect|actual)\\s+)*"
-        private val topLevelTypeDeclarationPattern = Regex(
-            "^$declarationModifierPattern(?:class|interface|object)\\b",
-        )
-        private val topLevelFunInterfacePattern = Regex("^$declarationModifierPattern(?:fun\\s+interface)\\b")
-        private val topLevelTypeAliasPattern = Regex("^$declarationModifierPattern(?:typealias)\\b")
-        private val topLevelTypeDeclarationNamePattern = Regex(
-            "^$declarationModifierPattern(?:class|interface|object)\\s+([A-Za-z_][A-Za-z0-9_]*)\\b",
-        )
-        private val topLevelFunInterfaceNamePattern = Regex(
-            "^$declarationModifierPattern(?:fun\\s+interface)\\s+([A-Za-z_][A-Za-z0-9_]*)\\b",
-        )
-        private val topLevelTypeAliasNamePattern = Regex(
-            "^$declarationModifierPattern(?:typealias)\\s+([A-Za-z_][A-Za-z0-9_]*)\\b",
-        )
-
         private fun multipleProductionTypesMessage(declarationCount: Int): String =
             "$declarationCount non-private top-level production declarations found. " +
                 "Split extra production types into their own files or make tightly coupled helpers private."
