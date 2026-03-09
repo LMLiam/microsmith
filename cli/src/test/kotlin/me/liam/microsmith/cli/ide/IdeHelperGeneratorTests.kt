@@ -52,7 +52,11 @@ class IdeHelperGeneratorTests :
                 buildContent.shouldContain("id(\"java-library\")")
                 buildContent.shouldContain("files(\n            \"")
                 buildContent.shouldContain(runtimeJarLiteral)
-                readmeFile.readText().shouldContain("microsmith ide refresh")
+                val helperReadme = readmeFile.readText()
+                helperReadme.shouldContain("microsmith ide refresh")
+                helperReadme.shouldContain("microsmith ide doctor --diagnostics json --verbose")
+                helperReadme.shouldContain(".microsmith/ide/` to your repository `.gitignore`")
+                helperReadme.shouldContain("do not hand-edit")
             } finally {
                 runCatching { repoRoot.deleteRecursively() }
             }
