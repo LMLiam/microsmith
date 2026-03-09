@@ -37,10 +37,23 @@ internal object IdeHelperProjectTemplates {
         - provide a minimal Gradle model that exposes Microsmith script-definition/runtime types
         - improve `.microsmith.kts` indexing and type resolution in JetBrains IDEs
 
+        Default first-run path:
+        - run `microsmith init` from the repository root unless helper generation was skipped intentionally
+
+        Lifecycle commands:
+        - run `microsmith ide refresh` to generate or resynchronize the helper
+        - run `microsmith ide doctor --diagnostics json --verbose` when the helper appears stale or symbols remain unresolved
+
         Usage:
-        1. run `microsmith ide refresh` from repository root
+        1. run `microsmith init`, or `microsmith ide refresh` if helper generation was skipped earlier
         2. in your JetBrains IDE, link/import `.microsmith/ide/build.gradle.kts` as a Gradle project
         3. refresh Gradle after upgrading Microsmith CLI or plugin dependencies
+
+        Repository hygiene:
+        - treat `.microsmith/ide/` as local generated IDE state
+        - add `.microsmith/ide/` to your repository `.gitignore`
+        - Microsmith manages only `settings.gradle.kts`, `build.gradle.kts`, and `README.md` in this directory
+        - do not hand-edit those managed files; rerun `microsmith ide refresh` instead
 
         Regeneration:
         - command is idempotent and safe to rerun
