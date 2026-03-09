@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import me.liam.microsmith.build.quality.RepositoryQualityTask
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
@@ -6,6 +7,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id 'base'
     id 'org.jetbrains.kotlin.jvm' apply false
     id 'org.jetbrains.kotlin.kapt' apply false
     id 'io.gitlab.arturbosch.detekt' apply false
@@ -32,6 +34,20 @@ version = scmVersion.version
 allprojects {
     group = rootProject.group
     version = rootProject.version
+}
+
+tasks.register("verifyRepositoryStandards", RepositoryQualityTask) {
+    repositoryRoot.set(layout.projectDirectory)
+    productionSources.from(
+        fileTree(layout.projectDirectory) {
+            include("**/src/main/kotlin/**/*.kt")
+            exclude("**/build/**")
+        },
+    )
+}
+
+tasks.named("check") {
+    dependsOn(tasks.named("verifyRepositoryStandards"))
 }
 
 subprojects {
