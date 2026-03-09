@@ -1,0 +1,47 @@
+package me.liam.microsmith.gen.schemas.protobuf.render
+
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.Reserved
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
+import me.liam.microsmith.dsl.schemas.protobuf.types.Enum
+import me.liam.microsmith.dsl.schemas.protobuf.types.Message
+import me.liam.microsmith.dsl.schemas.protobuf.types.Type
+import me.liam.microsmith.gen.schemas.protobuf.emission.invariantViolation
+
+internal object ProtobufReservedSectionRenderer {
+    fun render(type: Type): String? {
+        val entries =
+            when (type) {
+                is Message -> type.reserved
+                is Enum -> type.reserved
+            }
+        if (entries.isEmpty()) {
+            return null
+        }
+
+        val namesLine =
+            entries
+                .filterIsInstance<ReservedName>()
+                .takeIf { it.isNotEmpty() }
+                ?.joinToString(", ") { "\"${it.name}\"" }
+                ?.let { "reserved $it;" }
+
+        val indexesLine =
+            entries
+                .filterNot { it is ReservedName }
+                .takeIf { it.isNotEmpty() }
+                ?.joinToString(", ") { render(it) }
+                ?.let { "reserved $it;" }
+
+        return listOfNotNull(namesLine, indexesLine).joinToString("\n")
+    }
+
+    private fun render(reserved: Reserved): String = when (reserved) {
+        is ReservedIndex -> reserved.index.toString()
+        is ReservedRange -> "${reserved.indexRange.first} to ${reserved.indexRange.last}"
+        is ReservedToMax -> "${reserved.from} to max"
+        is ReservedName -> invariantViolation("Reserved names are rendered separately from reserved indexes.")
+    }
+}
