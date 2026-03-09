@@ -33,6 +33,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
       - name: Build
         run: ./gradlew build --stacktrace
+      - name: Validate IDE fallback release assets
+        run: |
+          ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
+          find runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microsmith-script-definition-*-all.jar' | grep -q .
+          find runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microsmith-script-definition-*-all.jar.sha256' | grep -q .
       - name: Publish Test Report
         uses: dorny/test-reporter@v2
         if: ${{ always() && hashFiles('**/build/test-results/jvmKotest/*.xml') != '' }}
@@ -91,6 +96,9 @@ jobs:
         run: |
           ./cli/build/microsmith-cli-dist/bin/microsmith --help > cli-help.txt
           grep -q "Usage:" cli-help.txt
+      - name: Verify README CLI usage block (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: python3 scripts/verify_readme_cli_usage.py README.md cli-help.txt
       - name: Smoke test dist generation and provider discovery (Unix)
         if: runner.os != 'Windows'
         run: |
@@ -205,6 +213,10 @@ jobs:
           test -f examples/non-gradle/node/build.microsmith.kts
           test -f examples/non-gradle/node/settings.microsmith.kts
           test -f examples/non-gradle/node/.microsmith/ide/build.gradle.kts
+          test -f examples/non-gradle/node/.microsmith/ide/README.md
+          ./.microsmith-bin/microsmith ide refresh --repo-root examples/non-gradle/node
+          ./.microsmith-bin/microsmith ide doctor --repo-root examples/non-gradle/node --diagnostics json > node-ide-doctor.json
+          grep -q "JetBrains IDE helper doctor checks passed." node-ide-doctor.json
           ./.microsmith-bin/microsmith run examples/non-gradle/node/build.microsmith.kts --out examples/non-gradle/node/generated
           test -f examples/non-gradle/node/generated/proto/NodeUserCreated.proto
           ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/go
@@ -212,6 +224,10 @@ jobs:
           test -f examples/non-gradle/go/build.microsmith.kts
           test -f examples/non-gradle/go/settings.microsmith.kts
           test -f examples/non-gradle/go/.microsmith/ide/build.gradle.kts
+          test -f examples/non-gradle/go/.microsmith/ide/README.md
+          ./.microsmith-bin/microsmith ide refresh --repo-root examples/non-gradle/go
+          ./.microsmith-bin/microsmith ide doctor --repo-root examples/non-gradle/go --diagnostics json > go-ide-doctor.json
+          grep -q "JetBrains IDE helper doctor checks passed." go-ide-doctor.json
           ./.microsmith-bin/microsmith run examples/non-gradle/go/build.microsmith.kts --out examples/non-gradle/go/internal/gen
           test -f examples/non-gradle/go/internal/gen/proto/GoUserCreated.proto
       - name: Install and verify from installer (Windows)
@@ -289,6 +305,24 @@ jobs:
           }
           if (-not (Test-Path .\examples\non-gradle\dotnet\.microsmith\ide\build.gradle.kts)) {
             Write-Error "Expected IDE helper build.gradle.kts to exist for the .NET fixture."
+            exit 1
+          }
+          if (-not (Test-Path .\examples\non-gradle\dotnet\.microsmith\ide\README.md)) {
+            Write-Error "Expected IDE helper README.md to exist for the .NET fixture."
+            exit 1
+          }
+          & .\.microsmith-bin\microsmith.cmd ide refresh --repo-root examples/non-gradle/dotnet
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          $ideDoctor = & .\.microsmith-bin\microsmith.cmd ide doctor --repo-root examples/non-gradle/dotnet --diagnostics json 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Output $ideDoctor
+            exit $LASTEXITCODE
+          }
+          if (($ideDoctor -join "`n") -notmatch "JetBrains IDE helper doctor checks passed.") {
+            Write-Error "IDE helper doctor did not report success for the .NET fixture."
+            Write-Output $ideDoctor
             exit 1
           }
           & .\.microsmith-bin\microsmith.cmd run examples/non-gradle/dotnet/build.microsmith.kts --out examples/non-gradle/dotnet/Generated
