@@ -33,7 +33,7 @@ internal class InitCommandHandler(
             details =
             mapOf(
                 "projectRoot" to projectRoot.toString(),
-                "repositoryType" to result.repositoryDetection.type.displayName,
+                "repositoryType" to result.repositoryDetection.profile.displayName,
                 "matchedMarkers" to result.repositoryDetection.matchedMarkers.joinToString(separator = ","),
                 "createdFiles" to result.createdFiles.size.toString(),
                 "overwrittenFiles" to result.overwrittenFiles.size.toString(),

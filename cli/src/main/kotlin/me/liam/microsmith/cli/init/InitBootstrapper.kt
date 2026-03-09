@@ -17,7 +17,7 @@ internal class InitBootstrapper(
         val projectRoot = command.projectRoot.toAbsolutePath().normalize()
         validateProjectRoot(projectRoot)
 
-        val repositoryDetection = detectOnboardingRepositoryType(projectRoot)
+        val repositoryDetection = detectOnboardingProfile(projectRoot)
         val createdFiles = mutableListOf<Path>()
         val overwrittenFiles = mutableListOf<Path>()
         val preservedFiles = mutableListOf<Path>()

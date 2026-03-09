@@ -1,28 +1,22 @@
 package me.liam.microsmith.cli.init
 
 internal object BootstrapScriptTemplates {
-    fun filesFor(repositoryDetection: OnboardingRepositoryDetection): Map<String, String> = linkedMapOf(
+    fun filesFor(repositoryDetection: OnboardingProfileDetection): Map<String, String> = linkedMapOf(
         "settings.microsmith.kts" to renderDefaultSettingsScript(repositoryDetection),
-        "build.microsmith.kts" to renderDefaultBuildScript(repositoryDetection.type),
+        "build.microsmith.kts" to renderDefaultBuildScript(repositoryDetection.profile),
     )
 
-    private fun renderDefaultSettingsScript(repositoryDetection: OnboardingRepositoryDetection): String = buildString {
+    private fun renderDefaultSettingsScript(repositoryDetection: OnboardingProfileDetection): String = buildString {
         appendLine("// Microsmith repository settings.")
         appendLine("// ${repositoryDetection.describeForComment()}.")
         appendLine("// Add shared script configuration here as your repository grows.")
     }
 
-    private fun renderDefaultBuildScript(repositoryType: OnboardingRepositoryType): String = buildString {
-        val displayName =
-            if (repositoryType == OnboardingRepositoryType.OTHER) {
-                "repository"
-            } else {
-                "${repositoryType.displayName} repository"
-            }
-        appendLine("// Bootstrapped Microsmith schema for this $displayName.")
+    private fun renderDefaultBuildScript(profile: OnboardingProfile): String = buildString {
+        appendLine("// Bootstrapped Microsmith schema for this ${profile.bootstrapTargetDescription}.")
         appendLine("// Canonical first run:")
         appendLine("// microsmith run build.microsmith.kts --out ./generated")
-        repositoryType.repoNativeOutputDirectory?.let { outputDirectory ->
+        profile.recommendedOutputDirectory?.let { outputDirectory ->
             appendLine("// Common repository-native output path:")
             appendLine("// microsmith run build.microsmith.kts --out $outputDirectory")
         }
@@ -31,7 +25,7 @@ internal object BootstrapScriptTemplates {
             microsmith {
                 schemas {
                     protobuf {
-                        message("${repositoryType.sampleMessageName}") {
+                        message("${profile.sampleMessageName}") {
                             int32("id") { index(1) }
                             string("email") { index(2) }
                         }
