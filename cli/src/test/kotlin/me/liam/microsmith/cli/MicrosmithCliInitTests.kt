@@ -5,11 +5,13 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.ide.IdeHelperRefreshResult
+import me.liam.microsmith.cli.init.GenericOnboardingProfile
+import me.liam.microsmith.cli.init.GoOnboardingProfile
 import me.liam.microsmith.cli.init.InitBootstrapResult
 import me.liam.microsmith.cli.init.InitConflictException
 import me.liam.microsmith.cli.init.InitValidationException
-import me.liam.microsmith.cli.init.OnboardingRepositoryDetection
-import me.liam.microsmith.cli.init.OnboardingRepositoryType
+import me.liam.microsmith.cli.init.NodeOnboardingProfile
+import me.liam.microsmith.cli.init.OnboardingProfileDetection
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
@@ -31,8 +33,8 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingRepositoryDetection(
-                                    type = OnboardingRepositoryType.GO,
+                                OnboardingProfileDetection(
+                                    profile = GoOnboardingProfile,
                                     matchedMarkers = listOf("go.mod"),
                                 ),
                                 createdFiles =
@@ -162,8 +164,8 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingRepositoryDetection(
-                                    type = OnboardingRepositoryType.NODE,
+                                OnboardingProfileDetection(
+                                    profile = NodeOnboardingProfile,
                                     matchedMarkers = listOf("package.json"),
                                 ),
                                 createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
@@ -217,8 +219,8 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingRepositoryDetection(
-                                    type = OnboardingRepositoryType.OTHER,
+                                OnboardingProfileDetection(
+                                    profile = GenericOnboardingProfile,
                                     matchedMarkers = emptyList(),
                                 ),
                                 createdFiles = emptyList(),

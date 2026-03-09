@@ -14,6 +14,7 @@ import java.io.IOException
 import java.io.UncheckedIOException
 import java.nio.file.FileSystems
 import java.nio.file.Files
+import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
@@ -44,7 +45,7 @@ class InitBootstrapTests :
                         },
                     )
 
-                result.repositoryDetection.type shouldBe OnboardingRepositoryType.NODE
+                result.repositoryDetection.profile shouldBe NodeOnboardingProfile
                 result.repositoryDetection.matchedMarkers shouldBe listOf("package.json")
                 result.createdFiles.shouldContainExactly(
                     listOf(
@@ -135,7 +136,7 @@ class InitBootstrapTests :
                         },
                     )
 
-                result.repositoryDetection.type shouldBe OnboardingRepositoryType.GO
+                result.repositoryDetection.profile shouldBe GoOnboardingProfile
                 result.createdFiles shouldBe emptyList()
                 result.overwrittenFiles.shouldContainExactly(listOf(buildScript, settingsScript))
                 result.preservedFiles shouldBe emptyList()
@@ -205,12 +206,12 @@ class InitBootstrapTests :
             try {
                 nodeRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
 
-                detectOnboardingRepositoryType(
+                detectOnboardingProfile(
                     projectRoot = nodeRoot,
-                    dotnetMarkerFinder = { throw IOException("permission denied") },
+                    detector = detectorWithDotnetMarkerFinder { throw IOException("permission denied") },
                 ) shouldBe
-                    OnboardingRepositoryDetection(
-                        type = OnboardingRepositoryType.NODE,
+                    OnboardingProfileDetection(
+                        profile = NodeOnboardingProfile,
                         matchedMarkers = listOf("package.json"),
                     )
             } finally {
@@ -223,14 +224,14 @@ class InitBootstrapTests :
             try {
                 nodeRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
 
-                detectOnboardingRepositoryType(
+                detectOnboardingProfile(
                     projectRoot = nodeRoot,
-                    dotnetMarkerFinder = {
+                    detector = detectorWithDotnetMarkerFinder {
                         throw UncheckedIOException(IOException("permission denied"))
                     },
                 ) shouldBe
-                    OnboardingRepositoryDetection(
-                        type = OnboardingRepositoryType.NODE,
+                    OnboardingProfileDetection(
+                        profile = NodeOnboardingProfile,
                         matchedMarkers = listOf("package.json"),
                     )
             } finally {
@@ -251,9 +252,9 @@ class InitBootstrapTests :
             val originalPermissions = Files.getPosixFilePermissions(unreadableDirectory)
             Files.setPosixFilePermissions(unreadableDirectory, emptySet())
             try {
-                detectOnboardingRepositoryType(dotnetRoot) shouldBe
-                    OnboardingRepositoryDetection(
-                        type = OnboardingRepositoryType.DOTNET,
+                detectOnboardingProfile(dotnetRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = DotnetOnboardingProfile,
                         matchedMarkers = listOf("src/apps/service/Fixture.csproj"),
                     )
             } finally {
@@ -278,24 +279,24 @@ class InitBootstrapTests :
                 mixedRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
                 mixedRoot.resolve("go.mod").writeText("module example.com/microsmith/fixture\n")
 
-                detectOnboardingRepositoryType(nodeRoot) shouldBe
-                    OnboardingRepositoryDetection(
-                        type = OnboardingRepositoryType.NODE,
+                detectOnboardingProfile(nodeRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = NodeOnboardingProfile,
                         matchedMarkers = listOf("package.json"),
                     )
-                detectOnboardingRepositoryType(goRoot) shouldBe
-                    OnboardingRepositoryDetection(
-                        type = OnboardingRepositoryType.GO,
+                detectOnboardingProfile(goRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = GoOnboardingProfile,
                         matchedMarkers = listOf("go.mod"),
                     )
-                detectOnboardingRepositoryType(dotnetRoot) shouldBe
-                    OnboardingRepositoryDetection(
-                        type = OnboardingRepositoryType.DOTNET,
+                detectOnboardingProfile(dotnetRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = DotnetOnboardingProfile,
                         matchedMarkers = listOf("src/apps/service/Fixture.csproj"),
                     )
-                detectOnboardingRepositoryType(mixedRoot) shouldBe
-                    OnboardingRepositoryDetection(
-                        type = OnboardingRepositoryType.OTHER,
+                detectOnboardingProfile(mixedRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = GenericOnboardingProfile,
                         matchedMarkers = listOf("go.mod", "package.json"),
                     )
             } finally {
@@ -367,3 +368,8 @@ private fun runningOnWindows(): Boolean = System.getProperty("os.name").startsWi
 
 private fun supportsPosixPermissions(): Boolean =
     !runningOnWindows() && FileSystems.getDefault().supportedFileAttributeViews().contains("posix")
+
+private fun detectorWithDotnetMarkerFinder(dotnetMarkerFinder: (Path) -> String?): OnboardingProfileDetector =
+    OnboardingProfileDetector(
+        matchers = BuiltInOnboardingProfileMatchers.all(dotnetMarkerFinder),
+    )
