@@ -5,18 +5,12 @@ import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
-import me.liam.microsmith.dsl.schemas.protobuf.types.Enum
-import me.liam.microsmith.dsl.schemas.protobuf.types.Message
-import me.liam.microsmith.dsl.schemas.protobuf.types.Type
+import me.liam.microsmith.dsl.schemas.protobuf.types.ReservedDeclarationOwner
 import me.liam.microsmith.gen.schemas.protobuf.emission.invariantViolation
 
 internal object ProtobufReservedSectionRenderer {
-    fun render(type: Type): String? {
-        val entries =
-            when (type) {
-                is Message -> type.reserved
-                is Enum -> type.reserved
-            }
+    fun render(type: ReservedDeclarationOwner): String? {
+        val entries = type.reserved
         if (entries.isEmpty()) {
             return null
         }
