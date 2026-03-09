@@ -27,7 +27,7 @@ class RepositoryQualityValidatorTests : StringSpec() {
                 RepositoryQualityViolation(
                     rule = "multiple-production-types",
                     path = "module/src/main/kotlin/example/MixedDeclarations.kt",
-                    message = "2 non-private top-level production declarations found. Split extra production types into their own files or make tightly coupled helpers private.",
+                    message = multipleProductionTypesMessage(2),
                 ),
             )
         }
@@ -49,7 +49,7 @@ class RepositoryQualityValidatorTests : StringSpec() {
                 RepositoryQualityViolation(
                     rule = "multiple-production-types",
                     path = "module/src/main/kotlin/example/PlatformTypes.kt",
-                    message = "2 non-private top-level production declarations found. Split extra production types into their own files or make tightly coupled helpers private.",
+                    message = multipleProductionTypesMessage(2),
                 ),
             )
         }
@@ -91,7 +91,7 @@ class RepositoryQualityValidatorTests : StringSpec() {
                 RepositoryQualityViolation(
                     rule = "multiple-production-types",
                     path = "module/src/main/kotlin/example/ApiShapes.kt",
-                    message = "2 non-private top-level production declarations found. Split extra production types into their own files or make tightly coupled helpers private.",
+                    message = multipleProductionTypesMessage(2),
                 ),
             )
         }
@@ -125,7 +125,11 @@ class RepositoryQualityValidatorTests : StringSpec() {
                 RepositoryQualityViolation(
                     rule = "production-file-lines",
                     path = "module/src/main/kotlin/example/TooLong.kt",
-                    message = "3 lines exceeds the allowed maximum of 2. Split parsing, validation, rendering, diagnostics, policy, or I/O responsibilities before extending the file further. Override rationale: A narrow exception should be called out explicitly.",
+                    message = productionFileLinesMessage(
+                        lineCount = 3,
+                        maxLines = 2,
+                        rationale = "A narrow exception should be called out explicitly.",
+                    ),
                 ),
             )
         }
@@ -146,7 +150,10 @@ class RepositoryQualityValidatorTests : StringSpec() {
                 RepositoryQualityViolation(
                     rule = "forbidden-package-segment",
                     path = "module/src/main/kotlin/example/util/Helpers.kt",
-                    message = "Package 'example.util' contains forbidden segment 'util'. Use a domain-led package name instead of util/utils/misc.",
+                    message = forbiddenPackageSegmentMessage(
+                        packageName = "example.util",
+                        forbiddenSegment = "util",
+                    ),
                 ),
             )
         }
@@ -171,7 +178,10 @@ class RepositoryQualityValidatorTests : StringSpec() {
                 """.trimIndent(),
             )
 
-            val violations = defaultValidator.validate(firstSource.repositoryRoot, listOf(secondSource.file, firstSource.file))
+            val violations = defaultValidator.validate(
+                firstSource.repositoryRoot,
+                listOf(secondSource.file, firstSource.file),
+            )
 
             violations.map(RepositoryQualityViolation::rule) shouldBe listOf(
                 "forbidden-package-segment",
@@ -195,4 +205,19 @@ class RepositoryQualityValidatorTests : StringSpec() {
         val repositoryRoot: java.nio.file.Path,
         val file: java.nio.file.Path,
     )
+
+    private companion object {
+        private fun multipleProductionTypesMessage(declarationCount: Int): String =
+            "$declarationCount non-private top-level production declarations found. " +
+                "Split extra production types into their own files or make tightly coupled helpers private."
+
+        private fun productionFileLinesMessage(lineCount: Int, maxLines: Int, rationale: String): String =
+            "$lineCount lines exceeds the allowed maximum of $maxLines. " +
+                "Split parsing, validation, rendering, diagnostics, policy, or I/O responsibilities " +
+                "before extending the file further. Override rationale: $rationale"
+
+        private fun forbiddenPackageSegmentMessage(packageName: String, forbiddenSegment: String): String =
+            "Package '$packageName' contains forbidden segment '$forbiddenSegment'. " +
+                "Use a domain-led package name instead of util/utils/misc."
+    }
 }

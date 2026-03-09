@@ -16,7 +16,10 @@ class RepositoryQualityPlugin : Plugin<Project> {
             exclude("**/build/**")
         }
 
-        val verifyTask = project.tasks.register("verifyRepositoryStandards", RepositoryQualityTask::class.java) { task ->
+        val verifyTask = project.tasks.register(
+            "verifyRepositoryStandards",
+            RepositoryQualityTask::class.java,
+        ) { task ->
             task.repositoryRoot.set(project.layout.projectDirectory)
             task.productionSources.from(productionSources)
         }

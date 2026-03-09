@@ -31,22 +31,30 @@ abstract class RepositoryQualityTask : DefaultTask() {
         val sourceFiles = productionSources.files.map { file -> file.toPath() }
         val violations = RepositoryQualityValidator(policy).validate(repositoryRoot.asFile.get().toPath(), sourceFiles)
         if (violations.isEmpty()) {
-            logger.lifecycle("Repository structural Kotlin quality guardrails passed.")
+            logger.lifecycle(successMessage)
             return
         }
 
         val report = buildString {
-            appendLine("Repository structural Kotlin quality guardrails failed:")
+            appendLine(failureHeader)
             violations.forEach { violation ->
                 appendLine("- [${violation.rule}] ${violation.path}: ${violation.message}")
             }
             appendLine()
-            appendLine(
-                @Suppress("ktlint:standard:max-line-length")
-                "Fix the structural issue, or if the exception is truly justified, update RepositoryQualityPolicy with a narrow path-specific rationale and mention it in the PR description.",
-            )
-            appendLine("Broader architecture and layering decisions remain review-gated in README.md.")
+            appendLine(policyExceptionRemediation)
+            appendLine(reviewGatedArchitectureGuidance)
         }
         throw GradleException(report)
+    }
+
+    private companion object {
+        private const val successMessage = "Repository structural Kotlin quality guardrails passed."
+        private const val failureHeader = "Repository structural Kotlin quality guardrails failed:"
+        private const val policyExceptionRemediation =
+            "Fix the structural issue, or if the exception is truly justified, " +
+                "update RepositoryQualityPolicy with a narrow path-specific rationale " +
+                "and mention it in the PR description."
+        private const val reviewGatedArchitectureGuidance =
+            "Broader architecture and layering decisions remain review-gated in README.md."
     }
 }

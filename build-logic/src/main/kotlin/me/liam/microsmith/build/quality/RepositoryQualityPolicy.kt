@@ -17,14 +17,19 @@ internal data class RepositoryQualityPolicy(
             productionFileLineOverrides = mapOf(
                 "cli/src/main/kotlin/me/liam/microsmith/cli/parsing/RunOptionsParser.kt" to ProductionFileLineOverride(
                     maxLines = 220,
-                    rationale = @Suppress("ktlint:standard:max-line-length")
-                    "Run option parsing still owns several closely related option groups and will be decomposed separately rather than hidden behind a catch-all helper.",
+                    rationale =
+                        "Run option parsing still owns several closely related option groups " +
+                            "and will be decomposed separately rather than hidden behind " +
+                            "a catch-all helper.",
                 ),
-                "dsl-schemas-protobuf/src/main/kotlin/me/liam/microsmith/dsl/schemas/protobuf/types/MessageBuilder.kt" to
+                "dsl-schemas-protobuf/src/main/kotlin/me/liam/microsmith/dsl/schemas/protobuf/" +
+                    "types/MessageBuilder.kt" to
                     ProductionFileLineOverride(
                         maxLines = 190,
-                        rationale = @Suppress("ktlint:standard:max-line-length")
-                        "Message builder orchestration is still being reduced in place; the temporary headroom is explicit until a narrower extraction is warranted.",
+                        rationale =
+                            "Message builder orchestration is still being reduced in place; " +
+                                "the temporary headroom is explicit until a narrower extraction " +
+                                "is warranted.",
                     ),
             ),
             multiDeclarationExemptions = emptyMap(),

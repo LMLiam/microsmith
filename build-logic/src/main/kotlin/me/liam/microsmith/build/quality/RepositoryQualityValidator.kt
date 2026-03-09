@@ -28,8 +28,7 @@ internal class RepositoryQualityValidator(private val policy: RepositoryQualityP
         return RepositoryQualityViolation(
             rule = "multiple-production-types",
             path = source.relativePath,
-            message = @Suppress("ktlint:standard:max-line-length")
-            "$declarationCount non-private top-level production declarations found. Split extra production types into their own files or make tightly coupled helpers private.",
+            message = multipleProductionTypesMessage(declarationCount),
         )
     }
 
@@ -44,7 +43,11 @@ internal class RepositoryQualityValidator(private val policy: RepositoryQualityP
         return RepositoryQualityViolation(
             rule = "production-file-lines",
             path = source.relativePath,
-            message = "${source.lineCount} lines exceeds the allowed maximum of $maxLines. Split parsing, validation, rendering, diagnostics, policy, or I/O responsibilities before extending the file further.$rationale",
+            message = productionFileLinesMessage(
+                lineCount = source.lineCount,
+                maxLines = maxLines,
+                rationale = rationale,
+            ),
         )
     }
 
@@ -56,7 +59,10 @@ internal class RepositoryQualityValidator(private val policy: RepositoryQualityP
         return RepositoryQualityViolation(
             rule = "forbidden-package-segment",
             path = source.relativePath,
-            message = "Package '$packageName' contains forbidden segment '$forbiddenSegment'. Use a domain-led package name instead of util/utils/misc.",
+            message = forbiddenPackageSegmentMessage(
+                packageName = packageName,
+                forbiddenSegment = forbiddenSegment,
+            ),
         )
     }
 
@@ -96,5 +102,18 @@ internal class RepositoryQualityValidator(private val policy: RepositoryQualityP
         )
         private val topLevelFunInterfacePattern = Regex("^$declarationModifierPattern(?:fun\\s+interface)\\b")
         private val topLevelTypeAliasPattern = Regex("^$declarationModifierPattern(?:typealias)\\b")
+
+        private fun multipleProductionTypesMessage(declarationCount: Int): String =
+            "$declarationCount non-private top-level production declarations found. " +
+                "Split extra production types into their own files or make tightly coupled helpers private."
+
+        private fun productionFileLinesMessage(lineCount: Int, maxLines: Int, rationale: String): String =
+            "$lineCount lines exceeds the allowed maximum of $maxLines. " +
+                "Split parsing, validation, rendering, diagnostics, policy, or I/O responsibilities " +
+                "before extending the file further.$rationale"
+
+        private fun forbiddenPackageSegmentMessage(packageName: String, forbiddenSegment: String): String =
+            "Package '$packageName' contains forbidden segment '$forbiddenSegment'. " +
+                "Use a domain-led package name instead of util/utils/misc."
     }
 }

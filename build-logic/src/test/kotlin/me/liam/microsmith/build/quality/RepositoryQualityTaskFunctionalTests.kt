@@ -39,8 +39,8 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             val result = project.buildAndFail("verifyRepositoryStandards")
 
             result.output shouldContain "[multiple-production-types] src/main/kotlin/example/MixedDeclarations.kt"
-            result.output shouldContain "Split extra production types into their own files or make tightly coupled helpers private."
-            result.output shouldContain "Fix the structural issue, or if the exception is truly justified, update RepositoryQualityPolicy"
+            result.output shouldContain multipleProductionTypesRemediation
+            result.output shouldContain policyExceptionRemediationPrefix
         }
 
         "verifyRepositoryStandards fails for production file line limit violations" {
@@ -53,7 +53,7 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             val result = project.buildAndFail("verifyRepositoryStandards")
 
             result.output shouldContain "[production-file-lines] src/main/kotlin/example/TooLong.kt"
-            result.output shouldContain "Split parsing, validation, rendering, diagnostics, policy, or I/O responsibilities before extending the file further."
+            result.output shouldContain lineLimitRemediation
         }
 
         "verifyRepositoryStandards fails for forbidden package segments" {
@@ -108,5 +108,16 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             appendLine("    fun line$index(): Int = $index")
         }
         appendLine("}")
+    }
+
+    private companion object {
+        private const val multipleProductionTypesRemediation =
+            "Split extra production types into their own files or make tightly coupled helpers private."
+        private const val lineLimitRemediation =
+            "Split parsing, validation, rendering, diagnostics, policy, or I/O responsibilities " +
+                "before extending the file further."
+        private const val policyExceptionRemediationPrefix =
+            "Fix the structural issue, or if the exception is truly justified, " +
+                "update RepositoryQualityPolicy"
     }
 }
