@@ -10,6 +10,13 @@ internal object BuiltInOnboardingProfileMatchers {
         return listOf(
             rootMarkerMatcher(NodeOnboardingProfile, "package.json"),
             rootMarkerMatcher(GoOnboardingProfile, "go.mod"),
+            rootMarkerMatcher(
+                PythonOnboardingProfile,
+                "pyproject.toml",
+                "requirements.txt",
+                "setup.py",
+                "setup.cfg",
+            ),
             dotnetMatcher(dotnetMarkerFinder),
         )
     }
@@ -20,12 +27,13 @@ internal object BuiltInOnboardingProfileMatchers {
         }
     }
 
-    private fun rootMarkerMatcher(profile: OnboardingProfile, markerFileName: String): OnboardingProfileMatcher {
+    private fun rootMarkerMatcher(
+        profile: OnboardingProfile,
+        vararg markerFileNames: String,
+    ): OnboardingProfileMatcher {
         return OnboardingProfileMatcher(profile) { projectRoot ->
-            if (projectRoot.resolve(markerFileName).isRegularFile()) {
-                listOf(markerFileName)
-            } else {
-                emptyList()
+            markerFileNames.filter { markerFileName ->
+                projectRoot.resolve(markerFileName).isRegularFile()
             }
         }
     }

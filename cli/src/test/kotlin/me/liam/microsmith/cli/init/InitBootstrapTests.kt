@@ -68,6 +68,46 @@ class InitBootstrapTests :
             }
         }
 
+        "creates repo-aware bootstrap files for Python repositories without a repository-native output override" {
+            val repoRoot = createTempDirectory("microsmith-init-bootstrap-python")
+            repoRoot.resolve("pyproject.toml").writeText(
+                """
+                [project]
+                name = "fixture-python"
+                version = "0.1.0"
+                """.trimIndent() + "\n",
+            )
+            try {
+                val helperRoot = repoRoot.resolve(".microsmith/ide")
+                val result =
+                    runInitBootstrap(
+                        command = InitCommand(projectRoot = repoRoot),
+                        ideRefreshRunner = { command ->
+                            IdeHelperRefreshResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                helperRoot = helperRoot,
+                                updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
+                                classpathEntries = listOf(repoRoot.resolve("runtime/microsmith-cli-all.jar")),
+                            )
+                        },
+                    )
+
+                result.repositoryDetection.profile shouldBe PythonOnboardingProfile
+                result.repositoryDetection.matchedMarkers shouldBe listOf("pyproject.toml")
+                val buildScript = repoRoot.resolve("build.microsmith.kts").readText()
+                val settingsScript = repoRoot.resolve("settings.microsmith.kts").readText()
+
+                buildScript.shouldContain("PythonUserCreated")
+                buildScript.shouldContain("microsmith run build.microsmith.kts --out ./generated")
+                buildScript.shouldContain("// Bootstrapped Microsmith schema for this Python repository.")
+                buildScript.shouldContain("Canonical first run:")
+                buildScript.contains("Common repository-native output path:") shouldBe false
+                settingsScript.shouldContain("Detected repository profile: Python")
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
         "preserves existing bootstrap files on repeated init runs by default" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-idempotent")
             val existingBuild = repoRoot.resolve("build.microsmith.kts")
@@ -270,14 +310,51 @@ class InitBootstrapTests :
             }
         }
 
-        "detects Node, Go, and .NET repositories and falls back to Other for mixed markers" {
+        listOf("pyproject.toml", "requirements.txt", "setup.py", "setup.cfg").forEach { markerFileName ->
+            "detects Python repositories from $markerFileName" {
+                val pythonRoot = createTempDirectory("microsmith-init-detect-python")
+                try {
+                    pythonRoot.resolve(markerFileName).writeText("# marker\n")
+
+                    detectOnboardingProfile(pythonRoot) shouldBe
+                        OnboardingProfileDetection(
+                            profile = PythonOnboardingProfile,
+                            selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                            matchedMarkers = listOf(markerFileName),
+                        )
+                } finally {
+                    runCatching { pythonRoot.deleteRecursively() }
+                }
+            }
+        }
+
+        "keeps the Python profile when multiple Python markers match" {
+            val pythonRoot = createTempDirectory("microsmith-init-detect-python-multi")
+            try {
+                pythonRoot.resolve("pyproject.toml").writeText("[project]\nname = \"fixture-python\"\n")
+                pythonRoot.resolve("requirements.txt").writeText("protobuf==0.0.0\n")
+
+                detectOnboardingProfile(pythonRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = PythonOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("pyproject.toml", "requirements.txt"),
+                    )
+            } finally {
+                runCatching { pythonRoot.deleteRecursively() }
+            }
+        }
+
+        "detects Node, Go, Python, and .NET repositories and falls back to Other for mixed markers" {
             val nodeRoot = createTempDirectory("microsmith-init-detect-node")
             val goRoot = createTempDirectory("microsmith-init-detect-go")
+            val pythonRoot = createTempDirectory("microsmith-init-detect-python")
             val dotnetRoot = createTempDirectory("microsmith-init-detect-dotnet")
             val mixedRoot = createTempDirectory("microsmith-init-detect-mixed")
             try {
                 nodeRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
                 goRoot.resolve("go.mod").writeText("module example.com/microsmith/fixture\n")
+                pythonRoot.resolve("pyproject.toml").writeText("[project]\nname = \"fixture-python\"\n")
                 dotnetRoot.resolve("src/apps/service").createDirectories()
                 dotnetRoot.resolve("src/apps/service/Fixture.csproj")
                     .writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
@@ -296,6 +373,12 @@ class InitBootstrapTests :
                         selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("go.mod"),
                     )
+                detectOnboardingProfile(pythonRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = PythonOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("pyproject.toml"),
+                    )
                 detectOnboardingProfile(dotnetRoot) shouldBe
                     OnboardingProfileDetection(
                         profile = DotnetOnboardingProfile,
@@ -311,6 +394,7 @@ class InitBootstrapTests :
             } finally {
                 runCatching { nodeRoot.deleteRecursively() }
                 runCatching { goRoot.deleteRecursively() }
+                runCatching { pythonRoot.deleteRecursively() }
                 runCatching { dotnetRoot.deleteRecursively() }
                 runCatching { mixedRoot.deleteRecursively() }
             }
