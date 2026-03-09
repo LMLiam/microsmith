@@ -47,8 +47,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build CLI release assets
-        run: ./gradlew :cli:releaseArtifacts --stacktrace
+      - name: Build release assets
+        run: ./gradlew :cli:releaseArtifacts :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -64,5 +64,7 @@ jobs:
             cli/build/release-assets/microsmith-install.sh
             cli/build/release-assets/microsmith-install.ps1
             cli/build/release-assets/*.sha256
+            runtime-scripting/build/release-assets/microsmith-script-definition-*-all.jar
+            runtime-scripting/build/release-assets/microsmith-script-definition-*-all.jar.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

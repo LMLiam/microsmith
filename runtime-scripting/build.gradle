@@ -1,3 +1,8 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.util.jar.JarFile
+
 dependencies {
     implementation project(":dsl")
     implementation project(":dsl-schemas")
@@ -9,4 +14,85 @@ dependencies {
     implementation libs.kotlin.scripting.common
     implementation libs.kotlin.scripting.jvm
     implementation libs.kotlin.scripting.jvm.host
+}
+
+def ideFallbackReleaseAssetsDirectory = layout.buildDirectory.dir("release-assets")
+def ideFallbackShadowJarTask = tasks.named("shadowJar", ShadowJar)
+def ideFallbackShadowJarArchive = ideFallbackShadowJarTask.flatMap { it.archiveFile }
+def ideFallbackExpectedEntries = [
+    "me/liam/microsmith/runtime/scripting/definition/MicrosmithScript.class",
+    "me/liam/microsmith/runtime/scripting/definition/MicrosmithScriptCompilationConfiguration.class",
+    "me/liam/microsmith/runtime/scripting/context/MicrosmithScriptContext.class",
+    "kotlin/script/experimental/jvmhost/BasicJvmScriptingHost.class",
+]
+
+tasks.named("shadowJar", ShadowJar) {
+    archiveBaseName.set("microsmith-script-definition")
+    archiveClassifier.set("all")
+    manifest {
+        attributes(
+            "Implementation-Version": project.version.toString(),
+        )
+    }
+}
+
+tasks.register("verifyIdeFallbackShadowJar") {
+    dependsOn(ideFallbackShadowJarTask)
+    inputs.file(ideFallbackShadowJarArchive)
+
+    doLast {
+        File archiveFile = ideFallbackShadowJarArchive.get().asFile
+        if (!archiveFile.isFile()) {
+            throw new GradleException("IDE fallback shadow jar '${archiveFile.path}' was not created.")
+        }
+
+        JarFile jarFile = new JarFile(archiveFile)
+        try {
+            def entryNames = jarFile.entries().collect { entry -> entry.name } as Set
+            def missingEntries = ideFallbackExpectedEntries.findAll { expected -> !entryNames.contains(expected) }
+            if (!missingEntries.isEmpty()) {
+                throw new GradleException(
+                    "IDE fallback shadow jar '${archiveFile.name}' is missing expected entries: ${missingEntries.join(', ')}",
+                )
+            }
+        } finally {
+            jarFile.close()
+        }
+    }
+}
+
+tasks.register("ideFallbackArtifacts", Sync) {
+    dependsOn(tasks.named("verifyIdeFallbackShadowJar"))
+    into(ideFallbackReleaseAssetsDirectory)
+    from(ideFallbackShadowJarArchive)
+}
+
+tasks.register("generateIdeFallbackChecksums") {
+    dependsOn(tasks.named("ideFallbackArtifacts"))
+    inputs.dir(ideFallbackReleaseAssetsDirectory)
+    outputs.dir(ideFallbackReleaseAssetsDirectory)
+
+    doLast {
+        File releaseDir = ideFallbackReleaseAssetsDirectory.get().asFile
+        if (!releaseDir.isDirectory()) {
+            throw new GradleException("IDE fallback release assets directory '${releaseDir.path}' does not exist.")
+        }
+
+        def sourceFiles =
+            releaseDir.listFiles()
+                .findAll { file -> file.isFile() && !file.name.endsWith('.sha256') }
+                .sort { left, right -> left.name <=> right.name }
+        if (sourceFiles.isEmpty()) {
+            throw new GradleException("IDE fallback release assets directory '${releaseDir.path}' did not contain files to checksum.")
+        }
+
+        sourceFiles.each { file ->
+            String checksum = MessageDigest.getInstance("SHA-256").digest(file.bytes).encodeHex().toString()
+            new File(releaseDir, "${file.name}.sha256").setText("${checksum}  ${file.name}\n", StandardCharsets.UTF_8.name())
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn(tasks.named("verifyIdeFallbackShadowJar"))
 }
