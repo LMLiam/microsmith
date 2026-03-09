@@ -41,7 +41,10 @@ abstract class RepositoryQualityTask : DefaultTask() {
                 appendLine("- [${violation.rule}] ${violation.path}: ${violation.message}")
             }
             appendLine()
-            appendLine("Fix the structural issue, or if the exception is truly justified, update RepositoryQualityPolicy with a narrow path-specific rationale and mention it in the PR description.")
+            appendLine(
+                @Suppress("ktlint:standard:max-line-length")
+                "Fix the structural issue, or if the exception is truly justified, update RepositoryQualityPolicy with a narrow path-specific rationale and mention it in the PR description.",
+            )
             appendLine("Broader architecture and layering decisions remain review-gated in README.md.")
         }
         throw GradleException(report)

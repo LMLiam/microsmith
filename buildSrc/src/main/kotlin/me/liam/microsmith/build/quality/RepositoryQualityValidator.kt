@@ -3,20 +3,17 @@ package me.liam.microsmith.build.quality
 import java.nio.file.Files
 import java.nio.file.Path
 
-internal class RepositoryQualityValidator(
-    private val policy: RepositoryQualityPolicy,
-) {
-    fun validate(repositoryRoot: Path, sourceFiles: Iterable<Path>): List<RepositoryQualityViolation> =
-        sourceFiles
-            .map { sourceFile -> sourceFile.toProductionKotlinSource(repositoryRoot) }
-            .flatMap { source ->
-                listOfNotNull(
-                    validateTopLevelProductionDeclarations(source),
-                    validateLineCount(source),
-                    validatePackageSegments(source),
-                )
-            }
-            .sortedWith(compareBy(RepositoryQualityViolation::rule, RepositoryQualityViolation::path))
+internal class RepositoryQualityValidator(private val policy: RepositoryQualityPolicy) {
+    fun validate(repositoryRoot: Path, sourceFiles: Iterable<Path>): List<RepositoryQualityViolation> = sourceFiles
+        .map { sourceFile -> sourceFile.toProductionKotlinSource(repositoryRoot) }
+        .flatMap { source ->
+            listOfNotNull(
+                validateTopLevelProductionDeclarations(source),
+                validateLineCount(source),
+                validatePackageSegments(source),
+            )
+        }
+        .sortedWith(compareBy(RepositoryQualityViolation::rule, RepositoryQualityViolation::path))
 
     private fun validateTopLevelProductionDeclarations(source: ProductionKotlinSource): RepositoryQualityViolation? {
         if (policy.multiDeclarationExemptionFor(source.relativePath) != null) {
@@ -31,7 +28,8 @@ internal class RepositoryQualityValidator(
         return RepositoryQualityViolation(
             rule = "multiple-production-types",
             path = source.relativePath,
-            message = "$declarationCount non-private top-level production declarations found. Split extra production types into their own files or make tightly coupled helpers private.",
+            message = @Suppress("ktlint:standard:max-line-length")
+            "$declarationCount non-private top-level production declarations found. Split extra production types into their own files or make tightly coupled helpers private.",
         )
     }
 
@@ -52,7 +50,8 @@ internal class RepositoryQualityValidator(
 
     private fun validatePackageSegments(source: ProductionKotlinSource): RepositoryQualityViolation? {
         val packageName = source.packageName ?: return null
-        val forbiddenSegment = packageName.split('.').firstOrNull(policy.forbiddenPackageSegments::contains) ?: return null
+        val forbiddenSegment =
+            packageName.split('.').firstOrNull(policy.forbiddenPackageSegments::contains) ?: return null
 
         return RepositoryQualityViolation(
             rule = "forbidden-package-segment",
@@ -90,10 +89,12 @@ internal class RepositoryQualityValidator(
 
     private companion object {
         private val packageDeclarationPattern = Regex("^package\\s+([A-Za-z0-9_.]+)$")
+        private const val declarationModifierPattern =
+            "(?:(?:public|internal|open|abstract|final|sealed|data|value|enum|annotation|expect|actual)\\s+)*"
         private val topLevelTypeDeclarationPattern = Regex(
-            "^(?:(?:public|internal)\\s+)?(?:(?:data|sealed|value|enum|annotation)\\s+)*(?:class|interface|object)\\b",
+            "^$declarationModifierPattern(?:class|interface|object)\\b",
         )
-        private val topLevelFunInterfacePattern = Regex("^(?:(?:public|internal)\\s+)?fun\\s+interface\\b")
-        private val topLevelTypeAliasPattern = Regex("^(?:(?:public|internal)\\s+)?typealias\\b")
+        private val topLevelFunInterfacePattern = Regex("^$declarationModifierPattern(?:fun\\s+interface)\\b")
+        private val topLevelTypeAliasPattern = Regex("^$declarationModifierPattern(?:typealias)\\b")
     }
 }

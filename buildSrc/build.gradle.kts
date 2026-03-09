@@ -12,6 +12,10 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    testImplementation(kotlin("test-junit5"))
+}
+
 kotlin {
     jvmToolchain(24)
 }
@@ -29,4 +33,8 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.withType<JavaCompile>().configureEach {
     options.release.set(22)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
