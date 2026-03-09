@@ -10,7 +10,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
 import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceFieldBuilder
 import me.liam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 
-class OneofBuilder(
+internal class OneofBuilder(
     private val name: String,
     private val segments: List<String>,
     private val allocateIndex: (Int?) -> Int,

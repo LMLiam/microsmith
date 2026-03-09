@@ -22,14 +22,13 @@ import me.liam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.OneofBuilder
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.Max
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.Reserved
 import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedBuilder
-import me.liam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
+import me.liam.microsmith.dsl.schemas.protobuf.reserved.buildReservedDeclarations
 import me.liam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
 import me.liam.microsmith.dsl.schemas.protobuf.support.NameRegistry
 import me.liam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 
-class MessageBuilder(private val name: String, private val segments: List<String>) : MessageScope {
+internal class MessageBuilder(private val name: String, private val segments: List<String>) : MessageScope {
     private val allocator = IndexAllocator(1, protoReservedIndexes)
     private val nameRegistry = NameRegistry()
 
@@ -40,52 +39,25 @@ class MessageBuilder(private val name: String, private val segments: List<String
         name = name,
         fields = fields.values.sortedBy { it.index },
         oneofs = oneofs.sortedBy { it.name },
-        reserved =
-        buildList {
-            allocator.reserved().sortedBy { it.first }.mapTo(this, Reserved::fromRange)
-
-            nameRegistry.reserved().sorted().mapTo(this, ::ReservedName)
-        },
+        reserved = buildReservedDeclarations(allocator, nameRegistry),
     )
 
     override fun optional(field: CardinalityField) {
-        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        fields[field.name] =
-            when (field) {
-                is ReferenceField -> field.copy(cardinality = Cardinality.OPTIONAL)
-                is ScalarField -> field.copy(cardinality = Cardinality.OPTIONAL)
-            }
+        fields[field.name] = field.withCardinality(Cardinality.OPTIONAL)
     }
 
     override fun optional(block: MessageScope.() -> CardinalityField) {
         val field = this.block()
-        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        val updated =
-            when (field) {
-                is ReferenceField -> field.copy(cardinality = Cardinality.OPTIONAL)
-                is ScalarField -> field.copy(cardinality = Cardinality.OPTIONAL)
-            }
-        fields[field.name] = updated
+        fields[field.name] = field.withCardinality(Cardinality.OPTIONAL)
     }
 
     override fun repeated(field: CardinalityField) {
-        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        fields[field.name] =
-            when (field) {
-                is ReferenceField -> field.copy(cardinality = Cardinality.REPEATED)
-                is ScalarField -> field.copy(cardinality = Cardinality.REPEATED)
-            }
+        fields[field.name] = field.withCardinality(Cardinality.REPEATED)
     }
 
     override fun repeated(block: MessageScope.() -> CardinalityField) {
         val field = this.block()
-        require(field.cardinality == Cardinality.REQUIRED) { "Field cardinality already set to ${field.cardinality}" }
-        val updated =
-            when (field) {
-                is ReferenceField -> field.copy(cardinality = Cardinality.REPEATED)
-                is ScalarField -> field.copy(cardinality = Cardinality.REPEATED)
-            }
-        fields[field.name] = updated
+        fields[field.name] = field.withCardinality(Cardinality.REPEATED)
     }
 
     override fun oneof(name: String, block: OneofScope.() -> Unit) {
@@ -102,7 +74,7 @@ class MessageBuilder(private val name: String, private val segments: List<String
 
     override fun map(name: String, block: MapFieldScope.() -> Unit): MapField {
         require(name.isNotBlank()) { "Field name cannot be blank" }
-        require(name !in fields) { "Duplicate field name: $name" }
+        nameRegistry.validate(name)
 
         val builder = MapFieldBuilder(segments).apply(block)
 
@@ -110,6 +82,7 @@ class MessageBuilder(private val name: String, private val segments: List<String
         val value = requireNotNull(builder.value) { "Map value type must be set" }
 
         val index = allocateIndex(builder.index)
+        nameRegistry.use(name)
 
         return MapField(name, index, MapType(key, value)).also { fields[name] = it }
     }
@@ -183,6 +156,17 @@ class MessageBuilder(private val name: String, private val segments: List<String
             .let { builder ->
                 ScalarField(name, allocateIndex(builder.index), type, builder.cardinality)
             }.also { field -> fields[name] = field }
+    }
+
+    private fun CardinalityField.withCardinality(cardinality: Cardinality): CardinalityField {
+        require(this.cardinality == Cardinality.REQUIRED) {
+            "Field cardinality already set to ${this.cardinality}"
+        }
+
+        return when (this) {
+            is ReferenceField -> copy(cardinality = cardinality)
+            is ScalarField -> copy(cardinality = cardinality)
+        }
     }
 
     companion object {

@@ -3,7 +3,7 @@ package me.liam.microsmith.dsl.schemas.protobuf.field
 import me.liam.microsmith.dsl.schemas.protobuf.MapFieldScope
 import me.liam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 
-class MapFieldBuilder(
+internal class MapFieldBuilder(
     private val segments: List<String>,
     var index: Int? = null,
     var key: MapKeyType? = null,

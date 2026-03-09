@@ -1,6 +1,6 @@
 package me.liam.microsmith.dsl.schemas.protobuf.support
 
-class NameRegistry {
+internal class NameRegistry {
     private val used = mutableSetOf<String>()
     private val reserved = mutableSetOf<String>()
 
