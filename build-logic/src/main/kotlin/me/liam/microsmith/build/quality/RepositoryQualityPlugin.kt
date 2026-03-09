@@ -11,18 +11,18 @@ class RepositoryQualityPlugin : Plugin<Project> {
 
         project.pluginManager.apply("base")
 
-        val verifyTask = project.tasks.register("verifyRepositoryStandards", RepositoryQualityTask::class.java) {
-            repositoryRoot.set(project.layout.projectDirectory)
-            productionSources.from(
-                project.fileTree(project.layout.projectDirectory) {
-                    include("**/src/main/kotlin/**/*.kt")
-                    exclude("**/build/**")
-                },
-            )
+        val productionSources = project.fileTree(project.layout.projectDirectory).apply {
+            include("**/src/main/kotlin/**/*.kt")
+            exclude("**/build/**")
         }
 
-        project.tasks.named("check").configure {
-            dependsOn(verifyTask)
+        val verifyTask = project.tasks.register("verifyRepositoryStandards", RepositoryQualityTask::class.java) { task ->
+            task.repositoryRoot.set(project.layout.projectDirectory)
+            task.productionSources.from(productionSources)
+        }
+
+        project.tasks.named("check").configure { task ->
+            task.dependsOn(verifyTask)
         }
     }
 }

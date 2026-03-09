@@ -1,10 +1,11 @@
 import org.gradle.api.JavaVersion
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    `kotlin-dsl`
+    id("org.jetbrains.kotlin.jvm")
     `java-gradle-plugin`
 }
 
@@ -14,8 +15,10 @@ repositories {
 }
 
 dependencies {
+    compileOnly(gradleApi())
     testImplementation(gradleTestKit())
-    testImplementation(kotlin("test-junit5"))
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.assertions.core)
 }
 
 kotlin {
@@ -37,7 +40,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.release.set(22)
 }
 
-tasks.test {
+tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
