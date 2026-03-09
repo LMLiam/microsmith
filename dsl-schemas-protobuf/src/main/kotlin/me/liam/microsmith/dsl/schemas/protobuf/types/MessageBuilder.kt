@@ -74,7 +74,7 @@ internal class MessageBuilder(private val name: String, private val segments: Li
 
     override fun map(name: String, block: MapFieldScope.() -> Unit): MapField {
         require(name.isNotBlank()) { "Field name cannot be blank" }
-        require(name !in fields) { "Duplicate field name: $name" }
+        nameRegistry.validate(name)
 
         val builder = MapFieldBuilder(segments).apply(block)
 
@@ -82,6 +82,7 @@ internal class MessageBuilder(private val name: String, private val segments: Li
         val value = requireNotNull(builder.value) { "Map value type must be set" }
 
         val index = allocateIndex(builder.index)
+        nameRegistry.use(name)
 
         return MapField(name, index, MapType(key, value)).also { fields[name] = it }
     }

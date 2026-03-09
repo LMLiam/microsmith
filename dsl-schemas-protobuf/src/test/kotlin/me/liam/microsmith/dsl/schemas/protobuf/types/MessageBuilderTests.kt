@@ -173,6 +173,30 @@ class MessageBuilderTests :
             }
         }
 
+        "reserved names prevent using same name for map fields" {
+            val b = builder()
+            b.reserved("tags")
+            shouldThrow<IllegalArgumentException> {
+                b.map("tags") {
+                    types(PrimitiveType.STRING, PrimitiveType.STRING)
+                    index(7)
+                }
+            }
+        }
+
+        "map field names cannot reuse oneof field names" {
+            val b = builder()
+            b.oneof("choice") {
+                string("shared") { index(9) }
+            }
+            shouldThrow<IllegalArgumentException> {
+                b.map("shared") {
+                    types(PrimitiveType.STRING, PrimitiveType.STRING)
+                    index(10)
+                }
+            }
+        }
+
         "optional on scalar field flips cardinality and stores updated copy" {
             val b = builder()
             val s = b.int32("age") { index(3) }
