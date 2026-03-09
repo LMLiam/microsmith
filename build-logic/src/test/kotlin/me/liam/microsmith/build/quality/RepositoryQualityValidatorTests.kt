@@ -56,7 +56,7 @@ class RepositoryQualityValidatorTests : StringSpec() {
 
         "validate ignores private and nested declarations" {
             val source = productionSource(
-                path = "module/src/main/kotlin/example/ScopedDeclarations.kt",
+                path = "module/src/main/kotlin/example/Visible.kt",
                 contents = """
                 package example
 
@@ -158,6 +158,74 @@ class RepositoryQualityValidatorTests : StringSpec() {
             )
         }
 
+        "validate reports missing package declarations" {
+            val source = productionSource(
+                path = "module/src/main/kotlin/example/NoPackage.kt",
+                contents = """
+                class NoPackage
+                """.trimIndent(),
+            )
+
+            val violations = defaultValidator.validate(source.repositoryRoot, listOf(source.file))
+
+            violations shouldContainExactly listOf(
+                RepositoryQualityViolation(
+                    rule = "missing-package-declaration",
+                    path = "module/src/main/kotlin/example/NoPackage.kt",
+                    message = missingPackageDeclarationMessage,
+                ),
+            )
+        }
+
+        "validate reports package path mismatches" {
+            val source = productionSource(
+                path = "module/src/main/kotlin/example/right/Alpha.kt",
+                contents = """
+                package example.wrong
+
+                class Alpha
+                """.trimIndent(),
+            )
+
+            val violations = defaultValidator.validate(source.repositoryRoot, listOf(source.file))
+
+            violations shouldContainExactly listOf(
+                RepositoryQualityViolation(
+                    rule = "package-path-mismatch",
+                    path = "module/src/main/kotlin/example/right/Alpha.kt",
+                    message = packagePathMismatchMessage(
+                        packageName = "example.wrong",
+                        expectedDirectory = "example/wrong",
+                        actualDirectory = "example/right",
+                    ),
+                ),
+            )
+        }
+
+        "validate reports single top level type file name mismatches" {
+            val source = productionSource(
+                path = "module/src/main/kotlin/example/TypeAliasFile.kt",
+                contents = """
+                package example
+
+                typealias ActualName = String
+                """.trimIndent(),
+            )
+
+            val violations = defaultValidator.validate(source.repositoryRoot, listOf(source.file))
+
+            violations shouldContainExactly listOf(
+                RepositoryQualityViolation(
+                    rule = "primary-type-file-name",
+                    path = "module/src/main/kotlin/example/TypeAliasFile.kt",
+                    message = primaryTypeFileNameMessage(
+                        fileNameWithoutExtension = "TypeAliasFile",
+                        declarationName = "ActualName",
+                    ),
+                ),
+            )
+        }
+
         "validate sorts violations by rule and path" {
             val firstSource = productionSource(
                 path = "module/src/main/kotlin/example/util/Helpers.kt",
@@ -219,5 +287,20 @@ class RepositoryQualityValidatorTests : StringSpec() {
         private fun forbiddenPackageSegmentMessage(packageName: String, forbiddenSegment: String): String =
             "Package '$packageName' contains forbidden segment '$forbiddenSegment'. " +
                 "Use a domain-led package name instead of util/utils/misc."
+
+        private const val missingPackageDeclarationMessage =
+            "Production Kotlin files must declare an explicit package. " +
+                "Use a domain-led package that matches the src/main/kotlin directory."
+
+        private fun packagePathMismatchMessage(
+            packageName: String,
+            expectedDirectory: String,
+            actualDirectory: String,
+        ): String = "Package '$packageName' maps to '$expectedDirectory', but the source file lives under " +
+            "'$actualDirectory'. Keep package declarations aligned with src/main/kotlin paths."
+
+        private fun primaryTypeFileNameMessage(fileNameWithoutExtension: String, declarationName: String): String =
+            "File '$fileNameWithoutExtension.kt' does not match the single top-level production declaration " +
+                "'$declarationName'. Rename the file or the declaration so the owning type remains obvious."
     }
 }

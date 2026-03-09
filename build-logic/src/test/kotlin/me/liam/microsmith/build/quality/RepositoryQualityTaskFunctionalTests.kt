@@ -73,6 +73,55 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             result.output shouldContain "Package 'example.util' contains forbidden segment 'util'."
         }
 
+        "verifyRepositoryStandards fails for missing package declarations" {
+            val project = RepositoryQualityFunctionalTestProject.rootProject("repository-quality-missing-package")
+            project.writeFile(
+                "src/main/kotlin/example/NoPackage.kt",
+                """
+                class NoPackage
+                """.trimIndent(),
+            )
+
+            val result = project.buildAndFail("verifyRepositoryStandards")
+
+            result.output shouldContain "[missing-package-declaration] src/main/kotlin/example/NoPackage.kt"
+            result.output shouldContain missingPackageDeclarationRemediation
+        }
+
+        "verifyRepositoryStandards fails for package path mismatches" {
+            val project = RepositoryQualityFunctionalTestProject.rootProject("repository-quality-package-path")
+            project.writeFile(
+                "src/main/kotlin/example/right/Alpha.kt",
+                """
+                package example.wrong
+
+                class Alpha
+                """.trimIndent(),
+            )
+
+            val result = project.buildAndFail("verifyRepositoryStandards")
+
+            result.output shouldContain "[package-path-mismatch] src/main/kotlin/example/right/Alpha.kt"
+            result.output shouldContain "Package 'example.wrong' maps to 'example/wrong'"
+        }
+
+        "verifyRepositoryStandards fails when single top level type does not match file name" {
+            val project = RepositoryQualityFunctionalTestProject.rootProject("repository-quality-file-name")
+            project.writeFile(
+                "src/main/kotlin/example/TypeAliasFile.kt",
+                """
+                package example
+
+                typealias ActualName = String
+                """.trimIndent(),
+            )
+
+            val result = project.buildAndFail("verifyRepositoryStandards")
+
+            result.output shouldContain "[primary-type-file-name] src/main/kotlin/example/TypeAliasFile.kt"
+            result.output shouldContain primaryTypeFileNamePrefix
+        }
+
         "verifyRepositoryStandards ignores files under build directories" {
             val project = RepositoryQualityFunctionalTestProject.rootProject("repository-quality-build-ignored")
             project.writeFile(
@@ -116,8 +165,12 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
         private const val lineLimitRemediation =
             "Split parsing, validation, rendering, diagnostics, policy, or I/O responsibilities " +
                 "before extending the file further."
+        private const val missingPackageDeclarationRemediation =
+            "Production Kotlin files must declare an explicit package."
         private const val policyExceptionRemediationPrefix =
             "Fix the structural issue, or if the exception is truly justified, " +
                 "update RepositoryQualityPolicy"
+        private const val primaryTypeFileNamePrefix =
+            "File 'TypeAliasFile.kt' does not match the single top-level production declaration"
     }
 }
