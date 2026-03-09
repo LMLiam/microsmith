@@ -14,8 +14,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.types.Message
 internal object ReservedUsageCollisionValidator {
     fun validate(message: Message) {
         validateNames(
-            ownerType = "Message",
-            ownerName = message.name,
+            owner = ReservedUsageOwner.message(message.name),
             reservedNames = message.reserved.filterIsInstance<ReservedName>().map(ReservedName::name),
             usedNames = buildList {
                 message.fields.forEach { add(it.name) }
@@ -23,8 +22,7 @@ internal object ReservedUsageCollisionValidator {
             },
         )
         validateNumbers(
-            ownerType = "Message",
-            ownerName = message.name,
+            owner = ReservedUsageOwner.message(message.name),
             reserved = message.reserved,
             usedNumbers = buildList {
                 message.fields.forEach { add(it.index) }
@@ -35,59 +33,42 @@ internal object ReservedUsageCollisionValidator {
 
     fun validate(enum: Enum) {
         validateNames(
-            ownerType = "Enum",
-            ownerName = enum.name,
+            owner = ReservedUsageOwner.enum(enum.name),
             reservedNames = enum.reserved.filterIsInstance<ReservedName>().map(ReservedName::name),
             usedNames = enum.values.map { it.name },
         )
         validateNumbers(
-            ownerType = "Enum",
-            ownerName = enum.name,
+            owner = ReservedUsageOwner.enum(enum.name),
             reserved = enum.reserved,
             usedNumbers = enum.values.map { it.index },
         )
     }
 
-    private fun validateNames(
-        ownerType: String,
-        ownerName: String,
-        reservedNames: List<String>,
-        usedNames: List<String>,
-    ) {
+    private fun validateNames(owner: ReservedUsageOwner, reservedNames: List<String>, usedNames: List<String>) {
         val duplicateReservedNames = reservedNames.groupingBy { it }.eachCount().filterValues { it > 1 }.keys
         require(duplicateReservedNames.isEmpty()) {
-            "$ownerType '$ownerName' has duplicate reserved names: ${duplicateReservedNames.sorted().joinToString(
-                ", ",
-            )}."
+            val duplicateNames = duplicateReservedNames.sorted().joinToString(", ")
+            "${owner.displayName} '${owner.name}' has duplicate reserved names: $duplicateNames."
         }
 
         val reservedNameSet = reservedNames.toSet()
         val collisions = usedNames.distinct().filter { it in reservedNameSet }
         require(collisions.isEmpty()) {
-            "$ownerType '$ownerName' uses reserved names: ${collisions.sorted().joinToString(", ")}."
+            "${owner.displayName} '${owner.name}' uses reserved names: ${collisions.sorted().joinToString(", ")}."
         }
     }
 
-    private fun validateNumbers(
-        ownerType: String,
-        ownerName: String,
-        reserved: List<Reserved>,
-        usedNumbers: List<Int>,
-    ) {
+    private fun validateNumbers(owner: ReservedUsageOwner, reserved: List<Reserved>, usedNumbers: List<Int>) {
         val reservedRanges = reserved.filterNot { it is ReservedName }.map(::toReservedSpan)
-        requireNoReservedRangeOverlaps(ownerType, ownerName, reservedRanges)
+        requireNoReservedRangeOverlaps(owner, reservedRanges)
 
         val collisions = usedNumbers.distinct().filter { number -> reservedRanges.any { number in it.range } }
         require(collisions.isEmpty()) {
-            "$ownerType '$ownerName' uses reserved numbers: ${collisions.sorted().joinToString(", ")}."
+            "${owner.displayName} '${owner.name}' uses reserved numbers: ${collisions.sorted().joinToString(", ")}."
         }
     }
 
-    private fun requireNoReservedRangeOverlaps(
-        ownerType: String,
-        ownerName: String,
-        reservedRanges: List<ReservedSpan>,
-    ) {
+    private fun requireNoReservedRangeOverlaps(owner: ReservedUsageOwner, reservedRanges: List<ReservedSpan>) {
         val overlaps =
             reservedRanges
                 .sortedBy { it.range.first }
@@ -96,7 +77,7 @@ internal object ReservedUsageCollisionValidator {
                 .map { (left, right) -> "${left.description} overlaps ${right.description}" }
 
         require(overlaps.isEmpty()) {
-            "$ownerType '$ownerName' has overlapping reserved ranges: ${overlaps.joinToString("; ")}."
+            "${owner.displayName} '${owner.name}' has overlapping reserved ranges: ${overlaps.joinToString("; ")}."
         }
     }
 
