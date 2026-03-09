@@ -9,9 +9,8 @@ import me.liam.microsmith.gen.files.GeneratedFile
 import me.liam.microsmith.gen.schemas.SchemaEmitter
 import me.liam.microsmith.gen.schemas.protobuf.imports.collectImports
 import me.liam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaName
-import me.liam.microsmith.gen.schemas.protobuf.render.renderEnum
-import me.liam.microsmith.gen.schemas.protobuf.render.renderMessage
-import me.liam.microsmith.gen.schemas.protobuf.render.renderProtobufFile
+import me.liam.microsmith.gen.schemas.protobuf.render.ProtobufDeclarationRenderer
+import me.liam.microsmith.gen.schemas.protobuf.render.ProtobufFileRenderer
 import java.nio.charset.StandardCharsets
 import kotlin.reflect.KClass
 
@@ -30,27 +29,29 @@ class ProtobufEmitter(override val type: KClass<ProtobufSchema> = ProtobufSchema
      */
     override suspend fun ProtobufSchema.emit(space: FileSpace): GeneratedFile {
         val qualifiedName = QualifiedSchemaName.parse(name)
-        validateForEmission()
+        ProtobufSchemaEmissionValidator.validate(this)
 
         val contents =
-            when (val currentType = schema) {
-                is Message ->
-                    renderProtobufFile(
-                        qualifiedName = qualifiedName,
-                        declaration = currentType.renderMessage(),
-                        imports = currentType.collectImports(qualifiedName),
-                    )
-
-                is Enum ->
-                    renderProtobufFile(
-                        qualifiedName = qualifiedName,
-                        declaration = currentType.renderEnum(),
-                    )
-            }
+            ProtobufFileRenderer.render(
+                qualifiedName = qualifiedName,
+                declaration = renderDeclaration(),
+                imports = collectImports(qualifiedName),
+            )
 
         return GeneratedFile(
             relativePath = qualifiedName.relativePath(),
             contents = contents.toByteArray(StandardCharsets.UTF_8),
         )
     }
+
+    private fun ProtobufSchema.renderDeclaration(): String = when (val currentType = schema) {
+        is Message -> ProtobufDeclarationRenderer.render(currentType)
+        is Enum -> ProtobufDeclarationRenderer.render(currentType)
+    }
+
+    private fun ProtobufSchema.collectImports(qualifiedName: QualifiedSchemaName): List<String> =
+        when (val currentType = schema) {
+            is Message -> currentType.collectImports(qualifiedName)
+            is Enum -> emptyList()
+        }
 }
