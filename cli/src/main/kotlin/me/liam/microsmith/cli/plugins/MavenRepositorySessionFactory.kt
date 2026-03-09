@@ -14,10 +14,9 @@ internal class MavenRepositorySessionFactory {
     ): RepositorySystemSession {
         val session = DefaultRepositorySystemSession()
         val localRepository = LocalRepository(localRepositoryRoot.toFile())
-        session.setOffline(offline)
-        session.setLocalRepositoryManager(
-            repositorySystem.newLocalRepositoryManager(session, localRepository),
-        )
+        session.isOffline = offline
+        session.localRepositoryManager =
+            repositorySystem.newLocalRepositoryManager(session, localRepository)
         return session
     }
 }

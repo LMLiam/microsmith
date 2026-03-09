@@ -6,6 +6,7 @@ import io.kotest.matchers.string.shouldNotContain
 import io.kotest.matchers.types.shouldBeTypeOf
 import me.liam.microsmith.cli.command.RunCommand
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.writeBytes
@@ -23,7 +24,7 @@ class PluginResolverLockingTests :
                 val localJar = tempDir.resolve("plugins/local-plugin.jar")
                 val lockfilePath = tempDir.resolve("plugins.microsmith.lock")
                 script.writeText("// test script")
-                localJar.parent?.toFile()?.mkdirs()
+                localJar.parent.createDirectories()
                 localJar.writeBytes("local-plugin".toByteArray())
                 lockfilePath.writeBytes(byteArrayOf(0xC3.toByte(), 0x28))
 

@@ -2,7 +2,7 @@ package me.liam.microsmith.build.quality
 
 internal fun String.packageNameOrNull(): String? {
     val line = trim().removeTrailingInlineComment()
-    return packageDeclarationPattern.matchEntire(line)?.groupValues?.get(1)
+    return PACKAGE_DECLARATION_PATTERN.matchEntire(line)?.groupValues?.get(1)
 }
 
 internal fun String.isTopLevelProductionDeclarationLine(): Boolean {
@@ -11,9 +11,9 @@ internal fun String.isTopLevelProductionDeclarationLine(): Boolean {
         return false
     }
 
-    return topLevelTypeDeclarationPattern.containsMatchIn(declarationLine) ||
-        topLevelFunInterfacePattern.containsMatchIn(declarationLine) ||
-        topLevelTypeAliasPattern.containsMatchIn(declarationLine)
+    return TOP_LEVEL_TYPE_DECLARATION_PATTERN.containsMatchIn(declarationLine) ||
+        TOP_LEVEL_FUN_INTERFACE_PATTERN.containsMatchIn(declarationLine) ||
+        TOP_LEVEL_TYPE_ALIAS_PATTERN.containsMatchIn(declarationLine)
 }
 
 internal fun String.topLevelProductionDeclarationNameOrNull(): String? {
@@ -22,9 +22,9 @@ internal fun String.topLevelProductionDeclarationNameOrNull(): String? {
         return null
     }
 
-    return topLevelTypeDeclarationNamePattern.find(declarationLine)?.groupValues?.get(1)
-        ?: topLevelFunInterfaceNamePattern.find(declarationLine)?.groupValues?.get(1)
-        ?: topLevelTypeAliasNamePattern.find(declarationLine)?.groupValues?.get(1)
+    return TOP_LEVEL_TYPE_DECLARATION_NAME_PATTERN.find(declarationLine)?.groupValues?.get(1)
+        ?: TOP_LEVEL_FUN_INTERFACE_NAME_PATTERN.find(declarationLine)?.groupValues?.get(1)
+        ?: TOP_LEVEL_TYPE_ALIAS_NAME_PATTERN.find(declarationLine)?.groupValues?.get(1)
 }
 
 private fun String.removeTrailingInlineComment(): String = substringBefore("//")
@@ -95,7 +95,7 @@ private fun String.consumeBalancedParentheses(startIndex: Int): Int? {
     var depth = 0
     while (index < length) {
         when {
-            startsWith(tripleQuote, index) -> {
+            startsWith(TRIPLE_QUOTE, index) -> {
                 index = consumeTripleQuotedString(index) ?: return null
                 continue
             }
@@ -124,8 +124,8 @@ private fun String.consumeBalancedParentheses(startIndex: Int): Int? {
 }
 
 private fun String.consumeTripleQuotedString(startIndex: Int): Int? {
-    val closingIndex = indexOf(tripleQuote, startIndex + tripleQuote.length)
-    return closingIndex.takeIf { it >= 0 }?.plus(tripleQuote.length)
+    val closingIndex = indexOf(TRIPLE_QUOTE, startIndex + TRIPLE_QUOTE.length)
+    return closingIndex.takeIf { it >= 0 }?.plus(TRIPLE_QUOTE.length)
 }
 
 private fun String.consumeQuotedLiteral(startIndex: Int, quote: Char): Int? {
@@ -143,21 +143,21 @@ private fun String.consumeQuotedLiteral(startIndex: Int, quote: Char): Int? {
     return null
 }
 
-private val packageDeclarationPattern = Regex("^package\\s+([A-Za-z0-9_.]+)$")
-private const val declarationModifierPattern =
+private val PACKAGE_DECLARATION_PATTERN = Regex("^package\\s+([A-Za-z0-9_.]+)$")
+private const val DECLARATION_MODIFIER_PATTERN =
     "(?:(?:public|internal|open|abstract|final|sealed|data|value|enum|annotation|expect|actual)\\s+)*"
-private val topLevelTypeDeclarationPattern = Regex(
-    "^$declarationModifierPattern(?:class|interface|object)\\b",
+private val TOP_LEVEL_TYPE_DECLARATION_PATTERN = Regex(
+    "^$DECLARATION_MODIFIER_PATTERN(?:class|interface|object)\\b",
 )
-private val topLevelFunInterfacePattern = Regex("^$declarationModifierPattern(?:fun\\s+interface)\\b")
-private val topLevelTypeAliasPattern = Regex("^$declarationModifierPattern(?:typealias)\\b")
-private val topLevelTypeDeclarationNamePattern = Regex(
-    "^$declarationModifierPattern(?:class|interface|object)\\s+([A-Za-z_][A-Za-z0-9_]*)\\b",
+private val TOP_LEVEL_FUN_INTERFACE_PATTERN = Regex("^$DECLARATION_MODIFIER_PATTERN(?:fun\\s+interface)\\b")
+private val TOP_LEVEL_TYPE_ALIAS_PATTERN = Regex("^$DECLARATION_MODIFIER_PATTERN(?:typealias)\\b")
+private val TOP_LEVEL_TYPE_DECLARATION_NAME_PATTERN = Regex(
+    "^$DECLARATION_MODIFIER_PATTERN(?:class|interface|object)\\s+([A-Za-z_][A-Za-z0-9_]*)\\b",
 )
-private val topLevelFunInterfaceNamePattern = Regex(
-    "^$declarationModifierPattern(?:fun\\s+interface)\\s+([A-Za-z_][A-Za-z0-9_]*)\\b",
+private val TOP_LEVEL_FUN_INTERFACE_NAME_PATTERN = Regex(
+    "^$DECLARATION_MODIFIER_PATTERN(?:fun\\s+interface)\\s+([A-Za-z_][A-Za-z0-9_]*)\\b",
 )
-private val topLevelTypeAliasNamePattern = Regex(
-    "^$declarationModifierPattern(?:typealias)\\s+([A-Za-z_][A-Za-z0-9_]*)\\b",
+private val TOP_LEVEL_TYPE_ALIAS_NAME_PATTERN = Regex(
+    "^$DECLARATION_MODIFIER_PATTERN(?:typealias)\\s+([A-Za-z_][A-Za-z0-9_]*)\\b",
 )
-private const val tripleQuote = "\"\"\""
+private const val TRIPLE_QUOTE = "\"\"\""

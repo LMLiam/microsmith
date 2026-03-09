@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.writeText
@@ -53,7 +54,7 @@ class MicrosmithScriptCacheTests :
                 val scriptFile = tempDir.resolve("schema.microsmith.kts")
                 val pluginJar = tempDir.resolve("plugins/custom-plugin.jar")
                 scriptFile.writeText("microsmith { }")
-                pluginJar.parent?.toFile()?.mkdirs()
+                pluginJar.parent.createDirectories()
                 pluginJar.writeText("v1")
 
                 val compilationConfiguration =

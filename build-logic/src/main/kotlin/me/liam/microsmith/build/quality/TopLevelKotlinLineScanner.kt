@@ -26,16 +26,16 @@ internal object TopLevelKotlinLineScanner {
             while (index < line.length) {
                 when {
                     currentBlockComment -> {
-                        val blockCommentEnd = line.indexOf(blockCommentEndMarker, index)
+                        val blockCommentEnd = line.indexOf(BLOCK_COMMENT_END_MARKER, index)
                         if (blockCommentEnd == -1) {
                             return copy(insideBlockComment = true)
                         }
                         currentBlockComment = false
-                        index = blockCommentEnd + blockCommentEndMarker.length
+                        index = blockCommentEnd + BLOCK_COMMENT_END_MARKER.length
                     }
 
                     currentTripleQuotedString -> {
-                        val tripleQuoteEnd = line.indexOf(tripleQuote, index)
+                        val tripleQuoteEnd = line.indexOf(TRIPLE_QUOTE, index)
                         if (tripleQuoteEnd == -1) {
                             return copy(
                                 braceDepth = currentBraceDepth,
@@ -44,18 +44,18 @@ internal object TopLevelKotlinLineScanner {
                             )
                         }
                         currentTripleQuotedString = false
-                        index = tripleQuoteEnd + tripleQuote.length
+                        index = tripleQuoteEnd + TRIPLE_QUOTE.length
                     }
 
-                    line.startsWith(lineCommentMarker, index) -> break
-                    line.startsWith(blockCommentStartMarker, index) -> {
+                    line.startsWith(LINE_COMMENT_MARKER, index) -> break
+                    line.startsWith(BLOCK_COMMENT_START_MARKER, index) -> {
                         currentBlockComment = true
-                        index += blockCommentStartMarker.length
+                        index += BLOCK_COMMENT_START_MARKER.length
                     }
 
-                    line.startsWith(tripleQuote, index) -> {
+                    line.startsWith(TRIPLE_QUOTE, index) -> {
                         currentTripleQuotedString = true
-                        index += tripleQuote.length
+                        index += TRIPLE_QUOTE.length
                     }
 
                     line[index] == '"' -> {
@@ -103,8 +103,8 @@ internal object TopLevelKotlinLineScanner {
         return null
     }
 
-    private const val lineCommentMarker = "//"
-    private const val blockCommentStartMarker = "/*"
-    private const val blockCommentEndMarker = "*/"
-    private const val tripleQuote = "\"\"\""
+    private const val LINE_COMMENT_MARKER = "//"
+    private const val BLOCK_COMMENT_START_MARKER = "/*"
+    private const val BLOCK_COMMENT_END_MARKER = "*/"
+    private const val TRIPLE_QUOTE = "\"\"\""
 }

@@ -13,14 +13,21 @@ internal class AetherRemoteRepositoryFactory {
             REMOTE_REPOSITORY_TYPE_DEFAULT,
             repository.uri,
         )
-        repository.credentials?.let { credentials ->
-            builder.setAuthentication(
-                AuthenticationBuilder()
-                    .addUsername(credentials.username)
-                    .addPassword(credentials.password)
-                    .build(),
-            )
-        }
+        repository.credentials?.let(builder::applyAuthentication)
         return builder.build()
     }
+}
+
+@Suppress("UsePropertyAccessSyntax")
+private fun RemoteRepository.Builder.applyAuthentication(credentials: RepositoryCredentials) {
+    /*
+     * Kotlin property syntax is not usable here: the Java type exposes a package-private field and
+     * the builder setter remains the only accessible API from this module.
+     */
+    setAuthentication(
+        AuthenticationBuilder()
+            .addUsername(credentials.username)
+            .addPassword(credentials.password)
+            .build(),
+    )
 }
