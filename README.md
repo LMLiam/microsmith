@@ -19,6 +19,7 @@ This README is the canonical repository documentation.
 - Plugin resolution and security model
 - CI examples
 - Example fixtures
+- Validation matrix and release checklist
 - Troubleshooting
 - Migration from Gradle
 - Distribution and release artifacts
@@ -388,6 +389,18 @@ Usage:
   microsmith doctor [--diagnostics <text|json>] [--verbose]
   microsmith --version
   microsmith --help
+
+Security policy env vars:
+  MICROSMITH_REPOSITORY_ALLOWLIST   Comma-separated additional allowed repository base URIs.
+  MICROSMITH_ALLOW_FILE_REPOSITORIES Set to true to allow file:// repositories for plugin coordinates.
+  MICROSMITH_REPOSITORY_CREDENTIALS_FILE Path to repository credentials file (<repository-uri>|<username>|<password>).
+  MICROSMITH_REPOSITORY_USERNAME    Default username for authenticated repository access.
+  MICROSMITH_REPOSITORY_PASSWORD    Default password/token for authenticated repository access.
+  MICROSMITH_GITHUB_PACKAGES_USER   Username for https://maven.pkg.github.com access.
+  MICROSMITH_GITHUB_PACKAGES_TOKEN  Token for https://maven.pkg.github.com access.
+  MICROSMITH_PLUGIN_ALLOWLIST_FILE  Path to checksum allowlist file (<kind>|<key>|<sha256>; kind=remote|remote-artifact|local).
+  MICROSMITH_SCRIPT_CACHE_DIR       Override script compilation cache directory.
+  MICROSMITH_PLUGIN_CACHE_DIR       Override plugin resolution cache directory.
 ```
 
 ### Canonical happy paths
@@ -746,6 +759,69 @@ Each fixture contains a repo marker used by `microsmith init`, a legacy `schema.
 | Node    | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
 | Go      | `examples/non-gradle/go`     | `microsmith init` then `microsmith run build.microsmith.kts --out ./internal/gen` | `examples/non-gradle/go/.github/workflows/microsmith.yml`     |
 | .NET    | `examples/non-gradle/dotnet` | `microsmith init` then `microsmith run build.microsmith.kts --out .\Generated`    | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
+
+## Validation matrix and release checklist
+
+### Automated validation matrix
+
+| Surface                        | Coverage source                                      | Evidence                                                                                   |
+|--------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| CLI help and README contract   | `build-and-qodana` on Ubuntu                         | `scripts/verify_readme_cli_usage.py` compares the README usage block to built `--help`.   |
+| CLI distribution smoke         | `cli-smoke` on Ubuntu, macOS, and Windows            | Dist launcher, generation, process isolation, and `doctor --diagnostics json`.             |
+| Installer and bootstrap smoke  | `cli-smoke` on Ubuntu, macOS, and Windows            | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.        |
+| Non-JVM fixture onboarding     | `cli-smoke` on Ubuntu and Windows                    | Node, Go, and .NET fixtures run the canonical `microsmith init` then `microsmith run`.    |
+| JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Fixture coverage runs `microsmith ide refresh` and `microsmith ide doctor`.               |
+| Fallback artifact packaging    | `build-and-qodana` on Ubuntu                         | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`. |
+| Resolver, auth, lock, offline  | `./gradlew build` and module regression suites       | `:cli:jvmKotest` covers authenticated repositories, lockfiles, cache policy, and offline behavior. |
+
+Automated gates are required on every release candidate commit:
+
+- `Build & Qodana`
+- `cli-smoke` on `ubuntu-latest`
+- `cli-smoke` on `macos-latest`
+- `cli-smoke` on `windows-latest`
+
+### JetBrains IDE validation bands
+
+JetBrains IDE indexing and import behavior is partly host-driven, so final sign-off stays manual even though CI covers helper generation, helper doctor, and fallback artifact packaging.
+
+Support policy:
+
+- supported products are IntelliJ IDEA, GoLand, and Rider
+- supported release band is the current stable major line and the previous stable major line at release cut
+- EAP builds are best-effort only and do not block release
+
+| Product         | Fixture root                    | Required helper smoke path                              | Required fallback smoke path                             |
+|-----------------|---------------------------------|---------------------------------------------------------|----------------------------------------------------------|
+| IntelliJ IDEA   | `examples/non-gradle/node`      | Run the helper checklist below against the Node fixture. | Run the fallback checklist below against the Node fixture. |
+| GoLand          | `examples/non-gradle/go`        | Run the helper checklist below against the Go fixture.   | Run the fallback checklist below against the Go fixture.   |
+| Rider           | `examples/non-gradle/dotnet`    | Run the helper checklist below against the .NET fixture. | Run the fallback checklist below against the .NET fixture. |
+
+### Manual IDE release checklist
+
+Helper path:
+
+1. Install the release-candidate Microsmith CLI.
+2. Run `microsmith init` from the fixture root.
+3. Import `.microsmith/ide/build.gradle.kts` as a Gradle project in the target JetBrains IDE.
+4. Refresh Gradle indexing.
+5. Run `microsmith ide doctor --repo-root <fixture> --diagnostics json --verbose`.
+6. Confirm `microsmith {}`, `schemas {}`, and `protobuf {}` resolve in `build.microsmith.kts` without red squiggles.
+
+Fallback path:
+
+1. Download or build the matching `microsmith-script-definition-<version>-all.jar`.
+2. Attach the jar as a project library in the target JetBrains IDE.
+3. Reindex the project.
+4. Confirm `microsmith {}`, `schemas {}`, and `protobuf {}` resolve in `build.microsmith.kts`.
+5. Confirm plugin-provided types remain a helper-only capability unless the helper project is imported.
+
+Release sign-off artifact:
+
+- record one row per product and IDE version in the release PR or release issue
+- include product, IDE version, fixture root, helper result, fallback result, verifier GitHub handle, and date
+- treat that release record as the required manual sign-off artifact
+- do not cut the release until all required rows for the supported version band are recorded and approved
 
 ## Troubleshooting
 
