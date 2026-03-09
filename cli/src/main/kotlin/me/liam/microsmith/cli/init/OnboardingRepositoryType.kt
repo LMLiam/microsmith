@@ -99,7 +99,7 @@ private fun findDotnetMarker(projectRoot: Path): String? {
                 FileVisitResult.CONTINUE
         },
     )
-    return matchedMarkers.sorted().firstOrNull()
+    return matchedMarkers.minOrNull()
 }
 
 private const val DOTNET_MARKER_SEARCH_DEPTH = 6
