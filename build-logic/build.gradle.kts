@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `kotlin-dsl`
+    `java-gradle-plugin`
 }
 
 repositories {
@@ -13,6 +14,7 @@ repositories {
 }
 
 dependencies {
+    testImplementation(gradleTestKit())
     testImplementation(kotlin("test-junit5"))
 }
 
@@ -37,4 +39,15 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+gradlePlugin {
+    plugins {
+        register("repositoryQuality") {
+            id = "me.liam.microsmith.repository-quality"
+            implementationClass = "me.liam.microsmith.build.quality.RepositoryQualityPlugin"
+            displayName = "Microsmith Repository Quality"
+            description = "Registers repository structural Kotlin quality guardrails."
+        }
+    }
 }

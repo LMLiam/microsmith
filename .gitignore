@@ -1,5 +1,6 @@
 ### Build system ###
 .gradle/
+**/.gradle/
 .gradle-user-home/
 build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -21,6 +22,7 @@ out/
 
 ### Kotlin ###
 .kotlin/
+**/.kotlin/
 
 ### Eclipse ###
 .apt_generated/
