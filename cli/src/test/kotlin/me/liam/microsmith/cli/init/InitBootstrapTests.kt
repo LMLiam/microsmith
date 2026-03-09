@@ -60,7 +60,9 @@ class InitBootstrapTests :
                 repoRoot.resolve("settings.microsmith.kts").isRegularFile() shouldBe true
                 repoRoot.resolve("build.microsmith.kts").readText().shouldContain("NodeUserCreated")
                 repoRoot.resolve("build.microsmith.kts").readText().shouldContain("./generated")
-                repoRoot.resolve("settings.microsmith.kts").readText().shouldContain("Detected repository type: Node")
+                repoRoot.resolve("settings.microsmith.kts")
+                    .readText()
+                    .shouldContain("Detected repository profile: Node")
             } finally {
                 runCatching { repoRoot.deleteRecursively() }
             }
@@ -212,6 +214,7 @@ class InitBootstrapTests :
                 ) shouldBe
                     OnboardingProfileDetection(
                         profile = NodeOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("package.json"),
                     )
             } finally {
@@ -232,6 +235,7 @@ class InitBootstrapTests :
                 ) shouldBe
                     OnboardingProfileDetection(
                         profile = NodeOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("package.json"),
                     )
             } finally {
@@ -255,6 +259,7 @@ class InitBootstrapTests :
                 detectOnboardingProfile(dotnetRoot) shouldBe
                     OnboardingProfileDetection(
                         profile = DotnetOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("src/apps/service/Fixture.csproj"),
                     )
             } finally {
@@ -282,21 +287,25 @@ class InitBootstrapTests :
                 detectOnboardingProfile(nodeRoot) shouldBe
                     OnboardingProfileDetection(
                         profile = NodeOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("package.json"),
                     )
                 detectOnboardingProfile(goRoot) shouldBe
                     OnboardingProfileDetection(
                         profile = GoOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("go.mod"),
                     )
                 detectOnboardingProfile(dotnetRoot) shouldBe
                     OnboardingProfileDetection(
                         profile = DotnetOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("src/apps/service/Fixture.csproj"),
                     )
                 detectOnboardingProfile(mixedRoot) shouldBe
                     OnboardingProfileDetection(
                         profile = GenericOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.AMBIGUOUS_MARKERS,
                         matchedMarkers = listOf("go.mod", "package.json"),
                     )
             } finally {

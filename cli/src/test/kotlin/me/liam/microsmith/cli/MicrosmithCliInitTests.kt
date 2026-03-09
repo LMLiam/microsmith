@@ -12,6 +12,7 @@ import me.liam.microsmith.cli.init.InitConflictException
 import me.liam.microsmith.cli.init.InitValidationException
 import me.liam.microsmith.cli.init.NodeOnboardingProfile
 import me.liam.microsmith.cli.init.OnboardingProfileDetection
+import me.liam.microsmith.cli.init.OnboardingProfileSelectionReason
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
@@ -35,6 +36,7 @@ class MicrosmithCliInitTests :
                                 repositoryDetection =
                                 OnboardingProfileDetection(
                                     profile = GoOnboardingProfile,
+                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                                     matchedMarkers = listOf("go.mod"),
                                 ),
                                 createdFiles =
@@ -59,7 +61,7 @@ class MicrosmithCliInitTests :
 
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("Microsmith init completed")
-                out.joinToString("\n").shouldContain("Detected repository type: Go")
+                out.joinToString("\n").shouldContain("Detected repository profile: Go")
                 out.joinToString("\n").shouldContain("build.microsmith.kts")
                 out.joinToString("\n").shouldContain("JetBrains IDE helper is updated")
                 out.joinToString("\n").shouldContain("microsmith run build.microsmith.kts --out ./generated")
@@ -166,6 +168,7 @@ class MicrosmithCliInitTests :
                                 repositoryDetection =
                                 OnboardingProfileDetection(
                                     profile = NodeOnboardingProfile,
+                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                                     matchedMarkers = listOf("package.json"),
                                 ),
                                 createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
@@ -197,7 +200,7 @@ class MicrosmithCliInitTests :
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("\"level\":\"info\"")
                 out.joinToString("\n").shouldContain("Microsmith init completed")
-                out.joinToString("\n").shouldContain("Detected repository type: Node")
+                out.joinToString("\n").shouldContain("Detected repository profile: Node")
                 out.joinToString("\n").shouldContain("\"details\"")
                 err shouldBe emptyList()
             } finally {
@@ -221,6 +224,7 @@ class MicrosmithCliInitTests :
                                 repositoryDetection =
                                 OnboardingProfileDetection(
                                     profile = GenericOnboardingProfile,
+                                    selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
                                     matchedMarkers = emptyList(),
                                 ),
                                 createdFiles = emptyList(),
