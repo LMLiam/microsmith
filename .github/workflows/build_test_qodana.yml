@@ -204,32 +204,34 @@ jobs:
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts --out install-smoke-repo/generated
           test -f install-smoke-repo/generated/proto/UserCreated.proto
-      - name: Smoke test Node and Go onboarding fixtures (Linux)
+      - name: Smoke test Node, Go, and Python onboarding fixtures (Linux)
         if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
         run: |
-          set -eu
-          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/node
-          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/node
-          test -f examples/non-gradle/node/build.microsmith.kts
-          test -f examples/non-gradle/node/settings.microsmith.kts
-          test -f examples/non-gradle/node/.microsmith/ide/build.gradle.kts
-          test -f examples/non-gradle/node/.microsmith/ide/README.md
-          ./.microsmith-bin/microsmith ide refresh --repo-root examples/non-gradle/node
-          ./.microsmith-bin/microsmith ide doctor --repo-root examples/non-gradle/node --diagnostics json > node-ide-doctor.json
-          grep -q "JetBrains IDE helper doctor checks passed." node-ide-doctor.json
-          ./.microsmith-bin/microsmith run examples/non-gradle/node/build.microsmith.kts --out examples/non-gradle/node/generated
-          test -f examples/non-gradle/node/generated/proto/NodeUserCreated.proto
-          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/go
-          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/go
-          test -f examples/non-gradle/go/build.microsmith.kts
-          test -f examples/non-gradle/go/settings.microsmith.kts
-          test -f examples/non-gradle/go/.microsmith/ide/build.gradle.kts
-          test -f examples/non-gradle/go/.microsmith/ide/README.md
-          ./.microsmith-bin/microsmith ide refresh --repo-root examples/non-gradle/go
-          ./.microsmith-bin/microsmith ide doctor --repo-root examples/non-gradle/go --diagnostics json > go-ide-doctor.json
-          grep -q "JetBrains IDE helper doctor checks passed." go-ide-doctor.json
-          ./.microsmith-bin/microsmith run examples/non-gradle/go/build.microsmith.kts --out examples/non-gradle/go/internal/gen
-          test -f examples/non-gradle/go/internal/gen/proto/GoUserCreated.proto
+          set -euo pipefail
+          smoke_unix_fixture() {
+            local repo_name="$1"
+            local repo_root="$2"
+            local output_root="$3"
+            local expected_proto="$4"
+            local doctor_output="$5"
+
+            ./.microsmith-bin/microsmith init --repo-root "$repo_root"
+            ./.microsmith-bin/microsmith init --repo-root "$repo_root"
+            test -f "$repo_root/build.microsmith.kts"
+            test -f "$repo_root/settings.microsmith.kts"
+            test -f "$repo_root/.microsmith/ide/build.gradle.kts"
+            test -f "$repo_root/.microsmith/ide/README.md"
+            ./.microsmith-bin/microsmith ide refresh --repo-root "$repo_root"
+            ./.microsmith-bin/microsmith ide doctor --repo-root "$repo_root" --diagnostics json > "$doctor_output"
+            grep -q "JetBrains IDE helper doctor checks passed." "$doctor_output"
+            ./.microsmith-bin/microsmith run "$repo_root/build.microsmith.kts" --out "$repo_root/$output_root"
+            test -f "$repo_root/$output_root/proto/$expected_proto"
+            echo "Validated $repo_name fixture."
+          }
+
+          smoke_unix_fixture node examples/non-gradle/node generated NodeUserCreated.proto node-ide-doctor.json
+          smoke_unix_fixture go examples/non-gradle/go internal/gen GoUserCreated.proto go-ide-doctor.json
+          smoke_unix_fixture python examples/non-gradle/python generated PythonUserCreated.proto python-ide-doctor.json
       - name: Install and verify from installer (Windows)
         id: install-windows
         if: ${{ always() && runner.os == 'Windows' && steps.build-release-windows.outcome == 'success' }}
