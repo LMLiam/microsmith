@@ -204,7 +204,7 @@ jobs:
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts --out install-smoke-repo/generated
           test -f install-smoke-repo/generated/proto/UserCreated.proto
-      - name: Smoke test Node, Go, and Python onboarding fixtures (Linux)
+      - name: Smoke test Node, Go, Python, and Rust onboarding fixtures (Linux)
         if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
         run: |
           set -euo pipefail
@@ -232,6 +232,7 @@ jobs:
           smoke_unix_fixture node examples/non-gradle/node generated NodeUserCreated.proto node-ide-doctor.json
           smoke_unix_fixture go examples/non-gradle/go internal/gen GoUserCreated.proto go-ide-doctor.json
           smoke_unix_fixture python examples/non-gradle/python generated PythonUserCreated.proto python-ide-doctor.json
+          smoke_unix_fixture rust examples/non-gradle/rust generated RustUserCreated.proto rust-ide-doctor.json
       - name: Install and verify from installer (Windows)
         id: install-windows
         if: ${{ always() && runner.os == 'Windows' && steps.build-release-windows.outcome == 'success' }}
