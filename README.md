@@ -226,8 +226,8 @@ microsmith run build.microsmith.kts --out ./generated
 
 `microsmith init` is deterministic and non-destructive by default:
 
-- it detects Node, Go, Python, Ruby, Rust, and .NET repositories from `package.json`, `go.mod`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, `Gemfile`, a root `*.gemspec`, a root `Cargo.toml`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
-- Ruby detection covers Bundler-first app roots and gem-style repositories through a root `Gemfile` or root `*.gemspec`; nested gems without a root Ruby marker stay on the generic path
+- it detects Node, Go, Python, Ruby, Rust, and .NET repositories from `package.json`, `go.mod`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `gems.rb`, a root `*.gemspec`, a root `Cargo.toml`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
+- Ruby detection covers Bundler-first app roots and gem-style repositories through a root `Gemfile`, root `gems.rb`, or root `*.gemspec`; nested gems without a root Ruby marker stay on the generic path
 - Rust detection covers both package manifests and workspace roots through a root `Cargo.toml`; nested crates without a root manifest stay on the generic path
 - it creates `settings.microsmith.kts` when missing
 - it creates `build.microsmith.kts` when missing
@@ -831,8 +831,8 @@ Each fixture contains a repo marker used by `microsmith init`, a legacy `schema.
 | CLI help and README contract   | `build-and-qodana` on Ubuntu                         | `scripts/verify_readme_cli_usage.py` compares the README usage block to built `--help`.   |
 | CLI distribution smoke         | `cli-smoke` on Ubuntu, macOS, and Windows            | Dist launcher, generation, process isolation, and `doctor --diagnostics json`.             |
 | Installer and bootstrap smoke  | `cli-smoke` on Ubuntu, macOS, and Windows            | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.        |
-| Non-JVM fixture onboarding     | `cli-smoke` on Ubuntu and Windows                    | Node, Go, Python, Ruby, Rust, and .NET fixtures run the canonical `microsmith init` then `microsmith run`. |
-| JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Fixture coverage runs `microsmith ide refresh` and `microsmith ide doctor` for Node, Go, Python, Ruby, Rust, and .NET fixtures. |
+| Non-JVM fixture onboarding     | `cli-smoke` on Ubuntu and Windows                    | Ubuntu covers Node, Go, Python, Ruby, and Rust fixtures; Windows covers the .NET fixture. |
+| JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Ubuntu runs `ide refresh` and `ide doctor` for Node, Go, Python, Ruby, and Rust fixtures; Windows runs the .NET helper path. |
 | Fallback artifact packaging    | `build-and-qodana` on Ubuntu                         | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`. |
 | Resolver, auth, lock, offline  | `./gradlew build` and module regression suites       | `:cli:jvmKotest` covers authenticated repositories, lockfiles, cache policy, and offline behavior. |
 

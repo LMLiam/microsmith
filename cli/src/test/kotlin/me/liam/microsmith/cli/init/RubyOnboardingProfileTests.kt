@@ -84,6 +84,27 @@ class RubyOnboardingProfileTests :
             }
         }
 
+        "detects Ruby repositories from gems.rb" {
+            val rubyRoot = createTempDirectory("microsmith-init-detect-ruby-gems-rb")
+            try {
+                rubyRoot.resolve("gems.rb").writeText(
+                    """
+                    source "https://rubygems.org"
+                    gem "rack"
+                    """.trimIndent() + "\n",
+                )
+
+                detectOnboardingProfile(rubyRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = RubyOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("gems.rb"),
+                    )
+            } finally {
+                runCatching { rubyRoot.deleteRecursively() }
+            }
+        }
+
         "detects Ruby repositories from a root gemspec" {
             val rubyRoot = createTempDirectory("microsmith-init-detect-ruby-gemspec")
             try {
@@ -160,75 +181,19 @@ class RubyOnboardingProfileTests :
             }
         }
 
-        "detects Node, Go, Python, Ruby, Rust, and .NET repositories and falls back to Other for mixed markers" {
-            val nodeRoot = createTempDirectory("microsmith-init-detect-node")
-            val goRoot = createTempDirectory("microsmith-init-detect-go")
-            val pythonRoot = createTempDirectory("microsmith-init-detect-python")
-            val rubyRoot = createTempDirectory("microsmith-init-detect-ruby")
-            val rustRoot = createTempDirectory("microsmith-init-detect-rust")
-            val dotnetRoot = createTempDirectory("microsmith-init-detect-dotnet")
-            val mixedRoot = createTempDirectory("microsmith-init-detect-mixed")
+        "falls back to the generic profile when Ruby and another ecosystem marker both match" {
+            val mixedRoot = createTempDirectory("microsmith-init-detect-ruby-mixed")
             try {
-                nodeRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
-                goRoot.resolve("go.mod").writeText("module example.com/microsmith/fixture\n")
-                pythonRoot.resolve("pyproject.toml").writeText("[project]\nname = \"fixture-python\"\n")
-                rubyRoot.resolve("Gemfile").writeText("source \"https://rubygems.org\"\n")
-                rustRoot.resolve("Cargo.toml").writeText("[package]\nname = \"fixture-rust\"\nversion = \"0.1.0\"\n")
-                dotnetRoot.resolve("src/apps/service").createDirectories()
-                dotnetRoot.resolve("src/apps/service/Fixture.csproj")
-                    .writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
+                mixedRoot.resolve("Gemfile").writeText("source \"https://rubygems.org\"\n")
                 mixedRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
-                mixedRoot.resolve("Cargo.toml").writeText("[package]\nname = \"fixture-rust\"\nversion = \"0.1.0\"\n")
 
-                detectOnboardingProfile(nodeRoot) shouldBe
-                    OnboardingProfileDetection(
-                        profile = NodeOnboardingProfile,
-                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                        matchedMarkers = listOf("package.json"),
-                    )
-                detectOnboardingProfile(goRoot) shouldBe
-                    OnboardingProfileDetection(
-                        profile = GoOnboardingProfile,
-                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                        matchedMarkers = listOf("go.mod"),
-                    )
-                detectOnboardingProfile(pythonRoot) shouldBe
-                    OnboardingProfileDetection(
-                        profile = PythonOnboardingProfile,
-                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                        matchedMarkers = listOf("pyproject.toml"),
-                    )
-                detectOnboardingProfile(rubyRoot) shouldBe
-                    OnboardingProfileDetection(
-                        profile = RubyOnboardingProfile,
-                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                        matchedMarkers = listOf("Gemfile"),
-                    )
-                detectOnboardingProfile(rustRoot) shouldBe
-                    OnboardingProfileDetection(
-                        profile = RustOnboardingProfile,
-                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                        matchedMarkers = listOf("Cargo.toml"),
-                    )
-                detectOnboardingProfile(dotnetRoot) shouldBe
-                    OnboardingProfileDetection(
-                        profile = DotnetOnboardingProfile,
-                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                        matchedMarkers = listOf("src/apps/service/Fixture.csproj"),
-                    )
                 detectOnboardingProfile(mixedRoot) shouldBe
                     OnboardingProfileDetection(
                         profile = GenericOnboardingProfile,
                         selectionReason = OnboardingProfileSelectionReason.AMBIGUOUS_MARKERS,
-                        matchedMarkers = listOf("Cargo.toml", "package.json"),
+                        matchedMarkers = listOf("Gemfile", "package.json"),
                     )
             } finally {
-                runCatching { nodeRoot.deleteRecursively() }
-                runCatching { goRoot.deleteRecursively() }
-                runCatching { pythonRoot.deleteRecursively() }
-                runCatching { rubyRoot.deleteRecursively() }
-                runCatching { rustRoot.deleteRecursively() }
-                runCatching { dotnetRoot.deleteRecursively() }
                 runCatching { mixedRoot.deleteRecursively() }
             }
         }

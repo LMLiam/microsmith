@@ -17,7 +17,7 @@ internal object BuiltInOnboardingProfileMatchers {
                 "setup.py",
                 "setup.cfg",
             ),
-            rootMarkerMatcher(RubyOnboardingProfile, "Gemfile"),
+            rootMarkerMatcher(RubyOnboardingProfile, "Gemfile", "gems.rb"),
             rubyGemspecMatcher(),
             rootMarkerMatcher(RustOnboardingProfile, "Cargo.toml"),
             dotnetMatcher(dotnetMarkerFinder),
