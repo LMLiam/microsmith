@@ -17,6 +17,7 @@ internal object BuiltInOnboardingProfileMatchers {
                 "setup.py",
                 "setup.cfg",
             ),
+            rootMarkerMatcher(RustOnboardingProfile, "Cargo.toml"),
             dotnetMatcher(dotnetMarkerFinder),
         )
     }
