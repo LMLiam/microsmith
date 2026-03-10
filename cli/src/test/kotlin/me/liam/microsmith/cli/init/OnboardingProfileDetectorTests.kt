@@ -369,6 +369,7 @@ class OnboardingProfileDetectorTests :
         }
 
         "detects built-in repository profiles and falls back to the generic profile for ambiguous markers" {
+            val javaRoot = createTempDirectory("microsmith-init-detect-java")
             val nodeRoot = createTempDirectory("microsmith-init-detect-node")
             val goRoot = createTempDirectory("microsmith-init-detect-go")
             val pythonRoot = createTempDirectory("microsmith-init-detect-python")
@@ -377,6 +378,8 @@ class OnboardingProfileDetectorTests :
             val dotnetRoot = createTempDirectory("microsmith-init-detect-dotnet")
             val mixedRoot = createTempDirectory("microsmith-init-detect-mixed")
             try {
+                javaRoot.resolve("pom.xml").writeText("<project />\n")
+                javaRoot.resolve("src/main/java/example").createDirectories()
                 nodeRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
                 goRoot.resolve("go.mod").writeText("module example.com/microsmith/fixture\n")
                 pythonRoot.resolve("pyproject.toml").writeText("[project]\nname = \"fixture-python\"\n")
@@ -388,6 +391,12 @@ class OnboardingProfileDetectorTests :
                 mixedRoot.resolve("gems.rb").writeText("source \"https://rubygems.org\"\n")
                 mixedRoot.resolve("Cargo.toml").writeText("[package]\nname = \"fixture-rust\"\nversion = \"0.1.0\"\n")
 
+                detectOnboardingProfile(javaRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = JavaOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("pom.xml", "src/main/java"),
+                    )
                 detectOnboardingProfile(nodeRoot) shouldBe
                     OnboardingProfileDetection(
                         profile = NodeOnboardingProfile,
@@ -431,6 +440,7 @@ class OnboardingProfileDetectorTests :
                         matchedMarkers = listOf("Cargo.toml", "gems.rb"),
                     )
             } finally {
+                runCatching { javaRoot.deleteRecursively() }
                 runCatching { nodeRoot.deleteRecursively() }
                 runCatching { goRoot.deleteRecursively() }
                 runCatching { pythonRoot.deleteRecursively() }

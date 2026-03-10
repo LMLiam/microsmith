@@ -11,6 +11,7 @@ import me.liam.microsmith.cli.init.GoOnboardingProfile
 import me.liam.microsmith.cli.init.InitBootstrapResult
 import me.liam.microsmith.cli.init.InitConflictException
 import me.liam.microsmith.cli.init.InitValidationException
+import me.liam.microsmith.cli.init.JavaOnboardingProfile
 import me.liam.microsmith.cli.init.NodeOnboardingProfile
 import me.liam.microsmith.cli.init.OnboardingProfileDetection
 import me.liam.microsmith.cli.init.OnboardingProfileSelectionReason
@@ -298,6 +299,51 @@ class MicrosmithCliInitTests :
 
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("Detected repository profile: Python")
+                out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts --out ./generated")
+                out.joinToString("\n").shouldNotContain("Optional repository-native output path")
+                err shouldBe emptyList()
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "init command keeps Java on the canonical generated output path" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val tempDir = createTempDirectory("microsmith-cli-init-java")
+            try {
+                val helperRoot = tempDir.resolve(".microsmith/ide")
+                val cli =
+                    MicrosmithCli(
+                        stdout = out::add,
+                        stderr = err::add,
+                        initRunner = { command: InitCommand ->
+                            InitBootstrapResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                repositoryDetection =
+                                OnboardingProfileDetection(
+                                    profile = JavaOnboardingProfile,
+                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                                    matchedMarkers = listOf("pom.xml", "src/main/java"),
+                                ),
+                                createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
+                                overwrittenFiles = emptyList(),
+                                preservedFiles = emptyList(),
+                                ideHelperResult =
+                                IdeHelperRefreshResult(
+                                    projectRoot = tempDir,
+                                    helperRoot = helperRoot,
+                                    updatedFiles = emptyList(),
+                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                ),
+                            )
+                        },
+                    )
+
+                val exitCode = cli.run(arrayOf("init", "--repo-root", tempDir.toString()))
+
+                exitCode shouldBe 0
+                out.joinToString("\n").shouldContain("Detected repository profile: Java")
                 out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts --out ./generated")
                 out.joinToString("\n").shouldNotContain("Optional repository-native output path")
                 err shouldBe emptyList()
