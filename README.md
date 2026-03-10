@@ -227,7 +227,7 @@ microsmith run build.microsmith.kts --out ./generated
 `microsmith init` is deterministic and non-destructive by default:
 
 - it detects Node, Go, Java, Python, Ruby, Rust, and .NET repositories from `package.json`, `go.mod`, Java source roots such as `src/main/java` or `src/test/java`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `gems.rb`, a root `*.gemspec`, a root `Cargo.toml`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
-- Java detection is intentionally conservative: it requires a Java source root, then adds Maven or Gradle root markers when present; build-file-only JVM roots stay on the generic path so future Kotlin and Scala support can remain unambiguous
+- Java detection is intentionally conservative: it requires a Java source root either at the repository root or inside a nested Maven or Gradle module, then adds root Maven or Gradle markers when present; build-file-only JVM roots stay on the generic path so future Kotlin and Scala support can remain unambiguous
 - Ruby detection covers Bundler-first app roots and gem-style repositories through a root `Gemfile`, root `gems.rb`, or root `*.gemspec`; nested gems without a root Ruby marker stay on the generic path
 - Rust detection covers both package manifests and workspace roots through a root `Cargo.toml`; nested crates without a root manifest stay on the generic path
 - it creates `settings.microsmith.kts` when missing

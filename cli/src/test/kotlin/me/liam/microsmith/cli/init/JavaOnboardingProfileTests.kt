@@ -25,7 +25,7 @@ class JavaOnboardingProfileTests :
 
                 public final class App {
                     public String message() {
-                        return \"Microsmith Java fixture\";
+                        return "Microsmith Java fixture";
                     }
                 }
                 """.trimIndent() + "\n",
@@ -77,6 +77,23 @@ class JavaOnboardingProfileTests :
             }
         }
 
+        "detects multi-module Maven Java repositories from nested Java source trees" {
+            val repoRoot = createTempDirectory("microsmith-init-detect-java-maven-multi-module")
+            try {
+                repoRoot.resolve("pom.xml").writeText("<project />\n")
+                repoRoot.resolve("modules/service-a/src/main/java/example").createDirectories()
+
+                detectOnboardingProfile(repoRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = JavaOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("modules/service-a/src/main/java", "pom.xml"),
+                    )
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
         "detects Java repositories from Gradle roots when a Java source tree exists" {
             val repoRoot = createTempDirectory("microsmith-init-detect-java-gradle")
             try {
@@ -89,6 +106,23 @@ class JavaOnboardingProfileTests :
                         profile = JavaOnboardingProfile,
                         selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("build.gradle.kts", "settings.gradle.kts", "src/test/java"),
+                    )
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
+        "detects multi-module Gradle Java repositories from nested Java source trees" {
+            val repoRoot = createTempDirectory("microsmith-init-detect-java-gradle-multi-module")
+            try {
+                repoRoot.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture-java\"\n")
+                repoRoot.resolve("services/app/src/test/java/example").createDirectories()
+
+                detectOnboardingProfile(repoRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = JavaOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("services/app/src/test/java", "settings.gradle.kts"),
                     )
             } finally {
                 runCatching { repoRoot.deleteRecursively() }
