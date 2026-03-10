@@ -1,7 +1,7 @@
 # Microsmith
 
 Microsmith is a Kotlin DSL and standalone CLI for declaring domain-specific models and generating artifacts from `.microsmith.kts` scripts.
-It is designed to work both inside this Gradle repository and from consumer repositories that do not use Gradle, including Go, .NET, Node, and Python projects.
+It is designed to work both inside this Gradle repository and from consumer repositories that do not use Gradle, including Go, .NET, Node, Python, and Rust projects.
 
 This README is the canonical repository documentation.
 
@@ -210,7 +210,7 @@ Inside `.microsmith.kts` scripts:
 
 ## Standalone CLI for non-Gradle repositories
 
-The CLI is the recommended entrypoint for Go, .NET, Node, Python, and other repositories that do not use Gradle.
+The CLI is the recommended entrypoint for Go, .NET, Node, Python, Rust, and other repositories that do not use Gradle.
 The official installer scripts are self-contained and provision a Java 24 runtime automatically when the machine does not already provide one.
 
 Manual channels remain available, but they require Java 24 or newer.
@@ -226,7 +226,8 @@ microsmith run build.microsmith.kts --out ./generated
 
 `microsmith init` is deterministic and non-destructive by default:
 
-- it detects Node, Go, Python, and .NET repositories from `package.json`, `go.mod`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
+- it detects Node, Go, Python, Rust, and .NET repositories from `package.json`, `go.mod`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, a root `Cargo.toml`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
+- Rust detection covers both package manifests and workspace roots through a root `Cargo.toml`; nested crates without a root manifest stay on the generic path
 - it creates `settings.microsmith.kts` when missing
 - it creates `build.microsmith.kts` when missing
 - it preserves existing regular bootstrap files instead of overwriting them
@@ -246,6 +247,7 @@ After the canonical first run succeeds, you can switch to a repository-native ou
 - Node: `microsmith run build.microsmith.kts --out ./generated`
 - Go: `microsmith run build.microsmith.kts --out ./internal/gen`
 - Python: keep the canonical `./generated` output path unless your repository already has a stronger convention
+- Rust: keep the canonical `./generated` output path unless your repository already has a stronger convention
 - .NET: `microsmith run build.microsmith.kts --out ./Generated`
 
 ### Direct script execution
@@ -433,7 +435,7 @@ microsmith ide refresh
 `microsmith init`
 
 - bootstraps `settings.microsmith.kts` and `build.microsmith.kts`
-- detects Node, Go, Python, .NET, or generic repository shape and emits a matching starter script
+- detects Node, Go, Python, Rust, .NET, or generic repository shape and emits a matching starter script
 - refreshes `.microsmith/ide` by default
 - preserves existing regular bootstrap files unless `--force` is provided
 - supports `--repo-root`, `--force`, `--skip-ide-helper`, `--diagnostics`, and `--verbose`
@@ -489,7 +491,7 @@ When `--diagnostics json` is used, each event is emitted as one JSON line with:
 
 ## JetBrains IDE helper
 
-Use the helper project when your repository is not Gradle-based and you want stronger `.microsmith.kts` type resolution in JetBrains IDEs such as IntelliJ IDEA, GoLand, Rider, and PyCharm.
+Use the helper project when your repository is not Gradle-based and you want stronger `.microsmith.kts` type resolution in JetBrains IDEs such as IntelliJ IDEA, GoLand, Rider, PyCharm, and RustRover.
 
 `microsmith init` already refreshes the helper by default. Use `microsmith ide refresh` when you skipped helper generation during init or need to repair or resynchronize the helper later.
 
@@ -523,6 +525,11 @@ JetBrains workflow:
 2. Link or import `.microsmith/ide/build.gradle.kts` as a Gradle project in the IDE.
 3. Refresh Gradle indexing.
 4. Rerun `microsmith ide refresh` after upgrading the Microsmith CLI or changing plugin dependencies.
+
+Rust-specific guidance:
+
+- for Rust repositories, RustRover is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native Cargo indexing does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar when `.microsmith.kts` files need IDE type resolution
 
 ### When to use each command
 
@@ -576,7 +583,7 @@ Fallback artifact sources:
 Manual JetBrains setup:
 
 1. Download the fallback jar that matches your Microsmith version, or build it locally.
-2. In IntelliJ IDEA, GoLand, Rider, or PyCharm, add the jar as a project library from the IDE project settings.
+2. In IntelliJ IDEA, GoLand, Rider, PyCharm, or RustRover, add the jar as a project library from the IDE project settings.
 3. Reopen or reindex `.microsmith.kts` files.
 4. Replace the jar after upgrading Microsmith.
 
@@ -725,6 +732,28 @@ jobs:
         run: microsmith run build.microsmith.kts --out internal/gen
 ```
 
+### Rust repository
+
+```yaml
+name: Microsmith Generate
+on:
+  pull_request:
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Microsmith CLI
+        run: |
+          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
+          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
+          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
+      - name: Bootstrap Microsmith
+        run: microsmith init
+      - name: Generate protobuf
+        run: microsmith run build.microsmith.kts --out generated
+```
+
 ### .NET repository
 
 ```yaml
@@ -760,6 +789,7 @@ Each fixture contains a repo marker used by `microsmith init`, a legacy `schema.
 | Node    | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
 | Go      | `examples/non-gradle/go`     | `microsmith init` then `microsmith run build.microsmith.kts --out ./internal/gen` | `examples/non-gradle/go/.github/workflows/microsmith.yml`     |
 | Python  | `examples/non-gradle/python` | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/python/.github/workflows/microsmith.yml` |
+| Rust    | `examples/non-gradle/rust`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/rust/.github/workflows/microsmith.yml`   |
 | .NET    | `examples/non-gradle/dotnet` | `microsmith init` then `microsmith run build.microsmith.kts --out .\Generated`    | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
 
 ## Validation matrix and release checklist
@@ -771,8 +801,8 @@ Each fixture contains a repo marker used by `microsmith init`, a legacy `schema.
 | CLI help and README contract   | `build-and-qodana` on Ubuntu                         | `scripts/verify_readme_cli_usage.py` compares the README usage block to built `--help`.   |
 | CLI distribution smoke         | `cli-smoke` on Ubuntu, macOS, and Windows            | Dist launcher, generation, process isolation, and `doctor --diagnostics json`.             |
 | Installer and bootstrap smoke  | `cli-smoke` on Ubuntu, macOS, and Windows            | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.        |
-| Non-JVM fixture onboarding     | `cli-smoke` on Ubuntu and Windows                    | Node, Go, Python, and .NET fixtures run the canonical `microsmith init` then `microsmith run`. |
-| JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Fixture coverage runs `microsmith ide refresh` and `microsmith ide doctor` for Node, Go, Python, and .NET fixtures. |
+| Non-JVM fixture onboarding     | `cli-smoke` on Ubuntu and Windows                    | Node, Go, Python, Rust, and .NET fixtures run the canonical `microsmith init` then `microsmith run`. |
+| JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Fixture coverage runs `microsmith ide refresh` and `microsmith ide doctor` for Node, Go, Python, Rust, and .NET fixtures. |
 | Fallback artifact packaging    | `build-and-qodana` on Ubuntu                         | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`. |
 | Resolver, auth, lock, offline  | `./gradlew build` and module regression suites       | `:cli:jvmKotest` covers authenticated repositories, lockfiles, cache policy, and offline behavior. |
 
@@ -789,7 +819,7 @@ JetBrains IDE indexing and import behavior is partly host-driven, so final sign-
 
 Support policy:
 
-- supported products are IntelliJ IDEA, GoLand, Rider, and PyCharm
+- supported products are IntelliJ IDEA, GoLand, Rider, PyCharm, and RustRover
 - supported release band is the current stable major line and the previous stable major line at release cut
 - EAP builds are best-effort only and do not block release
 
@@ -798,6 +828,7 @@ Support policy:
 | IntelliJ IDEA   | `examples/non-gradle/node`      | Run the helper checklist below against the Node fixture. | Run the fallback checklist below against the Node fixture. |
 | GoLand          | `examples/non-gradle/go`        | Run the helper checklist below against the Go fixture.   | Run the fallback checklist below against the Go fixture.   |
 | PyCharm         | `examples/non-gradle/python`    | Run the helper checklist below against the Python fixture. | Run the fallback checklist below against the Python fixture. |
+| RustRover       | `examples/non-gradle/rust`      | Run the helper checklist below against the Rust fixture. | Run the fallback checklist below against the Rust fixture. |
 | Rider           | `examples/non-gradle/dotnet`    | Run the helper checklist below against the .NET fixture. | Run the fallback checklist below against the .NET fixture. |
 
 ### Manual IDE release checklist
