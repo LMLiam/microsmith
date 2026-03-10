@@ -17,6 +17,8 @@ internal object BuiltInOnboardingProfileMatchers {
                 "setup.py",
                 "setup.cfg",
             ),
+            rootMarkerMatcher(RubyOnboardingProfile, "Gemfile"),
+            rubyGemspecMatcher(),
             rootMarkerMatcher(RustOnboardingProfile, "Cargo.toml"),
             dotnetMatcher(dotnetMarkerFinder),
         )
@@ -36,6 +38,12 @@ internal object BuiltInOnboardingProfileMatchers {
             markerFileNames.filter { markerFileName ->
                 projectRoot.resolve(markerFileName).isRegularFile()
             }
+        }
+    }
+
+    private fun rubyGemspecMatcher(): OnboardingProfileMatcher {
+        return OnboardingProfileMatcher(RubyOnboardingProfile) { projectRoot ->
+            RubyOnboardingMarkerFinder.findRootGemspecs(projectRoot)
         }
     }
 }
