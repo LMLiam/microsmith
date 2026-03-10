@@ -9,8 +9,8 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 
 internal object DotnetOnboardingMarkerFinder {
-    fun findSafely(projectRoot: Path, markerFinder: (Path) -> String? = ::find): String? = try {
-        markerFinder(projectRoot)
+    fun find(projectRoot: Path): String? = try {
+        findMatchingProjectFile(projectRoot)
     } catch (_: IOException) {
         null
     } catch (_: UncheckedIOException) {
@@ -19,7 +19,7 @@ internal object DotnetOnboardingMarkerFinder {
         null
     }
 
-    fun find(projectRoot: Path): String? {
+    private fun findMatchingProjectFile(projectRoot: Path): String? {
         val matchedMarkers = mutableListOf<String>()
         Files.walkFileTree(
             projectRoot,

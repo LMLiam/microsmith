@@ -1,5 +1,7 @@
 package me.liam.microsmith.cli.init
 
+import java.io.IOException
+import java.io.UncheckedIOException
 import java.nio.file.Path
 import kotlin.io.path.isRegularFile
 
@@ -26,7 +28,7 @@ internal object BuiltInOnboardingProfileMatchers {
 
     private fun dotnetMatcher(dotnetMarkerFinder: (Path) -> String?): OnboardingProfileMatcher {
         return OnboardingProfileMatcher(DotnetOnboardingProfile) { projectRoot ->
-            DotnetOnboardingMarkerFinder.findSafely(projectRoot, dotnetMarkerFinder)?.let(::listOf).orEmpty()
+            findDotnetMarkers(projectRoot, dotnetMarkerFinder)
         }
     }
 
@@ -43,7 +45,19 @@ internal object BuiltInOnboardingProfileMatchers {
 
     private fun rubyGemspecMatcher(): OnboardingProfileMatcher {
         return OnboardingProfileMatcher(RubyOnboardingProfile) { projectRoot ->
-            RubyOnboardingMarkerFinder.findRootGemspecsSafely(projectRoot)
+            RubyOnboardingMarkerFinder.find(projectRoot)
+        }
+    }
+
+    private fun findDotnetMarkers(projectRoot: Path, dotnetMarkerFinder: (Path) -> String?): List<String> {
+        return try {
+            dotnetMarkerFinder(projectRoot)?.let(::listOf).orEmpty()
+        } catch (_: IOException) {
+            emptyList()
+        } catch (_: UncheckedIOException) {
+            emptyList()
+        } catch (_: SecurityException) {
+            emptyList()
         }
     }
 }
