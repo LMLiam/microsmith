@@ -43,7 +43,7 @@ internal object BuiltInOnboardingProfileMatchers {
 
     private fun rubyGemspecMatcher(): OnboardingProfileMatcher {
         return OnboardingProfileMatcher(RubyOnboardingProfile) { projectRoot ->
-            RubyOnboardingMarkerFinder.findRootGemspecs(projectRoot)
+            RubyOnboardingMarkerFinder.findRootGemspecsSafely(projectRoot)
         }
     }
 }

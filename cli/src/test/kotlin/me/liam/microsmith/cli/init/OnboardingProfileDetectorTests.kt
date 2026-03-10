@@ -340,6 +340,34 @@ class OnboardingProfileDetectorTests :
             }
         }
 
+        "Ruby root gemspec detection skips unreadable repository roots".config(enabled = supportsPosixPermissions()) {
+            val rubyRoot = createTempDirectory("microsmith-init-detect-ruby-unreadable-root")
+            rubyRoot.resolve("microsmith-ruby-fixture.gemspec").writeText(
+                """
+                Gem::Specification.new do |spec|
+                  spec.name = "microsmith-ruby-fixture"
+                  spec.version = "0.1.0"
+                end
+                """.trimIndent() + "\n",
+            )
+
+            val originalPermissions = Files.getPosixFilePermissions(rubyRoot)
+            Files.setPosixFilePermissions(rubyRoot, emptySet())
+            try {
+                detectOnboardingProfile(rubyRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = GenericOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
+                        matchedMarkers = emptyList(),
+                    )
+            } finally {
+                runCatching {
+                    Files.setPosixFilePermissions(rubyRoot, originalPermissions)
+                }
+                runCatching { rubyRoot.deleteRecursively() }
+            }
+        }
+
         "detects built-in repository profiles and falls back to the generic profile for ambiguous markers" {
             val nodeRoot = createTempDirectory("microsmith-init-detect-node")
             val goRoot = createTempDirectory("microsmith-init-detect-go")
