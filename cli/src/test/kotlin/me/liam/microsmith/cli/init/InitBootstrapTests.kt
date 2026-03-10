@@ -108,6 +108,54 @@ class InitBootstrapTests :
             }
         }
 
+        "creates repo-aware bootstrap files for Rust workspace roots without a repository-native output override" {
+            val repoRoot = createTempDirectory("microsmith-init-bootstrap-rust")
+            repoRoot.resolve("crates/app/src").createDirectories()
+            repoRoot.resolve("Cargo.toml").writeText(
+                """
+                [workspace]
+                members = ["crates/app"]
+                """.trimIndent() + "\n",
+            )
+            repoRoot.resolve("crates/app/Cargo.toml").writeText(
+                """
+                [package]
+                name = "fixture-rust-app"
+                version = "0.1.0"
+                edition = "2024"
+                """.trimIndent() + "\n",
+            )
+            try {
+                val helperRoot = repoRoot.resolve(".microsmith/ide")
+                val result =
+                    runInitBootstrap(
+                        command = InitCommand(projectRoot = repoRoot),
+                        ideRefreshRunner = { command ->
+                            IdeHelperRefreshResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                helperRoot = helperRoot,
+                                updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
+                                classpathEntries = listOf(repoRoot.resolve("runtime/microsmith-cli-all.jar")),
+                            )
+                        },
+                    )
+
+                result.repositoryDetection.profile shouldBe RustOnboardingProfile
+                result.repositoryDetection.matchedMarkers shouldBe listOf("Cargo.toml")
+                val buildScript = repoRoot.resolve("build.microsmith.kts").readText()
+                val settingsScript = repoRoot.resolve("settings.microsmith.kts").readText()
+
+                buildScript.shouldContain("RustUserCreated")
+                buildScript.shouldContain("microsmith run build.microsmith.kts --out ./generated")
+                buildScript.shouldContain("// Bootstrapped Microsmith schema for this Rust repository.")
+                buildScript.shouldContain("Canonical first run:")
+                buildScript.contains("Common repository-native output path:") shouldBe false
+                settingsScript.shouldContain("Detected repository profile: Rust")
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
         "preserves existing bootstrap files on repeated init runs by default" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-idempotent")
             val existingBuild = repoRoot.resolve("build.microsmith.kts")
@@ -328,6 +376,68 @@ class InitBootstrapTests :
             }
         }
 
+        "detects Rust repositories from Cargo.toml at package or workspace roots" {
+            val packageRoot = createTempDirectory("microsmith-init-detect-rust-package")
+            val workspaceRoot = createTempDirectory("microsmith-init-detect-rust-workspace")
+            try {
+                packageRoot.resolve("Cargo.toml").writeText(
+                    """
+                    [package]
+                    name = "fixture-rust"
+                    version = "0.1.0"
+                    edition = "2024"
+                    """.trimIndent() + "\n",
+                )
+                workspaceRoot.resolve("crates/app").createDirectories()
+                workspaceRoot.resolve("Cargo.toml").writeText(
+                    """
+                    [workspace]
+                    members = ["crates/app"]
+                    """.trimIndent() + "\n",
+                )
+
+                detectOnboardingProfile(packageRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = RustOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("Cargo.toml"),
+                    )
+                detectOnboardingProfile(workspaceRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = RustOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("Cargo.toml"),
+                    )
+            } finally {
+                runCatching { packageRoot.deleteRecursively() }
+                runCatching { workspaceRoot.deleteRecursively() }
+            }
+        }
+
+        "falls back to the generic profile when a nested Rust crate exists without a root Cargo.toml" {
+            val repoRoot = createTempDirectory("microsmith-init-detect-rust-nested-only")
+            try {
+                repoRoot.resolve("crates/app").createDirectories()
+                repoRoot.resolve("crates/app/Cargo.toml").writeText(
+                    """
+                    [package]
+                    name = "fixture-rust-app"
+                    version = "0.1.0"
+                    edition = "2024"
+                    """.trimIndent() + "\n",
+                )
+
+                detectOnboardingProfile(repoRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = GenericOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
+                        matchedMarkers = emptyList(),
+                    )
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
         "keeps the Python profile when multiple Python markers match" {
             val pythonRoot = createTempDirectory("microsmith-init-detect-python-multi")
             try {
@@ -345,21 +455,23 @@ class InitBootstrapTests :
             }
         }
 
-        "detects Node, Go, Python, and .NET repositories and falls back to Other for mixed markers" {
+        "detects Node, Go, Python, Rust, and .NET repositories and falls back to Other for mixed markers" {
             val nodeRoot = createTempDirectory("microsmith-init-detect-node")
             val goRoot = createTempDirectory("microsmith-init-detect-go")
             val pythonRoot = createTempDirectory("microsmith-init-detect-python")
+            val rustRoot = createTempDirectory("microsmith-init-detect-rust")
             val dotnetRoot = createTempDirectory("microsmith-init-detect-dotnet")
             val mixedRoot = createTempDirectory("microsmith-init-detect-mixed")
             try {
                 nodeRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
                 goRoot.resolve("go.mod").writeText("module example.com/microsmith/fixture\n")
                 pythonRoot.resolve("pyproject.toml").writeText("[project]\nname = \"fixture-python\"\n")
+                rustRoot.resolve("Cargo.toml").writeText("[package]\nname = \"fixture-rust\"\nversion = \"0.1.0\"\n")
                 dotnetRoot.resolve("src/apps/service").createDirectories()
                 dotnetRoot.resolve("src/apps/service/Fixture.csproj")
                     .writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
                 mixedRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
-                mixedRoot.resolve("go.mod").writeText("module example.com/microsmith/fixture\n")
+                mixedRoot.resolve("Cargo.toml").writeText("[package]\nname = \"fixture-rust\"\nversion = \"0.1.0\"\n")
 
                 detectOnboardingProfile(nodeRoot) shouldBe
                     OnboardingProfileDetection(
@@ -379,6 +491,12 @@ class InitBootstrapTests :
                         selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("pyproject.toml"),
                     )
+                detectOnboardingProfile(rustRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = RustOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("Cargo.toml"),
+                    )
                 detectOnboardingProfile(dotnetRoot) shouldBe
                     OnboardingProfileDetection(
                         profile = DotnetOnboardingProfile,
@@ -389,12 +507,13 @@ class InitBootstrapTests :
                     OnboardingProfileDetection(
                         profile = GenericOnboardingProfile,
                         selectionReason = OnboardingProfileSelectionReason.AMBIGUOUS_MARKERS,
-                        matchedMarkers = listOf("go.mod", "package.json"),
+                        matchedMarkers = listOf("Cargo.toml", "package.json"),
                     )
             } finally {
                 runCatching { nodeRoot.deleteRecursively() }
                 runCatching { goRoot.deleteRecursively() }
                 runCatching { pythonRoot.deleteRecursively() }
+                runCatching { rustRoot.deleteRecursively() }
                 runCatching { dotnetRoot.deleteRecursively() }
                 runCatching { mixedRoot.deleteRecursively() }
             }

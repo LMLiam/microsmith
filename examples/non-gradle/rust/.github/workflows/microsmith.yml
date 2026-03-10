@@ -1,0 +1,23 @@
+name: Microsmith Generate (Rust Fixture)
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Microsmith
+        run: |
+          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
+          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
+          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
+      - name: Bootstrap Microsmith
+        working-directory: examples/non-gradle/rust
+        run: microsmith init
+      - name: Generate protobuf
+        working-directory: examples/non-gradle/rust
+        run: |
+          microsmith run build.microsmith.kts --out generated
+          test -f generated/proto/RustUserCreated.proto
