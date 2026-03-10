@@ -12,6 +12,7 @@ internal object BuiltInOnboardingProfileMatchers {
         return listOf(
             rootMarkerMatcher(NodeOnboardingProfile, "package.json"),
             rootMarkerMatcher(GoOnboardingProfile, "go.mod"),
+            javaMatcher(),
             rootMarkerMatcher(
                 PythonOnboardingProfile,
                 "pyproject.toml",
@@ -46,6 +47,12 @@ internal object BuiltInOnboardingProfileMatchers {
     private fun rubyGemspecMatcher(): OnboardingProfileMatcher {
         return OnboardingProfileMatcher(RubyOnboardingProfile) { projectRoot ->
             RubyOnboardingMarkerFinder.find(projectRoot)
+        }
+    }
+
+    private fun javaMatcher(): OnboardingProfileMatcher {
+        return OnboardingProfileMatcher(JavaOnboardingProfile) { projectRoot ->
+            JavaOnboardingMarkerFinder.find(projectRoot)
         }
     }
 

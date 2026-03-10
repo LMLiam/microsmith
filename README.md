@@ -1,7 +1,7 @@
 # Microsmith
 
 Microsmith is a Kotlin DSL and standalone CLI for declaring domain-specific models and generating artifacts from `.microsmith.kts` scripts.
-It is designed to work both inside this Gradle repository and from consumer repositories that do not use Gradle, including Go, .NET, Node, Python, Ruby, and Rust projects.
+It is designed to work both inside this Gradle repository and from consumer repositories including Go, .NET, Node, Python, Ruby, Rust, and Java projects.
 
 This README is the canonical repository documentation.
 
@@ -12,7 +12,7 @@ This README is the canonical repository documentation.
 - Repository Kotlin standards
 - Build, test, and quality gates
 - DSL usage
-- Standalone CLI for non-Gradle repositories
+- Standalone CLI for consumer repositories
 - Installation and verification
 - Command reference
 - JetBrains IDE helper
@@ -32,7 +32,7 @@ Microsmith provides:
 - extension points for schema and generation dialects
 - a standalone CLI for running `.microsmith.kts` scripts without embedding Gradle in consumer repositories
 - bundled built-in providers for the default schema and protobuf workflows
-- a JetBrains IDE helper workflow for stronger type resolution in non-Gradle repositories
+- a JetBrains IDE helper workflow for stronger type resolution in consumer repositories
 
 ## Repository modules
 
@@ -208,9 +208,9 @@ Inside `.microsmith.kts` scripts:
 - a script can return a `MicrosmithModel`
 - a script can also call `emit(model)` or `generate(model)`
 
-## Standalone CLI for non-Gradle repositories
+## Standalone CLI for consumer repositories
 
-The CLI is the recommended entrypoint for Go, .NET, Node, Python, Ruby, Rust, and other repositories that do not use Gradle.
+The CLI is the recommended entrypoint for Go, .NET, Node, Python, Ruby, Rust, Java, and other repositories when you want self-contained Microsmith execution without depending on a local Gradle or Maven install.
 The official installer scripts are self-contained and provision a Java 24 runtime automatically when the machine does not already provide one.
 
 Manual channels remain available, but they require Java 24 or newer.
@@ -226,7 +226,8 @@ microsmith run build.microsmith.kts --out ./generated
 
 `microsmith init` is deterministic and non-destructive by default:
 
-- it detects Node, Go, Python, Ruby, Rust, and .NET repositories from `package.json`, `go.mod`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `gems.rb`, a root `*.gemspec`, a root `Cargo.toml`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
+- it detects Node, Go, Java, Python, Ruby, Rust, and .NET repositories from `package.json`, `go.mod`, Java source roots such as `src/main/java` or `src/test/java`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `gems.rb`, a root `*.gemspec`, a root `Cargo.toml`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
+- Java detection is intentionally conservative: it requires a Java source root either at the repository root or inside a nested Maven or Gradle module, then adds root Maven or Gradle markers when present; build-file-only JVM roots stay on the generic path so future Kotlin and Scala support can remain unambiguous
 - Ruby detection covers Bundler-first app roots and gem-style repositories through a root `Gemfile`, root `gems.rb`, or root `*.gemspec`; nested gems without a root Ruby marker stay on the generic path
 - Rust detection covers both package manifests and workspace roots through a root `Cargo.toml`; nested crates without a root manifest stay on the generic path
 - it creates `settings.microsmith.kts` when missing
@@ -247,10 +248,17 @@ After the canonical first run succeeds, you can switch to a repository-native ou
 
 - Node: `microsmith run build.microsmith.kts --out ./generated`
 - Go: `microsmith run build.microsmith.kts --out ./internal/gen`
+- Java: keep the canonical `./generated` output path unless you explicitly wire generated sources into Maven or Gradle later
 - Python: keep the canonical `./generated` output path unless your repository already has a stronger convention
 - Ruby: keep the canonical `./generated` output path unless your repository already has a stronger convention
 - Rust: keep the canonical `./generated` output path unless your repository already has a stronger convention
 - .NET: `microsmith run build.microsmith.kts --out ./Generated`
+
+Java-specific guidance:
+
+- Maven-based Java repositories: keep Microsmith CLI-managed by default and only add `./generated` into the Maven compile path if you explicitly want generated sources compiled by Maven
+- Gradle-based Java repositories: keep Microsmith CLI-managed by default and do not wire Microsmith into the Gradle build automatically as part of onboarding
+- build-tool-light Java repositories: use the same canonical `./generated` output path and helper workflow
 
 ### Direct script execution
 
@@ -493,7 +501,7 @@ When `--diagnostics json` is used, each event is emitted as one JSON line with:
 
 ## JetBrains IDE helper
 
-Use the helper project when your repository is not Gradle-based and you want stronger `.microsmith.kts` type resolution in JetBrains IDEs such as IntelliJ IDEA, GoLand, Rider, PyCharm, RubyMine, and RustRover.
+Use the helper project when you want stronger `.microsmith.kts` type resolution in JetBrains IDEs such as IntelliJ IDEA, GoLand, Rider, PyCharm, RubyMine, and RustRover.
 
 `microsmith init` already refreshes the helper by default. Use `microsmith ide refresh` when you skipped helper generation during init or need to repair or resynchronize the helper later.
 
@@ -528,6 +536,11 @@ JetBrains workflow:
 3. Refresh Gradle indexing.
 4. Rerun `microsmith ide refresh` after upgrading the Microsmith CLI or changing plugin dependencies.
 
+Java-specific guidance:
+
+- for Java repositories, IntelliJ IDEA is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native Maven or Gradle import resolves Java project sources, but it does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar for `.microsmith.kts`
+
 Ruby-specific guidance:
 
 - for Ruby repositories, RubyMine is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
@@ -540,7 +553,7 @@ Rust-specific guidance:
 
 ### When to use each command
 
-- First-time setup in a non-Gradle repository: `microsmith init`
+- First-time setup in a consumer repository: `microsmith init`
 - Helper was skipped, removed, or needs regeneration after CLI or plugin changes: `microsmith ide refresh`
 - Symbols are still unresolved or the helper appears stale: `microsmith ide doctor --diagnostics json --verbose`
 
@@ -717,6 +730,28 @@ jobs:
         run: microsmith run build.microsmith.kts --out generated
 ```
 
+### Java repository
+
+```yaml
+name: Microsmith Generate
+on:
+  pull_request:
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Microsmith CLI
+        run: |
+          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
+          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
+          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
+      - name: Bootstrap Microsmith
+        run: microsmith init
+      - name: Generate protobuf
+        run: microsmith run build.microsmith.kts --out generated
+```
+
 ### Go repository
 
 ```yaml
@@ -810,11 +845,12 @@ jobs:
 
 ## Example fixtures
 
-The repository includes non-Gradle fixture repositories under `examples/non-gradle/`.
+The repository includes fixture repositories under `examples/non-gradle/` and `examples/jvm/`.
 Each fixture contains a repo marker used by `microsmith init`, a legacy `schema.microsmith.kts` manual example, and a GitHub Actions example that exercises the init-first path.
 
 | Fixture | Directory                    | Local command from fixture root                                                   | CI workflow                                                   |
 |---------|------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------|
+| Java    | `examples/jvm/java-maven`    | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`   | `examples/jvm/java-maven/.github/workflows/microsmith.yml`    |
 | Node    | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
 | Go      | `examples/non-gradle/go`     | `microsmith init` then `microsmith run build.microsmith.kts --out ./internal/gen` | `examples/non-gradle/go/.github/workflows/microsmith.yml`     |
 | Python  | `examples/non-gradle/python` | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/python/.github/workflows/microsmith.yml` |
@@ -831,8 +867,8 @@ Each fixture contains a repo marker used by `microsmith init`, a legacy `schema.
 | CLI help and README contract   | `build-and-qodana` on Ubuntu                         | `scripts/verify_readme_cli_usage.py` compares the README usage block to built `--help`.   |
 | CLI distribution smoke         | `cli-smoke` on Ubuntu, macOS, and Windows            | Dist launcher, generation, process isolation, and `doctor --diagnostics json`.             |
 | Installer and bootstrap smoke  | `cli-smoke` on Ubuntu, macOS, and Windows            | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.        |
-| Non-JVM fixture onboarding     | `cli-smoke` on Ubuntu and Windows                    | Ubuntu covers Node, Go, Python, Ruby, and Rust fixtures; Windows covers the .NET fixture. |
-| JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Ubuntu runs `ide refresh` and `ide doctor` for Node, Go, Python, Ruby, and Rust fixtures; Windows runs the .NET helper path. |
+| Consumer fixture onboarding    | `cli-smoke` on Ubuntu and Windows                    | Ubuntu covers Java, Node, Go, Python, Ruby, and Rust fixtures; Windows covers the .NET fixture. |
+| JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Ubuntu runs `ide refresh` and `ide doctor` for Java, Node, Go, Python, Ruby, and Rust fixtures; Windows runs the .NET helper path. |
 | Fallback artifact packaging    | `build-and-qodana` on Ubuntu                         | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`. |
 | Resolver, auth, lock, offline  | `./gradlew build` and module regression suites       | `:cli:jvmKotest` covers authenticated repositories, lockfiles, cache policy, and offline behavior. |
 
@@ -855,7 +891,7 @@ Support policy:
 
 | Product         | Fixture root                    | Required helper smoke path                              | Required fallback smoke path                             |
 |-----------------|---------------------------------|---------------------------------------------------------|----------------------------------------------------------|
-| IntelliJ IDEA   | `examples/non-gradle/node`      | Run the helper checklist below against the Node fixture. | Run the fallback checklist below against the Node fixture. |
+| IntelliJ IDEA   | `examples/jvm/java-maven`       | Run the helper checklist below against the Java fixture. | Run the fallback checklist below against the Java fixture. |
 | GoLand          | `examples/non-gradle/go`        | Run the helper checklist below against the Go fixture.   | Run the fallback checklist below against the Go fixture.   |
 | PyCharm         | `examples/non-gradle/python`    | Run the helper checklist below against the Python fixture. | Run the fallback checklist below against the Python fixture. |
 | RubyMine        | `examples/non-gradle/ruby`      | Run the helper checklist below against the Ruby fixture. | Run the fallback checklist below against the Ruby fixture. |
