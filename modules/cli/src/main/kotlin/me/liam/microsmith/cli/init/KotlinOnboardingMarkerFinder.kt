@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 internal object KotlinOnboardingMarkerFinder {
     fun find(projectRoot: Path): List<String> =
-        JvmOnboardingMarkerFinder.find(projectRoot, ::isSupportedKotlinSourceRoot)
+        JvmOnboardingMarkerFinder.find(projectRoot, JVM_LANGUAGE_BUILD_MARKERS, ::isSupportedKotlinSourceRoot)
 
     private fun isSupportedKotlinSourceRoot(relativeDirectory: Path): Boolean {
         if (relativeDirectory.nameCount < MINIMUM_KOTLIN_SOURCE_ROOT_DEPTH) {

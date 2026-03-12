@@ -10,12 +10,13 @@ import java.nio.file.attribute.BasicFileAttributes
 import kotlin.io.path.isRegularFile
 
 internal object JvmOnboardingMarkerFinder {
-    fun find(projectRoot: Path, sourceRootMatcher: (Path) -> Boolean): List<String> {
+    fun find(projectRoot: Path, buildMarkers: List<Path>, sourceRootMatcher: (Path) -> Boolean): List<String> {
         return try {
             val matchedBuildMarkers =
-                JVM_BUILD_MARKERS.filter { markerFileName ->
-                    projectRoot.resolve(markerFileName).isRegularFile()
-                }
+                buildMarkers
+                    .filter { markerPath ->
+                        projectRoot.resolve(markerPath).isRegularFile()
+                    }.map(Path::toString)
             val rootSourceMarkers = findRootSourceMarkers(projectRoot, sourceRootMatcher)
 
             when {
@@ -85,7 +86,9 @@ internal object JvmOnboardingMarkerFinder {
                     }
 
                     val relativeDirectory = projectRoot.relativize(directory)
-                    return if (isRootSourceMarker(relativeDirectory, sourceRootMatcher)) {
+                    return if (isIgnoredInfrastructureDirectory(relativeDirectory)) {
+                        FileVisitResult.SKIP_SUBTREE
+                    } else if (isRootSourceMarker(relativeDirectory, sourceRootMatcher)) {
                         FileVisitResult.SKIP_SUBTREE
                     } else if (sourceRootMatcher(relativeDirectory)) {
                         matchedMarkers += relativeDirectory.toString()
@@ -110,18 +113,26 @@ internal object JvmOnboardingMarkerFinder {
             relativeDirectory.getName(0).toString() == SOURCE_ROOT_DIRECTORY_NAME &&
             sourceRootMatcher(relativeDirectory)
     }
-}
 
-private val JVM_BUILD_MARKERS = listOf(
-    "pom.xml",
-    "build.gradle",
-    "build.gradle.kts",
-    "settings.gradle",
-    "settings.gradle.kts",
-)
+    private fun isIgnoredInfrastructureDirectory(relativeDirectory: Path): Boolean {
+        return relativeDirectory.nameCount == INFRASTRUCTURE_DIRECTORY_DEPTH &&
+            relativeDirectory.getName(0).toString() in IGNORED_INFRASTRUCTURE_DIRECTORIES
+    }
+}
 
 private const val MODULE_SOURCE_SEARCH_DEPTH = 6
 
 private const val ROOT_SOURCE_MARKER_DEPTH = 3
 
+private const val INFRASTRUCTURE_DIRECTORY_DEPTH = 1
+
 private const val SOURCE_ROOT_DIRECTORY_NAME = "src"
+
+private val IGNORED_INFRASTRUCTURE_DIRECTORIES = setOf(
+    ".gradle",
+    ".microsmith",
+    "build",
+    "build-logic",
+    "buildSrc",
+    "gradle",
+)

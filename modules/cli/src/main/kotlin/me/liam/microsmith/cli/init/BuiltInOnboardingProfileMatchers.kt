@@ -14,6 +14,7 @@ internal object BuiltInOnboardingProfileMatchers {
             rootMarkerMatcher(GoOnboardingProfile, "go.mod"),
             javaMatcher(),
             kotlinMatcher(),
+            scalaMatcher(),
             rootMarkerMatcher(
                 PythonOnboardingProfile,
                 "pyproject.toml",
@@ -60,6 +61,12 @@ internal object BuiltInOnboardingProfileMatchers {
     private fun kotlinMatcher(): OnboardingProfileMatcher {
         return OnboardingProfileMatcher(KotlinOnboardingProfile) { projectRoot ->
             KotlinOnboardingMarkerFinder.find(projectRoot)
+        }
+    }
+
+    private fun scalaMatcher(): OnboardingProfileMatcher {
+        return OnboardingProfileMatcher(ScalaOnboardingProfile) { projectRoot ->
+            ScalaOnboardingMarkerFinder.find(projectRoot)
         }
     }
 
