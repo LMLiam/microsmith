@@ -135,17 +135,18 @@ private fun parseIsolationOption(args: List<String>, index: Int, state: RunOptio
     if (value == null || value.startsWith("--")) {
         return ParsedToken(nextIndex = index, error = "Missing value for --isolation option.")
     }
-    if (state.isolationModeSpecified) {
-        return ParsedToken(nextIndex = index, error = "--isolation may only be specified once.")
+    val parsedMode = parseIsolationMode(value)
+    val error =
+        when {
+            state.isolationModeSpecified -> "--isolation may only be specified once."
+            parsedMode == null -> "Invalid --isolation value '$value'. Expected 'classloader' or 'process'."
+            else -> null
+        }
+    if (error != null) {
+        return ParsedToken(nextIndex = index, error = error)
     }
-    val parsedMode =
-        parseIsolationMode(value)
-            ?: return ParsedToken(
-                nextIndex = index,
-                error = "Invalid --isolation value '$value'. Expected 'classloader' or 'process'.",
-            )
 
-    state.isolationMode = parsedMode
+    state.isolationMode = requireNotNull(parsedMode)
     state.isolationModeSpecified = true
     return ParsedToken(nextIndex = index + 2)
 }
@@ -155,17 +156,18 @@ private fun parseDiagnosticsOption(args: List<String>, index: Int, state: RunOpt
     if (value == null || value.startsWith("--")) {
         return ParsedToken(nextIndex = index, error = "Missing value for --diagnostics option.")
     }
-    if (state.diagnosticsFormatSpecified) {
-        return ParsedToken(nextIndex = index, error = "--diagnostics may only be specified once.")
+    val parsedFormat = parseDiagnosticFormat(value)
+    val error =
+        when {
+            state.diagnosticsFormatSpecified -> "--diagnostics may only be specified once."
+            parsedFormat == null -> "Invalid --diagnostics value '$value'. Expected 'text' or 'json'."
+            else -> null
+        }
+    if (error != null) {
+        return ParsedToken(nextIndex = index, error = error)
     }
-    val parsedFormat =
-        parseDiagnosticFormat(value)
-            ?: return ParsedToken(
-                nextIndex = index,
-                error = "Invalid --diagnostics value '$value'. Expected 'text' or 'json'.",
-            )
 
-    state.diagnosticsFormat = parsedFormat
+    state.diagnosticsFormat = requireNotNull(parsedFormat)
     state.diagnosticsFormatSpecified = true
     return ParsedToken(nextIndex = index + 2)
 }

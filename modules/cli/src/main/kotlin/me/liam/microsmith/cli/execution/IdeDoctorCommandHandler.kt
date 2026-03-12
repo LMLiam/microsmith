@@ -24,13 +24,13 @@ internal class IdeDoctorCommandHandler(
         result.checks.forEach { check ->
             if (check.passed) {
                 emitter.info("ide-doctor/${check.id}: ${check.message}", check.details)
-                return@forEach
+            } else {
+                emitter.error(
+                    CliFailureCode.IDE_DOCTOR_FAILED,
+                    "ide-doctor/${check.id}: ${check.message}",
+                    check.details,
+                )
             }
-            emitter.error(
-                CliFailureCode.IDE_DOCTOR_FAILED,
-                "ide-doctor/${check.id}: ${check.message}",
-                check.details,
-            )
         }
 
         if (!result.hasFailures) {

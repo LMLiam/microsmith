@@ -30,19 +30,20 @@ internal object DoctorEnvironmentChecks {
     fun checkProviderDiscovery(providerValidator: () -> List<String>): DoctorCheckResult {
         return try {
             val errors = providerValidator()
-            if (errors.isNotEmpty()) {
-                return DoctorCheckResult(
+            if (errors.isEmpty()) {
+                DoctorCheckResult(
+                    id = "provider-discovery",
+                    status = DoctorCheckStatus.PASS,
+                    message = "Required built-in service providers are available.",
+                )
+            } else {
+                DoctorCheckResult(
                     id = "provider-discovery",
                     status = DoctorCheckStatus.FAIL,
                     message = "Required built-in service providers are missing.",
                     details = mapOf("errors" to errors.joinToString(" | ")),
                 )
             }
-            DoctorCheckResult(
-                id = "provider-discovery",
-                status = DoctorCheckStatus.PASS,
-                message = "Required built-in service providers are available.",
-            )
         } catch (error: ServiceConfigurationError) {
             DoctorCheckResult(
                 id = "provider-discovery",

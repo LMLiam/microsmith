@@ -98,7 +98,7 @@ Microsmith provides:
 - Use infix functions only for DSL-facing APIs when readability is clearly better than the non-infix equivalent.
 - Use `object` and `companion object` only when singleton semantics, namespaced factories, or constants are genuinely clearer than top-level declarations or regular types.
 - Avoid Java-style static utility patterns, unnecessary mutable state, and scope-function chains that hide control flow.
-- Do not contort control flow to appease return-count tooling. Guard clauses are allowed; once a function needs more than a small handful of exits, simplify or decompose it instead.
+- Do not contort control flow to appease return-count tooling. Guard clauses are allowed; excessive non-guard branching should still be simplified or decomposed.
 
 ### Interfaces and ports
 

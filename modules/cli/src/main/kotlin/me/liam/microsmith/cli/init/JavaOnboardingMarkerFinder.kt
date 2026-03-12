@@ -31,9 +31,10 @@ internal object JavaOnboardingMarkerFinder {
 
             val matchedModuleSourceMarkers = findModuleSourceMarkers(projectRoot)
             if (matchedModuleSourceMarkers.isEmpty()) {
-                return emptyList()
+                emptyList()
+            } else {
+                (matchedBuildMarkers + matchedModuleSourceMarkers).sorted()
             }
-            (matchedBuildMarkers + matchedModuleSourceMarkers).sorted()
         } catch (_: IOException) {
             emptyList()
         } catch (_: UncheckedIOException) {

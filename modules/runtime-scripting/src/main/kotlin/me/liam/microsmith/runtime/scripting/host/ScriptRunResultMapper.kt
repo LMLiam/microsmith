@@ -19,27 +19,28 @@ internal object ScriptRunResultMapper {
         val formattedReports = ScriptDiagnosticsFormatter.format(result.reports)
         val hasErrors = ScriptDiagnosticsFormatter.containsErrors(formattedReports)
 
-        if (result is ResultWithDiagnostics.Failure) {
-            return ScriptRunFailure(
-                diagnostics = formattedReports.ifEmpty { listOf("Script compilation failed.") },
-                type = ScriptFailureType.COMPILATION,
-            )
-        }
+        return when (result) {
+            is ResultWithDiagnostics.Failure ->
+                ScriptRunFailure(
+                    diagnostics = formattedReports.ifEmpty { listOf("Script compilation failed.") },
+                    type = ScriptFailureType.COMPILATION,
+                )
 
-        if (hasErrors) {
-            return ScriptRunFailure(
-                diagnostics = formattedReports,
-                type = ScriptFailureType.COMPILATION,
-            )
+            is ResultWithDiagnostics.Success ->
+                if (hasErrors) {
+                    ScriptRunFailure(
+                        diagnostics = formattedReports,
+                        type = ScriptFailureType.COMPILATION,
+                    )
+                } else {
+                    successFinalizer.complete(
+                        evaluationResult = result.value,
+                        scriptContext = scriptContext,
+                        warnings = formattedReports,
+                        cacheHit = cacheHit,
+                        elapsedMillis = elapsedMillis,
+                    )
+                }
         }
-
-        val successResult = result as ResultWithDiagnostics.Success
-        return successFinalizer.complete(
-            evaluationResult = successResult.value,
-            scriptContext = scriptContext,
-            warnings = formattedReports,
-            cacheHit = cacheHit,
-            elapsedMillis = elapsedMillis,
-        )
     }
 }

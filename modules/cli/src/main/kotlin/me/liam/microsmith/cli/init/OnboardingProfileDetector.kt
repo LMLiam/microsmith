@@ -26,24 +26,21 @@ internal class OnboardingProfileDetector(
 
         val matchedProfiles = matches.map(OnboardingProfileMatch::profile).distinctBy(OnboardingProfile::id)
         val matchedMarkers = matches.flatMap(OnboardingProfileMatch::matchedMarkers).distinct().sorted()
-        if (matchedProfiles.isEmpty()) {
-            return OnboardingProfileDetection(
-                profile = fallbackProfile,
-                selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
-                matchedMarkers = matchedMarkers,
-            )
-        }
-        if (matchedProfiles.size == 1) {
-            return OnboardingProfileDetection(
-                profile = matchedProfiles.single(),
-                selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                matchedMarkers = matchedMarkers,
-            )
-        }
+        val (profile, selectionReason) =
+            when {
+                matchedProfiles.isEmpty() ->
+                    fallbackProfile to OnboardingProfileSelectionReason.NO_MARKERS_MATCHED
+
+                matchedProfiles.size == 1 ->
+                    matchedProfiles.single() to OnboardingProfileSelectionReason.MATCHED_PROFILE
+
+                else ->
+                    fallbackProfile to OnboardingProfileSelectionReason.AMBIGUOUS_MARKERS
+            }
 
         return OnboardingProfileDetection(
-            profile = fallbackProfile,
-            selectionReason = OnboardingProfileSelectionReason.AMBIGUOUS_MARKERS,
+            profile = profile,
+            selectionReason = selectionReason,
             matchedMarkers = matchedMarkers,
         )
     }

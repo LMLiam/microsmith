@@ -7,6 +7,7 @@ import me.liam.microsmith.dsl.schemas.protobuf.field.MapType
 import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
 import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
 import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
+import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import me.liam.microsmith.dsl.schemas.protobuf.types.Message
 
@@ -46,17 +47,18 @@ internal class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) {
         return copy(type = target)
     }
 
-    private fun Field.resolve(messageName: String): Field {
-        if (this is ReferenceField) {
-            return copy(reference = reference.resolve("message $messageName field '$name'"))
-        }
-        if (this !is MapField) {
-            return this
+    private fun Field.resolve(messageName: String): Field = when (this) {
+        is ReferenceField -> copy(reference = reference.resolve("message $messageName field '$name'"))
+
+        is MapField -> {
+            val resolvedValue =
+                (type.value as? Reference)?.resolve("message $messageName map field '$name' value") ?: type.value
+            copy(type = MapType(type.key, resolvedValue))
         }
 
-        val resolvedValue =
-            (type.value as? Reference)?.resolve("message $messageName map field '$name' value") ?: type.value
-        return copy(type = MapType(type.key, resolvedValue))
+        is ScalarField -> this
+
+        is OneofField -> this
     }
 
     private fun OneofField.resolve(messageName: String, oneofName: String): OneofField {

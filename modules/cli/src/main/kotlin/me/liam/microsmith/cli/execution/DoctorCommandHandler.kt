@@ -16,9 +16,9 @@ internal class DoctorCommandHandler(
             val details = mapOf("check" to check.id) + check.details
             if (check.status == DoctorCheckStatus.PASS) {
                 emitter.info("doctor/${check.id}: ${check.message}", details)
-                return@forEach
+            } else {
+                emitter.error(CliFailureCode.DOCTOR_FAILED, "doctor/${check.id}: ${check.message}", details)
             }
-            emitter.error(CliFailureCode.DOCTOR_FAILED, "doctor/${check.id}: ${check.message}", details)
         }
 
         if (!result.hasFailures) {
