@@ -16,9 +16,7 @@ internal object JvmOnboardingMarkerFinder {
                 JVM_BUILD_MARKERS.filter { markerFileName ->
                     projectRoot.resolve(markerFileName).isRegularFile()
                 }
-            val matchedSourceMarkers = findSourceMarkers(projectRoot, sourceRootMatcher)
-            val rootSourceMarkers =
-                matchedSourceMarkers.filter(::isRootSourceMarker)
+            val rootSourceMarkers = findRootSourceMarkers(projectRoot, sourceRootMatcher)
 
             when {
                 rootSourceMarkers.isNotEmpty() -> {
@@ -29,12 +27,13 @@ internal object JvmOnboardingMarkerFinder {
                     emptyList()
                 }
 
-                matchedSourceMarkers.isEmpty() -> {
-                    emptyList()
-                }
-
                 else -> {
-                    (matchedBuildMarkers + matchedSourceMarkers).sorted()
+                    val matchedModuleSourceMarkers = findModuleSourceMarkers(projectRoot, sourceRootMatcher)
+                    if (matchedModuleSourceMarkers.isEmpty()) {
+                        emptyList()
+                    } else {
+                        (matchedBuildMarkers + matchedModuleSourceMarkers).sorted()
+                    }
                 }
             }
         } catch (_: IOException) {
@@ -46,7 +45,34 @@ internal object JvmOnboardingMarkerFinder {
         }
     }
 
-    private fun findSourceMarkers(projectRoot: Path, sourceRootMatcher: (Path) -> Boolean): List<String> {
+    private fun findRootSourceMarkers(projectRoot: Path, sourceRootMatcher: (Path) -> Boolean): List<String> {
+        val srcDirectory = projectRoot.resolve(SOURCE_ROOT_DIRECTORY_NAME)
+        if (!Files.isDirectory(srcDirectory)) {
+            return emptyList()
+        }
+
+        return Files.newDirectoryStream(srcDirectory).use { sourceSetDirectories ->
+            sourceSetDirectories
+                .asSequence()
+                .filter(Files::isDirectory)
+                .flatMap { sourceSetDirectory ->
+                    Files.newDirectoryStream(sourceSetDirectory).use { sourceTypeDirectories ->
+                        sourceTypeDirectories
+                            .asSequence()
+                            .filter(Files::isDirectory)
+                            .map(projectRoot::relativize)
+                            .filter(sourceRootMatcher)
+                            .map(Path::toString)
+                            .toList()
+                            .asSequence()
+                    }
+                }
+                .sorted()
+                .toList()
+        }
+    }
+
+    private fun findModuleSourceMarkers(projectRoot: Path, sourceRootMatcher: (Path) -> Boolean): List<String> {
         val matchedMarkers = mutableListOf<String>()
         Files.walkFileTree(
             projectRoot,
@@ -59,7 +85,9 @@ internal object JvmOnboardingMarkerFinder {
                     }
 
                     val relativeDirectory = projectRoot.relativize(directory)
-                    return if (sourceRootMatcher(relativeDirectory)) {
+                    return if (isRootSourceMarker(relativeDirectory, sourceRootMatcher)) {
+                        FileVisitResult.SKIP_SUBTREE
+                    } else if (sourceRootMatcher(relativeDirectory)) {
                         matchedMarkers += relativeDirectory.toString()
                         FileVisitResult.SKIP_SUBTREE
                     } else {
@@ -77,8 +105,10 @@ internal object JvmOnboardingMarkerFinder {
         return matchedMarkers.sorted()
     }
 
-    private fun isRootSourceMarker(markerPath: String): Boolean {
-        return Path.of(markerPath).nameCount == ROOT_SOURCE_MARKER_DEPTH
+    private fun isRootSourceMarker(relativeDirectory: Path, sourceRootMatcher: (Path) -> Boolean): Boolean {
+        return relativeDirectory.nameCount == ROOT_SOURCE_MARKER_DEPTH &&
+            relativeDirectory.getName(0).toString() == SOURCE_ROOT_DIRECTORY_NAME &&
+            sourceRootMatcher(relativeDirectory)
     }
 }
 
@@ -93,3 +123,5 @@ private val JVM_BUILD_MARKERS = listOf(
 private const val MODULE_SOURCE_SEARCH_DEPTH = 6
 
 private const val ROOT_SOURCE_MARKER_DEPTH = 3
+
+private const val SOURCE_ROOT_DIRECTORY_NAME = "src"
