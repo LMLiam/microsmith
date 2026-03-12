@@ -24,11 +24,11 @@ internal class GeneratorExecutionService(
     }
 
     private suspend fun generate(extension: MicrosmithExtension, space: FileSpace): List<GeneratedFile> {
-        val generator =
-            extension.getGenerator() ?: run {
-                progressReporter.reportMissingGenerator(extension)
-                return emptyList()
-            }
+        val generator = extension.getGenerator()
+        if (generator == null) {
+            progressReporter.reportMissingGenerator(extension)
+            return emptyList()
+        }
 
         return generator.run { extension.generate(space) }.also { generatedFiles ->
             progressReporter.reportGeneratedFiles(extension, generatedFiles.size, space)

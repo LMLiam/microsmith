@@ -7,7 +7,6 @@ import me.liam.microsmith.dsl.schemas.protobuf.field.MapType
 import me.liam.microsmith.dsl.schemas.protobuf.field.OneofField
 import me.liam.microsmith.dsl.schemas.protobuf.field.Reference
 import me.liam.microsmith.dsl.schemas.protobuf.field.ReferenceField
-import me.liam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import me.liam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import me.liam.microsmith.dsl.schemas.protobuf.types.Message
 
@@ -16,12 +15,12 @@ internal class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) {
     private val errors = mutableListOf<String>()
 
     fun resolve(schema: ProtobufSchema): ProtobufSchema {
-        val resolvedType =
-            when (val current = schema.schema) {
-                is Message -> current.resolveMessage()
-                else -> current
-            }
-        return schema.copy(schema = resolvedType)
+        val schemaType = schema.schema
+        if (schemaType !is Message) {
+            return schema
+        }
+
+        return schema.copy(schema = schemaType.resolveMessage())
     }
 
     fun failOnUnresolvedReferences() {
@@ -43,26 +42,27 @@ internal class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) {
             errors += "Unresolved reference '$name' in $context"
             return this
         }
+
         return copy(type = target)
     }
 
-    private fun Field.resolve(messageName: String): Field = when (this) {
-        is ReferenceField -> copy(reference = reference.resolve("message $messageName field '$name'"))
-
-        is MapField -> {
-            val resolvedValue =
-                (type.value as? Reference)?.resolve("message $messageName map field '$name' value") ?: type.value
-            copy(type = MapType(type.key, resolvedValue))
+    private fun Field.resolve(messageName: String): Field {
+        if (this is ReferenceField) {
+            return copy(reference = reference.resolve("message $messageName field '$name'"))
+        }
+        if (this !is MapField) {
+            return this
         }
 
-        is ScalarField -> this
-
-        is OneofField -> this
+        val resolvedValue =
+            (type.value as? Reference)?.resolve("message $messageName map field '$name' value") ?: type.value
+        return copy(type = MapType(type.key, resolvedValue))
     }
 
     private fun OneofField.resolve(messageName: String, oneofName: String): OneofField {
         val resolvedFieldType =
-            (fieldType as? Reference)?.resolve("message $messageName oneof '$oneofName' field '$name'") ?: fieldType
+            (fieldType as? Reference)?.resolve("message $messageName oneof '$oneofName' field '$name'")
+                ?: fieldType
         return copy(fieldType = resolvedFieldType)
     }
 

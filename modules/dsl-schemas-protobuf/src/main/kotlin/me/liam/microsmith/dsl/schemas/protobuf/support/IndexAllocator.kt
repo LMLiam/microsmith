@@ -11,21 +11,22 @@ internal class IndexAllocator(private val min: Int, private val protoReserved: I
     private val used = mutableSetOf<Int>()
     private var next = min
 
-    fun allocate(requested: Int? = null): Int = when (requested) {
-        null ->
-            generateSequence(next) { it + 1 }
-                .first { c ->
-                    c !in used && reserved.none { c in it } && protoReserved?.contains(c) != true
-                }.also { candidate ->
-                    validate(candidate)
-                    used += candidate
-                    next = candidate + 1
-                }
+    fun allocate(requested: Int? = null): Int {
+        if (requested != null) {
+            validate(requested)
+            used += requested
+            return requested
+        }
 
-        else ->
-            requested.also {
-                validate(it)
-                used += it
+        return generateSequence(next) { it + 1 }
+            .first { candidate ->
+                candidate !in used &&
+                    reserved.none { candidate in it } &&
+                    protoReserved?.contains(candidate) != true
+            }.also { candidate ->
+                validate(candidate)
+                used += candidate
+                next = candidate + 1
             }
     }
 
