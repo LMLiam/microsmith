@@ -223,7 +223,7 @@ Inside `.microsmith.kts` scripts:
 
 ## Standalone CLI for consumer repositories
 
-The CLI is the recommended entrypoint for Go, .NET, Node, Python, Ruby, Rust, Java, Kotlin, and other repositories when you want self-contained Microsmith execution without depending on a local Gradle or Maven install.
+The CLI is the recommended entrypoint for Go, .NET, Node, Python, Ruby, Rust, Java, Kotlin, Scala, and other repositories when you want self-contained Microsmith execution without depending on a local Gradle or Maven install.
 The official installer scripts are self-contained and provision a Java 24 runtime automatically when the machine does not already provide one.
 
 Manual channels remain available, but they require Java 24 or newer.
@@ -239,10 +239,11 @@ microsmith run build.microsmith.kts --out ./generated
 
 `microsmith init` is deterministic and non-destructive by default:
 
-- it detects Node, Go, Java, Kotlin, Python, Ruby, Rust, and .NET repositories from `package.json`, `go.mod`, Java source roots such as `src/main/java` or `src/test/java`, Kotlin source roots such as `src/main/kotlin`, `src/test/kotlin`, or `src/commonMain/kotlin`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `gems.rb`, a root `*.gemspec`, a root `Cargo.toml`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
-- repositories that match multiple first-class profiles at once, including mixed Java and Kotlin source roots, fall back to the generic bootstrap instead of guessing the dominant ecosystem
+- it detects Node, Go, Java, Kotlin, Scala, Python, Ruby, Rust, and .NET repositories from `package.json`, `go.mod`, Java source roots such as `src/main/java` or `src/test/java`, Kotlin source roots such as `src/main/kotlin`, `src/test/kotlin`, or `src/commonMain/kotlin`, Scala source roots such as `src/main/scala`, root JVM build markers such as `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`, `build.sbt`, and `project/build.properties`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `gems.rb`, a root `*.gemspec`, a root `Cargo.toml`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
+- repositories that match multiple first-class profiles at once, including mixed Java, Kotlin, and Scala source roots, fall back to the generic bootstrap instead of guessing the dominant ecosystem
 - Java detection is intentionally conservative: it requires a Java source root either at the repository root or inside a nested Maven or Gradle module, then adds root Maven or Gradle markers when present; build-file-only JVM roots stay on the generic path so Microsmith does not guess between Java, Kotlin, and Scala from build files alone
 - Kotlin detection is source-root driven: it recognizes root or nested Kotlin source roots for Maven, Gradle Kotlin DSL, Gradle Groovy, multiplatform-style source-set layouts, and build-tool-light repositories; build-file-only JVM roots still stay on the generic path
+- Scala detection is intentionally conservative: it requires a Scala main source root either at the repository root or inside a nested `sbt`, Maven, or Gradle module, then adds matching root build markers when present; `src/test/scala` alone stays on the generic path so Microsmith does not guess Scala from test-only roots
 - Ruby detection covers Bundler-first app roots and gem-style repositories through a root `Gemfile`, root `gems.rb`, or root `*.gemspec`; nested gems without a root Ruby marker stay on the generic path
 - Rust detection covers both package manifests and workspace roots through a root `Cargo.toml`; nested crates without a root manifest stay on the generic path
 - it creates `settings.microsmith.kts` when missing
@@ -265,6 +266,7 @@ After the canonical first run succeeds, you can switch to a repository-native ou
 - Go: `microsmith run build.microsmith.kts --out ./internal/gen`
 - Java: keep the canonical `./generated` output path unless you explicitly wire generated sources into Maven or Gradle later
 - Kotlin: keep the canonical `./generated` output path unless you intentionally adopt deeper native Gradle or Maven integration later
+- Scala: keep the canonical `./generated` output path unless you intentionally adopt deeper native `sbt`, Gradle, or Maven integration later
 - Python: keep the canonical `./generated` output path unless your repository already has a stronger convention
 - Ruby: keep the canonical `./generated` output path unless your repository already has a stronger convention
 - Rust: keep the canonical `./generated` output path unless your repository already has a stronger convention
@@ -282,6 +284,13 @@ Kotlin-specific guidance:
 - Gradle Groovy repositories that primarily host Kotlin code: use the same CLI-managed `./generated` path and helper workflow
 - Maven Kotlin repositories: keep Microsmith CLI-managed by default and only add `./generated` into the Maven compile path if you explicitly want generated sources compiled by Maven
 - build-tool-light Kotlin repositories: use the same canonical `./generated` output path and helper workflow
+
+Scala-specific guidance:
+
+- `sbt`-based Scala repositories: keep Microsmith CLI-managed during onboarding and do not wire Microsmith into `sbt` automatically as part of onboarding
+- Maven Scala repositories: keep Microsmith CLI-managed by default and only add `./generated` into the Maven compile path if you explicitly want generated sources compiled by Maven
+- Gradle Scala repositories: keep Microsmith CLI-managed by default and only wire generated sources into Gradle intentionally later
+- test-only Scala roots stay on the generic onboarding path until a Scala main source root exists
 
 ### Direct script execution
 
@@ -568,6 +577,11 @@ Kotlin-specific guidance:
 
 - for Kotlin repositories, IntelliJ IDEA is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
 - native Gradle or Maven import resolves Kotlin project sources, but it does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar for `.microsmith.kts`
+
+Scala-specific guidance:
+
+- for Scala repositories, IntelliJ IDEA with the Scala plugin is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native `sbt`, Maven, or Gradle import resolves Scala project sources, but it does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar for `.microsmith.kts`
 
 Ruby-specific guidance:
 
@@ -897,7 +911,7 @@ Each fixture contains a repo marker used by `microsmith init`, a legacy `schema.
 | CLI distribution smoke         | `cli-smoke` on Ubuntu, macOS, and Windows            | Dist launcher, generation, process isolation, and `doctor --diagnostics json`.             |
 | Installer and bootstrap smoke  | `cli-smoke` on Ubuntu, macOS, and Windows            | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.        |
 | Consumer fixture onboarding    | `cli-smoke` on Ubuntu and Windows                    | Ubuntu covers Java, Kotlin, Node, Go, Python, Ruby, and Rust fixtures; Windows covers the .NET fixture. |
-| JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Ubuntu runs `ide refresh` and `ide doctor` for Java, Kotlin, Node, Go, Python, Ruby, and Rust fixtures; Windows runs the .NET helper path. |
+| JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Ubuntu runs `ide refresh` and `ide doctor` for Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust fixtures; Windows runs the .NET helper path. |
 | Fallback artifact packaging    | `build-and-qodana` on Ubuntu                         | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`. |
 | Resolver, auth, lock, offline  | `./gradlew build` and module regression suites       | `:cli:jvmKotest` covers authenticated repositories, lockfiles, cache policy, and offline behavior. |
 
@@ -922,6 +936,7 @@ Support policy:
 |-----------------|---------------------------------|---------------------------------------------------------|----------------------------------------------------------|
 | IntelliJ IDEA   | `examples/jvm/java-maven`       | Run the helper checklist below against the Java fixture. | Run the fallback checklist below against the Java fixture. |
 | IntelliJ IDEA   | `examples/jvm/kotlin-gradle`    | Run the helper checklist below against the Kotlin fixture. | Run the fallback checklist below against the Kotlin fixture. |
+| IntelliJ IDEA   | `examples/jvm/scala-sbt`        | Run the helper checklist below against the Scala fixture. | Run the fallback checklist below against the Scala fixture. |
 | GoLand          | `examples/non-gradle/go`        | Run the helper checklist below against the Go fixture.   | Run the fallback checklist below against the Go fixture.   |
 | PyCharm         | `examples/non-gradle/python`    | Run the helper checklist below against the Python fixture. | Run the fallback checklist below against the Python fixture. |
 | RubyMine        | `examples/non-gradle/ruby`      | Run the helper checklist below against the Ruby fixture. | Run the fallback checklist below against the Ruby fixture. |
