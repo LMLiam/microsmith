@@ -36,8 +36,8 @@ jobs:
       - name: Validate IDE fallback release assets
         run: |
           ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
-          find runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microsmith-script-definition-*-all.jar' | grep -q .
-          find runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microsmith-script-definition-*-all.jar.sha256' | grep -q .
+          find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microsmith-script-definition-*-all.jar' | grep -q .
+          find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microsmith-script-definition-*-all.jar.sha256' | grep -q .
       - name: Publish Test Report
         uses: dorny/test-reporter@v2
         if: ${{ always() && hashFiles('**/build/test-results/jvmKotest/*.xml') != '' }}
@@ -94,7 +94,7 @@ jobs:
       - name: Smoke test dist launcher (Unix)
         if: runner.os != 'Windows'
         run: |
-          ./cli/build/microsmith-cli-dist/bin/microsmith --help > cli-help.txt
+          ./modules/cli/build/microsmith-cli-dist/bin/microsmith --help > cli-help.txt
           grep -q "Usage:" cli-help.txt
       - name: Verify README CLI usage block (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -113,20 +113,20 @@ jobs:
               }
           }
           EOF
-          ./cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --out generated
+          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --out generated
           test -f generated/proto/CiSmoke.proto
-          ./cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --out generated-process --isolation process
+          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --out generated-process --isolation process
           test -f generated-process/proto/CiSmoke.proto
       - name: Smoke test dist doctor diagnostics mode (Unix)
         if: runner.os != 'Windows'
         run: |
-          ./cli/build/microsmith-cli-dist/bin/microsmith doctor --diagnostics json > cli-doctor.json
+          ./modules/cli/build/microsmith-cli-dist/bin/microsmith doctor --diagnostics json > cli-doctor.json
           grep -q "Doctor checks passed." cli-doctor.json
       - name: Smoke test dist launcher (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $help = & .\cli\build\microsmith-cli-dist\bin\microsmith.bat --help 2>&1
+          $help = & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat --help 2>&1
           if ($LASTEXITCODE -ne 0) {
             Write-Output $help
             exit $LASTEXITCODE
@@ -151,7 +151,7 @@ jobs:
               }
           }
           '@ | Set-Content -Path schema.microsmith.kts -Encoding UTF8
-          & .\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated
+          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
@@ -159,7 +159,7 @@ jobs:
             Write-Error "Expected generated\\proto\\CiSmoke.proto to exist."
             exit 1
           }
-          & .\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated-process --isolation process
+          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated-process --isolation process
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
@@ -171,7 +171,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $doctor = & .\cli\build\microsmith-cli-dist\bin\microsmith.bat doctor --diagnostics json 2>&1
+          $doctor = & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat doctor --diagnostics json 2>&1
           if ($LASTEXITCODE -ne 0) {
             Write-Output $doctor
             exit $LASTEXITCODE
@@ -186,10 +186,10 @@ jobs:
         if: ${{ always() && runner.os != 'Windows' && steps.build-release-unix.outcome == 'success' }}
         run: |
           set -eu
-          DIST_FILE="$(find cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
+          DIST_FILE="$(find modules/cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
           CLI_VERSION="$(printf '%s\n' "$DIST_FILE" | sed -E 's#.*microsmith-cli-(.*)-dist.tar.gz#\1#')"
           DIST_SHA="$(awk '{print $1}' "${DIST_FILE}.sha256")"
-          sh cli/build/release-assets/microsmith-install.sh \
+          sh modules/cli/build/release-assets/microsmith-install.sh \
             --version "$CLI_VERSION" \
             --install-root "$PWD/.microsmith-home" \
             --bin-dir "$PWD/.microsmith-bin" \
@@ -240,7 +240,7 @@ jobs:
         if: ${{ always() && runner.os == 'Windows' && steps.build-release-windows.outcome == 'success' }}
         shell: pwsh
         run: |
-          $distAsset = Get-ChildItem -Path .\cli\build\release-assets\microsmith-cli-*-dist.zip | Select-Object -First 1
+          $distAsset = Get-ChildItem -Path .\modules\cli\build\release-assets\microsmith-cli-*-dist.zip | Select-Object -First 1
           if (-not $distAsset) {
             Write-Error "Unable to locate CLI dist zip asset."
             exit 1
@@ -252,7 +252,7 @@ jobs:
             exit 1
           }
           $distSha = (Get-Content -Path $distShaPath -Raw).Split(' ', [System.StringSplitOptions]::RemoveEmptyEntries)[0]
-          & .\cli\build\release-assets\microsmith-install.ps1 `
+          & .\modules\cli\build\release-assets\microsmith-install.ps1 `
             -Version $version `
             -InstallRoot "$pwd\.microsmith-home" `
             -BinDir "$pwd\.microsmith-bin" `

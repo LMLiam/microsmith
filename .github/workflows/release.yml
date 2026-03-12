@@ -56,15 +56,15 @@ jobs:
           tag_name: v${{ steps.release.outputs.released-version }}
           generate_release_notes: true
           append_body: true
-          body_path: docs/release/cli-runtime-notes.md
+          body_path: .github/release-notes.md
           files: |
-            cli/build/release-assets/microsmith-cli-*-all.jar
-            cli/build/release-assets/microsmith-cli-*-dist.zip
-            cli/build/release-assets/microsmith-cli-*-dist.tar.gz
-            cli/build/release-assets/microsmith-install.sh
-            cli/build/release-assets/microsmith-install.ps1
-            cli/build/release-assets/*.sha256
-            runtime-scripting/build/release-assets/microsmith-script-definition-*-all.jar
-            runtime-scripting/build/release-assets/microsmith-script-definition-*-all.jar.sha256
+            modules/cli/build/release-assets/microsmith-cli-*-all.jar
+            modules/cli/build/release-assets/microsmith-cli-*-dist.zip
+            modules/cli/build/release-assets/microsmith-cli-*-dist.tar.gz
+            modules/cli/build/release-assets/microsmith-install.sh
+            modules/cli/build/release-assets/microsmith-install.ps1
+            modules/cli/build/release-assets/*.sha256
+            modules/runtime-scripting/build/release-assets/microsmith-script-definition-*-all.jar
+            modules/runtime-scripting/build/release-assets/microsmith-script-definition-*-all.jar.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
