@@ -63,10 +63,8 @@ private fun parseVariableOption(args: List<String>, index: Int, state: RunOption
 
 private fun parseFlagOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
-    val flag = parseFlagValue(value)
-    if (flag == null) {
-        return ParsedToken(nextIndex = index, error = "Missing value for --flag option.")
-    }
+    val flag =
+        parseFlagValue(value) ?: return ParsedToken(nextIndex = index, error = "Missing value for --flag option.")
     if (state.flags.contains(flag)) {
         return ParsedToken(nextIndex = index, error = "--flag '$flag' may only be specified once.")
     }
@@ -77,13 +75,10 @@ private fun parseFlagOption(args: List<String>, index: Int, state: RunOptionsSta
 
 private fun parsePluginOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
-    val pluginCoordinate = parsePluginCoordinate(value)
-    if (pluginCoordinate == null) {
-        return ParsedToken(
-            nextIndex = index,
-            error = "Invalid --plugin value '$value'. Expected group:artifact:version.",
-        )
-    }
+    val pluginCoordinate = parsePluginCoordinate(value) ?: return ParsedToken(
+        nextIndex = index,
+        error = "Invalid --plugin value '$value'. Expected group:artifact:version.",
+    )
     if (state.plugins.contains(pluginCoordinate)) {
         return ParsedToken(
             nextIndex = index,
