@@ -39,8 +39,8 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             val result = project.buildAndFail("verifyRepositoryStandards")
 
             result.output shouldContain "[multiple-production-types] src/main/kotlin/example/MixedDeclarations.kt"
-            result.output shouldContain multipleProductionTypesRemediation
-            result.output shouldContain policyExceptionRemediationPrefix
+            result.output shouldContain MULTIPLE_PRODUCTION_TYPES_REMEDIATION
+            result.output shouldContain POLICY_EXCEPTION_REMEDIATION_PREFIX
         }
 
         "verifyRepositoryStandards fails for production file line limit violations" {
@@ -53,7 +53,7 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             val result = project.buildAndFail("verifyRepositoryStandards")
 
             result.output shouldContain "[production-file-lines] src/main/kotlin/example/TooLong.kt"
-            result.output shouldContain lineLimitRemediation
+            result.output shouldContain LINE_LIMIT_REMEDIATION
         }
 
         "verifyRepositoryStandards fails for forbidden package segments" {
@@ -85,7 +85,7 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             val result = project.buildAndFail("verifyRepositoryStandards")
 
             result.output shouldContain "[missing-package-declaration] src/main/kotlin/example/NoPackage.kt"
-            result.output shouldContain missingPackageDeclarationRemediation
+            result.output shouldContain MISSING_PACKAGE_DECLARATION_REMEDIATION
         }
 
         "verifyRepositoryStandards accepts package declarations with trailing comments" {
@@ -136,7 +136,7 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             val result = project.buildAndFail("verifyRepositoryStandards")
 
             result.output shouldContain "[primary-type-file-name] src/main/kotlin/example/TypeAliasFile.kt"
-            result.output shouldContain primaryTypeFileNamePrefix
+            result.output shouldContain PRIMARY_TYPE_FILE_NAME_PREFIX
         }
 
         "verifyRepositoryStandards fails for file name mismatches on inline annotated declarations" {
@@ -174,7 +174,7 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             val result = project.buildAndFail("verifyRepositoryStandards")
 
             result.output shouldContain "[multiple-production-types] src/main/kotlin/example/IndentedDeclarations.kt"
-            result.output shouldContain multipleProductionTypesRemediation
+            result.output shouldContain MULTIPLE_PRODUCTION_TYPES_REMEDIATION
         }
 
         "verifyRepositoryStandards scans build-logic production sources" {
@@ -187,7 +187,7 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
             val result = project.buildAndFail("verifyRepositoryStandards")
 
             result.output shouldContain "[production-file-lines] build-logic/src/main/kotlin/example/TooLong.kt"
-            result.output shouldContain lineLimitRemediation
+            result.output shouldContain LINE_LIMIT_REMEDIATION
         }
 
         "verifyRepositoryStandards ignores files under build directories" {
@@ -228,17 +228,17 @@ class RepositoryQualityTaskFunctionalTests : StringSpec() {
     }
 
     private companion object {
-        private const val multipleProductionTypesRemediation =
+        private const val MULTIPLE_PRODUCTION_TYPES_REMEDIATION =
             "Split extra production types into their own files or make tightly coupled helpers private."
-        private const val lineLimitRemediation =
+        private const val LINE_LIMIT_REMEDIATION =
             "Split parsing, validation, rendering, diagnostics, policy, or I/O responsibilities " +
                 "before extending the file further."
-        private const val missingPackageDeclarationRemediation =
+        private const val MISSING_PACKAGE_DECLARATION_REMEDIATION =
             "Production Kotlin files must declare an explicit package."
-        private const val policyExceptionRemediationPrefix =
+        private const val POLICY_EXCEPTION_REMEDIATION_PREFIX =
             "Fix the structural issue, or if the exception is truly justified, " +
                 "update RepositoryQualityPolicy"
-        private const val primaryTypeFileNamePrefix =
+        private const val PRIMARY_TYPE_FILE_NAME_PREFIX =
             "File 'TypeAliasFile.kt' does not match the single top-level production declaration"
     }
 }
