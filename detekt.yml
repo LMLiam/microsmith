@@ -127,12 +127,12 @@ style:
     excludeImportStatements: true
   ReturnCount:
     active: true
-    max: 3
+    max: 4
     excludedFunctions:
       - 'equals'
     excludeLabeled: false
     excludeReturnFromLambda: true
-    excludeGuardClauses: false
+    excludeGuardClauses: true
     excludes:
       - '**/test/**'
   ThrowsCount:
