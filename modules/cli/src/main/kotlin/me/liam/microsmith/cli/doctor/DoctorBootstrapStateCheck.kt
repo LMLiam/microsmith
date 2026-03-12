@@ -11,20 +11,20 @@ internal object DoctorBootstrapStateCheck {
         val buildScript = projectRoot.resolve(INIT_BUILD_FILE_NAME)
         val settingsScript = projectRoot.resolve(INIT_SETTINGS_FILE_NAME)
         val helperRoot = projectRoot.resolve(IDE_HELPER_DIRECTORY)
+
         validateBootstrapSurface(
             projectRoot = projectRoot,
             buildScript = buildScript,
             settingsScript = settingsScript,
             helperRoot = helperRoot,
         )?.let { return it }
+
         val invalidHelperFiles = invalidIdeHelperFiles(projectRoot = projectRoot, helperRoot = helperRoot)
         val missingHelperFiles = missingIdeHelperFiles(projectRoot = projectRoot, helperRoot = helperRoot)
 
         return when {
             invalidHelperFiles.isNotEmpty() ->
-                DoctorCheckResult(
-                    id = CHECK_ID,
-                    status = DoctorCheckStatus.FAIL,
+                failure(
                     message =
                     "JetBrains IDE helper contains conflicting managed paths. " +
                         "Remove them and run 'microsmith ide refresh' to repair it.",
@@ -32,25 +32,19 @@ internal object DoctorBootstrapStateCheck {
                 )
 
             missingHelperFiles.isNotEmpty() ->
-                DoctorCheckResult(
-                    id = CHECK_ID,
-                    status = DoctorCheckStatus.FAIL,
+                failure(
                     message = "JetBrains IDE helper is incomplete. Run 'microsmith ide refresh' to repair it.",
                     details = mapOf("missingIdeHelperFiles" to missingHelperFiles.joinToString(separator = ",")),
                 )
 
             Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) ->
-                DoctorCheckResult(
-                    id = CHECK_ID,
-                    status = DoctorCheckStatus.PASS,
+                pass(
                     message = "Bootstrap files and JetBrains IDE helper are present.",
                     details = mapOf("projectRoot" to projectRoot.toString()),
                 )
 
             else ->
-                DoctorCheckResult(
-                    id = CHECK_ID,
-                    status = DoctorCheckStatus.FAIL,
+                failure(
                     message =
                     "Bootstrap files are present, but the JetBrains IDE helper is missing. " +
                         "Run 'microsmith ide refresh' to restore the default onboarding surface.",
@@ -70,9 +64,7 @@ internal object DoctorBootstrapStateCheck {
                 Files.exists(settingsScript, LinkOption.NOFOLLOW_LINKS) ||
                 Files.exists(helperRoot, LinkOption.NOFOLLOW_LINKS)
         if (!hasManagedSurface) {
-            return DoctorCheckResult(
-                id = CHECK_ID,
-                status = DoctorCheckStatus.PASS,
+            return pass(
                 message = "Bootstrap files were not detected in the current working directory.",
                 details = mapOf("projectRoot" to projectRoot.toString()),
             )
@@ -81,11 +73,10 @@ internal object DoctorBootstrapStateCheck {
         val bootstrapFiles = listOf(buildScript, settingsScript)
         val invalidBootstrapFiles = invalidManagedFiles(projectRoot = projectRoot, managedFiles = bootstrapFiles)
         val missingBootstrapFiles = missingManagedFiles(projectRoot = projectRoot, managedFiles = bootstrapFiles)
+
         return when {
             invalidBootstrapFiles.isNotEmpty() ->
-                DoctorCheckResult(
-                    id = CHECK_ID,
-                    status = DoctorCheckStatus.FAIL,
+                failure(
                     message =
                     "Bootstrap paths are invalid. Remove the conflicting paths. " +
                         "Run 'microsmith init' to repair them.",
@@ -96,9 +87,7 @@ internal object DoctorBootstrapStateCheck {
                 )
 
             missingBootstrapFiles.isNotEmpty() ->
-                DoctorCheckResult(
-                    id = CHECK_ID,
-                    status = DoctorCheckStatus.FAIL,
+                failure(
                     message = "Bootstrap state is incomplete. Run 'microsmith init' to repair it.",
                     details =
                     mapOf(
@@ -107,9 +96,7 @@ internal object DoctorBootstrapStateCheck {
                 )
 
             managedPathExists(helperRoot) && !Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) ->
-                DoctorCheckResult(
-                    id = CHECK_ID,
-                    status = DoctorCheckStatus.FAIL,
+                failure(
                     message =
                     "JetBrains IDE helper path is invalid. " +
                         "Run 'microsmith ide refresh' after removing the conflicting path.",
@@ -152,6 +139,21 @@ internal object DoctorBootstrapStateCheck {
     private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
 
     private fun isManagedRegularFile(path: Path): Boolean = Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)
+
+    private fun pass(message: String, details: Map<String, String> = emptyMap()): DoctorCheckResult = DoctorCheckResult(
+        id = CHECK_ID,
+        status = DoctorCheckStatus.PASS,
+        message = message,
+        details = details,
+    )
+
+    private fun failure(message: String, details: Map<String, String> = emptyMap()): DoctorCheckResult =
+        DoctorCheckResult(
+            id = CHECK_ID,
+            status = DoctorCheckStatus.FAIL,
+            message = message,
+            details = details,
+        )
 }
 
 private const val CHECK_ID = "bootstrap-state"

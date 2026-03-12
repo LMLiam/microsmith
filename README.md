@@ -91,12 +91,14 @@ Microsmith provides:
 ### Kotlin idioms
 
 - Prefer immutable data, `val`, and expression-oriented control flow by default.
+- Prefer guard clauses and early returns for preconditions, invalid state handling, and fast exits when they reduce nesting and make the main path easier to read.
 - Default to the narrowest visibility that keeps the API honest. Widen visibility only when a real caller or extension point requires it.
 - Use `sealed interface`, `data object`, `value class`, exhaustive `when`, and null-safety where they make state and invariants clearer.
 - Use extension functions when they improve discoverability for a well-scoped domain operation and avoid creating utility dumping grounds.
 - Use infix functions only for DSL-facing APIs when readability is clearly better than the non-infix equivalent.
 - Use `object` and `companion object` only when singleton semantics, namespaced factories, or constants are genuinely clearer than top-level declarations or regular types.
 - Avoid Java-style static utility patterns, unnecessary mutable state, and scope-function chains that hide control flow.
+- Do not contort control flow to appease return-count tooling. Guard clauses are allowed; excessive non-guard branching should still be simplified or decomposed.
 
 ### Interfaces and ports
 

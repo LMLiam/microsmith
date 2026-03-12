@@ -96,29 +96,28 @@ internal object IdeHelperDoctorChecks {
         val buildFile = IdeHelperManagedSurface.buildFile(helperRoot)
         val buildFileContent = readManagedUtf8TextOrNull(buildFile)
         val missingClasspathEntries =
-            if (buildFileContent == null) {
-                classpathEntries
-            } else {
-                classpathEntries.filterNot { entry -> buildFileContent.contains(entry.toKotlinPathLiteral()) }
-            }
-        return if (missingClasspathEntries.isEmpty()) {
-            IdeDoctorCheckResult(
+            buildFileContent
+                ?.let { content ->
+                    classpathEntries.filterNot { entry -> content.contains(entry.toKotlinPathLiteral()) }
+                }
+                ?: classpathEntries
+        if (missingClasspathEntries.isEmpty()) {
+            return IdeDoctorCheckResult(
                 id = "classpath-sync",
                 passed = true,
                 message = "IDE helper build file is synchronized with runtime classpath.",
             )
-        } else {
-            IdeDoctorCheckResult(
-                id = "classpath-sync",
-                passed = false,
-                message = "IDE helper build file is stale. Run 'microsmith ide refresh'.",
-                details =
-                mapOf(
-                    "missingClasspathEntries" to missingClasspathEntries.size.toString(),
-                    "firstMissingClasspathEntry" to missingClasspathEntries.first().toString(),
-                ),
-            )
         }
+        return IdeDoctorCheckResult(
+            id = "classpath-sync",
+            passed = false,
+            message = "IDE helper build file is stale. Run 'microsmith ide refresh'.",
+            details =
+            mapOf(
+                "missingClasspathEntries" to missingClasspathEntries.size.toString(),
+                "firstMissingClasspathEntry" to missingClasspathEntries.first().toString(),
+            ),
+        )
     }
 
     private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
@@ -128,10 +127,9 @@ internal object IdeHelperDoctorChecks {
     private fun readManagedUtf8TextOrNull(path: Path): String? {
         return try {
             if (!isManagedRegularFile(path)) {
-                null
-            } else {
-                Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n")
+                return null
             }
+            Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n")
         } catch (_: IOException) {
             null
         } catch (_: SecurityException) {

@@ -26,23 +26,22 @@ private fun parseScriptArg(scriptArg: String?): Pair<Path?, String?> = when {
 
 private fun parseRunOptionsCommand(script: Path, args: List<String>, startIndex: Int): CliCommand {
     val parsedOptions = parseRunOptions(args, startIndex)
-    return when {
-        parsedOptions.error != null -> ErrorCommand(parsedOptions.error)
-        parsedOptions.outputDir == null -> ErrorCommand("Missing required --out <output-dir> option.")
-        else ->
-            RunCommand(
-                script = script,
-                outputDir = parsedOptions.outputDir,
-                variables = parsedOptions.variables,
-                flags = parsedOptions.flags,
-                plugins = parsedOptions.plugins,
-                pluginJars = parsedOptions.pluginJars,
-                offline = parsedOptions.offline,
-                repositoryOverride = parsedOptions.repositoryOverride,
-                isolationMode = parsedOptions.isolationMode,
-                diagnosticsFormat = parsedOptions.diagnosticsFormat,
-                verbose = parsedOptions.verbose,
-                eventLog = parsedOptions.eventLog,
-            )
-    }
+    parsedOptions.error?.let { return ErrorCommand(it) }
+    val outputDir =
+        parsedOptions.outputDir
+            ?: return ErrorCommand("Missing required --out <output-dir> option.")
+    return RunCommand(
+        script = script,
+        outputDir = outputDir,
+        variables = parsedOptions.variables,
+        flags = parsedOptions.flags,
+        plugins = parsedOptions.plugins,
+        pluginJars = parsedOptions.pluginJars,
+        offline = parsedOptions.offline,
+        repositoryOverride = parsedOptions.repositoryOverride,
+        isolationMode = parsedOptions.isolationMode,
+        diagnosticsFormat = parsedOptions.diagnosticsFormat,
+        verbose = parsedOptions.verbose,
+        eventLog = parsedOptions.eventLog,
+    )
 }

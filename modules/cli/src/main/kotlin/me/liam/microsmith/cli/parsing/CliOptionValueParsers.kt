@@ -8,24 +8,7 @@ private const val PLUGIN_COORDINATE_PART_COUNT = 3
 
 internal fun parseVariableValue(value: String?): ParsedVariable = when {
     value == null || value.startsWith("--") -> ParsedVariable(error = "Missing value for --var option.")
-
-    else -> {
-        val separatorIndex = value.indexOf('=')
-        val key =
-            if (separatorIndex > 0) {
-                value.take(separatorIndex).trim()
-            } else {
-                ""
-            }
-        if (separatorIndex <= 0 || key.isBlank()) {
-            ParsedVariable(error = "Invalid --var value '$value'. Expected key=value.")
-        } else {
-            ParsedVariable(
-                key = key,
-                value = value.substring(separatorIndex + 1),
-            )
-        }
-    }
+    else -> parseVariableAssignment(value)
 }
 
 internal fun parseFlagValue(value: String?): String? = value
@@ -93,16 +76,30 @@ internal inline fun parseRepoRootOption(
     onSuccess: (Path) -> Unit,
 ): ParsedToken {
     val value = args.getOrNull(index + 1)
-    val error =
-        when {
-            value == null || value.startsWith("--") -> "Missing value for --repo-root option."
-            alreadySpecified -> "--repo-root may only be specified once."
-            else -> null
-        }
-    if (error != null) {
-        return ParsedToken(nextIndex = index, error = error)
+    if (value == null || value.startsWith("--")) {
+        return ParsedToken(nextIndex = index, error = "Missing value for --repo-root option.")
+    }
+    if (alreadySpecified) {
+        return ParsedToken(nextIndex = index, error = "--repo-root may only be specified once.")
     }
 
     onSuccess(Path.of(value))
     return ParsedToken(nextIndex = index + 2)
+}
+
+private fun parseVariableAssignment(value: String): ParsedVariable {
+    val separatorIndex = value.indexOf('=')
+    if (separatorIndex <= 0) {
+        return ParsedVariable(error = "Invalid --var value '$value'. Expected key=value.")
+    }
+
+    val key = value.take(separatorIndex).trim()
+    if (key.isBlank()) {
+        return ParsedVariable(error = "Invalid --var value '$value'. Expected key=value.")
+    }
+
+    return ParsedVariable(
+        key = key,
+        value = value.substring(separatorIndex + 1),
+    )
 }

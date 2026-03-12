@@ -15,15 +15,17 @@ internal class DiagnosticOptionsState {
 
     fun consumeDiagnostics(args: List<String>, index: Int): Int {
         val value = args.getOrNull(index + 1)
+        if (value == null || value.startsWith("--")) {
+            error = "Missing value for --diagnostics option."
+            return 0
+        }
         val parsedFormat = parseDiagnosticFormat(value)
         error =
             when {
-                value == null || value.startsWith("--") -> "Missing value for --diagnostics option."
                 diagnosticsSpecified -> "--diagnostics may only be specified once."
                 parsedFormat == null -> "Invalid --diagnostics value '$value'. Expected 'text' or 'json'."
                 else -> null
             }
-
         if (error != null) {
             return 0
         }

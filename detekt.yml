@@ -132,7 +132,7 @@ style:
       - 'equals'
     excludeLabeled: false
     excludeReturnFromLambda: true
-    excludeGuardClauses: false
+    excludeGuardClauses: true
     excludes:
       - '**/test/**'
   ThrowsCount:

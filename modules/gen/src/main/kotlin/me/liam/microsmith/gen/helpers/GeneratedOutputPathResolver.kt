@@ -42,11 +42,11 @@ internal object GeneratedOutputPathResolver {
     private fun requireNoSymlinkTraversal(root: Path, relativePath: Path) {
         var current = root
         val segments = relativePath.toList()
-        segments.forEachIndexed { index, segment ->
+        for ((index, segment) in segments.withIndex()) {
             current = current.resolve(segment.toString())
 
             if (!Files.exists(current, LinkOption.NOFOLLOW_LINKS)) {
-                return@forEachIndexed
+                continue
             }
 
             require(!Files.isSymbolicLink(current)) {

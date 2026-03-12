@@ -21,12 +21,11 @@ internal class DoctorCommandHandler(
             }
         }
 
-        return if (result.hasFailures) {
-            emitter.error(CliFailureCode.DOCTOR_FAILED, "Doctor detected environment issues.")
-            CliFailureCode.DOCTOR_FAILED.exitCode
-        } else {
+        if (!result.hasFailures) {
             emitter.info("Doctor checks passed.")
-            0
+            return 0
         }
+        emitter.error(CliFailureCode.DOCTOR_FAILED, "Doctor detected environment issues.")
+        return CliFailureCode.DOCTOR_FAILED.exitCode
     }
 }

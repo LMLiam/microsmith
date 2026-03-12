@@ -9,15 +9,8 @@ import kotlin.io.path.deleteIfExists
 internal object DoctorEnvironmentChecks {
     fun checkJavaRuntime(minSupportedJavaFeature: Int = MIN_SUPPORTED_JAVA_FEATURE): DoctorCheckResult {
         val feature = Runtime.version().feature()
-        return if (feature >= minSupportedJavaFeature) {
-            DoctorCheckResult(
-                id = "java-runtime",
-                status = DoctorCheckStatus.PASS,
-                message = "Detected Java runtime feature $feature (minimum is $minSupportedJavaFeature).",
-                details = mapOf("feature" to feature.toString()),
-            )
-        } else {
-            DoctorCheckResult(
+        if (feature < minSupportedJavaFeature) {
+            return DoctorCheckResult(
                 id = "java-runtime",
                 status = DoctorCheckStatus.FAIL,
                 message =
@@ -26,31 +19,39 @@ internal object DoctorEnvironmentChecks {
                 details = mapOf("feature" to feature.toString()),
             )
         }
+        return DoctorCheckResult(
+            id = "java-runtime",
+            status = DoctorCheckStatus.PASS,
+            message = "Detected Java runtime feature $feature (minimum is $minSupportedJavaFeature).",
+            details = mapOf("feature" to feature.toString()),
+        )
     }
 
-    fun checkProviderDiscovery(providerValidator: () -> List<String>): DoctorCheckResult = try {
-        val errors = providerValidator()
-        if (errors.isEmpty()) {
-            DoctorCheckResult(
-                id = "provider-discovery",
-                status = DoctorCheckStatus.PASS,
-                message = "Required built-in service providers are available.",
-            )
-        } else {
+    fun checkProviderDiscovery(providerValidator: () -> List<String>): DoctorCheckResult {
+        return try {
+            val errors = providerValidator()
+            if (errors.isEmpty()) {
+                DoctorCheckResult(
+                    id = "provider-discovery",
+                    status = DoctorCheckStatus.PASS,
+                    message = "Required built-in service providers are available.",
+                )
+            } else {
+                DoctorCheckResult(
+                    id = "provider-discovery",
+                    status = DoctorCheckStatus.FAIL,
+                    message = "Required built-in service providers are missing.",
+                    details = mapOf("errors" to errors.joinToString(" | ")),
+                )
+            }
+        } catch (error: ServiceConfigurationError) {
             DoctorCheckResult(
                 id = "provider-discovery",
                 status = DoctorCheckStatus.FAIL,
-                message = "Required built-in service providers are missing.",
-                details = mapOf("errors" to errors.joinToString(" | ")),
+                message = "Service provider loading failed.",
+                details = mapOf("error" to (error.message ?: error::class.simpleName.orEmpty())),
             )
         }
-    } catch (error: ServiceConfigurationError) {
-        DoctorCheckResult(
-            id = "provider-discovery",
-            status = DoctorCheckStatus.FAIL,
-            message = "Service provider loading failed.",
-            details = mapOf("error" to (error.message ?: error::class.simpleName.orEmpty())),
-        )
     }
 
     fun checkDirectoryWritable(id: String, directory: Path): DoctorCheckResult = runCatching {

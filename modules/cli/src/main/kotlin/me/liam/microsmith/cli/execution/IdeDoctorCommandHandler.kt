@@ -33,12 +33,11 @@ internal class IdeDoctorCommandHandler(
             }
         }
 
-        return if (result.hasFailures) {
-            emitter.error(CliFailureCode.IDE_DOCTOR_FAILED, "JetBrains IDE helper doctor detected issues.")
-            CliFailureCode.IDE_DOCTOR_FAILED.exitCode
-        } else {
+        if (!result.hasFailures) {
             emitter.info("JetBrains IDE helper doctor checks passed.")
-            0
+            return 0
         }
+        emitter.error(CliFailureCode.IDE_DOCTOR_FAILED, "JetBrains IDE helper doctor detected issues.")
+        return CliFailureCode.IDE_DOCTOR_FAILED.exitCode
     }
 }

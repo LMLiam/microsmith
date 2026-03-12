@@ -19,9 +19,8 @@ internal fun defaultLockfilePath(scriptPath: Path): Path {
     val lockfileBaseName = normalizedScriptPath.fileName.toString().removeSuffix(".kts")
     val lockfileName = "$lockfileBaseName.plugins.lock"
     val parent = normalizedScriptPath.parent
-    return if (parent != null) {
-        parent.resolve(lockfileName)
-    } else {
-        Path.of(lockfileName)
+    if (parent == null) {
+        return Path.of(lockfileName)
     }
+    return parent.resolve(lockfileName)
 }
