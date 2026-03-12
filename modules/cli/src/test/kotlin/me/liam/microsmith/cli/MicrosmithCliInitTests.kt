@@ -19,6 +19,7 @@ import me.liam.microsmith.cli.init.OnboardingProfileSelectionReason
 import me.liam.microsmith.cli.init.PythonOnboardingProfile
 import me.liam.microsmith.cli.init.RubyOnboardingProfile
 import me.liam.microsmith.cli.init.RustOnboardingProfile
+import me.liam.microsmith.cli.init.ScalaOnboardingProfile
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
@@ -390,6 +391,51 @@ class MicrosmithCliInitTests :
 
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("Detected repository profile: Kotlin")
+                out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts --out ./generated")
+                out.joinToString("\n").shouldNotContain("Optional repository-native output path")
+                err shouldBe emptyList()
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "init command keeps Scala on the canonical generated output path" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val tempDir = createTempDirectory("microsmith-cli-init-scala")
+            try {
+                val helperRoot = tempDir.resolve(".microsmith/ide")
+                val cli =
+                    MicrosmithCli(
+                        stdout = out::add,
+                        stderr = err::add,
+                        initRunner = { command: InitCommand ->
+                            InitBootstrapResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                repositoryDetection =
+                                OnboardingProfileDetection(
+                                    profile = ScalaOnboardingProfile,
+                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                                    matchedMarkers = listOf("build.sbt", "src/main/scala"),
+                                ),
+                                createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
+                                overwrittenFiles = emptyList(),
+                                preservedFiles = emptyList(),
+                                ideHelperResult =
+                                IdeHelperRefreshResult(
+                                    projectRoot = tempDir,
+                                    helperRoot = helperRoot,
+                                    updatedFiles = emptyList(),
+                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                ),
+                            )
+                        },
+                    )
+
+                val exitCode = cli.run(arrayOf("init", "--repo-root", tempDir.toString()))
+
+                exitCode shouldBe 0
+                out.joinToString("\n").shouldContain("Detected repository profile: Scala")
                 out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts --out ./generated")
                 out.joinToString("\n").shouldNotContain("Optional repository-native output path")
                 err shouldBe emptyList()

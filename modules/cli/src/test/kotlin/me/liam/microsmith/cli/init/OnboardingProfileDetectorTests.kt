@@ -329,6 +329,105 @@ class OnboardingProfileDetectorTests :
             }
         }
 
+        "detects Scala repositories from sbt, Maven, Gradle, and build-tool-light layouts" {
+            val sbtRoot = createTempDirectory("microsmith-init-detect-scala-sbt")
+            val mavenRoot = createTempDirectory("microsmith-init-detect-scala-maven")
+            val gradleRoot = createTempDirectory("microsmith-init-detect-scala-gradle")
+            val lightweightRoot = createTempDirectory("microsmith-init-detect-scala-lightweight")
+            val testOnlyRoot = createTempDirectory("microsmith-init-detect-scala-test-only")
+            try {
+                sbtRoot.resolve("project").createDirectories()
+                sbtRoot.resolve("build.sbt").writeText("""scalaVersion := "3.7.1""" + "\n")
+                sbtRoot.resolve("project/build.properties").writeText("sbt.version=1.11.7\n")
+                sbtRoot.resolve("src/main/scala/example").createDirectories()
+                mavenRoot.resolve("pom.xml").writeText("<project />\n")
+                mavenRoot.resolve("src/main/scala/example").createDirectories()
+                gradleRoot.resolve("build.gradle.kts").writeText("plugins { scala }\n")
+                gradleRoot.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture-scala\"\n")
+                gradleRoot.resolve("src/main/scala/example").createDirectories()
+                lightweightRoot.resolve("src/main/scala/example").createDirectories()
+                testOnlyRoot.resolve("build.sbt").writeText("""scalaVersion := "3.7.1""" + "\n")
+                testOnlyRoot.resolve("src/test/scala/example").createDirectories()
+
+                detectOnboardingProfile(sbtRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = ScalaOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("build.sbt", "project/build.properties", "src/main/scala"),
+                    )
+                detectOnboardingProfile(mavenRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = ScalaOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("pom.xml", "src/main/scala"),
+                    )
+                detectOnboardingProfile(gradleRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = ScalaOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("build.gradle.kts", "settings.gradle.kts", "src/main/scala"),
+                    )
+                detectOnboardingProfile(lightweightRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = ScalaOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("src/main/scala"),
+                    )
+                detectOnboardingProfile(testOnlyRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = GenericOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
+                        matchedMarkers = emptyList(),
+                    )
+            } finally {
+                runCatching { sbtRoot.deleteRecursively() }
+                runCatching { mavenRoot.deleteRecursively() }
+                runCatching { gradleRoot.deleteRecursively() }
+                runCatching { lightweightRoot.deleteRecursively() }
+                runCatching { testOnlyRoot.deleteRecursively() }
+            }
+        }
+
+        "ignores top-level JVM build infrastructure source roots" {
+            val scalaInfrastructureRoot = createTempDirectory("microsmith-init-detect-scala-build-infra")
+            val kotlinInfrastructureRoot = createTempDirectory("microsmith-init-detect-kotlin-build-infra")
+            val scalaExamplesRoot = createTempDirectory("microsmith-init-detect-scala-examples")
+            try {
+                scalaInfrastructureRoot.resolve("settings.gradle.kts")
+                    .writeText("rootProject.name = \"fixture-build-infra\"\n")
+                scalaInfrastructureRoot.resolve("build-logic/src/main/scala/example").createDirectories()
+                kotlinInfrastructureRoot.resolve("settings.gradle.kts")
+                    .writeText("rootProject.name = \"fixture-build-infra\"\n")
+                kotlinInfrastructureRoot.resolve("buildSrc/src/main/kotlin/example").createDirectories()
+                scalaExamplesRoot.resolve("settings.gradle.kts")
+                    .writeText("rootProject.name = \"fixture-examples\"\n")
+                scalaExamplesRoot.resolve("examples/scala/src/main/scala/example").createDirectories()
+
+                detectOnboardingProfile(scalaInfrastructureRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = GenericOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
+                        matchedMarkers = emptyList(),
+                    )
+                detectOnboardingProfile(kotlinInfrastructureRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = GenericOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
+                        matchedMarkers = emptyList(),
+                    )
+                detectOnboardingProfile(scalaExamplesRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = GenericOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
+                        matchedMarkers = emptyList(),
+                    )
+            } finally {
+                runCatching { scalaInfrastructureRoot.deleteRecursively() }
+                runCatching { kotlinInfrastructureRoot.deleteRecursively() }
+                runCatching { scalaExamplesRoot.deleteRecursively() }
+            }
+        }
+
         "keeps the Python profile when multiple Python markers match" {
             val pythonRoot = createTempDirectory("microsmith-init-detect-python-multi")
             try {
@@ -444,6 +543,7 @@ class OnboardingProfileDetectorTests :
             val pythonRoot = createTempDirectory("microsmith-init-detect-python")
             val rubyRoot = createTempDirectory("microsmith-init-detect-ruby")
             val rustRoot = createTempDirectory("microsmith-init-detect-rust")
+            val scalaRoot = createTempDirectory("microsmith-init-detect-scala")
             val dotnetRoot = createTempDirectory("microsmith-init-detect-dotnet")
             val mixedRoot = createTempDirectory("microsmith-init-detect-mixed")
             try {
@@ -456,6 +556,8 @@ class OnboardingProfileDetectorTests :
                 pythonRoot.resolve("pyproject.toml").writeText("[project]\nname = \"fixture-python\"\n")
                 rubyRoot.resolve("gems.rb").writeText("source \"https://rubygems.org\"\n")
                 rustRoot.resolve("Cargo.toml").writeText("[package]\nname = \"fixture-rust\"\nversion = \"0.1.0\"\n")
+                scalaRoot.resolve("build.sbt").writeText("""scalaVersion := "3.7.1""" + "\n")
+                scalaRoot.resolve("src/main/scala/example").createDirectories()
                 dotnetRoot.resolve("src/apps/service").createDirectories()
                 dotnetRoot.resolve("src/apps/service/Fixture.csproj")
                     .writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
@@ -504,6 +606,12 @@ class OnboardingProfileDetectorTests :
                         selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("Cargo.toml"),
                     )
+                detectOnboardingProfile(scalaRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = ScalaOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("build.sbt", "src/main/scala"),
+                    )
                 detectOnboardingProfile(dotnetRoot) shouldBe
                     OnboardingProfileDetection(
                         profile = DotnetOnboardingProfile,
@@ -524,6 +632,7 @@ class OnboardingProfileDetectorTests :
                 runCatching { pythonRoot.deleteRecursively() }
                 runCatching { rubyRoot.deleteRecursively() }
                 runCatching { rustRoot.deleteRecursively() }
+                runCatching { scalaRoot.deleteRecursively() }
                 runCatching { dotnetRoot.deleteRecursively() }
                 runCatching { mixedRoot.deleteRecursively() }
             }
