@@ -391,6 +391,7 @@ class OnboardingProfileDetectorTests :
         "ignores top-level JVM build infrastructure source roots" {
             val scalaInfrastructureRoot = createTempDirectory("microsmith-init-detect-scala-build-infra")
             val kotlinInfrastructureRoot = createTempDirectory("microsmith-init-detect-kotlin-build-infra")
+            val scalaExamplesRoot = createTempDirectory("microsmith-init-detect-scala-examples")
             try {
                 scalaInfrastructureRoot.resolve("settings.gradle.kts")
                     .writeText("rootProject.name = \"fixture-build-infra\"\n")
@@ -398,6 +399,9 @@ class OnboardingProfileDetectorTests :
                 kotlinInfrastructureRoot.resolve("settings.gradle.kts")
                     .writeText("rootProject.name = \"fixture-build-infra\"\n")
                 kotlinInfrastructureRoot.resolve("buildSrc/src/main/kotlin/example").createDirectories()
+                scalaExamplesRoot.resolve("settings.gradle.kts")
+                    .writeText("rootProject.name = \"fixture-examples\"\n")
+                scalaExamplesRoot.resolve("examples/scala/src/main/scala/example").createDirectories()
 
                 detectOnboardingProfile(scalaInfrastructureRoot) shouldBe
                     OnboardingProfileDetection(
@@ -411,9 +415,16 @@ class OnboardingProfileDetectorTests :
                         selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
                         matchedMarkers = emptyList(),
                     )
+                detectOnboardingProfile(scalaExamplesRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = GenericOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
+                        matchedMarkers = emptyList(),
+                    )
             } finally {
                 runCatching { scalaInfrastructureRoot.deleteRecursively() }
                 runCatching { kotlinInfrastructureRoot.deleteRecursively() }
+                runCatching { scalaExamplesRoot.deleteRecursively() }
             }
         }
 

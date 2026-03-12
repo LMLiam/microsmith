@@ -86,7 +86,7 @@ internal object JvmOnboardingMarkerFinder {
                     }
 
                     val relativeDirectory = projectRoot.relativize(directory)
-                    return if (isIgnoredInfrastructureDirectory(relativeDirectory)) {
+                    return if (isIgnoredNestedScanRootDirectory(relativeDirectory)) {
                         FileVisitResult.SKIP_SUBTREE
                     } else if (isRootSourceMarker(relativeDirectory, sourceRootMatcher)) {
                         FileVisitResult.SKIP_SUBTREE
@@ -114,9 +114,9 @@ internal object JvmOnboardingMarkerFinder {
             sourceRootMatcher(relativeDirectory)
     }
 
-    private fun isIgnoredInfrastructureDirectory(relativeDirectory: Path): Boolean {
+    private fun isIgnoredNestedScanRootDirectory(relativeDirectory: Path): Boolean {
         return relativeDirectory.nameCount == INFRASTRUCTURE_DIRECTORY_DEPTH &&
-            relativeDirectory.getName(0).toString() in IGNORED_INFRASTRUCTURE_DIRECTORIES
+            relativeDirectory.getName(0).toString() in IGNORED_NESTED_SCAN_ROOT_DIRECTORIES
     }
 }
 
@@ -128,11 +128,17 @@ private const val INFRASTRUCTURE_DIRECTORY_DEPTH = 1
 
 private const val SOURCE_ROOT_DIRECTORY_NAME = "src"
 
-private val IGNORED_INFRASTRUCTURE_DIRECTORIES = setOf(
+private val IGNORED_NESTED_SCAN_ROOT_DIRECTORIES = setOf(
     ".gradle",
     ".microsmith",
     "build",
     "build-logic",
     "buildSrc",
+    "doc",
+    "docs",
+    "example",
+    "examples",
     "gradle",
+    "sample",
+    "samples",
 )
