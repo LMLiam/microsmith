@@ -13,6 +13,7 @@ internal object BuiltInOnboardingProfileMatchers {
             rootMarkerMatcher(NodeOnboardingProfile, "package.json"),
             rootMarkerMatcher(GoOnboardingProfile, "go.mod"),
             javaMatcher(),
+            kotlinMatcher(),
             rootMarkerMatcher(
                 PythonOnboardingProfile,
                 "pyproject.toml",
@@ -53,6 +54,12 @@ internal object BuiltInOnboardingProfileMatchers {
     private fun javaMatcher(): OnboardingProfileMatcher {
         return OnboardingProfileMatcher(JavaOnboardingProfile) { projectRoot ->
             JavaOnboardingMarkerFinder.find(projectRoot)
+        }
+    }
+
+    private fun kotlinMatcher(): OnboardingProfileMatcher {
+        return OnboardingProfileMatcher(KotlinOnboardingProfile) { projectRoot ->
+            KotlinOnboardingMarkerFinder.find(projectRoot)
         }
     }
 
