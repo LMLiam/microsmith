@@ -23,17 +23,17 @@ internal object JavaOnboardingMarkerFinder {
                 }
 
             if (matchedSourceMarkers.isNotEmpty()) {
-                (matchedBuildMarkers + matchedSourceMarkers).sorted()
-            } else if (matchedBuildMarkers.isEmpty()) {
-                emptyList()
-            } else {
-                val matchedModuleSourceMarkers = findModuleSourceMarkers(projectRoot)
-                if (matchedModuleSourceMarkers.isEmpty()) {
-                    emptyList()
-                } else {
-                    (matchedBuildMarkers + matchedModuleSourceMarkers).sorted()
-                }
+                return (matchedBuildMarkers + matchedSourceMarkers).sorted()
             }
+            if (matchedBuildMarkers.isEmpty()) {
+                return emptyList()
+            }
+
+            val matchedModuleSourceMarkers = findModuleSourceMarkers(projectRoot)
+            if (matchedModuleSourceMarkers.isEmpty()) {
+                return emptyList()
+            }
+            (matchedBuildMarkers + matchedModuleSourceMarkers).sorted()
         } catch (_: IOException) {
             emptyList()
         } catch (_: UncheckedIOException) {

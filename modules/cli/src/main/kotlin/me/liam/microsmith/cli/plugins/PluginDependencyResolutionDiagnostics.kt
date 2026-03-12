@@ -22,40 +22,18 @@ internal class PluginDependencyResolutionDiagnostics {
                 else -> cause?.message ?: error.message ?: "Unknown resolver failure."
             }
 
-        val remediation =
-            if (authenticationFailure) {
-                "Verify repository credentials. Configure per-endpoint credentials via " +
-                    "$REPOSITORY_CREDENTIALS_FILE_ENV, global credentials via " +
-                    "$REPOSITORY_USERNAME_ENV/$REPOSITORY_PASSWORD_ENV, or GitHub Packages via " +
-                    "$GITHUB_PACKAGES_USERNAME_ENV/$GITHUB_PACKAGES_TOKEN_ENV."
-            } else if (offline) {
-                "Offline mode is enabled. Ensure the full dependency graph is cached under " +
-                    "'$localRepositoryRoot' by running once without --offline."
-            } else {
-                "Verify plugin coordinates and repository availability."
-            }
-
-        val category =
-            if (authenticationFailure) {
-                PluginResolverErrorCategory.AUTHENTICATION
-            } else {
-                PluginResolverErrorCategory.DEPENDENCY_RESOLUTION
-            }
-
         return PluginResolutionDiagnosticException(
-            category = category,
+            category = errorCategory(authenticationFailure),
             message =
             "Could not resolve plugin '${coordinate.value}' with transitive dependencies. " +
-                "Repositories: $repositoryList. $reason $remediation",
+                "Repositories: $repositoryList. $reason " +
+                remediation(authenticationFailure, offline, localRepositoryRoot),
             cause = error,
         )
     }
 
     private fun isAuthenticationFailure(cause: Throwable?): Boolean {
-        if (cause == null) {
-            return false
-        }
-
+        cause ?: return false
         return generateSequence(cause) { throwable -> throwable.cause }
             .mapNotNull(Throwable::message)
             .map(String::lowercase)
@@ -67,6 +45,31 @@ internal class PluginDependencyResolutionDiagnostics {
                     message.contains("authentication failed") ||
                     message.contains("not authorized")
             }
+    }
+
+    private fun errorCategory(authenticationFailure: Boolean): PluginResolverErrorCategory =
+        if (authenticationFailure) {
+            PluginResolverErrorCategory.AUTHENTICATION
+        } else {
+            PluginResolverErrorCategory.DEPENDENCY_RESOLUTION
+        }
+
+    private fun remediation(
+        authenticationFailure: Boolean,
+        offline: Boolean,
+        localRepositoryRoot: java.nio.file.Path,
+    ): String {
+        if (authenticationFailure) {
+            return "Verify repository credentials. Configure per-endpoint credentials via " +
+                "$REPOSITORY_CREDENTIALS_FILE_ENV, global credentials via " +
+                "$REPOSITORY_USERNAME_ENV/$REPOSITORY_PASSWORD_ENV, or GitHub Packages via " +
+                "$GITHUB_PACKAGES_USERNAME_ENV/$GITHUB_PACKAGES_TOKEN_ENV."
+        }
+        if (offline) {
+            return "Offline mode is enabled. Ensure the full dependency graph is cached under " +
+                "'$localRepositoryRoot' by running once without --offline."
+        }
+        return "Verify plugin coordinates and repository availability."
     }
 
     private fun primaryResolutionCause(error: DependencyResolutionException): Throwable? =

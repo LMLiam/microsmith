@@ -14,35 +14,37 @@ internal class OnboardingProfileDetector(
         val matches =
             matchers.mapNotNull { matcher ->
                 val matchedMarkers = matcher.detect(projectRoot).sorted()
-                if (matchedMarkers.isEmpty()) {
-                    null
-                } else {
-                    OnboardingProfileMatch(
-                        profile = matcher.profile,
-                        matchedMarkers = matchedMarkers,
-                    )
-                }
+                matchedMarkers
+                    .takeIf(List<String>::isNotEmpty)
+                    ?.let {
+                        OnboardingProfileMatch(
+                            profile = matcher.profile,
+                            matchedMarkers = it,
+                        )
+                    }
             }
 
         val matchedProfiles = matches.map(OnboardingProfileMatch::profile).distinctBy(OnboardingProfile::id)
-        val selectionReason =
-            when (matchedProfiles.size) {
-                0 -> OnboardingProfileSelectionReason.NO_MARKERS_MATCHED
-                1 -> OnboardingProfileSelectionReason.MATCHED_PROFILE
-                else -> OnboardingProfileSelectionReason.AMBIGUOUS_MARKERS
-            }
-        val resolvedProfile =
-            when (selectionReason) {
-                OnboardingProfileSelectionReason.MATCHED_PROFILE -> matchedProfiles.single()
-                OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
-                OnboardingProfileSelectionReason.AMBIGUOUS_MARKERS,
-                -> fallbackProfile
-            }
+        val matchedMarkers = matches.flatMap(OnboardingProfileMatch::matchedMarkers).distinct().sorted()
+        if (matchedProfiles.isEmpty()) {
+            return OnboardingProfileDetection(
+                profile = fallbackProfile,
+                selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
+                matchedMarkers = matchedMarkers,
+            )
+        }
+        if (matchedProfiles.size == 1) {
+            return OnboardingProfileDetection(
+                profile = matchedProfiles.single(),
+                selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                matchedMarkers = matchedMarkers,
+            )
+        }
 
         return OnboardingProfileDetection(
-            profile = resolvedProfile,
-            selectionReason = selectionReason,
-            matchedMarkers = matches.flatMap(OnboardingProfileMatch::matchedMarkers).distinct().sorted(),
+            profile = fallbackProfile,
+            selectionReason = OnboardingProfileSelectionReason.AMBIGUOUS_MARKERS,
+            matchedMarkers = matchedMarkers,
         )
     }
 }

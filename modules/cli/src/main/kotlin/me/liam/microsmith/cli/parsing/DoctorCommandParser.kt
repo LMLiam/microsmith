@@ -6,14 +6,11 @@ import me.liam.microsmith.cli.command.ErrorCommand
 
 internal fun parseDoctorCommand(args: List<String>): CliCommand {
     val parsed = parseDoctorOptions(args = args, startIndex = 1)
-    return if (parsed.error != null) {
-        ErrorCommand(parsed.error)
-    } else {
-        DoctorCommand(
-            diagnosticsFormat = parsed.diagnosticsFormat,
-            verbose = parsed.verbose,
-        )
-    }
+    parsed.error?.let { return ErrorCommand(it) }
+    return DoctorCommand(
+        diagnosticsFormat = parsed.diagnosticsFormat,
+        verbose = parsed.verbose,
+    )
 }
 
 private fun parseDoctorOptions(args: List<String>, startIndex: Int): ParsedDoctorOptions {

@@ -24,19 +24,32 @@ internal fun resolvePlugins(command: RunCommand, settings: PluginResolverSetting
     }
 
     val diagnostics = PluginResolutionDiagnostics()
-    var sensitiveValues: Set<String> = emptySet()
+    if (command.plugins.isEmpty()) {
+        return resolveWithDiagnostics(command, settings, diagnostics, sensitiveValues = emptySet())
+    }
 
-    return runCatching {
-        if (command.plugins.isNotEmpty()) {
-            sensitiveValues = settings.repositoryCredentialsResolver.sensitiveValuesWithDiagnostics()
+    val sensitiveValues =
+        runCatching {
+            settings.repositoryCredentialsResolver.sensitiveValuesWithDiagnostics()
+        }.getOrElse { error ->
+            return PluginResolutionResult.Failure(listOf(diagnostics.format(error, sensitiveValues = emptySet())))
         }
-        PluginResolutionService(settings = settings).resolve(command)
-    }.fold(
-        onSuccess = { success -> success },
-        onFailure = { error ->
-            PluginResolutionResult.Failure(listOf(diagnostics.format(error, sensitiveValues)))
-        },
-    )
+
+    return resolveWithDiagnostics(command, settings, diagnostics, sensitiveValues)
 }
 
 private fun RunCommand.requiresPluginResolution(): Boolean = plugins.isNotEmpty() || pluginJars.isNotEmpty()
+
+private fun resolveWithDiagnostics(
+    command: RunCommand,
+    settings: PluginResolverSettings,
+    diagnostics: PluginResolutionDiagnostics,
+    sensitiveValues: Set<String>,
+): PluginResolutionResult = runCatching {
+    PluginResolutionService(settings = settings).resolve(command)
+}.fold(
+    onSuccess = { success -> success },
+    onFailure = { error ->
+        PluginResolutionResult.Failure(listOf(diagnostics.format(error, sensitiveValues)))
+    },
+)

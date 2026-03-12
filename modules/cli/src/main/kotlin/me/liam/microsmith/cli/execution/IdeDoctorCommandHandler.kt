@@ -24,21 +24,20 @@ internal class IdeDoctorCommandHandler(
         result.checks.forEach { check ->
             if (check.passed) {
                 emitter.info("ide-doctor/${check.id}: ${check.message}", check.details)
-            } else {
-                emitter.error(
-                    CliFailureCode.IDE_DOCTOR_FAILED,
-                    "ide-doctor/${check.id}: ${check.message}",
-                    check.details,
-                )
+                return@forEach
             }
+            emitter.error(
+                CliFailureCode.IDE_DOCTOR_FAILED,
+                "ide-doctor/${check.id}: ${check.message}",
+                check.details,
+            )
         }
 
-        return if (result.hasFailures) {
-            emitter.error(CliFailureCode.IDE_DOCTOR_FAILED, "JetBrains IDE helper doctor detected issues.")
-            CliFailureCode.IDE_DOCTOR_FAILED.exitCode
-        } else {
+        if (!result.hasFailures) {
             emitter.info("JetBrains IDE helper doctor checks passed.")
-            0
+            return 0
         }
+        emitter.error(CliFailureCode.IDE_DOCTOR_FAILED, "JetBrains IDE helper doctor detected issues.")
+        return CliFailureCode.IDE_DOCTOR_FAILED.exitCode
     }
 }

@@ -36,10 +36,7 @@ internal class DefaultRepositoryCredentialsResolver(
 
     private fun githubPackagesCredentialsFor(repositoryUri: String): RepositoryCredentials? {
         val host = URI.create(repositoryUri).host?.lowercase()
-        if (host != GITHUB_PACKAGES_HOST) {
-            return null
-        }
-        return githubPackagesCredentials
+        return githubPackagesCredentials.takeIf { host == GITHUB_PACKAGES_HOST }
     }
 }
 
@@ -60,12 +57,9 @@ internal fun defaultRepositoryCredentialsResolver(
     require(repositoryUsername.isNotEmpty() == repositoryPassword.isNotEmpty()) {
         "Set both $REPOSITORY_USERNAME_ENV and $REPOSITORY_PASSWORD_ENV, or leave both unset."
     }
-    val defaultCredentials =
-        if (repositoryUsername.isNotEmpty()) {
-            RepositoryCredentials(username = repositoryUsername, password = repositoryPassword)
-        } else {
-            null
-        }
+    val defaultCredentials = repositoryUsername.takeIf(String::isNotEmpty)?.let { username ->
+        RepositoryCredentials(username = username, password = repositoryPassword)
+    }
 
     val githubPackagesToken =
         githubPackagesTokenEnv
@@ -74,18 +68,15 @@ internal fun defaultRepositoryCredentialsResolver(
             ?: githubTokenEnv
                 ?.trim()
                 ?.takeIf(String::isNotEmpty)
-    val githubPackagesCredentials =
-        if (githubPackagesToken != null) {
-            val githubPackagesUsername = githubPackagesUsernameEnv?.trim()?.takeIf(String::isNotEmpty)
-            val githubActorUsername = githubActorEnv?.trim()?.takeIf(String::isNotEmpty)
-            val username =
-                githubPackagesUsername
-                    ?: githubActorUsername
-                    ?: DEFAULT_GITHUB_PACKAGES_USERNAME
-            RepositoryCredentials(username = username, password = githubPackagesToken)
-        } else {
-            null
-        }
+    val githubPackagesCredentials = githubPackagesToken?.let { token ->
+        val githubPackagesUsername = githubPackagesUsernameEnv?.trim()?.takeIf(String::isNotEmpty)
+        val githubActorUsername = githubActorEnv?.trim()?.takeIf(String::isNotEmpty)
+        val username =
+            githubPackagesUsername
+                ?: githubActorUsername
+                ?: DEFAULT_GITHUB_PACKAGES_USERNAME
+        RepositoryCredentials(username = username, password = token)
+    }
 
     return DefaultRepositoryCredentialsResolver(
         fileCredentialsByRepository = fileCredentials,

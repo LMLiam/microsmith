@@ -7,17 +7,14 @@ import java.nio.file.Path
 
 internal fun parseInitCommand(args: List<String>): CliCommand {
     val parsed = parseInitOptions(args = args, startIndex = 1)
-    return if (parsed.error != null) {
-        ErrorCommand(parsed.error)
-    } else {
-        InitCommand(
-            projectRoot = parsed.projectRoot,
-            diagnosticsFormat = parsed.diagnosticsFormat,
-            verbose = parsed.verbose,
-            force = parsed.force,
-            skipIdeHelper = parsed.skipIdeHelper,
-        )
-    }
+    parsed.error?.let { return ErrorCommand(it) }
+    return InitCommand(
+        projectRoot = parsed.projectRoot,
+        diagnosticsFormat = parsed.diagnosticsFormat,
+        verbose = parsed.verbose,
+        force = parsed.force,
+        skipIdeHelper = parsed.skipIdeHelper,
+    )
 }
 
 private fun parseInitOptions(args: List<String>, startIndex: Int): ParsedInitOptions {

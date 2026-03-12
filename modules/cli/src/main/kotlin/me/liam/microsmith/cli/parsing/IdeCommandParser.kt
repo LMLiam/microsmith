@@ -15,28 +15,22 @@ internal fun parseIdeCommand(args: List<String>): CliCommand = when (val subcomm
 
 private fun parseIdeRefreshCommand(args: List<String>, startIndex: Int): CliCommand {
     val parsed = parseIdeOptions(args = args, startIndex = startIndex)
-    return if (parsed.error != null) {
-        ErrorCommand(parsed.error)
-    } else {
-        IdeRefreshCommand(
-            projectRoot = parsed.projectRoot,
-            diagnosticsFormat = parsed.diagnosticsFormat,
-            verbose = parsed.verbose,
-        )
-    }
+    parsed.error?.let { return ErrorCommand(it) }
+    return IdeRefreshCommand(
+        projectRoot = parsed.projectRoot,
+        diagnosticsFormat = parsed.diagnosticsFormat,
+        verbose = parsed.verbose,
+    )
 }
 
 private fun parseIdeDoctorCommand(args: List<String>, startIndex: Int): CliCommand {
     val parsed = parseIdeOptions(args = args, startIndex = startIndex)
-    return if (parsed.error != null) {
-        ErrorCommand(parsed.error)
-    } else {
-        IdeDoctorCommand(
-            projectRoot = parsed.projectRoot,
-            diagnosticsFormat = parsed.diagnosticsFormat,
-            verbose = parsed.verbose,
-        )
-    }
+    parsed.error?.let { return ErrorCommand(it) }
+    return IdeDoctorCommand(
+        projectRoot = parsed.projectRoot,
+        diagnosticsFormat = parsed.diagnosticsFormat,
+        verbose = parsed.verbose,
+    )
 }
 
 private fun parseIdeOptions(args: List<String>, startIndex: Int): ParsedIdeOptions {

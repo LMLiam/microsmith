@@ -11,12 +11,14 @@ internal object DoctorBootstrapStateCheck {
         val buildScript = projectRoot.resolve(INIT_BUILD_FILE_NAME)
         val settingsScript = projectRoot.resolve(INIT_SETTINGS_FILE_NAME)
         val helperRoot = projectRoot.resolve(IDE_HELPER_DIRECTORY)
+
         validateBootstrapSurface(
             projectRoot = projectRoot,
             buildScript = buildScript,
             settingsScript = settingsScript,
             helperRoot = helperRoot,
         )?.let { return it }
+
         val invalidHelperFiles = invalidIdeHelperFiles(projectRoot = projectRoot, helperRoot = helperRoot)
         val missingHelperFiles = missingIdeHelperFiles(projectRoot = projectRoot, helperRoot = helperRoot)
 
@@ -81,6 +83,7 @@ internal object DoctorBootstrapStateCheck {
         val bootstrapFiles = listOf(buildScript, settingsScript)
         val invalidBootstrapFiles = invalidManagedFiles(projectRoot = projectRoot, managedFiles = bootstrapFiles)
         val missingBootstrapFiles = missingManagedFiles(projectRoot = projectRoot, managedFiles = bootstrapFiles)
+
         return when {
             invalidBootstrapFiles.isNotEmpty() ->
                 DoctorCheckResult(

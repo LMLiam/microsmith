@@ -16,17 +16,16 @@ internal class DoctorCommandHandler(
             val details = mapOf("check" to check.id) + check.details
             if (check.status == DoctorCheckStatus.PASS) {
                 emitter.info("doctor/${check.id}: ${check.message}", details)
-            } else {
-                emitter.error(CliFailureCode.DOCTOR_FAILED, "doctor/${check.id}: ${check.message}", details)
+                return@forEach
             }
+            emitter.error(CliFailureCode.DOCTOR_FAILED, "doctor/${check.id}: ${check.message}", details)
         }
 
-        return if (result.hasFailures) {
-            emitter.error(CliFailureCode.DOCTOR_FAILED, "Doctor detected environment issues.")
-            CliFailureCode.DOCTOR_FAILED.exitCode
-        } else {
+        if (!result.hasFailures) {
             emitter.info("Doctor checks passed.")
-            0
+            return 0
         }
+        emitter.error(CliFailureCode.DOCTOR_FAILED, "Doctor detected environment issues.")
+        return CliFailureCode.DOCTOR_FAILED.exitCode
     }
 }
