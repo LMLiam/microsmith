@@ -15,14 +15,14 @@ internal data class RepositoryQualityPolicy(
         fun default(): RepositoryQualityPolicy = RepositoryQualityPolicy(
             defaultMaxProductionFileLines = 170,
             productionFileLineOverrides = mapOf(
-                "cli/src/main/kotlin/me/liam/microsmith/cli/parsing/RunOptionsParser.kt" to ProductionFileLineOverride(
+                "modules/cli/src/main/kotlin/me/liam/microsmith/cli/parsing/RunOptionsParser.kt" to ProductionFileLineOverride(
                     maxLines = 220,
                     rationale =
                         "Run option parsing still owns several closely related option groups " +
                             "and will be decomposed separately rather than hidden behind " +
                             "a catch-all helper.",
                 ),
-                "dsl-schemas-protobuf/src/main/kotlin/me/liam/microsmith/dsl/schemas/protobuf/" +
+                "modules/dsl-schemas-protobuf/src/main/kotlin/me/liam/microsmith/dsl/schemas/protobuf/" +
                     "types/MessageBuilder.kt" to
                     ProductionFileLineOverride(
                         maxLines = 190,

@@ -55,12 +55,17 @@ buildCache {
 
 rootProject.name = 'microsmith'
 
-include 'dsl'
-include 'dsl-schemas'
-include 'dsl-schemas-protobuf'
-include 'gen'
-include 'gen-schemas'
-include 'gen-schemas-protobuf'
-include 'runtime-scripting'
-include 'cli'
-include 'kotest'
+[
+    'dsl',
+    'dsl-schemas',
+    'dsl-schemas-protobuf',
+    'gen',
+    'gen-schemas',
+    'gen-schemas-protobuf',
+    'runtime-scripting',
+    'cli',
+    'kotest',
+].each { moduleName ->
+    include moduleName
+    project(":${moduleName}").projectDir = file("modules/${moduleName}")
+}
