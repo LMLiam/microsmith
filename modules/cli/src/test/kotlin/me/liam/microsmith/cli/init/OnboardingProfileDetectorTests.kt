@@ -261,6 +261,74 @@ class OnboardingProfileDetectorTests :
             }
         }
 
+        "detects Kotlin repositories from source roots across Maven, Gradle, and build-tool-light layouts" {
+            val mavenRoot = createTempDirectory("microsmith-init-detect-kotlin-maven")
+            val gradleKotlinDslRoot = createTempDirectory("microsmith-init-detect-kotlin-gradle-kts")
+            val gradleGroovyRoot = createTempDirectory("microsmith-init-detect-kotlin-gradle-groovy")
+            val multiplatformRoot = createTempDirectory("microsmith-init-detect-kotlin-multiplatform")
+            val lightweightRoot = createTempDirectory("microsmith-init-detect-kotlin-lightweight")
+            try {
+                mavenRoot.resolve("pom.xml").writeText("<project />\n")
+                mavenRoot.resolve("src/main/kotlin/example").createDirectories()
+                gradleKotlinDslRoot.resolve(
+                    "build.gradle.kts",
+                ).writeText("plugins { kotlin(\"jvm\") version \"2.2.21\" }\n")
+                gradleKotlinDslRoot.resolve(
+                    "settings.gradle.kts",
+                ).writeText("rootProject.name = \"fixture-kotlin\"\n")
+                gradleKotlinDslRoot.resolve("src/test/kotlin/example").createDirectories()
+                gradleGroovyRoot.resolve(
+                    "build.gradle",
+                ).writeText("plugins { id 'org.jetbrains.kotlin.jvm' version '2.2.21' }\n")
+                gradleGroovyRoot.resolve(
+                    "settings.gradle",
+                ).writeText("rootProject.name = 'fixture-kotlin'\n")
+                gradleGroovyRoot.resolve("src/main/kotlin/example").createDirectories()
+                multiplatformRoot.resolve(
+                    "build.gradle.kts",
+                ).writeText("plugins { kotlin(\"multiplatform\") version \"2.2.21\" }\n")
+                multiplatformRoot.resolve("src/commonMain/kotlin/example").createDirectories()
+                lightweightRoot.resolve("src/main/kotlin/example").createDirectories()
+
+                detectOnboardingProfile(mavenRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = KotlinOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("pom.xml", "src/main/kotlin"),
+                    )
+                detectOnboardingProfile(gradleKotlinDslRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = KotlinOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("build.gradle.kts", "settings.gradle.kts", "src/test/kotlin"),
+                    )
+                detectOnboardingProfile(gradleGroovyRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = KotlinOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("build.gradle", "settings.gradle", "src/main/kotlin"),
+                    )
+                detectOnboardingProfile(multiplatformRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = KotlinOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("build.gradle.kts", "src/commonMain/kotlin"),
+                    )
+                detectOnboardingProfile(lightweightRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = KotlinOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("src/main/kotlin"),
+                    )
+            } finally {
+                runCatching { mavenRoot.deleteRecursively() }
+                runCatching { gradleKotlinDslRoot.deleteRecursively() }
+                runCatching { gradleGroovyRoot.deleteRecursively() }
+                runCatching { multiplatformRoot.deleteRecursively() }
+                runCatching { lightweightRoot.deleteRecursively() }
+            }
+        }
+
         "keeps the Python profile when multiple Python markers match" {
             val pythonRoot = createTempDirectory("microsmith-init-detect-python-multi")
             try {
@@ -370,6 +438,7 @@ class OnboardingProfileDetectorTests :
 
         "detects built-in repository profiles and falls back to the generic profile for ambiguous markers" {
             val javaRoot = createTempDirectory("microsmith-init-detect-java")
+            val kotlinRoot = createTempDirectory("microsmith-init-detect-kotlin")
             val nodeRoot = createTempDirectory("microsmith-init-detect-node")
             val goRoot = createTempDirectory("microsmith-init-detect-go")
             val pythonRoot = createTempDirectory("microsmith-init-detect-python")
@@ -380,6 +449,8 @@ class OnboardingProfileDetectorTests :
             try {
                 javaRoot.resolve("pom.xml").writeText("<project />\n")
                 javaRoot.resolve("src/main/java/example").createDirectories()
+                kotlinRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.2.21\" }\n")
+                kotlinRoot.resolve("src/main/kotlin/example").createDirectories()
                 nodeRoot.resolve("package.json").writeText("""{"name":"fixture-node"}""")
                 goRoot.resolve("go.mod").writeText("module example.com/microsmith/fixture\n")
                 pythonRoot.resolve("pyproject.toml").writeText("[project]\nname = \"fixture-python\"\n")
@@ -396,6 +467,12 @@ class OnboardingProfileDetectorTests :
                         profile = JavaOnboardingProfile,
                         selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
                         matchedMarkers = listOf("pom.xml", "src/main/java"),
+                    )
+                detectOnboardingProfile(kotlinRoot) shouldBe
+                    OnboardingProfileDetection(
+                        profile = KotlinOnboardingProfile,
+                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                        matchedMarkers = listOf("build.gradle.kts", "src/main/kotlin"),
                     )
                 detectOnboardingProfile(nodeRoot) shouldBe
                     OnboardingProfileDetection(
@@ -441,6 +518,7 @@ class OnboardingProfileDetectorTests :
                     )
             } finally {
                 runCatching { javaRoot.deleteRecursively() }
+                runCatching { kotlinRoot.deleteRecursively() }
                 runCatching { nodeRoot.deleteRecursively() }
                 runCatching { goRoot.deleteRecursively() }
                 runCatching { pythonRoot.deleteRecursively() }
