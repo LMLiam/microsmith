@@ -9,6 +9,7 @@ This README is the canonical repository documentation.
 
 - Overview
 - Repository modules
+- Repository layout
 - Repository Kotlin standards
 - Build, test, and quality gates
 - DSL usage
@@ -56,6 +57,16 @@ Microsmith provides:
 - `runtime-scripting` is the scripting host and execution boundary. It may depend on DSL and generation layers, but it must not absorb CLI parsing, onboarding, or distribution concerns.
 - `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
 - `kotest` is test support only and should not become a production dependency surface.
+
+## Repository layout
+
+- `modules/`: production Gradle subprojects, including `cli`, `dsl`, `dsl-schemas`, `dsl-schemas-protobuf`, `gen`, `gen-schemas`, `gen-schemas-protobuf`, `runtime-scripting`, and `kotest`
+- `build-logic/`: included Gradle build that owns repository-specific plugins and quality tasks
+- `examples/`: consumer-repository fixtures and onboarding examples
+- `gradle/`: wrapper files, version catalog, and dependency locks
+- `scripts/`: repository helper scripts used by CI and local validation
+- `.github/`: workflows and repository automation
+- repository root: shared build files, license, and top-level contributor entrypoints such as `README.md`, `build.gradle`, and `settings.gradle`
 
 ## Repository Kotlin standards
 
@@ -1036,15 +1047,15 @@ The DSL surface and plugin architecture stay the same; the execution model chang
 
 `./gradlew :cli:releaseArtifacts :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums` produces:
 
-- `cli/build/libs/microsmith-cli-<version>-all.jar`
-- `cli/build/distributions/microsmith-cli-<version>-dist.zip`
-- `cli/build/distributions/microsmith-cli-<version>-dist.tar.gz`
-- `cli/build/release-assets/microsmith-install.sh`
-- `cli/build/release-assets/microsmith-install.ps1`
-- `cli/build/release-assets/*.sha256`
-- `cli/build/generated/microsmith/bundled-plugins.lock`
-- `runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar`
-- `runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar.sha256`
+- `modules/cli/build/libs/microsmith-cli-<version>-all.jar`
+- `modules/cli/build/distributions/microsmith-cli-<version>-dist.zip`
+- `modules/cli/build/distributions/microsmith-cli-<version>-dist.tar.gz`
+- `modules/cli/build/release-assets/microsmith-install.sh`
+- `modules/cli/build/release-assets/microsmith-install.ps1`
+- `modules/cli/build/release-assets/*.sha256`
+- `modules/cli/build/generated/microsmith/bundled-plugins.lock`
+- `modules/runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar`
+- `modules/runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar.sha256`
 
 The bundled plugin catalog is packaged into the official artifacts and pinned to the CLI version.
 Published packages are available from:
@@ -1061,7 +1072,7 @@ https://maven.pkg.github.com/lmliam/microsmith
 - `:cli:cliDistZip`
 - `:cli:cliDistTar`
 - `:cli:verifyDistLayout`
-- `:cli:distArtifacts` for internal staging into `cli/build/release-assets/`
+- `:cli:distArtifacts` for internal staging into `modules/cli/build/release-assets/`
 - `:cli:generateReleaseChecksums`
 - `:cli:releaseArtifacts`
 - `:runtime-scripting:verifyIdeFallbackShadowJar`
