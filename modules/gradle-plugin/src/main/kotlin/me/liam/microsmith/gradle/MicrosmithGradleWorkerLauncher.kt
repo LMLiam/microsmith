@@ -7,34 +7,44 @@ import java.nio.file.Path
 internal class MicrosmithGradleWorkerLauncher(
     private val requestCodec: MicrosmithGradleWorkerRequestCodec = MicrosmithGradleWorkerRequestCodec(),
     private val resultCodec: MicrosmithGradleWorkerResultCodec = MicrosmithGradleWorkerResultCodec(),
+    private val processExecutor: MicrosmithGradleWorkerProcessExecutor =
+        DefaultMicrosmithGradleWorkerProcessExecutor(),
 ) {
     fun execute(
         request: MicrosmithGradleWorkerRequest,
         workDirectory: Path,
         runtimeClasspath: List<Path>,
     ): MicrosmithGradleWorkerResult {
-        val workspace = Files.createDirectories(workDirectory.resolve("microsmith-worker"))
-        val requestFile = workspace.resolve("request.properties")
-        val resultFile = workspace.resolve("result.properties")
+        val workspace = createWorkspace(workDirectory)
+        val requestFile = workspace.resolve(WORKER_REQUEST_FILE_NAME)
+        val resultFile = workspace.resolve(WORKER_RESULT_FILE_NAME)
         requestCodec.write(requestFile, request)
-        val outcome = execute(runtimeClasspath, requestFile, resultFile)
+        val outcome = executeProcess(runtimeClasspath, requestFile, resultFile)
         return outcome.parsedResult ?: throw GradleException(formatFailure(outcome, resultFile))
     }
 
-    private fun execute(
+    private fun createWorkspace(workDirectory: Path): Path {
+        Files.createDirectories(workDirectory)
+        return Files.createTempDirectory(workDirectory, WORKER_DIRECTORY_PREFIX)
+    }
+
+    private fun executeProcess(
         runtimeClasspath: List<Path>,
         requestFile: Path,
         resultFile: Path,
     ): MicrosmithGradleWorkerExecutionOutcome {
-        val process =
-            ProcessBuilder(
+        val processOutcome =
+            processExecutor.execute(
                 buildCommand(runtimeClasspath, requestFile, resultFile),
-            ).redirectErrorStream(true)
-                .start()
-        val processOutput = process.inputStream.bufferedReader().use { reader -> reader.readText().trim() }
-        val exitCode = process.waitFor()
-        val parsedResult = runCatching { resultCodec.read(resultFile) }.getOrNull()
-        return MicrosmithGradleWorkerExecutionOutcome(exitCode, processOutput, parsedResult)
+            )
+        val parsedResult = resultFile.takeIf(Files::isRegularFile)?.let { file ->
+            runCatching { resultCodec.read(file) }.getOrNull()
+        }
+        return MicrosmithGradleWorkerExecutionOutcome(
+            exitCode = processOutcome.exitCode,
+            processOutput = processOutcome.processOutput,
+            parsedResult = parsedResult,
+        )
     }
 
     private fun buildCommand(runtimeClasspath: List<Path>, requestFile: Path, resultFile: Path): List<String> = listOf(
@@ -68,3 +78,7 @@ internal class MicrosmithGradleWorkerLauncher(
 
     private fun isWindows(): Boolean = System.getProperty("os.name").orEmpty().lowercase().contains("windows")
 }
+
+private const val WORKER_DIRECTORY_PREFIX = "microsmith-worker-"
+private const val WORKER_REQUEST_FILE_NAME = "request.properties"
+private const val WORKER_RESULT_FILE_NAME = "result.properties"
