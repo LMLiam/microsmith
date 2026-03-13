@@ -3,12 +3,16 @@ package me.liam.microsmith.cli.execution
 import me.liam.microsmith.cli.command.InitCommand
 import me.liam.microsmith.cli.diagnostics.CliDiagnosticEmitter
 import me.liam.microsmith.cli.init.InitBootstrapResult
+import me.liam.microsmith.cli.init.JavaOnboardingProfile
+import me.liam.microsmith.cli.init.KotlinOnboardingProfile
+import me.liam.microsmith.cli.init.ScalaOnboardingProfile
 
 internal object InitSummaryEmitter {
     fun emit(emitter: CliDiagnosticEmitter, command: InitCommand, result: InitBootstrapResult) {
         emitBootstrapSummary(emitter, command, result)
         emitIdeHelperSummary(emitter, result)
         emitter.info("Next: microsmith run build.microsmith.kts --out ./generated")
+        emitGradleNativeGuidance(emitter, result)
         result.repositoryDetection.profile.recommendedOutputDirectory?.let { outputDirectory ->
             emitter.info(
                 "Optional repository-native output path: microsmith run build.microsmith.kts --out $outputDirectory",
@@ -64,4 +68,29 @@ internal object InitSummaryEmitter {
         emitter.info("JetBrains IDE helper is $state at '$helperRoot'.")
         emitter.info("Import '${helperRoot.resolve("build.gradle.kts")}' as a Gradle project in JetBrains IDEs.")
     }
+
+    private fun emitGradleNativeGuidance(emitter: CliDiagnosticEmitter, result: InitBootstrapResult) {
+        if (!result.isGradleNativeCandidate()) {
+            return
+        }
+        emitter.info(
+            "Gradle repository detected. Prefer the native Gradle plugin path when you want imported-project " +
+                "IDE support: apply plugin id 'me.liam.microsmith.gradle' and run './gradlew microsmithGenerate'.",
+        )
+    }
 }
+
+private fun InitBootstrapResult.isGradleNativeCandidate(): Boolean {
+    val profile = repositoryDetection.profile
+    if (profile != JavaOnboardingProfile && profile != KotlinOnboardingProfile && profile != ScalaOnboardingProfile) {
+        return false
+    }
+    return repositoryDetection.matchedMarkers.any(::isGradleMarker)
+}
+
+private fun isGradleMarker(marker: String): Boolean = marker in setOf(
+    "build.gradle",
+    "build.gradle.kts",
+    "settings.gradle",
+    "settings.gradle.kts",
+)
