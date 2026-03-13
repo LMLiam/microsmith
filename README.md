@@ -471,7 +471,7 @@ Minimal `pom.xml` example:
 
 Repository credentials:
 
-- `mavenLocal()` is enough for local fixture validation after `publishToMavenLocal`
+- the local Maven repository at `~/.m2/repository` is enough for local fixture validation after `publishToMavenLocal`
 - when consuming releases from GitHub Packages, configure a `github-microsmith` server entry in `~/.m2/settings.xml` or use `actions/setup-java` with `server-id: github-microsmith` in CI
 
 External plugin example:

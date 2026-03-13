@@ -132,5 +132,21 @@ class MicrosmithGenerateMojoTests : StringSpec() {
             error.message shouldContain "Microsmith Maven plugin failed before generation completed."
             error.cause shouldBe failure
         }
+
+        "generic runtime failures surface as MojoExecutionException with the original cause" {
+            val fixture = MicrosmithMavenTestProject.create("microsmith-maven-plugin-runtime-failure")
+            fixture.writeFile("build.microsmith.kts", "emit(microsmith { })")
+            val failure = RuntimeException("Unexpected runtime failure")
+            val mojo = fixture.createMojo().apply {
+                scriptHostRunner = MicrosmithScriptHostRunner { _, _ -> throw failure }
+            }
+
+            val error = shouldThrow<MojoExecutionException> {
+                mojo.execute()
+            }
+
+            error.message shouldContain "Microsmith Maven plugin failed before generation completed."
+            error.cause shouldBe failure
+        }
     }
 }

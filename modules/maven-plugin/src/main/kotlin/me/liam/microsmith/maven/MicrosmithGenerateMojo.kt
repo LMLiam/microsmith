@@ -4,7 +4,6 @@ import org.apache.maven.plugin.AbstractMojo
 import org.apache.maven.plugin.MojoExecutionException
 import org.apache.maven.plugin.MojoFailureException
 import java.io.File
-import java.io.UncheckedIOException
 import java.util.Properties
 
 class MicrosmithGenerateMojo : AbstractMojo() {
@@ -20,7 +19,7 @@ class MicrosmithGenerateMojo : AbstractMojo() {
     internal var resultHandler: MicrosmithMavenResultHandler = MicrosmithMavenResultHandler()
 
     override fun execute() {
-        try {
+        runWithMojoFailureMapping {
             val request =
                 requestFactory.create(
                     MicrosmithMavenExecutionConfiguration(
@@ -34,19 +33,24 @@ class MicrosmithGenerateMojo : AbstractMojo() {
                 )
             val result = scriptHostRunner.run(request.cacheDirectory, request.scriptRunRequest)
             resultHandler.handle(log, request.outputDirectory, result)
-        } catch (error: MojoFailureException) {
-            throw error
-        } catch (error: MojoExecutionException) {
-            throw error
-        } catch (error: IllegalArgumentException) {
-            throw unexpectedExecutionFailure(error)
-        } catch (error: IllegalStateException) {
-            throw unexpectedExecutionFailure(error)
-        } catch (error: SecurityException) {
-            throw unexpectedExecutionFailure(error)
-        } catch (error: UncheckedIOException) {
-            throw MojoExecutionException("Microsmith Maven plugin failed before generation completed.", error)
         }
+    }
+
+    @Suppress("TooGenericExceptionCaught")
+    private inline fun runWithMojoFailureMapping(action: () -> Unit) {
+        try {
+            action()
+        } catch (error: Exception) {
+            // Maven plugin entrypoints should not leak raw runtime failures into Maven core.
+            throw error.toMojoException()
+        }
+    }
+
+    private fun Exception.toMojoException(): Exception = when (this) {
+        is MojoFailureException -> this
+        is MojoExecutionException -> this
+        is RuntimeException -> unexpectedExecutionFailure(this)
+        else -> this
     }
 
     private fun unexpectedExecutionFailure(error: RuntimeException): MojoExecutionException =
