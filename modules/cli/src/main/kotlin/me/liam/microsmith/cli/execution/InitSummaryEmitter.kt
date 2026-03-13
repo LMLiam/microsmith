@@ -12,7 +12,7 @@ internal object InitSummaryEmitter {
         emitBootstrapSummary(emitter, command, result)
         emitIdeHelperSummary(emitter, result)
         emitter.info("Next: microsmith run build.microsmith.kts --out ./generated")
-        emitGradleNativeGuidance(emitter, result)
+        emitNativeJvmGuidance(emitter, result)
         result.repositoryDetection.profile.recommendedOutputDirectory?.let { outputDirectory ->
             emitter.info(
                 "Optional repository-native output path: microsmith run build.microsmith.kts --out $outputDirectory",
@@ -69,24 +69,35 @@ internal object InitSummaryEmitter {
         emitter.info("Import '${helperRoot.resolve("build.gradle.kts")}' as a Gradle project in JetBrains IDEs.")
     }
 
-    private fun emitGradleNativeGuidance(emitter: CliDiagnosticEmitter, result: InitBootstrapResult) {
-        if (!result.isGradleNativeCandidate()) {
-            return
+    private fun emitNativeJvmGuidance(emitter: CliDiagnosticEmitter, result: InitBootstrapResult) {
+        val nativeBuildSystem = result.nativeJvmBuildSystem() ?: return
+        when (nativeBuildSystem) {
+            JvmNativeBuildSystem.GRADLE -> emitter.info(
+                "Gradle repository detected. Prefer the native Gradle plugin path when you want imported-project " +
+                    "IDE support: apply plugin id 'me.liam.microsmith.gradle', configure 'microsmith { ... }', " +
+                    "and run './gradlew microsmithGenerate'.",
+            )
+            JvmNativeBuildSystem.MAVEN -> emitter.info(
+                "Maven repository detected. Prefer the native Maven plugin path when you want imported-project " +
+                    "IDE support: add 'me.liam.microsmith:runtime-scripting' as a provided dependency, " +
+                    "configure 'me.liam.microsmith:microsmith-maven-plugin', and run 'mvn microsmith:generate'.",
+            )
         }
-        emitter.info(
-            "Gradle repository detected. Prefer the native Gradle plugin path when you want imported-project " +
-                "IDE support: apply plugin id 'me.liam.microsmith.gradle', configure 'microsmith { ... }', " +
-                "and run './gradlew microsmithGenerate'.",
-        )
     }
 }
 
-private fun InitBootstrapResult.isGradleNativeCandidate(): Boolean {
+private fun InitBootstrapResult.nativeJvmBuildSystem(): JvmNativeBuildSystem? {
     val profile = repositoryDetection.profile
     if (profile != JavaOnboardingProfile && profile != KotlinOnboardingProfile && profile != ScalaOnboardingProfile) {
-        return false
+        return null
     }
-    return repositoryDetection.matchedMarkers.any(::isGradleMarker)
+    val hasGradleMarker = repositoryDetection.matchedMarkers.any(::isGradleMarker)
+    val hasMavenMarker = repositoryDetection.matchedMarkers.any(::isMavenMarker)
+    return when {
+        hasGradleMarker && !hasMavenMarker -> JvmNativeBuildSystem.GRADLE
+        hasMavenMarker && !hasGradleMarker -> JvmNativeBuildSystem.MAVEN
+        else -> null
+    }
 }
 
 private fun isGradleMarker(marker: String): Boolean = marker in setOf(
@@ -95,3 +106,10 @@ private fun isGradleMarker(marker: String): Boolean = marker in setOf(
     "settings.gradle",
     "settings.gradle.kts",
 )
+
+private fun isMavenMarker(marker: String): Boolean = marker == "pom.xml"
+
+private enum class JvmNativeBuildSystem {
+    GRADLE,
+    MAVEN,
+}
