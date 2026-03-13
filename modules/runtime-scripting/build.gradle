@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.jvm.tasks.Jar
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.jar.JarFile
@@ -16,6 +17,14 @@ dependencies {
     implementation libs.kotlin.scripting.jvm.host
 }
 
+def scriptTemplateRegistrationEntry =
+    "META-INF/kotlin/script/templates/io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript"
+def runtimeScriptingJarTask = tasks.named("jar", Jar)
+def runtimeScriptingJarArchive = runtimeScriptingJarTask.flatMap { it.archiveFile }
+def runtimeScriptingJarExpectedEntries = [
+    "io/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScript.class",
+    scriptTemplateRegistrationEntry,
+]
 def ideFallbackReleaseAssetsDirectory = layout.buildDirectory.dir("release-assets")
 def ideFallbackShadowJarTask = tasks.named("shadowJar", ShadowJar)
 def ideFallbackShadowJarArchive = ideFallbackShadowJarTask.flatMap { it.archiveFile }
@@ -24,6 +33,7 @@ def ideFallbackExpectedEntries = [
     "io/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScriptCompilationConfiguration.class",
     "io/github/lmliam/microsmith/runtime/scripting/context/MicrosmithScriptContext.class",
     "kotlin/script/experimental/jvmhost/BasicJvmScriptingHost.class",
+    scriptTemplateRegistrationEntry,
 ]
 
 tasks.named("shadowJar", ShadowJar) {
@@ -36,28 +46,48 @@ tasks.named("shadowJar", ShadowJar) {
     }
 }
 
+def verifyJarEntries = { File archiveFile, List<String> expectedEntries, String artifactDescription ->
+    if (!archiveFile.isFile()) {
+        throw new GradleException("${artifactDescription} '${archiveFile.path}' was not created.")
+    }
+
+    JarFile jarFile = new JarFile(archiveFile)
+    try {
+        def entryNames = jarFile.entries().collect { entry -> entry.name } as Set
+        def missingEntries = expectedEntries.findAll { expected -> !entryNames.contains(expected) }
+        if (!missingEntries.isEmpty()) {
+            throw new GradleException(
+                "${artifactDescription} '${archiveFile.name}' is missing expected entries: ${missingEntries.join(', ')}",
+            )
+        }
+    } finally {
+        jarFile.close()
+    }
+}
+
+tasks.register("verifyRuntimeScriptingJar") {
+    dependsOn(runtimeScriptingJarTask)
+    inputs.file(runtimeScriptingJarArchive)
+
+    doLast {
+        verifyJarEntries(
+            runtimeScriptingJarArchive.get().asFile,
+            runtimeScriptingJarExpectedEntries,
+            "Runtime-scripting jar",
+        )
+    }
+}
+
 tasks.register("verifyIdeFallbackShadowJar") {
     dependsOn(ideFallbackShadowJarTask)
     inputs.file(ideFallbackShadowJarArchive)
 
     doLast {
-        File archiveFile = ideFallbackShadowJarArchive.get().asFile
-        if (!archiveFile.isFile()) {
-            throw new GradleException("IDE fallback shadow jar '${archiveFile.path}' was not created.")
-        }
-
-        JarFile jarFile = new JarFile(archiveFile)
-        try {
-            def entryNames = jarFile.entries().collect { entry -> entry.name } as Set
-            def missingEntries = ideFallbackExpectedEntries.findAll { expected -> !entryNames.contains(expected) }
-            if (!missingEntries.isEmpty()) {
-                throw new GradleException(
-                    "IDE fallback shadow jar '${archiveFile.name}' is missing expected entries: ${missingEntries.join(', ')}",
-                )
-            }
-        } finally {
-            jarFile.close()
-        }
+        verifyJarEntries(
+            ideFallbackShadowJarArchive.get().asFile,
+            ideFallbackExpectedEntries,
+            "IDE fallback shadow jar",
+        )
     }
 }
 
@@ -94,5 +124,6 @@ tasks.register("generateIdeFallbackChecksums") {
 }
 
 tasks.named("check") {
+    dependsOn(tasks.named("verifyRuntimeScriptingJar"))
     dependsOn(tasks.named("verifyIdeFallbackShadowJar"))
 }
