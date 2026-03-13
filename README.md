@@ -892,7 +892,7 @@ JetBrains workflow:
 
 Node-specific guidance:
 
-- for Node repositories, IntelliJ IDEA is the supported JetBrains IDE path when you want `.microsmith.kts` authoring support
+- for Node repositories, WebStorm is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
 - native Node indexing does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar when `.microsmith.kts` files need IDE type resolution
 
 Go-specific guidance:
@@ -1284,8 +1284,7 @@ JetBrains IDE indexing and import behavior is partly host-driven, so final sign-
 
 Support policy:
 
-- supported products are IntelliJ IDEA, GoLand, Rider, PyCharm, RubyMine, and RustRover
-- Node repositories are validated in IntelliJ IDEA; WebStorm is not part of the current release sign-off band for `.microsmith.kts` support
+- supported products are IntelliJ IDEA, WebStorm, GoLand, Rider, PyCharm, RubyMine, and RustRover
 - supported release band is the current stable major line and the previous stable major line at release cut
 - EAP builds are best-effort only and do not block release
 
@@ -1340,7 +1339,7 @@ Native sbt checklist:
 
 | Product         | Fixture root                    | Required helper smoke path                              | Required fallback smoke path                             |
 |-----------------|---------------------------------|---------------------------------------------------------|----------------------------------------------------------|
-| IntelliJ IDEA   | `examples/non-gradle/node`      | Run the helper checklist below against the Node fixture. | Run the fallback checklist below against the Node fixture. |
+| WebStorm        | `examples/non-gradle/node`      | Run the helper checklist below against the Node fixture. | Run the fallback checklist below against the Node fixture. |
 | IntelliJ IDEA   | `examples/jvm/java-maven`       | Run the helper checklist below against the Java fixture. | Run the fallback checklist below against the Java fixture. |
 | IntelliJ IDEA   | `examples/jvm/kotlin-gradle`    | Run the helper checklist below against the Kotlin fixture. | Run the fallback checklist below against the Kotlin fixture. |
 | IntelliJ IDEA   | `examples/jvm/scala-sbt`        | Run the helper checklist below against the Scala fixture. | Run the fallback checklist below against the Scala fixture. |
