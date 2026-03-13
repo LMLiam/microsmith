@@ -45,7 +45,10 @@ jobs:
             :runtime-scripting:publishToMavenLocal \
             :gradle-plugin:publishToMavenLocal \
             :maven-plugin:publishToMavenLocal \
+            :sbt-plugin:publishToMavenLocal \
             --stacktrace
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
       - name: Validate native Gradle fixtures
         run: |
           set -euo pipefail
@@ -79,6 +82,21 @@ jobs:
           validate_maven_fixture examples/maven/java
           validate_maven_fixture examples/maven/kotlin
           validate_maven_fixture examples/maven/scala
+      - name: Validate native sbt fixtures
+        run: |
+          set -euo pipefail
+          VERSION="$(./gradlew -q properties | sed -n 's/^version: //p' | head -n 1)"
+
+          validate_sbt_fixture() {
+            local repo_root="$1"
+            local generated_root="$repo_root/target/generated/microsmith/proto"
+
+            (cd "$repo_root" && sbt -batch -Dsbt.supershell=false -Dmicrosmith.version="$VERSION" microsmithGenerate)
+            test -d "$generated_root"
+            find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
+          }
+
+          validate_sbt_fixture examples/sbt/scala
       - name: Validate IDE fallback release assets
         run: |
           ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace

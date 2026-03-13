@@ -1,0 +1,33 @@
+name: Microsmith (Scala sbt Native Fixture)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "build.microsmith.kts"
+      - "build.sbt"
+      - "project/build.properties"
+      - "project/plugins.sbt"
+      - ".github/workflows/microsmith.yml"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 24
+          cache: sbt
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+      - name: Generate with Microsmith sbt plugin
+        run: sbt -batch -Dmicrosmith.version=<version> microsmithGenerate
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

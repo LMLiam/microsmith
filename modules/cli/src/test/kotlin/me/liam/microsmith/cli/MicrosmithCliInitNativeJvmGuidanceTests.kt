@@ -63,13 +63,15 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             )
         }
 
-        "init command keeps sbt-style Scala repositories on the canonical generated output path" {
+        "init command points sbt-based Scala repositories toward the native sbt plugin path" {
             assertNativeJvmGuidance(
                 profile = ScalaOnboardingProfile,
                 matchedMarkers = listOf("build.sbt", "src/main/scala"),
                 expectedOutput = listOf(
                     "Detected repository profile: Scala",
                     "Next: microsmith run build.microsmith.kts --out ./generated",
+                    "Prefer the native sbt plugin path",
+                    "sbt microsmithGenerate",
                 ),
                 unexpectedOutput = listOf(
                     "Prefer the native Gradle plugin path",
@@ -114,6 +116,23 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
                     "Prefer the native Gradle plugin path",
                 ),
                 tempDirectoryPrefix = "microsmith-cli-init-scala-gradle",
+            )
+        }
+
+        "init command does not guess a native build tool when Scala repositories expose mixed native markers" {
+            assertNativeJvmGuidance(
+                profile = ScalaOnboardingProfile,
+                matchedMarkers = listOf("build.sbt", "build.gradle.kts", "src/main/scala"),
+                expectedOutput = listOf(
+                    "Detected repository profile: Scala",
+                    "Next: microsmith run build.microsmith.kts --out ./generated",
+                ),
+                unexpectedOutput = listOf(
+                    "Prefer the native Gradle plugin path",
+                    "Prefer the native Maven plugin path",
+                    "Prefer the native sbt plugin path",
+                ),
+                tempDirectoryPrefix = "microsmith-cli-init-scala-mixed-native-markers",
             )
         }
     })

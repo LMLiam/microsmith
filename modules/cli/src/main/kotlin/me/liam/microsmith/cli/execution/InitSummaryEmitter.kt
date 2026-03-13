@@ -82,6 +82,11 @@ internal object InitSummaryEmitter {
                     "IDE support: add 'me.liam.microsmith:runtime-scripting' as a provided dependency, " +
                     "configure 'me.liam.microsmith:microsmith-maven-plugin', and run 'mvn microsmith:generate'.",
             )
+            JvmNativeBuildSystem.SBT -> emitter.info(
+                "sbt repository detected. Prefer the native sbt plugin path when you want build-aligned " +
+                    "generation: add 'me.liam.microsmith' % 'sbt-microsmith' in project/plugins.sbt, " +
+                    "enable 'MicrosmithSbtPlugin', and run 'sbt microsmithGenerate'.",
+            )
         }
     }
 }
@@ -93,9 +98,11 @@ private fun InitBootstrapResult.nativeJvmBuildSystem(): JvmNativeBuildSystem? {
     }
     val hasGradleMarker = repositoryDetection.matchedMarkers.any(::isGradleMarker)
     val hasMavenMarker = repositoryDetection.matchedMarkers.any(::isMavenMarker)
+    val hasSbtMarker = repositoryDetection.matchedMarkers.any(::isSbtMarker)
     return when {
-        hasGradleMarker && !hasMavenMarker -> JvmNativeBuildSystem.GRADLE
-        hasMavenMarker && !hasGradleMarker -> JvmNativeBuildSystem.MAVEN
+        hasGradleMarker && !hasMavenMarker && !hasSbtMarker -> JvmNativeBuildSystem.GRADLE
+        hasMavenMarker && !hasGradleMarker && !hasSbtMarker -> JvmNativeBuildSystem.MAVEN
+        hasSbtMarker && !hasGradleMarker && !hasMavenMarker -> JvmNativeBuildSystem.SBT
         else -> null
     }
 }
@@ -109,7 +116,13 @@ private fun isGradleMarker(marker: String): Boolean = marker in setOf(
 
 private fun isMavenMarker(marker: String): Boolean = marker == "pom.xml"
 
+private fun isSbtMarker(marker: String): Boolean = marker in setOf(
+    "build.sbt",
+    "project/build.properties",
+)
+
 private enum class JvmNativeBuildSystem {
     GRADLE,
     MAVEN,
+    SBT,
 }

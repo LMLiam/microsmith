@@ -1,0 +1,31 @@
+plugins {
+    id 'scala'
+}
+
+def sbtPluginArtifactId = "sbt-microsmith_2.12_1.0"
+
+dependencies {
+    implementation project(':runtime-scripting')
+    compileOnly "org.scala-sbt:main_2.12:${libs.versions.sbt.get()}"
+    compileOnly "org.scala-sbt:main-settings_2.12:${libs.versions.sbt.get()}"
+    compileOnly "org.scala-lang:scala-library:${libs.versions.scala212.get()}"
+    testImplementation project(':runtime-scripting')
+    testRuntimeOnly libs.kotest.runner.junit5
+}
+
+tasks.withType(ScalaCompile).configureEach {
+    scalaCompileOptions.additionalParameters = ['-target:jvm-1.8']
+}
+
+tasks.named('compileScala', ScalaCompile).configure {
+    dependsOn(tasks.named('compileKotlin'))
+    classpath += files(layout.buildDirectory.dir('classes/kotlin/main'))
+}
+
+publishing {
+    publications {
+        named('gpr', MavenPublication) {
+            artifactId = sbtPluginArtifactId
+        }
+    }
+}

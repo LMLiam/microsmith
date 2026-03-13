@@ -5,6 +5,8 @@ coroutines = "1.10.2"
 spiTooling = "0.1.22"
 mavenResolver = "1.9.22"
 mavenPluginApi = "3.9.9"
+sbt = "1.11.7"
+scala212 = "2.12.20"
 
 [libraries]
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
