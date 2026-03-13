@@ -1,6 +1,6 @@
 plugins {
     java
-    id("me.liam.microsmith.gradle")
+    id("io.github.lmliam.microsmith.gradle")
 }
 
 microsmith {

@@ -19,7 +19,7 @@ pluginManagement {
         }
     }
     plugins {
-        id("me.liam.microsmith.gradle") version microsmithVersion
+        id("io.github.lmliam.microsmith.gradle") version microsmithVersion
     }
 }
 
