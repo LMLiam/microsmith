@@ -375,18 +375,12 @@ tasks.named("check") {
 }
 ```
 
-No extra import is required. The plugin exposes `microsmith { ... }` through Gradle Kotlin DSL accessors once the plugin is applied in the `plugins {}` block.
-
-The plugin version still has to be declared in `settings.gradle.kts` or in the `plugins {}` block. Gradle resolves the plugin before plugin code runs, so the plugin cannot self-select or self-upgrade its own version.
-
 The native Gradle plugin exposes:
 
 - `microsmithGenerate`: runs the configured `.microsmith.kts` script in a dedicated worker JVM so Gradle's embedded Kotlin runtime does not collide with Microsmith's scripting host
 - `microsmith`: extension for `scriptFile`, `outputDirectory`, `variables`, and `flags`
 - `microsmithPlugins`: resolvable configuration for external Microsmith generator plugins
 - `microsmithIde`: IDE-facing classpath that includes Microsmith runtime types and plugin-provided types and is wired into `compileOnly` for Java-base projects
-
-Gradle does not support a task path like `microsmith:generate` unless Microsmith were modeled as a separate project. The idiomatic expansion path is a `microsmith` task group with prefixed tasks such as `microsmithGenerate`, `microsmithDoctor`, and `microsmithIdeRefresh`.
 
 External plugin example:
 
@@ -1205,14 +1199,14 @@ The DSL surface stays the same; the execution boundary changes.
 
 | Previous pattern                 | CLI replacement                                          |
 |----------------------------------|----------------------------------------------------------|
-| Gradle task invoking generation  | `microsmith run schema.microsmith.kts --out ./generated` |
+| Gradle task invoking generation  | `microsmith run build.microsmith.kts --out ./generated`  |
 | Gradle-managed plugin dependency | `--plugin group:artifact:version`                        |
 | local classpath jar wiring       | `--plugin-jar ./path/to/plugin.jar`                      |
 | Gradle offline mode              | `--offline`                                              |
 
 ### Recommended migration sequence to the standalone CLI
 
-1. Move the DSL into `*.microsmith.kts` files.
+1. Keep the Microsmith DSL in `*.microsmith.kts` files.
 2. Replace Gradle-based generation commands in CI with `microsmith run`.
 3. Pin plugin coordinates and validate lock or checksum behavior for reproducibility.
 4. Enable the relevant security controls for your environment.
