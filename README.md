@@ -304,18 +304,6 @@ Scala-specific guidance:
 - Gradle Scala repositories: prefer the native Gradle integration path documented below when you want imported-project IDE support and Gradle-task execution
 - test-only Scala roots stay on the generic onboarding path until a Scala main source root exists
 
-## Namespace migration
-
-Microsmith now uses `io.github.lmliam.microsmith` as its public package and publication namespace.
-
-Use these identifiers in new and migrated builds:
-
-- Gradle plugin id: `io.github.lmliam.microsmith`
-- Maven coordinates: `io.github.lmliam.microsmith:<artifact>:<version>`
-- sbt plugin coordinates: `addSbtPlugin("io.github.lmliam.microsmith" % "sbt-plugin" % microsmithVersion)`
-
-The previous `me.liam.microsmith` namespace is no longer supported.
-
 ## Native Gradle integration
 
 Use the Gradle plugin as the primary path for Java, Kotlin, and Scala repositories that already build with Gradle and want imported-project IDE support.
