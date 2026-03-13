@@ -98,11 +98,11 @@ private fun InitBootstrapResult.nativeJvmBuildSystem(): JvmNativeBuildSystem? {
     }
     val hasGradleMarker = repositoryDetection.matchedMarkers.any(::isGradleMarker)
     val hasMavenMarker = repositoryDetection.matchedMarkers.any(::isMavenMarker)
+    val hasSbtMarker = repositoryDetection.matchedMarkers.any(::isSbtMarker)
     return when {
-        hasGradleMarker && !hasMavenMarker -> JvmNativeBuildSystem.GRADLE
-        hasMavenMarker && !hasGradleMarker -> JvmNativeBuildSystem.MAVEN
-        repositoryDetection.matchedMarkers.any(::isSbtMarker) && !hasGradleMarker && !hasMavenMarker ->
-            JvmNativeBuildSystem.SBT
+        hasGradleMarker && !hasMavenMarker && !hasSbtMarker -> JvmNativeBuildSystem.GRADLE
+        hasMavenMarker && !hasGradleMarker && !hasSbtMarker -> JvmNativeBuildSystem.MAVEN
+        hasSbtMarker && !hasGradleMarker && !hasMavenMarker -> JvmNativeBuildSystem.SBT
         else -> null
     }
 }
