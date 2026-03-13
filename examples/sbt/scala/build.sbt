@@ -19,5 +19,5 @@ lazy val root = (project in file("."))
     resolvers += Resolver.mavenLocal,
     resolvers += "GitHub Microsmith" at "https://maven.pkg.github.com/lmliam/microsmith",
     credentials ++= githubMicrosmithCredentials,
-    libraryDependencies += "me.liam.microsmith" % "runtime-scripting" % microsmithVersion % Provided,
+    libraryDependencies += "io.github.lmliam.microsmith" % "runtime-scripting" % microsmithVersion % Provided,
   )

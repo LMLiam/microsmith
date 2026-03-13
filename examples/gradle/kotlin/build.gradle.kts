@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "2.2.21"
-    id("me.liam.microsmith.gradle")
+    id("io.github.lmliam.microsmith")
 }
 
 kotlin {

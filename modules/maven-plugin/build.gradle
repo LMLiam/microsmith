@@ -3,7 +3,7 @@ import groovy.xml.XmlUtil
 import org.gradle.api.artifacts.Configuration
 import java.nio.charset.StandardCharsets
 
-def mavenPluginArtifactId = "microsmith-maven-plugin"
+def mavenPluginArtifactId = "maven-plugin"
 def mavenPluginGoalPrefix = "microsmith"
 def mavenGenerateGoal = "generate"
 def pluginDescriptorOutput = layout.buildDirectory.file("generated/resources/plugin/META-INF/maven/plugin.xml")
@@ -44,7 +44,7 @@ class MavenPluginDescriptorWriter {
                 mojo {
                     goal(generateGoalValue)
                     description("Generates artifacts from a .microsmith.kts script.")
-                    implementation("me.liam.microsmith.maven.MicrosmithGenerateMojo")
+                    implementation("io.github.lmliam.microsmith.maven.MicrosmithGenerateMojo")
                     language("java")
                     phase("generate-resources")
                     instantiationStrategy("per-lookup")

@@ -1,0 +1,13 @@
+package io.github.lmliam.microsmith.cli.init
+
+import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
+import java.nio.file.Path
+
+internal data class InitBootstrapResult(
+    val projectRoot: Path,
+    val repositoryDetection: OnboardingProfileDetection,
+    val createdFiles: List<Path>,
+    val overwrittenFiles: List<Path>,
+    val preservedFiles: List<Path>,
+    val ideHelperResult: IdeHelperRefreshResult?,
+)

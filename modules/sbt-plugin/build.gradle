@@ -2,7 +2,7 @@ plugins {
     id 'scala'
 }
 
-def sbtPluginArtifactId = "sbt-microsmith_2.12_1.0"
+def sbtPluginArtifactId = "sbt-plugin_2.12_1.0"
 
 dependencies {
     implementation project(':runtime-scripting')

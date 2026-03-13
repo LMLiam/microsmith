@@ -20,9 +20,9 @@ def ideFallbackReleaseAssetsDirectory = layout.buildDirectory.dir("release-asset
 def ideFallbackShadowJarTask = tasks.named("shadowJar", ShadowJar)
 def ideFallbackShadowJarArchive = ideFallbackShadowJarTask.flatMap { it.archiveFile }
 def ideFallbackExpectedEntries = [
-    "me/liam/microsmith/runtime/scripting/definition/MicrosmithScript.class",
-    "me/liam/microsmith/runtime/scripting/definition/MicrosmithScriptCompilationConfiguration.class",
-    "me/liam/microsmith/runtime/scripting/context/MicrosmithScriptContext.class",
+    "io/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScript.class",
+    "io/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScriptCompilationConfiguration.class",
+    "io/github/lmliam/microsmith/runtime/scripting/context/MicrosmithScriptContext.class",
     "kotlin/script/experimental/jvmhost/BasicJvmScriptingHost.class",
 ]
 

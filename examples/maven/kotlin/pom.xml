@@ -40,7 +40,7 @@
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
-            <groupId>me.liam.microsmith</groupId>
+            <groupId>io.github.lmliam.microsmith</groupId>
             <artifactId>runtime-scripting</artifactId>
             <version>${microsmith.version}</version>
             <scope>provided</scope>
@@ -55,8 +55,8 @@
                 <version>${kotlin.version}</version>
             </plugin>
             <plugin>
-                <groupId>me.liam.microsmith</groupId>
-                <artifactId>microsmith-maven-plugin</artifactId>
+                <groupId>io.github.lmliam.microsmith</groupId>
+                <artifactId>maven-plugin</artifactId>
                 <version>${microsmith.version}</version>
             </plugin>
         </plugins>
