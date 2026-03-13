@@ -137,7 +137,7 @@ Microsmith provides:
   - keep package declarations aligned with `src/main/kotlin` directory paths
   - keep single top-level production declaration files named after the owning declaration
   - do not introduce `util`, `utils`, or `misc` package segments in production code
-- If a structural exception is genuinely clearer than splitting the code, encode the exception in `build-logic/src/main/kotlin/me/liam/microsmith/build/quality/RepositoryQualityPolicy.kt` with a narrow path-specific rationale and call it out in the PR description.
+- If a structural exception is genuinely clearer than splitting the code, encode the exception in the repository quality policy with a narrow path-specific rationale and call it out in the PR description.
 - Broader architecture and layering decisions remain review-gated. If a rule cannot be automated without becoming brittle, explain the boundary explicitly in review.
 - Reviewers should check:
   - file ownership and package placement are obvious
@@ -189,7 +189,7 @@ Useful notes:
   - split large production files by responsibility before raising any threshold
   - add or correct explicit package declarations and keep them aligned with `src/main/kotlin` paths
   - rename single-type files so the file name matches the owning declaration
-  - only add a path-specific exception in `build-logic/src/main/kotlin/me/liam/microsmith/build/quality/RepositoryQualityPolicy.kt` when the split would genuinely reduce clarity, and explain that exception in the PR
+  - only add a path-specific exception in the repository quality policy when the split would genuinely reduce clarity, and explain that exception in the PR
 
 ## DSL usage
 
@@ -890,6 +890,26 @@ JetBrains workflow:
 3. Refresh Gradle indexing.
 4. Rerun `microsmith ide refresh` after upgrading the Microsmith CLI or changing plugin dependencies.
 
+Node-specific guidance:
+
+- for Node repositories, WebStorm is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native Node indexing does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar when `.microsmith.kts` files need IDE type resolution
+
+Go-specific guidance:
+
+- for Go repositories, GoLand is the supported JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native Go indexing does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar when `.microsmith.kts` files need IDE type resolution
+
+Python-specific guidance:
+
+- for Python repositories, PyCharm is the supported JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native Python indexing does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar when `.microsmith.kts` files need IDE type resolution
+
+.NET-specific guidance:
+
+- for .NET repositories, Rider is the supported JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native .NET indexing does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar when `.microsmith.kts` files need IDE type resolution
+
 Java-specific guidance:
 
 - for Java repositories, IntelliJ IDEA is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
@@ -1264,7 +1284,7 @@ JetBrains IDE indexing and import behavior is partly host-driven, so final sign-
 
 Support policy:
 
-- supported products are IntelliJ IDEA, GoLand, Rider, PyCharm, RubyMine, and RustRover
+- supported products are IntelliJ IDEA, WebStorm, GoLand, Rider, PyCharm, RubyMine, and RustRover
 - supported release band is the current stable major line and the previous stable major line at release cut
 - EAP builds are best-effort only and do not block release
 
@@ -1298,6 +1318,14 @@ Native Gradle checklist:
 4. Run `./gradlew microsmithGenerate`.
 5. Confirm `microsmith {}`, `schemas {}`, and `protobuf {}` resolve in `build.microsmith.kts` without importing `.microsmith/ide`.
 
+Native Maven checklist:
+
+1. Install or publish the release-candidate Microsmith Maven plugin and runtime packages.
+2. Import the fixture root as a Maven project in IntelliJ IDEA.
+3. Reload Maven indexing.
+4. Run `mvn microsmith:generate -Dmicrosmith.version=<version>`.
+5. Confirm `microsmith {}`, `schemas {}`, and `protobuf {}` resolve in `build.microsmith.kts` without importing `.microsmith/ide`.
+
 Native sbt checklist:
 
 1. Install or publish the release-candidate Microsmith sbt plugin and runtime packages.
@@ -1311,6 +1339,7 @@ Native sbt checklist:
 
 | Product         | Fixture root                    | Required helper smoke path                              | Required fallback smoke path                             |
 |-----------------|---------------------------------|---------------------------------------------------------|----------------------------------------------------------|
+| WebStorm        | `examples/non-gradle/node`      | Run the helper checklist below against the Node fixture. | Run the fallback checklist below against the Node fixture. |
 | IntelliJ IDEA   | `examples/jvm/java-maven`       | Run the helper checklist below against the Java fixture. | Run the fallback checklist below against the Java fixture. |
 | IntelliJ IDEA   | `examples/jvm/kotlin-gradle`    | Run the helper checklist below against the Kotlin fixture. | Run the fallback checklist below against the Kotlin fixture. |
 | IntelliJ IDEA   | `examples/jvm/scala-sbt`        | Run the helper checklist below against the Scala fixture. | Run the fallback checklist below against the Scala fixture. |
@@ -1469,7 +1498,6 @@ The DSL surface stays the same; the execution boundary changes.
 - `modules/runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar`
 - `modules/runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar.sha256`
 
-The bundled plugin catalog is packaged into the official artifacts and pinned to the CLI version.
 Published packages are available from:
 
 ```text
@@ -1484,16 +1512,16 @@ https://maven.pkg.github.com/lmliam/microsmith
 - `:cli:cliDistZip`
 - `:cli:cliDistTar`
 - `:cli:verifyDistLayout`
-- `:cli:distArtifacts` for internal staging into `modules/cli/build/release-assets/`
+- `:cli:distArtifacts`
 - `:cli:generateReleaseChecksums`
 - `:cli:releaseArtifacts`
 - `:runtime-scripting:verifyIdeFallbackShadowJar`
 - `:runtime-scripting:ideFallbackArtifacts`
 - `:runtime-scripting:generateIdeFallbackChecksums`
 
-### Current packaging model
+### Packaging model
 
-Microsmith currently ships with:
+Microsmith ships with:
 
 - installer scripts that provision Java 24 automatically when needed
 - manual fat jar and unpacked distribution channels for teams that want explicit runtime management
