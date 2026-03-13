@@ -3,7 +3,7 @@ plugins {
     id("me.liam.microsmith.gradle")
 }
 
-microsmithGradle {
+microsmith {
     scriptFile.set(layout.projectDirectory.file("schema.microsmith.kts"))
 }
 

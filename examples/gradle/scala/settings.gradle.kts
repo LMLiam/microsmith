@@ -1,4 +1,8 @@
 pluginManagement {
+    val microsmithVersion = providers.gradleProperty("microsmithVersion").orNull ?: error(
+        "Set microsmithVersion in gradle.properties or pass -PmicrosmithVersion=<version>.",
+    )
+
     repositories {
         mavenLocal()
         gradlePluginPortal()
@@ -14,15 +18,8 @@ pluginManagement {
             }
         }
     }
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "me.liam.microsmith.gradle") {
-                val version = providers.gradleProperty("microsmithVersion").orNull ?: error(
-                    "Set microsmithVersion in gradle.properties or pass -PmicrosmithVersion=<version>.",
-                )
-                useModule("me.liam.microsmith:gradle-plugin:$version")
-            }
-        }
+    plugins {
+        id("me.liam.microsmith.gradle") version microsmithVersion
     }
 }
 

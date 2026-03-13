@@ -311,13 +311,17 @@ Canonical contract:
 1. Configure plugin resolution in `settings.gradle.kts`.
 2. Configure normal dependency repositories as well, because the plugin resolves `runtime-scripting` and any `microsmithPlugins` entries as standard Gradle dependencies.
 3. Apply plugin id `me.liam.microsmith.gradle`.
-4. Configure `microsmithGradle { ... }`.
+4. Configure `microsmith { ... }`.
 5. Run `./gradlew microsmithGenerate`.
 
 Minimal settings example:
 
 ```kotlin
 pluginManagement {
+    val microsmithVersion = providers.gradleProperty("microsmithVersion").orNull ?: error(
+        "Set microsmithVersion in gradle.properties or pass -PmicrosmithVersion=<version>.",
+    )
+
     repositories {
         gradlePluginPortal()
         mavenCentral()
@@ -332,15 +336,8 @@ pluginManagement {
             }
         }
     }
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "me.liam.microsmith.gradle") {
-                val microsmithVersion = providers.gradleProperty("microsmithVersion").orNull ?: error(
-                    "Set microsmithVersion in gradle.properties or pass -PmicrosmithVersion=<version>.",
-                )
-                useModule("me.liam.microsmith:gradle-plugin:$microsmithVersion")
-            }
-        }
+    plugins {
+        id("me.liam.microsmith.gradle") version microsmithVersion
     }
 }
 
@@ -369,7 +366,7 @@ plugins {
     id("me.liam.microsmith.gradle")
 }
 
-microsmithGradle {
+microsmith {
     scriptFile.set(layout.projectDirectory.file("build.microsmith.kts"))
 }
 
@@ -378,12 +375,18 @@ tasks.named("check") {
 }
 ```
 
+No extra import is required. The plugin exposes `microsmith { ... }` through Gradle Kotlin DSL accessors once the plugin is applied in the `plugins {}` block.
+
+The plugin version still has to be declared in `settings.gradle.kts` or in the `plugins {}` block. Gradle resolves the plugin before plugin code runs, so the plugin cannot self-select or self-upgrade its own version.
+
 The native Gradle plugin exposes:
 
 - `microsmithGenerate`: runs the configured `.microsmith.kts` script in a dedicated worker JVM so Gradle's embedded Kotlin runtime does not collide with Microsmith's scripting host
-- `microsmithGradle`: extension for `scriptFile`, `outputDirectory`, `variables`, and `flags`
+- `microsmith`: extension for `scriptFile`, `outputDirectory`, `variables`, and `flags`
 - `microsmithPlugins`: resolvable configuration for external Microsmith generator plugins
 - `microsmithIde`: IDE-facing classpath that includes Microsmith runtime types and plugin-provided types and is wired into `compileOnly` for Java-base projects
+
+Gradle does not support a task path like `microsmith:generate` unless Microsmith were modeled as a separate project. The idiomatic expansion path is a `microsmith` task group with prefixed tasks such as `microsmithGenerate`, `microsmithDoctor`, and `microsmithIdeRefresh`.
 
 External plugin example:
 

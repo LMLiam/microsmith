@@ -7,7 +7,7 @@ kotlin {
     jvmToolchain(21)
 }
 
-microsmithGradle {
+microsmith {
     scriptFile.set(layout.projectDirectory.file("schema.microsmith.kts"))
 }
 
