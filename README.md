@@ -15,6 +15,7 @@ This README is the canonical repository documentation.
 - DSL usage
 - Standalone CLI for consumer repositories
 - Native Gradle integration
+- Native Maven integration
 - Installation and verification
 - Command reference
 - JetBrains IDE helper
@@ -35,6 +36,7 @@ Microsmith provides:
 - a standalone CLI for running `.microsmith.kts` scripts without embedding Gradle in consumer repositories
 - bundled built-in providers for the default schema and protobuf workflows
 - a native Gradle plugin for Java, Kotlin, and Scala repositories that want imported-project build alignment
+- a native Maven plugin for Java, Kotlin, and Scala repositories that want imported-project build alignment
 - a JetBrains IDE helper workflow for stronger type resolution in consumer repositories
 
 ## Repository modules
@@ -48,6 +50,7 @@ Microsmith provides:
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution
 - `cli`: command-line entrypoint, diagnostics, installer packaging, and IDE helper support
 - `gradle-plugin`: native Gradle integration for `.microsmith.kts` execution and imported-project IDE alignment
+- `maven-plugin`: native Maven integration for `.microsmith.kts` execution and imported-project IDE alignment
 - `kotest`: shared Kotest configuration used by repository test suites
 
 ### Module boundary map
@@ -60,11 +63,12 @@ Microsmith provides:
 - `runtime-scripting` is the scripting host and execution boundary. It may depend on DSL and generation layers, but it must not absorb CLI parsing, onboarding, or distribution concerns.
 - `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
 - `gradle-plugin` is the native Gradle integration surface for Gradle-imported JVM repositories. It should stay thin, Gradle-conventional, and explicit about task/configuration wiring rather than absorbing CLI concerns.
+- `maven-plugin` is the native Maven integration surface for Maven-imported JVM repositories. It should stay thin, Maven-conventional, and explicit about plugin configuration, generated-source wiring, and imported-project IDE expectations rather than absorbing CLI concerns.
 - `kotest` is test support only and should not become a production dependency surface.
 
 ## Repository layout
 
-- `modules/`: production Gradle subprojects, including `cli`, `dsl`, `dsl-schemas`, `dsl-schemas-protobuf`, `gen`, `gen-schemas`, `gen-schemas-protobuf`, `runtime-scripting`, `gradle-plugin`, and `kotest`
+- `modules/`: production Gradle subprojects, including `cli`, `dsl`, `dsl-schemas`, `dsl-schemas-protobuf`, `gen`, `gen-schemas`, `gen-schemas-protobuf`, `runtime-scripting`, `gradle-plugin`, `maven-plugin`, and `kotest`
 - `build-logic/`: included Gradle build that owns repository-specific plugins and quality tasks
 - `examples/`: consumer-repository fixtures and onboarding examples
 - `gradle/`: wrapper files, version catalog, and dependency locks
@@ -227,7 +231,7 @@ Inside `.microsmith.kts` scripts:
 
 ## Standalone CLI for consumer repositories
 
-The CLI is the recommended entrypoint for Go, .NET, Node, Python, Ruby, Rust, Maven-based JVM repositories, build-tool-light JVM repositories, and any repository where you want self-contained Microsmith execution without depending on a local Gradle or Maven install.
+The CLI is the recommended entrypoint for Go, .NET, Node, Python, Ruby, Rust, build-tool-light JVM repositories, and any repository where you want self-contained Microsmith execution without depending on a local Gradle or Maven install.
 The official installer scripts are self-contained and provision a Java 24 runtime automatically when the machine does not already provide one.
 
 Manual channels remain available, but they require Java 24 or newer.
@@ -278,7 +282,7 @@ After the canonical first run succeeds, you can switch to a repository-native ou
 
 Java-specific guidance:
 
-- Maven-based Java repositories: keep Microsmith CLI-managed by default and only add `./generated` into the Maven compile path if you explicitly want generated sources compiled by Maven
+- Maven-based Java repositories: prefer the native Maven integration path documented below when you want imported-project IDE support and Maven-goal execution
 - Gradle-based Java repositories: prefer the native Gradle integration path documented below when you want imported-project IDE support and Gradle-task execution
 - build-tool-light Java repositories: use the same canonical `./generated` output path and helper workflow
 
@@ -286,13 +290,13 @@ Kotlin-specific guidance:
 
 - Gradle Kotlin DSL repositories: prefer the native Gradle integration path documented below when you want imported-project IDE support and Gradle-task execution
 - Gradle Groovy repositories that primarily host Kotlin code: the same native Gradle plugin path applies when Kotlin is the primary source language
-- Maven Kotlin repositories: keep Microsmith CLI-managed by default and only add `./generated` into the Maven compile path if you explicitly want generated sources compiled by Maven
+- Maven Kotlin repositories: prefer the native Maven integration path documented below when you want imported-project IDE support and Maven-goal execution
 - build-tool-light Kotlin repositories: use the same canonical `./generated` output path and helper workflow
 
 Scala-specific guidance:
 
 - `sbt`-based Scala repositories: keep Microsmith CLI-managed during onboarding until native `sbt` integration is configured separately
-- Maven Scala repositories: keep Microsmith CLI-managed by default and only add `./generated` into the Maven compile path if you explicitly want generated sources compiled by Maven
+- Maven Scala repositories: prefer the native Maven integration path documented below when you want imported-project IDE support and Maven-goal execution
 - Gradle Scala repositories: prefer the native Gradle integration path documented below when you want imported-project IDE support and Gradle-task execution
 - test-only Scala roots stay on the generic onboarding path until a Scala main source root exists
 
@@ -403,6 +407,105 @@ Coexistence with the CLI, helper, and fallback paths:
 - once native Gradle integration is adopted, use `./gradlew microsmithGenerate` as the primary generation path
 - the JetBrains IDE helper and fallback jar remain useful when you intentionally keep Microsmith outside the Gradle build, or when you are validating CLI-managed flows
 - representative native Gradle fixtures live in `examples/gradle/java`, `examples/gradle/kotlin`, and `examples/gradle/scala`
+
+## Native Maven integration
+
+Use the Maven plugin as the primary path for Java, Kotlin, and Scala repositories that already build with Maven and want imported-project IDE support.
+
+Prefer this path when:
+
+- the repository already builds through Maven rather than Gradle
+- generation should run as `mvn microsmith:generate`
+- JetBrains IDEs should resolve built-in Microsmith `.microsmith.kts` symbols from the imported Maven project instead of a separate helper project
+
+Canonical contract:
+
+1. Keep Microsmith authoring in `build.microsmith.kts` or another `*.microsmith.kts` file.
+2. Add `me.liam.microsmith:runtime-scripting` as a `provided` dependency so Maven-imported IDE projects see the built-in script definition and Microsmith types.
+3. Add `me.liam.microsmith:microsmith-maven-plugin` under `<build><plugins>`.
+4. Configure `<repositories>` and `<pluginRepositories>` so both the project dependency and the Maven plugin resolve.
+5. Run `mvn microsmith:generate`.
+
+Minimal `pom.xml` example:
+
+```xml
+<project>
+    <properties>
+        <microsmith.version><!-- Microsmith version --></microsmith.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>github-microsmith</id>
+            <url>https://maven.pkg.github.com/lmliam/microsmith</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>github-microsmith</id>
+            <url>https://maven.pkg.github.com/lmliam/microsmith</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>me.liam.microsmith</groupId>
+            <artifactId>runtime-scripting</artifactId>
+            <version>${microsmith.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>me.liam.microsmith</groupId>
+                <artifactId>microsmith-maven-plugin</artifactId>
+                <version>${microsmith.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+Repository credentials:
+
+- `mavenLocal()` is enough for local fixture validation after `publishToMavenLocal`
+- when consuming releases from GitHub Packages, configure a `github-microsmith` server entry in `~/.m2/settings.xml` or use `actions/setup-java` with `server-id: github-microsmith` in CI
+
+External plugin example:
+
+```xml
+<plugin>
+    <groupId>me.liam.microsmith</groupId>
+    <artifactId>microsmith-maven-plugin</artifactId>
+    <version>${microsmith.version}</version>
+    <dependencies>
+        <dependency>
+            <groupId>com.acme</groupId>
+            <artifactId>microsmith-emitter-ts</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+    </dependencies>
+</plugin>
+```
+
+If JetBrains IDEs also need those plugin-provided types in `.microsmith.kts`, mirror the plugin library as a `provided` project dependency or keep using the helper or fallback path for that repository.
+
+Generated-source guidance:
+
+- Microsmith does not auto-register generated directories as Java, Kotlin, or Scala sources in Maven
+- keep the default `target/generated/microsmith` output root unless a generator actually emits compilable sources for that repository
+- only add concrete language source directories into the build when you have a real source-emission contract
+- use the same explicit Maven source-registration approach you already use for other generated sources, such as `build-helper-maven-plugin`, rather than adding the entire output root blindly
+
+Coexistence with the CLI, helper, and fallback paths:
+
+- `microsmith init` still works in Maven repositories and is the fastest way to scaffold `build.microsmith.kts`
+- once native Maven integration is adopted, use `mvn microsmith:generate` as the primary generation path
+- the JetBrains IDE helper and fallback jar remain useful when you intentionally keep Microsmith outside Maven, or when a Maven-imported IDE project needs plugin-provided types that are not mirrored as project dependencies
+- representative native Maven fixtures live in `examples/maven/java`, `examples/maven/kotlin`, and `examples/maven/scala`
 
 ### Direct script execution
 
@@ -1001,14 +1104,17 @@ jobs:
 
 ## Example fixtures
 
-The repository includes fixture repositories under `examples/non-gradle/`, `examples/jvm/`, and `examples/gradle/`.
-CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flows. Native Gradle fixtures exercise `./gradlew microsmithGenerate`.
+The repository includes fixture repositories under `examples/non-gradle/`, `examples/jvm/`, `examples/gradle/`, and `examples/maven/`.
+CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flows. Native Gradle fixtures exercise `./gradlew microsmithGenerate`. Native Maven fixtures exercise `mvn microsmith:generate`.
 
 | Fixture | Directory                    | Local command from fixture root                                                   | CI workflow                                                   |
 |---------|------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------|
 | Java (native Gradle)   | `examples/gradle/java`      | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                      | `examples/gradle/java/.github/workflows/microsmith.yml`       |
 | Kotlin (native Gradle) | `examples/gradle/kotlin`   | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                      | `examples/gradle/kotlin/.github/workflows/microsmith.yml`     |
 | Scala (native Gradle)  | `examples/gradle/scala`    | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                      | `examples/gradle/scala/.github/workflows/microsmith.yml`      |
+| Java (native Maven)    | `examples/maven/java`      | `mvn microsmith:generate -Dmicrosmith.version=<version>`                          | `examples/maven/java/.github/workflows/microsmith.yml`        |
+| Kotlin (native Maven)  | `examples/maven/kotlin`    | `mvn microsmith:generate -Dmicrosmith.version=<version>`                          | `examples/maven/kotlin/.github/workflows/microsmith.yml`      |
+| Scala (native Maven)   | `examples/maven/scala`     | `mvn microsmith:generate -Dmicrosmith.version=<version>`                          | `examples/maven/scala/.github/workflows/microsmith.yml`       |
 | Java    | `examples/jvm/java-maven`    | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/jvm/java-maven/.github/workflows/microsmith.yml`    |
 | Kotlin  | `examples/jvm/kotlin-gradle` | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/jvm/kotlin-gradle/.github/workflows/microsmith.yml` |
 | Node    | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
@@ -1028,6 +1134,7 @@ CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flow
 | CLI distribution smoke         | `cli-smoke` on Ubuntu, macOS, and Windows            | Dist launcher, generation, process isolation, and `doctor --diagnostics json`.             |
 | Installer and bootstrap smoke  | `cli-smoke` on Ubuntu, macOS, and Windows            | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.        |
 | Native Gradle fixture smoke    | `build-and-qodana` on Ubuntu                         | Publishes required packages to `mavenLocal`, then runs `microsmithGenerate` for Java, Kotlin, and Scala Gradle fixtures. |
+| Native Maven fixture smoke     | `build-and-qodana` on Ubuntu                         | Publishes required packages to `mavenLocal`, then runs `mvn microsmith:generate` for Java, Kotlin, and Scala Maven fixtures. |
 | Consumer fixture onboarding    | `cli-smoke` on Ubuntu and Windows                    | Ubuntu covers Java, Kotlin, Node, Go, Python, Ruby, and Rust fixtures; Windows covers the .NET fixture. |
 | JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Ubuntu runs `ide refresh` and `ide doctor` for Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust fixtures; Windows runs the .NET helper path. |
 | Fallback artifact packaging    | `build-and-qodana` on Ubuntu                         | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`. |
@@ -1057,6 +1164,14 @@ Support policy:
 | IntelliJ IDEA            | `examples/gradle/java`      | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
 | IntelliJ IDEA            | `examples/gradle/kotlin`    | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
 | IntelliJ IDEA + Scala plugin | `examples/gradle/scala` | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
+
+### Native Maven IDE validation
+
+| Product                    | Fixture root              | Required validation path |
+|---------------------------|---------------------------|--------------------------|
+| IntelliJ IDEA            | `examples/maven/java`     | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
+| IntelliJ IDEA            | `examples/maven/kotlin`   | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
+| IntelliJ IDEA + Scala plugin | `examples/maven/scala` | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
 
 Native Gradle checklist:
 
