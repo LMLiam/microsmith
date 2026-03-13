@@ -4,6 +4,7 @@ kotest = "6.0.1"
 coroutines = "1.10.2"
 spiTooling = "0.1.22"
 mavenResolver = "1.9.22"
+mavenPluginApi = "3.9.9"
 
 [libraries]
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
@@ -23,5 +24,6 @@ maven-resolver-supplier = { module = "org.apache.maven.resolver:maven-resolver-s
 maven-resolver-connector-basic = { module = "org.apache.maven.resolver:maven-resolver-connector-basic", version.ref = "mavenResolver" }
 maven-resolver-transport-file = { module = "org.apache.maven.resolver:maven-resolver-transport-file", version.ref = "mavenResolver" }
 maven-resolver-transport-http = { module = "org.apache.maven.resolver:maven-resolver-transport-http", version.ref = "mavenResolver" }
+maven-plugin-api = { module = "org.apache.maven:maven-plugin-api", version.ref = "mavenPluginApi" }
 spi-tooling-annotations = { module = "io.github.eventhorizonlab:spi-tooling-annotations", version.ref = "spiTooling" }
 spi-tooling-processor = { module = "io.github.eventhorizonlab:spi-tooling-processor", version.ref = "spiTooling" }
