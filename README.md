@@ -1254,13 +1254,6 @@ CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flow
 | Rust    | `examples/non-gradle/rust`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/rust/.github/workflows/microsmith.yml`   |
 | .NET    | `examples/non-gradle/dotnet` | `microsmith init` then `microsmith run build.microsmith.kts --out .\Generated`    | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
 
-Intentionally out of scope for first-class fixture coverage:
-
-- mixed-marker or polyglot roots that match multiple first-class profiles at once; they stay on the generic onboarding path and are covered by detector regression tests instead of dedicated fixture repositories
-- build-file-only JVM roots with no language source roots; they stay on the generic onboarding path until a source-root-backed language profile or native build-tool path applies
-- nested-only Ruby gems and nested-only Rust crates without a matching root marker; they stay on the generic onboarding path and are covered by detector regression tests
-- test-only Scala roots without a matching Scala main source tree; they stay on the generic onboarding path and are covered by detector regression tests
-
 ## Validation matrix and release checklist
 
 ### Automated validation matrix
