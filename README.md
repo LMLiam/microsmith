@@ -890,6 +890,26 @@ JetBrains workflow:
 3. Refresh Gradle indexing.
 4. Rerun `microsmith ide refresh` after upgrading the Microsmith CLI or changing plugin dependencies.
 
+Node-specific guidance:
+
+- for Node repositories, IntelliJ IDEA is the supported JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native Node indexing does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar when `.microsmith.kts` files need IDE type resolution
+
+Go-specific guidance:
+
+- for Go repositories, GoLand is the supported JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native Go indexing does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar when `.microsmith.kts` files need IDE type resolution
+
+Python-specific guidance:
+
+- for Python repositories, PyCharm is the supported JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native Python indexing does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar when `.microsmith.kts` files need IDE type resolution
+
+.NET-specific guidance:
+
+- for .NET repositories, Rider is the supported JetBrains IDE path when you want `.microsmith.kts` authoring support
+- native .NET indexing does not resolve Microsmith script symbols on its own; use the helper project or the fallback jar when `.microsmith.kts` files need IDE type resolution
+
 Java-specific guidance:
 
 - for Java repositories, IntelliJ IDEA is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
@@ -1234,6 +1254,13 @@ CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flow
 | Rust    | `examples/non-gradle/rust`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/rust/.github/workflows/microsmith.yml`   |
 | .NET    | `examples/non-gradle/dotnet` | `microsmith init` then `microsmith run build.microsmith.kts --out .\Generated`    | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
 
+Intentionally out of scope for first-class fixture coverage:
+
+- mixed-marker or polyglot roots that match multiple first-class profiles at once; they stay on the generic onboarding path and are covered by detector regression tests instead of dedicated fixture repositories
+- build-file-only JVM roots with no language source roots; they stay on the generic onboarding path until a source-root-backed language profile or native build-tool path applies
+- nested-only Ruby gems and nested-only Rust crates without a matching root marker; they stay on the generic onboarding path and are covered by detector regression tests
+- test-only Scala roots without a matching Scala main source tree; they stay on the generic onboarding path and are covered by detector regression tests
+
 ## Validation matrix and release checklist
 
 ### Automated validation matrix
@@ -1265,6 +1292,7 @@ JetBrains IDE indexing and import behavior is partly host-driven, so final sign-
 Support policy:
 
 - supported products are IntelliJ IDEA, GoLand, Rider, PyCharm, RubyMine, and RustRover
+- Node repositories are validated in IntelliJ IDEA; WebStorm is not part of the current release sign-off band for `.microsmith.kts` support
 - supported release band is the current stable major line and the previous stable major line at release cut
 - EAP builds are best-effort only and do not block release
 
@@ -1298,6 +1326,14 @@ Native Gradle checklist:
 4. Run `./gradlew microsmithGenerate`.
 5. Confirm `microsmith {}`, `schemas {}`, and `protobuf {}` resolve in `build.microsmith.kts` without importing `.microsmith/ide`.
 
+Native Maven checklist:
+
+1. Install or publish the release-candidate Microsmith Maven plugin and runtime packages.
+2. Import the fixture root as a Maven project in IntelliJ IDEA.
+3. Reload Maven indexing.
+4. Run `mvn microsmith:generate -Dmicrosmith.version=<version>`.
+5. Confirm `microsmith {}`, `schemas {}`, and `protobuf {}` resolve in `build.microsmith.kts` without importing `.microsmith/ide`.
+
 Native sbt checklist:
 
 1. Install or publish the release-candidate Microsmith sbt plugin and runtime packages.
@@ -1311,6 +1347,7 @@ Native sbt checklist:
 
 | Product         | Fixture root                    | Required helper smoke path                              | Required fallback smoke path                             |
 |-----------------|---------------------------------|---------------------------------------------------------|----------------------------------------------------------|
+| IntelliJ IDEA   | `examples/non-gradle/node`      | Run the helper checklist below against the Node fixture. | Run the fallback checklist below against the Node fixture. |
 | IntelliJ IDEA   | `examples/jvm/java-maven`       | Run the helper checklist below against the Java fixture. | Run the fallback checklist below against the Java fixture. |
 | IntelliJ IDEA   | `examples/jvm/kotlin-gradle`    | Run the helper checklist below against the Kotlin fixture. | Run the fallback checklist below against the Kotlin fixture. |
 | IntelliJ IDEA   | `examples/jvm/scala-sbt`        | Run the helper checklist below against the Scala fixture. | Run the fallback checklist below against the Scala fixture. |
