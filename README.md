@@ -1498,7 +1498,6 @@ The DSL surface stays the same; the execution boundary changes.
 - `modules/runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar`
 - `modules/runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar.sha256`
 
-The bundled plugin catalog is packaged into the official artifacts and pinned to the CLI version.
 Published packages are available from:
 
 ```text
@@ -1513,16 +1512,16 @@ https://maven.pkg.github.com/lmliam/microsmith
 - `:cli:cliDistZip`
 - `:cli:cliDistTar`
 - `:cli:verifyDistLayout`
-- `:cli:distArtifacts` for internal staging into `modules/cli/build/release-assets/`
+- `:cli:distArtifacts`
 - `:cli:generateReleaseChecksums`
 - `:cli:releaseArtifacts`
 - `:runtime-scripting:verifyIdeFallbackShadowJar`
 - `:runtime-scripting:ideFallbackArtifacts`
 - `:runtime-scripting:generateIdeFallbackChecksums`
 
-### Current packaging model
+### Packaging model
 
-Microsmith currently ships with:
+Microsmith ships with:
 
 - installer scripts that provision Java 24 automatically when needed
 - manual fat jar and unpacked distribution channels for teams that want explicit runtime management
