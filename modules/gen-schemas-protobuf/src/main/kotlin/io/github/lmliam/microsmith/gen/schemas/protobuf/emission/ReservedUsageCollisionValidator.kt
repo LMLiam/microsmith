@@ -1,0 +1,99 @@
+package io.github.lmliam.microsmith.gen.schemas.protobuf.emission
+
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Reserved
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+
+/**
+ * Reapplies builder-level reserved-name and reserved-number invariants for programmatic schemas.
+ */
+internal object ReservedUsageCollisionValidator {
+    fun validate(message: Message) {
+        validateNames(
+            owner = ReservedUsageOwner.message(message.name),
+            reservedNames = message.reserved.filterIsInstance<ReservedName>().map(ReservedName::name),
+            usedNames = buildList {
+                message.fields.forEach { add(it.name) }
+                message.oneofs.forEach { oneof -> oneof.fields.forEach { add(it.name) } }
+            },
+        )
+        validateNumbers(
+            owner = ReservedUsageOwner.message(message.name),
+            reserved = message.reserved,
+            usedNumbers = buildList {
+                message.fields.forEach { add(it.index) }
+                message.oneofs.forEach { oneof -> oneof.fields.forEach { add(it.index) } }
+            },
+        )
+    }
+
+    fun validate(enum: Enum) {
+        validateNames(
+            owner = ReservedUsageOwner.enum(enum.name),
+            reservedNames = enum.reserved.filterIsInstance<ReservedName>().map(ReservedName::name),
+            usedNames = enum.values.map { it.name },
+        )
+        validateNumbers(
+            owner = ReservedUsageOwner.enum(enum.name),
+            reserved = enum.reserved,
+            usedNumbers = enum.values.map { it.index },
+        )
+    }
+
+    private fun validateNames(owner: ReservedUsageOwner, reservedNames: List<String>, usedNames: List<String>) {
+        val duplicateReservedNames = reservedNames.groupingBy { it }.eachCount().filterValues { it > 1 }.keys
+        require(duplicateReservedNames.isEmpty()) {
+            val duplicateNames = duplicateReservedNames.sorted().joinToString(", ")
+            "${owner.displayName} '${owner.name}' has duplicate reserved names: $duplicateNames."
+        }
+
+        val reservedNameSet = reservedNames.toSet()
+        val collisions = usedNames.distinct().filter { it in reservedNameSet }
+        require(collisions.isEmpty()) {
+            "${owner.displayName} '${owner.name}' uses reserved names: ${collisions.sorted().joinToString(", ")}."
+        }
+    }
+
+    private fun validateNumbers(owner: ReservedUsageOwner, reserved: List<Reserved>, usedNumbers: List<Int>) {
+        val reservedRanges = reserved.filterNot { it is ReservedName }.map(::toReservedSpan)
+        requireNoReservedRangeOverlaps(owner, reservedRanges)
+
+        val collisions = usedNumbers.distinct().filter { number -> reservedRanges.any { number in it.range } }
+        require(collisions.isEmpty()) {
+            "${owner.displayName} '${owner.name}' uses reserved numbers: ${collisions.sorted().joinToString(", ")}."
+        }
+    }
+
+    private fun requireNoReservedRangeOverlaps(owner: ReservedUsageOwner, reservedRanges: List<ReservedSpan>) {
+        val overlaps =
+            reservedRanges
+                .sortedBy { it.range.first }
+                .zipWithNext()
+                .filter { (left, right) -> left.range.last >= right.range.first }
+                .map { (left, right) -> "${left.description} overlaps ${right.description}" }
+
+        require(overlaps.isEmpty()) {
+            "${owner.displayName} '${owner.name}' has overlapping reserved ranges: ${overlaps.joinToString("; ")}."
+        }
+    }
+
+    private fun toReservedSpan(reserved: Reserved): ReservedSpan = when (reserved) {
+        is ReservedIndex -> ReservedSpan(
+            description = reserved.index.toString(),
+            range = reserved.index..reserved.index,
+        )
+        is ReservedRange -> ReservedSpan(
+            description = "${reserved.indexRange.first} to ${reserved.indexRange.last}",
+            range = reserved.indexRange,
+        )
+        is ReservedToMax -> ReservedSpan(
+            description = "${reserved.from} to max",
+            range = reserved.from..ProtobufFieldNumbers.MAX_FIELD_NUMBER,
+        )
+        is ReservedName -> error("Reserved names do not produce numeric spans.")
+    }
+}

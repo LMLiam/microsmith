@@ -48,8 +48,8 @@ tasks.named('kotest') {
 gradlePlugin {
     plugins {
         microsmithPlugin {
-            id = 'me.liam.microsmith.gradle'
-            implementationClass = 'me.liam.microsmith.gradle.MicrosmithGradlePlugin'
+            id = 'io.github.lmliam.microsmith.gradle'
+            implementationClass = 'io.github.lmliam.microsmith.gradle.MicrosmithGradlePlugin'
             displayName = 'Microsmith Gradle Plugin'
             description = 'Native Microsmith integration for Gradle repositories'
         }

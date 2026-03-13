@@ -165,7 +165,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'me.liam.microsmith.cli.CliKt'
+    mainClass = 'io.github.lmliam.microsmith.cli.CliKt'
 }
 
 def cliVersion = project.version.toString()
@@ -176,16 +176,16 @@ def bundledPluginCatalogOutput = layout.buildDirectory.file("generated/microsmit
 
 def bundledPlugins = [
     [
-        coordinate: "me.liam.microsmith:gen-schemas:${cliVersion}",
+        coordinate: "io.github.lmliam.microsmith:gen-schemas:${cliVersion}",
         providers : [
-            "META-INF/services/me.liam.microsmith.gen.core.ModelGenerator": "me.liam.microsmith.gen.schemas.SchemasGenerator",
+            "META-INF/services/io.github.lmliam.microsmith.gen.core.ModelGenerator": "io.github.lmliam.microsmith.gen.schemas.SchemasGenerator",
         ],
     ],
     [
-        coordinate: "me.liam.microsmith:gen-schemas-protobuf:${cliVersion}",
+        coordinate: "io.github.lmliam.microsmith:gen-schemas-protobuf:${cliVersion}",
         providers : [
-            "META-INF/services/me.liam.microsmith.gen.schemas.SchemaEmitter":
-                "me.liam.microsmith.gen.schemas.protobuf.emission.ProtobufEmitter",
+            "META-INF/services/io.github.lmliam.microsmith.gen.schemas.SchemaEmitter":
+                "io.github.lmliam.microsmith.gen.schemas.protobuf.emission.ProtobufEmitter",
         ],
     ],
 ]
