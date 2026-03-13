@@ -64,6 +64,7 @@ rootProject.name = 'microsmith'
     'gen-schemas-protobuf',
     'runtime-scripting',
     'cli',
+    'gradle-plugin',
     'kotest',
 ].each { moduleName ->
     include moduleName

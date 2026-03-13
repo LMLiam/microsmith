@@ -1,0 +1,7 @@
+package me.liam.microsmith.gradle
+
+internal object MicrosmithGradleConfigurations {
+    const val IDE = "microsmithIde"
+    const val PLUGINS = "microsmithPlugins"
+    const val RUNTIME = "microsmithRuntime"
+}

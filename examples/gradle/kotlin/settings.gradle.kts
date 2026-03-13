@@ -1,0 +1,43 @@
+pluginManagement {
+    val microsmithVersion = providers.gradleProperty("microsmithVersion").orNull ?: error(
+        "Set microsmithVersion in gradle.properties or pass -PmicrosmithVersion=<version>.",
+    )
+
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+        mavenCentral()
+        maven(url = "https://maven.pkg.github.com/lmliam/microsmith") {
+            credentials {
+                username = providers.gradleProperty("gpr.user")
+                    .orElse(providers.environmentVariable("GITHUB_ACTOR"))
+                    .orNull
+                password = providers.gradleProperty("gpr.key")
+                    .orElse(providers.environmentVariable("GITHUB_TOKEN"))
+                    .orNull
+            }
+        }
+    }
+    plugins {
+        id("me.liam.microsmith.gradle") version microsmithVersion
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven(url = "https://maven.pkg.github.com/lmliam/microsmith") {
+            credentials {
+                username = providers.gradleProperty("gpr.user")
+                    .orElse(providers.environmentVariable("GITHUB_ACTOR"))
+                    .orNull
+                password = providers.gradleProperty("gpr.key")
+                    .orElse(providers.environmentVariable("GITHUB_TOKEN"))
+                    .orNull
+            }
+        }
+    }
+}
+
+rootProject.name = "kotlin-gradle-native-fixture"

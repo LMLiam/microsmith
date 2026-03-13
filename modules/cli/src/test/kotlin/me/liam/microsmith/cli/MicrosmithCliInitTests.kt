@@ -347,6 +347,7 @@ class MicrosmithCliInitTests :
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("Detected repository profile: Java")
                 out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts --out ./generated")
+                out.joinToString("\n").shouldNotContain("Prefer the native Gradle plugin path")
                 out.joinToString("\n").shouldNotContain("Optional repository-native output path")
                 err shouldBe emptyList()
             } finally {
@@ -354,7 +355,7 @@ class MicrosmithCliInitTests :
             }
         }
 
-        "init command keeps Kotlin on the canonical generated output path" {
+        "init command points Gradle-based Kotlin repositories toward the native Gradle plugin path" {
             val out = mutableListOf<String>()
             val err = mutableListOf<String>()
             val tempDir = createTempDirectory("microsmith-cli-init-kotlin")
@@ -392,6 +393,7 @@ class MicrosmithCliInitTests :
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("Detected repository profile: Kotlin")
                 out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts --out ./generated")
+                out.joinToString("\n").shouldContain("Prefer the native Gradle plugin path")
                 out.joinToString("\n").shouldNotContain("Optional repository-native output path")
                 err shouldBe emptyList()
             } finally {
@@ -437,7 +439,96 @@ class MicrosmithCliInitTests :
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("Detected repository profile: Scala")
                 out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts --out ./generated")
+                out.joinToString("\n").shouldNotContain("Prefer the native Gradle plugin path")
                 out.joinToString("\n").shouldNotContain("Optional repository-native output path")
+                err shouldBe emptyList()
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "init command points Gradle-based Java repositories toward the native Gradle plugin path" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val tempDir = createTempDirectory("microsmith-cli-init-java-gradle")
+            try {
+                val helperRoot = tempDir.resolve(".microsmith/ide")
+                val cli =
+                    MicrosmithCli(
+                        stdout = out::add,
+                        stderr = err::add,
+                        initRunner = { command: InitCommand ->
+                            InitBootstrapResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                repositoryDetection =
+                                OnboardingProfileDetection(
+                                    profile = JavaOnboardingProfile,
+                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                                    matchedMarkers = listOf("build.gradle.kts", "src/main/java"),
+                                ),
+                                createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
+                                overwrittenFiles = emptyList(),
+                                preservedFiles = emptyList(),
+                                ideHelperResult =
+                                IdeHelperRefreshResult(
+                                    projectRoot = tempDir,
+                                    helperRoot = helperRoot,
+                                    updatedFiles = emptyList(),
+                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                ),
+                            )
+                        },
+                    )
+
+                val exitCode = cli.run(arrayOf("init", "--repo-root", tempDir.toString()))
+
+                exitCode shouldBe 0
+                out.joinToString("\n").shouldContain("Detected repository profile: Java")
+                out.joinToString("\n").shouldContain("Prefer the native Gradle plugin path")
+                err shouldBe emptyList()
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "init command points Gradle-based Scala repositories toward the native Gradle plugin path" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val tempDir = createTempDirectory("microsmith-cli-init-scala-gradle")
+            try {
+                val helperRoot = tempDir.resolve(".microsmith/ide")
+                val cli =
+                    MicrosmithCli(
+                        stdout = out::add,
+                        stderr = err::add,
+                        initRunner = { command: InitCommand ->
+                            InitBootstrapResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                repositoryDetection =
+                                OnboardingProfileDetection(
+                                    profile = ScalaOnboardingProfile,
+                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                                    matchedMarkers = listOf("build.gradle", "src/main/scala"),
+                                ),
+                                createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
+                                overwrittenFiles = emptyList(),
+                                preservedFiles = emptyList(),
+                                ideHelperResult =
+                                IdeHelperRefreshResult(
+                                    projectRoot = tempDir,
+                                    helperRoot = helperRoot,
+                                    updatedFiles = emptyList(),
+                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                ),
+                            )
+                        },
+                    )
+
+                val exitCode = cli.run(arrayOf("init", "--repo-root", tempDir.toString()))
+
+                exitCode shouldBe 0
+                out.joinToString("\n").shouldContain("Detected repository profile: Scala")
+                out.joinToString("\n").shouldContain("Prefer the native Gradle plugin path")
                 err shouldBe emptyList()
             } finally {
                 runCatching { tempDir.deleteRecursively() }

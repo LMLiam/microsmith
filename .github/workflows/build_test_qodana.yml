@@ -11,7 +11,7 @@ concurrency:
 jobs:
   build-and-qodana:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     env:
       QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
     permissions:
@@ -33,6 +33,34 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
       - name: Build
         run: ./gradlew build --stacktrace
+      - name: Publish Gradle-native packages to mavenLocal
+        run: |
+          ./gradlew \
+            :dsl:publishToMavenLocal \
+            :dsl-schemas:publishToMavenLocal \
+            :dsl-schemas-protobuf:publishToMavenLocal \
+            :gen:publishToMavenLocal \
+            :gen-schemas:publishToMavenLocal \
+            :gen-schemas-protobuf:publishToMavenLocal \
+            :runtime-scripting:publishToMavenLocal \
+            :gradle-plugin:publishToMavenLocal \
+            --stacktrace
+      - name: Validate native Gradle fixtures
+        run: |
+          set -euo pipefail
+          VERSION="$(./gradlew -q properties | sed -n 's/^version: //p' | head -n 1)"
+          validate_gradle_fixture() {
+            local repo_root="$1"
+            local generated_root="$repo_root/build/generated/microsmith/proto"
+
+            ./gradlew -p "$repo_root" microsmithGenerate -PmicrosmithVersion="$VERSION" --stacktrace
+            test -d "$generated_root"
+            find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
+          }
+
+          validate_gradle_fixture examples/gradle/java
+          validate_gradle_fixture examples/gradle/kotlin
+          validate_gradle_fixture examples/gradle/scala
       - name: Validate IDE fallback release assets
         run: |
           ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
@@ -40,10 +68,10 @@ jobs:
           find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microsmith-script-definition-*-all.jar.sha256' | grep -q .
       - name: Publish Test Report
         uses: dorny/test-reporter@v2
-        if: ${{ always() && hashFiles('**/build/test-results/jvmKotest/*.xml') != '' }}
+        if: ${{ always() && hashFiles('**/build/test-results/**/*.xml') != '' }}
         with:
-          name: Kotest Results
-          path: '**/build/test-results/jvmKotest/*.xml'
+          name: JVM Test Results
+          path: '**/build/test-results/**/*.xml'
           reporter: java-junit
       - name: 'Qodana Scan'
         if: ${{ env.QODANA_TOKEN != '' }}
