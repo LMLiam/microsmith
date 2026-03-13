@@ -56,7 +56,7 @@
             </plugin>
             <plugin>
                 <groupId>io.github.lmliam.microsmith</groupId>
-                <artifactId>microsmith-maven-plugin</artifactId>
+                <artifactId>maven-plugin</artifactId>
                 <version>${microsmith.version}</version>
             </plugin>
         </plugins>

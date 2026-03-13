@@ -14,7 +14,7 @@ import java.util.Properties
 class MicrosmithGenerateMojoTests : StringSpec() {
     init {
         "execute generates outputs from the configured script" {
-            val fixture = MicrosmithMavenTestProject.create("microsmith-maven-plugin-generate")
+            val fixture = MicrosmithMavenTestProject.create("maven-plugin-generate")
             fixture.writeFile(
                 "build.microsmith.kts",
                 """
@@ -38,7 +38,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
         }
 
         "execute forwards vars and flags to the script" {
-            val fixture = MicrosmithMavenTestProject.create("microsmith-maven-plugin-vars-flags")
+            val fixture = MicrosmithMavenTestProject.create("maven-plugin-vars-flags")
             fixture.writeFile(
                 "build.microsmith.kts",
                 """
@@ -76,7 +76,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
         }
 
         "script compilation failures surface as MojoFailureException" {
-            val fixture = MicrosmithMavenTestProject.create("microsmith-maven-plugin-compilation-failure")
+            val fixture = MicrosmithMavenTestProject.create("maven-plugin-compilation-failure")
             fixture.writeFile(
                 "build.microsmith.kts",
                 """
@@ -101,7 +101,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
         }
 
         "host failures surface as MojoExecutionException" {
-            val fixture = MicrosmithMavenTestProject.create("microsmith-maven-plugin-host-failure")
+            val fixture = MicrosmithMavenTestProject.create("maven-plugin-host-failure")
             fixture.writeFile("build.microsmith.kts", "emit(microsmith { })")
             val mojo = fixture.createMojo().apply {
                 scriptHostRunner = MicrosmithScriptHostRunner { _, _ ->
@@ -118,7 +118,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
         }
 
         "unexpected execution failures surface as MojoExecutionException with the original cause" {
-            val fixture = MicrosmithMavenTestProject.create("microsmith-maven-plugin-unexpected-failure")
+            val fixture = MicrosmithMavenTestProject.create("maven-plugin-unexpected-failure")
             fixture.writeFile("build.microsmith.kts", "emit(microsmith { })")
             val failure = IllegalStateException("Unexpected host failure")
             val mojo = fixture.createMojo().apply {
@@ -134,7 +134,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
         }
 
         "generic runtime failures surface as MojoExecutionException with the original cause" {
-            val fixture = MicrosmithMavenTestProject.create("microsmith-maven-plugin-runtime-failure")
+            val fixture = MicrosmithMavenTestProject.create("maven-plugin-runtime-failure")
             fixture.writeFile("build.microsmith.kts", "emit(microsmith { })")
             val failure = RuntimeException("Unexpected runtime failure")
             val mojo = fixture.createMojo().apply {

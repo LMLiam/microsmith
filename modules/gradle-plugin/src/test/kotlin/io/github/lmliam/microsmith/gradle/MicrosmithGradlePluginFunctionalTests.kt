@@ -14,7 +14,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                 buildScript = """
                 plugins {
                     java
-                    id("io.github.lmliam.microsmith.gradle")
+                    id("io.github.lmliam.microsmith")
                 }
 
                 tasks.register("verifyMicrosmithWiring") {
@@ -47,7 +47,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                 name = "microsmith-gradle-plugin-default-generate",
                 buildScript = """
                 plugins {
-                    id("io.github.lmliam.microsmith.gradle")
+                    id("io.github.lmliam.microsmith")
                 }
                 """.trimIndent(),
             )
@@ -78,7 +78,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                 name = "microsmith-gradle-plugin-custom-generate",
                 buildScript = """
                 plugins {
-                    id("io.github.lmliam.microsmith.gradle")
+                    id("io.github.lmliam.microsmith")
                 }
 
                 microsmith {
@@ -122,7 +122,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                 name = "microsmith-gradle-plugin-failure",
                 buildScript = """
                 plugins {
-                    id("io.github.lmliam.microsmith.gradle")
+                    id("io.github.lmliam.microsmith")
                 }
                 """.trimIndent(),
             )

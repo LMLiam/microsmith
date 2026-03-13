@@ -310,9 +310,9 @@ Microsmith now uses `io.github.lmliam.microsmith` as its public package and publ
 
 Use these identifiers in new and migrated builds:
 
-- Gradle plugin id: `io.github.lmliam.microsmith.gradle`
+- Gradle plugin id: `io.github.lmliam.microsmith`
 - Maven coordinates: `io.github.lmliam.microsmith:<artifact>:<version>`
-- sbt plugin coordinates: `addSbtPlugin("io.github.lmliam.microsmith" % "sbt-microsmith" % microsmithVersion)`
+- sbt plugin coordinates: `addSbtPlugin("io.github.lmliam.microsmith" % "sbt-plugin" % microsmithVersion)`
 
 The previous `me.liam.microsmith` namespace is no longer supported.
 
@@ -330,7 +330,7 @@ Canonical contract:
 
 1. Configure plugin resolution in `settings.gradle.kts`.
 2. Configure normal dependency repositories as well, because the plugin resolves `runtime-scripting` and any `microsmithPlugins` entries as standard Gradle dependencies.
-3. Apply plugin id `io.github.lmliam.microsmith.gradle`.
+3. Apply plugin id `io.github.lmliam.microsmith`.
 4. Configure `microsmith { ... }`.
 5. Run `./gradlew microsmithGenerate`.
 
@@ -357,7 +357,7 @@ pluginManagement {
         }
     }
     plugins {
-        id("io.github.lmliam.microsmith.gradle") version microsmithVersion
+        id("io.github.lmliam.microsmith") version microsmithVersion
     }
 }
 
@@ -383,7 +383,7 @@ Minimal build example:
 ```kotlin
 plugins {
     java
-    id("io.github.lmliam.microsmith.gradle")
+    id("io.github.lmliam.microsmith")
 }
 
 microsmith {
@@ -438,7 +438,7 @@ Canonical contract:
 
 1. Keep Microsmith authoring in `build.microsmith.kts` or another `*.microsmith.kts` file.
 2. Add `io.github.lmliam.microsmith:runtime-scripting` as a `provided` dependency so Maven-imported IDE projects see the built-in script definition and Microsmith types.
-3. Add `io.github.lmliam.microsmith:microsmith-maven-plugin` under `<build><plugins>`.
+3. Add `io.github.lmliam.microsmith:maven-plugin` under `<build><plugins>`.
 4. Configure `<repositories>` and `<pluginRepositories>` so both the project dependency and the Maven plugin resolve.
 5. Run `mvn microsmith:generate`.
 
@@ -477,7 +477,7 @@ Minimal `pom.xml` example:
         <plugins>
             <plugin>
                 <groupId>io.github.lmliam.microsmith</groupId>
-                <artifactId>microsmith-maven-plugin</artifactId>
+                <artifactId>maven-plugin</artifactId>
                 <version>${microsmith.version}</version>
             </plugin>
         </plugins>
@@ -495,7 +495,7 @@ External plugin example:
 ```xml
 <plugin>
     <groupId>io.github.lmliam.microsmith</groupId>
-    <artifactId>microsmith-maven-plugin</artifactId>
+    <artifactId>maven-plugin</artifactId>
     <version>${microsmith.version}</version>
     <dependencies>
         <dependency>
@@ -536,7 +536,7 @@ Prefer this path when:
 Canonical contract:
 
 1. Keep Microsmith authoring in `build.microsmith.kts` or another `*.microsmith.kts` file.
-2. Add `io.github.lmliam.microsmith` `%` `sbt-microsmith` in `project/plugins.sbt`.
+2. Add `io.github.lmliam.microsmith` `%` `sbt-plugin` in `project/plugins.sbt`.
 3. Add `io.github.lmliam.microsmith:runtime-scripting` as a `Provided` dependency in `build.sbt` so sbt-imported IDE projects can see the built-in Microsmith script-definition/runtime types.
 4. Enable `MicrosmithSbtPlugin` in `build.sbt`.
 5. Run `sbt microsmithGenerate`.
@@ -560,7 +560,7 @@ resolvers += Resolver.mavenLocal
 resolvers += "GitHub Microsmith" at "https://maven.pkg.github.com/lmliam/microsmith"
 credentials ++= githubMicrosmithCredentials
 
-addSbtPlugin("io.github.lmliam.microsmith" % "sbt-microsmith" % microsmithVersion)
+addSbtPlugin("io.github.lmliam.microsmith" % "sbt-plugin" % microsmithVersion)
 ```
 
 Minimal `build.sbt` example:

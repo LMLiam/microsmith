@@ -7,10 +7,10 @@ import io.github.lmliam.microsmith.cli.init.JavaOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.KotlinOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.ScalaOnboardingProfile
 
-private const val GRADLE_PLUGIN_ID = "io.github.lmliam.microsmith.gradle"
+private const val GRADLE_PLUGIN_ID = "io.github.lmliam.microsmith"
 private const val MICROSMITH_GROUP = "io.github.lmliam.microsmith"
-private const val MICROSMITH_MAVEN_PLUGIN_ARTIFACT = "microsmith-maven-plugin"
-private const val MICROSMITH_SBT_PLUGIN_ARTIFACT = "sbt-microsmith"
+private const val MICROSMITH_MAVEN_PLUGIN_ARTIFACT = "maven-plugin"
+private const val MICROSMITH_SBT_PLUGIN_ARTIFACT = "sbt-plugin"
 private const val MICROSMITH_RUNTIME_SCRIPTING_COORDINATE = "$MICROSMITH_GROUP:runtime-scripting"
 private const val MICROSMITH_MAVEN_PLUGIN_COORDINATE =
     "$MICROSMITH_GROUP:$MICROSMITH_MAVEN_PLUGIN_ARTIFACT"

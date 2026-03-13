@@ -14,4 +14,4 @@ resolvers += Resolver.mavenLocal
 resolvers += "GitHub Microsmith" at "https://maven.pkg.github.com/lmliam/microsmith"
 credentials ++= githubMicrosmithCredentials
 
-addSbtPlugin("io.github.lmliam.microsmith" % "sbt-microsmith" % microsmithVersion)
+addSbtPlugin("io.github.lmliam.microsmith" % "sbt-plugin" % microsmithVersion)
