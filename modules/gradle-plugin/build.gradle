@@ -1,0 +1,76 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+def microsmithPluginVersion = project.version.toString()
+def generatedVersionResourceDir = layout.buildDirectory.dir('generated/resources/version')
+
+def generatePluginVersionResource = tasks.register('generatePluginVersionResource') {
+    inputs.property('microsmithVersion', microsmithPluginVersion)
+    outputs.dir(generatedVersionResourceDir)
+
+    doLast {
+        def outputFile = generatedVersionResourceDir.get().file('META-INF/microsmith/gradle-plugin-version.txt').asFile
+        outputFile.parentFile.mkdirs()
+        outputFile.setText("${microsmithPluginVersion}\n", 'UTF-8')
+    }
+}
+
+sourceSets.main.resources.srcDir(generatedVersionResourceDir)
+
+dependencies {
+    compileOnly project(':runtime-scripting')
+    testImplementation gradleTestKit()
+    testImplementation project(':runtime-scripting')
+    testRuntimeOnly libs.kotest.runner.junit5
+}
+
+tasks.named('processResources') {
+    dependsOn(generatePluginVersionResource)
+}
+
+tasks.named('sourcesJar') {
+    dependsOn(generatePluginVersionResource)
+}
+
+tasks.named('test') {
+    enabled = true
+}
+
+tasks.named('check') {
+    dependsOn(tasks.named('test'))
+}
+
+tasks.named('build') {
+    dependsOn(tasks.named('test'))
+}
+
+tasks.named('jvmKotest') {
+    enabled = false
+}
+
+tasks.named('kotest') {
+    enabled = false
+}
+
+gradlePlugin {
+    plugins {
+        microsmithGradle {
+            id = 'me.liam.microsmith.gradle'
+            implementationClass = 'me.liam.microsmith.gradle.MicrosmithGradlePlugin'
+            displayName = 'Microsmith Gradle Plugin'
+            description = 'Native Microsmith integration for Gradle repositories'
+        }
+    }
+}
+
+afterEvaluate {
+    def gprPublication = publishing.publications.findByName('gpr')
+    if (gprPublication != null) {
+        publishing.publications.remove(gprPublication)
+    }
+}
+
+tasks.matching { task -> task.name.contains('GprPublication') }.configureEach {
+    enabled = false
+}
