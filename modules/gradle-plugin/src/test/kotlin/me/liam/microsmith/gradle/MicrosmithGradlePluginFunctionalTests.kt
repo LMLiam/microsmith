@@ -19,16 +19,19 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
 
                 tasks.register("verifyMicrosmithWiring") {
                     doLast {
-                        val generateTask = tasks.named("microsmithGenerate").get()
+                        val generateTask = tasks.named("$GENERATE_TASK_NAME").get()
                         check(generateTask is me.liam.microsmith.gradle.MicrosmithGenerateTask)
+                        check(generateTask.group == "$TASK_GROUP_NAME")
 
-                        val ide = configurations.getByName("microsmithIde")
-                        val plugins = configurations.getByName("microsmithPlugins")
-                        val compileOnly = configurations.getByName("compileOnly")
+                        val ide = project.configurations.getByName("microsmithIde")
+                        val plugins = project.configurations.getByName("microsmithPlugins")
+                        val compileOnly = project.configurations.getByName("compileOnly")
+                        val extension = project.extensions.getByName("$EXTENSION_NAME")
 
                         check(ide.extendsFrom.contains(plugins))
                         check(compileOnly.extendsFrom.contains(ide))
                         check(!ide.isCanBeResolved)
+                        check(extension is me.liam.microsmith.gradle.MicrosmithGradleExtension)
                     }
                 }
                 """.trimIndent(),
@@ -78,7 +81,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                     id("me.liam.microsmith.gradle")
                 }
 
-                microsmithGradle {
+                microsmith {
                     scriptFile.set(layout.projectDirectory.file("schema.microsmith.kts"))
                     outputDirectory.set(layout.projectDirectory.dir("custom-generated"))
                     variables.put("entityName", "GradleConfiguredUserCreated")
@@ -143,3 +146,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
         }
     }
 }
+
+private const val GENERATE_TASK_NAME = "microsmithGenerate"
+private const val TASK_GROUP_NAME = "microsmith"
+private const val EXTENSION_NAME = "microsmith"

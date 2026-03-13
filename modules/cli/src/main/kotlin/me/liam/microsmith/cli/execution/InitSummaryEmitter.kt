@@ -75,7 +75,8 @@ internal object InitSummaryEmitter {
         }
         emitter.info(
             "Gradle repository detected. Prefer the native Gradle plugin path when you want imported-project " +
-                "IDE support: apply plugin id 'me.liam.microsmith.gradle' and run './gradlew microsmithGenerate'.",
+                "IDE support: apply plugin id 'me.liam.microsmith.gradle', configure 'microsmith { ... }', " +
+                "and run './gradlew microsmithGenerate'.",
         )
     }
 }

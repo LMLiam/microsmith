@@ -9,7 +9,7 @@ class MicrosmithGradlePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val extension =
             project.extensions.create(
-                MicrosmithGradleConfigurations.EXTENSION,
+                MicrosmithGradleDsl.EXTENSION,
                 MicrosmithGradleExtension::class.java,
             )
         extension.scriptFile.convention(project.layout.projectDirectory.file("build.microsmith.kts"))
@@ -59,10 +59,10 @@ class MicrosmithGradlePlugin : Plugin<Project> {
         }
 
         project.tasks.register(
-            MicrosmithGradleConfigurations.GENERATE_TASK,
+            MicrosmithGradleTasks.GENERATE,
             MicrosmithGenerateTask::class.java,
         ) { task ->
-            task.group = "microsmith"
+            task.group = MicrosmithGradleTasks.GROUP
             task.description = "Generates artifacts from a .microsmith.kts script."
             task.scriptFile.convention(extension.scriptFile)
             task.outputDirectory.convention(extension.outputDirectory)

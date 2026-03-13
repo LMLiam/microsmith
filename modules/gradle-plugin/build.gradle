@@ -47,7 +47,7 @@ tasks.named('kotest') {
 
 gradlePlugin {
     plugins {
-        microsmithGradle {
+        microsmithPlugin {
             id = 'me.liam.microsmith.gradle'
             implementationClass = 'me.liam.microsmith.gradle.MicrosmithGradlePlugin'
             displayName = 'Microsmith Gradle Plugin'
