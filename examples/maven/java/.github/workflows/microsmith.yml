@@ -1,0 +1,31 @@
+name: Microsmith
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "build.microsmith.kts"
+      - "pom.xml"
+      - ".github/workflows/microsmith.yml"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 24
+          server-id: github-microsmith
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+      - name: Generate with Microsmith Maven plugin
+        run: mvn -B microsmith:generate -Dmicrosmith.version=<version>
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

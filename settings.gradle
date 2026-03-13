@@ -65,6 +65,7 @@ rootProject.name = 'microsmith'
     'runtime-scripting',
     'cli',
     'gradle-plugin',
+    'maven-plugin',
     'kotest',
 ].each { moduleName ->
     include moduleName
