@@ -3,11 +3,15 @@
 **/.gradle/
 .gradle-user-home/
 build/
+target/
+**/target/
 !gradle/wrapper/gradle-wrapper.jar
 
 # Ignore build outputs inside source trees
 !**/src/main/**/build/
 !**/src/test/**/build/
+!**/src/main/**/target/
+!**/src/test/**/target/
 !**/src/main/**/out/
 !**/src/test/**/out/
 !**/src/main/**/bin/

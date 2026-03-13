@@ -33,7 +33,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
       - name: Build
         run: ./gradlew build --stacktrace
-      - name: Publish Gradle-native packages to mavenLocal
+      - name: Publish native JVM packages to mavenLocal
         run: |
           ./gradlew \
             :dsl:publishToMavenLocal \
@@ -44,6 +44,7 @@ jobs:
             :gen-schemas-protobuf:publishToMavenLocal \
             :runtime-scripting:publishToMavenLocal \
             :gradle-plugin:publishToMavenLocal \
+            :maven-plugin:publishToMavenLocal \
             --stacktrace
       - name: Validate native Gradle fixtures
         run: |
@@ -61,6 +62,23 @@ jobs:
           validate_gradle_fixture examples/gradle/java
           validate_gradle_fixture examples/gradle/kotlin
           validate_gradle_fixture examples/gradle/scala
+      - name: Validate native Maven fixtures
+        run: |
+          set -euo pipefail
+          VERSION="$(./gradlew -q properties | sed -n 's/^version: //p' | head -n 1)"
+
+          validate_maven_fixture() {
+            local repo_root="$1"
+            local generated_root="$repo_root/target/generated/microsmith/proto"
+
+            mvn -B -f "$repo_root/pom.xml" microsmith:generate -Dmicrosmith.version="$VERSION"
+            test -d "$generated_root"
+            find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
+          }
+
+          validate_maven_fixture examples/maven/java
+          validate_maven_fixture examples/maven/kotlin
+          validate_maven_fixture examples/maven/scala
       - name: Validate IDE fallback release assets
         run: |
           ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
