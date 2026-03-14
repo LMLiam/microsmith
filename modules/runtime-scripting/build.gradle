@@ -1,18 +1,23 @@
+plugins {
+    id 'java-library'
+}
+
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.jvm.tasks.Jar
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.jar.JarFile
+import java.util.regex.Pattern
 
 dependencies {
-    implementation project(":dsl")
-    implementation project(":dsl-schemas")
-    implementation project(":dsl-schemas-protobuf")
+    api project(":dsl")
+    api project(":dsl-schemas")
+    api project(":dsl-schemas-protobuf")
     implementation project(":gen")
     implementation project(":gen-schemas")
     implementation project(":gen-schemas-protobuf")
     implementation libs.coroutines.core
-    implementation libs.kotlin.scripting.common
+    api libs.kotlin.scripting.common
     implementation libs.kotlin.scripting.jvm
     implementation libs.kotlin.scripting.jvm.host
 }
@@ -21,9 +26,17 @@ def scriptTemplateRegistrationEntry =
     "META-INF/kotlin/script/templates/io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript"
 def runtimeScriptingJarTask = tasks.named("jar", Jar)
 def runtimeScriptingJarArchive = runtimeScriptingJarTask.flatMap { it.archiveFile }
+def runtimeScriptingPomTask = tasks.named("generatePomFileForGprPublication")
+def runtimeScriptingPomFile = layout.buildDirectory.file("publications/gpr/pom-default.xml")
 def runtimeScriptingJarExpectedEntries = [
     "io/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScript.class",
     scriptTemplateRegistrationEntry,
+]
+def runtimeScriptingPomExpectedScopes = [
+    "io.github.lmliam.microsmith:dsl"                 : "compile",
+    "io.github.lmliam.microsmith:dsl-schemas"         : "compile",
+    "io.github.lmliam.microsmith:dsl-schemas-protobuf": "compile",
+    "org.jetbrains.kotlin:kotlin-scripting-common"   : "compile",
 ]
 def ideFallbackReleaseAssetsDirectory = layout.buildDirectory.dir("release-assets")
 def ideFallbackShadowJarTask = tasks.named("shadowJar", ShadowJar)
@@ -78,6 +91,41 @@ tasks.register("verifyRuntimeScriptingJar") {
     }
 }
 
+tasks.register("verifyRuntimeScriptingPublishedPom") {
+    dependsOn(runtimeScriptingPomTask)
+    inputs.file(runtimeScriptingPomFile)
+
+    doLast {
+        File pomFile = runtimeScriptingPomFile.get().asFile
+        if (!pomFile.isFile()) {
+            throw new GradleException("Runtime-scripting published pom '${pomFile.path}' was not created.")
+        }
+
+        String pomContents = pomFile.getText(StandardCharsets.UTF_8.name())
+
+        def invalidScopes =
+            runtimeScriptingPomExpectedScopes.findAll { dependencyCoordinates, expectedScope ->
+                def (groupId, artifactId) = dependencyCoordinates.split(":")
+                def dependencyPattern = Pattern.compile(
+                    "(?s)<dependency>\\s*<groupId>${Pattern.quote(groupId)}</groupId>\\s*" +
+                        "<artifactId>${Pattern.quote(artifactId)}</artifactId>\\s*" +
+                        "<version>[^<]+</version>\\s*" +
+                        "<scope>${Pattern.quote(expectedScope)}</scope>\\s*</dependency>",
+                )
+                !dependencyPattern.matcher(pomContents).find()
+            }
+        if (!invalidScopes.isEmpty()) {
+            def formattedInvalidScopes =
+                invalidScopes.collect { dependencyCoordinates, expectedScope ->
+                    "${dependencyCoordinates} expected ${expectedScope} scope"
+                }
+            throw new GradleException(
+                "Runtime-scripting published pom '${pomFile.name}' had unexpected dependency scopes: ${formattedInvalidScopes.join(', ')}",
+            )
+        }
+    }
+}
+
 tasks.register("verifyIdeFallbackShadowJar") {
     dependsOn(ideFallbackShadowJarTask)
     inputs.file(ideFallbackShadowJarArchive)
@@ -125,5 +173,6 @@ tasks.register("generateIdeFallbackChecksums") {
 
 tasks.named("check") {
     dependsOn(tasks.named("verifyRuntimeScriptingJar"))
+    dependsOn(tasks.named("verifyRuntimeScriptingPublishedPom"))
     dependsOn(tasks.named("verifyIdeFallbackShadowJar"))
 }
