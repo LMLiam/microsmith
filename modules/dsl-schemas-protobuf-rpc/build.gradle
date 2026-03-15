@@ -1,0 +1,5 @@
+dependencies {
+    api project(":dsl")
+    implementation project(":dsl-schemas")
+    api project(":dsl-schemas-protobuf")
+}
