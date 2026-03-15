@@ -7,8 +7,8 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service
 import io.github.lmliam.microsmith.gen.files.TemporaryDirectory
 import io.github.lmliam.microsmith.gen.schemas.protobuf.emission.ProtobufEmitter
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import kotlin.io.path.readText
 import kotlin.io.use
 
 class ProtobufRpcEmitterIntegrationTests :
@@ -29,8 +29,9 @@ class ProtobufRpcEmitterIntegrationTests :
 
             TemporaryDirectory.create().use { space ->
                 val generated = with(emitter) { serviceSchema.emit(space) }
-                val contents = space.root.resolve(generated.relativePath).readText()
+                val contents = generated.contents.toString(Charsets.UTF_8)
 
+                generated.relativePath.toString().replace("\\", "/") shouldBe "proto/UserService.proto"
                 contents.shouldContain("import \"GetUserRequest.proto\";")
                 contents.shouldContain("import \"GetUserResponse.proto\";")
                 contents.shouldContain("service UserService {")
