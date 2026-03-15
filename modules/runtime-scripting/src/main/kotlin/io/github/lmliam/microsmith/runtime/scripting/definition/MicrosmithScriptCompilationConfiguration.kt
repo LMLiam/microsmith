@@ -22,6 +22,7 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
             importFromPackageOf(MicrosmithScope::class, ::microsmith),
             importFromPackageOf(SchemasScope::class, MicrosmithScope::schemas),
             importFromPackageOf(ProtobufScope::class, SchemasScope::protobuf),
+            "io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service",
         )
 
         implicitReceivers(MicrosmithScriptContext::class)

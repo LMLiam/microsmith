@@ -151,9 +151,11 @@ dependencies {
     implementation project(":dsl")
     implementation project(":dsl-schemas")
     implementation project(":dsl-schemas-protobuf")
+    implementation project(":dsl-schemas-protobuf-rpc")
     implementation project(":gen")
     implementation project(":gen-schemas")
     implementation project(":gen-schemas-protobuf")
+    implementation project(":gen-schemas-protobuf-rpc")
     implementation libs.maven.resolver.api
     implementation libs.maven.resolver.spi
     implementation libs.maven.resolver.util
@@ -186,6 +188,13 @@ def bundledPlugins = [
         providers : [
             "META-INF/services/io.github.lmliam.microsmith.gen.schemas.SchemaEmitter":
                 "io.github.lmliam.microsmith.gen.schemas.protobuf.emission.ProtobufEmitter",
+        ],
+    ],
+    [
+        coordinate: "io.github.lmliam.microsmith:gen-schemas-protobuf-rpc:${cliVersion}",
+        providers : [
+            "META-INF/services/io.github.lmliam.microsmith.gen.schemas.protobuf.emission.ProtobufDeclarationSupport":
+                "io.github.lmliam.microsmith.gen.schemas.protobuf.rpc.ServiceDeclarationSupport",
         ],
     ],
 ]

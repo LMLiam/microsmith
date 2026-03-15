@@ -13,9 +13,11 @@ dependencies {
     api project(":dsl")
     api project(":dsl-schemas")
     api project(":dsl-schemas-protobuf")
+    api project(":dsl-schemas-protobuf-rpc")
     implementation project(":gen")
     implementation project(":gen-schemas")
     implementation project(":gen-schemas-protobuf")
+    implementation project(":gen-schemas-protobuf-rpc")
     implementation libs.coroutines.core
     api libs.kotlin.scripting.common
     implementation libs.kotlin.scripting.jvm
@@ -36,6 +38,7 @@ def runtimeScriptingPomExpectedScopes = [
     "io.github.lmliam.microsmith:dsl"                 : "compile",
     "io.github.lmliam.microsmith:dsl-schemas"         : "compile",
     "io.github.lmliam.microsmith:dsl-schemas-protobuf": "compile",
+    "io.github.lmliam.microsmith:dsl-schemas-protobuf-rpc": "compile",
     "org.jetbrains.kotlin:kotlin-scripting-common"   : "compile",
 ]
 def ideFallbackReleaseAssetsDirectory = layout.buildDirectory.dir("release-assets")

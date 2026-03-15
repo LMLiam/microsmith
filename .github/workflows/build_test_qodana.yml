@@ -39,9 +39,11 @@ jobs:
             :dsl:publishToMavenLocal \
             :dsl-schemas:publishToMavenLocal \
             :dsl-schemas-protobuf:publishToMavenLocal \
+            :dsl-schemas-protobuf-rpc:publishToMavenLocal \
             :gen:publishToMavenLocal \
             :gen-schemas:publishToMavenLocal \
             :gen-schemas-protobuf:publishToMavenLocal \
+            :gen-schemas-protobuf-rpc:publishToMavenLocal \
             :runtime-scripting:publishToMavenLocal \
             :gradle-plugin:publishToMavenLocal \
             :maven-plugin:publishToMavenLocal \
