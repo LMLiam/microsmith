@@ -10,13 +10,13 @@ import kotlin.io.path.Path
  * - [typeName] is non-blank.
  * - [packageName] is `null` for unqualified schema names.
  */
-internal data class QualifiedSchemaName(
+data class QualifiedSchemaName(
     val fullyQualifiedName: String,
     val packageName: String?,
     val typeName: String,
 ) {
     /** Returns the canonical relative output path under `proto/`. */
-    internal fun relativePath(): java.nio.file.Path {
+    fun relativePath(): java.nio.file.Path {
         val packagePath =
             packageName
                 ?.replace(".", "/")
@@ -29,7 +29,7 @@ internal data class QualifiedSchemaName(
         /** Parses and validates a raw schema name
          * from [io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema.name].
          */
-        internal fun parse(rawName: String): QualifiedSchemaName {
+        fun parse(rawName: String): QualifiedSchemaName {
             val normalized = ProtobufNameValidation.normalizeQualifiedName(rawName, "Schema name")
             val packageName = normalized.substringBeforeLast(".", "").ifBlank { null }
             val typeName = normalized.substringAfterLast(".")

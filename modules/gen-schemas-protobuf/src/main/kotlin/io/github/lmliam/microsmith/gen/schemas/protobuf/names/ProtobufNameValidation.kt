@@ -6,9 +6,9 @@ package io.github.lmliam.microsmith.gen.schemas.protobuf.names
  * Kept as explicit utilities instead of `String` extensions to avoid implying behavior
  * belongs on `String` itself.
  */
-internal object ProtobufNameValidation {
+object ProtobufNameValidation {
     /** Validates and normalizes a dotted, fully-qualified identifier. */
-    internal fun normalizeQualifiedName(value: String, label: String): String {
+    fun normalizeQualifiedName(value: String, label: String): String {
         val normalized = value.trim()
         require(normalized.isNotBlank()) { "$label cannot be blank." }
         require(!normalized.startsWith(".")) { "$label cannot start with '.': '$value'" }
@@ -25,7 +25,7 @@ internal object ProtobufNameValidation {
     }
 
     /** Validates a protobuf identifier with regex `[A-Za-z_][A-Za-z0-9_]*`. */
-    internal fun requireIdentifier(value: String, label: String) {
+    fun requireIdentifier(value: String, label: String) {
         val normalized = value.trim()
         require(normalized.isNotBlank()) { "$label cannot be blank." }
         require(normalized == value && PROTO_IDENTIFIER.matches(normalized)) {

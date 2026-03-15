@@ -4,9 +4,11 @@ dependencies {
     api project(":dsl")
     api project(":dsl-schemas")
     implementation project(":dsl-schemas-protobuf")
+    implementation project(":dsl-schemas-protobuf-rpc")
     api project(":gen")
     implementation project(":gen-schemas")
+    implementation project(":gen-schemas-protobuf")
     api libs.coroutines.core
-    api libs.spi.tooling.annotations
+    implementation libs.spi.tooling.annotations
     kapt libs.spi.tooling.processor
 }
