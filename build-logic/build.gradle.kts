@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.2.2")
     compileOnly(gradleApi())
     testImplementation(gradleTestKit())
     testImplementation(libs.kotest.runner.junit5)
@@ -63,6 +64,13 @@ gradlePlugin {
             implementationClass = "io.github.lmliam.microsmith.build.runtime.RuntimeScriptingPlugin"
             displayName = "Microsmith Runtime Scripting"
             description = "Configures runtime scripting publication and IDE fallback artifacts."
+        }
+
+        register("cliPackaging") {
+            id = "io.github.lmliam.microsmith.cli-packaging"
+            implementationClass = "io.github.lmliam.microsmith.build.cli.CliPackagingPlugin"
+            displayName = "Microsmith CLI Packaging"
+            description = "Configures CLI packaging, distributions, and release artifacts."
         }
     }
 }
