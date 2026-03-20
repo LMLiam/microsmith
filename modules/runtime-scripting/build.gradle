@@ -9,15 +9,59 @@ import java.security.MessageDigest
 import java.util.jar.JarFile
 import java.util.regex.Pattern
 
+class RuntimeScriptingBuildNames {
+    static final List<String> API_PROJECT_PATHS = [
+        ':dsl',
+        ':dsl-schemas',
+        ':dsl-schemas-protobuf',
+        ':dsl-schemas-protobuf-rpc',
+    ]
+
+    static final List<String> IMPLEMENTATION_PROJECT_PATHS = [
+        ':gen',
+        ':gen-schemas',
+        ':gen-schemas-protobuf',
+        ':gen-schemas-protobuf-rpc',
+    ]
+
+    static final String JAR_TASK_NAME = 'jar'
+    static final String SHADOW_JAR_TASK_NAME = 'shadowJar'
+    static final String GENERATE_POM_TASK_NAME = 'generatePomFileForGprPublication'
+    static final String CHECK_TASK_NAME = 'check'
+    static final String POM_PATH = 'publications/gpr/pom-default.xml'
+    static final String RELATIVE_RELEASE_ASSETS_DIRECTORY = 'release-assets'
+    static final String IDE_FALLBACK_SHADOW_JAR_BASE_NAME = 'microsmith-script-definition'
+    static final String IDE_FALLBACK_SHADOW_JAR_CLASSIFIER = 'all'
+    static final String SCRIPT_TEMPLATE_META_INF_PREFIX = 'META-INF/kotlin/script/templates'
+    static final String SCRIPT_DEFINITION_TEMPLATE_FQCN =
+        'io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript'
+    static final String SCRIPT_DEFINITION_PACKAGE_PATH =
+        SCRIPT_DEFINITION_TEMPLATE_FQCN.substring(0, SCRIPT_DEFINITION_TEMPLATE_FQCN.lastIndexOf('.')).replace('.', '/')
+    static final String SCRIPT_CONTEXT_PACKAGE_PATH = 'io/github/lmliam/microsmith/runtime/scripting/context'
+    static final String SCRIPT_DEFINITION_SCRIPT_CLASS_NAME = 'MicrosmithScript'
+    static final String SCRIPT_DEFINITION_COMPILATION_CONFIGURATION_CLASS_NAME = 'MicrosmithScriptCompilationConfiguration'
+    static final String SCRIPT_DEFINITION_CONTEXT_CLASS_NAME = 'MicrosmithScriptContext'
+
+    static String classEntryName(String packagePath, String simpleName) {
+        "${packagePath}/${simpleName}.class"
+    }
+
+    static String scriptTemplateRegistrationEntry(String templateFqcn) {
+        "${SCRIPT_TEMPLATE_META_INF_PREFIX}/${templateFqcn}"
+    }
+
+    static String projectCoordinate(def dependencyProject) {
+        "${dependencyProject.group}:${dependencyProject.name}"
+    }
+
+    static String libraryCoordinate(def dependency) {
+        "${dependency.module.group}:${dependency.module.name}"
+    }
+}
+
 dependencies {
-    api project(":dsl")
-    api project(":dsl-schemas")
-    api project(":dsl-schemas-protobuf")
-    api project(":dsl-schemas-protobuf-rpc")
-    implementation project(":gen")
-    implementation project(":gen-schemas")
-    implementation project(":gen-schemas-protobuf")
-    implementation project(":gen-schemas-protobuf-rpc")
+    RuntimeScriptingBuildNames.API_PROJECT_PATHS.each { api project(it) }
+    RuntimeScriptingBuildNames.IMPLEMENTATION_PROJECT_PATHS.each { implementation project(it) }
     implementation libs.coroutines.core
     api libs.kotlin.scripting.common
     implementation libs.kotlin.scripting.jvm
@@ -25,36 +69,46 @@ dependencies {
 }
 
 def scriptTemplateRegistrationEntry =
-    "META-INF/kotlin/script/templates/io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript"
-def runtimeScriptingJarTask = tasks.named("jar", Jar)
+    RuntimeScriptingBuildNames.scriptTemplateRegistrationEntry(RuntimeScriptingBuildNames.SCRIPT_DEFINITION_TEMPLATE_FQCN)
+def runtimeScriptingJarTask = tasks.named(RuntimeScriptingBuildNames.JAR_TASK_NAME, Jar)
 def runtimeScriptingJarArchive = runtimeScriptingJarTask.flatMap { it.archiveFile }
-def runtimeScriptingPomTask = tasks.named("generatePomFileForGprPublication")
-def runtimeScriptingPomFile = layout.buildDirectory.file("publications/gpr/pom-default.xml")
+def runtimeScriptingPomTask = tasks.named(RuntimeScriptingBuildNames.GENERATE_POM_TASK_NAME)
+def runtimeScriptingPomFile = layout.buildDirectory.file(RuntimeScriptingBuildNames.POM_PATH)
 def runtimeScriptingJarExpectedEntries = [
-    "io/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScript.class",
+    RuntimeScriptingBuildNames.classEntryName(
+        RuntimeScriptingBuildNames.SCRIPT_DEFINITION_PACKAGE_PATH,
+        RuntimeScriptingBuildNames.SCRIPT_DEFINITION_SCRIPT_CLASS_NAME,
+    ),
     scriptTemplateRegistrationEntry,
 ]
-def runtimeScriptingPomExpectedScopes = [
-    "io.github.lmliam.microsmith:dsl"                 : "compile",
-    "io.github.lmliam.microsmith:dsl-schemas"         : "compile",
-    "io.github.lmliam.microsmith:dsl-schemas-protobuf": "compile",
-    "io.github.lmliam.microsmith:dsl-schemas-protobuf-rpc": "compile",
-    "org.jetbrains.kotlin:kotlin-scripting-common"   : "compile",
-]
-def ideFallbackReleaseAssetsDirectory = layout.buildDirectory.dir("release-assets")
-def ideFallbackShadowJarTask = tasks.named("shadowJar", ShadowJar)
+def runtimeScriptingPomExpectedScopes = RuntimeScriptingBuildNames.API_PROJECT_PATHS.collectEntries { path ->
+    def dependencyProject = project(path)
+    [(RuntimeScriptingBuildNames.projectCoordinate(dependencyProject)): 'compile']
+}
+runtimeScriptingPomExpectedScopes[RuntimeScriptingBuildNames.libraryCoordinate(libs.kotlin.scripting.common.get())] = 'compile'
+def ideFallbackReleaseAssetsDirectory = layout.buildDirectory.dir(RuntimeScriptingBuildNames.RELATIVE_RELEASE_ASSETS_DIRECTORY)
+def ideFallbackShadowJarTask = tasks.named(RuntimeScriptingBuildNames.SHADOW_JAR_TASK_NAME, ShadowJar)
 def ideFallbackShadowJarArchive = ideFallbackShadowJarTask.flatMap { it.archiveFile }
 def ideFallbackExpectedEntries = [
-    "io/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScript.class",
-    "io/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScriptCompilationConfiguration.class",
-    "io/github/lmliam/microsmith/runtime/scripting/context/MicrosmithScriptContext.class",
-    "kotlin/script/experimental/jvmhost/BasicJvmScriptingHost.class",
+    RuntimeScriptingBuildNames.classEntryName(
+        RuntimeScriptingBuildNames.SCRIPT_DEFINITION_PACKAGE_PATH,
+        RuntimeScriptingBuildNames.SCRIPT_DEFINITION_SCRIPT_CLASS_NAME,
+    ),
+    RuntimeScriptingBuildNames.classEntryName(
+        RuntimeScriptingBuildNames.SCRIPT_DEFINITION_PACKAGE_PATH,
+        RuntimeScriptingBuildNames.SCRIPT_DEFINITION_COMPILATION_CONFIGURATION_CLASS_NAME,
+    ),
+    RuntimeScriptingBuildNames.classEntryName(
+        RuntimeScriptingBuildNames.SCRIPT_CONTEXT_PACKAGE_PATH,
+        RuntimeScriptingBuildNames.SCRIPT_DEFINITION_CONTEXT_CLASS_NAME,
+    ),
+    'kotlin/script/experimental/jvmhost/BasicJvmScriptingHost.class',
     scriptTemplateRegistrationEntry,
 ]
 
-tasks.named("shadowJar", ShadowJar) {
-    archiveBaseName.set("microsmith-script-definition")
-    archiveClassifier.set("all")
+tasks.named(RuntimeScriptingBuildNames.SHADOW_JAR_TASK_NAME, ShadowJar) {
+    archiveBaseName.set(RuntimeScriptingBuildNames.IDE_FALLBACK_SHADOW_JAR_BASE_NAME)
+    archiveClassifier.set(RuntimeScriptingBuildNames.IDE_FALLBACK_SHADOW_JAR_CLASSIFIER)
     manifest {
         attributes(
             "Implementation-Version": project.version.toString(),
@@ -174,7 +228,7 @@ tasks.register("generateIdeFallbackChecksums") {
     }
 }
 
-tasks.named("check") {
+tasks.named(RuntimeScriptingBuildNames.CHECK_TASK_NAME) {
     dependsOn(tasks.named("verifyRuntimeScriptingJar"))
     dependsOn(tasks.named("verifyRuntimeScriptingPublishedPom"))
     dependsOn(tasks.named("verifyIdeFallbackShadowJar"))
