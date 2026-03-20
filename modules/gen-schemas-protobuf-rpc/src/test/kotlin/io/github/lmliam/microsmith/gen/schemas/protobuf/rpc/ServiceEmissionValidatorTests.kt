@@ -63,4 +63,32 @@ class ServiceEmissionValidatorTests :
 
             error.message shouldBe "RPC 'GetUser' response must target a protobuf message, but was 'pkg.Status'."
         }
+
+        "rejects duplicate rpc names within a service" {
+            val schema =
+                ProtobufSchema(
+                    "pkg.UserService",
+                    Service(
+                        "UserService",
+                        listOf(
+                            Rpc(
+                                "GetUser",
+                                RpcEndpoint(Reference("pkg.GetUserRequest", Message("GetUserRequest"))),
+                                RpcEndpoint(Reference("pkg.GetUserResponse", Message("GetUserResponse"))),
+                            ),
+                            Rpc(
+                                "GetUser",
+                                RpcEndpoint(Reference("pkg.GetUserDetailsRequest", Message("GetUserDetailsRequest"))),
+                                RpcEndpoint(Reference("pkg.GetUserDetailsResponse", Message("GetUserDetailsResponse"))),
+                            ),
+                        ),
+                    ),
+                )
+
+            val error = shouldThrow<IllegalArgumentException> {
+                validator.validate(schema, QualifiedSchemaName.parse(schema.name))
+            }
+
+            error.message shouldBe "Duplicate RPC name in service 'UserService': GetUser"
+        }
     })

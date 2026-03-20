@@ -20,8 +20,12 @@ class ServiceDeclarationSupport : ProtobufDeclarationSupport<Service> {
 
         val service = schema.schema as Service
         ProtobufNameValidation.requireIdentifier(service.name, "Service name")
+        val rpcNames = mutableSetOf<String>()
         service.rpcs.forEach { rpc ->
             ProtobufNameValidation.requireIdentifier(rpc.name, "RPC name")
+            require(rpcNames.add(rpc.name)) {
+                "Duplicate RPC name in service '${service.name}': ${rpc.name}"
+            }
             require(rpc.request.reference.type is Message) {
                 "RPC '${rpc.name}' request must target a protobuf message, but was '${rpc.request.reference.name}'."
             }
