@@ -11,7 +11,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 
-internal class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) : ProtobufReferenceResolutionScope {
+internal class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) : ProtobufReferenceResolver {
     private val schemasByName = schemas.associateBy(ProtobufSchema::name)
     private val errors = mutableListOf<String>()
 
