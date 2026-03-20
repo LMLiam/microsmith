@@ -9,4 +9,8 @@ interface RpcScope {
     fun response(target: String, block: RpcEndpointScope.() -> Unit = {})
 
     fun stream(target: String): RpcEndpointMarker
+
+    infix fun String.to(other: String)
+
+    infix fun RpcEndpointMarker.to(other: RpcEndpointMarker)
 }

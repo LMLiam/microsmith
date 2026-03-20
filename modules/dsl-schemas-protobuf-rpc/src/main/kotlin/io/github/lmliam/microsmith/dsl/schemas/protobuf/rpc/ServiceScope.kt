@@ -4,5 +4,5 @@ import io.github.lmliam.microsmith.dsl.core.MicrosmithDsl
 
 @MicrosmithDsl
 interface ServiceScope {
-    operator fun String.invoke(block: RpcScope.() -> Any?)
+    operator fun String.invoke(block: RpcScope.() -> Unit = {})
 }

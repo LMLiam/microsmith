@@ -4,9 +4,11 @@ import io.github.lmliam.microsmith.dsl.schemas.core.SchemasBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 
 class ProtobufRpcDslIntegrationTests :
     StringSpec({
@@ -41,5 +43,25 @@ class ProtobufRpcDslIntegrationTests :
             service.rpcs[1].response.streaming shouldBe true
             service.rpcs[2].request.streaming shouldBe true
             service.rpcs[2].response.streaming shouldBe true
+        }
+
+        "protobuf RPC DSL rejects mixed explicit and shorthand route declarations" {
+            val error =
+                shouldThrowExactly<IllegalArgumentException> {
+                    SchemasBuilder().apply {
+                        protobuf {
+                            message("GetUserRequest")
+                            message("GetUserResponse")
+                            service("UserService") {
+                                "GetUser" {
+                                    request("GetUserRequest")
+                                    "GetUserRequest" to "GetUserResponse"
+                                }
+                            }
+                        }
+                    }.toExtension()
+                }
+
+            error.message shouldContain "cannot mix explicit request/response declarations with pair shorthand"
         }
     })

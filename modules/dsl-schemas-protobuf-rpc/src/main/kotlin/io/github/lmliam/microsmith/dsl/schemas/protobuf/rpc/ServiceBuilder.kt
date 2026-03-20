@@ -10,11 +10,11 @@ internal class ServiceBuilder(
     private val routeNames = mutableSetOf<String>()
     private val rpcs = mutableListOf<Rpc>()
 
-    override fun String.invoke(block: RpcScope.() -> Any?) {
+    override fun String.invoke(block: RpcScope.() -> Unit) {
         require(isNotBlank()) { "RPC name cannot be blank." }
         require(routeNames.add(this)) { "Duplicate RPC name: $this" }
         val builder = RpcBuilder(this, declarationContext)
-        builder.captureResult(builder.block())
+        builder.block()
         rpcs += builder.build()
     }
 
@@ -27,16 +27,31 @@ private class RpcBuilder(
 ) : RpcScope {
     private var request: RpcEndpoint? = null
     private var response: RpcEndpoint? = null
+    private var declarationStyle: RpcDeclarationStyle? = null
 
     override fun request(target: String, block: RpcEndpointScope.() -> Unit) {
+        useDeclarationStyle(RpcDeclarationStyle.EXPLICIT)
         setRequest(buildEndpoint(target, block))
     }
 
     override fun response(target: String, block: RpcEndpointScope.() -> Unit) {
+        useDeclarationStyle(RpcDeclarationStyle.EXPLICIT)
         setResponse(buildEndpoint(target, block))
     }
 
     override fun stream(target: String): RpcEndpointMarker = RpcEndpointMarker(target = target, streaming = true)
+
+    override fun String.to(other: String) {
+        useDeclarationStyle(RpcDeclarationStyle.SHORTHAND)
+        setRequest(normalizeEndpoint(this))
+        setResponse(normalizeEndpoint(other))
+    }
+
+    override fun RpcEndpointMarker.to(other: RpcEndpointMarker) {
+        useDeclarationStyle(RpcDeclarationStyle.SHORTHAND)
+        setRequest(normalizeEndpoint(this))
+        setResponse(normalizeEndpoint(other))
+    }
 
     fun build(): Rpc = Rpc(
         name = name,
@@ -46,7 +61,7 @@ private class RpcBuilder(
 
     private fun buildEndpoint(target: String, block: RpcEndpointScope.() -> Unit): RpcEndpoint {
         val scope = RpcEndpointScopeBuilder().apply(block)
-        return normalizeEndpoint(RpcEndpointMarker(target, scope.streaming), "explicit endpoint")
+        return normalizeEndpoint(RpcEndpointMarker(target, scope.streaming))
     }
 
     private fun setRequest(endpoint: RpcEndpoint) {
@@ -59,27 +74,25 @@ private class RpcBuilder(
         response = endpoint
     }
 
-    private fun normalizeEndpoint(value: Any?, label: String): RpcEndpoint = when (value) {
-        is String -> RpcEndpoint(Reference(declarationContext.resolveReference(value)))
-        is RpcEndpointMarker -> RpcEndpoint(Reference(declarationContext.resolveReference(value.target)), value.streaming)
-        else -> error("RPC '$name' $label must be a message name or stream(messageName).")
-    }
+    private fun useDeclarationStyle(style: RpcDeclarationStyle) {
+        val currentStyle = declarationStyle
+        if (currentStyle == null) {
+            declarationStyle = style
+            return
+        }
 
-    override fun toString(): String = name
-
-    fun captureResult(result: Any?) {
-        when (result) {
-            null, Unit -> Unit
-            is Pair<*, *> -> {
-                setRequest(normalizeEndpoint(result.first, "request shorthand"))
-                setResponse(normalizeEndpoint(result.second, "response shorthand"))
-            }
-            else -> error(
-                "RPC '$name' block must use request/response declarations or a " +
-                    "request-to-response pair shorthand.",
-            )
+        require(currentStyle == style) {
+            "RPC '$name' cannot mix explicit request/response declarations with pair shorthand."
         }
     }
+
+    private fun normalizeEndpoint(target: String): RpcEndpoint =
+        RpcEndpoint(Reference(declarationContext.resolveReference(target)))
+
+    private fun normalizeEndpoint(target: RpcEndpointMarker): RpcEndpoint =
+        RpcEndpoint(Reference(declarationContext.resolveReference(target.target)), target.streaming)
+
+    override fun toString(): String = name
 
     private class RpcEndpointScopeBuilder : RpcEndpointScope {
         var streaming: Boolean = false
@@ -89,5 +102,10 @@ private class RpcBuilder(
             require(!streaming) { "stream() already set for RPC endpoint." }
             streaming = true
         }
+    }
+
+    private enum class RpcDeclarationStyle {
+        EXPLICIT,
+        SHORTHAND,
     }
 }
