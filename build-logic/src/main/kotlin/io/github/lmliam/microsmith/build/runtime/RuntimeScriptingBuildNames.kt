@@ -23,9 +23,6 @@ internal object RuntimeScriptingBuildNames {
     const val IDE_FALLBACK_SHADOW_JAR_BASE_NAME = "microscript-definition"
     const val IDE_FALLBACK_SHADOW_JAR_CLASSIFIER = "all"
     const val SCRIPT_TEMPLATE_META_INF_PREFIX = "META-INF/kotlin/script/templates"
-    const val SCRIPT_DEFINITION_SCRIPT_CLASS_NAME = "MicrosmithScript"
-    const val SCRIPT_DEFINITION_COMPILATION_CONFIGURATION_CLASS_NAME = "MicrosmithScriptCompilationConfiguration"
-    const val SCRIPT_DEFINITION_CONTEXT_CLASS_NAME = "MicrosmithScriptContext"
 
     fun classEntryName(packagePath: String, simpleName: String): String = "$packagePath/$simpleName.class"
 

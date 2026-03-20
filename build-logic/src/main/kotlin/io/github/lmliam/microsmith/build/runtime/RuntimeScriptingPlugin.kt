@@ -21,16 +21,16 @@ class RuntimeScriptingPlugin : Plugin<Project> {
             RuntimeScriptingSourceFiles.annotatedKotlinScriptSourceFile(project, "microsmith.kts")
         val scriptTemplateFqcn = RuntimeScriptingSourceFiles.fqcnFromSourceFile(scriptTemplateSourceFile)
         val scriptCompilationConfigurationSourceFile =
-            RuntimeScriptingSourceFiles.sourceFileBySimpleName(
+            RuntimeScriptingSourceFiles.compilationConfigurationSourceFileFromScriptTemplateSourceFile(
                 project,
-                RuntimeScriptingBuildNames.SCRIPT_DEFINITION_COMPILATION_CONFIGURATION_CLASS_NAME,
+                scriptTemplateSourceFile,
             )
         val scriptCompilationConfigurationFqcn =
             RuntimeScriptingSourceFiles.fqcnFromSourceFile(scriptCompilationConfigurationSourceFile)
         val scriptContextSourceFile =
-            RuntimeScriptingSourceFiles.sourceFileBySimpleName(
+            RuntimeScriptingSourceFiles.contextSourceFileFromCompilationConfigurationSourceFile(
                 project,
-                RuntimeScriptingBuildNames.SCRIPT_DEFINITION_CONTEXT_CLASS_NAME,
+                scriptCompilationConfigurationSourceFile,
             )
         val scriptContextFqcn = RuntimeScriptingSourceFiles.fqcnFromSourceFile(scriptContextSourceFile)
         val scriptTemplateRegistrationJarEntry =
