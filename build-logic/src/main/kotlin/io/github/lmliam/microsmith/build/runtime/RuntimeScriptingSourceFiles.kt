@@ -5,21 +5,27 @@ import org.gradle.api.Project
 
 import java.io.File
 import java.nio.charset.StandardCharsets
-import java.util.regex.Pattern
 
 internal object RuntimeScriptingSourceFiles {
-    private val PACKAGE_PATTERN: Pattern = Pattern.compile("(?m)^\\s*package\\s+([A-Za-z0-9_.]+)\\s*$")
-    private val TOP_LEVEL_DECLARATION_PATTERN: Pattern =
-        Pattern.compile(
-            "(?m)^\\s*(?:@[A-Za-z0-9_.]+(?:\\([^\\n]*?\\))?\\s*)*" +
-                "(?:(?:public|private|protected|internal|protected\\s+internal)\\s+)?" +
-                "(?:(?:abstract|final|sealed|data|inner|enum|annotation)\\s+)*" +
-                "(?:class|object)\\s+([A-Za-z0-9_]+)\\b",
-        )
-    private val COMPILATION_CONFIGURATION_PATTERN: Pattern =
-        Pattern.compile("(?m)compilationConfiguration\\s*=\\s*([A-Za-z0-9_.]+)::class")
-    private val IMPLICIT_RECEIVER_PATTERN: Pattern =
-        Pattern.compile("(?m)implicitReceivers\\s*\\(\\s*([A-Za-z0-9_.]+)::class")
+    private val DECLARATION_MODIFIER_PREFIXES = listOf(
+        "protected internal ",
+        "public ",
+        "private ",
+        "protected ",
+        "internal ",
+        "abstract ",
+        "final ",
+        "sealed ",
+        "data ",
+        "inner ",
+        "enum ",
+        "annotation ",
+    )
+    private const val PACKAGE_DECLARATION_PREFIX = "package "
+    private const val CLASS_DECLARATION_PREFIX = "class "
+    private const val OBJECT_DECLARATION_PREFIX = "object "
+    private const val COMPILATION_CONFIGURATION_MARKER = "compilationConfiguration ="
+    private const val IMPLICIT_RECEIVER_MARKER = "implicitReceivers("
 
     fun annotatedKotlinScriptSourceFile(project: Project, fileExtension: String): File {
         return annotatedKotlinScriptSourceFile(sourceRoot(project), fileExtension)
@@ -66,12 +72,17 @@ internal object RuntimeScriptingSourceFiles {
     }
 
     fun packageNameFromSourceFile(sourceFile: File): String {
-        val packageMatcher = PACKAGE_PATTERN.matcher(sourceFile.readText(StandardCharsets.UTF_8))
-        if (!packageMatcher.find()) {
-            throw GradleException("Source file '${sourceFile.path}' did not declare a package.")
-        }
+        return firstMatchingLine(sourceFile) { line ->
+            val trimmedLine = line.trim()
+            if (!trimmedLine.startsWith(PACKAGE_DECLARATION_PREFIX)) {
+                return@firstMatchingLine null
+            }
 
-        return packageMatcher.group(1)
+            trimmedLine
+                .removePrefix(PACKAGE_DECLARATION_PREFIX)
+                .trim()
+                .takeIf { it.isNotBlank() }
+        } ?: throw GradleException("Source file '${sourceFile.path}' did not declare a package.")
     }
 
     fun topLevelDeclarationNameFromSourceFile(sourceFile: File): String {
@@ -98,7 +109,7 @@ internal object RuntimeScriptingSourceFiles {
             sourceRoot,
             referencedTypeSimpleNameFromSourceFile(
                 sourceFile,
-                COMPILATION_CONFIGURATION_PATTERN,
+                COMPILATION_CONFIGURATION_MARKER,
                 "compilation configuration",
             ),
         )
@@ -119,33 +130,88 @@ internal object RuntimeScriptingSourceFiles {
             sourceRoot,
             referencedTypeSimpleNameFromSourceFile(
                 sourceFile,
-                IMPLICIT_RECEIVER_PATTERN,
+                IMPLICIT_RECEIVER_MARKER,
                 "script context",
             ),
         )
     }
 
     private fun topLevelDeclarationNameOrNull(sourceFile: File): String? {
-        val declarationMatcher = TOP_LEVEL_DECLARATION_PATTERN.matcher(sourceFile.readText(StandardCharsets.UTF_8))
-        if (!declarationMatcher.find()) {
-            return null
-        }
+        return firstMatchingLine(sourceFile) { line ->
+            val trimmedLine = line.trimStart()
+            if (trimmedLine.isBlank() || trimmedLine.startsWith("//") || trimmedLine.startsWith("/*") || trimmedLine.startsWith("*")) {
+                return@firstMatchingLine null
+            }
+            if (trimmedLine.startsWith("@")) {
+                return@firstMatchingLine null
+            }
 
-        return declarationMatcher.group(1)
+            val declarationLine = removeLeadingDeclarationModifiers(trimmedLine)
+            when {
+                declarationLine.startsWith(CLASS_DECLARATION_PREFIX) ->
+                    extractDeclarationName(declarationLine, CLASS_DECLARATION_PREFIX)
+                declarationLine.startsWith(OBJECT_DECLARATION_PREFIX) ->
+                    extractDeclarationName(declarationLine, OBJECT_DECLARATION_PREFIX)
+                else -> null
+            }
+        }
     }
 
     private fun referencedTypeSimpleNameFromSourceFile(
         sourceFile: File,
-        pattern: Pattern,
+        marker: String,
         description: String,
     ): String {
         val sourceText = sourceFile.readText(StandardCharsets.UTF_8)
-        val matcher = pattern.matcher(sourceText)
-        if (!matcher.find()) {
+        val markerIndex = sourceText.indexOf(marker)
+        if (markerIndex < 0) {
             throw GradleException("Source file '${sourceFile.path}' did not reference a $description type.")
         }
 
-        return matcher.group(1).substringAfterLast('.')
+        val classIndex = sourceText.indexOf("::class", startIndex = markerIndex + marker.length)
+        if (classIndex < 0) {
+            throw GradleException("Source file '${sourceFile.path}' did not reference a $description type.")
+        }
+
+        val referencedType = sourceText
+            .substring(markerIndex + marker.length, classIndex)
+            .trim()
+            .trimEnd(',', ')')
+        val simpleName = referencedType.substringAfterLast('.').takeWhile { char -> char.isLetterOrDigit() || char == '_' }
+        if (simpleName.isBlank()) {
+            throw GradleException("Source file '${sourceFile.path}' did not reference a valid $description type.")
+        }
+
+        return simpleName
+    }
+
+    private fun firstMatchingLine(sourceFile: File, matcher: (String) -> String?): String? {
+        val sourceText = sourceFile.readText(StandardCharsets.UTF_8)
+        return sourceText.lineSequence().mapNotNull(matcher).firstOrNull()
+    }
+
+    private fun removeLeadingDeclarationModifiers(line: String): String {
+        var candidate = line
+        while (true) {
+            val matchedPrefix = DECLARATION_MODIFIER_PREFIXES.firstOrNull { prefix ->
+                candidate.startsWith(prefix)
+            } ?: break
+            candidate = candidate.removePrefix(matchedPrefix)
+        }
+
+        return candidate
+    }
+
+    private fun extractDeclarationName(line: String, declarationPrefix: String): String? {
+        val declarationRemainder = line.removePrefix(declarationPrefix).trimStart()
+        if (declarationRemainder.isBlank()) {
+            return null
+        }
+
+        val declarationName = declarationRemainder.takeWhile { char ->
+            char.isLetterOrDigit() || char == '_'
+        }
+        return declarationName.takeIf { it.isNotBlank() }
     }
 
     private fun sourceRoot(project: Project): File = project.layout.projectDirectory.asFile.resolve("src/main/kotlin")
