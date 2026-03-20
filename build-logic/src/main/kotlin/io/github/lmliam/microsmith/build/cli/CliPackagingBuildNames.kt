@@ -9,7 +9,6 @@ internal object CliPackagingBuildNames {
         ":gen-schemas-protobuf-rpc",
     )
 
-    const val APPLICATION_MAIN_CLASS = "io.github.lmliam.microsmith.cli.CliKt"
     const val BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION = 1
     const val BUNDLED_PLUGIN_CATALOG_FILE_NAME = "bundled-plugins.lock"
     const val BUNDLED_PLUGIN_CATALOG_JAR_PATH = "META-INF/microsmith/$BUNDLED_PLUGIN_CATALOG_FILE_NAME"
