@@ -65,11 +65,8 @@ class CliPackagingPlugin : Plugin<Project> {
             )
         }
         val bundledPluginCoordinates = bundledPlugins.map { it.coordinate }
-        val bundledServiceEntries = bundledPlugins.flatMap { it.collectServiceEntries() }
-        val expectedServiceProvidersByDescriptor =
-            bundledServiceEntries.groupBy { it.servicePath }.mapValues { (_, entries) ->
-                entries.map { it.provider }
-            }
+        fun collectBundledServiceEntries(): List<BundledServiceEntry> =
+            bundledPlugins.flatMap { it.collectServiceEntries() }
 
         val cliVersion = project.version.toString()
         val bundledPluginCatalogOutput =
@@ -99,11 +96,13 @@ class CliPackagingPlugin : Plugin<Project> {
                 task.doLast {
                     val outputFile = bundledPluginCatalogOutput.get().asFile
                     outputFile.parentFile.mkdirs()
+                    val bundledServiceEntries = collectBundledServiceEntries()
                     val catalogText =
                         CliBundledPluginCatalogWriter.buildText(
                             cliVersion = cliVersion,
                             formatVersion = CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
                             bundledPlugins = bundledPlugins,
+                            bundledServiceEntries = bundledServiceEntries,
                         )
                     outputFile.writeText(catalogText, StandardCharsets.UTF_8)
                     CliBundledPluginCatalogVerifier.validate(
@@ -153,6 +152,11 @@ class CliPackagingPlugin : Plugin<Project> {
                 task.doLast {
                     val shadedJar = shadowJarArchive.get().asFile
                     val expectedCatalogText = bundledPluginCatalogOutput.get().asFile.readText(StandardCharsets.UTF_8)
+                    val bundledServiceEntries = collectBundledServiceEntries()
+                    val expectedServiceProvidersByDescriptor =
+                        bundledServiceEntries.groupBy { it.servicePath }.mapValues { (_, entries) ->
+                            entries.map { it.provider }
+                        }
                     CliBundledPluginCatalogVerifier.validate(
                         expectedCatalogText,
                         bundledPluginCatalogOutput.get().asFile.path,
@@ -284,6 +288,7 @@ class CliPackagingPlugin : Plugin<Project> {
 
                 task.doLast {
                     val expectedCatalogText = bundledPluginCatalogOutput.get().asFile.readText(StandardCharsets.UTF_8)
+                    val bundledServiceEntries = collectBundledServiceEntries()
                     val distRootDirectory = distDirectory.get().asFile
                     val distCatalogFile = java.io.File(distRootDirectory, CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME)
                     if (!distCatalogFile.isFile) {

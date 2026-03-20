@@ -164,15 +164,17 @@ internal object CliBundledPluginCatalogWriter {
         cliVersion: String,
         formatVersion: Int,
         bundledPlugins: List<BundledPluginCatalogEntry>,
+        bundledServiceEntries: List<BundledServiceEntry>,
     ): String =
         buildString {
             appendLine("# Microsmith bundled plugin profile")
             appendLine("# Plugin coordinates are pinned to the CLI release version for deterministic runtime behavior.")
             appendLine("format=$formatVersion")
             appendLine("cliVersion=$cliVersion")
+            val serviceEntriesByCoordinate = bundledServiceEntries.groupBy { it.coordinate }
             bundledPlugins.forEach { plugin ->
                 appendLine("plugin=${plugin.coordinate}")
-                plugin.collectServiceEntries().forEach { entry ->
+                serviceEntriesByCoordinate.getOrDefault(plugin.coordinate, emptyList()).forEach { entry ->
                     appendLine("service=${entry.coordinate}|${entry.servicePath}|${entry.provider}")
                 }
             }
