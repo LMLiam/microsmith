@@ -52,6 +52,7 @@ class CliPackagingPlugin : Plugin<Project> {
             add("implementation", libs.findLibrary("maven-resolver-transport-http").orElseThrow().get())
         }
 
+        val bundledPluginCatalogDirectory = project.layout.buildDirectory.dir("generated/microsmith")
         val bundledPluginJarTasks =
             CliPackagingBuildNames.BUNDLED_PLUGIN_PROJECT_PATHS.map { path ->
                 project.project(path).tasks.named("jar", Jar::class.java)
@@ -73,7 +74,7 @@ class CliPackagingPlugin : Plugin<Project> {
         val cliVersion = project.version.toString()
         val bundledPluginCatalogOutput =
             project.layout.buildDirectory.file(
-                "${CliPackagingBuildNames.GENERATED_CATALOG_DIRECTORY}/${CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}",
+                "generated/microsmith/${CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}",
             )
         val bundledPluginCatalogJarEntry = CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_JAR_PATH
         val shadowJarTask = project.tasks.named("shadowJar", ShadowJar::class.java)
@@ -85,9 +86,7 @@ class CliPackagingPlugin : Plugin<Project> {
 
         project.extensions.getByType(SourceSetContainer::class.java)
             .named("main")
-            .configure { sourceSet ->
-                sourceSet.resources.srcDir(project.layout.buildDirectory.dir(CliPackagingBuildNames.GENERATED_CATALOG_DIRECTORY))
-            }
+            .configure { sourceSet -> sourceSet.resources.srcDir(bundledPluginCatalogDirectory) }
 
         val generateBundledPluginCatalogTask =
             project.tasks.register(CliTaskNames.GENERATE_BUNDLED_PLUGIN_CATALOG, DefaultTask::class.java) { task ->

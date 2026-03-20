@@ -12,7 +12,6 @@ internal object CliPackagingBuildNames {
     const val BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION = 1
     const val BUNDLED_PLUGIN_CATALOG_FILE_NAME = "bundled-plugins.lock"
     const val BUNDLED_PLUGIN_CATALOG_JAR_PATH = "META-INF/microsmith/$BUNDLED_PLUGIN_CATALOG_FILE_NAME"
-    const val GENERATED_CATALOG_DIRECTORY = "generated/microsmith"
     const val SHADOW_JAR_BASE_NAME = "microsmith-cli"
     const val SHADOW_JAR_CLASSIFIER = "all"
     const val DIST_OUTPUT_DIRECTORY = "distributions"
