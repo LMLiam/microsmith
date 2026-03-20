@@ -5,7 +5,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.EnumBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.MessageBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 
-internal class ProtobufBuilder(private val segments: List<String> = emptyList()) : ProtobufDeclarationScope {
+internal class ProtobufBuilder(private val segments: List<String> = emptyList()) : ProtobufDeclarationContext {
     private val schemasByName = mutableMapOf<String, ProtobufSchema>()
     private val registeredNames = mutableSetOf<String>()
 
