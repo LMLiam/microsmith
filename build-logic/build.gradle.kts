@@ -57,5 +57,12 @@ gradlePlugin {
             displayName = "Microsmith Repository Quality"
             description = "Registers repository structural Kotlin quality guardrails."
         }
+
+        register("runtimeScripting") {
+            id = "io.github.lmliam.microsmith.runtime-scripting"
+            implementationClass = "io.github.lmliam.microsmith.build.runtime.RuntimeScriptingPlugin"
+            displayName = "Microsmith Runtime Scripting"
+            description = "Configures runtime scripting publication and IDE fallback artifacts."
+        }
     }
 }
