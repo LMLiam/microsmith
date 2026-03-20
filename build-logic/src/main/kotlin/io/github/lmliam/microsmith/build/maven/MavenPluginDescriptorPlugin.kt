@@ -39,7 +39,7 @@ class MavenPluginDescriptorPlugin : Plugin<Project> {
             }
 
         val generateMavenPluginDescriptorTask =
-            project.tasks.register(MavenPluginBuildNames.DESCRIPTOR_TASK_NAME, DefaultTask::class.java) { task ->
+            project.tasks.register("generateMavenPluginDescriptor", DefaultTask::class.java) { task ->
                 task.inputs.property("pluginGroupId", pluginGroupId)
                 task.inputs.property("pluginArtifactId", pluginArtifactId)
                 task.inputs.property("pluginVersion", pluginVersion)
@@ -70,7 +70,7 @@ class MavenPluginDescriptorPlugin : Plugin<Project> {
         }
 
         val verifyMavenPluginDescriptorTask =
-            project.tasks.register(MavenPluginBuildNames.VERIFY_TASK_NAME, DefaultTask::class.java) { task ->
+            project.tasks.register("verifyMavenPluginDescriptor", DefaultTask::class.java) { task ->
                 task.dependsOn(generateMavenPluginDescriptorTask)
                 task.inputs.file(descriptorFile)
 

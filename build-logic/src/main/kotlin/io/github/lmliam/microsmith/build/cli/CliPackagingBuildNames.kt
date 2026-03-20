@@ -19,10 +19,6 @@ internal object CliPackagingBuildNames {
     const val DIST_OUTPUT_DIRECTORY = "distributions"
     const val DIST_BUILD_DIRECTORY = "microsmith-cli-dist"
     const val RELEASE_ASSETS_DIRECTORY = "release-assets"
-    const val JAR_TASK_NAME = "jar"
-    const val PROCESS_RESOURCES_TASK_NAME = "processResources"
-    const val SHADOW_JAR_TASK_NAME = "shadowJar"
-    const val CHECK_TASK_NAME = "check"
 
     fun bundledPluginCoordinate(project: Project): String =
         "${project.group}:${project.name}:${project.version}"

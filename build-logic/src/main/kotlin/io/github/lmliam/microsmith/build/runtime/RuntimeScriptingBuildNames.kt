@@ -18,10 +18,6 @@ internal object RuntimeScriptingBuildNames {
         ":gen-schemas-protobuf-rpc",
     )
 
-    const val JAR_TASK_NAME = "jar"
-    const val SHADOW_JAR_TASK_NAME = "shadowJar"
-    const val GENERATE_POM_TASK_NAME = "generatePomFileForGprPublication"
-    const val CHECK_TASK_NAME = "check"
     const val POM_PATH = "publications/gpr/pom-default.xml"
     const val RELATIVE_RELEASE_ASSETS_DIRECTORY = "release-assets"
     const val IDE_FALLBACK_SHADOW_JAR_BASE_NAME = "microscript-definition"

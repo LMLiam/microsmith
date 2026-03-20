@@ -54,13 +54,13 @@ class CliPackagingPlugin : Plugin<Project> {
 
         val bundledPluginJarTasks =
             CliPackagingBuildNames.BUNDLED_PLUGIN_PROJECT_PATHS.map { path ->
-                project.project(path).tasks.named(CliArchiveTaskNames.JAR, Jar::class.java)
+                project.project(path).tasks.named("jar", Jar::class.java)
             }
         val bundledPlugins = CliPackagingBuildNames.BUNDLED_PLUGIN_PROJECT_PATHS.map { path ->
             val bundledProject = project.project(path)
             BundledPluginCatalogEntry(
                 coordinate = CliPackagingBuildNames.bundledPluginCoordinate(bundledProject),
-                archiveFile = bundledProject.tasks.named(CliArchiveTaskNames.JAR, Jar::class.java).flatMap { it.archiveFile },
+                archiveFile = bundledProject.tasks.named("jar", Jar::class.java).flatMap { it.archiveFile },
             )
         }
         val bundledPluginCoordinates = bundledPlugins.map { it.coordinate }
@@ -76,7 +76,7 @@ class CliPackagingPlugin : Plugin<Project> {
                 "${CliPackagingBuildNames.GENERATED_CATALOG_DIRECTORY}/${CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}",
             )
         val bundledPluginCatalogJarEntry = CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_JAR_PATH
-        val shadowJarTask = project.tasks.named(CliPackagingBuildNames.SHADOW_JAR_TASK_NAME, ShadowJar::class.java)
+        val shadowJarTask = project.tasks.named("shadowJar", ShadowJar::class.java)
         val shadowJarArchive = shadowJarTask.flatMap { it.archiveFile }
         val shadowJarArchiveName = CliPackagingBuildNames.shadowJarArchiveName(cliVersion)
         val distRootName = CliPackagingBuildNames.distRootName(cliVersion)
@@ -118,7 +118,7 @@ class CliPackagingPlugin : Plugin<Project> {
                 }
             }
 
-        project.tasks.named(CliTaskNames.PROCESS_RESOURCES, Copy::class.java).configure { task ->
+        project.tasks.named("processResources", Copy::class.java).configure { task ->
             task.dependsOn(generateBundledPluginCatalogTask)
             task.from(
                 bundledPluginCatalogOutput,
@@ -205,7 +205,7 @@ class CliPackagingPlugin : Plugin<Project> {
                 }
             }
 
-        project.tasks.named(CliTaskNames.CHECK).configure { task ->
+        project.tasks.named("check").configure { task ->
             task.dependsOn(verifyShadowJarServices)
         }
 
@@ -398,13 +398,7 @@ class CliPackagingPlugin : Plugin<Project> {
     }
 }
 
-private object CliArchiveTaskNames {
-    const val JAR = "jar"
-}
-
 private object CliTaskNames {
-    const val CHECK = "check"
-    const val PROCESS_RESOURCES = "processResources"
     const val GENERATE_BUNDLED_PLUGIN_CATALOG = "generateBundledPluginCatalog"
     const val VERIFY_SHADOW_JAR_SERVICES = "verifyShadowJarServices"
     const val PREPARE_DIST = "prepareDist"

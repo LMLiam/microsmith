@@ -47,9 +47,9 @@ class RuntimeScriptingPlugin : Plugin<Project> {
             add("implementation", libs.findLibrary("kotlin-scripting-jvm-host").orElseThrow().get())
         }
 
-        val runtimeScriptingJarTask = project.tasks.named(RuntimeScriptingBuildNames.JAR_TASK_NAME, Jar::class.java)
+        val runtimeScriptingJarTask = project.tasks.named("jar", Jar::class.java)
         val runtimeScriptingJarArchive = runtimeScriptingJarTask.flatMap { it.archiveFile }
-        val runtimeScriptingPomTask = project.tasks.named(RuntimeScriptingBuildNames.GENERATE_POM_TASK_NAME)
+        val runtimeScriptingPomTask = project.tasks.named("generatePomFileForGprPublication")
         val runtimeScriptingPomFile = project.layout.buildDirectory.file(RuntimeScriptingBuildNames.POM_PATH)
         val runtimeScriptingJarExpectedEntries = listOf(
             RuntimeScriptingBuildNames.classEntryName(scriptTemplateFqcn),
@@ -64,7 +64,7 @@ class RuntimeScriptingPlugin : Plugin<Project> {
         }
         val ideFallbackReleaseAssetsDirectory =
             project.layout.buildDirectory.dir(RuntimeScriptingBuildNames.RELATIVE_RELEASE_ASSETS_DIRECTORY)
-        val ideFallbackShadowJarTask = project.tasks.named(RuntimeScriptingBuildNames.SHADOW_JAR_TASK_NAME, Jar::class.java)
+        val ideFallbackShadowJarTask = project.tasks.named("shadowJar", Jar::class.java)
         val ideFallbackShadowJarArchive = ideFallbackShadowJarTask.flatMap { it.archiveFile }
         val ideFallbackExpectedEntries = listOf(
             RuntimeScriptingBuildNames.classEntryName(scriptTemplateFqcn),
@@ -195,7 +195,7 @@ class RuntimeScriptingPlugin : Plugin<Project> {
             }
         }
 
-        project.tasks.named(RuntimeScriptingBuildNames.CHECK_TASK_NAME).configure { checkTask ->
+        project.tasks.named("check").configure { checkTask ->
             checkTask.dependsOn(project.tasks.named("verifyRuntimeScriptingJar"))
             checkTask.dependsOn(project.tasks.named("verifyRuntimeScriptingPublishedPom"))
             checkTask.dependsOn(project.tasks.named("verifyIdeFallbackShadowJar"))
