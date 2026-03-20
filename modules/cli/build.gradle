@@ -1,5 +1,8 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.bundling.Compression
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
+import org.gradle.jvm.tasks.Jar
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.apache.tools.tar.TarInputStream
 import java.nio.charset.StandardCharsets
@@ -8,6 +11,28 @@ import java.security.MessageDigest
 import java.util.zip.GZIPInputStream
 import java.util.jar.JarFile
 import java.util.zip.ZipFile
+
+class BundledPluginCatalogEntry {
+    private final String coordinate
+    private final Provider<RegularFile> archiveFile
+
+    BundledPluginCatalogEntry(String coordinate, Provider<RegularFile> archiveFile) {
+        this.coordinate = coordinate
+        this.archiveFile = archiveFile
+    }
+
+    String coordinate() {
+        coordinate
+    }
+
+    Provider<RegularFile> getArchiveFile() {
+        archiveFile
+    }
+
+    List<Map<String, String>> collectServiceEntries() {
+        BundledPluginCatalogVerifier.collectServiceEntries(archiveFile.get().asFile, coordinate)
+    }
+}
 
 class BundledPluginCatalogVerifier {
     static void validate(
@@ -96,6 +121,42 @@ class BundledPluginCatalogVerifier {
             }
     }
 
+    static List<Map<String, String>> collectServiceEntries(File jarFile, String coordinate) {
+        def entries = []
+        JarFile jarFileHandle = new JarFile(jarFile)
+        try {
+            def jarEntries = jarFileHandle.entries()
+            while (jarEntries.hasMoreElements()) {
+                def entry = jarEntries.nextElement()
+                if (entry.isDirectory()) {
+                    continue
+                }
+                if (!entry.name.startsWith("META-INF/services/")) {
+                    continue
+                }
+
+                def contents = jarFileHandle.getInputStream(entry).getText(StandardCharsets.UTF_8.name())
+                contents
+                    .readLines()
+                    .collect { it.trim() }
+                    .findAll { !it.isEmpty() && !it.startsWith("#") }
+                    .each { provider ->
+                        entries << [
+                            coordinate : coordinate,
+                            servicePath: entry.name,
+                            provider   : provider,
+                        ]
+                    }
+            }
+        } finally {
+            jarFileHandle.close()
+        }
+
+        entries.sort { left, right ->
+            compareEntry(left, right)
+        }
+    }
+
     private static int compareEntry(Map<String, String> left, Map<String, String> right) {
         int byCoordinate = left.coordinate <=> right.coordinate
         if (byCoordinate != 0) {
@@ -175,80 +236,91 @@ def bundledPluginCatalogFormatVersion = 1
 def bundledPluginCatalogFileName = "bundled-plugins.lock"
 def bundledPluginCatalogJarPath = "META-INF/microsmith/${bundledPluginCatalogFileName}"
 def bundledPluginCatalogOutput = layout.buildDirectory.file("generated/microsmith/${bundledPluginCatalogFileName}")
-
-def bundledPlugins = [
-    [
-        coordinate: "io.github.lmliam.microsmith:gen-schemas:${cliVersion}",
-        providers : [
-            "META-INF/services/io.github.lmliam.microsmith.gen.core.ModelGenerator": "io.github.lmliam.microsmith.gen.schemas.SchemasGenerator",
-        ],
-    ],
-    [
-        coordinate: "io.github.lmliam.microsmith:gen-schemas-protobuf:${cliVersion}",
-        providers : [
-            "META-INF/services/io.github.lmliam.microsmith.gen.schemas.SchemaEmitter":
-                "io.github.lmliam.microsmith.gen.schemas.protobuf.emission.ProtobufEmitter",
-        ],
-    ],
-    [
-        coordinate: "io.github.lmliam.microsmith:gen-schemas-protobuf-rpc:${cliVersion}",
-        providers : [
-            "META-INF/services/io.github.lmliam.microsmith.gen.schemas.protobuf.emission.ProtobufDeclarationSupport":
-                "io.github.lmliam.microsmith.gen.schemas.protobuf.rpc.ServiceDeclarationSupport",
-        ],
-    ],
+def bundledPluginJarTasks = [
+    project(":gen-schemas").tasks.named("jar", Jar),
+    project(":gen-schemas-protobuf").tasks.named("jar", Jar),
+    project(":gen-schemas-protobuf-rpc").tasks.named("jar", Jar),
 ]
 
-def expectedServiceProviders =
-    bundledPlugins.collectMany { plugin ->
-        plugin.providers.collect { servicePath, provider ->
-            [
-                coordinate : plugin.coordinate.toString(),
-                servicePath: servicePath.toString(),
-                provider   : provider.toString(),
-            ]
-        }
-    }
+def bundledPlugins = [
+    new BundledPluginCatalogEntry(
+        "io.github.lmliam.microsmith:${project(":gen-schemas").name}:${cliVersion}",
+        project(":gen-schemas").tasks.named("jar", Jar).flatMap { it.archiveFile },
+    ),
+    new BundledPluginCatalogEntry(
+        "io.github.lmliam.microsmith:${project(":gen-schemas-protobuf").name}:${cliVersion}",
+        project(":gen-schemas-protobuf").tasks.named("jar", Jar).flatMap { it.archiveFile },
+    ),
+    new BundledPluginCatalogEntry(
+        "io.github.lmliam.microsmith:${project(":gen-schemas-protobuf-rpc").name}:${cliVersion}",
+        project(":gen-schemas-protobuf-rpc").tasks.named("jar", Jar).flatMap { it.archiveFile },
+    ),
+]
 
-def expectedServiceProvidersByDescriptor =
-    expectedServiceProviders.groupBy { it.servicePath }.collectEntries { servicePath, entries ->
+def bundledPluginCoordinates = {
+    bundledPlugins.collect { it.coordinate() }
+}
+
+def bundledServiceEntries = {
+    bundledPlugins.collectMany { plugin ->
+        plugin.collectServiceEntries()
+    }
+}
+
+def expectedServiceProvidersByDescriptor = {
+    bundledServiceEntries().groupBy { it.servicePath }.collectEntries { servicePath, entries ->
         [servicePath, entries.collect { it.provider }]
     }
+}
 
-def expectedBundledPluginCoordinates = bundledPlugins.collect { it.coordinate.toString() }
-def expectedBundledServiceEntries =
-    expectedServiceProviders.collect { entry ->
+def expectedBundledServiceEntries = {
+    bundledServiceEntries().collect { entry ->
         [
             coordinate : entry.coordinate.toString(),
             servicePath: entry.servicePath.toString(),
             provider   : entry.provider.toString(),
         ]
     }
-
-def bundledPluginCatalogLines = [
-    "# Microsmith bundled plugin profile",
-    "# Plugin coordinates are pinned to the CLI release version for deterministic runtime behavior.",
-    "format=${bundledPluginCatalogFormatVersion}",
-    "cliVersion=${cliVersion}",
-]
-bundledPlugins.each { plugin ->
-    bundledPluginCatalogLines << "plugin=${plugin.coordinate}"
-    plugin.providers.each { servicePath, provider ->
-        bundledPluginCatalogLines << "service=${plugin.coordinate}|${servicePath}|${provider}"
-    }
 }
-def bundledPluginCatalogText = bundledPluginCatalogLines.join("\n") + "\n"
+
+def bundledPluginCatalogText = {
+    def bundledPluginCatalogLines = [
+        "# Microsmith bundled plugin profile",
+        "# Plugin coordinates are pinned to the CLI release version for deterministic runtime behavior.",
+        "format=${bundledPluginCatalogFormatVersion}",
+        "cliVersion=${cliVersion}",
+    ]
+    bundledPlugins.each { plugin ->
+        bundledPluginCatalogLines << "plugin=${plugin.coordinate()}"
+        plugin.collectServiceEntries().each { entry ->
+            bundledPluginCatalogLines << "service=${entry.coordinate}|${entry.servicePath}|${entry.provider}"
+        }
+    }
+    bundledPluginCatalogLines.join("\n") + "\n"
+}
 
 def generateBundledPluginCatalogTask =
     tasks.register("generateBundledPluginCatalog") {
+        dependsOn(bundledPluginJarTasks)
         inputs.property("cliVersion", cliVersion)
         inputs.property("catalogFormatVersion", bundledPluginCatalogFormatVersion)
-        inputs.property("catalogText", bundledPluginCatalogText)
+        inputs.files(bundledPlugins.collect { it.archiveFile })
         outputs.file(bundledPluginCatalogOutput)
         doLast {
+            def outputCatalogText = bundledPluginCatalogText()
+            def outputServiceEntries = expectedBundledServiceEntries()
+            def outputPluginCoordinates = bundledPluginCoordinates()
             def outputFile = bundledPluginCatalogOutput.get().asFile
             outputFile.parentFile.mkdirs()
-            outputFile.setText(bundledPluginCatalogText, StandardCharsets.UTF_8.name())
+            outputFile.setText(outputCatalogText, StandardCharsets.UTF_8.name())
+            BundledPluginCatalogVerifier.validate(
+                outputCatalogText,
+                outputFile.path,
+                bundledPluginCatalogFormatVersion,
+                cliVersion,
+                outputPluginCoordinates,
+                outputServiceEntries,
+            )
         }
     }
 
@@ -295,12 +367,12 @@ tasks.register("verifyShadowJarServices") {
             bundledPluginCatalogOutput.get().asFile.path,
             bundledPluginCatalogFormatVersion,
             cliVersion,
-            expectedBundledPluginCoordinates,
-            expectedBundledServiceEntries,
+            bundledPluginCoordinates(),
+            expectedBundledServiceEntries(),
         )
         JarFile jarFile = new JarFile(shadedJar)
         try {
-            expectedServiceProvidersByDescriptor.each { servicePath, expectedProviders ->
+            expectedServiceProvidersByDescriptor().each { servicePath, expectedProviders ->
                 def entry = jarFile.getJarEntry(servicePath)
                 if (entry == null) {
                     throw new GradleException("Missing merged service descriptor '${servicePath}' in ${shadedJar.name}.")
@@ -338,8 +410,8 @@ tasks.register("verifyShadowJarServices") {
                 "${shadedJar.name}!/${bundledPluginCatalogJarPath}",
                 bundledPluginCatalogFormatVersion,
                 cliVersion,
-                expectedBundledPluginCoordinates,
-                expectedBundledServiceEntries,
+                bundledPluginCoordinates(),
+                expectedBundledServiceEntries(),
             )
         } finally {
             jarFile.close()
@@ -436,8 +508,8 @@ tasks.register("verifyDistLayout") {
             distCatalogFile.path,
             bundledPluginCatalogFormatVersion,
             cliVersion,
-            expectedBundledPluginCoordinates,
-            expectedBundledServiceEntries,
+            bundledPluginCoordinates(),
+            expectedBundledServiceEntries(),
         )
 
         [
