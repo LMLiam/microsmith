@@ -36,10 +36,7 @@ private data class TestType(
 private object TestDeclarationHandler : ProtobufDeclarationHandler<TestType> {
     override val type: KClass<TestType> = TestType::class
 
-    override fun validate(
-        schema: ProtobufSchema,
-        qualifiedName: QualifiedSchemaName,
-    ) = Unit
+    override fun validate(schema: ProtobufSchema, qualifiedName: QualifiedSchemaName) = Unit
 
     override fun render(declaration: TestType): String = declaration.name
 }
@@ -47,10 +44,7 @@ private object TestDeclarationHandler : ProtobufDeclarationHandler<TestType> {
 private object DuplicateTestDeclarationHandler : ProtobufDeclarationHandler<TestType> {
     override val type: KClass<TestType> = TestType::class
 
-    override fun validate(
-        schema: ProtobufSchema,
-        qualifiedName: QualifiedSchemaName,
-    ) = Unit
+    override fun validate(schema: ProtobufSchema, qualifiedName: QualifiedSchemaName) = Unit
 
     override fun render(declaration: TestType): String = declaration.name
 }
