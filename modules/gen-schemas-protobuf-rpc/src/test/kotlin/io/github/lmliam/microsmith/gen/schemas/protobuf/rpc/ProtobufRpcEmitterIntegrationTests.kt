@@ -38,4 +38,37 @@ class ProtobufRpcEmitterIntegrationTests :
                 contents.shouldContain("rpc GetUser (GetUserRequest) returns (GetUserResponse);")
             }
         }
+
+        "emits qualified service declarations under the namespaced proto path" {
+            val serviceSchema =
+                SchemasBuilder().apply {
+                    protobuf {
+                        "acme.user.v1" {
+                            message("GetUserRequest")
+                            message("GetUserResponse")
+                            service("UserService") {
+                                "GetUser" { "GetUserRequest" to "GetUserResponse" }
+                            }
+                        }
+                    }
+                }.toExtension()
+                    .schemas
+                    .filterIsInstance<ProtobufSchema>()
+                    .first { it.name == "acme.user.v1.UserService" }
+
+            TemporaryDirectory.create().use { space ->
+                val generated = with(emitter) { serviceSchema.emit(space) }
+                val contents = generated.contents.toString(Charsets.UTF_8)
+                val expectedPath = "proto/acme/user/v1/UserService.proto"
+                val expectedRpc =
+                    "rpc GetUser (acme.user.v1.GetUserRequest) returns " +
+                        "(acme.user.v1.GetUserResponse);"
+
+                generated.relativePath.toString().replace("\\", "/") shouldBe expectedPath
+                contents.shouldContain("package acme.user.v1;")
+                contents.shouldContain("import \"acme/user/v1/GetUserRequest.proto\";")
+                contents.shouldContain("import \"acme/user/v1/GetUserResponse.proto\";")
+                contents.shouldContain(expectedRpc)
+            }
+        }
     })
