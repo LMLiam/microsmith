@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.ProtobufReferenceResolvableType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.ProtobufReferenceResolutionScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.ProtobufReferenceResolvableType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 
 data class Service(
