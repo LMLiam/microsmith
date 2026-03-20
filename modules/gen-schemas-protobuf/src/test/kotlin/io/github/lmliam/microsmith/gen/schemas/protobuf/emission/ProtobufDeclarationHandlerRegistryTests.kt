@@ -6,20 +6,20 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlin.reflect.KClass
 
-class ProtobufDeclarationSupportRegistryTests :
+class ProtobufDeclarationHandlerRegistryTests :
     StringSpec({
         "resolves built-in protobuf declaration support" {
-            val registry = ProtobufDeclarationSupportRegistry()
+            val registry = ProtobufDeclarationHandlerRegistry()
 
             registry.resolve(Message("Test")).type shouldBe Message::class
         }
 
         "rejects duplicate declaration support for the same type" {
             shouldThrow<IllegalArgumentException> {
-                ProtobufDeclarationSupportRegistry(
+                ProtobufDeclarationHandlerRegistry(
                     listOf(
-                        TestDeclarationSupport,
-                        DuplicateTestDeclarationSupport,
+                        TestDeclarationHandler,
+                        DuplicateTestDeclarationHandler,
                     ),
                 )
             }
@@ -30,7 +30,7 @@ private data class TestType(
     override val name: String = "Test",
 ) : io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 
-private object TestDeclarationSupport : ProtobufDeclarationSupport<TestType> {
+private object TestDeclarationHandler : ProtobufDeclarationHandler<TestType> {
     override val type: KClass<TestType> = TestType::class
 
     override fun validate(
@@ -41,7 +41,7 @@ private object TestDeclarationSupport : ProtobufDeclarationSupport<TestType> {
     override fun render(declaration: TestType): String = declaration.name
 }
 
-private object DuplicateTestDeclarationSupport : ProtobufDeclarationSupport<TestType> {
+private object DuplicateTestDeclarationHandler : ProtobufDeclarationHandler<TestType> {
     override val type: KClass<TestType> = TestType::class
 
     override fun validate(

@@ -7,7 +7,7 @@ import io.github.lmliam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaNam
 import kotlin.reflect.KClass
 
 @ServiceContract
-interface ProtobufDeclarationSupport<T : Type> {
+interface ProtobufDeclarationHandler<T : Type> {
     val type: KClass<T>
 
     fun validate(schema: ProtobufSchema, qualifiedName: QualifiedSchemaName)

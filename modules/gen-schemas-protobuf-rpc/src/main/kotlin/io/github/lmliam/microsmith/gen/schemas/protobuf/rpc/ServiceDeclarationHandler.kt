@@ -4,13 +4,13 @@ import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
-import io.github.lmliam.microsmith.gen.schemas.protobuf.emission.ProtobufDeclarationSupport
+import io.github.lmliam.microsmith.gen.schemas.protobuf.emission.ProtobufDeclarationHandler
 import io.github.lmliam.microsmith.gen.schemas.protobuf.names.ProtobufNameValidation
 import io.github.lmliam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaName
 import kotlin.reflect.KClass
 
-@ServiceProvider(ProtobufDeclarationSupport::class)
-class ServiceDeclarationSupport : ProtobufDeclarationSupport<Service> {
+@ServiceProvider(ProtobufDeclarationHandler::class)
+class ServiceDeclarationHandler : ProtobufDeclarationHandler<Service> {
     override val type: KClass<Service> = Service::class
 
     override fun validate(schema: ProtobufSchema, qualifiedName: QualifiedSchemaName) {

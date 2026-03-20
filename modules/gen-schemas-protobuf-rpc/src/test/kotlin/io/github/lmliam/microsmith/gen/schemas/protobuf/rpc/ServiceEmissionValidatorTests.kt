@@ -15,7 +15,7 @@ import io.kotest.matchers.shouldBe
 
 class ServiceEmissionValidatorTests :
     StringSpec({
-        val validator = ServiceDeclarationSupport()
+        val validator = ServiceDeclarationHandler()
 
         "validates service routes target messages" {
             val schema =

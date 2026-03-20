@@ -7,7 +7,7 @@ import io.github.lmliam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaNam
 import io.github.lmliam.microsmith.gen.schemas.protobuf.render.ProtobufDeclarationRenderer
 import kotlin.reflect.KClass
 
-internal object MessageDeclarationSupport : ProtobufDeclarationSupport<Message> {
+internal object MessageDeclarationHandler : ProtobufDeclarationHandler<Message> {
     override val type: KClass<Message> = Message::class
 
     override fun validate(schema: ProtobufSchema, qualifiedName: QualifiedSchemaName) {

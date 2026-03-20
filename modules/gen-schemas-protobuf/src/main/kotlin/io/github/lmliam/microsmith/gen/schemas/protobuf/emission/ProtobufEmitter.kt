@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
 @ServiceProvider(SchemaEmitter::class)
 class ProtobufEmitter(override val type: KClass<ProtobufSchema> = ProtobufSchema::class) :
     SchemaEmitter<ProtobufSchema> {
-    private val declarationSupportRegistry = ProtobufDeclarationSupportRegistry()
+    private val declarationSupportRegistry = ProtobufDeclarationHandlerRegistry()
 
     /**
      * Converts the receiving schema into a deterministic protobuf source file.
