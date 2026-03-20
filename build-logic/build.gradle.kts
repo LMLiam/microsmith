@@ -72,5 +72,12 @@ gradlePlugin {
             displayName = "Microsmith CLI Packaging"
             description = "Configures CLI packaging, distributions, and release artifacts."
         }
+
+        register("mavenPluginDescriptor") {
+            id = "io.github.lmliam.microsmith.maven-plugin"
+            implementationClass = "io.github.lmliam.microsmith.build.maven.MavenPluginDescriptorPlugin"
+            displayName = "Microsmith Maven Plugin Descriptor"
+            description = "Configures Maven plugin descriptor generation and publication metadata."
+        }
     }
 }
