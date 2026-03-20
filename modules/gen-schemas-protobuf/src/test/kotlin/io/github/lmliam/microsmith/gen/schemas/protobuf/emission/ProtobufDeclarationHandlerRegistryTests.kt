@@ -1,6 +1,9 @@
 package io.github.lmliam.microsmith.gen.schemas.protobuf.emission
 
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
+import io.github.lmliam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaName
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -28,14 +31,14 @@ class ProtobufDeclarationHandlerRegistryTests :
 
 private data class TestType(
     override val name: String = "Test",
-) : io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
+) : Type
 
 private object TestDeclarationHandler : ProtobufDeclarationHandler<TestType> {
     override val type: KClass<TestType> = TestType::class
 
     override fun validate(
-        schema: io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema,
-        qualifiedName: io.github.lmliam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaName,
+        schema: ProtobufSchema,
+        qualifiedName: QualifiedSchemaName,
     ) = Unit
 
     override fun render(declaration: TestType): String = declaration.name
@@ -45,8 +48,8 @@ private object DuplicateTestDeclarationHandler : ProtobufDeclarationHandler<Test
     override val type: KClass<TestType> = TestType::class
 
     override fun validate(
-        schema: io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema,
-        qualifiedName: io.github.lmliam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaName,
+        schema: ProtobufSchema,
+        qualifiedName: QualifiedSchemaName,
     ) = Unit
 
     override fun render(declaration: TestType): String = declaration.name
