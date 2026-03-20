@@ -19,7 +19,7 @@ internal class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) : Protob
         val schemaType = schema.schema
         return when (schemaType) {
             is Message -> schema.copy(schema = schemaType.resolveMessage())
-            is ProtobufReferenceAwareType -> schema.copy(schema = schemaType.resolveReferences(this))
+            is ProtobufReferenceResolvableType -> schema.copy(schema = schemaType.resolveReferences(this))
             else -> schema
         }
     }

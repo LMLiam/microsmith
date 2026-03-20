@@ -1,13 +1,13 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.ProtobufReferenceAwareType
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.ProtobufReferenceResolvableType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.ProtobufReferenceResolutionScope
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 
 data class Service(
     override val name: String,
     val rpcs: List<Rpc>,
-) : Type, ProtobufReferenceAwareType {
+) : Type, ProtobufReferenceResolvableType {
     override fun resolveReferences(context: ProtobufReferenceResolutionScope): Type = copy(
         rpcs = rpcs.map { rpc -> rpc.resolveReferences(context, name) },
     )
