@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.2.2")
     compileOnly(gradleApi())
     testImplementation(gradleTestKit())
     testImplementation(libs.kotest.runner.junit5)
@@ -56,6 +57,27 @@ gradlePlugin {
             implementationClass = "io.github.lmliam.microsmith.build.quality.RepositoryQualityPlugin"
             displayName = "Microsmith Repository Quality"
             description = "Registers repository structural Kotlin quality guardrails."
+        }
+
+        register("runtimeScripting") {
+            id = "io.github.lmliam.microsmith.runtime-scripting"
+            implementationClass = "io.github.lmliam.microsmith.build.runtime.RuntimeScriptingPlugin"
+            displayName = "Microsmith Runtime Scripting"
+            description = "Configures runtime scripting publication and IDE fallback artifacts."
+        }
+
+        register("cliPackaging") {
+            id = "io.github.lmliam.microsmith.cli-packaging"
+            implementationClass = "io.github.lmliam.microsmith.build.cli.CliPackagingPlugin"
+            displayName = "Microsmith CLI Packaging"
+            description = "Configures CLI packaging, distributions, and release artifacts."
+        }
+
+        register("mavenPluginDescriptor") {
+            id = "io.github.lmliam.microsmith.maven-plugin"
+            implementationClass = "io.github.lmliam.microsmith.build.maven.MavenPluginDescriptorPlugin"
+            displayName = "Microsmith Maven Plugin Descriptor"
+            description = "Configures Maven plugin descriptor generation and publication metadata."
         }
     }
 }

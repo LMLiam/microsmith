@@ -11,17 +11,17 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 
-internal class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) {
+internal class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) : ProtobufReferenceResolver {
     private val schemasByName = schemas.associateBy(ProtobufSchema::name)
     private val errors = mutableListOf<String>()
 
     fun resolve(schema: ProtobufSchema): ProtobufSchema {
         val schemaType = schema.schema
-        if (schemaType !is Message) {
-            return schema
+        return when (schemaType) {
+            is Message -> schema.copy(schema = schemaType.resolveMessage())
+            is ProtobufReferenceResolvableType -> schema.copy(schema = schemaType.resolveReferences(this))
+            else -> schema
         }
-
-        return schema.copy(schema = schemaType.resolveMessage())
     }
 
     fun failOnUnresolvedReferences() {
@@ -36,6 +36,8 @@ internal class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) {
             }.trimEnd(),
         )
     }
+
+    override fun resolveReference(reference: Reference, context: String): Reference = reference.resolve(context)
 
     private fun Reference.resolve(context: String): Reference {
         val target = schemasByName[name]?.schema

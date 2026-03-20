@@ -2,14 +2,10 @@ package io.github.lmliam.microsmith.gen.schemas.protobuf.emission
 
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.gen.files.FileSpace
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import io.github.lmliam.microsmith.gen.schemas.SchemaEmitter
-import io.github.lmliam.microsmith.gen.schemas.protobuf.imports.collectImports
 import io.github.lmliam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaName
-import io.github.lmliam.microsmith.gen.schemas.protobuf.render.ProtobufDeclarationRenderer
 import io.github.lmliam.microsmith.gen.schemas.protobuf.render.ProtobufFileRenderer
 import java.nio.charset.StandardCharsets
 import kotlin.reflect.KClass
@@ -22,6 +18,8 @@ import kotlin.reflect.KClass
 @ServiceProvider(SchemaEmitter::class)
 class ProtobufEmitter(override val type: KClass<ProtobufSchema> = ProtobufSchema::class) :
     SchemaEmitter<ProtobufSchema> {
+    private val declarationSupportRegistry = ProtobufDeclarationHandlerRegistry()
+
     /**
      * Converts the receiving schema into a deterministic protobuf source file.
      *
@@ -29,13 +27,14 @@ class ProtobufEmitter(override val type: KClass<ProtobufSchema> = ProtobufSchema
      */
     override suspend fun ProtobufSchema.emit(space: FileSpace): GeneratedFile {
         val qualifiedName = QualifiedSchemaName.parse(name)
-        ProtobufSchemaEmissionValidator.validate(this)
+        val declarationSupport = declarationSupportRegistry.resolve(schema)
+        declarationSupport.validate(this, qualifiedName)
 
         val contents =
             ProtobufFileRenderer.render(
                 qualifiedName = qualifiedName,
-                declaration = renderDeclaration(),
-                imports = collectImports(qualifiedName),
+                declaration = declarationSupport.render(schema),
+                imports = declarationSupport.collectImports(schema, qualifiedName),
             )
 
         return GeneratedFile(
@@ -43,15 +42,4 @@ class ProtobufEmitter(override val type: KClass<ProtobufSchema> = ProtobufSchema
             contents = contents.toByteArray(StandardCharsets.UTF_8),
         )
     }
-
-    private fun ProtobufSchema.renderDeclaration(): String = when (val currentType = schema) {
-        is Message -> ProtobufDeclarationRenderer.render(currentType)
-        is Enum -> ProtobufDeclarationRenderer.render(currentType)
-    }
-
-    private fun ProtobufSchema.collectImports(qualifiedName: QualifiedSchemaName): List<String> =
-        when (val currentType = schema) {
-            is Message -> currentType.collectImports(qualifiedName)
-            is Enum -> emptyList()
-        }
 }

@@ -39,9 +39,11 @@ jobs:
             :dsl:publishToMavenLocal \
             :dsl-schemas:publishToMavenLocal \
             :dsl-schemas-protobuf:publishToMavenLocal \
+            :dsl-schemas-protobuf-rpc:publishToMavenLocal \
             :gen:publishToMavenLocal \
             :gen-schemas:publishToMavenLocal \
             :gen-schemas-protobuf:publishToMavenLocal \
+            :gen-schemas-protobuf-rpc:publishToMavenLocal \
             :runtime-scripting:publishToMavenLocal \
             :gradle-plugin:publishToMavenLocal \
             :maven-plugin:publishToMavenLocal \
@@ -100,8 +102,8 @@ jobs:
       - name: Validate IDE fallback release assets
         run: |
           ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
-          find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microsmith-script-definition-*-all.jar' | grep -q .
-          find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microsmith-script-definition-*-all.jar.sha256' | grep -q .
+          find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar' | grep -q .
+          find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar.sha256' | grep -q .
       - name: Publish Test Report
         uses: dorny/test-reporter@v2
         if: ${{ always() && hashFiles('**/build/test-results/**/*.xml') != '' }}

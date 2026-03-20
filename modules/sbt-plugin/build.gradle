@@ -2,7 +2,7 @@ plugins {
     id 'scala'
 }
 
-def sbtPluginArtifactId = "sbt-plugin_2.12_1.0"
+def sbtPluginArtifactId = "${project.name}_2.12_1.0".toString()
 
 dependencies {
     implementation project(':runtime-scripting')

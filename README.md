@@ -46,9 +46,11 @@ Microsmith provides:
 - `dsl`: core DSL primitives, builders, model types, and extension APIs
 - `dsl-schemas`: generic schema registry and schema-oriented DSL surface
 - `dsl-schemas-protobuf`: protobuf-flavoured schema DSL on top of `dsl-schemas`
+- `dsl-schemas-protobuf-rpc`: protobuf service and RPC DSL extensions on top of `dsl-schemas-protobuf`
 - `gen`: generator contracts, model traversal, and shared generation helpers
 - `gen-schemas`: schema-aware generation support on top of `gen`
 - `gen-schemas-protobuf`: protobuf emitters, rendering, and protobuf-specific generation support
+- `gen-schemas-protobuf-rpc`: protobuf service rendering and RPC-specific generation support
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution
 - `cli`: command-line entrypoint, diagnostics, installer packaging, and IDE helper support
 - `gradle-plugin`: native Gradle integration for `.microsmith.kts` execution and imported-project IDE alignment
@@ -61,8 +63,10 @@ Microsmith provides:
 - `dsl` is the foundational model and DSL layer. It should stay free of CLI, scripting-host, installer, resolver, and generation-application concerns.
 - `dsl-schemas` extends `dsl` with schema registration and schema-oriented DSL concepts. It should not absorb CLI or runtime concerns.
 - `dsl-schemas-protobuf` adds protobuf-specific schema modeling on top of `dsl` and `dsl-schemas`. Keep protobuf domain types, builders, and DSL entrypoints here rather than leaking them into application layers.
+- `dsl-schemas-protobuf-rpc` adds protobuf service and RPC DSL support as an extension layer on top of the core protobuf schema module.
 - `gen` owns generator contracts and shared generation abstractions. It should not contain CLI command handling, repository bootstrapping, or scripting host orchestration.
 - `gen-schemas` and `gen-schemas-protobuf` own schema-aware emission, rendering, and validation. They should depend downward on model and generator layers, not upward on CLI or installer behavior.
+- `gen-schemas-protobuf-rpc` owns protobuf service rendering, validation, and import derivation without bloating the core protobuf emitter module.
 - `runtime-scripting` is the scripting host and execution boundary. It may depend on DSL and generation layers, but it must not absorb CLI parsing, onboarding, or distribution concerns.
 - `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
 - `gradle-plugin` is the native Gradle integration surface for Gradle-imported JVM repositories. It should stay thin, Gradle-conventional, and explicit about task/configuration wiring rather than absorbing CLI concerns.
@@ -72,7 +76,7 @@ Microsmith provides:
 
 ## Repository layout
 
-- `modules/`: production Gradle subprojects, including `cli`, `dsl`, `dsl-schemas`, `dsl-schemas-protobuf`, `gen`, `gen-schemas`, `gen-schemas-protobuf`, `runtime-scripting`, `gradle-plugin`, `maven-plugin`, `sbt-plugin`, and `kotest`
+- `modules/`: production Gradle subprojects, including `cli`, `dsl`, `dsl-schemas`, `dsl-schemas-protobuf`, `dsl-schemas-protobuf-rpc`, `gen`, `gen-schemas`, `gen-schemas-protobuf`, `gen-schemas-protobuf-rpc`, `runtime-scripting`, `gradle-plugin`, `maven-plugin`, `sbt-plugin`, and `kotest`
 - `build-logic/`: included Gradle build that owns repository-specific plugins and quality tasks
 - `examples/`: consumer-repository fixtures and onboarding examples
 - `gradle/`: wrapper files, version catalog, and dependency locks
@@ -219,6 +223,15 @@ microsmith {
             enum("UserStatus") {
                 +"ACTIVE"
                 +"DISABLED"
+            }
+
+            service("UserService") {
+                "GetUser" {
+                    "GetUserRequest" to "GetUserResponse"
+                }
+                "WatchUsers" {
+                    "WatchUsersRequest" to stream("WatchUsersResponse")
+                }
             }
         }
     }
@@ -983,7 +996,7 @@ Choose between the two paths like this:
 
 Fallback artifact sources:
 
-- GitHub Release asset: `microsmith-script-definition-<version>-all.jar`
+- GitHub Release asset: `microscript-definition-<version>-all.jar`
 - local build: `./gradlew :runtime-scripting:ideFallbackArtifacts`
 - published package: `io.github.lmliam.microsmith:runtime-scripting:<version>:all`
 
@@ -1362,7 +1375,7 @@ Helper path:
 
 Fallback path:
 
-1. Download or build the matching `microsmith-script-definition-<version>-all.jar`.
+1. Download or build the matching `microscript-definition-<version>-all.jar`.
 2. Attach the jar as a project library in the target JetBrains IDE.
 3. Reindex the project.
 4. Confirm `microsmith {}`, `schemas {}`, and `protobuf {}` resolve in `build.microsmith.kts`.
@@ -1495,8 +1508,8 @@ The DSL surface stays the same; the execution boundary changes.
 - `modules/cli/build/release-assets/microsmith-install.ps1`
 - `modules/cli/build/release-assets/*.sha256`
 - `modules/cli/build/generated/microsmith/bundled-plugins.lock`
-- `modules/runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar`
-- `modules/runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar.sha256`
+- `modules/runtime-scripting/build/release-assets/microscript-definition-<version>-all.jar`
+- `modules/runtime-scripting/build/release-assets/microscript-definition-<version>-all.jar.sha256`
 
 Published packages are available from:
 

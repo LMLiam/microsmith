@@ -1,9 +1,11 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf
 
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.getReferencePath
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.EnumBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.MessageBuilder
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 
-internal class ProtobufBuilder(private val segments: List<String> = emptyList()) : ProtobufScope {
+internal class ProtobufBuilder(private val segments: List<String> = emptyList()) : ProtobufDeclarationContext {
     private val schemasByName = mutableMapOf<String, ProtobufSchema>()
     private val registeredNames = mutableSetOf<String>()
 
@@ -14,25 +16,11 @@ internal class ProtobufBuilder(private val segments: List<String> = emptyList())
     }
 
     override fun message(name: String, block: MessageScope.() -> Unit) {
-        val fqName = (segments + name).joinToString(".")
-        register(
-            fqName,
-            ProtobufSchema(
-                fqName,
-                schema = MessageBuilder(name, segments).apply(block).build(),
-            ),
-        )
+        registerDeclaration(name, MessageBuilder(name, segments).apply(block).build())
     }
 
     override fun enum(name: String, block: EnumScope.() -> Unit) {
-        val fqName = (segments + name).joinToString(".")
-        register(
-            fqName,
-            ProtobufSchema(
-                fqName,
-                schema = EnumBuilder(name).apply(block).build(),
-            ),
-        )
+        registerDeclaration(name, EnumBuilder(name).apply(block).build())
     }
 
     override operator fun String.invoke(block: ProtobufScope.() -> Unit) {
@@ -44,6 +32,15 @@ internal class ProtobufBuilder(private val segments: List<String> = emptyList())
     override fun version(version: Int, block: ProtobufScope.() -> Unit) {
         require(version > 0) { "Version must be positive, but was $version." }
         ProtobufBuilder(segments + "v$version").apply(block).build().forEach { register(it.name, it) }
+    }
+
+    override fun qualifyName(name: String): String = (segments + name).joinToString(".")
+
+    override fun resolveReference(target: String): String = getReferencePath(segments, target).joinToString(".")
+
+    override fun registerDeclaration(name: String, declaration: Type) {
+        val fqName = qualifyName(name)
+        register(fqName, ProtobufSchema(fqName, declaration))
     }
 
     fun build() = schemasByName.values.toSet()
