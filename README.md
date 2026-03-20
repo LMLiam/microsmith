@@ -996,7 +996,7 @@ Choose between the two paths like this:
 
 Fallback artifact sources:
 
-- GitHub Release asset: `microsmith-script-definition-<version>-all.jar`
+- GitHub Release asset: `microscript-definition-<version>-all.jar`
 - local build: `./gradlew :runtime-scripting:ideFallbackArtifacts`
 - published package: `io.github.lmliam.microsmith:runtime-scripting:<version>:all`
 
@@ -1375,7 +1375,7 @@ Helper path:
 
 Fallback path:
 
-1. Download or build the matching `microsmith-script-definition-<version>-all.jar`.
+1. Download or build the matching `microscript-definition-<version>-all.jar`.
 2. Attach the jar as a project library in the target JetBrains IDE.
 3. Reindex the project.
 4. Confirm `microsmith {}`, `schemas {}`, and `protobuf {}` resolve in `build.microsmith.kts`.
@@ -1508,8 +1508,8 @@ The DSL surface stays the same; the execution boundary changes.
 - `modules/cli/build/release-assets/microsmith-install.ps1`
 - `modules/cli/build/release-assets/*.sha256`
 - `modules/cli/build/generated/microsmith/bundled-plugins.lock`
-- `modules/runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar`
-- `modules/runtime-scripting/build/release-assets/microsmith-script-definition-<version>-all.jar.sha256`
+- `modules/runtime-scripting/build/release-assets/microscript-definition-<version>-all.jar`
+- `modules/runtime-scripting/build/release-assets/microscript-definition-<version>-all.jar.sha256`
 
 Published packages are available from:
 

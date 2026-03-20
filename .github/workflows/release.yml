@@ -64,7 +64,7 @@ jobs:
             modules/cli/build/release-assets/microsmith-install.sh
             modules/cli/build/release-assets/microsmith-install.ps1
             modules/cli/build/release-assets/*.sha256
-            modules/runtime-scripting/build/release-assets/microsmith-script-definition-*-all.jar
-            modules/runtime-scripting/build/release-assets/microsmith-script-definition-*-all.jar.sha256
+            modules/runtime-scripting/build/release-assets/microscript-definition-*-all.jar
+            modules/runtime-scripting/build/release-assets/microscript-definition-*-all.jar.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
