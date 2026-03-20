@@ -19,6 +19,10 @@ class ProtobufRpcDslIntegrationTests :
                     message("GetUserResponse")
                     message("WatchUsersRequest")
                     message("WatchUsersResponse")
+                    message("DownloadUserRequest")
+                    message("DownloadUserResponse")
+                    message("UploadUserRequest")
+                    message("UploadUserResponse")
                     service("UserService") {
                         "GetUser" {
                             request("GetUserRequest")
@@ -31,18 +35,32 @@ class ProtobufRpcDslIntegrationTests :
                         "ChatUsers" {
                             stream("WatchUsersRequest") to stream("WatchUsersResponse")
                         }
+                        "DownloadUser" {
+                            "DownloadUserRequest" to stream("DownloadUserResponse")
+                        }
+                        "UploadUser" {
+                            stream("UploadUserRequest") to "UploadUserResponse"
+                        }
                     }
                 }
             }.toExtension().schemas.filterIsInstance<ProtobufSchema>()
 
             val service = schemas.first { it.name == "UserService" }.schema as Service
 
-            service.rpcs.map(Rpc::name) shouldContainExactly listOf("GetUser", "WatchUsers", "ChatUsers")
+            service.rpcs.map(Rpc::name) shouldContainExactly listOf(
+                "GetUser",
+                "WatchUsers",
+                "ChatUsers",
+                "DownloadUser",
+                "UploadUser",
+            )
             service.rpcs[0].request.reference.type shouldBe Message("GetUserRequest")
             service.rpcs[0].response.reference.type shouldBe Message("GetUserResponse")
             service.rpcs[1].response.streaming shouldBe true
             service.rpcs[2].request.streaming shouldBe true
             service.rpcs[2].response.streaming shouldBe true
+            service.rpcs[3].response.streaming shouldBe true
+            service.rpcs[4].request.streaming shouldBe true
         }
 
         "protobuf RPC DSL rejects mixed explicit and shorthand route declarations" {

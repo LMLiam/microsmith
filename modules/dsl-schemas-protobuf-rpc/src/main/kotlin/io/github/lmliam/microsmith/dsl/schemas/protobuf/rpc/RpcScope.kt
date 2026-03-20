@@ -12,5 +12,9 @@ interface RpcScope {
 
     infix fun String.to(other: String)
 
+    infix fun String.to(other: RpcEndpointMarker)
+
+    infix fun RpcEndpointMarker.to(other: String)
+
     infix fun RpcEndpointMarker.to(other: RpcEndpointMarker)
 }

@@ -47,6 +47,18 @@ private class RpcBuilder(
         setResponse(normalizeEndpoint(other))
     }
 
+    override fun String.to(other: RpcEndpointMarker) {
+        useDeclarationStyle(RpcDeclarationStyle.SHORTHAND)
+        setRequest(normalizeEndpoint(this))
+        setResponse(normalizeEndpoint(other))
+    }
+
+    override fun RpcEndpointMarker.to(other: String) {
+        useDeclarationStyle(RpcDeclarationStyle.SHORTHAND)
+        setRequest(normalizeEndpoint(this))
+        setResponse(normalizeEndpoint(other))
+    }
+
     override fun RpcEndpointMarker.to(other: RpcEndpointMarker) {
         useDeclarationStyle(RpcDeclarationStyle.SHORTHAND)
         setRequest(normalizeEndpoint(this))
