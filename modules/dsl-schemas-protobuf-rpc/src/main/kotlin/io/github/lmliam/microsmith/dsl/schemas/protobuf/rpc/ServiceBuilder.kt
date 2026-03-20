@@ -1,10 +1,11 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc
 
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufDeclarationContext
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 
 internal class ServiceBuilder(
     private val name: String,
-    private val resolveReference: (String) -> String,
+    private val declarationContext: ProtobufDeclarationContext,
 ) : ServiceScope {
     private val routeNames = mutableSetOf<String>()
     private val rpcs = mutableListOf<Rpc>()
@@ -12,7 +13,7 @@ internal class ServiceBuilder(
     override fun String.invoke(block: RpcScope.() -> Any?) {
         require(isNotBlank()) { "RPC name cannot be blank." }
         require(routeNames.add(this)) { "Duplicate RPC name: $this" }
-        val builder = RpcBuilder(this, resolveReference)
+        val builder = RpcBuilder(this, declarationContext)
         builder.captureResult(builder.block())
         rpcs += builder.build()
     }
@@ -22,7 +23,7 @@ internal class ServiceBuilder(
 
 private class RpcBuilder(
     private val name: String,
-    private val resolveReference: (String) -> String,
+    private val declarationContext: ProtobufDeclarationContext,
 ) : RpcScope {
     private var request: RpcEndpoint? = null
     private var response: RpcEndpoint? = null
@@ -59,8 +60,8 @@ private class RpcBuilder(
     }
 
     private fun normalizeEndpoint(value: Any?, label: String): RpcEndpoint = when (value) {
-        is String -> RpcEndpoint(Reference(resolveReference(value)))
-        is RpcEndpointMarker -> RpcEndpoint(Reference(resolveReference(value.target)), value.streaming)
+        is String -> RpcEndpoint(Reference(declarationContext.resolveReference(value)))
+        is RpcEndpointMarker -> RpcEndpoint(Reference(declarationContext.resolveReference(value.target)), value.streaming)
         else -> error("RPC '$name' $label must be a message name or stream(messageName).")
     }
 

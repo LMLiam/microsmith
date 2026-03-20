@@ -10,6 +10,6 @@ fun ProtobufScope.service(name: String, block: ServiceScope.() -> Unit = {}) {
 
     declarationScope.registerDeclaration(
         name,
-        ServiceBuilder(name, declarationScope::resolveReference).apply(block).build(),
+        ServiceBuilder(name, declarationScope).apply(block).build(),
     )
 }
