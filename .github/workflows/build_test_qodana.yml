@@ -269,7 +269,7 @@ jobs:
           test -f install-smoke-repo/build.microsmith.kts
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts
-          test -f install-smoke-repo/proto/UserCreated.proto
+            test -f proto/UserCreated.proto
       - name: Smoke test Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
         if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
         run: |
