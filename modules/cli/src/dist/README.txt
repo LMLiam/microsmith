@@ -14,8 +14,8 @@ Quick checks:
 - bin/microsmith --help
 - bin/microsmith --version
 - bin/microsmith init
-- bin/microsmith run build.microsmith.kts --out ./generated
-- bin/microsmith run schema.microsmith.kts --out ./generated
+- bin/microsmith run build.microsmith.kts
+- bin/microsmith run schema.microsmith.kts
 - bin/microsmith ide refresh
 - bin/microsmith ide doctor
 - cat bundled-plugins.lock

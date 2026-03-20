@@ -53,7 +53,7 @@ class RubyOnboardingProfileTests :
                 val settingsScript = repoRoot.resolve("settings.microsmith.kts").readText()
 
                 buildScript.shouldContain("RubyUserCreated")
-                buildScript.shouldContain("microsmith run build.microsmith.kts --out ./generated")
+                buildScript.shouldContain("microsmith run build.microsmith.kts")
                 buildScript.shouldContain("// Bootstrapped Microsmith schema for this Ruby repository.")
                 buildScript.shouldContain("Canonical first run:")
                 buildScript.contains("Common repository-native output path:") shouldBe false

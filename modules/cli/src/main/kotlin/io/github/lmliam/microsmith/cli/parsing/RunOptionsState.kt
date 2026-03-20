@@ -21,7 +21,7 @@ internal class RunOptionsState {
     var error: String? = null
 
     fun toParsedRunOptions(): ParsedRunOptions = ParsedRunOptions(
-        outputDir = outputDir,
+        outputDir = outputDir ?: Path.of("."),
         variables = variables.toMap(),
         flags = flags.toSet(),
         plugins = plugins.toSet(),

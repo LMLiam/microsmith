@@ -259,7 +259,7 @@ Install Microsmith, then initialize the repository and run generation:
 
 ```bash
 microsmith init
-microsmith run build.microsmith.kts --out ./generated
+microsmith run build.microsmith.kts
 ```
 
 `microsmith init` is deterministic and non-destructive by default:
@@ -285,30 +285,30 @@ Important behavior:
 - if you skip IDE helper generation, `microsmith doctor` will continue to report bootstrap as incomplete until you run `microsmith ide refresh`
 - after a successful `init`, no additional IDE command is required for the default path
 
-After the canonical first run succeeds, you can switch to a repository-native output layout if you prefer:
+If your repository has a deliberate alternative output root, override `--out` explicitly:
 
 - Node: `microsmith run build.microsmith.kts --out ./generated`
 - Go: `microsmith run build.microsmith.kts --out ./internal/gen`
-- Java: keep the canonical `./generated` output path unless you explicitly wire generated sources into Maven or Gradle later
-- Kotlin: keep the canonical `./generated` output path unless you explicitly wire generated sources into Gradle or Maven later
-- Scala: keep the canonical `./generated` output path unless you explicitly wire generated sources into Gradle, `sbt`, or Maven later
-- Python: keep the canonical `./generated` output path unless your repository already has a stronger convention
-- Ruby: keep the canonical `./generated` output path unless your repository already has a stronger convention
-- Rust: keep the canonical `./generated` output path unless your repository already has a stronger convention
+- Java: keep the default repository-root `./proto` output path unless you explicitly wire generated sources into Maven or Gradle later
+- Kotlin: keep the default repository-root `./proto` output path unless you explicitly wire generated sources into Gradle or Maven later
+- Scala: keep the default repository-root `./proto` output path unless you explicitly wire generated sources into Gradle, `sbt`, or Maven later
+- Python: keep the default repository-root `./proto` output path unless your repository already has a stronger convention
+- Ruby: keep the default repository-root `./proto` output path unless your repository already has a stronger convention
+- Rust: keep the default repository-root `./proto` output path unless your repository already has a stronger convention
 - .NET: `microsmith run build.microsmith.kts --out ./Generated`
 
 Java-specific guidance:
 
 - Maven-based Java repositories: prefer the native Maven integration path documented below when you want imported-project IDE support and Maven-goal execution
 - Gradle-based Java repositories: prefer the native Gradle integration path documented below when you want imported-project IDE support and Gradle-task execution
-- build-tool-light Java repositories: use the same canonical `./generated` output path and helper workflow
+- build-tool-light Java repositories: use the same default repository-root `./proto` output path and helper workflow
 
 Kotlin-specific guidance:
 
 - Gradle Kotlin DSL repositories: prefer the native Gradle integration path documented below when you want imported-project IDE support and Gradle-task execution
 - Gradle Groovy repositories that primarily host Kotlin code: the same native Gradle plugin path applies when Kotlin is the primary source language
 - Maven Kotlin repositories: prefer the native Maven integration path documented below when you want imported-project IDE support and Maven-goal execution
-- build-tool-light Kotlin repositories: use the same canonical `./generated` output path and helper workflow
+- build-tool-light Kotlin repositories: use the same default repository-root `./proto` output path and helper workflow
 
 Scala-specific guidance:
 
@@ -414,9 +414,9 @@ dependencies {
 Generated-source guidance:
 
 - Microsmith does not auto-register generated directories as Java, Kotlin, or Scala sources
-- keep the default `build/generated/microsmith` output root unless you have a concrete source-emission contract to wire into your build
+- Microsmith writes generated `.proto` files under `./proto` by default
 - only add generated directories into source sets when a generator actually emits compilable language sources for that repository
-- use the same explicit Gradle source-set wiring you already use for other generated sources; do not add the entire output root blindly
+- use the same explicit Gradle source-set wiring you already use for other generated sources; wire `./proto` only when you intentionally consume generated protobuf sources from the build
 
 Coexistence with the CLI, helper, and fallback paths:
 
@@ -513,7 +513,7 @@ If JetBrains IDEs also need those plugin-provided types in `.microsmith.kts`, mi
 Generated-source guidance:
 
 - Microsmith does not auto-register generated directories as Java, Kotlin, or Scala sources in Maven
-- keep the default `target/generated/microsmith` output root unless a generator actually emits compilable sources for that repository
+- Microsmith writes generated `.proto` files under `./proto` by default
 - only add concrete language source directories into the build when you have a real source-emission contract
 - use the same explicit Maven source-registration approach you already use for other generated sources, such as `build-helper-maven-plugin`, rather than adding the entire output root blindly
 
@@ -595,7 +595,7 @@ The native sbt plugin exposes:
 
 - `microsmithGenerate`: runs the configured `.microsmith.kts` script and returns the generated files
 - `microsmithScriptFile`: defaults to `build.microsmith.kts`
-- `microsmithOutputDirectory`: defaults to `target/generated/microsmith`
+- `microsmithOutputDirectory`: defaults to the repository root, which emits `.proto` files under `./proto`
 - `microsmithCacheDirectory`: defaults to `target/tmp/microsmith/cache`
 - `microsmithVariables`: string variables exposed to the script via `requireVar` and `hasVar`
 - `microsmithFlags`: flags exposed to the script via `hasFlag`
@@ -608,7 +608,7 @@ Repository credentials:
 Generated-output guidance:
 
 - Microsmith does not auto-register generated directories as Scala, Java, or resource roots in sbt
-- keep the default `target/generated/microsmith` output root unless a generator has a concrete source-emission contract for that repository
+- Microsmith writes generated `.proto` files under `./proto` by default
 - only wire specific generated subdirectories into sbt when you have a real downstream source or resource consumer
 - do not add the entire output root blindly to `Compile / unmanagedSourceDirectories` or similar settings
 
@@ -645,19 +645,19 @@ microsmith {
 Run generation:
 
 ```bash
-microsmith run schema.microsmith.kts --out ./generated
+microsmith run schema.microsmith.kts
 ```
 
 Pass script context values when needed:
 
 ```bash
-microsmith run schema.microsmith.kts --out ./generated --var env=prod --flag emit
+microsmith run schema.microsmith.kts --var env=prod --flag emit
 ```
 
 Run in a separate JVM for stronger isolation:
 
 ```bash
-microsmith run schema.microsmith.kts --out ./generated --isolation process
+microsmith run schema.microsmith.kts --isolation process
 ```
 
 ## Installation and verification
@@ -758,7 +758,7 @@ Microsmith CLI
 Usage:
   microsmith init [--repo-root <path>] [--force] [--skip-ide-helper]
                  [--diagnostics <text|json>] [--verbose]
-  microsmith run <script.microsmith.kts> --out <output-dir> [--var <name=value>]... [--flag <name>]...
+  microsmith run <script.microsmith.kts> [--out <output-dir>] [--var <name=value>]... [--flag <name>]...
                  [--plugin <group:artifact:version>]... [--plugin-jar <path>]...
                  [--offline] [--repository <uri>] [--isolation <classloader|process>]
                  [--diagnostics <text|json>] [--verbose] [--event-log <path>]
@@ -787,14 +787,14 @@ Local:
 
 ```bash
 microsmith init
-microsmith run build.microsmith.kts --out ./generated
+microsmith run build.microsmith.kts
 ```
 
 CI:
 
 ```bash
 microsmith init --diagnostics json --verbose
-microsmith run build.microsmith.kts --out ./generated --diagnostics json --verbose
+microsmith run build.microsmith.kts --diagnostics json --verbose
 ```
 
 Maintenance:
@@ -817,7 +817,7 @@ microsmith ide refresh
 
 `microsmith run`
 
-- executes a `.microsmith.kts` script and writes generated files under `--out`
+- executes a `.microsmith.kts` script and writes generated files under the configured output root, which defaults to the repository root and emits `.proto` files under `./proto`
 - requires the script file to use the `.microsmith.kts` extension
 - supports `--var`, `--flag`, `--plugin`, `--plugin-jar`, `--offline`, `--repository`, `--isolation`, `--diagnostics`, `--verbose`, and `--event-log`
 
@@ -1021,19 +1021,19 @@ Limitations versus the helper path:
 Use remote plugin coordinates:
 
 ```bash
-microsmith run schema.microsmith.kts --out ./generated --plugin com.acme:microsmith-emitter-ts:1.4.2
+microsmith run schema.microsmith.kts --plugin com.acme:microsmith-emitter-ts:1.4.2
 ```
 
 Use local plugin jars:
 
 ```bash
-microsmith run schema.microsmith.kts --out ./generated --plugin-jar ./plugins/emitter.jar
+microsmith run schema.microsmith.kts --plugin-jar ./plugins/emitter.jar
 ```
 
 Run offline after cache warmup and lock generation:
 
 ```bash
-microsmith run schema.microsmith.kts --out ./generated --offline
+microsmith run schema.microsmith.kts --offline
 ```
 
 ### Security defaults
@@ -1045,7 +1045,7 @@ Microsmith enforces the following defaults:
 - the built-in allowed remote repository is Maven Central: `https://repo1.maven.org/maven2`
 - additional allowed repositories can be configured with `MICROSMITH_REPOSITORY_ALLOWLIST`
 - `file://` repositories are blocked by default and can be explicitly enabled with `MICROSMITH_ALLOW_FILE_REPOSITORIES=true`
-- generated output writes are constrained to the configured `--out` root and reject traversal or symlink escapes
+- generated output writes are constrained to the configured output root and reject traversal or symlink escapes
 - the default execution mode is isolated per run; `--isolation process` moves execution into a separate JVM
 - official CLI distributions include a pinned bundled plugin profile in `bundled-plugins.lock`
 
@@ -1063,7 +1063,7 @@ Example using GitHub Packages:
 export MICROSMITH_REPOSITORY_ALLOWLIST="https://maven.pkg.github.com/acme/microsmith"
 export MICROSMITH_REPOSITORY_USERNAME="octocat"
 export MICROSMITH_REPOSITORY_PASSWORD="$GITHUB_TOKEN"
-microsmith run schema.microsmith.kts --out ./generated \
+microsmith run schema.microsmith.kts \
   --repository https://maven.pkg.github.com/acme/microsmith \
   --plugin com.acme:private-emitter:1.2.3
 ```
@@ -1080,7 +1080,7 @@ Use that file:
 
 ```bash
 export MICROSMITH_REPOSITORY_CREDENTIALS_FILE="$HOME/.microsmith/repository-credentials.txt"
-microsmith run schema.microsmith.kts --out ./generated --plugin com.acme:private-emitter:1.2.3
+microsmith run schema.microsmith.kts --plugin com.acme:private-emitter:1.2.3
 ```
 
 ### Environment variables
@@ -1127,7 +1127,7 @@ jobs:
       - name: Bootstrap Microsmith
         run: microsmith init
       - name: Run Microsmith
-        run: microsmith run build.microsmith.kts --out generated
+        run: microsmith run build.microsmith.kts
 ```
 
 ### Java repository
@@ -1149,7 +1149,7 @@ jobs:
       - name: Bootstrap Microsmith
         run: microsmith init
       - name: Generate protobuf
-        run: microsmith run build.microsmith.kts --out generated
+        run: microsmith run build.microsmith.kts
 ```
 
 ### Go repository
@@ -1171,7 +1171,7 @@ jobs:
       - name: Bootstrap Microsmith
         run: microsmith init
       - name: Generate protobuf
-        run: microsmith run build.microsmith.kts --out internal/gen
+        run: microsmith run build.microsmith.kts
 ```
 
 ### Ruby repository
@@ -1193,7 +1193,7 @@ jobs:
       - name: Bootstrap Microsmith
         run: microsmith init
       - name: Generate protobuf
-        run: microsmith run build.microsmith.kts --out generated
+        run: microsmith run build.microsmith.kts
 ```
 
 ### Rust repository
@@ -1215,7 +1215,7 @@ jobs:
       - name: Bootstrap Microsmith
         run: microsmith init
       - name: Generate protobuf
-        run: microsmith run build.microsmith.kts --out generated
+        run: microsmith run build.microsmith.kts
 ```
 
 ### .NET repository
@@ -1240,7 +1240,7 @@ jobs:
         run: microsmith init
       - name: Run Microsmith
         shell: pwsh
-        run: microsmith run build.microsmith.kts --out .\Generated
+        run: microsmith run build.microsmith.kts
 ```
 
 ## Example fixtures
@@ -1257,14 +1257,14 @@ CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flow
 | Kotlin (native Maven)  | `examples/maven/kotlin`    | `mvn microsmith:generate -Dmicrosmith.version=<version>`                          | `examples/maven/kotlin/.github/workflows/microsmith.yml`      |
 | Scala (native Maven)   | `examples/maven/scala`     | `mvn microsmith:generate -Dmicrosmith.version=<version>`                          | `examples/maven/scala/.github/workflows/microsmith.yml`       |
 | Scala (native sbt)     | `examples/sbt/scala`       | `sbt -Dmicrosmith.version=<version> microsmithGenerate`                           | `examples/sbt/scala/.github/workflows/microsmith.yml`         |
-| Java    | `examples/jvm/java-maven`    | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/jvm/java-maven/.github/workflows/microsmith.yml`    |
-| Kotlin  | `examples/jvm/kotlin-gradle` | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/jvm/kotlin-gradle/.github/workflows/microsmith.yml` |
-| Scala   | `examples/jvm/scala-sbt`     | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/jvm/scala-sbt/.github/workflows/microsmith.yml`     |
-| Node    | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
-| Go      | `examples/non-gradle/go`     | `microsmith init` then `microsmith run build.microsmith.kts --out ./internal/gen` | `examples/non-gradle/go/.github/workflows/microsmith.yml`     |
-| Python  | `examples/non-gradle/python` | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/python/.github/workflows/microsmith.yml` |
-| Ruby    | `examples/non-gradle/ruby`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/ruby/.github/workflows/microsmith.yml`   |
-| Rust    | `examples/non-gradle/rust`   | `microsmith init` then `microsmith run build.microsmith.kts --out ./generated`    | `examples/non-gradle/rust/.github/workflows/microsmith.yml`   |
+| Java    | `examples/jvm/java-maven`    | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/jvm/java-maven/.github/workflows/microsmith.yml`    |
+| Kotlin  | `examples/jvm/kotlin-gradle` | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/jvm/kotlin-gradle/.github/workflows/microsmith.yml` |
+| Scala   | `examples/jvm/scala-sbt`     | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/jvm/scala-sbt/.github/workflows/microsmith.yml`     |
+| Node    | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
+| Go      | `examples/non-gradle/go`     | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/non-gradle/go/.github/workflows/microsmith.yml`     |
+| Python  | `examples/non-gradle/python` | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/non-gradle/python/.github/workflows/microsmith.yml` |
+| Ruby    | `examples/non-gradle/ruby`   | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/non-gradle/ruby/.github/workflows/microsmith.yml`   |
+| Rust    | `examples/non-gradle/rust`   | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/non-gradle/rust/.github/workflows/microsmith.yml`   |
 | .NET    | `examples/non-gradle/dotnet` | `microsmith init` then `microsmith run build.microsmith.kts --out .\Generated`    | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
 
 ## Validation matrix and release checklist
@@ -1482,7 +1482,7 @@ The DSL surface stays the same; the execution boundary changes.
 
 | Previous pattern                 | CLI replacement                                          |
 |----------------------------------|----------------------------------------------------------|
-| Gradle task invoking generation  | `microsmith run build.microsmith.kts --out ./generated`  |
+| Gradle task invoking generation  | `microsmith run build.microsmith.kts`                      |
 | Gradle-managed plugin dependency | `--plugin group:artifact:version`                        |
 | local classpath jar wiring       | `--plugin-jar ./path/to/plugin.jar`                      |
 | Gradle offline mode              | `--offline`                                              |

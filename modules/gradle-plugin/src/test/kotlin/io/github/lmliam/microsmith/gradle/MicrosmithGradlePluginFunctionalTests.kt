@@ -69,7 +69,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
             val result = project.build("microsmithGenerate")
 
             result.task(":microsmithGenerate")?.outcome shouldBe TaskOutcome.SUCCESS
-            project.file("build/generated/microsmith/proto/GradleDefaultUserCreated.proto").toFile().shouldExist()
+            project.file("proto/GradleDefaultUserCreated.proto").toFile().shouldExist()
             result.output shouldContain "Generated Microsmith outputs into"
         }
 

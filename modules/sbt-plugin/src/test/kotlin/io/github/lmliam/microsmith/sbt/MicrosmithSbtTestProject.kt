@@ -16,7 +16,7 @@ class MicrosmithSbtTestProject private constructor(
 
     fun executionConfiguration(
         scriptFile: Path = file("build.microsmith.kts"),
-        outputDirectory: Path = file("target/generated/microsmith"),
+        outputDirectory: Path = file("."),
         cacheDirectory: Path = file("target/tmp/microsmith/cache"),
         variables: Map<String, String> = emptyMap(),
         flags: Set<String> = emptySet(),

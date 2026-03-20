@@ -27,7 +27,7 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
                 matchedMarkers = listOf("pom.xml", "src/main/java"),
                 expectedOutput = listOf(
                     "Detected repository profile: Java",
-                    "Next: microsmith run build.microsmith.kts --out ./generated",
+                    "Next: microsmith run build.microsmith.kts",
                     "Prefer the native Maven plugin path",
                     "mvn microsmith:generate",
                 ),
@@ -55,7 +55,7 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
                 matchedMarkers = listOf("build.gradle.kts", "src/main/kotlin"),
                 expectedOutput = listOf(
                     "Detected repository profile: Kotlin",
-                    "Next: microsmith run build.microsmith.kts --out ./generated",
+                    "Next: microsmith run build.microsmith.kts",
                     "Prefer the native Gradle plugin path",
                 ),
                 unexpectedOutput = listOf("Optional repository-native output path"),
@@ -69,7 +69,7 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
                 matchedMarkers = listOf("build.sbt", "src/main/scala"),
                 expectedOutput = listOf(
                     "Detected repository profile: Scala",
-                    "Next: microsmith run build.microsmith.kts --out ./generated",
+                    "Next: microsmith run build.microsmith.kts",
                     "Prefer the native sbt plugin path",
                     "sbt microsmithGenerate",
                 ),
@@ -125,7 +125,7 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
                 matchedMarkers = listOf("build.sbt", "build.gradle.kts", "src/main/scala"),
                 expectedOutput = listOf(
                     "Detected repository profile: Scala",
-                    "Next: microsmith run build.microsmith.kts --out ./generated",
+                    "Next: microsmith run build.microsmith.kts",
                 ),
                 unexpectedOutput = listOf(
                     "Prefer the native Gradle plugin path",

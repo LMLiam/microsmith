@@ -34,7 +34,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
 
             mojo.execute()
 
-            fixture.file("target/generated/microsmith/proto/MavenUserCreated.proto").toFile().shouldExist()
+            fixture.file("proto/MavenUserCreated.proto").toFile().shouldExist()
         }
 
         "execute forwards vars and flags to the script" {

@@ -29,8 +29,8 @@ class MicrosmithSbtExecutionServiceTests : StringSpec() {
 
             val result = MicrosmithSbtExecutionService().execute(fixture.executionConfiguration())
 
-            result.outputDirectory shouldBe fixture.file("target/generated/microsmith")
-            fixture.file("target/generated/microsmith/proto/SbtUserCreated.proto").toFile().shouldExist()
+            result.outputDirectory shouldBe fixture.file(".").normalize()
+            fixture.file("proto/SbtUserCreated.proto").toFile().shouldExist()
         }
 
         "execute forwards vars and flags to the script" {

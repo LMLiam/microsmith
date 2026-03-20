@@ -15,7 +15,8 @@ internal object BootstrapScriptTemplates {
     private fun renderDefaultBuildScript(profile: OnboardingProfile): String = buildString {
         appendLine("// Bootstrapped Microsmith schema for this ${profile.bootstrapTargetDescription}.")
         appendLine("// Canonical first run:")
-        appendLine("// microsmith run build.microsmith.kts --out ./generated")
+        appendLine("// microsmith run build.microsmith.kts")
+        appendLine("// Generated .proto files land in ./proto by default.")
         profile.recommendedOutputDirectory?.let { outputDirectory ->
             appendLine("// Common repository-native output path:")
             appendLine("// microsmith run build.microsmith.kts --out $outputDirectory")

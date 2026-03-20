@@ -14,7 +14,7 @@ internal class MicrosmithMavenTestProject private constructor(
 
     fun createMojo(): MicrosmithGenerateMojo = MicrosmithGenerateMojo().apply {
         projectBaseDirectory = rootDirectory.toFile()
-        outputDirectory = file("target/generated/microsmith").toFile()
+        outputDirectory = file(".").toFile()
         cacheDirectory = file("target/tmp/microsmith/cache").toFile()
     }
 
