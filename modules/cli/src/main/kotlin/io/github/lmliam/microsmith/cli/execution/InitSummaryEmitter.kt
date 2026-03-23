@@ -19,7 +19,8 @@ internal object InitSummaryEmitter {
     fun emit(emitter: CliDiagnosticEmitter, command: InitCommand, result: InitBootstrapResult) {
         emitBootstrapSummary(emitter, command, result)
         emitIdeHelperSummary(emitter, result)
-        emitter.info("Next: microsmith run build.microsmith.kts --out ./generated")
+        emitter.info("Next: microsmith run build.microsmith.kts")
+        emitter.info("Default protobuf output lands in './proto'.")
         emitNativeJvmGuidance(emitter, result)
         result.repositoryDetection.profile.recommendedOutputDirectory?.let { outputDirectory ->
             emitter.info(

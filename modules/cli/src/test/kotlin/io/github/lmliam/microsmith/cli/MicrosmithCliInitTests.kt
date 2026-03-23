@@ -68,7 +68,7 @@ class MicrosmithCliInitTests :
                 out.joinToString("\n").shouldContain("Detected repository profile: Go")
                 out.joinToString("\n").shouldContain("build.microsmith.kts")
                 out.joinToString("\n").shouldContain("JetBrains IDE helper is updated")
-                out.joinToString("\n").shouldContain("microsmith run build.microsmith.kts --out ./generated")
+                out.joinToString("\n").shouldContain("microsmith run build.microsmith.kts")
                 out.joinToString("\n").shouldContain("./internal/gen")
                 err shouldBe emptyList()
             } finally {
@@ -298,7 +298,7 @@ class MicrosmithCliInitTests :
 
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("Detected repository profile: Python")
-                out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts --out ./generated")
+                out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts")
                 out.joinToString("\n").shouldNotContain("Optional repository-native output path")
                 err shouldBe emptyList()
             } finally {
@@ -343,7 +343,7 @@ class MicrosmithCliInitTests :
 
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("Detected repository profile: Ruby")
-                out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts --out ./generated")
+                out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts")
                 out.joinToString("\n").shouldNotContain("Optional repository-native output path")
                 err shouldBe emptyList()
             } finally {
@@ -388,7 +388,7 @@ class MicrosmithCliInitTests :
 
                 exitCode shouldBe 0
                 out.joinToString("\n").shouldContain("Detected repository profile: Rust")
-                out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts --out ./generated")
+                out.joinToString("\n").shouldContain("Next: microsmith run build.microsmith.kts")
                 out.joinToString("\n").shouldNotContain("Optional repository-native output path")
                 err shouldBe emptyList()
             } finally {

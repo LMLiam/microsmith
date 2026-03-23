@@ -13,7 +13,7 @@ class MicrosmithGradlePlugin : Plugin<Project> {
                 MicrosmithGradleExtension::class.java,
             )
         extension.scriptFile.convention(project.layout.projectDirectory.file("build.microsmith.kts"))
-        extension.outputDirectory.convention(project.layout.buildDirectory.dir("generated/microsmith"))
+        extension.outputDirectory.convention(project.layout.projectDirectory)
         extension.variables.convention(emptyMap())
         extension.flags.convention(emptySet())
 

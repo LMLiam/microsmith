@@ -9,7 +9,7 @@ import java.util.Properties
 class MicrosmithGenerateMojo : AbstractMojo() {
     var projectBaseDirectory: File = File(".")
     var scriptFile: File = File("build.microsmith.kts")
-    var outputDirectory: File = File("target/generated/microsmith")
+    var outputDirectory: File = File(".")
     var cacheDirectory: File = File("target/tmp/microsmith/cache")
     var variables: Properties? = null
     var flags: List<String>? = null

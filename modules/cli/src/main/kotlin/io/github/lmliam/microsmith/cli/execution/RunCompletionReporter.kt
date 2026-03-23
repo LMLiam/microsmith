@@ -47,8 +47,9 @@ internal class RunCompletionReporter(
             emitter.warn(warning)
         }
         val cacheState = if (runResult.cacheHit) "hit" else "miss"
+        val generatedOutputRoot = command.outputDir.toAbsolutePath().normalize().resolve("proto")
         emitter.info(
-            "Generated script '${command.script}' into '${command.outputDir}' " +
+            "Generated script '${command.script}' into '$generatedOutputRoot' " +
                 "(compile-cache=$cacheState, elapsed=${runResult.elapsedMillis}ms).",
             details =
             mapOf(

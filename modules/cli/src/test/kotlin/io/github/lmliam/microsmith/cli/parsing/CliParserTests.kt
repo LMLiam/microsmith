@@ -113,11 +113,11 @@ class CliParserTests :
                 )
         }
 
-        "parses run command with required out option" {
-            parseCliArgs(listOf("run", "schema.microsmith.kts", "--out", "build/generated")) shouldBe
+        "parses run command with default output root when --out is omitted" {
+            parseCliArgs(listOf("run", "schema.microsmith.kts")) shouldBe
                 RunCommand(
                     script = Path("schema.microsmith.kts"),
-                    outputDir = Path("build/generated"),
+                    outputDir = Path("."),
                     variables = emptyMap(),
                     flags = emptySet(),
                 )
@@ -198,11 +198,6 @@ class CliParserTests :
                     verbose = true,
                     eventLog = Path("build/event-log.jsonl"),
                 )
-        }
-
-        "returns error when run command has missing out option" {
-            parseCliArgs(listOf("run", "schema.microsmith.kts")) shouldBe
-                ErrorCommand("Missing required --out <output-dir> option.")
         }
 
         "returns error when script has unsupported extension" {

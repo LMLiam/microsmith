@@ -52,7 +52,7 @@ class ScalaOnboardingProfileTests :
                 val settingsScript = repoRoot.resolve("settings.microsmith.kts").readText()
 
                 buildScript.shouldContain("ScalaUserCreated")
-                buildScript.shouldContain("microsmith run build.microsmith.kts --out ./generated")
+                buildScript.shouldContain("microsmith run build.microsmith.kts")
                 buildScript.shouldContain("// Bootstrapped Microsmith schema for this Scala repository.")
                 buildScript.contains("Common repository-native output path:") shouldBe false
                 settingsScript.shouldContain("Detected repository profile: Scala")

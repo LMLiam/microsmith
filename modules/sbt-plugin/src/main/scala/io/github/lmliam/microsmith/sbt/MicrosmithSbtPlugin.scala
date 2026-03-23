@@ -46,7 +46,7 @@ object MicrosmithSbtPlugin extends AutoPlugin {
 
   override lazy val projectSettings: Seq[Def.Setting[_]] = Seq(
     microsmithScriptFile := new File(baseDirectory.value, "build.microsmith.kts"),
-    microsmithOutputDirectory := new File(new File(target.value, "generated"), "microsmith"),
+    microsmithOutputDirectory := baseDirectory.value,
     microsmithCacheDirectory := new File(new File(new File(target.value, "tmp"), "microsmith"), "cache"),
     microsmithVariables := Map.empty,
     microsmithFlags := Set.empty,
@@ -82,11 +82,12 @@ object MicrosmithSbtPlugin extends AutoPlugin {
     try {
       val outcome = executionService.execute(configuration)
       outcome.getWarnings.asScala.foreach(message => logger.warn(message))
+      val generatedOutputRoot = outcome.getOutputDirectory.toAbsolutePath.normalize.resolve("proto")
       logger.info(
-        s"Generated Microsmith outputs into '${outcome.getOutputDirectory}'. " +
+        s"Generated Microsmith outputs into '$generatedOutputRoot'. " +
           s"(compile-cache=${if (outcome.getCacheHit) "hit" else "miss"}, elapsed=${outcome.getElapsedMillis}ms)"
       )
-      generatedFiles(outputDirectory)
+      generatedFiles(generatedOutputRoot.toFile)
     } catch {
       case error: MicrosmithSbtScriptFailureException =>
         throw new MessageOnlyException(error.getMessage)

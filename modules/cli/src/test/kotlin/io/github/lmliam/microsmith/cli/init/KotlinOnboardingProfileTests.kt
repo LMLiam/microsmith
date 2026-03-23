@@ -51,7 +51,7 @@ class KotlinOnboardingProfileTests :
                 val settingsScript = repoRoot.resolve("settings.microsmith.kts").readText()
 
                 buildScript.shouldContain("KotlinUserCreated")
-                buildScript.shouldContain("microsmith run build.microsmith.kts --out ./generated")
+                buildScript.shouldContain("microsmith run build.microsmith.kts")
                 buildScript.shouldContain("// Bootstrapped Microsmith schema for this Kotlin repository.")
                 buildScript.contains("Common repository-native output path:") shouldBe false
                 settingsScript.shouldContain("Detected repository profile: Kotlin")

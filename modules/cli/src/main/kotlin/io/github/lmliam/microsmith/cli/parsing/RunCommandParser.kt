@@ -27,12 +27,9 @@ private fun parseScriptArg(scriptArg: String?): Pair<Path?, String?> = when {
 private fun parseRunOptionsCommand(script: Path, args: List<String>, startIndex: Int): CliCommand {
     val parsedOptions = parseRunOptions(args, startIndex)
     parsedOptions.error?.let { return ErrorCommand(it) }
-    val outputDir =
-        parsedOptions.outputDir
-            ?: return ErrorCommand("Missing required --out <output-dir> option.")
     return RunCommand(
         script = script,
-        outputDir = outputDir,
+        outputDir = parsedOptions.outputDir,
         variables = parsedOptions.variables,
         flags = parsedOptions.flags,
         plugins = parsedOptions.plugins,

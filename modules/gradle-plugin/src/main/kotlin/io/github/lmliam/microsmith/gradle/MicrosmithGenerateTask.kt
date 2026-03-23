@@ -76,8 +76,9 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
 
     private fun reportSuccess(result: MicrosmithGradleWorkerSuccess) {
         result.warnings.forEach(logger::warn)
+        val generatedOutputRoot = outputDirectory.get().asFile.toPath().toAbsolutePath().normalize().resolve("proto")
         logger.lifecycle(
-            "Generated Microsmith outputs into '${outputDirectory.get().asFile}'. " +
+            "Generated Microsmith outputs into '$generatedOutputRoot'. " +
                 "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)",
         )
     }

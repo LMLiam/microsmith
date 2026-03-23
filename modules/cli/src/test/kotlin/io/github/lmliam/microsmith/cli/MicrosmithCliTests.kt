@@ -15,6 +15,7 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import java.nio.file.Path
 import java.util.ServiceConfigurationError
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
@@ -121,6 +122,33 @@ class MicrosmithCliTests :
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
 
             exitCode shouldBe 0
+            out.joinToString("\n").shouldContain("Generated script")
+            err shouldBe emptyList()
+        }
+
+        "returns success for run command with the default output root when --out is omitted" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val observedOutputDirs = mutableListOf<Path>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    providerValidator = { emptyList() },
+                    scriptRunner = { command, _ ->
+                        observedOutputDirs.add(command.outputDir)
+                        ScriptRunSuccess(
+                            warnings = emptyList(),
+                            cacheHit = false,
+                            elapsedMillis = 12,
+                        )
+                    },
+                )
+
+            val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts"))
+
+            exitCode shouldBe 0
+            observedOutputDirs shouldBe listOf(Path.of("."))
             out.joinToString("\n").shouldContain("Generated script")
             err shouldBe emptyList()
         }

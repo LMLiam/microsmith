@@ -57,7 +57,7 @@ jobs:
           VERSION="$(./gradlew -q properties | sed -n 's/^version: //p' | head -n 1)"
           validate_gradle_fixture() {
             local repo_root="$1"
-            local generated_root="$repo_root/build/generated/microsmith/proto"
+            local generated_root="$repo_root/proto"
 
             ./gradlew -p "$repo_root" microsmithGenerate -PmicrosmithVersion="$VERSION" --stacktrace
             test -d "$generated_root"
@@ -91,7 +91,7 @@ jobs:
 
           validate_sbt_fixture() {
             local repo_root="$1"
-            local generated_root="$repo_root/target/generated/microsmith/proto"
+            local generated_root="$repo_root/proto"
 
             (cd "$repo_root" && sbt -batch -Dsbt.supershell=false -Dmicrosmith.version="$VERSION" microsmithGenerate)
             test -d "$generated_root"
@@ -179,10 +179,10 @@ jobs:
               }
           }
           EOF
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --out generated
-          test -f generated/proto/CiSmoke.proto
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --out generated-process --isolation process
-          test -f generated-process/proto/CiSmoke.proto
+          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts
+          test -f proto/CiSmoke.proto
+          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --isolation process
+          test -f proto/CiSmoke.proto
       - name: Smoke test dist doctor diagnostics mode (Unix)
         if: runner.os != 'Windows'
         run: |
@@ -217,12 +217,12 @@ jobs:
               }
           }
           '@ | Set-Content -Path schema.microsmith.kts -Encoding UTF8
-          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated
+          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
-          if (-not (Test-Path .\generated\proto\CiSmoke.proto)) {
-            Write-Error "Expected generated\\proto\\CiSmoke.proto to exist."
+          if (-not (Test-Path .\proto\CiSmoke.proto)) {
+            Write-Error "Expected proto\\CiSmoke.proto to exist."
             exit 1
           }
           & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated-process --isolation process
@@ -268,8 +268,8 @@ jobs:
           ./.microsmith-bin/microsmith init --repo-root install-smoke-repo
           test -f install-smoke-repo/build.microsmith.kts
           test -f install-smoke-repo/settings.microsmith.kts
-          ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts --out install-smoke-repo/generated
-          test -f install-smoke-repo/generated/proto/UserCreated.proto
+          ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts
+            test -f proto/UserCreated.proto
       - name: Smoke test Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
         if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
         run: |
@@ -277,9 +277,8 @@ jobs:
           smoke_unix_fixture() {
             local repo_name="$1"
             local repo_root="$2"
-            local output_root="$3"
-            local expected_proto="$4"
-            local doctor_output="$5"
+            local expected_proto="$3"
+            local doctor_output="$4"
 
             ./.microsmith-bin/microsmith init --repo-root "$repo_root"
             ./.microsmith-bin/microsmith init --repo-root "$repo_root"
@@ -290,19 +289,19 @@ jobs:
             ./.microsmith-bin/microsmith ide refresh --repo-root "$repo_root"
             ./.microsmith-bin/microsmith ide doctor --repo-root "$repo_root" --diagnostics json > "$doctor_output"
             grep -q "JetBrains IDE helper doctor checks passed." "$doctor_output"
-            ./.microsmith-bin/microsmith run "$repo_root/build.microsmith.kts" --out "$repo_root/$output_root"
-            test -f "$repo_root/$output_root/proto/$expected_proto"
+            ./.microsmith-bin/microsmith run "$repo_root/build.microsmith.kts"
+            test -f "proto/$expected_proto"
             echo "Validated $repo_name fixture."
           }
 
-          smoke_unix_fixture java examples/jvm/java-maven generated JavaUserCreated.proto java-ide-doctor.json
-          smoke_unix_fixture kotlin examples/jvm/kotlin-gradle generated KotlinUserCreated.proto kotlin-ide-doctor.json
-          smoke_unix_fixture scala examples/jvm/scala-sbt generated ScalaUserCreated.proto scala-ide-doctor.json
-          smoke_unix_fixture node examples/non-gradle/node generated NodeUserCreated.proto node-ide-doctor.json
-          smoke_unix_fixture go examples/non-gradle/go internal/gen GoUserCreated.proto go-ide-doctor.json
-          smoke_unix_fixture python examples/non-gradle/python generated PythonUserCreated.proto python-ide-doctor.json
-          smoke_unix_fixture ruby examples/non-gradle/ruby generated RubyUserCreated.proto ruby-ide-doctor.json
-          smoke_unix_fixture rust examples/non-gradle/rust generated RustUserCreated.proto rust-ide-doctor.json
+          smoke_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
+          smoke_unix_fixture kotlin examples/jvm/kotlin-gradle KotlinUserCreated.proto kotlin-ide-doctor.json
+          smoke_unix_fixture scala examples/jvm/scala-sbt ScalaUserCreated.proto scala-ide-doctor.json
+          smoke_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
+          smoke_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
+          smoke_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
+          smoke_unix_fixture ruby examples/non-gradle/ruby RubyUserCreated.proto ruby-ide-doctor.json
+          smoke_unix_fixture rust examples/non-gradle/rust RustUserCreated.proto rust-ide-doctor.json
       - name: Install and verify from installer (Windows)
         id: install-windows
         if: ${{ always() && runner.os == 'Windows' && steps.build-release-windows.outcome == 'success' }}
@@ -348,12 +347,12 @@ jobs:
             Write-Error "Expected settings.microsmith.kts to exist after init."
             exit 1
           }
-          & .\.microsmith-bin\microsmith.cmd run install-smoke-repo\build.microsmith.kts --out install-smoke-repo\generated
+          & .\.microsmith-bin\microsmith.cmd run install-smoke-repo\build.microsmith.kts
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
-          if (-not (Test-Path .\install-smoke-repo\generated\proto\UserCreated.proto)) {
-            Write-Error "Expected generated\\proto\\UserCreated.proto to exist after run."
+          if (-not (Test-Path .\proto\UserCreated.proto)) {
+            Write-Error "Expected proto\\UserCreated.proto to exist after run."
             exit 1
           }
       - name: Smoke test .NET onboarding fixture (Windows)
