@@ -74,7 +74,7 @@ jobs:
 
           validate_maven_fixture() {
             local repo_root="$1"
-            local generated_root="$repo_root/proto"
+            local generated_root="$repo_root/target/generated/microsmith/proto"
 
             mvn -B -f "$repo_root/pom.xml" microsmith:generate -Dmicrosmith.version="$VERSION"
             test -d "$generated_root"
@@ -290,7 +290,7 @@ jobs:
             ./.microsmith-bin/microsmith ide doctor --repo-root "$repo_root" --diagnostics json > "$doctor_output"
             grep -q "JetBrains IDE helper doctor checks passed." "$doctor_output"
             ./.microsmith-bin/microsmith run "$repo_root/build.microsmith.kts"
-            test -f "$repo_root/proto/$expected_proto"
+            test -f "proto/$expected_proto"
             echo "Validated $repo_name fixture."
           }
 
