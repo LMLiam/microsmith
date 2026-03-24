@@ -60,6 +60,7 @@ rootProject.name = 'microsmith'
 
 [
     'dsl',
+    'dsl-services',
     'dsl-schemas',
     'dsl-schemas-protobuf',
     'dsl-schemas-protobuf-rpc',
