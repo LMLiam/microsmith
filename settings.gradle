@@ -61,11 +61,13 @@ rootProject.name = 'microsmith'
 [
     'dsl',
     'dsl-services',
+    'dsl-services-dotnet',
     'dsl-schemas',
     'dsl-schemas-protobuf',
     'dsl-schemas-protobuf-rpc',
     'gen',
     'gen-services',
+    'gen-services-dotnet',
     'gen-schemas',
     'gen-schemas-protobuf',
     'gen-schemas-protobuf-rpc',

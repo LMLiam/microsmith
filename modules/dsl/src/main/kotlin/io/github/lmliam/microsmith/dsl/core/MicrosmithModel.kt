@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.dsl.core
 
+import io.github.lmliam.microsmith.dsl.helpers.mergeModelExtension
 import kotlin.reflect.KClass
 
 /**
@@ -27,8 +28,9 @@ class MicrosmithModel internal constructor(
     /**
      * Internal: return a new model with the given extension attached.
      */
+    @Suppress("UNCHECKED_CAST")
     internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = MicrosmithModel(
-        extensions + (mapOf(type to value)),
+        extensions + (mapOf(type to mergeModelExtension(extensions[type] as T?, value))),
     )
 
     /**

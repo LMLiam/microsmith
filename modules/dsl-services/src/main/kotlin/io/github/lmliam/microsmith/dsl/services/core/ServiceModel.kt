@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.core
 
+import io.github.lmliam.microsmith.dsl.helpers.mergeModelExtension
 import kotlin.reflect.KClass
 
 /**
@@ -13,8 +14,16 @@ class ServiceModel internal constructor(
 
     inline fun <reified T : ServiceExtension> get(): T? = get(T::class)
 
+    @Suppress("UNCHECKED_CAST")
     internal fun <T : ServiceExtension> with(type: KClass<T>, value: T) = ServiceModel(
-        extensions + (mapOf(type to value)),
+        extensions + (mapOf(type to mergeModelExtension(extensions[type] as T?, value))),
+    )
+
+    internal fun merge(other: ServiceModel): ServiceModel = ServiceModel(
+        extensions +
+            other.extensions.mapValues { (type, value) ->
+                mergeModelExtension(extensions[type] as ServiceExtension?, value)
+            },
     )
 
     fun keys() = extensions.keys
