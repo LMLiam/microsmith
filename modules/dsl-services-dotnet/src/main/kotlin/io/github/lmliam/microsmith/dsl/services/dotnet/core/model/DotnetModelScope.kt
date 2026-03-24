@@ -10,11 +10,23 @@ interface DotnetModelScope {
 
     fun byte(name: String): DotnetField
 
+    fun sbyte(name: String): DotnetField
+
     fun short(name: String): DotnetField
+
+    fun ushort(name: String): DotnetField
 
     fun int(name: String): DotnetField
 
+    fun uint(name: String): DotnetField
+
     fun long(name: String): DotnetField
+
+    fun ulong(name: String): DotnetField
+
+    fun nint(name: String): DotnetField
+
+    fun nuint(name: String): DotnetField
 
     fun float(name: String): DotnetField
 

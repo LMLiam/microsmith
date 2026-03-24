@@ -5,44 +5,56 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotn
 /**
  * Supported field types for service-local .NET models.
  */
-sealed class DotnetFieldType(val csharpType: String) {
-    data object StringType : DotnetFieldType("string")
+sealed class DotnetFieldType(val csharpType: kotlin.String) {
+    data object String : DotnetFieldType("string")
 
-    data object CharType : DotnetFieldType("char")
+    data object Char : DotnetFieldType("char")
 
-    data object ByteType : DotnetFieldType("byte")
+    data object Byte : DotnetFieldType("byte")
 
-    data object ShortType : DotnetFieldType("short")
+    data object SByte : DotnetFieldType("sbyte")
 
-    data object IntType : DotnetFieldType("int")
+    data object Short : DotnetFieldType("short")
 
-    data object LongType : DotnetFieldType("long")
+    data object UShort : DotnetFieldType("ushort")
 
-    data object FloatType : DotnetFieldType("float")
+    data object Int : DotnetFieldType("int")
 
-    data object DoubleType : DotnetFieldType("double")
+    data object UInt : DotnetFieldType("uint")
 
-    data object DecimalType : DotnetFieldType("decimal")
+    data object Long : DotnetFieldType("long")
 
-    data object BoolType : DotnetFieldType("bool")
+    data object ULong : DotnetFieldType("ulong")
 
-    data object GuidType : DotnetFieldType("Guid")
+    data object NInt : DotnetFieldType("nint")
 
-    data object DateOnlyType : DotnetFieldType("DateOnly")
+    data object NUInt : DotnetFieldType("nuint")
 
-    data object TimeOnlyType : DotnetFieldType("TimeOnly")
+    data object Float : DotnetFieldType("float")
 
-    data object DateTimeType : DotnetFieldType("DateTime")
+    data object Double : DotnetFieldType("double")
 
-    data object DateTimeOffsetType : DotnetFieldType("DateTimeOffset")
+    data object Decimal : DotnetFieldType("decimal")
 
-    data object TimeSpanType : DotnetFieldType("TimeSpan")
+    data object Bool : DotnetFieldType("bool")
 
-    data class Reference(val target: String) : DotnetFieldType(target) {
+    data object Guid : DotnetFieldType("Guid")
+
+    data object DateOnly : DotnetFieldType("DateOnly")
+
+    data object TimeOnly : DotnetFieldType("TimeOnly")
+
+    data object DateTime : DotnetFieldType("DateTime")
+
+    data object DateTimeOffset : DotnetFieldType("DateTimeOffset")
+
+    data object TimeSpan : DotnetFieldType("TimeSpan")
+
+    data class Reference(val target: kotlin.String) : DotnetFieldType(target) {
         init {
             validateDotnetIdentifier(target, "Reference target")
         }
     }
 
-    override fun toString(): String = csharpType
+    override fun toString(): kotlin.String = csharpType
 }

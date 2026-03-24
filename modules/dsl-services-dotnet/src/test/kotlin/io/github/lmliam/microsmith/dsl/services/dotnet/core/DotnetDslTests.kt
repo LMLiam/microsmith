@@ -125,7 +125,7 @@ class DotnetDslTests :
             userModel.fields.last().type shouldBe DotnetFieldType.Reference("User")
         }
 
-        "dotnet models support the common csharp scalar set" {
+        "dotnet models support the csharp scalar set" {
             val builder = MicrosmithBuilder()
 
             builder.services {
@@ -137,9 +137,15 @@ class DotnetDslTests :
                                 string("name")
                                 char("initial")
                                 byte("level")
+                                sbyte("delta")
                                 short("rank")
+                                ushort("maxRank")
                                 int("count")
+                                uint("capacity")
                                 long("total")
+                                ulong("lifetimeTotal")
+                                nint("offset")
+                                nuint("pageSize")
                                 float("ratio")
                                 double("average")
                                 decimal("amount")
@@ -165,22 +171,28 @@ class DotnetDslTests :
                     .requireModel("Example")
 
             exampleModel.fields.map(DotnetField::type) shouldContainExactly listOf(
-                DotnetFieldType.StringType,
-                DotnetFieldType.CharType,
-                DotnetFieldType.ByteType,
-                DotnetFieldType.ShortType,
-                DotnetFieldType.IntType,
-                DotnetFieldType.LongType,
-                DotnetFieldType.FloatType,
-                DotnetFieldType.DoubleType,
-                DotnetFieldType.DecimalType,
-                DotnetFieldType.BoolType,
-                DotnetFieldType.GuidType,
-                DotnetFieldType.DateOnlyType,
-                DotnetFieldType.TimeOnlyType,
-                DotnetFieldType.DateTimeType,
-                DotnetFieldType.DateTimeOffsetType,
-                DotnetFieldType.TimeSpanType,
+                DotnetFieldType.String,
+                DotnetFieldType.Char,
+                DotnetFieldType.Byte,
+                DotnetFieldType.SByte,
+                DotnetFieldType.Short,
+                DotnetFieldType.UShort,
+                DotnetFieldType.Int,
+                DotnetFieldType.UInt,
+                DotnetFieldType.Long,
+                DotnetFieldType.ULong,
+                DotnetFieldType.NInt,
+                DotnetFieldType.NUInt,
+                DotnetFieldType.Float,
+                DotnetFieldType.Double,
+                DotnetFieldType.Decimal,
+                DotnetFieldType.Bool,
+                DotnetFieldType.Guid,
+                DotnetFieldType.DateOnly,
+                DotnetFieldType.TimeOnly,
+                DotnetFieldType.DateTime,
+                DotnetFieldType.DateTimeOffset,
+                DotnetFieldType.TimeSpan,
             )
         }
 

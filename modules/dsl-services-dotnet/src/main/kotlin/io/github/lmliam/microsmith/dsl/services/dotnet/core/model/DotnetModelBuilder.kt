@@ -14,37 +14,49 @@ internal class DotnetModelBuilder(
         )
     }
 
-    override fun string(name: String) = addField(name, DotnetFieldType.StringType)
+    override fun string(name: String) = addField(name, DotnetFieldType.String)
 
-    override fun char(name: String) = addField(name, DotnetFieldType.CharType)
+    override fun char(name: String) = addField(name, DotnetFieldType.Char)
 
-    override fun byte(name: String) = addField(name, DotnetFieldType.ByteType)
+    override fun byte(name: String) = addField(name, DotnetFieldType.Byte)
 
-    override fun short(name: String) = addField(name, DotnetFieldType.ShortType)
+    override fun sbyte(name: String) = addField(name, DotnetFieldType.SByte)
 
-    override fun int(name: String) = addField(name, DotnetFieldType.IntType)
+    override fun short(name: String) = addField(name, DotnetFieldType.Short)
 
-    override fun long(name: String) = addField(name, DotnetFieldType.LongType)
+    override fun ushort(name: String) = addField(name, DotnetFieldType.UShort)
 
-    override fun float(name: String) = addField(name, DotnetFieldType.FloatType)
+    override fun int(name: String) = addField(name, DotnetFieldType.Int)
 
-    override fun double(name: String) = addField(name, DotnetFieldType.DoubleType)
+    override fun uint(name: String) = addField(name, DotnetFieldType.UInt)
 
-    override fun decimal(name: String) = addField(name, DotnetFieldType.DecimalType)
+    override fun long(name: String) = addField(name, DotnetFieldType.Long)
 
-    override fun bool(name: String) = addField(name, DotnetFieldType.BoolType)
+    override fun ulong(name: String) = addField(name, DotnetFieldType.ULong)
 
-    override fun guid(name: String) = addField(name, DotnetFieldType.GuidType)
+    override fun nint(name: String) = addField(name, DotnetFieldType.NInt)
 
-    override fun dateOnly(name: String) = addField(name, DotnetFieldType.DateOnlyType)
+    override fun nuint(name: String) = addField(name, DotnetFieldType.NUInt)
 
-    override fun timeOnly(name: String) = addField(name, DotnetFieldType.TimeOnlyType)
+    override fun float(name: String) = addField(name, DotnetFieldType.Float)
 
-    override fun dateTime(name: String) = addField(name, DotnetFieldType.DateTimeType)
+    override fun double(name: String) = addField(name, DotnetFieldType.Double)
 
-    override fun dateTimeOffset(name: String) = addField(name, DotnetFieldType.DateTimeOffsetType)
+    override fun decimal(name: String) = addField(name, DotnetFieldType.Decimal)
 
-    override fun timeSpan(name: String) = addField(name, DotnetFieldType.TimeSpanType)
+    override fun bool(name: String) = addField(name, DotnetFieldType.Bool)
+
+    override fun guid(name: String) = addField(name, DotnetFieldType.Guid)
+
+    override fun dateOnly(name: String) = addField(name, DotnetFieldType.DateOnly)
+
+    override fun timeOnly(name: String) = addField(name, DotnetFieldType.TimeOnly)
+
+    override fun dateTime(name: String) = addField(name, DotnetFieldType.DateTime)
+
+    override fun dateTimeOffset(name: String) = addField(name, DotnetFieldType.DateTimeOffset)
+
+    override fun timeSpan(name: String) = addField(name, DotnetFieldType.TimeSpan)
 
     override infix fun String.ref(target: String) = addField(
         name = this,
