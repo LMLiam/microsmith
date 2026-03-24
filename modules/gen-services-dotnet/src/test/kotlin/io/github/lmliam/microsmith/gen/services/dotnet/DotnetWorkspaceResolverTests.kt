@@ -11,6 +11,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
+private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
+    requireNotNull(model.get<ServicesExtension>())
+
 class DotnetWorkspaceResolverTests :
     StringSpec({
         "resolve inherits shared target and resolves services" {
@@ -38,14 +41,15 @@ class DotnetWorkspaceResolverTests :
                 }
             }
 
-            val workspace = DotnetWorkspaceResolver().resolve(builder.model.get<ServicesExtension>()!!)
+            val workspace = DotnetWorkspaceResolver().resolve(builder.requireServicesExtension())
+            val userService = requireNotNull(workspace.services["UserService"])
 
             workspace.target shouldBe NET8
             workspace.solutions.keys shouldContainExactly listOf("Platform")
             workspace.services.keys shouldContainExactly listOf("UserService")
-            workspace.services["UserService"]?.target shouldBe NET8
-            workspace.services["UserService"]?.project shouldBe "UserService.Api"
-            workspace.services["UserService"]?.solution?.name shouldBe "Platform"
+            userService.target shouldBe NET8
+            userService.project shouldBe "UserService.Api"
+            userService.solution.name shouldBe "Platform"
         }
 
         "resolve rejects unknown dotnet model references" {
@@ -72,7 +76,7 @@ class DotnetWorkspaceResolverTests :
                 }
             }
 
-            val extension = builder.model.get<ServicesExtension>()!!
+            val extension = builder.requireServicesExtension()
 
             shouldThrow<IllegalArgumentException> {
                 DotnetWorkspaceResolver().resolve(extension)
@@ -97,7 +101,7 @@ class DotnetWorkspaceResolverTests :
                 }
             }
 
-            val extension = builder.model.get<ServicesExtension>()!!
+            val extension = builder.requireServicesExtension()
 
             shouldThrow<IllegalStateException> {
                 DotnetWorkspaceResolver().resolve(extension)

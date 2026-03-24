@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.dsl.services.core
 
 import io.github.lmliam.microsmith.dsl.core.MergeableExtension
 import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+import io.github.lmliam.microsmith.dsl.services.helpers.require
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
@@ -25,6 +26,9 @@ class ServicesModelTests :
                     MergeableTestSharedExtension(listOf("right")),
                 )
 
-            left.merge(right).get<MergeableTestSharedExtension>()!!.values shouldContainExactly listOf("left", "right")
+            left
+                .merge(right)
+                .require<MergeableTestSharedExtension>()
+                .values shouldContainExactly listOf("left", "right")
         }
     })

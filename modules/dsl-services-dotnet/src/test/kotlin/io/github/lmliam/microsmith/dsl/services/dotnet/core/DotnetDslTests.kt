@@ -18,6 +18,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
+private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
+    requireNotNull(model.get<ServicesExtension>())
+
 private data class TestSolutionExtension(
     val values: List<String>,
 ) : MicrosmithExtension, MergeableExtension<TestSolutionExtension> {
@@ -50,8 +53,8 @@ class DotnetDslTests :
                 }
             }
 
-            val extension = builder.model.get<ServicesExtension>()!!
-            val defaults = extension.get<DotnetDefaultsExtension>()!!
+            val extension = builder.requireServicesExtension()
+            val defaults = requireNotNull(extension.get<DotnetDefaultsExtension>())
 
             defaults.target shouldBe NET8
             defaults.solutions.keys shouldContainExactly listOf("Platform")
@@ -80,10 +83,10 @@ class DotnetDslTests :
                 }
             }
 
-            val extension = builder.model.get<ServicesExtension>()!!
-            val solution = extension.get<DotnetDefaultsExtension>()!!.requireSolution("Platform")
+            val extension = builder.requireServicesExtension()
+            val solution = requireNotNull(extension.get<DotnetDefaultsExtension>()).requireSolution("Platform")
 
-            solution.get<TestSolutionExtension>()!!.values shouldContainExactly listOf("left", "right")
+            requireNotNull(solution.get<TestSolutionExtension>()).values shouldContainExactly listOf("left", "right")
         }
 
         "service dotnet blocks merge into a single service extension" {
@@ -109,9 +112,9 @@ class DotnetDslTests :
                 }
             }
 
-            val extension = builder.model.get<ServicesExtension>()!!
+            val extension = builder.requireServicesExtension()
             val service = extension.require("UserService")
-            val dotnet = service.model.get<DotnetServiceExtension>()!!
+            val dotnet = requireNotNull(service.model.get<DotnetServiceExtension>())
 
             dotnet.target shouldBe NET9
             dotnet.solution shouldBe "Platform"
