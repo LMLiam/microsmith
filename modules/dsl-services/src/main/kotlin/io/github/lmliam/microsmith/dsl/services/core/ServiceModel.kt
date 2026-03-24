@@ -14,6 +14,7 @@ class ServiceModel internal constructor(
 
     inline fun <reified T : ServiceExtension> get(): T? = get(T::class)
 
+    @Suppress("UNCHECKED_CAST")
     internal fun <T : ServiceExtension> with(type: KClass<T>, value: T) = ServiceModel(
         extensions + (mapOf(type to mergeModelExtension(extensions[type] as T?, value))),
     )

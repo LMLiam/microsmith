@@ -15,6 +15,7 @@ class DotnetSharedModel internal constructor(
 
     inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
 
+    @Suppress("UNCHECKED_CAST")
     internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = DotnetSharedModel(
         extensions + (mapOf(type to mergeModelExtension(extensions[type] as T?, value))),
     )
