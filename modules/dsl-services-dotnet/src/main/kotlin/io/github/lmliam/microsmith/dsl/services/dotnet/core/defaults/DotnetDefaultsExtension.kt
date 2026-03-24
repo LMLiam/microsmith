@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.core.shared
+package io.github.lmliam.microsmith.dsl.services.dotnet.core.defaults
 
 import io.github.lmliam.microsmith.dsl.core.MergeableExtension
 import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
@@ -10,11 +10,11 @@ import kotlin.reflect.KClass
 /**
  * Shared .NET defaults declared under `services { dotnet { ... } }`.
  */
-data class DotnetSharedExtension(
+data class DotnetDefaultsExtension(
     val target: DotnetTarget? = null,
     val solutions: Map<String, DotnetSolution> = emptyMap(),
-    val model: DotnetSharedModel = DotnetSharedModel.empty(),
-) : MicrosmithExtension, MergeableExtension<DotnetSharedExtension> {
+    val model: DotnetDefaultsModel = DotnetDefaultsModel.empty(),
+) : MicrosmithExtension, MergeableExtension<DotnetDefaultsExtension> {
     fun findSolution(name: String) = solutions[name]
 
     fun requireSolution(name: String): DotnetSolution {
@@ -33,7 +33,7 @@ data class DotnetSharedExtension(
         model = model.with(type, ext),
     )
 
-    override fun merge(other: DotnetSharedExtension): DotnetSharedExtension {
+    override fun merge(other: DotnetDefaultsExtension): DotnetDefaultsExtension {
         val mergedSolutions = linkedMapOf<String, DotnetSolution>()
 
         solutions.values.forEach { solution ->

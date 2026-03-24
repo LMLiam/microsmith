@@ -11,7 +11,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
-class DotnetGenerationServiceTests :
+class DotnetWorkspaceResolverTests :
     StringSpec({
         "resolve inherits shared target and resolves services" {
             val builder = MicrosmithBuilder()
@@ -38,7 +38,7 @@ class DotnetGenerationServiceTests :
                 }
             }
 
-            val workspace = DotnetGenerationService().resolve(builder.model.get<ServicesExtension>()!!)
+            val workspace = DotnetWorkspaceResolver().resolve(builder.model.get<ServicesExtension>()!!)
 
             workspace.target shouldBe NET8
             workspace.solutions.keys shouldContainExactly listOf("Platform")
@@ -75,7 +75,7 @@ class DotnetGenerationServiceTests :
             val extension = builder.model.get<ServicesExtension>()!!
 
             shouldThrow<IllegalArgumentException> {
-                DotnetGenerationService().resolve(extension)
+                DotnetWorkspaceResolver().resolve(extension)
             }
         }
 
@@ -100,7 +100,7 @@ class DotnetGenerationServiceTests :
             val extension = builder.model.get<ServicesExtension>()!!
 
             shouldThrow<IllegalStateException> {
-                DotnetGenerationService().resolve(extension)
+                DotnetWorkspaceResolver().resolve(extension)
             }
         }
     })

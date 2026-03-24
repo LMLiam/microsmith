@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.core.shared
+package io.github.lmliam.microsmith.dsl.services.dotnet.core.defaults
 
 import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget
@@ -7,10 +7,10 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolut
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolutionsScope
 import kotlin.reflect.KClass
 
-internal class DotnetSharedBuilder : DotnetSharedContext {
+internal class DotnetDefaultsBuilder : DotnetDefaultsContext {
     private var target: DotnetTarget? = null
     private val solutionsByName = linkedMapOf<String, DotnetSolution>()
-    private var model = DotnetSharedModel.empty()
+    private var model = DotnetDefaultsModel.empty()
 
     override fun target(target: DotnetTarget) {
         this.target = target
@@ -30,7 +30,7 @@ internal class DotnetSharedBuilder : DotnetSharedContext {
         model = model.with(type, ext)
     }
 
-    fun build() = DotnetSharedExtension(
+    fun build() = DotnetDefaultsExtension(
         target = target,
         solutions = solutionsByName.toMap(),
         model = model,

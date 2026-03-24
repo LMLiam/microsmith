@@ -5,7 +5,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotn
 import kotlin.reflect.KClass
 
 /**
- * A named .NET solution declared in the shared dotnet scope.
+ * A named .NET solution declared in the services-level dotnet defaults scope.
  */
 data class DotnetSolution(
     val name: String,

@@ -2,28 +2,28 @@ package io.github.lmliam.microsmith.gen.services.dotnet
 
 import io.github.lmliam.microsmith.dsl.services.core.Service
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.defaults.DotnetDefaultsExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.shared.DotnetSharedExtension
 
 /**
  * Normalises the shared and per-service .NET DSL into a resolved workspace model.
  */
-class DotnetGenerationService {
+class DotnetWorkspaceResolver {
     fun resolve(extension: ServicesExtension): DotnetWorkspace {
-        val shared = extension.get<DotnetSharedExtension>() ?: DotnetSharedExtension()
+        val defaults = extension.get<DotnetDefaultsExtension>() ?: DotnetDefaultsExtension()
 
         val services =
             extension.services.mapNotNull { service ->
                 service.model.get<DotnetServiceExtension>()?.let { dotnet ->
-                    resolveService(service, dotnet, shared)
+                    resolveService(service, dotnet, defaults)
                 }
             }.associateBy(ResolvedDotnetService::name)
 
         return DotnetWorkspace(
-            target = shared.target,
-            solutions = shared.solutions,
+            target = defaults.target,
+            solutions = defaults.solutions,
             services = services,
         )
     }
@@ -31,16 +31,16 @@ class DotnetGenerationService {
     private fun resolveService(
         service: Service,
         dotnet: DotnetServiceExtension,
-        shared: DotnetSharedExtension,
+        defaults: DotnetDefaultsExtension,
     ): ResolvedDotnetService {
         val target =
             dotnet.target
-                ?: shared.target
+                ?: defaults.target
                 ?: error("Dotnet target not configured for service '${service.name}'.")
         val solutionName = dotnet.solution ?: error("Dotnet solution not configured for service '${service.name}'.")
         val solution =
-            shared.findSolution(solutionName)
-                ?: throw DotnetGenerationErrors.solutionNotDeclared(service.name, solutionName)
+            defaults.findSolution(solutionName)
+                ?: throw DotnetWorkspaceResolutionErrors.solutionNotDeclared(service.name, solutionName)
         val project = dotnet.project ?: error("Dotnet project not configured for service '${service.name}'.")
 
         validateModelReferences(service, dotnet.models.values.toList())

@@ -7,10 +7,10 @@ import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.core.services
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget.NET8
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget.NET9
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.defaults.DotnetDefaultsExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.shared.DotnetSharedExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolutionContext
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolutionScope
 import io.kotest.assertions.throwables.shouldThrow
@@ -33,7 +33,7 @@ private fun DotnetSolutionScope.marker(value: String) {
 
 class DotnetDslTests :
     StringSpec({
-        "shared dotnet blocks merge into services extension" {
+        "services-level dotnet blocks merge into defaults extension" {
             val builder = MicrosmithBuilder()
 
             builder.services {
@@ -51,13 +51,13 @@ class DotnetDslTests :
             }
 
             val extension = builder.model.get<ServicesExtension>()!!
-            val dotnet = extension.get<DotnetSharedExtension>()!!
+            val defaults = extension.get<DotnetDefaultsExtension>()!!
 
-            dotnet.target shouldBe NET8
-            dotnet.solutions.keys shouldContainExactly listOf("Platform")
+            defaults.target shouldBe NET8
+            defaults.solutions.keys shouldContainExactly listOf("Platform")
         }
 
-        "shared dotnet blocks merge matching solution declarations by name" {
+        "services-level dotnet blocks merge matching solution declarations by name" {
             val builder = MicrosmithBuilder()
 
             builder.services {
@@ -81,7 +81,7 @@ class DotnetDslTests :
             }
 
             val extension = builder.model.get<ServicesExtension>()!!
-            val solution = extension.get<DotnetSharedExtension>()!!.requireSolution("Platform")
+            val solution = extension.get<DotnetDefaultsExtension>()!!.requireSolution("Platform")
 
             solution.get<TestSolutionExtension>()!!.values shouldContainExactly listOf("left", "right")
         }
