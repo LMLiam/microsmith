@@ -1,9 +1,16 @@
 package io.github.lmliam.microsmith.dsl.services.core
 
+import io.github.lmliam.microsmith.dsl.core.MergeableExtension
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
 private data class TestServiceExtension(val value: String) : ServiceExtension
+private data class MergeableTestServiceExtension(
+    val values: List<String>,
+) : ServiceExtension, MergeableExtension<MergeableTestServiceExtension> {
+    override fun merge(other: MergeableTestServiceExtension) = MergeableTestServiceExtension(values + other.values)
+}
 
 class ServiceModelTests :
     StringSpec({
@@ -30,5 +37,20 @@ class ServiceModelTests :
 
             model1.get<TestServiceExtension>() shouldBe null
             model2.get<TestServiceExtension>() shouldBe TestServiceExtension("hello")
+        }
+
+        "merge combines mergeable service extensions by type" {
+            val left =
+                ServiceModel.empty().with(
+                    MergeableTestServiceExtension::class,
+                    MergeableTestServiceExtension(listOf("left")),
+                )
+            val right =
+                ServiceModel.empty().with(
+                    MergeableTestServiceExtension::class,
+                    MergeableTestServiceExtension(listOf("right")),
+                )
+
+            left.merge(right).get<MergeableTestServiceExtension>()!!.values shouldContainExactly listOf("left", "right")
         }
     })

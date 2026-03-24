@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.core
 
+import io.github.lmliam.microsmith.dsl.core.MergeableExtension
 import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
+import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.core.services
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget.NET8
@@ -9,6 +11,19 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+
+private data class TestSolutionExtension(
+    val values: List<String>,
+) : MicrosmithExtension, MergeableExtension<TestSolutionExtension> {
+    override fun merge(other: TestSolutionExtension) = TestSolutionExtension(values + other.values)
+}
+
+private fun DotnetSolutionScope.marker(value: String) {
+    val context =
+        this as? DotnetSolutionContext
+            ?: error("marker { ... } can only be invoked within a .NET solution block.")
+    context.put(TestSolutionExtension::class, TestSolutionExtension(listOf(value)))
+}
 
 class DotnetDslTests :
     StringSpec({
@@ -34,6 +49,35 @@ class DotnetDslTests :
 
             dotnet.target shouldBe NET8
             dotnet.solutions.keys shouldContainExactly listOf("Platform")
+        }
+
+        "shared dotnet blocks merge matching solution declarations by name" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                dotnet {
+                    solutions {
+                        "Platform" {
+                            marker("left")
+                        }
+                    }
+                }
+            }
+
+            builder.services {
+                dotnet {
+                    solutions {
+                        "Platform" {
+                            marker("right")
+                        }
+                    }
+                }
+            }
+
+            val extension = builder.model.get<ServicesExtension>()!!
+            val solution = extension.get<DotnetSharedExtension>()!!.requireSolution("Platform")
+
+            solution.get<TestSolutionExtension>()!!.values shouldContainExactly listOf("left", "right")
         }
 
         "service dotnet blocks merge into a single service extension" {

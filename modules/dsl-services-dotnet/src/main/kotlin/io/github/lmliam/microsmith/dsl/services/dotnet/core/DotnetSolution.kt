@@ -22,4 +22,12 @@ data class DotnetSolution(
     internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = copy(
         model = model.with(type, value),
     )
+
+    internal fun merge(other: DotnetSolution): DotnetSolution {
+        require(name == other.name) {
+            "Cannot merge .NET solutions with different names: '$name' and '${other.name}'."
+        }
+
+        return copy(model = model.merge(other.model))
+    }
 }

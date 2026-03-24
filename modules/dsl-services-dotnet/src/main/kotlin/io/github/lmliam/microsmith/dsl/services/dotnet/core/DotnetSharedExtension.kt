@@ -31,15 +31,19 @@ data class DotnetSharedExtension(
     )
 
     override fun merge(other: DotnetSharedExtension): DotnetSharedExtension {
-        val collisions = other.solutions.keys.filter { it in solutions }.sorted()
+        val mergedSolutions = linkedMapOf<String, DotnetSolution>()
 
-        require(collisions.isEmpty()) {
-            "Duplicate .NET solution registration while merging shared defaults: ${collisions.joinToString(", ")}"
+        solutions.values.forEach { solution ->
+            mergedSolutions[solution.name] = solution
+        }
+
+        other.solutions.values.forEach { solution ->
+            mergedSolutions[solution.name] = mergedSolutions[solution.name]?.merge(solution) ?: solution
         }
 
         return copy(
             target = other.target ?: target,
-            solutions = solutions + other.solutions,
+            solutions = mergedSolutions,
             model = model.merge(other.model),
         )
     }
