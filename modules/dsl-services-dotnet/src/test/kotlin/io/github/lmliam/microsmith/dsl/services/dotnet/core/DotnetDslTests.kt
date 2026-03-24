@@ -277,11 +277,14 @@ class DotnetDslTests :
 
         "dotnet target validates supported tfms" {
             DotnetTarget.of("net10.0") shouldBe DotnetTarget.NET10
-            DotnetTarget.of("netcoreapp3.1") shouldBe DotnetTarget.NETCOREAPP3_1
-            DotnetTarget.of("net481") shouldBe DotnetTarget.NET481
+            DotnetTarget.of("net5.0") shouldBe DotnetTarget.NET5
 
             shouldThrow<IllegalArgumentException> {
                 DotnetTarget.of("netstandard2.1")
+            }
+
+            shouldThrow<IllegalArgumentException> {
+                DotnetTarget.of("netcoreapp3.1")
             }
         }
     })
