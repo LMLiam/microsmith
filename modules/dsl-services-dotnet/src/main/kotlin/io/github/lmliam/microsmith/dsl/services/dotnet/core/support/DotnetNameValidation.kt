@@ -1,12 +1,9 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.core.support
 
-private val DOTNET_IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*")
-private val DOTNET_QUALIFIED_IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*")
-
 internal fun validateDotnetIdentifier(value: String, label: String): String {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }
-    require(DOTNET_IDENTIFIER.matches(normalized)) {
+    require(isDotnetIdentifier(normalized)) {
         "$label is not a valid .NET identifier: '$value'"
     }
 
@@ -16,9 +13,41 @@ internal fun validateDotnetIdentifier(value: String, label: String): String {
 internal fun validateDotnetQualifiedIdentifier(value: String, label: String): String {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }
-    require(DOTNET_QUALIFIED_IDENTIFIER.matches(normalized)) {
+    require(isDotnetQualifiedIdentifier(normalized)) {
         "$label is not a valid .NET qualified identifier: '$value'"
     }
 
     return normalized
+}
+
+private fun isDotnetQualifiedIdentifier(value: String): Boolean {
+    return value.split('.').all(::isDotnetIdentifier)
+}
+
+private fun isDotnetIdentifier(value: String): Boolean {
+    if (value.isEmpty()) {
+        return false
+    }
+
+    if (!value.first().isDotnetIdentifierStart()) {
+        return false
+    }
+
+    return value.drop(1).all(Char::isDotnetIdentifierPart)
+}
+
+private fun Char.isDotnetIdentifierStart(): Boolean {
+    return isAsciiLetter() || this == '_'
+}
+
+private fun Char.isDotnetIdentifierPart(): Boolean {
+    return isAsciiLetterOrDigit() || this == '_'
+}
+
+private fun Char.isAsciiLetter(): Boolean {
+    return this in 'a'..'z' || this in 'A'..'Z'
+}
+
+private fun Char.isAsciiLetterOrDigit(): Boolean {
+    return isAsciiLetter() || isDigit()
 }

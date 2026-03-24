@@ -3,8 +3,8 @@ package io.github.lmliam.microsmith.gen.services.dotnet
 import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.core.services
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget.NET8
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget.NET9
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.NET8
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.NET9
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec

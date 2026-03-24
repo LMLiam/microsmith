@@ -5,8 +5,6 @@ import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.core.services
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget.NET8
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget.NET9
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.defaults.DotnetDefaultsExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
@@ -58,6 +56,23 @@ class DotnetDslTests :
 
             defaults.target shouldBe NET8
             defaults.solutions.keys shouldContainExactly listOf("Platform")
+        }
+
+        "services-level dotnet solutions support both string-invoke and solution helpers" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                dotnet {
+                    solutions {
+                        "Platform" {}
+                        solution("Operations") {}
+                    }
+                }
+            }
+
+            val defaults = requireNotNull(builder.requireServicesExtension().get<DotnetDefaultsExtension>())
+
+            defaults.solutions.keys shouldContainExactly listOf("Platform", "Operations")
         }
 
         "services-level dotnet blocks merge matching solution declarations by name" {
@@ -257,6 +272,16 @@ class DotnetDslTests :
                         }
                     }
                 }
+            }
+        }
+
+        "dotnet target validates supported tfms" {
+            DotnetTarget.of("net10.0") shouldBe DotnetTarget.NET10
+            DotnetTarget.of("netcoreapp3.1") shouldBe DotnetTarget.NETCOREAPP3_1
+            DotnetTarget.of("net481") shouldBe DotnetTarget.NET481
+
+            shouldThrow<IllegalArgumentException> {
+                DotnetTarget.of("netstandard2.1")
             }
         }
     })

@@ -5,4 +5,6 @@ import io.github.lmliam.microsmith.dsl.core.MicrosmithDsl
 @MicrosmithDsl
 interface DotnetSolutionsScope {
     operator fun String.invoke(block: DotnetSolutionScope.() -> Unit = {})
+
+    fun solution(name: String, block: DotnetSolutionScope.() -> Unit = {})
 }

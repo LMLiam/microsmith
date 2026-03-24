@@ -4,7 +4,11 @@ internal class DotnetSolutionsBuilder : DotnetSolutionsScope {
     private val solutionsByName = linkedMapOf<String, DotnetSolution>()
 
     override fun String.invoke(block: DotnetSolutionScope.() -> Unit) {
-        val builder = DotnetSolutionBuilder(this).apply(block)
+        solution(this, block)
+    }
+
+    override fun solution(name: String, block: DotnetSolutionScope.() -> Unit) {
+        val builder = DotnetSolutionBuilder(name).apply(block)
         register(builder.build())
     }
 

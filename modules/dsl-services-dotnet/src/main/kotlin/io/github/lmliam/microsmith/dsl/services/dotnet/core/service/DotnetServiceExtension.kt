@@ -24,7 +24,7 @@ data class DotnetServiceExtension(
         return findModel(normalized) ?: error("Dotnet model not found: $normalized")
     }
 
-    fun allModels() = models.values
+    fun models() = models.values
 
     @Suppress("UNCHECKED_CAST")
     fun <T : ServiceExtension> get(type: KClass<T>) = model.get(type) as? T?
