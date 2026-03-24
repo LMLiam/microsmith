@@ -49,4 +49,6 @@ interface DotnetModelScope {
     fun timeSpan(name: String): DotnetField
 
     infix fun String.ref(target: String): DotnetField
+
+    infix fun String.references(target: String): DotnetField
 }

@@ -63,6 +63,8 @@ internal class DotnetModelBuilder(
         type = DotnetFieldType.Reference(validateDotnetIdentifier(target, "Reference target")),
     )
 
+    override infix fun String.references(target: String) = this ref target
+
     private fun addField(name: String, type: DotnetFieldType): DotnetField {
         val fieldName = validateDotnetIdentifier(name, "Field name")
         require(fieldName !in fieldsByName) {

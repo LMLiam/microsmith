@@ -106,6 +106,7 @@ class DotnetDslTests :
                                 string("id")
                                 int("age")
                                 "manager" ref "User"
+                                "owner" references "User"
                             }
                         }
                     }
@@ -121,8 +122,11 @@ class DotnetDslTests :
             dotnet.project shouldBe "UserService.Api"
             dotnet.models.keys shouldContainExactly listOf("User")
             val userModel = requireNotNull(dotnet.models["User"])
-            userModel.fields.map(DotnetField::name) shouldContainExactly listOf("id", "age", "manager")
-            userModel.fields.last().type shouldBe DotnetFieldType.Reference("User")
+            userModel.fields.map(DotnetField::name) shouldContainExactly listOf("id", "age", "manager", "owner")
+            userModel.fields.drop(2).map(DotnetField::type) shouldContainExactly listOf(
+                DotnetFieldType.Reference("User"),
+                DotnetFieldType.Reference("User"),
+            )
         }
 
         "dotnet models support the csharp scalar set" {
