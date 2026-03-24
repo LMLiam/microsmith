@@ -20,7 +20,7 @@ internal class MicrosmithGenerationRunner(
                 // Generators still receive the final destination so any output-root-aware generator
                 // continues to see the stable repository path while staging validates write safety.
                 val generated = generatorExecutionService.generate(model, finalDir)
-                outputUniquenessValidator.requireUniqueRelativePaths(generated)
+                outputUniquenessValidator.requireUniqueOutputPaths(generated)
                 outputWriter.write(generated, tempSpace)
                 generated
             }
