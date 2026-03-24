@@ -1,0 +1,46 @@
+package io.github.lmliam.microsmith.dsl.services.dotnet.core
+
+import io.github.lmliam.microsmith.dsl.core.MergeableExtension
+import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+import kotlin.reflect.KClass
+
+/**
+ * Shared .NET defaults declared under `services { dotnet { ... } }`.
+ */
+data class DotnetSharedExtension(
+    val target: DotnetTarget? = null,
+    val solutions: Map<String, DotnetSolution> = emptyMap(),
+    val model: DotnetSharedModel = DotnetSharedModel.empty(),
+) : MicrosmithExtension, MergeableExtension<DotnetSharedExtension> {
+    fun findSolution(name: String) = solutions[name]
+
+    fun requireSolution(name: String): DotnetSolution {
+        val normalized = validateDotnetQualifiedIdentifier(name, "Solution name")
+        return findSolution(normalized) ?: error("Dotnet solution not found: $normalized")
+    }
+
+    fun allSolutions() = solutions.values
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T : MicrosmithExtension> get(type: KClass<T>) = model.get(type) as? T?
+
+    inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
+
+    internal fun <T : MicrosmithExtension> with(type: KClass<T>, ext: T) = copy(
+        model = model.with(type, ext),
+    )
+
+    override fun merge(other: DotnetSharedExtension): DotnetSharedExtension {
+        val collisions = other.solutions.keys.filter { it in solutions }.sorted()
+
+        require(collisions.isEmpty()) {
+            "Duplicate .NET solution registration while merging shared defaults: ${collisions.joinToString(", ")}"
+        }
+
+        return copy(
+            target = other.target ?: target,
+            solutions = solutions + other.solutions,
+            model = model.merge(other.model),
+        )
+    }
+}

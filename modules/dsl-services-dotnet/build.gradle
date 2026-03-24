@@ -1,0 +1,4 @@
+dependencies {
+    api project(":dsl")
+    api project(":dsl-services")
+}
