@@ -248,6 +248,46 @@ class DotnetDslTests :
             )
         }
 
+        "dotnet validators accept unicode and verbatim identifiers" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                dotnet {
+                    solutions {
+                        "Acme.Δelta" {}
+                    }
+                }
+
+                "UserService" {
+                    dotnet {
+                        solution("Acme.Δelta")
+                        project("Acme.@class")
+                        models {
+                            "@class" {
+                                string("Δelta")
+                            }
+
+                            "Owner" {
+                                "Δelta" ref "@class"
+                            }
+                        }
+                    }
+                }
+            }
+
+            val dotnet =
+                builder
+                    .requireServicesExtension()
+                    .require("UserService")
+                    .model
+                    .let { requireNotNull(it.get<DotnetServiceExtension>()) }
+
+            dotnet.solution shouldBe "Acme.Δelta"
+            dotnet.project shouldBe "Acme.@class"
+            dotnet.requireModel("@class").fields.map(DotnetField::name) shouldContainExactly listOf("Δelta")
+            dotnet.requireModel("Owner").fields.single().type shouldBe DotnetFieldType.Reference("@class")
+        }
+
         "duplicate service dotnet model names are rejected" {
             val builder = MicrosmithBuilder()
 

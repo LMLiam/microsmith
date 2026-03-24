@@ -25,29 +25,48 @@ private fun isDotnetQualifiedIdentifier(value: String): Boolean {
 }
 
 private fun isDotnetIdentifier(value: String): Boolean {
-    if (value.isEmpty()) {
+    val candidate = value.removePrefix("@")
+    if (candidate.isEmpty()) {
         return false
     }
 
-    if (!value.first().isDotnetIdentifierStart()) {
+    val firstCodePoint = candidate.firstCodePoint()
+    if (!firstCodePoint.isDotnetIdentifierStart()) {
         return false
     }
 
-    return value.drop(1).all(Char::isDotnetIdentifierPart)
+    return candidate.asCodePoints().drop(1).all(Int::isDotnetIdentifierPart)
 }
 
-private fun Char.isDotnetIdentifierStart(): Boolean {
-    return isAsciiLetter() || this == '_'
+private fun String.firstCodePoint(): Int {
+    return codePointAt(0)
 }
 
-private fun Char.isDotnetIdentifierPart(): Boolean {
-    return isAsciiLetterOrDigit() || this == '_'
+private fun String.asCodePoints(): Sequence<Int> = sequence {
+    var index = 0
+    while (index < length) {
+        val codePoint = codePointAt(index)
+        yield(codePoint)
+        index += Character.charCount(codePoint)
+    }
 }
 
-private fun Char.isAsciiLetter(): Boolean {
-    return this in 'a'..'z' || this in 'A'..'Z'
+private fun Int.isDotnetIdentifierStart(): Boolean {
+    return this == '_'.code ||
+        Character.isLetter(this) ||
+        Character.getType(this).toInt() == Character.LETTER_NUMBER.toInt()
 }
 
-private fun Char.isAsciiLetterOrDigit(): Boolean {
-    return isAsciiLetter() || isDigit()
+private fun Int.isDotnetIdentifierPart(): Boolean {
+    return isDotnetIdentifierStart() ||
+        when (Character.getType(this).toInt()) {
+            Character.NON_SPACING_MARK.toInt(),
+            Character.COMBINING_SPACING_MARK.toInt(),
+            Character.DECIMAL_DIGIT_NUMBER.toInt(),
+            Character.CONNECTOR_PUNCTUATION.toInt(),
+            Character.FORMAT.toInt(),
+            -> true
+
+            else -> false
+        }
 }
