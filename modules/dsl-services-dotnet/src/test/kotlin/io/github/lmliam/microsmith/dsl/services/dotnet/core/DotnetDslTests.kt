@@ -125,6 +125,65 @@ class DotnetDslTests :
             userModel.fields.last().type shouldBe DotnetFieldType.Reference("User")
         }
 
+        "dotnet models support the common csharp scalar set" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                "UserService" {
+                    dotnet {
+                        project("UserService.Api")
+                        models {
+                            "Example" {
+                                string("name")
+                                char("initial")
+                                byte("level")
+                                short("rank")
+                                int("count")
+                                long("total")
+                                float("ratio")
+                                double("average")
+                                decimal("amount")
+                                bool("active")
+                                guid("id")
+                                dateOnly("startDate")
+                                timeOnly("startTime")
+                                dateTime("createdAt")
+                                dateTimeOffset("publishedAt")
+                                timeSpan("duration")
+                            }
+                        }
+                    }
+                }
+            }
+
+            val exampleModel =
+                builder
+                    .requireServicesExtension()
+                    .require("UserService")
+                    .model
+                    .let { requireNotNull(it.get<DotnetServiceExtension>()) }
+                    .requireModel("Example")
+
+            exampleModel.fields.map(DotnetField::type) shouldContainExactly listOf(
+                DotnetFieldType.StringType,
+                DotnetFieldType.CharType,
+                DotnetFieldType.ByteType,
+                DotnetFieldType.ShortType,
+                DotnetFieldType.IntType,
+                DotnetFieldType.LongType,
+                DotnetFieldType.FloatType,
+                DotnetFieldType.DoubleType,
+                DotnetFieldType.DecimalType,
+                DotnetFieldType.BoolType,
+                DotnetFieldType.GuidType,
+                DotnetFieldType.DateOnlyType,
+                DotnetFieldType.TimeOnlyType,
+                DotnetFieldType.DateTimeType,
+                DotnetFieldType.DateTimeOffsetType,
+                DotnetFieldType.TimeSpanType,
+            )
+        }
+
         "duplicate service dotnet model names are rejected" {
             val builder = MicrosmithBuilder()
 
