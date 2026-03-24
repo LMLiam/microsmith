@@ -4,7 +4,11 @@ internal class DotnetModelsBuilder : DotnetModelsScope {
     private val modelsByName = linkedMapOf<String, DotnetModel>()
 
     override fun String.invoke(block: DotnetModelScope.() -> Unit) {
-        val builder = DotnetModelBuilder(this).apply(block)
+        model(this, block)
+    }
+
+    override fun model(name: String, block: DotnetModelScope.() -> Unit) {
+        val builder = DotnetModelBuilder(name).apply(block)
         register(builder.build())
     }
 

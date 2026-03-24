@@ -129,6 +129,39 @@ class DotnetDslTests :
             )
         }
 
+        "dotnet models support both string-invoke and model helpers" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                "UserService" {
+                    dotnet {
+                        project("UserService.Api")
+                        models {
+                            "User" {
+                                string("id")
+                            }
+
+                            model("Address") {
+                                string("line1")
+                            }
+                        }
+                    }
+                }
+            }
+
+            val models =
+                builder
+                    .requireServicesExtension()
+                    .require("UserService")
+                    .model
+                    .let { requireNotNull(it.get<DotnetServiceExtension>()) }
+                    .models
+
+            models.keys shouldContainExactly listOf("User", "Address")
+            requireNotNull(models["User"]).fields.map(DotnetField::name) shouldContainExactly listOf("id")
+            requireNotNull(models["Address"]).fields.map(DotnetField::name) shouldContainExactly listOf("line1")
+        }
+
         "dotnet models support the csharp scalar set" {
             val builder = MicrosmithBuilder()
 
