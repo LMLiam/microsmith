@@ -54,7 +54,7 @@ class DotnetDslTests :
             val extension = builder.requireServicesExtension()
             val defaults = requireNotNull(extension.get<DotnetDefaultsExtension>())
 
-            defaults.target shouldBe NET8
+            defaults.target shouldBe DotnetTarget.NET8
             defaults.solutions.keys shouldContainExactly listOf("Platform")
         }
 
@@ -132,7 +132,7 @@ class DotnetDslTests :
             val service = extension.require("UserService")
             val dotnet = requireNotNull(service.model.get<DotnetServiceExtension>())
 
-            dotnet.target shouldBe NET9
+            dotnet.target shouldBe DotnetTarget.NET9
             dotnet.solution shouldBe "Platform"
             dotnet.project shouldBe "UserService.Api"
             dotnet.models.keys shouldContainExactly listOf("User")

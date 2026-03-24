@@ -3,8 +3,7 @@ package io.github.lmliam.microsmith.gen.services.dotnet
 import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.core.services
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.NET8
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.NET9
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -44,10 +43,10 @@ class DotnetWorkspaceResolverTests :
             val workspace = DotnetWorkspaceResolver().resolve(builder.requireServicesExtension())
             val userService = requireNotNull(workspace.services["UserService"])
 
-            workspace.target shouldBe NET8
+            workspace.target shouldBe DotnetTarget.NET8
             workspace.solutions.keys shouldContainExactly listOf("Platform")
             workspace.services.keys shouldContainExactly listOf("UserService")
-            userService.target shouldBe NET8
+            userService.target shouldBe DotnetTarget.NET8
             userService.project shouldBe "UserService.Api"
             userService.solution.name shouldBe "Platform"
         }
