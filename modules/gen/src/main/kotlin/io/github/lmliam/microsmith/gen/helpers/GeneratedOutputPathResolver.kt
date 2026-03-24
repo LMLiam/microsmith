@@ -1,11 +1,28 @@
 package io.github.lmliam.microsmith.gen.helpers
 
+import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.github.lmliam.microsmith.gen.files.FileSpace
+import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
 
 internal object GeneratedOutputPathResolver {
+    fun resolve(space: FileSpace, output: GeneratedFile): Path {
+        val normalizedRoot = space.root.toAbsolutePath().normalize()
+        ensureOutputRootIsSafe(normalizedRoot)
+
+        val routedRoot = resolveRoot(normalizedRoot, output.outputRoot)
+        val routedSpace =
+            if (routedRoot == normalizedRoot) {
+                space
+            } else {
+                DirectorySpace.from(routedRoot)
+            }
+
+        return resolve(routedSpace, output.relativePath)
+    }
+
     fun resolve(space: FileSpace, relativePath: Path): Path {
         require(!relativePath.isAbsolute) {
             "Generated output path must be relative, but was '$relativePath'."
@@ -23,6 +40,25 @@ internal object GeneratedOutputPathResolver {
         requireNoSymlinkTraversal(normalizedRoot, normalizedRelativePath)
 
         return target
+    }
+
+    fun resolveRoot(root: Path, outputRoot: Path): Path {
+        require(!outputRoot.isAbsolute) {
+            "Generated output root must be relative, but was '$outputRoot'."
+        }
+
+        val normalizedRoot = root.toAbsolutePath().normalize()
+        ensureOutputRootIsSafe(normalizedRoot)
+        val normalizedOutputRoot = outputRoot.normalize()
+        val targetRoot = normalizedRoot.resolve(normalizedOutputRoot).normalize()
+
+        require(targetRoot.startsWith(normalizedRoot)) {
+            "Generated output root '$outputRoot' escapes output root '$normalizedRoot'."
+        }
+
+        requireNoSymlinkTraversal(normalizedRoot, normalizedOutputRoot)
+
+        return targetRoot
     }
 
     private fun ensureOutputRootIsSafe(root: Path) {

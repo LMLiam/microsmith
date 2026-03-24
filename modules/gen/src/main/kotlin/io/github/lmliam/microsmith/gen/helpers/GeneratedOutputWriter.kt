@@ -13,7 +13,7 @@ internal class GeneratedOutputWriter(
     suspend fun write(outputs: List<GeneratedFile>, space: FileSpace) {
         withContext(ioDispatcher) {
             outputs.forEach { output ->
-                val target = GeneratedOutputPathResolver.resolve(space, output.relativePath)
+                val target = GeneratedOutputPathResolver.resolve(space, output)
                 target.parent?.let(Files::createDirectories)
                 Files.write(target, output.contents)
             }

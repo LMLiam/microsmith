@@ -11,18 +11,19 @@ import kotlin.io.path.writeText
 
 class GeneratedOutputWriterTests :
     StringSpec({
-        "write overwrites generated files inside an existing proto directory" {
+        "write overwrites generated files inside an existing routed output directory" {
             val workspaceRoot = Files.createTempDirectory("microsmith-generated-output-writer-")
             val outputRoot = workspaceRoot.resolve("repo-root")
-            val existingProtoFile = outputRoot.resolve("proto/UserCreated.proto")
+            val existingProtoFile = outputRoot.resolve("services/UserService/UserCreated.proto")
             Files.createDirectories(existingProtoFile.parent)
             existingProtoFile.writeText("stale")
 
             GeneratedOutputWriter().write(
                 outputs = listOf(
                     GeneratedFile(
-                        relativePath = Path("proto/UserCreated.proto"),
+                        relativePath = Path("UserCreated.proto"),
                         contents = "fresh".toByteArray(),
+                        outputRoot = Path("services/UserService"),
                     ),
                 ),
                 space = DirectorySpace.from(outputRoot),
