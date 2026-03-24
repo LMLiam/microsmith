@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.core
+package io.github.lmliam.microsmith.dsl.services.dotnet.core.model
 
 internal class DotnetModelsBuilder : DotnetModelsScope {
     private val modelsByName = linkedMapOf<String, DotnetModel>()

@@ -1,7 +1,10 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.core
+package io.github.lmliam.microsmith.dsl.services.dotnet.core.shared
 
 import io.github.lmliam.microsmith.dsl.core.MergeableExtension
 import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolution
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetQualifiedIdentifier
 import kotlin.reflect.KClass
 
 /**

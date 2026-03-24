@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.core
+package io.github.lmliam.microsmith.dsl.services.dotnet.core.solution
 
 internal class DotnetSolutionsBuilder : DotnetSolutionsScope {
     private val solutionsByName = linkedMapOf<String, DotnetSolution>()

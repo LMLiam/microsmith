@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.helpers
 
 import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetSolutionModel
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolutionModel
 
 /**
  * Returns true if the solution model contains an extension of type [T].

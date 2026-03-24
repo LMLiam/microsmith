@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.helpers
 
 import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetSharedExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.shared.DotnetSharedExtension
 
 /**
  * Returns true if the shared dotnet model contains an extension of type [T].

@@ -7,6 +7,12 @@ import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.core.services
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget.NET8
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget.NET9
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.shared.DotnetSharedExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolutionContext
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolutionScope
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly

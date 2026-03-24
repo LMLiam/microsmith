@@ -2,10 +2,10 @@ package io.github.lmliam.microsmith.gen.services.dotnet
 
 import io.github.lmliam.microsmith.dsl.services.core.Service
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetFieldType
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetModel
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetServiceExtension
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetSharedExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.shared.DotnetSharedExtension
 
 /**
  * Normalises the shared and per-service .NET DSL into a resolved workspace model.

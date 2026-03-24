@@ -1,6 +1,11 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.core
+package io.github.lmliam.microsmith.dsl.services.dotnet.core.service
 
 import io.github.lmliam.microsmith.dsl.services.core.ServiceExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModelsBuilder
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModelsScope
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetQualifiedIdentifier
 import kotlin.reflect.KClass
 
 internal class DotnetServiceBuilder : DotnetServiceContext {

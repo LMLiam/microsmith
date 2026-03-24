@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.core
+package io.github.lmliam.microsmith.dsl.services.dotnet.core.support
 
 private val DOTNET_IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*")
 private val DOTNET_QUALIFIED_IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*")

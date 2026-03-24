@@ -1,4 +1,6 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.core
+package io.github.lmliam.microsmith.dsl.services.dotnet.core.model
+
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetIdentifier
 
 /**
  * Supported field types for service-local .NET models.

@@ -1,13 +1,13 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.core
+package io.github.lmliam.microsmith.dsl.services.dotnet.core.solution
 
 import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.helpers.mergeModelExtension
 import kotlin.reflect.KClass
 
 /**
- * Immutable snapshot of shared .NET-specific extensions.
+ * Immutable snapshot of future solution-scoped extensions.
  */
-class DotnetSharedModel internal constructor(
+class DotnetSolutionModel internal constructor(
     private val extensions: Map<KClass<out MicrosmithExtension>, MicrosmithExtension>,
 ) {
     @Suppress("UNCHECKED_CAST")
@@ -16,11 +16,11 @@ class DotnetSharedModel internal constructor(
     inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
 
     @Suppress("UNCHECKED_CAST")
-    internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = DotnetSharedModel(
+    internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = DotnetSolutionModel(
         extensions + (mapOf(type to mergeModelExtension(extensions[type] as T?, value))),
     )
 
-    internal fun merge(other: DotnetSharedModel): DotnetSharedModel = DotnetSharedModel(
+    internal fun merge(other: DotnetSolutionModel): DotnetSolutionModel = DotnetSolutionModel(
         extensions +
             other.extensions.mapValues { (type, value) ->
                 mergeModelExtension(extensions[type] as MicrosmithExtension?, value)
@@ -30,12 +30,12 @@ class DotnetSharedModel internal constructor(
     fun keys() = extensions.keys
 
     override fun equals(other: Any?): Boolean {
-        return other is DotnetSharedModel && extensions == other.extensions
+        return other is DotnetSolutionModel && extensions == other.extensions
     }
 
     override fun hashCode(): Int = extensions.hashCode()
 
     companion object {
-        fun empty() = DotnetSharedModel(emptyMap())
+        fun empty() = DotnetSolutionModel(emptyMap())
     }
 }

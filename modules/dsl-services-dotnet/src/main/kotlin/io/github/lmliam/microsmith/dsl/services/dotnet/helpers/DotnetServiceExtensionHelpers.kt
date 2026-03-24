@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.helpers
 
 import io.github.lmliam.microsmith.dsl.services.core.ServiceExtension
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetServiceExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension
 
 /**
  * Returns true if the service model contains an extension of type [T].
