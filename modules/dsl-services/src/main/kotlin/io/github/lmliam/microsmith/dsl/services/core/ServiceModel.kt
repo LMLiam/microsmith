@@ -19,6 +19,12 @@ class ServiceModel internal constructor(
 
     fun keys() = extensions.keys
 
+    override fun equals(other: Any?): Boolean {
+        return other is ServiceModel && extensions == other.extensions
+    }
+
+    override fun hashCode(): Int = extensions.hashCode()
+
     companion object {
         fun empty() = ServiceModel(emptyMap())
     }

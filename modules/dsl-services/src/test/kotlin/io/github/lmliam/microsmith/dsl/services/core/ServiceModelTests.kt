@@ -7,6 +7,10 @@ private data class TestServiceExtension(val value: String) : ServiceExtension
 
 class ServiceModelTests :
     StringSpec({
+        "empty models compare equal by value" {
+            ServiceModel.empty() shouldBe ServiceModel.empty()
+        }
+
         "get returns extension when present" {
             val extension = TestServiceExtension("hello")
             val model = ServiceModel.empty().with(TestServiceExtension::class, extension)

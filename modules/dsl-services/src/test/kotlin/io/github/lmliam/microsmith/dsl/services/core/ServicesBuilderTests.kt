@@ -17,10 +17,9 @@ class ServicesBuilderTests :
 
         "register throws if service name is blank" {
             val builder = ServicesBuilder()
-            val service = Service(name = " ", model = ServiceModel.empty())
 
             shouldThrow<IllegalArgumentException> {
-                builder.register(service)
+                builder.register(Service(name = " ", model = ServiceModel.empty()))
             }
         }
 
