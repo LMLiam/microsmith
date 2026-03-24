@@ -20,23 +20,23 @@ internal class DotnetModelBuilder(
 
     override fun byte(name: String) = addField(name, DotnetFieldType.Byte)
 
-    override fun sbyte(name: String) = addField(name, DotnetFieldType.SByte)
+    override fun sbyte(name: String) = addField(name, DotnetFieldType.SignedByte)
 
     override fun short(name: String) = addField(name, DotnetFieldType.Short)
 
-    override fun ushort(name: String) = addField(name, DotnetFieldType.UShort)
+    override fun ushort(name: String) = addField(name, DotnetFieldType.UnsignedShort)
 
     override fun int(name: String) = addField(name, DotnetFieldType.Int)
 
-    override fun uint(name: String) = addField(name, DotnetFieldType.UInt)
+    override fun uint(name: String) = addField(name, DotnetFieldType.UnsignedInt)
 
     override fun long(name: String) = addField(name, DotnetFieldType.Long)
 
-    override fun ulong(name: String) = addField(name, DotnetFieldType.ULong)
+    override fun ulong(name: String) = addField(name, DotnetFieldType.UnsignedLong)
 
-    override fun nint(name: String) = addField(name, DotnetFieldType.NInt)
+    override fun nint(name: String) = addField(name, DotnetFieldType.NativeInt)
 
-    override fun nuint(name: String) = addField(name, DotnetFieldType.NUInt)
+    override fun nuint(name: String) = addField(name, DotnetFieldType.UnsignedNativeInt)
 
     override fun float(name: String) = addField(name, DotnetFieldType.Float)
 

@@ -12,23 +12,23 @@ sealed class DotnetFieldType(val csharpType: kotlin.String) {
 
     data object Byte : DotnetFieldType("byte")
 
-    data object SByte : DotnetFieldType("sbyte")
+    data object SignedByte : DotnetFieldType("sbyte")
 
     data object Short : DotnetFieldType("short")
 
-    data object UShort : DotnetFieldType("ushort")
+    data object UnsignedShort : DotnetFieldType("ushort")
 
     data object Int : DotnetFieldType("int")
 
-    data object UInt : DotnetFieldType("uint")
+    data object UnsignedInt : DotnetFieldType("uint")
 
     data object Long : DotnetFieldType("long")
 
-    data object ULong : DotnetFieldType("ulong")
+    data object UnsignedLong : DotnetFieldType("ulong")
 
-    data object NInt : DotnetFieldType("nint")
+    data object NativeInt : DotnetFieldType("nint")
 
-    data object NUInt : DotnetFieldType("nuint")
+    data object UnsignedNativeInt : DotnetFieldType("nuint")
 
     data object Float : DotnetFieldType("float")
 
