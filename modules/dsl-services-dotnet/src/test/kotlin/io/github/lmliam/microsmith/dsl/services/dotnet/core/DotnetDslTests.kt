@@ -55,7 +55,7 @@ class DotnetDslTests :
             val defaults = requireNotNull(extension.get<DotnetDefaultsExtension>())
 
             defaults.target shouldBe DotnetTarget.NET8
-            defaults.solutions.keys shouldContainExactly listOf("Platform")
+            defaults.solutions.keys.toList() shouldContainExactly listOf("Platform")
         }
 
         "services-level dotnet solutions support both string-invoke and solution helpers" {
@@ -72,7 +72,7 @@ class DotnetDslTests :
 
             val defaults = requireNotNull(builder.requireServicesExtension().get<DotnetDefaultsExtension>())
 
-            defaults.solutions.keys shouldContainExactly listOf("Platform", "Operations")
+            defaults.solutions.keys.toList() shouldContainExactly listOf("Platform", "Operations")
         }
 
         "services-level dotnet blocks merge matching solution declarations by name" {
@@ -135,7 +135,7 @@ class DotnetDslTests :
             dotnet.target shouldBe DotnetTarget.NET9
             dotnet.solution shouldBe "Platform"
             dotnet.project shouldBe "UserService.Api"
-            dotnet.models.keys shouldContainExactly listOf("User")
+            dotnet.models.keys.toList() shouldContainExactly listOf("User")
             val userModel = requireNotNull(dotnet.models["User"])
             userModel.fields.map(DotnetField::name) shouldContainExactly listOf("id", "age", "manager", "owner")
             userModel.fields.drop(2).map(DotnetField::type) shouldContainExactly listOf(
@@ -172,7 +172,7 @@ class DotnetDslTests :
                     .let { requireNotNull(it.get<DotnetServiceExtension>()) }
                     .models
 
-            models.keys shouldContainExactly listOf("User", "Address")
+            models.keys.toList() shouldContainExactly listOf("User", "Address")
             requireNotNull(models["User"]).fields.map(DotnetField::name) shouldContainExactly listOf("id")
             requireNotNull(models["Address"]).fields.map(DotnetField::name) shouldContainExactly listOf("line1")
         }
