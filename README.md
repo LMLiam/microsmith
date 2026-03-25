@@ -51,7 +51,7 @@ Microsmith generation is organized into five explicit stages:
 2. `resolve-*`: normalization, inheritance application, and semantic validation into finalized domain models
 3. `artifact-*`: logical artifact creation and contribution assembly
 4. `compile-*`: artifact-to-artifact compilation into renderable file artifacts
-5. `gen-*`: final rendering, output routing, and file writing
+5. `gen`: final rendering, output routing, and file writing
 
 Generators consume finalized models and compiled artifacts instead of raw authoring DSL state.
 
@@ -115,18 +115,8 @@ flowchart LR
         C --> CV --> CVD --> CVDP
     end
 
-    subgraph GenStage[5. gen and provider packaging modules]
+    subgraph GenStage[5. gen module]
         G[gen]
-        GS[gen-schemas]
-        GSP[gen-schemas-protobuf]
-        GSPR[gen-schemas-protobuf-rpc]
-        GV[gen-services]
-        GVD[gen-services-dotnet]
-        GVDP[gen-services-dotnet-packages]
-        G --> GS
-        G --> GSP --> GSPR
-        G --> GV
-        G --> GVD --> GVDP
     end
 
     subgraph ExecutionStage[Execution surfaces]
@@ -171,20 +161,12 @@ flowchart LR
     AVD --> CVD
     AVDP --> CVDP
 
-    DS --> GS
-    DSP --> GSP
-    DSPR --> GSPR
-    DV --> GV
-    AVD --> GVD
-    AVDP --> GVDP
-    CSP --> GSP
-    CSPR --> GSPR
-    CVD --> GVD
-    CVDP --> GVDP
+    CSP --> G
+    CSPR --> G
+    CVD --> G
+    CVDP --> G
 
-    GS --> RT
-    GSP --> RT
-    GSPR --> RT
+    G --> RT
     CLI --> RT
     GP --> RT
     MP --> RT
@@ -197,7 +179,7 @@ flowchart LR
     KT -.-> G
 ```
 
-`runtime-scripting` and `cli` currently bundle the schema and protobuf provider stack. The service-side provider packaging modules exist in the repository, but they are not yet wired into those execution surfaces.
+`runtime-scripting` and `cli` currently bundle the schema and protobuf provider stack from resolver, artifact, compiler, and renderer provider modules.
 
 ### Provider responsibilities
 
@@ -215,7 +197,7 @@ This keeps the layering explicit:
 - `resolve-*` finalizes and validates domain state
 - `artifact-*` defines mergeable logical contracts
 - `compile-*` translates logical artifacts into renderable file artifacts
-- `gen-*` renders final file artifacts and writes outputs
+- `gen` renders final file artifacts and writes outputs
 
 ## Repository modules
 
@@ -248,12 +230,6 @@ This keeps the layering explicit:
 - `compile-services-dotnet`: .NET/MSBuild artifact compilation into file artifacts
 - `compile-services-dotnet-packages`: .NET package artifact compilation into file artifacts
 - `gen`: final file rendering, output routing, and generation orchestration
-- `gen-schemas`: schema provider packaging module over `gen`
-- `gen-schemas-protobuf`: protobuf provider packaging module over `gen`, `artifact-schemas-protobuf`, and `compile-schemas-protobuf`
-- `gen-schemas-protobuf-rpc`: protobuf RPC provider packaging module over `gen`, `artifact-schemas-protobuf-rpc`, and `compile-schemas-protobuf-rpc`
-- `gen-services`: service provider packaging module over `gen`
-- `gen-services-dotnet`: .NET service provider packaging module over `gen`, `artifact-services-dotnet`, and `compile-services-dotnet`
-- `gen-services-dotnet-packages`: .NET package provider packaging module over `gen`, `artifact-services-dotnet-packages`, and `compile-services-dotnet-packages`
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution and built-in provider loading
 - `cli`: command-line entrypoint, diagnostics, installer packaging, IDE helper support, and built-in provider validation
 - `gradle-plugin`: native Gradle integration for `.microsmith.kts` execution and imported-project IDE alignment
@@ -267,9 +243,9 @@ This keeps the layering explicit:
 - `resolve-*` modules own finalization. They apply inheritance and defaults, validate cross-object semantics, and produce generator-facing immutable models. They must stay pure and avoid rendering or output-path concerns.
 - `artifact-*` modules own logical artifacts and artifact contributions. They define what exists before rendering, how same-artifact contributions merge, and where conflicts are rejected.
 - `compile` owns the shared artifact-compilation contracts and recursive compilation loop. `compile-schemas` and `compile-services` own domain-root compile contracts, while feature compile modules own concrete artifact-to-artifact transformations.
-- `gen` owns final rendering, output routing, and shared generation orchestration. Domain-specific `gen-schemas*` and `gen-services*` modules package provider sets on top of that core stage rather than re-implementing semantic resolution or artifact assembly.
-- `dsl-schemas*`, `resolve-schemas*`, `artifact-schemas*`, `compile-schemas*`, and `gen-schemas*` together form the current schema-domain pipeline. Keep protobuf-specific behavior in the protobuf-specific modules rather than bloating the generic schema layers.
-- `dsl-services*`, `resolve-services*`, `artifact-services*`, `compile-services*`, and `gen-services*` together form the current service-domain pipeline. Keep .NET and package-management behavior in the feature-specific service modules rather than bloating the generic service layers.
+- `gen` owns final rendering, output routing, and shared generation orchestration.
+- `dsl-schemas*`, `resolve-schemas*`, `artifact-schemas*`, `compile-schemas*`, and `gen` form the current schema-domain generation path. Keep protobuf-specific behavior in the protobuf-specific modules rather than bloating the generic schema layers.
+- `dsl-services*`, `resolve-services*`, `artifact-services*`, `compile-services*`, and `gen` form the current service-domain generation path. Keep .NET and package-management behavior in the feature-specific service modules rather than bloating the generic service layers.
 - `runtime-scripting` is the scripting host and execution boundary. It may depend on DSL and generation layers, but it must not absorb CLI parsing, onboarding, or distribution concerns.
 - `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
 - `gradle-plugin` is the native Gradle integration surface for Gradle-imported JVM repositories. It should stay thin, Gradle-conventional, and explicit about task/configuration wiring rather than absorbing CLI concerns.
@@ -279,7 +255,7 @@ This keeps the layering explicit:
 
 ## Repository layout
 
-- `modules/`: production Gradle subprojects grouped into pipeline families such as `dsl-*`, `resolve-*`, `artifact-*`, `compile-*`, `gen-*`, plus execution layers like `runtime-scripting`, `cli`, `gradle-plugin`, `maven-plugin`, `sbt-plugin`, and `kotest`
+- `modules/`: production Gradle subprojects grouped into pipeline families such as `dsl-*`, `resolve-*`, `artifact-*`, `compile-*`, and `gen`, plus execution layers like `runtime-scripting`, `cli`, `gradle-plugin`, `maven-plugin`, `sbt-plugin`, and `kotest`
 - `build-logic/`: included Gradle build that owns repository-specific plugins and quality tasks
 - `examples/`: consumer-repository fixtures and onboarding examples
 - `gradle/`: wrapper files, version catalog, and dependency locks
