@@ -7,17 +7,37 @@ class ArtifactAssemblyService {
         assemblerRegistry = ArtifactAssemblerRegistry()
     }
 
+    constructor(assemblers: List<ArtifactAssembler<*>>) {
+        assemblerRegistry = ArtifactAssemblerRegistry(assemblers)
+    }
+
     internal constructor(assemblerRegistry: ArtifactAssemblerRegistry) {
         this.assemblerRegistry = assemblerRegistry
     }
 
     fun assemble(contributions: List<ArtifactContribution<out Artifact>>): ArtifactAssembly {
-        val artifacts = linkedMapOf<ArtifactId<out Artifact>, Artifact>()
+        return assembleRetaining(emptyList(), contributions)
+    }
+
+    fun assembleRetaining(
+        retainedArtifacts: List<Artifact>,
+        contributions: List<ArtifactContribution<out Artifact>>,
+    ): ArtifactAssembly {
+        val assembled = linkedMapOf<ArtifactId<out Artifact>, Artifact>()
+        retainedArtifacts.forEach { artifact ->
+            val previous = assembled.put(artifact.id, artifact)
+            require(previous == null || previous == artifact) {
+                "Conflicting retained artifact for '${artifact.id}'."
+            }
+        }
+
+        val artifactsById = linkedMapOf<ArtifactId<out Artifact>, Artifact>()
+        artifactsById.putAll(assembled)
 
         contributions.forEach { contribution ->
             val assembler = assemblerRegistry.resolve(contribution.artifactId)
-            val current = artifacts[contribution.artifactId]
-            artifacts[contribution.artifactId] =
+            val current = artifactsById[contribution.artifactId]
+            artifactsById[contribution.artifactId] =
                 if (current == null) {
                     assembler.create(contribution.cast())
                 } else {
@@ -25,7 +45,7 @@ class ArtifactAssemblyService {
                 }
         }
 
-        return ArtifactAssembly(LinkedHashMap(artifacts))
+        return ArtifactAssembly(LinkedHashMap(artifactsById))
     }
 
     @Suppress("UNCHECKED_CAST")
