@@ -59,6 +59,7 @@ The diagram below is exhaustive at the module level:
 
 - solid arrows show the main transformation and dependency path
 - dotted arrows show thin domain boundary modules that package or expose the shared `gen` stage
+- the only transformation path is `dsl -> resolve -> artifact -> compile -> gen`; domain-specific `gen-*` modules do not bypass the intermediate stages
 
 ```mermaid
 flowchart TB
@@ -173,22 +174,12 @@ flowchart TB
     ADP --> CSDP
     C --> G
 
-    DS --> GS
     GS -.-> G
-    GS --> GSP
-    CSP --> GSP
     GSP -.-> G
-    GSP --> GSPR
-    CSPR --> GSPR
     GSPR -.-> G
 
-    DSV --> GV
     GV -.-> G
-    GV --> GSD
-    CSD --> GSD
     GSD -.-> G
-    GSD --> GSDP
-    CSDP --> GSDP
     GSDP -.-> G
 
     RT --> G
