@@ -105,12 +105,14 @@ flowchart LR
 
     subgraph CompileStage[4. compile modules]
         C[compile]
+        CS[compile-schemas]
         CSP[compile-schemas-protobuf]
         CSPR[compile-schemas-protobuf-rpc]
+        CV[compile-services]
         CVD[compile-services-dotnet]
         CVDP[compile-services-dotnet-packages]
-        C --> CSP --> CSPR
-        C --> CVD --> CVDP
+        C --> CS --> CSP --> CSPR
+        C --> CV --> CVD --> CVDP
     end
 
     subgraph GenStage[5. gen and provider packaging modules]
@@ -162,8 +164,10 @@ flowchart LR
     RVD --> AVD
     RVDP --> AVDP
 
+    AS --> CS
     ASP --> CSP
     ASPR --> CSPR
+    AV --> CV
     AVD --> CVD
     AVDP --> CVDP
 
@@ -192,8 +196,6 @@ flowchart LR
     KT -.-> C
     KT -.-> G
 ```
-
-There are currently no domain-root `compile-schemas` or `compile-services` modules. The compile stage is implemented as the shared `compile` core plus the feature-specific compiler modules that own concrete artifact-to-artifact transformations.
 
 `runtime-scripting` and `cli` currently bundle the schema and protobuf provider stack. The service-side provider packaging modules exist in the repository, but they are not yet wired into those execution surfaces.
 
@@ -239,8 +241,10 @@ This keeps the layering explicit:
 - `artifact-services-dotnet`: .NET/MSBuild artifact types and assembly
 - `artifact-services-dotnet-packages`: .NET package artifact types and contributions
 - `compile`: artifact compiler contracts and recursive artifact compilation
+- `compile-schemas`: schema-domain compiler contracts and shared schema compilation entrypoints
 - `compile-schemas-protobuf`: protobuf artifact compilation into file artifacts
 - `compile-schemas-protobuf-rpc`: protobuf RPC artifact compilation into file artifacts
+- `compile-services`: service-domain compiler contracts and shared service compilation entrypoints
 - `compile-services-dotnet`: .NET/MSBuild artifact compilation into file artifacts
 - `compile-services-dotnet-packages`: .NET package artifact compilation into file artifacts
 - `gen`: final file rendering, output routing, and generation orchestration
@@ -262,10 +266,10 @@ This keeps the layering explicit:
 - `dsl-*` modules own authoring ergonomics only. They may model layered defaults and rich DSL entrypoints, but they should stay free of output routing, rendering, scripting-host concerns, and filesystem writes.
 - `resolve-*` modules own finalization. They apply inheritance and defaults, validate cross-object semantics, and produce generator-facing immutable models. They must stay pure and avoid rendering or output-path concerns.
 - `artifact-*` modules own logical artifacts and artifact contributions. They define what exists before rendering, how same-artifact contributions merge, and where conflicts are rejected.
-- `compile` owns the shared artifact-compilation contracts and recursive compilation loop. Domain compilation is currently introduced only where a feature owns a concrete transformation, which is why the repository has `compile-schemas-protobuf`, `compile-schemas-protobuf-rpc`, `compile-services-dotnet`, and `compile-services-dotnet-packages`, but no `compile-schemas` or `compile-services` root modules.
+- `compile` owns the shared artifact-compilation contracts and recursive compilation loop. `compile-schemas` and `compile-services` own domain-root compile contracts, while feature compile modules own concrete artifact-to-artifact transformations.
 - `gen` owns final rendering, output routing, and shared generation orchestration. Domain-specific `gen-schemas*` and `gen-services*` modules package provider sets on top of that core stage rather than re-implementing semantic resolution or artifact assembly.
-- `dsl-schemas*`, `resolve-schemas*`, `artifact-schemas*`, the feature `compile-schemas-*` modules, and `gen-schemas*` together form the current schema-domain pipeline. Keep protobuf-specific behavior in the protobuf-specific modules rather than bloating the generic schema layers.
-- `dsl-services*`, `resolve-services*`, `artifact-services*`, the feature `compile-services-*` modules, and `gen-services*` together form the current service-domain pipeline. Keep .NET and package-management behavior in the feature-specific service modules rather than bloating the generic service layers.
+- `dsl-schemas*`, `resolve-schemas*`, `artifact-schemas*`, `compile-schemas*`, and `gen-schemas*` together form the current schema-domain pipeline. Keep protobuf-specific behavior in the protobuf-specific modules rather than bloating the generic schema layers.
+- `dsl-services*`, `resolve-services*`, `artifact-services*`, `compile-services*`, and `gen-services*` together form the current service-domain pipeline. Keep .NET and package-management behavior in the feature-specific service modules rather than bloating the generic service layers.
 - `runtime-scripting` is the scripting host and execution boundary. It may depend on DSL and generation layers, but it must not absorb CLI parsing, onboarding, or distribution concerns.
 - `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
 - `gradle-plugin` is the native Gradle integration surface for Gradle-imported JVM repositories. It should stay thin, Gradle-conventional, and explicit about task/configuration wiring rather than absorbing CLI concerns.

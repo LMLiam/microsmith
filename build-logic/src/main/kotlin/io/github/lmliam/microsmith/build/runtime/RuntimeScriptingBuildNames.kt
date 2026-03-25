@@ -21,6 +21,7 @@ internal object RuntimeScriptingBuildNames {
         ":artifact-schemas-protobuf",
         ":artifact-schemas-protobuf-rpc",
         ":compile",
+        ":compile-schemas",
         ":compile-schemas-protobuf",
         ":compile-schemas-protobuf-rpc",
         ":gen",

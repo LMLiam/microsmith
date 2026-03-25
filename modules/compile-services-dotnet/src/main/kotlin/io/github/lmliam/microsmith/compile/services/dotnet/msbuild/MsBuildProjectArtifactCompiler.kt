@@ -8,11 +8,12 @@ import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
+import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
 import java.nio.file.Path
 import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactCompiler::class)
-class MsBuildProjectArtifactCompiler : ArtifactCompiler<MsBuildProjectArtifact> {
+class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectArtifact> {
     override val artifactType: KClass<MsBuildProjectArtifact> = MsBuildProjectArtifact::class
 
     override fun compile(artifact: MsBuildProjectArtifact): List<ArtifactContribution<out Artifact>> {

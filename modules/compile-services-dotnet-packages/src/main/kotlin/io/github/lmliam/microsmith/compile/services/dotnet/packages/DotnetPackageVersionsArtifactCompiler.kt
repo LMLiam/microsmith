@@ -9,10 +9,11 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
+import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
 import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactCompiler::class)
-class DotnetPackageVersionsArtifactCompiler : ArtifactCompiler<DotnetPackageVersionsArtifact> {
+class DotnetPackageVersionsArtifactCompiler : ServicesArtifactCompiler<DotnetPackageVersionsArtifact> {
     override val artifactType: KClass<DotnetPackageVersionsArtifact> = DotnetPackageVersionsArtifact::class
 
     override fun compile(artifact: DotnetPackageVersionsArtifact): List<ArtifactContribution<out Artifact>> {

@@ -48,6 +48,7 @@ class CliPackagingPlugin : Plugin<Project> {
             add("implementation", project.project(":artifact-schemas-protobuf"))
             add("implementation", project.project(":artifact-schemas-protobuf-rpc"))
             add("implementation", project.project(":compile"))
+            add("implementation", project.project(":compile-schemas"))
             add("implementation", project.project(":compile-schemas-protobuf"))
             add("implementation", project.project(":compile-schemas-protobuf-rpc"))
             add("implementation", project.project(":gen"))
