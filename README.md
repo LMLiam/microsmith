@@ -91,6 +91,24 @@ flowchart LR
     Runtime --> GEN
 ```
 
+### Provider responsibilities
+
+Microsmith’s pipeline is extensible through explicit provider roles:
+
+- `DomainResolver`: transforms one top-level authoring extension into a finalized resolved model
+- `ArtifactContributor`: contributes logical artifacts or artifact contributions from a resolved model
+- `ArtifactAssembler`: merges contributions for a specific artifact family into a stable logical artifact
+- `ArtifactCompiler`: compiles a logical artifact into more concrete artifacts until only renderable file artifacts remain
+- `ArtifactRenderer`: renders a final file artifact into a `GeneratedFile`
+
+This keeps the layering explicit:
+
+- `dsl-*` defines authoring surfaces
+- `resolve-*` finalizes and validates domain state
+- `artifact-*` defines mergeable logical contracts
+- `compile-*` translates logical artifacts into renderable file artifacts
+- `gen-*` renders final file artifacts and writes outputs
+
 ## Repository modules
 
 - `dsl`: core DSL primitives, builders, model types, and extension APIs
@@ -126,8 +144,8 @@ flowchart LR
 - `gen-services`: service-domain generation entrypoints
 - `gen-services-dotnet`: .NET service generation entrypoints
 - `gen-services-dotnet-packages`: .NET package generation entrypoints
-- `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution
-- `cli`: command-line entrypoint, diagnostics, installer packaging, and IDE helper support
+- `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution and built-in provider loading
+- `cli`: command-line entrypoint, diagnostics, installer packaging, IDE helper support, and built-in provider validation
 - `gradle-plugin`: native Gradle integration for `.microsmith.kts` execution and imported-project IDE alignment
 - `maven-plugin`: native Maven integration for `.microsmith.kts` execution and imported-project IDE alignment
 - `sbt-plugin`: native sbt integration for `.microsmith.kts` execution inside Scala sbt builds
@@ -260,7 +278,7 @@ Auto-format Kotlin sources:
 Useful notes:
 
 - the Gradle build is configured for Java 24
-- `./gradlew build` now includes the root `check` lifecycle and therefore runs `verifyRepositoryStandards`
+- `./gradlew build` includes the root `check` lifecycle and therefore runs `verifyRepositoryStandards`
 - if `ktlintCheck` fails, run `./gradlew ktlintFormat` and rerun checks
 - if `detekt` fails, inspect the generated report under `build/reports/detekt/`
 - if `verifyRepositoryStandards` fails:
@@ -475,7 +493,7 @@ The native Gradle plugin exposes:
 
 - `microsmithGenerate`: runs the configured `.microsmith.kts` script in a dedicated worker JVM so Gradle's embedded Kotlin runtime does not collide with Microsmith's scripting host
 - `microsmith`: extension for `scriptFile`, `outputDirectory`, `variables`, and `flags`
-- `microsmithPlugins`: resolvable configuration for external Microsmith generator plugins
+- `microsmithPlugins`: resolvable configuration for external Microsmith provider plugins
 - `microsmithIde`: IDE-facing classpath that includes Microsmith runtime types and plugin-provided types and is wired into `compileOnly` for Java-base projects
 
 External plugin example:
@@ -1534,7 +1552,7 @@ What to do:
 
 Symptoms:
 
-- built-in generators or emitters are reported missing
+- built-in resolvers, artifact contributors, assemblers, compilers, or renderers are reported missing
 - `.microsmith.kts` files still show unresolved Microsmith symbols in JetBrains IDEs
 - helper project appears stale after a CLI upgrade
 
