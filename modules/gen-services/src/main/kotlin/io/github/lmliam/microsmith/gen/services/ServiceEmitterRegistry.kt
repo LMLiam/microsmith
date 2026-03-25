@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 /**
  * Resolves service emitters by concrete service extension class and rejects ambiguous registrations.
  */
-internal class ServiceEmitterRegistry(
+class ServiceEmitterRegistry(
     emitters: List<ServiceEmitter<*>> = loadServiceEmitters(),
 ) {
     private val emittersByType: Map<KClass<out ServiceExtension>, ServiceEmitter<*>> = indexEmitters(emitters)
