@@ -9,7 +9,6 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.packages
 import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.github.lmliam.microsmith.gen.services.ServiceEmitterRegistry
 import io.github.lmliam.microsmith.gen.services.ServicesGenerationService
-import io.github.lmliam.microsmith.gen.services.SharedServiceEmitterRegistry
 import io.github.lmliam.microsmith.gen.services.dotnet.packages.emission.DotnetPackageReferencesEmitter
 import io.github.lmliam.microsmith.gen.services.dotnet.packages.emission.DotnetPackageVersionsEmitter
 import io.kotest.core.spec.style.StringSpec
@@ -58,10 +57,10 @@ class DotnetPackageEmissionTests :
                 }
             }
 
+            val emitters = listOf(DotnetPackageVersionsEmitter(), DotnetPackageReferencesEmitter())
             val generationService =
                 ServicesGenerationService(
-                    sharedEmitterRegistry = SharedServiceEmitterRegistry(listOf(DotnetPackageVersionsEmitter())),
-                    emitterRegistry = ServiceEmitterRegistry(listOf(DotnetPackageReferencesEmitter())),
+                    emitterRegistry = ServiceEmitterRegistry(emitters),
                 )
             val space = DirectorySpace.from(Files.createTempDirectory("microsmith-dotnet-packages-"))
 

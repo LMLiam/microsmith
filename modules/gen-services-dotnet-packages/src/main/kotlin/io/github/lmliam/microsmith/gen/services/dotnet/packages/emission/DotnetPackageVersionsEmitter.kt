@@ -5,15 +5,15 @@ import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.defaults.DotnetDefaultsExtension
 import io.github.lmliam.microsmith.gen.files.FileSpace
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
-import io.github.lmliam.microsmith.gen.services.SharedServiceEmitter
+import io.github.lmliam.microsmith.gen.services.ServiceEmitter
 import io.github.lmliam.microsmith.gen.services.dotnet.packages.DotnetPackageWorkspaceResolver
 import io.github.lmliam.microsmith.gen.services.dotnet.packages.ResolvedDotnetPackageSolution
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import kotlin.reflect.KClass
 
-@ServiceProvider(SharedServiceEmitter::class)
-class DotnetPackageVersionsEmitter : SharedServiceEmitter<DotnetDefaultsExtension> {
+@ServiceProvider(ServiceEmitter::class)
+class DotnetPackageVersionsEmitter : ServiceEmitter<DotnetDefaultsExtension> {
     private val workspaceResolver = DotnetPackageWorkspaceResolver()
 
     override val type: KClass<DotnetDefaultsExtension> = DotnetDefaultsExtension::class
