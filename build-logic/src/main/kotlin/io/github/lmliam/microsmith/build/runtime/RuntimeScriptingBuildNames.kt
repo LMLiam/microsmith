@@ -12,6 +12,12 @@ internal object RuntimeScriptingBuildNames {
     )
 
     val IMPLEMENTATION_PROJECT_PATHS = listOf(
+        ":resolve",
+        ":resolve-schemas",
+        ":resolve-schemas-protobuf",
+        ":resolve-schemas-protobuf-rpc",
+        ":artifact",
+        ":artifact-schemas-protobuf",
         ":gen",
         ":gen-schemas",
         ":gen-schemas-protobuf",
