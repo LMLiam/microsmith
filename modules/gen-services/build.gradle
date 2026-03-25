@@ -1,10 +1,6 @@
-apply plugin: 'org.jetbrains.kotlin.kapt'
-
 dependencies {
     implementation project(":gen")
     api project(":dsl")
     implementation project(":dsl-services")
-    api libs.spi.tooling.annotations
-    kapt libs.spi.tooling.processor
     api libs.coroutines.core
 }

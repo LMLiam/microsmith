@@ -1,13 +1,18 @@
 package io.github.lmliam.microsmith.cli.provider
 
+import io.github.lmliam.microsmith.artifact.core.Artifact
 import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.core.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
+import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileContribution
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
 import io.github.lmliam.microsmith.gen.core.ArtifactRenderer
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
+import io.github.lmliam.microsmith.lower.core.ArtifactLowerer
 import io.github.lmliam.microsmith.resolve.core.DomainResolver
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
@@ -25,10 +30,11 @@ class CliProviderValidatorTests :
                     domainResolvers = emptyList(),
                     artifactContributors = emptyList(),
                     artifactAssemblers = emptyList(),
+                    artifactLowerers = emptyList(),
                     artifactRenderers = emptyList(),
                 )
 
-            errors.shouldHaveSize(6)
+            errors.shouldHaveSize(10)
             errors.shouldContain(
                 "Missing built-in DomainResolver for SchemasExtension -> " +
                     "ResolvedProtobufSchemaModel. Check CLI runtime packaging.",
@@ -49,7 +55,19 @@ class CliProviderValidatorTests :
                 "Missing built-in ArtifactAssembler for ProtoFileArtifact. Check CLI runtime packaging.",
             )
             errors.shouldContain(
-                "Missing built-in ArtifactRenderer for ProtoFileArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactAssembler for ProtobufRpcServiceArtifact. Check CLI runtime packaging.",
+            )
+            errors.shouldContain(
+                "Missing built-in ArtifactAssembler for TextFileArtifact. Check CLI runtime packaging.",
+            )
+            errors.shouldContain(
+                "Missing built-in ArtifactLowerer for ProtoFileArtifact. Check CLI runtime packaging.",
+            )
+            errors.shouldContain(
+                "Missing built-in ArtifactLowerer for ProtobufRpcServiceArtifact. Check CLI runtime packaging.",
+            )
+            errors.shouldContain(
+                "Missing built-in ArtifactRenderer for TextFileArtifact. Check CLI runtime packaging.",
             )
         }
 
@@ -58,8 +76,13 @@ class CliProviderValidatorTests :
                 verifyBuiltinProviders(
                     domainResolvers = listOf(ProtobufResolverStub(), ProtobufRpcResolverStub()),
                     artifactContributors = listOf(ProtobufContributorStub(), ProtobufRpcContributorStub()),
-                    artifactAssemblers = listOf(ProtoFileAssemblerStub()),
-                    artifactRenderers = listOf(ProtoFileRendererStub()),
+                    artifactAssemblers = listOf(
+                        ProtoFileAssemblerStub(),
+                        ProtobufRpcAssemblerStub(),
+                        TextFileAssemblerStub(),
+                    ),
+                    artifactLowerers = listOf(ProtoFileLowererStub(), ProtobufRpcLowererStub()),
+                    artifactRenderers = listOf(TextFileRendererStub()),
                 )
 
             errors shouldBe emptyList()
@@ -113,12 +136,58 @@ private class ProtoFileAssemblerStub : ArtifactAssembler<ProtoFileArtifact> {
     ): ProtoFileArtifact = current
 }
 
-private class ProtoFileRendererStub : ArtifactRenderer<ProtoFileArtifact> {
+private class ProtobufRpcAssemblerStub : ArtifactAssembler<ProtobufRpcServiceArtifact> {
+    override val artifactType: KClass<ProtobufRpcServiceArtifact> = ProtobufRpcServiceArtifact::class
+
+    override fun create(first: ArtifactContribution<ProtobufRpcServiceArtifact>): ProtobufRpcServiceArtifact {
+        error("Not used in provider validator tests.")
+    }
+
+    override fun merge(
+        current: ProtobufRpcServiceArtifact,
+        contribution: ArtifactContribution<ProtobufRpcServiceArtifact>,
+    ): ProtobufRpcServiceArtifact = current
+}
+
+private class TextFileAssemblerStub : ArtifactAssembler<TextFileArtifact> {
+    override val artifactType: KClass<TextFileArtifact> = TextFileArtifact::class
+
+    override fun create(first: ArtifactContribution<TextFileArtifact>): TextFileArtifact {
+        val contribution = first as TextFileArtifactContribution
+        return TextFileArtifact(
+            id = contribution.artifactId,
+            contents = contribution.contents,
+        )
+    }
+
+    override fun merge(
+        current: TextFileArtifact,
+        contribution: ArtifactContribution<TextFileArtifact>,
+    ): TextFileArtifact = current
+}
+
+private class ProtoFileLowererStub : ArtifactLowerer<ProtoFileArtifact> {
     override val artifactType: KClass<ProtoFileArtifact> = ProtoFileArtifact::class
 
-    override fun render(artifact: ProtoFileArtifact): GeneratedFile = GeneratedFile(
+    override fun lower(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> {
+        return emptyList()
+    }
+}
+
+private class ProtobufRpcLowererStub : ArtifactLowerer<ProtobufRpcServiceArtifact> {
+    override val artifactType: KClass<ProtobufRpcServiceArtifact> = ProtobufRpcServiceArtifact::class
+
+    override fun lower(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> {
+        return emptyList()
+    }
+}
+
+private class TextFileRendererStub : ArtifactRenderer<TextFileArtifact> {
+    override val artifactType: KClass<TextFileArtifact> = TextFileArtifact::class
+
+    override fun render(artifact: TextFileArtifact): GeneratedFile = GeneratedFile(
         relativePath = artifact.id.relativePath,
-        contents = artifact.declarations.joinToString("\n") { it.contents }.toByteArray(),
+        contents = artifact.contents.toByteArray(),
         outputRoot = artifact.id.outputRoot,
     )
 }
