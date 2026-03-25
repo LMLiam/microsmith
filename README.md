@@ -55,140 +55,147 @@ Microsmith generation is organized into five explicit stages:
 
 Generators consume finalized models and compiled artifacts instead of raw authoring DSL state.
 
-The diagram below is exhaustive at the module level:
-
-- solid arrows show the main transformation and dependency path
-- dotted arrows show thin domain boundary modules that package or expose the shared `gen` stage
-- the only transformation path is `dsl -> resolve -> artifact -> compile -> gen`; domain-specific `gen-*` modules do not bypass the intermediate stages
+The graph below shows the central runtime data flow and the Gradle subprojects that participate in each stage.
 
 ```mermaid
-flowchart TB
-    Script["Authoring scripts"]
+flowchart LR
+    Script[Authoring scripts]
+    Model[MicrosmithModel]
+    Resolved[Resolved models]
+    Contributions[Artifact contributions]
+    Assembly[Artifact assembly]
+    Compiled[Compiled artifacts]
+    Files[Generated files]
 
-    subgraph DSLStage["1. Authoring DSL"]
-        D["dsl: MicrosmithModel primitives"]
-        DS["dsl-schemas: schema registry"]
-        DSP["dsl-schemas-protobuf: protobuf DSL"]
-        DSPR["dsl-schemas-protobuf-rpc: protobuf RPC DSL"]
-        DSV["dsl-services: service registry"]
-        DSD["dsl-services-dotnet: dotnet service DSL"]
-        DSDP["dsl-services-dotnet-packages: dotnet package DSL"]
+    subgraph DSLStage[1. dsl modules]
+        D[dsl]
+        DS[dsl-schemas]
+        DSP[dsl-schemas-protobuf]
+        DSPR[dsl-schemas-protobuf-rpc]
+        DV[dsl-services]
+        DVD[dsl-services-dotnet]
+        DVDP[dsl-services-dotnet-packages]
+        D --> DS --> DSP --> DSPR
+        D --> DV --> DVD --> DVDP
     end
 
-    subgraph ResolveStage["2. Resolution"]
-        R["resolve: resolver contracts"]
-        RS["resolve-schemas: resolved schema model"]
-        RSP["resolve-schemas-protobuf: finalized protobuf schemas"]
-        RSPR["resolve-schemas-protobuf-rpc: finalized protobuf RPC"]
-        RSV["resolve-services: resolved service model"]
-        RSD["resolve-services-dotnet: finalized dotnet workspace"]
-        RSDP["resolve-services-dotnet-packages: finalized package workspace"]
+    subgraph ResolveStage[2. resolve modules]
+        R[resolve]
+        RS[resolve-schemas]
+        RSP[resolve-schemas-protobuf]
+        RSPR[resolve-schemas-protobuf-rpc]
+        RV[resolve-services]
+        RVD[resolve-services-dotnet]
+        RVDP[resolve-services-dotnet-packages]
+        R --> RS --> RSP --> RSPR
+        R --> RV --> RVD --> RVDP
     end
 
-    subgraph ArtifactStage["3. Logical artifacts"]
-        A["artifact: artifact assembly contracts"]
-        AS["artifact-schemas: schema artifact base"]
-        ASP["artifact-schemas-protobuf: proto artifacts"]
-        ASPR["artifact-schemas-protobuf-rpc: RPC artifacts"]
-        AV["artifact-services: service artifact base"]
-        AD["artifact-services-dotnet: MSBuild artifacts"]
-        ADP["artifact-services-dotnet-packages: package artifacts"]
+    subgraph ArtifactStage[3. artifact modules]
+        A[artifact]
+        AS[artifact-schemas]
+        ASP[artifact-schemas-protobuf]
+        ASPR[artifact-schemas-protobuf-rpc]
+        AV[artifact-services]
+        AVD[artifact-services-dotnet]
+        AVDP[artifact-services-dotnet-packages]
+        A --> AS --> ASP --> ASPR
+        A --> AV --> AVD --> AVDP
     end
 
-    subgraph CompileStage["4. Artifact compilation"]
-        C["compile: recursive artifact compilation"]
-        CSP["compile-schemas-protobuf: proto file compilation"]
-        CSPR["compile-schemas-protobuf-rpc: RPC file compilation"]
-        CSD["compile-services-dotnet: MSBuild file compilation"]
-        CSDP["compile-services-dotnet-packages: package file compilation"]
+    subgraph CompileStage[4. compile modules]
+        C[compile]
+        CSP[compile-schemas-protobuf]
+        CSPR[compile-schemas-protobuf-rpc]
+        CVD[compile-services-dotnet]
+        CVDP[compile-services-dotnet-packages]
+        C --> CSP --> CSPR
+        C --> CVD --> CVDP
     end
 
-    subgraph GenStage["5. Rendering and output"]
-        G["gen: renderers and output routing"]
-        GS["gen-schemas: schema generation boundary"]
-        GSP["gen-schemas-protobuf: protobuf generation boundary"]
-        GSPR["gen-schemas-protobuf-rpc: protobuf RPC generation boundary"]
-        GV["gen-services: service generation boundary"]
-        GSD["gen-services-dotnet: dotnet generation boundary"]
-        GSDP["gen-services-dotnet-packages: package generation boundary"]
+    subgraph GenStage[5. gen and provider packaging modules]
+        G[gen]
+        GS[gen-schemas]
+        GSP[gen-schemas-protobuf]
+        GSPR[gen-schemas-protobuf-rpc]
+        GV[gen-services]
+        GVD[gen-services-dotnet]
+        GVDP[gen-services-dotnet-packages]
+        G --> GS
+        G --> GSP --> GSPR
+        G --> GV
+        G --> GVD --> GVDP
     end
 
-    subgraph ExecutionStage["Execution surfaces"]
-        RT["runtime-scripting: script host and provider loading"]
-        CLI["cli: provider validation and script execution"]
-        GP["gradle-plugin: Gradle worker host"]
-        MP["maven-plugin: Maven host"]
-        SB["sbt-plugin: sbt host"]
+    subgraph ExecutionStage[Execution surfaces]
+        RT[runtime-scripting]
+        CLI[cli]
+        GP[gradle-plugin]
+        MP[maven-plugin]
+        SB[sbt-plugin]
+        KT[kotest]
     end
-
-    subgraph SupportStage["Support"]
-        K["kotest: shared test conventions"]
-    end
-
-    Files["Generated files"]
 
     Script --> D
-    D --> DS
-    DS --> DSP
-    DSP --> DSPR
-    D --> DSV
-    DSV --> DSD
-    DSD --> DSDP
+    D --> Model
+    Model --> R
+    R --> Resolved
+    Resolved --> A
+    A --> Contributions
+    Contributions --> Assembly
+    Assembly --> C
+    C --> Compiled
+    Compiled --> G
+    G --> Files
 
-    D --> R
-    R --> RS
-    R --> RSV
     DS --> RS
-    RS --> RSP
     DSP --> RSP
-    RSP --> RSPR
     DSPR --> RSPR
-    DSV --> RSV
-    RSV --> RSD
-    DSD --> RSD
-    RSD --> RSDP
-    DSDP --> RSDP
+    DV --> RV
+    DVD --> RVD
+    DVDP --> RVDP
 
-    R --> A
-    A --> AS
-    A --> AV
     RS --> AS
-    AS --> ASP
     RSP --> ASP
-    ASP --> ASPR
     RSPR --> ASPR
-    RSV --> AV
-    AV --> AD
-    RSD --> AD
-    AD --> ADP
-    RSDP --> ADP
+    RV --> AV
+    RVD --> AVD
+    RVDP --> AVDP
 
-    A --> C
-    C --> CSP
-    C --> CSPR
-    C --> CSD
-    C --> CSDP
     ASP --> CSP
     ASPR --> CSPR
-    AD --> CSD
-    ADP --> CSDP
-    C --> G
+    AVD --> CVD
+    AVDP --> CVDP
 
-    GS -.-> G
-    GSP -.-> G
-    GSPR -.-> G
+    DS --> GS
+    DSP --> GSP
+    DSPR --> GSPR
+    DV --> GV
+    AVD --> GVD
+    AVDP --> GVDP
+    CSP --> GSP
+    CSPR --> GSPR
+    CVD --> GVD
+    CVDP --> GVDP
 
-    GV -.-> G
-    GSD -.-> G
-    GSDP -.-> G
-
-    RT --> G
+    GS --> RT
+    GSP --> RT
+    GSPR --> RT
     CLI --> RT
     GP --> RT
     MP --> RT
     SB --> RT
-    G --> Files
+
+    KT -.-> D
+    KT -.-> R
+    KT -.-> A
+    KT -.-> C
+    KT -.-> G
 ```
+
+There are currently no domain-root `compile-schemas` or `compile-services` modules. The compile stage is implemented as the shared `compile` core plus the feature-specific compiler modules that own concrete artifact-to-artifact transformations.
+
+`runtime-scripting` and `cli` currently bundle the schema and protobuf provider stack. The service-side provider packaging modules exist in the repository, but they are not yet wired into those execution surfaces.
 
 ### Provider responsibilities
 
@@ -237,12 +244,12 @@ This keeps the layering explicit:
 - `compile-services-dotnet`: .NET/MSBuild artifact compilation into file artifacts
 - `compile-services-dotnet-packages`: .NET package artifact compilation into file artifacts
 - `gen`: final file rendering, output routing, and generation orchestration
-- `gen-schemas`: schema-domain generation entrypoints
-- `gen-schemas-protobuf`: protobuf generation entrypoints
-- `gen-schemas-protobuf-rpc`: protobuf RPC generation entrypoints
-- `gen-services`: service-domain generation entrypoints
-- `gen-services-dotnet`: .NET service generation entrypoints
-- `gen-services-dotnet-packages`: .NET package generation entrypoints
+- `gen-schemas`: schema provider packaging module over `gen`
+- `gen-schemas-protobuf`: protobuf provider packaging module over `gen`, `artifact-schemas-protobuf`, and `compile-schemas-protobuf`
+- `gen-schemas-protobuf-rpc`: protobuf RPC provider packaging module over `gen`, `artifact-schemas-protobuf-rpc`, and `compile-schemas-protobuf-rpc`
+- `gen-services`: service provider packaging module over `gen`
+- `gen-services-dotnet`: .NET service provider packaging module over `gen`, `artifact-services-dotnet`, and `compile-services-dotnet`
+- `gen-services-dotnet-packages`: .NET package provider packaging module over `gen`, `artifact-services-dotnet-packages`, and `compile-services-dotnet-packages`
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution and built-in provider loading
 - `cli`: command-line entrypoint, diagnostics, installer packaging, IDE helper support, and built-in provider validation
 - `gradle-plugin`: native Gradle integration for `.microsmith.kts` execution and imported-project IDE alignment
@@ -255,10 +262,10 @@ This keeps the layering explicit:
 - `dsl-*` modules own authoring ergonomics only. They may model layered defaults and rich DSL entrypoints, but they should stay free of output routing, rendering, scripting-host concerns, and filesystem writes.
 - `resolve-*` modules own finalization. They apply inheritance and defaults, validate cross-object semantics, and produce generator-facing immutable models. They must stay pure and avoid rendering or output-path concerns.
 - `artifact-*` modules own logical artifacts and artifact contributions. They define what exists before rendering, how same-artifact contributions merge, and where conflicts are rejected.
-- `compile-*` modules own artifact-to-artifact compilation. They turn higher-level domain artifacts into renderable file artifacts without taking on output writing or CLI orchestration.
-- `gen` owns final rendering, output routing, and shared generation orchestration. Domain-specific `gen-schemas*` and `gen-services*` modules stay thin boundary modules over that core stage and should not re-implement DSL inheritance or semantic validation already handled in `resolve-*`.
-- `dsl-schemas*`, `resolve-schemas*`, `artifact-schemas*`, `compile-schemas*`, and `gen-schemas*` together form the schema domain pipeline. Keep protobuf-specific behavior in the protobuf-specific modules rather than bloating the generic schema layers.
-- `dsl-services*`, `resolve-services*`, `artifact-services*`, `compile-services*`, and `gen-services*` together form the service domain pipeline. Keep .NET and package-management behavior in the feature-specific service modules rather than bloating the generic service layers.
+- `compile` owns the shared artifact-compilation contracts and recursive compilation loop. Domain compilation is currently introduced only where a feature owns a concrete transformation, which is why the repository has `compile-schemas-protobuf`, `compile-schemas-protobuf-rpc`, `compile-services-dotnet`, and `compile-services-dotnet-packages`, but no `compile-schemas` or `compile-services` root modules.
+- `gen` owns final rendering, output routing, and shared generation orchestration. Domain-specific `gen-schemas*` and `gen-services*` modules package provider sets on top of that core stage rather than re-implementing semantic resolution or artifact assembly.
+- `dsl-schemas*`, `resolve-schemas*`, `artifact-schemas*`, the feature `compile-schemas-*` modules, and `gen-schemas*` together form the current schema-domain pipeline. Keep protobuf-specific behavior in the protobuf-specific modules rather than bloating the generic schema layers.
+- `dsl-services*`, `resolve-services*`, `artifact-services*`, the feature `compile-services-*` modules, and `gen-services*` together form the current service-domain pipeline. Keep .NET and package-management behavior in the feature-specific service modules rather than bloating the generic service layers.
 - `runtime-scripting` is the scripting host and execution boundary. It may depend on DSL and generation layers, but it must not absorb CLI parsing, onboarding, or distribution concerns.
 - `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
 - `gradle-plugin` is the native Gradle integration surface for Gradle-imported JVM repositories. It should stay thin, Gradle-conventional, and explicit about task/configuration wiring rather than absorbing CLI concerns.
