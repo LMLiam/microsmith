@@ -6,16 +6,31 @@ import io.kotest.matchers.shouldBe
 
 class ServiceEmitterRegistryTests :
     StringSpec({
-        "resolve returns emitter for matching service extension class" {
+        "resolve returns emitters for matching extension class" {
             val emitter = TestServiceEmitter()
             val registry = ServiceEmitterRegistry(listOf(emitter))
 
-            registry.resolve(TestServiceExtension()).type shouldBe TestServiceExtension::class
+            registry.resolve(TestServiceExtension()).map(ServiceEmitter<*>::type) shouldBe
+                listOf(TestServiceExtension::class)
         }
 
-        "resolve rejects duplicate emitters for the same service extension class" {
+        "resolve also handles services-level extensions" {
+            val registry = ServiceEmitterRegistry(listOf(TestSharedEmitter()))
+
+            registry.resolve(TestSharedExtension()).map(ServiceEmitter<*>::type) shouldBe
+                listOf(TestSharedExtension::class)
+        }
+
+        "resolve allows multiple emitters for the same extension class" {
+            val registry = ServiceEmitterRegistry(listOf(TestServiceEmitter(), AdditionalTestServiceEmitter()))
+
+            registry.resolve(TestServiceExtension()).map { it::class } shouldBe
+                listOf(AdditionalTestServiceEmitter::class, TestServiceEmitter::class)
+        }
+
+        "resolve rejects duplicate emitter implementations for the same extension class" {
             shouldThrow<IllegalArgumentException> {
-                ServiceEmitterRegistry(listOf(TestServiceEmitter(), DuplicateTestServiceEmitter()))
+                ServiceEmitterRegistry(listOf(TestServiceEmitter(), TestServiceEmitter()))
             }
         }
 

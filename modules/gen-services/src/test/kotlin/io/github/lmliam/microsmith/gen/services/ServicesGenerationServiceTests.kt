@@ -10,8 +10,6 @@ import kotlin.io.path.Path
 class ServicesGenerationServiceTests :
     StringSpec({
         "generate emits files for shared and service extensions in declaration order" {
-            val sharedEmitter = TestSharedEmitter()
-            val serviceEmitter = TestServiceEmitter()
             val service =
                 ServiceBuilder("UserService").apply {
                     put(TestServiceExtension::class, TestServiceExtension("hello"))
@@ -24,8 +22,7 @@ class ServicesGenerationServiceTests :
             val extension = builder.toExtension()
             val generationService =
                 ServicesGenerationService(
-                    sharedEmitterRegistry = SharedServiceEmitterRegistry(listOf(sharedEmitter)),
-                    emitterRegistry = ServiceEmitterRegistry(listOf(serviceEmitter)),
+                    emitterRegistry = ServiceEmitterRegistry(listOf(TestSharedEmitter(), TestServiceEmitter())),
                 )
             val space = DirectorySpace.from(Files.createTempDirectory("microsmith-services-gen-"))
 

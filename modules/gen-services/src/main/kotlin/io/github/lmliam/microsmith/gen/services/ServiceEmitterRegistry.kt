@@ -1,35 +1,50 @@
 package io.github.lmliam.microsmith.gen.services
 
-import io.github.lmliam.microsmith.dsl.services.core.ServiceExtension
+import io.github.lmliam.microsmith.dsl.core.ModelExtension
 import java.util.ServiceLoader
 import kotlin.reflect.KClass
 
 /**
- * Resolves service emitters by concrete service extension class and rejects ambiguous registrations.
+ * Resolves emitters for the extension payloads attached to the services aggregate and individual services.
  */
 class ServiceEmitterRegistry(
     emitters: List<ServiceEmitter<*>> = loadServiceEmitters(),
 ) {
-    private val emittersByType: Map<KClass<out ServiceExtension>, ServiceEmitter<*>> = indexEmitters(emitters)
+    private val emittersByType: Map<KClass<out ModelExtension>, List<ServiceEmitter<*>>> = indexEmitters(emitters)
 
-    fun resolve(extension: ServiceExtension): ServiceEmitter<ServiceExtension> = emittersByType[extension::class]
-        ?.cast()
-        ?: error("No emitter found for service extension type: ${extension::class}")
+    fun resolve(extension: ModelExtension): List<ServiceEmitter<ModelExtension>> {
+        return emittersByType[extension::class]
+            ?.map { it.cast() }
+            ?: error("No emitter found for services-model extension type: ${extension::class}")
+    }
 
-    private fun indexEmitters(emitters: List<ServiceEmitter<*>>): Map<KClass<out ServiceExtension>, ServiceEmitter<*>> {
-        val duplicates = emitters.groupBy(ServiceEmitter<*>::type).filterValues { it.size > 1 }
-        require(duplicates.isEmpty()) {
-            val types = duplicates.keys.map(::formatType).sorted().joinToString(", ")
-            "Duplicate service emitters registered for extension types: $types"
+    private fun indexEmitters(
+        emitters: List<ServiceEmitter<*>>,
+    ): Map<KClass<out ModelExtension>, List<ServiceEmitter<*>>> {
+        val emittersByType = emitters.groupBy(ServiceEmitter<*>::type)
+        emittersByType.forEach { (type, registrations) ->
+            val duplicateImplementations =
+                registrations
+                    .groupBy { it::class }
+                    .filterValues { it.size > 1 }
+                    .keys
+                    .map { it.qualifiedName ?: it.toString() }
+                    .sorted()
+            require(duplicateImplementations.isEmpty()) {
+                "Duplicate service emitters registered for extension type ${formatType(type)}: " +
+                    duplicateImplementations.joinToString(", ")
+            }
         }
 
-        return emitters.associateBy(ServiceEmitter<*>::type)
+        return emittersByType.mapValues { (_, registrations) ->
+            registrations.sortedBy { it::class.qualifiedName ?: it::class.toString() }
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun ServiceEmitter<*>.cast(): ServiceEmitter<ServiceExtension> = this as ServiceEmitter<ServiceExtension>
+    private fun ServiceEmitter<*>.cast(): ServiceEmitter<ModelExtension> = this as ServiceEmitter<ModelExtension>
 
-    private fun formatType(type: KClass<out ServiceExtension>): String = type.qualifiedName ?: type.toString()
+    private fun formatType(type: KClass<out ModelExtension>): String = type.qualifiedName ?: type.toString()
 }
 
 private fun loadServiceEmitters(): List<ServiceEmitter<*>> =
