@@ -9,7 +9,6 @@ internal object RuntimeScriptingBuildNames {
         ":dsl-schemas",
         ":dsl-schemas-protobuf",
         ":dsl-schemas-protobuf-rpc",
-        ":dsl-services-dotnet-packages",
     )
 
     val IMPLEMENTATION_PROJECT_PATHS = listOf(
