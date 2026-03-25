@@ -35,6 +35,7 @@ Microsmith provides:
 
 - a core immutable model built from `microsmith { ... }`
 - extension points for schema and generation dialects
+- a layered generation pipeline spanning authoring DSLs, resolved domain models, logical artifacts, artifact compilation, and final output rendering
 - a standalone CLI for running `.microsmith.kts` scripts without embedding Gradle in consumer repositories
 - bundled built-in providers for the default schema and protobuf workflows
 - a native Gradle plugin for Java, Kotlin, and Scala repositories that want imported-project build alignment
@@ -44,7 +45,7 @@ Microsmith provides:
 
 ## Generation architecture
 
-Microsmith now runs generation through five explicit stages:
+Microsmith generation is organized into five explicit stages:
 
 1. `dsl-*`: authoring-facing builders and immutable extension models
 2. `resolve-*`: normalization, inheritance application, and semantic validation into finalized domain models
@@ -52,33 +53,33 @@ Microsmith now runs generation through five explicit stages:
 4. `compile-*`: artifact-to-artifact compilation into renderable file artifacts
 5. `gen-*`: final rendering, output routing, and file writing
 
-The important boundary is that generators no longer read raw authoring DSL state directly. They consume finalized models and compiled artifacts.
+Generators consume finalized models and compiled artifacts instead of raw authoring DSL state.
 
 ```mermaid
 flowchart LR
-    Script["`.microsmith.kts` / `microsmith { ... }` authoring"]
+    Script["Authoring script (.microsmith.kts)"]
 
     subgraph Authoring["Authoring"]
-        DSL["`dsl-*`"]
+        DSL["dsl-*"]
     end
 
     subgraph Resolution["Resolution"]
-        RES["`resolve-*`"]
+        RES["resolve-*"]
     end
 
     subgraph Artifacts["Logical artifacts"]
-        ART["`artifact-*`"]
+        ART["artifact-*"]
     end
 
     subgraph Compilation["Artifact compilation"]
-        COMP["`compile-*`"]
+        COMP["compile-*"]
     end
 
     subgraph Rendering["Rendering and output"]
-        GEN["`gen-*`"]
+        GEN["gen-*"]
     end
 
-    Runtime["`runtime-scripting` / `cli` / native build plugins"]
+    Runtime["runtime-scripting, cli, and native build plugins"]
     Files["Generated files"]
 
     Script --> DSL
