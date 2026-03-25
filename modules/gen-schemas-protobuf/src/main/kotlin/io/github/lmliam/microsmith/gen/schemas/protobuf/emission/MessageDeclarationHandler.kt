@@ -3,8 +3,8 @@ package io.github.lmliam.microsmith.gen.schemas.protobuf.emission
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.gen.schemas.protobuf.imports.collectImports
-import io.github.lmliam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaName
 import io.github.lmliam.microsmith.gen.schemas.protobuf.render.ProtobufDeclarationRenderer
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 import kotlin.reflect.KClass
 
 internal object MessageDeclarationHandler : ProtobufDeclarationHandler<Message> {

@@ -7,8 +7,8 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.gen.schemas.protobuf.emission.invalidTopLevelOneofField
-import io.github.lmliam.microsmith.gen.schemas.protobuf.names.ProtobufNameValidation
-import io.github.lmliam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaName
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 internal fun Message.collectImports(current: QualifiedSchemaName): List<String> = buildSet {
     collectReferenceNames().forEach { referenceName ->

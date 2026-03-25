@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.gen.schemas.protobuf.emission
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
-import io.github.lmliam.microsmith.gen.schemas.protobuf.names.QualifiedSchemaName
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 internal object ProtobufSchemaEmissionValidator {
     private val declarationSupportRegistry = ProtobufDeclarationHandlerRegistry()

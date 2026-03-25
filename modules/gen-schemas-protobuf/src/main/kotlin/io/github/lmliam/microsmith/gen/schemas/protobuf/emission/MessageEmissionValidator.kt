@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.gen.schemas.protobuf.emission
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
-import io.github.lmliam.microsmith.gen.schemas.protobuf.names.ProtobufNameValidation
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 
 internal object MessageEmissionValidator {
     fun validate(message: Message) {

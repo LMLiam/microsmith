@@ -7,7 +7,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
-import io.github.lmliam.microsmith.gen.schemas.protobuf.names.ProtobufNameValidation
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 
 internal object FieldEmissionValidator {
     fun validate(oneof: Oneof) {

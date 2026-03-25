@@ -5,7 +5,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
-import io.github.lmliam.microsmith.gen.schemas.protobuf.names.ProtobufNameValidation
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 
 internal object ReservedEmissionValidator {
     fun validate(reserved: Reserved) {
