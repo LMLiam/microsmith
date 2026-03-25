@@ -25,7 +25,7 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
     ): ProtoFileArtifact {
         val next = requireContribution(contribution)
         require(current.packageName == next.packageName) {
-            "Conflicting protobuf package names for '${current.id.relativePath}' under '${current.id.outputRoot}'."
+            "Conflicting protobuf package names for '${current.id.fullyQualifiedName}'."
         }
 
         val mergedDeclarations = LinkedHashMap(current.declarations.associateBy(ProtoDeclaration::name))
@@ -33,7 +33,7 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
             val existing = mergedDeclarations[declaration.name]
             require(existing == null || existing == declaration) {
                 "Conflicting protobuf declaration '${declaration.name}' for " +
-                    "'${current.id.relativePath}' under '${current.id.outputRoot}'."
+                    "'${current.id.fullyQualifiedName}'."
             }
             mergedDeclarations.putIfAbsent(declaration.name, declaration)
         }

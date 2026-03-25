@@ -4,12 +4,11 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import java.nio.file.Path
 
 class ProtoFileArtifactAssemblerTests :
     StringSpec({
         val assembler = ProtoFileArtifactAssembler()
-        val sharedId = ProtoFileArtifactId(relativePath = Path.of("proto/acme/user/v1/User.proto"))
+        val sharedId = ProtoFileArtifactId(packageName = "acme.user.v1", typeName = "User")
 
         "merges imports and declarations for the same proto artifact" {
             val assembled =
@@ -61,6 +60,6 @@ class ProtoFileArtifactAssemblerTests :
                 }
 
             error.message shouldBe
-                "Conflicting protobuf declaration 'User' for 'proto/acme/user/v1/User.proto' under '.'."
+                "Conflicting protobuf declaration 'User' for 'acme.user.v1.User'."
         }
     })
