@@ -4,7 +4,7 @@ dependencies {
     implementation project(":dsl-schemas-protobuf")
     implementation project(":artifact-schemas")
     implementation project(":artifact-schemas-protobuf")
-    implementation project(":lower-schemas-protobuf")
+    implementation project(":compile-schemas-protobuf")
     api project(":gen")
     api libs.coroutines.core
 }

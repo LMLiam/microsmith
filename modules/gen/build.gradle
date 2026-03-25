@@ -4,7 +4,7 @@ dependencies {
     implementation project(":dsl")
     implementation project(":resolve")
     implementation project(":artifact")
-    implementation project(":lower")
+    implementation project(":compile")
     implementation libs.coroutines.core
     implementation libs.spi.tooling.annotations
     kapt libs.spi.tooling.processor

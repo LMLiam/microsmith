@@ -3,7 +3,7 @@ dependencies {
     implementation project(":artifact-schemas-protobuf")
     implementation project(":artifact-schemas-protobuf-rpc")
     implementation project(":gen-schemas-protobuf")
-    implementation project(":lower-schemas-protobuf-rpc")
+    implementation project(":compile-schemas-protobuf-rpc")
     implementation project(":gen")
     api libs.coroutines.core
 

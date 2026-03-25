@@ -9,10 +9,10 @@ import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
+import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
 import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
 import io.github.lmliam.microsmith.gen.core.ArtifactRenderer
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
-import io.github.lmliam.microsmith.lower.core.ArtifactLowerer
 import io.github.lmliam.microsmith.resolve.core.DomainResolver
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
@@ -30,7 +30,7 @@ class CliProviderValidatorTests :
                     domainResolvers = emptyList(),
                     artifactContributors = emptyList(),
                     artifactAssemblers = emptyList(),
-                    artifactLowerers = emptyList(),
+                    artifactCompilers = emptyList(),
                     artifactRenderers = emptyList(),
                 )
 
@@ -61,10 +61,10 @@ class CliProviderValidatorTests :
                 "Missing built-in ArtifactAssembler for TextFileArtifact. Check CLI runtime packaging.",
             )
             errors.shouldContain(
-                "Missing built-in ArtifactLowerer for ProtoFileArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactCompiler for ProtoFileArtifact. Check CLI runtime packaging.",
             )
             errors.shouldContain(
-                "Missing built-in ArtifactLowerer for ProtobufRpcServiceArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactCompiler for ProtobufRpcServiceArtifact. Check CLI runtime packaging.",
             )
             errors.shouldContain(
                 "Missing built-in ArtifactRenderer for TextFileArtifact. Check CLI runtime packaging.",
@@ -81,7 +81,7 @@ class CliProviderValidatorTests :
                         ProtobufRpcAssemblerStub(),
                         TextFileAssemblerStub(),
                     ),
-                    artifactLowerers = listOf(ProtoFileLowererStub(), ProtobufRpcLowererStub()),
+                    artifactCompilers = listOf(ProtoFileCompilerStub(), ProtobufRpcCompilerStub()),
                     artifactRenderers = listOf(TextFileRendererStub()),
                 )
 
@@ -166,18 +166,18 @@ private class TextFileAssemblerStub : ArtifactAssembler<TextFileArtifact> {
     ): TextFileArtifact = current
 }
 
-private class ProtoFileLowererStub : ArtifactLowerer<ProtoFileArtifact> {
+private class ProtoFileCompilerStub : ArtifactCompiler<ProtoFileArtifact> {
     override val artifactType: KClass<ProtoFileArtifact> = ProtoFileArtifact::class
 
-    override fun lower(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> {
+    override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> {
         return emptyList()
     }
 }
 
-private class ProtobufRpcLowererStub : ArtifactLowerer<ProtobufRpcServiceArtifact> {
+private class ProtobufRpcCompilerStub : ArtifactCompiler<ProtobufRpcServiceArtifact> {
     override val artifactType: KClass<ProtobufRpcServiceArtifact> = ProtobufRpcServiceArtifact::class
 
-    override fun lower(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> {
+    override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> {
         return emptyList()
     }
 }

@@ -2,7 +2,7 @@ dependencies {
     implementation project(":artifact-services")
     implementation project(":artifact-services-dotnet")
     implementation project(":artifact-services-dotnet-packages")
-    implementation project(":lower-services-dotnet-packages")
+    implementation project(":compile-services-dotnet-packages")
     implementation project(":gen-services-dotnet")
     implementation project(":gen")
     api libs.coroutines.core

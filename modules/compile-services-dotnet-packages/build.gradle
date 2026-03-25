@@ -1,0 +1,11 @@
+apply plugin: 'org.jetbrains.kotlin.kapt'
+
+dependencies {
+    api project(":artifact")
+    api project(":artifact-services")
+    api project(":artifact-services-dotnet")
+    api project(":artifact-services-dotnet-packages")
+    api project(":compile")
+    api libs.spi.tooling.annotations
+    kapt libs.spi.tooling.processor
+}

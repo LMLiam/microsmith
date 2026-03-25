@@ -5,9 +5,9 @@ import io.github.lmliam.microsmith.artifact.core.ArtifactContributor
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
+import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
 import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
 import io.github.lmliam.microsmith.gen.core.ArtifactRenderer
-import io.github.lmliam.microsmith.lower.core.ArtifactLowerer
 import io.github.lmliam.microsmith.resolve.core.DomainResolver
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
@@ -17,7 +17,7 @@ internal fun verifyBuiltinProviders(
     domainResolvers: List<DomainResolver<*, *>> = loadDomainResolvers(),
     artifactContributors: List<ArtifactContributor<*>> = loadArtifactContributors(),
     artifactAssemblers: List<ArtifactAssembler<*>> = loadArtifactAssemblers(),
-    artifactLowerers: List<ArtifactLowerer<*>> = loadArtifactLowerers(),
+    artifactCompilers: List<ArtifactCompiler<*>> = loadArtifactCompilers(),
     artifactRenderers: List<ArtifactRenderer<*>> = loadArtifactRenderers(),
 ): List<String> {
     val errors = mutableListOf<String>()
@@ -64,12 +64,12 @@ internal fun verifyBuiltinProviders(
         errors += "Missing built-in ArtifactAssembler for TextFileArtifact. Check CLI runtime packaging."
     }
 
-    if (artifactLowerers.none { it.artifactType == ProtoFileArtifact::class }) {
-        errors += "Missing built-in ArtifactLowerer for ProtoFileArtifact. Check CLI runtime packaging."
+    if (artifactCompilers.none { it.artifactType == ProtoFileArtifact::class }) {
+        errors += "Missing built-in ArtifactCompiler for ProtoFileArtifact. Check CLI runtime packaging."
     }
 
-    if (artifactLowerers.none { it.artifactType == ProtobufRpcServiceArtifact::class }) {
-        errors += "Missing built-in ArtifactLowerer for ProtobufRpcServiceArtifact. Check CLI runtime packaging."
+    if (artifactCompilers.none { it.artifactType == ProtobufRpcServiceArtifact::class }) {
+        errors += "Missing built-in ArtifactCompiler for ProtobufRpcServiceArtifact. Check CLI runtime packaging."
     }
 
     if (artifactRenderers.none { it.artifactType == TextFileArtifact::class }) {
@@ -94,7 +94,7 @@ private fun loadArtifactAssemblers() = ServiceLoader.load(ArtifactAssembler::cla
     .asSequence()
     .toList()
 
-private fun loadArtifactLowerers() = ServiceLoader.load(ArtifactLowerer::class.java)
+private fun loadArtifactCompilers() = ServiceLoader.load(ArtifactCompiler::class.java)
     .iterator()
     .asSequence()
     .toList()
