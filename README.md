@@ -8,6 +8,7 @@ This README is the canonical repository documentation.
 ## Contents
 
 - Overview
+- Generation architecture
 - Repository modules
 - Repository layout
 - Repository Kotlin standards
@@ -41,16 +42,89 @@ Microsmith provides:
 - a native sbt plugin for Scala repositories that want build-aligned generation inside sbt
 - a JetBrains IDE helper workflow for stronger type resolution in consumer repositories
 
+## Generation architecture
+
+Microsmith now runs generation through five explicit stages:
+
+1. `dsl-*`: authoring-facing builders and immutable extension models
+2. `resolve-*`: normalization, inheritance application, and semantic validation into finalized domain models
+3. `artifact-*`: logical artifact creation and contribution assembly
+4. `compile-*`: artifact-to-artifact compilation into renderable file artifacts
+5. `gen-*`: final rendering, output routing, and file writing
+
+The important boundary is that generators no longer read raw authoring DSL state directly. They consume finalized models and compiled artifacts.
+
+```mermaid
+flowchart LR
+    Script["`.microsmith.kts` / `microsmith { ... }` authoring"]
+
+    subgraph Authoring["Authoring"]
+        DSL["`dsl-*`"]
+    end
+
+    subgraph Resolution["Resolution"]
+        RES["`resolve-*`"]
+    end
+
+    subgraph Artifacts["Logical artifacts"]
+        ART["`artifact-*`"]
+    end
+
+    subgraph Compilation["Artifact compilation"]
+        COMP["`compile-*`"]
+    end
+
+    subgraph Rendering["Rendering and output"]
+        GEN["`gen-*`"]
+    end
+
+    Runtime["`runtime-scripting` / `cli` / native build plugins"]
+    Files["Generated files"]
+
+    Script --> DSL
+    DSL --> RES
+    RES --> ART
+    ART --> COMP
+    COMP --> GEN
+    GEN --> Files
+    Runtime --> GEN
+```
+
 ## Repository modules
 
 - `dsl`: core DSL primitives, builders, model types, and extension APIs
 - `dsl-schemas`: generic schema registry and schema-oriented DSL surface
 - `dsl-schemas-protobuf`: protobuf-flavoured schema DSL on top of `dsl-schemas`
 - `dsl-schemas-protobuf-rpc`: protobuf service and RPC DSL extensions on top of `dsl-schemas-protobuf`
-- `gen`: generator contracts, model traversal, and shared generation helpers
-- `gen-schemas`: schema-aware generation support on top of `gen`
-- `gen-schemas-protobuf`: protobuf emitters, rendering, and protobuf-specific generation support
-- `gen-schemas-protobuf-rpc`: protobuf service rendering and RPC-specific generation support
+- `dsl-services`: generic service registry and service-oriented DSL surface
+- `dsl-services-dotnet`: .NET service defaults, identity, and model DSL support
+- `dsl-services-dotnet-packages`: .NET package ownership and package reference DSL support
+- `resolve`: base resolution contracts and resolved-model orchestration
+- `resolve-schemas`: schema-domain resolved model support
+- `resolve-schemas-protobuf`: protobuf schema finalization and validation
+- `resolve-schemas-protobuf-rpc`: protobuf RPC finalization and validation
+- `resolve-services`: service-domain resolved model support
+- `resolve-services-dotnet`: finalized .NET service workspace resolution
+- `resolve-services-dotnet-packages`: finalized .NET package workspace resolution
+- `artifact`: shared artifact contracts, assembly, and contribution infrastructure
+- `artifact-schemas`: schema-domain artifact contracts
+- `artifact-schemas-protobuf`: protobuf artifact types and contributions
+- `artifact-schemas-protobuf-rpc`: protobuf RPC artifact types and contributions
+- `artifact-services`: service-domain artifact contracts
+- `artifact-services-dotnet`: .NET/MSBuild artifact types and assembly
+- `artifact-services-dotnet-packages`: .NET package artifact types and contributions
+- `compile`: artifact compiler contracts and recursive artifact compilation
+- `compile-schemas-protobuf`: protobuf artifact compilation into file artifacts
+- `compile-schemas-protobuf-rpc`: protobuf RPC artifact compilation into file artifacts
+- `compile-services-dotnet`: .NET/MSBuild artifact compilation into file artifacts
+- `compile-services-dotnet-packages`: .NET package artifact compilation into file artifacts
+- `gen`: final file rendering, output routing, and generation orchestration
+- `gen-schemas`: schema-domain generation entrypoints
+- `gen-schemas-protobuf`: protobuf generation entrypoints
+- `gen-schemas-protobuf-rpc`: protobuf RPC generation entrypoints
+- `gen-services`: service-domain generation entrypoints
+- `gen-services-dotnet`: .NET service generation entrypoints
+- `gen-services-dotnet-packages`: .NET package generation entrypoints
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution
 - `cli`: command-line entrypoint, diagnostics, installer packaging, and IDE helper support
 - `gradle-plugin`: native Gradle integration for `.microsmith.kts` execution and imported-project IDE alignment
@@ -60,13 +134,13 @@ Microsmith provides:
 
 ### Module boundary map
 
-- `dsl` is the foundational model and DSL layer. It should stay free of CLI, scripting-host, installer, resolver, and generation-application concerns.
-- `dsl-schemas` extends `dsl` with schema registration and schema-oriented DSL concepts. It should not absorb CLI or runtime concerns.
-- `dsl-schemas-protobuf` adds protobuf-specific schema modeling on top of `dsl` and `dsl-schemas`. Keep protobuf domain types, builders, and DSL entrypoints here rather than leaking them into application layers.
-- `dsl-schemas-protobuf-rpc` adds protobuf service and RPC DSL support as an extension layer on top of the core protobuf schema module.
-- `gen` owns generator contracts and shared generation abstractions. It should not contain CLI command handling, repository bootstrapping, or scripting host orchestration.
-- `gen-schemas` and `gen-schemas-protobuf` own schema-aware emission, rendering, and validation. They should depend downward on model and generator layers, not upward on CLI or installer behavior.
-- `gen-schemas-protobuf-rpc` owns protobuf service rendering, validation, and import derivation without bloating the core protobuf emitter module.
+- `dsl-*` modules own authoring ergonomics only. They may model layered defaults and rich DSL entrypoints, but they should stay free of output routing, rendering, scripting-host concerns, and filesystem writes.
+- `resolve-*` modules own finalization. They apply inheritance and defaults, validate cross-object semantics, and produce generator-facing immutable models. They must stay pure and avoid rendering or output-path concerns.
+- `artifact-*` modules own logical artifacts and artifact contributions. They define what exists before rendering, how same-artifact contributions merge, and where conflicts are rejected.
+- `compile-*` modules own artifact-to-artifact compilation. They turn higher-level domain artifacts into renderable file artifacts without taking on output writing or CLI orchestration.
+- `gen-*` modules own final rendering, output routing, and generation orchestration. They should not re-implement DSL inheritance or semantic validation already handled in `resolve-*`.
+- `dsl-schemas*`, `resolve-schemas*`, `artifact-schemas*`, `compile-schemas*`, and `gen-schemas*` together form the schema domain pipeline. Keep protobuf-specific behavior in the protobuf-specific modules rather than bloating the generic schema layers.
+- `dsl-services*`, `resolve-services*`, `artifact-services*`, `compile-services*`, and `gen-services*` together form the service domain pipeline. Keep .NET and package-management behavior in the feature-specific service modules rather than bloating the generic service layers.
 - `runtime-scripting` is the scripting host and execution boundary. It may depend on DSL and generation layers, but it must not absorb CLI parsing, onboarding, or distribution concerns.
 - `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
 - `gradle-plugin` is the native Gradle integration surface for Gradle-imported JVM repositories. It should stay thin, Gradle-conventional, and explicit about task/configuration wiring rather than absorbing CLI concerns.
@@ -76,7 +150,7 @@ Microsmith provides:
 
 ## Repository layout
 
-- `modules/`: production Gradle subprojects, including `cli`, `dsl`, `dsl-schemas`, `dsl-schemas-protobuf`, `dsl-schemas-protobuf-rpc`, `gen`, `gen-schemas`, `gen-schemas-protobuf`, `gen-schemas-protobuf-rpc`, `runtime-scripting`, `gradle-plugin`, `maven-plugin`, `sbt-plugin`, and `kotest`
+- `modules/`: production Gradle subprojects grouped into pipeline families such as `dsl-*`, `resolve-*`, `artifact-*`, `compile-*`, `gen-*`, plus execution layers like `runtime-scripting`, `cli`, `gradle-plugin`, `maven-plugin`, `sbt-plugin`, and `kotest`
 - `build-logic/`: included Gradle build that owns repository-specific plugins and quality tasks
 - `examples/`: consumer-repository fixtures and onboarding examples
 - `gradle/`: wrapper files, version catalog, and dependency locks
