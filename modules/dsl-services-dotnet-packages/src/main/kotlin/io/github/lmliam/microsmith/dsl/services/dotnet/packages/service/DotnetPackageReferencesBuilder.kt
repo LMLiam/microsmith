@@ -1,0 +1,41 @@
+package io.github.lmliam.microsmith.dsl.services.dotnet.packages.service
+
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.DotnetPackageNode
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.flattenReferencedPackages
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.normalizeDotnetPackagePath
+
+internal class DotnetPackageReferencesBuilder(
+    private val pathSegments: List<String> = emptyList(),
+) : DotnetPackageReferencesScope {
+    private val children = linkedMapOf<String, DotnetPackageReferencesBuilder>()
+
+    override fun String.invoke(block: DotnetPackageReferencesScope.() -> Unit) {
+        val normalizedPathSegments = normalizeDotnetPackagePath(this, "Package name")
+        val childKey = normalizedPathSegments.joinToString(".")
+        require(childKey !in children) {
+            "Duplicate .NET package declaration for '$childKey'."
+        }
+
+        val child = DotnetPackageReferencesBuilder(pathSegments + normalizedPathSegments)
+        child.block()
+        children[childKey] = child
+    }
+
+    override fun String.unaryPlus() {
+        this.invoke {}
+    }
+
+    fun build(): DotnetPackageReferencesExtension {
+        return DotnetPackageReferencesExtension(
+            packages = flattenReferencedPackages(buildNode()),
+        )
+    }
+
+    private fun buildNode(): DotnetPackageNode {
+        return DotnetPackageNode(
+            pathSegments = pathSegments,
+            version = null,
+            children = children.values.map { it.buildNode() },
+        )
+    }
+}
