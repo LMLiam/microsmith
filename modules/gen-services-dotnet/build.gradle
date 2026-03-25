@@ -1,7 +1,0 @@
-dependencies {
-    implementation project(":artifact-services")
-    implementation project(":artifact-services-dotnet")
-    implementation project(":compile-services-dotnet")
-    implementation project(":gen")
-    api libs.coroutines.core
-}

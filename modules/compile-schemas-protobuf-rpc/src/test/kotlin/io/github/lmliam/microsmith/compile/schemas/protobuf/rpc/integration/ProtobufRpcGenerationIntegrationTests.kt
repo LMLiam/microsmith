@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.gen.schemas.protobuf.rpc
+package io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.integration
 
 import io.github.lmliam.microsmith.dsl.core.microsmith
 import io.github.lmliam.microsmith.dsl.schemas.core.schemas

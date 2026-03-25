@@ -25,9 +25,6 @@ internal object RuntimeScriptingBuildNames {
         ":compile-schemas-protobuf",
         ":compile-schemas-protobuf-rpc",
         ":gen",
-        ":gen-schemas",
-        ":gen-schemas-protobuf",
-        ":gen-schemas-protobuf-rpc",
     )
 
     const val POM_PATH = "publications/gpr/pom-default.xml"

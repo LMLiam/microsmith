@@ -1,6 +1,0 @@
-dependencies {
-    implementation project(":gen")
-    api project(":dsl")
-    implementation project(":dsl-services")
-    api libs.coroutines.core
-}
