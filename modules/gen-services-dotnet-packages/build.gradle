@@ -1,12 +1,11 @@
-apply plugin: 'org.jetbrains.kotlin.kapt'
-
 dependencies {
-    implementation project(":artifact")
+    implementation project(":artifact-services")
     implementation project(":artifact-services-dotnet")
+    implementation project(":artifact-services-dotnet-packages")
+    implementation project(":lower-services-dotnet-packages")
+    implementation project(":gen-services-dotnet")
     implementation project(":gen")
-    implementation project(":resolve")
-    implementation project(":resolve-services-dotnet-packages")
-    api libs.spi.tooling.annotations
-    kapt libs.spi.tooling.processor
     api libs.coroutines.core
+
+    testImplementation project(":resolve-services-dotnet-packages")
 }

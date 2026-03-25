@@ -27,8 +27,8 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
         next.properties.forEach { (name, value) ->
             val existing = mergedProperties[name]
             require(existing == null || existing == value) {
-                "Conflicting MSBuild property '$name' for '${current.id.relativePath}' " +
-                    "under '${current.id.outputRoot}'."
+                "Conflicting MSBuild property '$name' for '${current.id.kind}' in solution " +
+                    "'${current.id.solutionName}'${current.id.projectName?.let { " project '$it'" }.orEmpty()}."
             }
             mergedProperties[name] = value
         }
@@ -42,7 +42,9 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
             val existing = mergedItems[key]
             require(existing == null || existing == item) {
                 "Conflicting MSBuild item '${item.type}:${item.include}' for " +
-                    "'${current.id.relativePath}' under '${current.id.outputRoot}'."
+                    "'${current.id.kind}' in solution '${current.id.solutionName}'" +
+                    current.id.projectName?.let { " project '$it'" }.orEmpty() +
+                    "."
             }
             mergedItems[key] = item
         }

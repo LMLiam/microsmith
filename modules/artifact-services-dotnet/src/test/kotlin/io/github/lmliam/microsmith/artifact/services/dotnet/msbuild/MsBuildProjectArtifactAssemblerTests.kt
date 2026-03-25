@@ -5,14 +5,13 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import java.nio.file.Path
 
 class MsBuildProjectArtifactAssemblerTests :
     StringSpec({
         val assembler = MsBuildProjectArtifactAssembler()
         val artifactId = MsBuildProjectArtifactId(
-            relativePath = Path.of("Directory.Packages.props"),
-            outputRoot = Path.of("dotnet", "Platform"),
+            solutionName = "Platform",
+            kind = MsBuildProjectKind.DirectoryPackagesProps,
         )
 
         "merge combines compatible properties and items" {
