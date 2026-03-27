@@ -38,4 +38,32 @@ class MsBuildProjectArtifactCompilerTests :
             contents.shouldContain("<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>")
             contents.shouldContain("<PackageVersion Include=\"Serilog.AspNetCore\" Version=\"9.0.0 &amp; preview\" />")
         }
+
+        "compile writes project package references into auto-imported Directory.Build.props" {
+            val artifact =
+                MsBuildProjectArtifact(
+                    id = MsBuildProjectArtifactId(
+                        solutionName = "Platform",
+                        projectName = "UserService.Api",
+                        kind = MsBuildProjectKind.DirectoryBuildProps,
+                    ),
+                    properties = emptyMap(),
+                    items =
+                    listOf(
+                        MsBuildItem(
+                            type = "PackageReference",
+                            include = "Serilog.AspNetCore",
+                            metadata = emptyMap(),
+                        ),
+                    ),
+                )
+
+            val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
+            val textContribution = contribution as TextFileArtifactContribution
+
+            textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("Directory.Build.props")
+            textContribution.artifactId.outputRoot shouldBe
+                java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
+            textContribution.contents.shouldContain("<PackageReference Include=\"Serilog.AspNetCore\" />")
+        }
     })

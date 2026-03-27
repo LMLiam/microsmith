@@ -4,5 +4,5 @@ enum class MsBuildProjectKind(
     val fileName: String,
 ) {
     DirectoryPackagesProps("Directory.Packages.props"),
-    PackageReferencesProps("PackageReferences.props"),
+    DirectoryBuildProps("Directory.Build.props"),
 }

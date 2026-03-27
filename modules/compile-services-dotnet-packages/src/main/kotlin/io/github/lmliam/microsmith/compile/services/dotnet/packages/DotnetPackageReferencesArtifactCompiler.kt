@@ -22,7 +22,7 @@ class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetP
                 artifactId = MsBuildProjectArtifactId(
                     solutionName = artifact.solutionName,
                     projectName = artifact.projectName,
-                    kind = MsBuildProjectKind.PackageReferencesProps,
+                    kind = MsBuildProjectKind.DirectoryBuildProps,
                 ),
                 items = artifact.packages.sorted().map { packageName ->
                     MsBuildItem(

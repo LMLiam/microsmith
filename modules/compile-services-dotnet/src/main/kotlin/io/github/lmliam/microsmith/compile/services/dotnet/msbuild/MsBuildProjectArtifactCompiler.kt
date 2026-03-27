@@ -30,6 +30,6 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
 
     private fun MsBuildProjectArtifact.outputRoot(): Path = when (id.kind) {
         MsBuildProjectKind.DirectoryPackagesProps -> Path.of("dotnet", id.solutionName)
-        MsBuildProjectKind.PackageReferencesProps -> Path.of("dotnet", id.solutionName, requireNotNull(id.projectName))
+        MsBuildProjectKind.DirectoryBuildProps -> Path.of("dotnet", id.solutionName, requireNotNull(id.projectName))
     }
 }
