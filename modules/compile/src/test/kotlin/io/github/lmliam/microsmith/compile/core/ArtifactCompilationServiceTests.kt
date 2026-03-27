@@ -48,6 +48,24 @@ class ArtifactCompilationServiceTests :
                 compilationService.compile(initial)
             }
         }
+
+        "compile rejects indirect cycles across compiler stages" {
+            val assemblyService = ArtifactAssemblyService(
+                listOf(
+                    StageOneArtifactAssembler(),
+                    StageTwoArtifactAssembler(),
+                ),
+            )
+            val compilationService = ArtifactCompilationService(
+                compilers = listOf(StageOneToStageTwoCompiler(), StageTwoToStageOneCompiler()),
+                assemblyService = assemblyService,
+            )
+            val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
+
+            shouldThrow<IllegalArgumentException> {
+                compilationService.compile(initial)
+            }
+        }
     })
 
 private data class StageOneArtifact(
@@ -145,5 +163,21 @@ private class SelfCyclingCompiler : ArtifactCompiler<StageOneArtifact> {
 
     override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> {
         return listOf(StageOneContribution(StageOneId("cycle"), artifact.contents))
+    }
+}
+
+private class StageOneToStageTwoCompiler : ArtifactCompiler<StageOneArtifact> {
+    override val artifactType: KClass<StageOneArtifact> = StageOneArtifact::class
+
+    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> {
+        return listOf(StageTwoContribution(StageTwoId(artifact.id.name), artifact.contents))
+    }
+}
+
+private class StageTwoToStageOneCompiler : ArtifactCompiler<StageTwoArtifact> {
+    override val artifactType: KClass<StageTwoArtifact> = StageTwoArtifact::class
+
+    override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<out Artifact>> {
+        return listOf(StageOneContribution(StageOneId(artifact.id.name), artifact.contents))
     }
 }

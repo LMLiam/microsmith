@@ -29,7 +29,11 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
     }
 
     private fun MsBuildProjectArtifact.outputRoot(): Path = when (id.kind) {
-        MsBuildProjectKind.DirectoryPackagesProps -> Path.of("dotnet", id.solutionName)
-        MsBuildProjectKind.DirectoryBuildProps -> Path.of("dotnet", id.solutionName, requireNotNull(id.projectName))
+        MsBuildProjectKind.DirectoryPackagesProps -> dotnetOutputRoot.resolve(id.solutionName)
+        MsBuildProjectKind.DirectoryBuildProps -> dotnetOutputRoot.resolve(id.solutionName).resolve(requireNotNull(id.projectName))
+    }
+
+    private companion object {
+        val dotnetOutputRoot: Path = Path.of("dotnet")
     }
 }

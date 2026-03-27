@@ -6,18 +6,18 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildPrope
 
 internal object MsBuildProjectXmlRenderer {
     fun render(artifact: MsBuildProjectArtifact): String = buildString {
-        appendLine("<Project>")
+        appendLine(openElement(ProjectElementName))
         if (artifact.properties.isNotEmpty()) {
-            appendLine("  <PropertyGroup>")
+            appendLine(indentedOpenElement(PropertyGroupElementName))
             artifact.properties.toSortedMap(compareBy(MsBuildPropertyName::value)).forEach { (name, value) ->
                 appendLine("    <${name.value}>${xmlEscape(value)}</${name.value}>")
             }
-            appendLine("  </PropertyGroup>")
+            appendLine(indentedCloseElement(PropertyGroupElementName))
         }
         if (artifact.items.isNotEmpty()) {
-            appendLine("  <ItemGroup>")
+            appendLine(indentedOpenElement(ItemGroupElementName))
             artifact.items.forEach { item ->
-                append("    <${item.itemName.value} Include=\"")
+                append("    <${item.itemName.value} $IncludeAttributeName=\"")
                 append(xmlEscape(item.include))
                 append("\"")
                 item.attributes.toSortedMap(compareBy(MsBuildAttributeName::value)).forEach { (key, value) ->
@@ -27,9 +27,9 @@ internal object MsBuildProjectXmlRenderer {
                 }
                 appendLine(" />")
             }
-            appendLine("  </ItemGroup>")
+            appendLine(indentedCloseElement(ItemGroupElementName))
         }
-        appendLine("</Project>")
+        appendLine(closeElement(ProjectElementName))
     }
 
     private fun xmlEscape(value: String): String = buildString(value.length) {
@@ -44,4 +44,17 @@ internal object MsBuildProjectXmlRenderer {
             }
         }
     }
+
+    private fun openElement(name: String): String = "<$name>"
+
+    private fun closeElement(name: String): String = "</$name>"
+
+    private fun indentedOpenElement(name: String): String = "  ${openElement(name)}"
+
+    private fun indentedCloseElement(name: String): String = "  ${closeElement(name)}"
+
+    private const val ProjectElementName = "Project"
+    private const val PropertyGroupElementName = "PropertyGroup"
+    private const val ItemGroupElementName = "ItemGroup"
+    private const val IncludeAttributeName = "Include"
 }
