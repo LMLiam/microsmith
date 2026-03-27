@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.compile.core
 import io.github.lmliam.microsmith.artifact.core.Artifact
 import io.github.lmliam.microsmith.artifact.core.ArtifactAssembly
 import io.github.lmliam.microsmith.artifact.core.ArtifactAssemblyService
+import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
 
 class ArtifactCompilationService internal constructor(
     private val compilerRegistry: ArtifactCompilerRegistry = ArtifactCompilerRegistry(),
@@ -32,8 +33,7 @@ class ArtifactCompilationService internal constructor(
 
     private fun compileSinglePass(current: ArtifactAssembly): ArtifactAssembly? {
         val passthroughArtifacts = mutableListOf<Artifact>()
-        val compiledContributions =
-            mutableListOf<io.github.lmliam.microsmith.artifact.core.ArtifactContribution<out Artifact>>()
+        val compiledContributions = mutableListOf<ArtifactContribution<out Artifact>>()
         var compiledAny = false
 
         current.artifacts().forEach { artifact ->
@@ -71,7 +71,5 @@ class ArtifactCompilationService internal constructor(
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun ArtifactCompiler<Artifact>.compileUnchecked(
-    artifact: Artifact,
-): List<io.github.lmliam.microsmith.artifact.core.ArtifactContribution<out Artifact>> =
+private fun ArtifactCompiler<Artifact>.compileUnchecked(artifact: Artifact): List<ArtifactContribution<out Artifact>> =
     (this as ArtifactCompiler<Artifact>).compile(artifact)
