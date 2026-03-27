@@ -30,7 +30,10 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
 
     private fun MsBuildProjectArtifact.outputRoot(): Path = when (id.kind) {
         MsBuildProjectKind.DirectoryPackagesProps -> dotnetOutputRoot.resolve(id.solutionName)
-        MsBuildProjectKind.DirectoryBuildProps -> dotnetOutputRoot.resolve(id.solutionName).resolve(requireNotNull(id.projectName))
+        MsBuildProjectKind.DirectoryBuildProps ->
+            dotnetOutputRoot
+                .resolve(id.solutionName)
+                .resolve(requireNotNull(id.projectName))
     }
 
     private companion object {

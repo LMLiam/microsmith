@@ -12,10 +12,10 @@ internal object MsBuildProjectXmlRenderer {
         val output = StringWriter()
         val writer = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
         try {
-            writer.writeStartElement(ProjectElementName)
+            writer.writeStartElement(PROJECT_ELEMENT_NAME)
             renderProperties(writer, artifact)
             renderItems(writer, artifact)
-            writer.writeCharacters(NewLine)
+            writer.writeCharacters(NEW_LINE)
             writer.writeEndElement()
             writer.flush()
         } finally {
@@ -26,7 +26,7 @@ internal object MsBuildProjectXmlRenderer {
 
     private fun renderProperties(writer: XMLStreamWriter, artifact: MsBuildProjectArtifact) {
         if (artifact.properties.isNotEmpty()) {
-            writer.writeIndentedStartElement(PropertyGroupElementName, level = 1)
+            writer.writeIndentedStartElement(PROPERTY_GROUP_ELEMENT_NAME, level = 1)
             artifact.properties.toSortedMap(compareBy(MsBuildPropertyName::value)).forEach { (name, value) ->
                 writer.writeIndentedStartElement(name.value, level = 2)
                 writer.writeCharacters(value)
@@ -38,11 +38,11 @@ internal object MsBuildProjectXmlRenderer {
 
     private fun renderItems(writer: XMLStreamWriter, artifact: MsBuildProjectArtifact) {
         if (artifact.items.isNotEmpty()) {
-            writer.writeIndentedStartElement(ItemGroupElementName, level = 1)
+            writer.writeIndentedStartElement(ITEM_GROUP_ELEMENT_NAME, level = 1)
             artifact.items.forEach { item ->
                 writer.writeIndent(level = 2)
                 writer.writeEmptyElement(item.itemName.value)
-                writer.writeAttribute(IncludeAttributeName, item.include)
+                writer.writeAttribute(INCLUDE_ATTRIBUTE_NAME, item.include)
                 item.attributes.toSortedMap(compareBy(MsBuildAttributeName::value)).forEach { (key, value) ->
                     writer.writeAttribute(key.value, value)
                 }
@@ -62,16 +62,16 @@ internal object MsBuildProjectXmlRenderer {
     }
 
     private fun XMLStreamWriter.writeIndent(level: Int) {
-        writeCharacters(NewLine)
+        writeCharacters(NEW_LINE)
         repeat(level) {
-            writeCharacters(Indent)
+            writeCharacters(INDENT)
         }
     }
 
-    private const val ProjectElementName = "Project"
-    private const val PropertyGroupElementName = "PropertyGroup"
-    private const val ItemGroupElementName = "ItemGroup"
-    private const val IncludeAttributeName = "Include"
-    private const val NewLine = "\n"
-    private const val Indent = "  "
+    private const val PROJECT_ELEMENT_NAME = "Project"
+    private const val PROPERTY_GROUP_ELEMENT_NAME = "PropertyGroup"
+    private const val ITEM_GROUP_ELEMENT_NAME = "ItemGroup"
+    private const val INCLUDE_ATTRIBUTE_NAME = "Include"
+    private const val NEW_LINE = "\n"
+    private const val INDENT = "  "
 }

@@ -95,8 +95,12 @@ class MsBuildProjectArtifactCompilerTests :
             val textContribution = contribution as TextFileArtifactContribution
             val contents = textContribution.contents
 
-            contents.shouldContain("<ManagePackageVersionsCentrally>A&amp;B&lt;true&gt;</ManagePackageVersionsCentrally>")
-            contents.shouldContain("""<PackageVersion Include="Serilog.&quot;AspNetCore&quot;" Version="9.0.0 &amp; preview"/>""")
+            contents.shouldContain(
+                "<ManagePackageVersionsCentrally>A&amp;B&lt;true&gt;</ManagePackageVersionsCentrally>",
+            )
+            contents.shouldContain(
+                """<PackageVersion Include="Serilog.&quot;AspNetCore&quot;" Version="9.0.0 &amp; preview"/>""",
+            )
             parseXml(contents) shouldBe "Project"
         }
     })

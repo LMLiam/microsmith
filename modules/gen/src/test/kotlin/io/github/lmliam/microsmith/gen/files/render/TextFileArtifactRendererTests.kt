@@ -28,10 +28,17 @@ class TextFileArtifactRendererTests :
         }
 
         "render prepends generated banner for xml-based project files" {
+            val projectFile =
+                Path.of(
+                    "src",
+                    "apps",
+                    "UserService.Api",
+                    "UserService.Api.csproj",
+                )
             val rendered =
                 renderer.render(
                     TextFileArtifact(
-                        id = TextFileArtifactId(relativePath = Path.of("src", "apps", "UserService.Api", "UserService.Api.csproj")),
+                        id = TextFileArtifactId(relativePath = projectFile),
                         contents = "<Project />",
                     ),
                 )
