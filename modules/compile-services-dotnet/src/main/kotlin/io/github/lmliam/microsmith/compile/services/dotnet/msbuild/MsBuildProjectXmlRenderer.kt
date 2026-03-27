@@ -3,58 +3,75 @@ package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildPropertyName
+import java.io.StringWriter
+import javax.xml.stream.XMLOutputFactory
+import javax.xml.stream.XMLStreamWriter
 
 internal object MsBuildProjectXmlRenderer {
-    fun render(artifact: MsBuildProjectArtifact): String = buildString {
-        appendLine(openElement(ProjectElementName))
+    fun render(artifact: MsBuildProjectArtifact): String {
+        val output = StringWriter()
+        val writer = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
+        try {
+            writer.writeStartElement(ProjectElementName)
+            renderProperties(writer, artifact)
+            renderItems(writer, artifact)
+            writer.writeCharacters(NewLine)
+            writer.writeEndElement()
+            writer.flush()
+        } finally {
+            writer.close()
+        }
+        return output.toString()
+    }
+
+    private fun renderProperties(writer: XMLStreamWriter, artifact: MsBuildProjectArtifact) {
         if (artifact.properties.isNotEmpty()) {
-            appendLine(indentedOpenElement(PropertyGroupElementName))
+            writer.writeIndentedStartElement(PropertyGroupElementName, level = 1)
             artifact.properties.toSortedMap(compareBy(MsBuildPropertyName::value)).forEach { (name, value) ->
-                appendLine("    <${name.value}>${xmlEscape(value)}</${name.value}>")
+                writer.writeIndentedStartElement(name.value, level = 2)
+                writer.writeCharacters(value)
+                writer.writeEndElement()
             }
-            appendLine(indentedCloseElement(PropertyGroupElementName))
+            writer.writeIndentedEndElement(level = 1)
         }
+    }
+
+    private fun renderItems(writer: XMLStreamWriter, artifact: MsBuildProjectArtifact) {
         if (artifact.items.isNotEmpty()) {
-            appendLine(indentedOpenElement(ItemGroupElementName))
+            writer.writeIndentedStartElement(ItemGroupElementName, level = 1)
             artifact.items.forEach { item ->
-                append("    <${item.itemName.value} $IncludeAttributeName=\"")
-                append(xmlEscape(item.include))
-                append("\"")
+                writer.writeIndent(level = 2)
+                writer.writeEmptyElement(item.itemName.value)
+                writer.writeAttribute(IncludeAttributeName, item.include)
                 item.attributes.toSortedMap(compareBy(MsBuildAttributeName::value)).forEach { (key, value) ->
-                    append(" ${key.value}=\"")
-                    append(xmlEscape(value))
-                    append("\"")
+                    writer.writeAttribute(key.value, value)
                 }
-                appendLine(" />")
             }
-            appendLine(indentedCloseElement(ItemGroupElementName))
-        }
-        appendLine(closeElement(ProjectElementName))
-    }
-
-    private fun xmlEscape(value: String): String = buildString(value.length) {
-        value.forEach { character ->
-            when (character) {
-                '&' -> append("&amp;")
-                '<' -> append("&lt;")
-                '>' -> append("&gt;")
-                '\"' -> append("&quot;")
-                '\'' -> append("&apos;")
-                else -> append(character)
-            }
+            writer.writeIndentedEndElement(level = 1)
         }
     }
 
-    private fun openElement(name: String): String = "<$name>"
+    private fun XMLStreamWriter.writeIndentedStartElement(name: String, level: Int) {
+        writeIndent(level)
+        writeStartElement(name)
+    }
 
-    private fun closeElement(name: String): String = "</$name>"
+    private fun XMLStreamWriter.writeIndentedEndElement(level: Int) {
+        writeIndent(level)
+        writeEndElement()
+    }
 
-    private fun indentedOpenElement(name: String): String = "  ${openElement(name)}"
-
-    private fun indentedCloseElement(name: String): String = "  ${closeElement(name)}"
+    private fun XMLStreamWriter.writeIndent(level: Int) {
+        writeCharacters(NewLine)
+        repeat(level) {
+            writeCharacters(Indent)
+        }
+    }
 
     private const val ProjectElementName = "Project"
     private const val PropertyGroupElementName = "PropertyGroup"
     private const val ItemGroupElementName = "ItemGroup"
     private const val IncludeAttributeName = "Include"
+    private const val NewLine = "\n"
+    private const val Indent = "  "
 }
