@@ -59,27 +59,29 @@ internal fun flattenOwnedPackages(root: DotnetPackageNode): Map<String, String> 
     return packages
 }
 
-internal fun flattenReferencedPackages(root: DotnetPackageNode): Set<String> {
-    val packages = linkedSetOf<String>()
+internal fun flattenReferencedPackages(root: DotnetPackageNode): Map<String, String?> {
+    val packages = linkedMapOf<String, String?>()
 
-    fun visit(node: DotnetPackageNode) {
+    fun visit(node: DotnetPackageNode, inheritedVersion: String?) {
+        val currentVersion = node.version ?: inheritedVersion
+
         if (node.pathSegments.isNotEmpty() && node.children.isEmpty()) {
             val packageName = node.pathSegments.joinToString(".")
 
-            require(packageName !in packages) {
+            require(packageName !in packages.keys) {
                 "Duplicate .NET package reference declaration for '$packageName'."
             }
 
-            packages += packageName
+            packages[packageName] = currentVersion
             return
         }
 
         node.children.forEach { child ->
-            visit(child)
+            visit(child, currentVersion)
         }
     }
 
-    visit(root)
+    visit(root, null)
     return packages
 }
 

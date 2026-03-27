@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.compile.services.dotnet.packages
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReference
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
@@ -42,7 +43,10 @@ class DotnetPackageArtifactCompilerTests :
                     id = DotnetPackageReferencesArtifactId(serviceName = "UserService"),
                     solutionName = "Platform",
                     projectName = "UserService.Api",
-                    packages = listOf("Serilog.Settings.Configuration", "Serilog.AspNetCore"),
+                    packages = listOf(
+                        DotnetPackageReference(name = "Serilog.Settings.Configuration", version = null),
+                        DotnetPackageReference(name = "Serilog.AspNetCore", version = null),
+                    ),
                 )
 
             val contribution =
@@ -52,9 +56,34 @@ class DotnetPackageArtifactCompilerTests :
             contribution.artifactId.projectName shouldBe "UserService.Api"
             contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryBuildProps
             contribution.properties shouldBe emptyMap()
-            contribution.items.map { it.include } shouldContainExactly listOf(
-                "Serilog.AspNetCore",
-                "Serilog.Settings.Configuration",
+            contribution.items.map { it.include to it.metadata } shouldContainExactly listOf(
+                "Serilog.AspNetCore" to emptyMap(),
+                "Serilog.Settings.Configuration" to emptyMap(),
+            )
+        }
+
+        "compile emits direct per-project package versions into Directory.Build.props" {
+            val artifact =
+                DotnetPackageReferencesArtifact(
+                    id = DotnetPackageReferencesArtifactId(serviceName = "UserService"),
+                    solutionName = "Platform",
+                    projectName = "UserService.Api",
+                    packages = listOf(
+                        DotnetPackageReference(name = "Serilog.Settings.Configuration", version = "9.0.1"),
+                        DotnetPackageReference(name = "Serilog.AspNetCore", version = "9.0.0"),
+                    ),
+                )
+
+            val contribution =
+                DotnetPackageReferencesArtifactCompiler().compile(artifact).single() as MsBuildProjectContribution
+
+            contribution.artifactId.solutionName shouldBe "Platform"
+            contribution.artifactId.projectName shouldBe "UserService.Api"
+            contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryBuildProps
+            contribution.properties shouldBe emptyMap()
+            contribution.items.map { it.include to it.metadata } shouldContainExactly listOf(
+                "Serilog.AspNetCore" to mapOf("Version" to "9.0.0"),
+                "Serilog.Settings.Configuration" to mapOf("Version" to "9.0.1"),
             )
         }
     })

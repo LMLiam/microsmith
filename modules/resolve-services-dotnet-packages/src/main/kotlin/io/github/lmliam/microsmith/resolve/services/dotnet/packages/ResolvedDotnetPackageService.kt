@@ -4,5 +4,5 @@ data class ResolvedDotnetPackageService(
     val name: String,
     val solution: String,
     val project: String,
-    val packages: Map<String, String>,
+    val packages: List<ResolvedDotnetPackageReference>,
 )

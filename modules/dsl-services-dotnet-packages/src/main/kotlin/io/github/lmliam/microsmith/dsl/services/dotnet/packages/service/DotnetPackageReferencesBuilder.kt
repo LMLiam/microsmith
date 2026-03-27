@@ -3,11 +3,17 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.packages.service
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.DotnetPackageNode
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.flattenReferencedPackages
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.normalizeDotnetPackagePath
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.validateDotnetPackageVersion
 
 internal class DotnetPackageReferencesBuilder(
     private val pathSegments: List<String> = emptyList(),
 ) : DotnetPackageReferencesScope {
+    private var version: String? = null
     private val children = linkedMapOf<String, DotnetPackageReferencesBuilder>()
+
+    override fun version(version: String) {
+        this.version = validateDotnetPackageVersion(version, "Package version")
+    }
 
     override fun String.invoke(block: DotnetPackageReferencesScope.() -> Unit) {
         val normalizedPathSegments = normalizeDotnetPackagePath(this, "Package name")
@@ -34,7 +40,7 @@ internal class DotnetPackageReferencesBuilder(
     private fun buildNode(): DotnetPackageNode {
         return DotnetPackageNode(
             pathSegments = pathSegments,
-            version = null,
+            version = version,
             children = children.values.map { it.buildNode() },
         )
     }

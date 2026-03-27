@@ -98,10 +98,50 @@ class DotnetPackageDslTests :
                     .get<io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension>()
             val packages = requireNotNull(requireNotNull(service).get<DotnetPackageReferencesExtension>()).packages
 
-            packages shouldBe setOf(
-                "Serilog.AspNetCore",
-                "Serilog.Settings.Configuration",
-                "FluentValidation.AspNetCore",
+            packages shouldBe mapOf(
+                "Serilog.AspNetCore" to null,
+                "Serilog.Settings.Configuration" to null,
+                "FluentValidation.AspNetCore" to null,
+            )
+        }
+
+        "dotnet service packages support grouped version inheritance and leaf overrides" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                "UserService" {
+                    dotnet {
+                        solution("Platform")
+                        project("UserService.Api")
+                        packages {
+                            "Serilog" {
+                                version("9.0.0")
+                                +"AspNetCore"
+                                "Settings.Configuration" {
+                                    version("9.0.1")
+                                }
+                            }
+
+                            "FluentValidation.AspNetCore" {
+                                version("12.0.0")
+                            }
+                        }
+                    }
+                }
+            }
+
+            val service =
+                builder
+                    .requireServicesExtension()
+                    .require("UserService")
+                    .model
+                    .get<io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension>()
+            val packages = requireNotNull(requireNotNull(service).get<DotnetPackageReferencesExtension>()).packages
+
+            packages shouldBe mapOf(
+                "Serilog.AspNetCore" to "9.0.0",
+                "Serilog.Settings.Configuration" to "9.0.1",
+                "FluentValidation.AspNetCore" to "12.0.0",
             )
         }
 

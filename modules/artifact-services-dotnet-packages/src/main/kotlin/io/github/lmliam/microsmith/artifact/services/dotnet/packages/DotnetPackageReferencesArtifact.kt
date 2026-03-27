@@ -6,5 +6,5 @@ data class DotnetPackageReferencesArtifact(
     override val id: DotnetPackageReferencesArtifactId,
     val solutionName: String,
     val projectName: String,
-    val packages: List<String>,
+    val packages: List<DotnetPackageReference>,
 ) : DotnetPackagesArtifact

@@ -29,18 +29,43 @@ class DotnetPackageWorkspaceResolver(
 
                 val solutionPackages =
                     solutions[resolvedService.solution.name]?.packages.orEmpty()
-                val resolvedPackages = linkedMapOf<String, String>()
+                val usesCentralPackageManagement = solutionPackages.isNotEmpty()
+                val resolvedPackages =
+                    references.packages.toSortedMap().map { (packageName, declaredVersion) ->
+                        when {
+                            declaredVersion != null && usesCentralPackageManagement ->
+                                DotnetPackageWorkspaceResolutionErrors.mixedPackageVersionManagement(
+                                    service.name,
+                                    resolvedService.solution.name,
+                                    packageName,
+                                )
 
-                references.packages.forEach { packageName ->
-                    val version =
-                        solutionPackages[packageName]
-                            ?: DotnetPackageWorkspaceResolutionErrors.packageNotDeclared(
-                                service.name,
-                                resolvedService.solution.name,
-                                packageName,
-                            )
-                    resolvedPackages[packageName] = version
-                }
+                            declaredVersion != null ->
+                                ResolvedDotnetPackageReference(
+                                    name = packageName,
+                                    version = declaredVersion,
+                                )
+
+                            usesCentralPackageManagement -> {
+                                solutionPackages[packageName]
+                                    ?: DotnetPackageWorkspaceResolutionErrors.packageNotDeclared(
+                                        service.name,
+                                        resolvedService.solution.name,
+                                        packageName,
+                                    )
+                                ResolvedDotnetPackageReference(
+                                    name = packageName,
+                                    version = null,
+                                )
+                            }
+
+                            else ->
+                                DotnetPackageWorkspaceResolutionErrors.packageVersionRequired(
+                                    service.name,
+                                    packageName,
+                                )
+                        }
+                    }
 
                 ResolvedDotnetPackageService(
                     name = service.name,

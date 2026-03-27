@@ -23,7 +23,12 @@ class DotnetPackageArtifactContributor : ArtifactContributor<DotnetPackageWorksp
                 artifactId = DotnetPackageReferencesArtifactId(service.name),
                 solutionName = service.solution,
                 projectName = service.project,
-                packages = service.packages.keys.toList(),
+                packages = service.packages.map { packageReference ->
+                    DotnetPackageReference(
+                        name = packageReference.name,
+                        version = packageReference.version,
+                    )
+                },
             )
         }
 

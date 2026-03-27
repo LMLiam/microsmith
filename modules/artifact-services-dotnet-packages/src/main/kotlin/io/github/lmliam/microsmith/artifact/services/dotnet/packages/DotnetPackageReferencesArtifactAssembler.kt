@@ -15,7 +15,7 @@ class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackage
             id = contribution.artifactId,
             solutionName = contribution.solutionName,
             projectName = contribution.projectName,
-            packages = contribution.packages.distinct().sorted(),
+            packages = mergePackages(emptyList(), contribution.packages, contribution.artifactId.serviceName),
         )
     }
 
@@ -30,7 +30,9 @@ class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackage
         require(current.projectName == next.projectName) {
             "Conflicting dotnet project for package references owned by service '${current.id.serviceName}'."
         }
-        return current.copy(packages = (current.packages + next.packages).distinct().sorted())
+        return current.copy(
+            packages = mergePackages(current.packages, next.packages, current.id.serviceName),
+        )
     }
 
     private fun requireContribution(
@@ -40,5 +42,21 @@ class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackage
             "Unsupported dotnet package references contribution type: ${contribution::class}"
         }
         return contribution
+    }
+
+    private fun mergePackages(
+        current: List<DotnetPackageReference>,
+        next: List<DotnetPackageReference>,
+        serviceName: String,
+    ): List<DotnetPackageReference> {
+        val merged = LinkedHashMap(current.associateBy(DotnetPackageReference::name))
+        next.forEach { packageReference ->
+            val existing = merged[packageReference.name]
+            require(existing == null || existing == packageReference) {
+                "Conflicting dotnet package reference '${packageReference.name}' for service '$serviceName'."
+            }
+            merged.putIfAbsent(packageReference.name, packageReference)
+        }
+        return merged.values.sortedBy(DotnetPackageReference::name)
     }
 }
