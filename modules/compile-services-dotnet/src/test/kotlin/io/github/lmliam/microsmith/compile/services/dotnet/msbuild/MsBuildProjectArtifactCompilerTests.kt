@@ -22,9 +22,9 @@ class MsBuildProjectArtifactCompilerTests :
                     items =
                     listOf(
                         MsBuildItem(
-                            type = "PackageVersion",
+                            itemName = "PackageVersion",
                             include = "Serilog.AspNetCore",
-                            metadata = mapOf("Version" to "9.0.0 & preview"),
+                            attributes = mapOf("Version" to "9.0.0 & preview"),
                         ),
                     ),
                 )
@@ -51,9 +51,9 @@ class MsBuildProjectArtifactCompilerTests :
                     items =
                     listOf(
                         MsBuildItem(
-                            type = "PackageReference",
+                            itemName = "PackageReference",
                             include = "Serilog.AspNetCore",
-                            metadata = emptyMap(),
+                            attributes = emptyMap(),
                         ),
                     ),
                 )

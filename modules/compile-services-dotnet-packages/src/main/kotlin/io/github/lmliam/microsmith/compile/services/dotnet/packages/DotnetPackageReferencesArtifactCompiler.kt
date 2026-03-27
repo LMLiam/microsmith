@@ -27,9 +27,9 @@ class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetP
                 ),
                 items = artifact.packages.sortedBy(DotnetPackageReference::name).map { packageReference ->
                     MsBuildItem(
-                        type = "PackageReference",
+                        itemName = "PackageReference",
                         include = packageReference.name,
-                        metadata = packageReference.version?.let { mapOf("Version" to it) }.orEmpty(),
+                        attributes = packageReference.version?.let { mapOf("Version" to it) }.orEmpty(),
                     )
                 },
             ),

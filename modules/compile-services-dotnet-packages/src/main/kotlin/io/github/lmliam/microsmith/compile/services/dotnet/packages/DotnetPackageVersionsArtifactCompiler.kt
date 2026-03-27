@@ -27,9 +27,9 @@ class DotnetPackageVersionsArtifactCompiler : ServicesArtifactCompiler<DotnetPac
                 properties = mapOf("ManagePackageVersionsCentrally" to "true"),
                 items = artifact.packages.sortedBy(DotnetPackageVersion::name).map { packageVersion ->
                     MsBuildItem(
-                        type = "PackageVersion",
+                        itemName = "PackageVersion",
                         include = packageVersion.name,
-                        metadata = mapOf("Version" to packageVersion.version),
+                        attributes = mapOf("Version" to packageVersion.version),
                     )
                 },
             ),

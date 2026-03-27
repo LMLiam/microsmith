@@ -15,10 +15,10 @@ internal object MsBuildProjectXmlRenderer {
         if (artifact.items.isNotEmpty()) {
             appendLine("  <ItemGroup>")
             artifact.items.forEach { item ->
-                append("    <${item.type} Include=\"")
+                append("    <${item.itemName} Include=\"")
                 append(xmlEscape(item.include))
                 append("\"")
-                item.metadata.toSortedMap().forEach { (key, value) ->
+                item.attributes.toSortedMap().forEach { (key, value) ->
                     append(" $key=\"")
                     append(xmlEscape(value))
                     append("\"")
