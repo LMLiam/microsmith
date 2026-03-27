@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.schemas.protobuf.rpc
 
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcEndpoint
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 
 internal object ProtobufServiceRenderer {
@@ -10,18 +11,18 @@ internal object ProtobufServiceRenderer {
         service.operations.forEach { operation ->
             append(INDENT)
             append("rpc ${operation.name} (")
-            append(render(operation.requestTypeName, operation.requestStreaming))
+            append(render(operation.request))
             append(") returns (")
-            append(render(operation.responseTypeName, operation.responseStreaming))
+            append(render(operation.response))
             appendLine(");")
         }
         append("}")
     }
 
-    private fun render(typeName: String, streaming: Boolean): String = buildString {
-        if (streaming) {
+    private fun render(endpoint: ProtobufRpcEndpoint): String = buildString {
+        if (endpoint.streaming) {
             append("stream ")
         }
-        append(typeName)
+        append(endpoint.typeName)
     }
 }

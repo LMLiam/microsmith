@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.schemas.protobuf.rpc
 
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcEndpoint
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcOperation
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifactId
@@ -17,17 +18,25 @@ class ProtobufServiceRendererTests :
                         operations = listOf(
                             ProtobufRpcOperation(
                                 name = "GetUser",
-                                requestTypeName = "pkg.GetUserRequest",
-                                requestStreaming = false,
-                                responseTypeName = "pkg.GetUserResponse",
-                                responseStreaming = false,
+                                request = ProtobufRpcEndpoint(
+                                    typeName = "pkg.GetUserRequest",
+                                    streaming = false,
+                                ),
+                                response = ProtobufRpcEndpoint(
+                                    typeName = "pkg.GetUserResponse",
+                                    streaming = false,
+                                ),
                             ),
                             ProtobufRpcOperation(
                                 name = "ChatUsers",
-                                requestTypeName = "pkg.ChatRequest",
-                                requestStreaming = true,
-                                responseTypeName = "pkg.ChatResponse",
-                                responseStreaming = true,
+                                request = ProtobufRpcEndpoint(
+                                    typeName = "pkg.ChatRequest",
+                                    streaming = true,
+                                ),
+                                response = ProtobufRpcEndpoint(
+                                    typeName = "pkg.ChatResponse",
+                                    streaming = true,
+                                ),
                             ),
                         ),
                     ),

@@ -21,10 +21,14 @@ class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSc
                 operations = schema.rpcs.map { rpc ->
                     ProtobufRpcOperation(
                         name = rpc.name,
-                        requestTypeName = rpc.request.qualifiedTypeName,
-                        requestStreaming = rpc.request.streaming,
-                        responseTypeName = rpc.response.qualifiedTypeName,
-                        responseStreaming = rpc.response.streaming,
+                        request = ProtobufRpcEndpoint(
+                            typeName = rpc.request.qualifiedTypeName,
+                            streaming = rpc.request.streaming,
+                        ),
+                        response = ProtobufRpcEndpoint(
+                            typeName = rpc.response.qualifiedTypeName,
+                            streaming = rpc.response.streaming,
+                        ),
                     )
                 },
             )
