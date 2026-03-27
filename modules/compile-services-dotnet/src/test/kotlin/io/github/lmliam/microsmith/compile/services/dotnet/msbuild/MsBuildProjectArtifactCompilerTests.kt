@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItemName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
@@ -24,7 +25,7 @@ class MsBuildProjectArtifactCompilerTests :
                     items =
                     listOf(
                         MsBuildItem(
-                            itemName = "PackageVersion",
+                            itemName = MsBuildItemName.PackageVersion,
                             include = "Serilog.AspNetCore",
                             attributes = mapOf(MsBuildAttributeName.Version to "9.0.0 & preview"),
                         ),
@@ -53,7 +54,7 @@ class MsBuildProjectArtifactCompilerTests :
                     items =
                     listOf(
                         MsBuildItem(
-                            itemName = "PackageReference",
+                            itemName = MsBuildItemName.PackageReference,
                             include = "Serilog.AspNetCore",
                             attributes = emptyMap(),
                         ),

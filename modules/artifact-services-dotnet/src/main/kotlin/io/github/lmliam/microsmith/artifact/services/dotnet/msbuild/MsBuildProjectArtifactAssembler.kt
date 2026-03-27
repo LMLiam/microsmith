@@ -41,7 +41,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
             val key = MsBuildItemIdentity(item.itemName, item.include)
             val existing = mergedItems[key]
             require(existing == null || existing == item) {
-                "Conflicting MSBuild item '${item.itemName}:${item.include}' for " +
+                "Conflicting MSBuild item '${item.itemName.value}:${item.include}' for " +
                     "'${current.id.kind}' in solution '${current.id.solutionName}'" +
                     current.id.projectName?.let { " project '$it'" }.orEmpty() +
                     "."
@@ -66,6 +66,6 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
 }
 
 private data class MsBuildItemIdentity(
-    val itemName: String,
+    val itemName: MsBuildItemName,
     val include: String,
 )

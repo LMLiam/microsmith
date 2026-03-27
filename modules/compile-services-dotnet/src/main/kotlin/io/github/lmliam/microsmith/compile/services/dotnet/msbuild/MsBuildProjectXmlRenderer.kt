@@ -17,7 +17,7 @@ internal object MsBuildProjectXmlRenderer {
         if (artifact.items.isNotEmpty()) {
             appendLine("  <ItemGroup>")
             artifact.items.forEach { item ->
-                append("    <${item.itemName} Include=\"")
+                append("    <${item.itemName.value} Include=\"")
                 append(xmlEscape(item.include))
                 append("\"")
                 item.attributes.toSortedMap(compareBy(MsBuildAttributeName::value)).forEach { (key, value) ->

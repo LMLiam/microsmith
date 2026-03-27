@@ -5,6 +5,7 @@ import io.github.lmliam.microsmith.artifact.core.Artifact
 import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItemName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
@@ -28,7 +29,7 @@ class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetP
                 ),
                 items = artifact.packages.sortedBy(DotnetPackageReference::name).map { packageReference ->
                     MsBuildItem(
-                        itemName = "PackageReference",
+                        itemName = MsBuildItemName.PackageReference,
                         include = packageReference.name,
                         attributes = packageReference.version
                             ?.let { mapOf(MsBuildAttributeName.Version to it) }

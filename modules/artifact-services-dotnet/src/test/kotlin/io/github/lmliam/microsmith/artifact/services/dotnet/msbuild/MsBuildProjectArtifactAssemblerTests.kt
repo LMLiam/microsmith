@@ -23,7 +23,7 @@ class MsBuildProjectArtifactAssemblerTests :
                         items =
                         listOf(
                             MsBuildItem(
-                                itemName = "PackageVersion",
+                                itemName = MsBuildItemName.PackageVersion,
                                 include = "Serilog.AspNetCore",
                                 attributes = mapOf(MsBuildAttributeName.Version to "9.0.0"),
                             ),
@@ -40,7 +40,7 @@ class MsBuildProjectArtifactAssemblerTests :
                         items =
                         listOf(
                             MsBuildItem(
-                                itemName = "PackageVersion",
+                                itemName = MsBuildItemName.PackageVersion,
                                 include = "FluentValidation.AspNetCore",
                                 attributes = mapOf(MsBuildAttributeName.Version to "12.0.0"),
                             ),
@@ -52,12 +52,12 @@ class MsBuildProjectArtifactAssemblerTests :
                 mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true")
             merged.items shouldContainExactly listOf(
                 MsBuildItem(
-                    itemName = "PackageVersion",
+                    itemName = MsBuildItemName.PackageVersion,
                     include = "Serilog.AspNetCore",
                     attributes = mapOf(MsBuildAttributeName.Version to "9.0.0"),
                 ),
                 MsBuildItem(
-                    itemName = "PackageVersion",
+                    itemName = MsBuildItemName.PackageVersion,
                     include = "FluentValidation.AspNetCore",
                     attributes = mapOf(MsBuildAttributeName.Version to "12.0.0"),
                 ),
@@ -73,7 +73,7 @@ class MsBuildProjectArtifactAssemblerTests :
                         items =
                         listOf(
                             MsBuildItem(
-                                itemName = "PackageVersion",
+                                itemName = MsBuildItemName.PackageVersion,
                                 include = "Serilog.AspNetCore",
                                 attributes = mapOf(MsBuildAttributeName.Version to "9.0.0"),
                             ),
@@ -99,7 +99,7 @@ class MsBuildProjectArtifactAssemblerTests :
                         items =
                         listOf(
                             MsBuildItem(
-                                itemName = "PackageVersion",
+                                itemName = MsBuildItemName.PackageVersion,
                                 include = "Serilog.AspNetCore",
                                 attributes = mapOf(MsBuildAttributeName.Version to "9.0.1"),
                             ),
