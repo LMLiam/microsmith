@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.DotnetPackageNode
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.DotnetPackageDeclarationNode
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.flattenOwnedPackages
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.normalizeDotnetPackagePath
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.validateDotnetPackageVersion
@@ -37,11 +37,11 @@ internal class DotnetPackageVersionsBuilder(
         )
     }
 
-    private fun buildNode(): DotnetPackageNode {
-        return DotnetPackageNode(
+    private fun buildNode(): DotnetPackageDeclarationNode {
+        return DotnetPackageDeclarationNode(
             pathSegments = pathSegments,
             version = version,
-            children = children.values.map { it.buildNode() },
+            childPackages = children.values.map { it.buildNode() },
         )
     }
 }

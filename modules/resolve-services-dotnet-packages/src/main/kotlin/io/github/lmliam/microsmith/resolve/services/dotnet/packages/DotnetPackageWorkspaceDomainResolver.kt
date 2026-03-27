@@ -14,6 +14,8 @@ class DotnetPackageWorkspaceDomainResolver(
 
     override fun resolve(authoring: ServicesExtension): DotnetPackageWorkspace? {
         val workspace = workspaceResolver.resolve(authoring)
-        return workspace.takeIf { it.solutions.isNotEmpty() || it.services.isNotEmpty() }
+        return workspace.takeIf {
+            it.solutionsByName.isNotEmpty() || it.servicesByName.isNotEmpty()
+        }
     }
 }

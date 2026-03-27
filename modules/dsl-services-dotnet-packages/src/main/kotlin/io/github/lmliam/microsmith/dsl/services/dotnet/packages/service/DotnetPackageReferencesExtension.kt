@@ -9,9 +9,9 @@ import io.github.lmliam.microsmith.dsl.services.core.ServiceExtension
  * satisfied by central package ownership during resolution.
  */
 data class DotnetPackageReferencesExtension(
-    val packages: Map<String, String?> = emptyMap(),
+    val packages: List<DotnetPackageReferenceDeclaration> = emptyList(),
 ) : ServiceExtension, MergeableExtension<DotnetPackageReferencesExtension> {
-    fun findPackage(name: String) = packages[name]
+    fun findPackage(name: String): String? = packages.find { it.name == name }?.version
 
     fun requirePackage(name: String): String? {
         require(name.isNotBlank()) { "Package name cannot be blank." }
@@ -19,7 +19,12 @@ data class DotnetPackageReferencesExtension(
     }
 
     override fun merge(other: DotnetPackageReferencesExtension): DotnetPackageReferencesExtension {
-        val collisions = other.packages.keys.filter { it in packages }.sorted()
+        val existingNames = packages.map(DotnetPackageReferenceDeclaration::name).toSet()
+        val collisions =
+            other.packages
+                .map(DotnetPackageReferenceDeclaration::name)
+                .filter(existingNames::contains)
+                .sorted()
 
         require(collisions.isEmpty()) {
             "Duplicate .NET package references while merging service configuration: ${collisions.joinToString(", ")}"

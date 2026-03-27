@@ -1,5 +1,8 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages.support
 
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferenceDeclaration
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetPackageVersionDeclaration
+
 internal fun normalizeDotnetPackagePath(value: String, label: String): List<String> {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }
@@ -30,13 +33,13 @@ internal fun validateDotnetPackageVersion(value: String, label: String): String 
     return normalized
 }
 
-internal fun flattenOwnedPackages(root: DotnetPackageNode): Map<String, String> {
-    val packages = linkedMapOf<String, String>()
+internal fun flattenOwnedPackages(root: DotnetPackageDeclarationNode): List<DotnetPackageVersionDeclaration> {
+    val packages = linkedMapOf<String, DotnetPackageVersionDeclaration>()
 
-    fun visit(node: DotnetPackageNode, inheritedVersion: String?) {
+    fun visit(node: DotnetPackageDeclarationNode, inheritedVersion: String?) {
         val currentVersion = node.version ?: inheritedVersion
 
-        if (node.pathSegments.isNotEmpty() && node.children.isEmpty()) {
+        if (node.pathSegments.isNotEmpty() && node.childPackages.isEmpty()) {
             val packageName = node.pathSegments.joinToString(".")
             val version =
                 currentVersion
@@ -46,43 +49,43 @@ internal fun flattenOwnedPackages(root: DotnetPackageNode): Map<String, String> 
                 "Duplicate .NET package ownership declaration for '$packageName'."
             }
 
-            packages[packageName] = version
+            packages[packageName] = DotnetPackageVersionDeclaration(name = packageName, version = version)
             return
         }
 
-        node.children.forEach { child ->
+        node.childPackages.forEach { child ->
             visit(child, currentVersion)
         }
     }
 
     visit(root, null)
-    return packages
+    return packages.values.toList()
 }
 
-internal fun flattenReferencedPackages(root: DotnetPackageNode): Map<String, String?> {
-    val packages = linkedMapOf<String, String?>()
+internal fun flattenReferencedPackages(root: DotnetPackageDeclarationNode): List<DotnetPackageReferenceDeclaration> {
+    val packages = linkedMapOf<String, DotnetPackageReferenceDeclaration>()
 
-    fun visit(node: DotnetPackageNode, inheritedVersion: String?) {
+    fun visit(node: DotnetPackageDeclarationNode, inheritedVersion: String?) {
         val currentVersion = node.version ?: inheritedVersion
 
-        if (node.pathSegments.isNotEmpty() && node.children.isEmpty()) {
+        if (node.pathSegments.isNotEmpty() && node.childPackages.isEmpty()) {
             val packageName = node.pathSegments.joinToString(".")
 
-            require(packageName !in packages.keys) {
+            require(packageName !in packages) {
                 "Duplicate .NET package reference declaration for '$packageName'."
             }
 
-            packages[packageName] = currentVersion
+            packages[packageName] = DotnetPackageReferenceDeclaration(name = packageName, version = currentVersion)
             return
         }
 
-        node.children.forEach { child ->
+        node.childPackages.forEach { child ->
             visit(child, currentVersion)
         }
     }
 
     visit(root, null)
-    return packages
+    return packages.values.toList()
 }
 
 private fun isValidDotnetPackageSegment(value: String): Boolean {

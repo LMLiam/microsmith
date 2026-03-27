@@ -6,7 +6,9 @@ import io.github.lmliam.microsmith.dsl.services.core.services
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.packages
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.packages
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferenceDeclaration
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferencesExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetPackageVersionDeclaration
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetPackageVersionsExtension
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -47,9 +49,9 @@ class DotnetPackageDslTests :
                 ).requireSolution("Platform")
             val packages = requireNotNull(solution.get<DotnetPackageVersionsExtension>()).packages
 
-            packages shouldBe mapOf(
-                "Serilog.AspNetCore" to "9.0.0",
-                "Serilog.Settings.Configuration" to "9.0.1",
+            packages shouldBe listOf(
+                DotnetPackageVersionDeclaration(name = "Serilog.AspNetCore", version = "9.0.0"),
+                DotnetPackageVersionDeclaration(name = "Serilog.Settings.Configuration", version = "9.0.1"),
             )
         }
 
@@ -98,10 +100,10 @@ class DotnetPackageDslTests :
                     .get<io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension>()
             val packages = requireNotNull(requireNotNull(service).get<DotnetPackageReferencesExtension>()).packages
 
-            packages shouldBe mapOf(
-                "Serilog.AspNetCore" to null,
-                "Serilog.Settings.Configuration" to null,
-                "FluentValidation.AspNetCore" to null,
+            packages shouldBe listOf(
+                DotnetPackageReferenceDeclaration(name = "Serilog.AspNetCore", version = null),
+                DotnetPackageReferenceDeclaration(name = "Serilog.Settings.Configuration", version = null),
+                DotnetPackageReferenceDeclaration(name = "FluentValidation.AspNetCore", version = null),
             )
         }
 
@@ -138,10 +140,10 @@ class DotnetPackageDslTests :
                     .get<io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension>()
             val packages = requireNotNull(requireNotNull(service).get<DotnetPackageReferencesExtension>()).packages
 
-            packages shouldBe mapOf(
-                "Serilog.AspNetCore" to "9.0.0",
-                "Serilog.Settings.Configuration" to "9.0.1",
-                "FluentValidation.AspNetCore" to "12.0.0",
+            packages shouldBe listOf(
+                DotnetPackageReferenceDeclaration(name = "Serilog.AspNetCore", version = "9.0.0"),
+                DotnetPackageReferenceDeclaration(name = "Serilog.Settings.Configuration", version = "9.0.1"),
+                DotnetPackageReferenceDeclaration(name = "FluentValidation.AspNetCore", version = "12.0.0"),
             )
         }
 

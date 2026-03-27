@@ -14,7 +14,7 @@ class DotnetPackageArtifactContributorTests :
             val contributions =
                 DotnetPackageArtifactContributor().contribute(
                     DotnetPackageWorkspace(
-                        solutions =
+                        solutionsByName =
                         mapOf(
                             "Platform" to
                                 ResolvedDotnetPackageSolution(
@@ -31,7 +31,7 @@ class DotnetPackageArtifactContributorTests :
                                     ),
                                 ),
                         ),
-                        services =
+                        servicesByName =
                         mapOf(
                             "UserService" to
                                 ResolvedDotnetPackageService(

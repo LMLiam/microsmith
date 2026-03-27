@@ -11,7 +11,7 @@ class DotnetPackageArtifactContributor : ArtifactContributor<DotnetPackageWorksp
     override val resolvedType: KClass<DotnetPackageWorkspace> = DotnetPackageWorkspace::class
 
     override fun contribute(model: DotnetPackageWorkspace): List<ArtifactContribution<*>> {
-        val solutionContributions = model.solutions.values.sortedBy { it.name }.map { solution ->
+        val solutionContributions = model.solutionsByName.values.sortedBy { it.name }.map { solution ->
             DotnetPackageVersionsContribution(
                 artifactId = DotnetPackageVersionsArtifactId(solution.name),
                 packages = solution.packages.map { packageVersion ->
@@ -23,7 +23,7 @@ class DotnetPackageArtifactContributor : ArtifactContributor<DotnetPackageWorksp
             )
         }
 
-        val serviceContributions = model.services.values.sortedBy { it.name }.map { service ->
+        val serviceContributions = model.servicesByName.values.sortedBy { it.name }.map { service ->
             DotnetPackageReferencesContribution(
                 artifactId = DotnetPackageReferencesArtifactId(service.name),
                 solutionName = service.solution,

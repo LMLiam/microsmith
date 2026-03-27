@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages.support
 
-internal data class DotnetPackageNode(
+internal data class DotnetPackageDeclarationNode(
     val pathSegments: List<String>,
     val version: String?,
-    val children: List<DotnetPackageNode>,
+    val childPackages: List<DotnetPackageDeclarationNode>,
 )

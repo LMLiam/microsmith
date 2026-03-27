@@ -52,11 +52,11 @@ class DotnetPackageWorkspaceResolverTests :
 
             val workspace = DotnetPackageWorkspaceResolver().resolve(builder.requireServicesExtension())
 
-            requireNotNull(workspace.solutions["Platform"]).packages shouldContainExactly listOf(
+            workspace.requireSolution("Platform").packages shouldContainExactly listOf(
                 ResolvedDotnetPackageVersion(name = "Serilog.AspNetCore", version = "9.0.0"),
                 ResolvedDotnetPackageVersion(name = "Serilog.Settings.Configuration", version = "9.0.1"),
             )
-            requireNotNull(workspace.services["UserService"]).packages shouldContainExactly listOf(
+            workspace.requireService("UserService").packages shouldContainExactly listOf(
                 ResolvedDotnetPackageReference(name = "Serilog.AspNetCore", version = null),
                 ResolvedDotnetPackageReference(name = "Serilog.Settings.Configuration", version = null),
             )
@@ -126,7 +126,7 @@ class DotnetPackageWorkspaceResolverTests :
 
             val workspace = DotnetPackageWorkspaceResolver().resolve(builder.requireServicesExtension())
 
-            requireNotNull(workspace.services["UserService"]).packages shouldContainExactly listOf(
+            workspace.requireService("UserService").packages shouldContainExactly listOf(
                 ResolvedDotnetPackageReference(name = "Serilog.AspNetCore", version = "9.0.0"),
                 ResolvedDotnetPackageReference(name = "Serilog.Settings.Configuration", version = "9.0.1"),
             )
