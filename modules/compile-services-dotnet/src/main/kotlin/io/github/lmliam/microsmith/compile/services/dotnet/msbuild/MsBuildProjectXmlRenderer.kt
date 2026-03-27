@@ -2,14 +2,15 @@ package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildPropertyName
 
 internal object MsBuildProjectXmlRenderer {
     fun render(artifact: MsBuildProjectArtifact): String = buildString {
         appendLine("<Project>")
         if (artifact.properties.isNotEmpty()) {
             appendLine("  <PropertyGroup>")
-            artifact.properties.forEach { (name, value) ->
-                appendLine("    <$name>${xmlEscape(value)}</$name>")
+            artifact.properties.toSortedMap(compareBy(MsBuildPropertyName::value)).forEach { (name, value) ->
+                appendLine("    <${name.value}>${xmlEscape(value)}</${name.value}>")
             }
             appendLine("  </PropertyGroup>")
         }

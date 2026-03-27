@@ -19,7 +19,7 @@ class MsBuildProjectArtifactAssemblerTests :
                 assembler.create(
                     MsBuildProjectContribution(
                         artifactId = artifactId,
-                        properties = mapOf("ManagePackageVersionsCentrally" to "true"),
+                        properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true"),
                         items =
                         listOf(
                             MsBuildItem(
@@ -36,7 +36,7 @@ class MsBuildProjectArtifactAssemblerTests :
                     initial,
                     MsBuildProjectContribution(
                         artifactId = artifactId,
-                        properties = mapOf("ManagePackageVersionsCentrally" to "true"),
+                        properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true"),
                         items =
                         listOf(
                             MsBuildItem(
@@ -48,7 +48,8 @@ class MsBuildProjectArtifactAssemblerTests :
                     ),
                 )
 
-            merged.properties shouldContainExactly mapOf("ManagePackageVersionsCentrally" to "true")
+            merged.properties shouldContainExactly
+                mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true")
             merged.items shouldContainExactly listOf(
                 MsBuildItem(
                     itemName = "PackageVersion",
@@ -68,7 +69,7 @@ class MsBuildProjectArtifactAssemblerTests :
                 assembler.create(
                     MsBuildProjectContribution(
                         artifactId = artifactId,
-                        properties = mapOf("ManagePackageVersionsCentrally" to "true"),
+                        properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true"),
                         items =
                         listOf(
                             MsBuildItem(
@@ -85,7 +86,7 @@ class MsBuildProjectArtifactAssemblerTests :
                     current,
                     MsBuildProjectContribution(
                         artifactId = artifactId,
-                        properties = mapOf("ManagePackageVersionsCentrally" to "false"),
+                        properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "false"),
                     ),
                 )
             }

@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.compile.services.dotnet.packages
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildPropertyName
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReference
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifactId
@@ -32,7 +33,8 @@ class DotnetPackageArtifactCompilerTests :
             contribution.artifactId.solutionName shouldBe "Platform"
             contribution.artifactId.projectName shouldBe null
             contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryPackagesProps
-            contribution.properties shouldContainExactly mapOf("ManagePackageVersionsCentrally" to "true")
+            contribution.properties shouldContainExactly
+                mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true")
             contribution.items.map { it.include to it.attributes } shouldContainExactly listOf(
                 "Serilog.AspNetCore" to mapOf(MsBuildAttributeName.Version to "9.0.0"),
                 "Serilog.Settings.Configuration" to mapOf(MsBuildAttributeName.Version to "9.0.1"),

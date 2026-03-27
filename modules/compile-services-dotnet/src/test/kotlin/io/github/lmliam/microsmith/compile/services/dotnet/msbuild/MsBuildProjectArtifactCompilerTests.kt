@@ -6,6 +6,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildPropertyName
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -19,7 +20,7 @@ class MsBuildProjectArtifactCompilerTests :
                         solutionName = "Platform",
                         kind = MsBuildProjectKind.DirectoryPackagesProps,
                     ),
-                    properties = mapOf("ManagePackageVersionsCentrally" to "true"),
+                    properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true"),
                     items =
                     listOf(
                         MsBuildItem(
