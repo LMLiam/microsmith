@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
 
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 
 internal object MsBuildProjectXmlRenderer {
@@ -18,8 +19,8 @@ internal object MsBuildProjectXmlRenderer {
                 append("    <${item.itemName} Include=\"")
                 append(xmlEscape(item.include))
                 append("\"")
-                item.attributes.toSortedMap().forEach { (key, value) ->
-                    append(" $key=\"")
+                item.attributes.toSortedMap(compareBy(MsBuildAttributeName::value)).forEach { (key, value) ->
+                    append(" ${key.value}=\"")
                     append(xmlEscape(value))
                     append("\"")
                 }

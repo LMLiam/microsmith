@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.compile.services.dotnet.packages
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.core.Artifact
 import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
@@ -29,7 +30,9 @@ class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetP
                     MsBuildItem(
                         itemName = "PackageReference",
                         include = packageReference.name,
-                        attributes = packageReference.version?.let { mapOf("Version" to it) }.orEmpty(),
+                        attributes = packageReference.version
+                            ?.let { mapOf(MsBuildAttributeName.Version to it) }
+                            .orEmpty(),
                     )
                 },
             ),

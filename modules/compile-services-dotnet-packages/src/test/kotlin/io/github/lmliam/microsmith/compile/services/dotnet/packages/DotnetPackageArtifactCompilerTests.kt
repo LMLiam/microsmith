@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.packages
 
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReference
@@ -33,8 +34,8 @@ class DotnetPackageArtifactCompilerTests :
             contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryPackagesProps
             contribution.properties shouldContainExactly mapOf("ManagePackageVersionsCentrally" to "true")
             contribution.items.map { it.include to it.attributes } shouldContainExactly listOf(
-                "Serilog.AspNetCore" to mapOf("Version" to "9.0.0"),
-                "Serilog.Settings.Configuration" to mapOf("Version" to "9.0.1"),
+                "Serilog.AspNetCore" to mapOf(MsBuildAttributeName.Version to "9.0.0"),
+                "Serilog.Settings.Configuration" to mapOf(MsBuildAttributeName.Version to "9.0.1"),
             )
         }
 
@@ -83,8 +84,8 @@ class DotnetPackageArtifactCompilerTests :
             contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryBuildProps
             contribution.properties shouldBe emptyMap()
             contribution.items.map { it.include to it.attributes } shouldContainExactly listOf(
-                "Serilog.AspNetCore" to mapOf("Version" to "9.0.0"),
-                "Serilog.Settings.Configuration" to mapOf("Version" to "9.0.1"),
+                "Serilog.AspNetCore" to mapOf(MsBuildAttributeName.Version to "9.0.0"),
+                "Serilog.Settings.Configuration" to mapOf(MsBuildAttributeName.Version to "9.0.1"),
             )
         }
     })
