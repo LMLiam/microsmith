@@ -4,9 +4,15 @@ import org.gradle.api.Project
 
 internal object CliPackagingBuildNames {
     val BUNDLED_PLUGIN_PROJECT_PATHS = listOf(
-        ":gen-schemas",
-        ":gen-schemas-protobuf",
-        ":gen-schemas-protobuf-rpc",
+        ":resolve-schemas",
+        ":resolve-schemas-protobuf",
+        ":resolve-schemas-protobuf-rpc",
+        ":artifact",
+        ":artifact-schemas-protobuf",
+        ":artifact-schemas-protobuf-rpc",
+        ":compile-schemas-protobuf",
+        ":compile-schemas-protobuf-rpc",
+        ":gen",
     )
 
     const val BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION = 1

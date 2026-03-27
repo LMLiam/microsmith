@@ -1,0 +1,5 @@
+dependencies {
+    api project(":compile")
+    api project(":artifact")
+    api project(":artifact-services")
+}

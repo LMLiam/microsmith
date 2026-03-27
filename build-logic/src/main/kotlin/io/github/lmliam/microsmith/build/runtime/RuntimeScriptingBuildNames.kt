@@ -12,10 +12,19 @@ internal object RuntimeScriptingBuildNames {
     )
 
     val IMPLEMENTATION_PROJECT_PATHS = listOf(
+        ":resolve",
+        ":resolve-schemas",
+        ":resolve-schemas-protobuf",
+        ":resolve-schemas-protobuf-rpc",
+        ":artifact",
+        ":artifact-schemas",
+        ":artifact-schemas-protobuf",
+        ":artifact-schemas-protobuf-rpc",
+        ":compile",
+        ":compile-schemas",
+        ":compile-schemas-protobuf",
+        ":compile-schemas-protobuf-rpc",
         ":gen",
-        ":gen-schemas",
-        ":gen-schemas-protobuf",
-        ":gen-schemas-protobuf-rpc",
     )
 
     const val POM_PATH = "publications/gpr/pom-default.xml"

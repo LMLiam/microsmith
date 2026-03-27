@@ -1,0 +1,7 @@
+apply plugin: 'org.jetbrains.kotlin.kapt'
+
+dependencies {
+    implementation project(":resolve")
+    api libs.spi.tooling.annotations
+    kapt libs.spi.tooling.processor
+}

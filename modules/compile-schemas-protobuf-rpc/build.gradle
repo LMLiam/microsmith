@@ -1,0 +1,15 @@
+apply plugin: 'org.jetbrains.kotlin.kapt'
+
+dependencies {
+    api project(":compile-schemas")
+    api project(":compile-schemas-protobuf")
+    api project(":artifact-schemas-protobuf-rpc")
+    api libs.spi.tooling.annotations
+    kapt libs.spi.tooling.processor
+
+    testImplementation project(":dsl")
+    testImplementation project(":dsl-schemas")
+    testImplementation project(":dsl-schemas-protobuf")
+    testImplementation project(":dsl-schemas-protobuf-rpc")
+    testImplementation project(":gen")
+}

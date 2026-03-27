@@ -1,5 +1,0 @@
-dependencies {
-    api project(":dsl")
-    api project(":dsl-services")
-    api project(":dsl-services-dotnet")
-}

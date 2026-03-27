@@ -8,6 +8,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.ConfigurableFilePermissions
 import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.JavaApplication
@@ -38,10 +39,19 @@ class CliPackagingPlugin : Plugin<Project> {
             add("implementation", project.project(":dsl-schemas"))
             add("implementation", project.project(":dsl-schemas-protobuf"))
             add("implementation", project.project(":dsl-schemas-protobuf-rpc"))
+            add("implementation", project.project(":resolve"))
+            add("implementation", project.project(":resolve-schemas"))
+            add("implementation", project.project(":resolve-schemas-protobuf"))
+            add("implementation", project.project(":resolve-schemas-protobuf-rpc"))
+            add("implementation", project.project(":artifact"))
+            add("implementation", project.project(":artifact-schemas"))
+            add("implementation", project.project(":artifact-schemas-protobuf"))
+            add("implementation", project.project(":artifact-schemas-protobuf-rpc"))
+            add("implementation", project.project(":compile"))
+            add("implementation", project.project(":compile-schemas"))
+            add("implementation", project.project(":compile-schemas-protobuf"))
+            add("implementation", project.project(":compile-schemas-protobuf-rpc"))
             add("implementation", project.project(":gen"))
-            add("implementation", project.project(":gen-schemas"))
-            add("implementation", project.project(":gen-schemas-protobuf"))
-            add("implementation", project.project(":gen-schemas-protobuf-rpc"))
             add("implementation", libs.findLibrary("maven-resolver-api").orElseThrow().get())
             add("implementation", libs.findLibrary("maven-resolver-spi").orElseThrow().get())
             add("implementation", libs.findLibrary("maven-resolver-util").orElseThrow().get())
@@ -133,6 +143,9 @@ class CliPackagingPlugin : Plugin<Project> {
         shadowJarTask.configure { shadowJar ->
             shadowJar.archiveBaseName.set(CliPackagingBuildNames.SHADOW_JAR_BASE_NAME)
             shadowJar.archiveClassifier.set(CliPackagingBuildNames.SHADOW_JAR_CLASSIFIER)
+            shadowJar.filesMatching("META-INF/services/**") { fileCopyDetails ->
+                fileCopyDetails.duplicatesStrategy = DuplicatesStrategy.INCLUDE
+            }
             shadowJar.mergeServiceFiles()
             shadowJar.manifest.attributes(
                 mapOf(
