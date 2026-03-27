@@ -13,7 +13,7 @@ class DotnetPackageVersionsArtifactAssembler : ArtifactAssembler<DotnetPackageVe
         val contribution = requireContribution(first)
         return DotnetPackageVersionsArtifact(
             id = contribution.artifactId,
-            packages = linkedMapOf<String, String>().apply { putAll(contribution.packages) },
+            packages = mergePackages(emptyList(), contribution.packages, contribution.artifactId.solutionName),
         )
     }
 
@@ -22,15 +22,9 @@ class DotnetPackageVersionsArtifactAssembler : ArtifactAssembler<DotnetPackageVe
         contribution: ArtifactContribution<DotnetPackageVersionsArtifact>,
     ): DotnetPackageVersionsArtifact {
         val next = requireContribution(contribution)
-        val merged = linkedMapOf<String, String>().apply { putAll(current.packages) }
-        next.packages.forEach { (packageName, version) ->
-            val existing = merged[packageName]
-            require(existing == null || existing == version) {
-                "Conflicting central package version for '$packageName' in solution '${current.id.solutionName}'."
-            }
-            merged[packageName] = version
-        }
-        return current.copy(packages = merged)
+        return current.copy(
+            packages = mergePackages(current.packages, next.packages, current.id.solutionName),
+        )
     }
 
     private fun requireContribution(
@@ -40,5 +34,21 @@ class DotnetPackageVersionsArtifactAssembler : ArtifactAssembler<DotnetPackageVe
             "Unsupported dotnet package versions contribution type: ${contribution::class}"
         }
         return contribution
+    }
+
+    private fun mergePackages(
+        current: List<DotnetPackageVersion>,
+        next: List<DotnetPackageVersion>,
+        solutionName: String,
+    ): List<DotnetPackageVersion> {
+        val merged = LinkedHashMap(current.associateBy(DotnetPackageVersion::name))
+        next.forEach { packageVersion ->
+            val existing = merged[packageVersion.name]
+            require(existing == null || existing == packageVersion) {
+                "Conflicting central package version for '${packageVersion.name}' in solution '$solutionName'."
+            }
+            merged.putIfAbsent(packageVersion.name, packageVersion)
+        }
+        return merged.values.sortedBy(DotnetPackageVersion::name)
     }
 }

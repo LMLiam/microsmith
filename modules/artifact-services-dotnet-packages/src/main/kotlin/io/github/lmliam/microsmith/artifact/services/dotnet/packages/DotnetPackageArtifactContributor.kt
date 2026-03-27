@@ -14,7 +14,12 @@ class DotnetPackageArtifactContributor : ArtifactContributor<DotnetPackageWorksp
         val solutionContributions = model.solutions.values.sortedBy { it.name }.map { solution ->
             DotnetPackageVersionsContribution(
                 artifactId = DotnetPackageVersionsArtifactId(solution.name),
-                packages = solution.packages,
+                packages = solution.packages.map { packageVersion ->
+                    DotnetPackageVersion(
+                        name = packageVersion.name,
+                        version = packageVersion.version,
+                    )
+                },
             )
         }
 

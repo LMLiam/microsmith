@@ -4,6 +4,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackag
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageReference
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageService
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageSolution
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageVersion
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
@@ -18,10 +19,15 @@ class DotnetPackageArtifactContributorTests :
                             "Platform" to
                                 ResolvedDotnetPackageSolution(
                                     name = "Platform",
-                                    packages =
-                                    mapOf(
-                                        "Serilog.AspNetCore" to "9.0.0",
-                                        "FluentValidation.AspNetCore" to "12.0.0",
+                                    packages = listOf(
+                                        ResolvedDotnetPackageVersion(
+                                            name = "FluentValidation.AspNetCore",
+                                            version = "12.0.0",
+                                        ),
+                                        ResolvedDotnetPackageVersion(
+                                            name = "Serilog.AspNetCore",
+                                            version = "9.0.0",
+                                        ),
                                     ),
                                 ),
                         ),
@@ -50,9 +56,9 @@ class DotnetPackageArtifactContributorTests :
             contributions shouldContainExactly listOf(
                 DotnetPackageVersionsContribution(
                     artifactId = DotnetPackageVersionsArtifactId("Platform"),
-                    packages = mapOf(
-                        "Serilog.AspNetCore" to "9.0.0",
-                        "FluentValidation.AspNetCore" to "12.0.0",
+                    packages = listOf(
+                        DotnetPackageVersion(name = "FluentValidation.AspNetCore", version = "12.0.0"),
+                        DotnetPackageVersion(name = "Serilog.AspNetCore", version = "9.0.0"),
                     ),
                 ),
                 DotnetPackageReferencesContribution(

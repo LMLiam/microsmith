@@ -28,7 +28,10 @@ class DotnetPackageWorkspaceResolver(
                 }
 
                 val solutionPackages =
-                    solutions[resolvedService.solution.name]?.packages.orEmpty()
+                    solutions[resolvedService.solution.name]
+                        ?.packages
+                        .orEmpty()
+                        .associateBy(ResolvedDotnetPackageVersion::name)
                 val usesCentralPackageManagement = solutionPackages.isNotEmpty()
                 val resolvedPackages =
                     references.packages.toSortedMap().map { (packageName, declaredVersion) ->
@@ -90,7 +93,12 @@ class DotnetPackageWorkspaceResolver(
             solutions[solution.name] =
                 ResolvedDotnetPackageSolution(
                     name = solution.name,
-                    packages = packageVersions,
+                    packages = packageVersions.toSortedMap().map { (packageName, version) ->
+                        ResolvedDotnetPackageVersion(
+                            name = packageName,
+                            version = version,
+                        )
+                    },
                 )
         }
 

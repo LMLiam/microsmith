@@ -5,6 +5,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReference
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifactId
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersion
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifactId
 import io.kotest.core.spec.style.StringSpec
@@ -18,9 +19,9 @@ class DotnetPackageArtifactCompilerTests :
             val artifact =
                 DotnetPackageVersionsArtifact(
                     id = DotnetPackageVersionsArtifactId(solutionName = "Platform"),
-                    packages = linkedMapOf(
-                        "Serilog.AspNetCore" to "9.0.0",
-                        "Serilog.Settings.Configuration" to "9.0.1",
+                    packages = listOf(
+                        DotnetPackageVersion(name = "Serilog.AspNetCore", version = "9.0.0"),
+                        DotnetPackageVersion(name = "Serilog.Settings.Configuration", version = "9.0.1"),
                     ),
                 )
 

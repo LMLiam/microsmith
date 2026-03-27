@@ -4,5 +4,5 @@ import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
 
 data class DotnetPackageVersionsContribution(
     override val artifactId: DotnetPackageVersionsArtifactId,
-    val packages: Map<String, String>,
+    val packages: List<DotnetPackageVersion>,
 ) : ArtifactContribution<DotnetPackageVersionsArtifact>

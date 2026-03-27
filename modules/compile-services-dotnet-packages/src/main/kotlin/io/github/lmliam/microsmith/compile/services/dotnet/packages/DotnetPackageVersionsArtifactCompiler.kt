@@ -7,6 +7,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersion
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
@@ -24,11 +25,11 @@ class DotnetPackageVersionsArtifactCompiler : ServicesArtifactCompiler<DotnetPac
                     kind = MsBuildProjectKind.DirectoryPackagesProps,
                 ),
                 properties = mapOf("ManagePackageVersionsCentrally" to "true"),
-                items = artifact.packages.toSortedMap().map { (packageName, version) ->
+                items = artifact.packages.sortedBy(DotnetPackageVersion::name).map { packageVersion ->
                     MsBuildItem(
                         type = "PackageVersion",
-                        include = packageName,
-                        metadata = mapOf("Version" to version),
+                        include = packageVersion.name,
+                        metadata = mapOf("Version" to packageVersion.version),
                     )
                 },
             ),

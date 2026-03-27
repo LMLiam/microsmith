@@ -9,7 +9,6 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.packages
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.maps.shouldContainExactly
 
 private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
@@ -53,9 +52,9 @@ class DotnetPackageWorkspaceResolverTests :
 
             val workspace = DotnetPackageWorkspaceResolver().resolve(builder.requireServicesExtension())
 
-            requireNotNull(workspace.solutions["Platform"]).packages shouldContainExactly mapOf(
-                "Serilog.AspNetCore" to "9.0.0",
-                "Serilog.Settings.Configuration" to "9.0.1",
+            requireNotNull(workspace.solutions["Platform"]).packages shouldContainExactly listOf(
+                ResolvedDotnetPackageVersion(name = "Serilog.AspNetCore", version = "9.0.0"),
+                ResolvedDotnetPackageVersion(name = "Serilog.Settings.Configuration", version = "9.0.1"),
             )
             requireNotNull(workspace.services["UserService"]).packages shouldContainExactly listOf(
                 ResolvedDotnetPackageReference(name = "Serilog.AspNetCore", version = null),
