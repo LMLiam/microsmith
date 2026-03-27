@@ -34,21 +34,7 @@ jobs:
       - name: Build
         run: ./gradlew build --stacktrace
       - name: Publish native JVM packages to mavenLocal
-        run: |
-          ./gradlew \
-            :dsl:publishToMavenLocal \
-            :dsl-schemas:publishToMavenLocal \
-            :dsl-schemas-protobuf:publishToMavenLocal \
-            :dsl-schemas-protobuf-rpc:publishToMavenLocal \
-            :gen:publishToMavenLocal \
-            :gen-schemas:publishToMavenLocal \
-            :gen-schemas-protobuf:publishToMavenLocal \
-            :gen-schemas-protobuf-rpc:publishToMavenLocal \
-            :runtime-scripting:publishToMavenLocal \
-            :gradle-plugin:publishToMavenLocal \
-            :maven-plugin:publishToMavenLocal \
-            :sbt-plugin:publishToMavenLocal \
-            --stacktrace
+        run: ./gradlew publishToMavenLocal --stacktrace
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
       - name: Validate native Gradle fixtures
