@@ -19,6 +19,6 @@ internal object OnboardingProfileConflictValidator {
             .groupBy(OnboardingProfile::id)
             .filterValues { groupedProfiles -> groupedProfiles.distinct().size > 1 }
             .keys
-            .sortedBy(OnboardingProfileId::value)
+            .sorted()
     }
 }
