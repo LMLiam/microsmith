@@ -74,9 +74,12 @@ flowchart LR
         DSPR[dsl-schemas-protobuf-rpc]
         DV[dsl-services]
         DVD[dsl-services-dotnet]
+        DVDA[dsl-services-dotnet-asp]
         DVDP[dsl-services-dotnet-packages]
         D --> DS --> DSP --> DSPR
-        D --> DV --> DVD --> DVDP
+        D --> DV --> DVD
+        DVD --> DVDA
+        DVD --> DVDP
     end
 
     subgraph ResolveStage[2. resolve modules]
@@ -86,9 +89,12 @@ flowchart LR
         RSPR[resolve-schemas-protobuf-rpc]
         RV[resolve-services]
         RVD[resolve-services-dotnet]
+        RVDA[resolve-services-dotnet-asp]
         RVDP[resolve-services-dotnet-packages]
         R --> RS --> RSP --> RSPR
-        R --> RV --> RVD --> RVDP
+        R --> RV --> RVD
+        RVD --> RVDA
+        RVD --> RVDP
     end
 
     subgraph ArtifactStage[3. artifact modules]
@@ -98,9 +104,12 @@ flowchart LR
         ASPR[artifact-schemas-protobuf-rpc]
         AV[artifact-services]
         AVD[artifact-services-dotnet]
+        AVDA[artifact-services-dotnet-asp]
         AVDP[artifact-services-dotnet-packages]
         A --> AS --> ASP --> ASPR
-        A --> AV --> AVD --> AVDP
+        A --> AV --> AVD
+        AVD --> AVDA
+        AVD --> AVDP
     end
 
     subgraph CompileStage[4. compile modules]
@@ -110,9 +119,12 @@ flowchart LR
         CSPR[compile-schemas-protobuf-rpc]
         CV[compile-services]
         CVD[compile-services-dotnet]
+        CVDA[compile-services-dotnet-asp]
         CVDP[compile-services-dotnet-packages]
         C --> CS --> CSP --> CSPR
-        C --> CV --> CVD --> CVDP
+        C --> CV --> CVD
+        CVD --> CVDA
+        CVD --> CVDP
     end
 
     subgraph GenStage[5. gen module]
@@ -145,6 +157,7 @@ flowchart LR
     DSPR --> RSPR
     DV --> RV
     DVD --> RVD
+    DVDA --> RVDA
     DVDP --> RVDP
 
     RS --> AS
@@ -152,6 +165,7 @@ flowchart LR
     RSPR --> ASPR
     RV --> AV
     RVD --> AVD
+    RVDA --> AVDA
     RVDP --> AVDP
 
     AS --> CS
@@ -159,11 +173,13 @@ flowchart LR
     ASPR --> CSPR
     AV --> CV
     AVD --> CVD
+    AVDA --> CVDA
     AVDP --> CVDP
 
     CSP --> G
     CSPR --> G
     CVD --> G
+    CVDA --> G
     CVDP --> G
 
     G --> RT
@@ -207,6 +223,7 @@ This keeps the layering explicit:
 - `dsl-schemas-protobuf-rpc`: protobuf service and RPC DSL extensions on top of `dsl-schemas-protobuf`
 - `dsl-services`: generic service registry and service-oriented DSL surface
 - `dsl-services-dotnet`: .NET service defaults, identity, and model DSL support
+- `dsl-services-dotnet-asp`: ASP.NET scaffold opt-in DSL support on top of `dsl-services-dotnet`
 - `dsl-services-dotnet-packages`: .NET package ownership and package reference DSL support
 - `resolve`: base resolution contracts and resolved-model orchestration
 - `resolve-schemas`: schema-domain resolved model support
@@ -214,6 +231,7 @@ This keeps the layering explicit:
 - `resolve-schemas-protobuf-rpc`: protobuf RPC finalization and validation
 - `resolve-services`: service-domain resolved model support
 - `resolve-services-dotnet`: finalized .NET service workspace resolution
+- `resolve-services-dotnet-asp`: finalized ASP.NET scaffold workspace resolution
 - `resolve-services-dotnet-packages`: finalized .NET package workspace resolution
 - `artifact`: shared artifact contracts, assembly, and contribution infrastructure
 - `artifact-schemas`: schema-domain artifact contracts
@@ -221,6 +239,7 @@ This keeps the layering explicit:
 - `artifact-schemas-protobuf-rpc`: protobuf RPC artifact types and contributions
 - `artifact-services`: service-domain artifact contracts
 - `artifact-services-dotnet`: .NET/MSBuild artifact types and assembly
+- `artifact-services-dotnet-asp`: ASP.NET scaffold artifact types and contributions
 - `artifact-services-dotnet-packages`: .NET package artifact types and contributions
 - `compile`: artifact compiler contracts and recursive artifact compilation
 - `compile-schemas`: schema-domain compiler contracts and shared schema compilation entrypoints
@@ -228,6 +247,7 @@ This keeps the layering explicit:
 - `compile-schemas-protobuf-rpc`: protobuf RPC artifact compilation into file artifacts
 - `compile-services`: service-domain compiler contracts and shared service compilation entrypoints
 - `compile-services-dotnet`: .NET/MSBuild artifact compilation into file artifacts
+- `compile-services-dotnet-asp`: ASP.NET scaffold compilation into project and source file artifacts
 - `compile-services-dotnet-packages`: .NET package artifact compilation into file artifacts
 - `gen`: final file rendering, output routing, and generation orchestration
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution and built-in provider loading
@@ -245,7 +265,7 @@ This keeps the layering explicit:
 - `compile` owns the shared artifact-compilation contracts and recursive compilation loop. `compile-schemas` and `compile-services` own domain-root compile contracts, while feature compile modules own concrete artifact-to-artifact transformations.
 - `gen` owns final rendering, output routing, and shared generation orchestration.
 - `dsl-schemas*`, `resolve-schemas*`, `artifact-schemas*`, `compile-schemas*`, and `gen` form the current schema-domain generation path. Keep protobuf-specific behavior in the protobuf-specific modules rather than bloating the generic schema layers.
-- `dsl-services*`, `resolve-services*`, `artifact-services*`, `compile-services*`, and `gen` form the current service-domain generation path. Keep .NET and package-management behavior in the feature-specific service modules rather than bloating the generic service layers.
+- `dsl-services*`, `resolve-services*`, `artifact-services*`, `compile-services*`, and `gen` form the current service-domain generation path. Keep .NET, ASP.NET, and package-management behavior in the feature-specific service modules rather than bloating the generic service layers.
 - `runtime-scripting` is the scripting host and execution boundary. It may depend on DSL and generation layers, but it must not absorb CLI parsing, onboarding, or distribution concerns.
 - `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
 - `gradle-plugin` is the native Gradle integration surface for Gradle-imported JVM repositories. It should stay thin, Gradle-conventional, and explicit about task/configuration wiring rather than absorbing CLI concerns.
@@ -418,6 +438,48 @@ microsmith {
     }
 }
 ```
+
+### ASP.NET service scaffolding DSL
+
+```kotlin
+microsmith {
+    services {
+        dotnet {
+            target(NET8)
+            solutions {
+                "Platform" {}
+            }
+        }
+
+        "UserService" {
+            dotnet {
+                solution("Platform")
+                project("UserService.Api")
+                asp { }
+            }
+        }
+    }
+}
+```
+
+The base ASP.NET scaffold currently emits this canonical layout under the run output root:
+
+```text
+dotnet/
+  Platform/
+    UserService.Api/
+      UserService.Api.csproj
+      Program.cs
+      appsettings.json
+      Properties/
+        launchSettings.json
+```
+
+Canonical scaffold policy:
+
+- `Program.cs` uses top-level hosting with `WebApplication.CreateBuilder(args)`, `AddControllers()`, `MapControllers()`, and `Run()`
+- the scaffold above is generator-owned and is overwritten in place on rerun
+- user-authored ASP.NET extension code should live under `Controllers/`; this base scaffold does not emit or rewrite that area yet
 
 ### Script defaults
 
