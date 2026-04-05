@@ -5,13 +5,12 @@ import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.core.ArtifactContributor
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.ProtobufDeclarationHandlerRegistry
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
-import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactContributor::class)
 class ProtobufArtifactContributor : ArtifactContributor<ResolvedProtobufSchemaModel> {
     private val declarationHandlerRegistry = ProtobufDeclarationHandlerRegistry()
 
-    override val resolvedType: KClass<ResolvedProtobufSchemaModel> = ResolvedProtobufSchemaModel::class
+    override val resolvedType = ResolvedProtobufSchemaModel::class
 
     override fun contribute(model: ResolvedProtobufSchemaModel): List<ArtifactContribution<*>> {
         return model.schemas.map { resolvedSchema ->

@@ -20,7 +20,6 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import kotlin.reflect.KClass
 
 class CliProviderValidatorTests :
     StringSpec({
@@ -90,35 +89,35 @@ class CliProviderValidatorTests :
     })
 
 private class ProtobufResolverStub : DomainResolver<SchemasExtension, ResolvedProtobufSchemaModel> {
-    override val authoringType: KClass<SchemasExtension> = SchemasExtension::class
-    override val resolvedType: KClass<ResolvedProtobufSchemaModel> = ResolvedProtobufSchemaModel::class
+    override val authoringType = SchemasExtension::class
+    override val resolvedType = ResolvedProtobufSchemaModel::class
 
     override fun resolve(authoring: SchemasExtension): ResolvedProtobufSchemaModel =
         ResolvedProtobufSchemaModel(emptyList())
 }
 
 private class ProtobufRpcResolverStub : DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
-    override val authoringType: KClass<SchemasExtension> = SchemasExtension::class
-    override val resolvedType: KClass<ResolvedProtobufRpcSchemaModel> = ResolvedProtobufRpcSchemaModel::class
+    override val authoringType = SchemasExtension::class
+    override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 
     override fun resolve(authoring: SchemasExtension): ResolvedProtobufRpcSchemaModel =
         ResolvedProtobufRpcSchemaModel(emptyList())
 }
 
 private class ProtobufContributorStub : ArtifactContributor<ResolvedProtobufSchemaModel> {
-    override val resolvedType: KClass<ResolvedProtobufSchemaModel> = ResolvedProtobufSchemaModel::class
+    override val resolvedType = ResolvedProtobufSchemaModel::class
 
     override fun contribute(model: ResolvedProtobufSchemaModel): List<ArtifactContribution<*>> = emptyList()
 }
 
 private class ProtobufRpcContributorStub : ArtifactContributor<ResolvedProtobufRpcSchemaModel> {
-    override val resolvedType: KClass<ResolvedProtobufRpcSchemaModel> = ResolvedProtobufRpcSchemaModel::class
+    override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 
     override fun contribute(model: ResolvedProtobufRpcSchemaModel): List<ArtifactContribution<*>> = emptyList()
 }
 
 private class ProtoFileAssemblerStub : ArtifactAssembler<ProtoFileArtifact> {
-    override val artifactType: KClass<ProtoFileArtifact> = ProtoFileArtifact::class
+    override val artifactType = ProtoFileArtifact::class
 
     override fun create(first: ArtifactContribution<ProtoFileArtifact>): ProtoFileArtifact {
         val contribution = first as ProtoFileContribution
@@ -137,7 +136,7 @@ private class ProtoFileAssemblerStub : ArtifactAssembler<ProtoFileArtifact> {
 }
 
 private class ProtobufRpcAssemblerStub : ArtifactAssembler<ProtobufRpcServiceArtifact> {
-    override val artifactType: KClass<ProtobufRpcServiceArtifact> = ProtobufRpcServiceArtifact::class
+    override val artifactType = ProtobufRpcServiceArtifact::class
 
     override fun create(first: ArtifactContribution<ProtobufRpcServiceArtifact>): ProtobufRpcServiceArtifact {
         error("Not used in provider validator tests.")
@@ -150,7 +149,7 @@ private class ProtobufRpcAssemblerStub : ArtifactAssembler<ProtobufRpcServiceArt
 }
 
 private class TextFileAssemblerStub : ArtifactAssembler<TextFileArtifact> {
-    override val artifactType: KClass<TextFileArtifact> = TextFileArtifact::class
+    override val artifactType = TextFileArtifact::class
 
     override fun create(first: ArtifactContribution<TextFileArtifact>): TextFileArtifact {
         val contribution = first as TextFileArtifactContribution
@@ -167,7 +166,7 @@ private class TextFileAssemblerStub : ArtifactAssembler<TextFileArtifact> {
 }
 
 private class ProtoFileCompilerStub : ArtifactCompiler<ProtoFileArtifact> {
-    override val artifactType: KClass<ProtoFileArtifact> = ProtoFileArtifact::class
+    override val artifactType = ProtoFileArtifact::class
 
     override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> {
         return emptyList()
@@ -175,7 +174,7 @@ private class ProtoFileCompilerStub : ArtifactCompiler<ProtoFileArtifact> {
 }
 
 private class ProtobufRpcCompilerStub : ArtifactCompiler<ProtobufRpcServiceArtifact> {
-    override val artifactType: KClass<ProtobufRpcServiceArtifact> = ProtobufRpcServiceArtifact::class
+    override val artifactType = ProtobufRpcServiceArtifact::class
 
     override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> {
         return emptyList()
@@ -183,7 +182,7 @@ private class ProtobufRpcCompilerStub : ArtifactCompiler<ProtobufRpcServiceArtif
 }
 
 private class TextFileRendererStub : ArtifactRenderer<TextFileArtifact> {
-    override val artifactType: KClass<TextFileArtifact> = TextFileArtifact::class
+    override val artifactType = TextFileArtifact::class
 
     override fun render(artifact: TextFileArtifact): GeneratedFile = GeneratedFile(
         relativePath = artifact.id.relativePath,

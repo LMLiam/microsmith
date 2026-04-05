@@ -12,11 +12,10 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPacka
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
-import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactCompiler::class)
 class DotnetPackageVersionsArtifactCompiler : ServicesArtifactCompiler<DotnetPackageVersionsArtifact> {
-    override val artifactType: KClass<DotnetPackageVersionsArtifact> = DotnetPackageVersionsArtifact::class
+    override val artifactType = DotnetPackageVersionsArtifact::class
 
     override fun compile(artifact: DotnetPackageVersionsArtifact): List<ArtifactContribution<out Artifact>> {
         return listOf(

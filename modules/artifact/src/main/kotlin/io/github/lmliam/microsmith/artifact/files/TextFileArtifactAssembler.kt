@@ -3,11 +3,10 @@ package io.github.lmliam.microsmith.artifact.files
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactAssembler::class)
 class TextFileArtifactAssembler : ArtifactAssembler<TextFileArtifact> {
-    override val artifactType: KClass<TextFileArtifact> = TextFileArtifact::class
+    override val artifactType = TextFileArtifact::class
 
     override fun create(first: ArtifactContribution<TextFileArtifact>): TextFileArtifact {
         val contribution = requireContribution(first)

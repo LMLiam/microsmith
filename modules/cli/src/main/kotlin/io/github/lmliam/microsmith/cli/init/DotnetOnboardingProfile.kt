@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.cli.init
 
 internal data object DotnetOnboardingProfile : OnboardingProfile {
-    override val id: OnboardingProfileId = "dotnet"
-    override val displayName: String = ".NET"
-    override val sampleMessageName: String = "DotnetUserCreated"
-    override val recommendedOutputDirectory: String = "./Generated"
+    override val id = "dotnet"
+    override val displayName = ".NET"
+    override val sampleMessageName = "DotnetUserCreated"
+    override val recommendedOutputDirectory = "./Generated"
 }

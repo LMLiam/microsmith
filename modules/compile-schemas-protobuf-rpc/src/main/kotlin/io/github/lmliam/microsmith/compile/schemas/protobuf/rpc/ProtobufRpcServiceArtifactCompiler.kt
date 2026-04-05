@@ -9,11 +9,10 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileContributi
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.core.SchemasArtifactCompiler
-import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactCompiler::class)
 class ProtobufRpcServiceArtifactCompiler : SchemasArtifactCompiler<ProtobufRpcServiceArtifact> {
-    override val artifactType: KClass<ProtobufRpcServiceArtifact> = ProtobufRpcServiceArtifact::class
+    override val artifactType = ProtobufRpcServiceArtifact::class
 
     override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> {
         return listOf(

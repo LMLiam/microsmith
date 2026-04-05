@@ -3,11 +3,10 @@ package io.github.lmliam.microsmith.artifact.services.dotnet.packages
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactAssembler::class)
 class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackageReferencesArtifact> {
-    override val artifactType: KClass<DotnetPackageReferencesArtifact> = DotnetPackageReferencesArtifact::class
+    override val artifactType = DotnetPackageReferencesArtifact::class
 
     override fun create(first: ArtifactContribution<DotnetPackageReferencesArtifact>): DotnetPackageReferencesArtifact {
         val contribution = requireContribution(first)

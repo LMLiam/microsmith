@@ -10,11 +10,10 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
 import java.nio.file.Path
-import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactCompiler::class)
 class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectArtifact> {
-    override val artifactType: KClass<MsBuildProjectArtifact> = MsBuildProjectArtifact::class
+    override val artifactType = MsBuildProjectArtifact::class
 
     override fun compile(artifact: MsBuildProjectArtifact): List<ArtifactContribution<out Artifact>> {
         return listOf(

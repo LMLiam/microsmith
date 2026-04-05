@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 internal class ArtifactCompilerRegistry(
     compilers: List<ArtifactCompiler<*>> = loadArtifactCompilers(),
 ) {
-    private val compilersByType: Map<KClass<out Artifact>, ArtifactCompiler<*>> = indexCompilers(compilers)
+    private val compilersByType = indexCompilers(compilers)
 
     fun resolveOrNull(artifact: Artifact): ArtifactCompiler<Artifact>? =
         compilersByType[artifact.id.artifactType]?.cast()
