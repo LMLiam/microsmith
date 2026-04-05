@@ -43,6 +43,14 @@ class SchemasExtensionTests :
             }
         }
 
+        "find throws when schema name is blank" {
+            val ext = SchemasExtension(emptySet())
+
+            shouldThrow<IllegalArgumentException> {
+                ext.find(TestSchemaTypes.PROTOBUF, " ")
+            }
+        }
+
         "allOf returns all schemas of given type" {
             val s1 = ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")
             val s2 = ExtFakeSchema(TestSchemaTypes.PROTOBUF, "Company")

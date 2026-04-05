@@ -32,7 +32,7 @@ package io.github.lmliam.microsmith.dsl.schemas.core
  * an internal mechanism to accumulate schemas during DSL evaluation.
  */
 class SchemasBuilder : SchemasScope {
-    private val schemasByKey = linkedMapOf<SchemaKey, Schema>()
+    private val schemasByKey = linkedMapOf<Pair<SchemaType, String>, Schema>()
     internal val schemas: Set<Schema>
         get() = schemasByKey.values.toSet()
 
@@ -42,9 +42,9 @@ class SchemasBuilder : SchemasScope {
      * @throws IllegalArgumentException if the schema name is blank.
      */
     fun register(schema: Schema) {
-        val schemaKey = SchemaKey.of(schema)
+        val schemaKey = schema.schemaKey()
         require(schemaKey !in schemasByKey) {
-            "Duplicate schema registration for '$schemaKey'."
+            "Duplicate schema registration for '${schema.schemaDisplayKey()}'."
         }
 
         schemasByKey[schemaKey] = schema
