@@ -6,5 +6,5 @@ import io.github.lmliam.microsmith.dsl.core.MicrosmithDsl
 interface DotnetPackageVersionScope : DotnetPackageVersionsScope {
     fun version(version: String)
 
-    operator fun String.unaryPlus()
+    override operator fun String.unaryPlus()
 }

@@ -217,7 +217,7 @@ class DotnetPackageDslTests :
                         solutions {
                             "Platform" {
                                 packages {
-                                    "Serilog.AspNetCore" {}
+                                    +"Serilog.AspNetCore"
                                 }
                             }
                         }

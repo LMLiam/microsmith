@@ -5,4 +5,6 @@ import io.github.lmliam.microsmith.dsl.core.MicrosmithDsl
 @MicrosmithDsl
 interface DotnetPackageVersionsScope {
     operator fun String.invoke(block: DotnetPackageVersionScope.() -> Unit = {})
+
+    operator fun String.unaryPlus()
 }
