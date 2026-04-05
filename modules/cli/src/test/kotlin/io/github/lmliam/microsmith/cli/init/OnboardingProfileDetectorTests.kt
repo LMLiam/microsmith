@@ -639,7 +639,7 @@ class OnboardingProfileDetectorTests :
         }
     })
 
-private val UNUSED_PROJECT_ROOT: Path = Path.of(".")
+private val UNUSED_PROJECT_ROOT = Path.of(".")
 
 private fun supportsPosixPermissions(): Boolean =
     !runningOnWindows() && FileSystems.getDefault().supportedFileAttributeViews().contains("posix")

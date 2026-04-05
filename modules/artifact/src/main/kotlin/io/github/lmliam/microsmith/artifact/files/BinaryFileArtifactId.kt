@@ -3,7 +3,7 @@ package io.github.lmliam.microsmith.artifact.files
 import io.github.lmliam.microsmith.artifact.core.ArtifactId
 import java.nio.file.Path
 
-private val defaultBinaryFileOutputRoot: Path = Path.of(".")
+private val defaultBinaryFileOutputRoot = Path.of(".")
 
 data class BinaryFileArtifactId(
     val relativePath: Path,

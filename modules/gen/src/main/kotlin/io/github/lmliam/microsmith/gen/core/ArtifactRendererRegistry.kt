@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 class ArtifactRendererRegistry(
     renderers: List<ArtifactRenderer<*>> = loadArtifactRenderers(),
 ) {
-    private val renderersByType: Map<KClass<out Artifact>, ArtifactRenderer<*>> = indexRenderers(renderers)
+    private val renderersByType = indexRenderers(renderers)
 
     fun resolve(artifact: Artifact): ArtifactRenderer<Artifact> {
         return renderersByType[artifact.id.artifactType]
