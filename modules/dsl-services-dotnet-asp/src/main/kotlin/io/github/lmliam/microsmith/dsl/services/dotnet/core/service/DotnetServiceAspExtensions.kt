@@ -14,3 +14,10 @@ fun DotnetServiceScope.asp(block: DotnetAspServiceScope.() -> Unit = {}) {
 
     builder.put(DotnetAspServiceExtension::class, DotnetAspServiceBuilder().apply(block).build())
 }
+
+/**
+ * Alias for `asp { ... }` when the longer ASP.NET spelling is preferred.
+ */
+fun DotnetServiceScope.aspNet(block: DotnetAspServiceScope.() -> Unit = {}) {
+    asp(block)
+}
