@@ -5,7 +5,6 @@ import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import kotlin.reflect.KClass
 
 private data object AlphaExtension : MicrosmithExtension
 
@@ -20,22 +19,22 @@ private data class BetaResolvedModel(
 ) : ResolvedModel
 
 private class AlphaFirstResolver : DomainResolver<AlphaExtension, AlphaResolvedModel> {
-    override val authoringType: KClass<AlphaExtension> = AlphaExtension::class
-    override val resolvedType: KClass<AlphaResolvedModel> = AlphaResolvedModel::class
+    override val authoringType = AlphaExtension::class
+    override val resolvedType = AlphaResolvedModel::class
 
     override fun resolve(authoring: AlphaExtension) = AlphaResolvedModel("alpha")
 }
 
 private class AlphaNullResolver : DomainResolver<AlphaExtension, BetaResolvedModel> {
-    override val authoringType: KClass<AlphaExtension> = AlphaExtension::class
-    override val resolvedType: KClass<BetaResolvedModel> = BetaResolvedModel::class
+    override val authoringType = AlphaExtension::class
+    override val resolvedType = BetaResolvedModel::class
 
     override fun resolve(authoring: AlphaExtension): BetaResolvedModel? = null
 }
 
 private class BetaResolver : DomainResolver<BetaExtension, BetaResolvedModel> {
-    override val authoringType: KClass<BetaExtension> = BetaExtension::class
-    override val resolvedType: KClass<BetaResolvedModel> = BetaResolvedModel::class
+    override val authoringType = BetaExtension::class
+    override val resolvedType = BetaResolvedModel::class
 
     override fun resolve(authoring: BetaExtension) = BetaResolvedModel("beta")
 }

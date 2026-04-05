@@ -13,7 +13,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import java.nio.file.Path
-import kotlin.reflect.KClass
 
 class ArtifactCompilationServiceTests :
     StringSpec({
@@ -76,7 +75,7 @@ private data class StageOneArtifact(
 private data class StageOneId(
     val name: String,
 ) : ArtifactId<StageOneArtifact> {
-    override val artifactType: KClass<StageOneArtifact> = StageOneArtifact::class
+    override val artifactType = StageOneArtifact::class
 }
 
 private data class StageOneContribution(
@@ -85,7 +84,7 @@ private data class StageOneContribution(
 ) : ArtifactContribution<StageOneArtifact>
 
 private class StageOneArtifactAssembler : ArtifactAssembler<StageOneArtifact> {
-    override val artifactType: KClass<StageOneArtifact> = StageOneArtifact::class
+    override val artifactType = StageOneArtifact::class
 
     override fun create(first: ArtifactContribution<StageOneArtifact>): StageOneArtifact =
         StageOneArtifact(requireContribution(first).artifactId, requireContribution(first).contents)
@@ -113,7 +112,7 @@ private data class StageTwoArtifact(
 private data class StageTwoId(
     val name: String,
 ) : ArtifactId<StageTwoArtifact> {
-    override val artifactType: KClass<StageTwoArtifact> = StageTwoArtifact::class
+    override val artifactType = StageTwoArtifact::class
 }
 
 private data class StageTwoContribution(
@@ -122,7 +121,7 @@ private data class StageTwoContribution(
 ) : ArtifactContribution<StageTwoArtifact>
 
 private class StageTwoArtifactAssembler : ArtifactAssembler<StageTwoArtifact> {
-    override val artifactType: KClass<StageTwoArtifact> = StageTwoArtifact::class
+    override val artifactType = StageTwoArtifact::class
 
     override fun create(first: ArtifactContribution<StageTwoArtifact>): StageTwoArtifact =
         StageTwoArtifact(requireContribution(first).artifactId, requireContribution(first).contents)
@@ -143,7 +142,7 @@ private class StageTwoArtifactAssembler : ArtifactAssembler<StageTwoArtifact> {
 }
 
 private class StageOneCompiler : ArtifactCompiler<StageOneArtifact> {
-    override val artifactType: KClass<StageOneArtifact> = StageOneArtifact::class
+    override val artifactType = StageOneArtifact::class
 
     override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> {
         return listOf(StageTwoContribution(StageTwoId("middle"), artifact.contents))
@@ -151,7 +150,7 @@ private class StageOneCompiler : ArtifactCompiler<StageOneArtifact> {
 }
 
 private class StageTwoCompiler : ArtifactCompiler<StageTwoArtifact> {
-    override val artifactType: KClass<StageTwoArtifact> = StageTwoArtifact::class
+    override val artifactType = StageTwoArtifact::class
 
     override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<out Artifact>> {
         return listOf(TextFileArtifactContribution(TextFileArtifactId(Path.of("result.txt")), artifact.contents))
@@ -159,7 +158,7 @@ private class StageTwoCompiler : ArtifactCompiler<StageTwoArtifact> {
 }
 
 private class SelfCyclingCompiler : ArtifactCompiler<StageOneArtifact> {
-    override val artifactType: KClass<StageOneArtifact> = StageOneArtifact::class
+    override val artifactType = StageOneArtifact::class
 
     override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> {
         return listOf(StageOneContribution(StageOneId("cycle"), artifact.contents))
@@ -167,7 +166,7 @@ private class SelfCyclingCompiler : ArtifactCompiler<StageOneArtifact> {
 }
 
 private class StageOneToStageTwoCompiler : ArtifactCompiler<StageOneArtifact> {
-    override val artifactType: KClass<StageOneArtifact> = StageOneArtifact::class
+    override val artifactType = StageOneArtifact::class
 
     override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> {
         return listOf(StageTwoContribution(StageTwoId(artifact.id.name), artifact.contents))
@@ -175,7 +174,7 @@ private class StageOneToStageTwoCompiler : ArtifactCompiler<StageOneArtifact> {
 }
 
 private class StageTwoToStageOneCompiler : ArtifactCompiler<StageTwoArtifact> {
-    override val artifactType: KClass<StageTwoArtifact> = StageTwoArtifact::class
+    override val artifactType = StageTwoArtifact::class
 
     override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<out Artifact>> {
         return listOf(StageOneContribution(StageOneId(artifact.id.name), artifact.contents))

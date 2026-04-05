@@ -7,7 +7,6 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchem
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import kotlin.reflect.KClass
 
 class ProtobufDeclarationHandlerRegistryTests :
     StringSpec({
@@ -34,7 +33,7 @@ private data class TestType(
 ) : Type
 
 private object TestDeclarationHandler : ProtobufDeclarationHandler<TestType> {
-    override val type: KClass<TestType> = TestType::class
+    override val type = TestType::class
 
     override fun validate(schema: ProtobufSchema, qualifiedName: QualifiedSchemaName) = Unit
 
@@ -42,7 +41,7 @@ private object TestDeclarationHandler : ProtobufDeclarationHandler<TestType> {
 }
 
 private object DuplicateTestDeclarationHandler : ProtobufDeclarationHandler<TestType> {
-    override val type: KClass<TestType> = TestType::class
+    override val type = TestType::class
 
     override fun validate(schema: ProtobufSchema, qualifiedName: QualifiedSchemaName) = Unit
 

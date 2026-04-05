@@ -9,7 +9,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import java.nio.file.Path
-import kotlin.reflect.KClass
 
 private data class AlphaResolved(
     val name: String,
@@ -20,7 +19,7 @@ private data class BetaResolved(
 ) : ResolvedModel
 
 private class AlphaContributor : ArtifactContributor<AlphaResolved> {
-    override val resolvedType: KClass<AlphaResolved> = AlphaResolved::class
+    override val resolvedType = AlphaResolved::class
 
     override fun contribute(model: AlphaResolved): List<ArtifactContribution<out Artifact>> {
         return listOf(
@@ -33,7 +32,7 @@ private class AlphaContributor : ArtifactContributor<AlphaResolved> {
 }
 
 private class BetaContributor : ArtifactContributor<BetaResolved> {
-    override val resolvedType: KClass<BetaResolved> = BetaResolved::class
+    override val resolvedType = BetaResolved::class
 
     override fun contribute(model: BetaResolved): List<ArtifactContribution<out Artifact>> {
         return listOf(
