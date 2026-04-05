@@ -12,11 +12,12 @@ class MsBuildItem(
         this.attributes.keys.forEach(MsBuildNames::requireAttributeName)
     }
 
-    override fun equals(other: Any?): Boolean =
-        other is MsBuildItem &&
+    override fun equals(other: Any?): Boolean {
+        return other is MsBuildItem &&
             itemName == other.itemName &&
             include == other.include &&
             attributes == other.attributes
+    }
 
     override fun hashCode(): Int {
         var result = itemName.hashCode()
@@ -25,6 +26,7 @@ class MsBuildItem(
         return result
     }
 
-    override fun toString(): String =
-        "MsBuildItem(itemName=$itemName, include=$include, attributes=$attributes)"
+    override fun toString(): String {
+        return "MsBuildItem(itemName=$itemName, include=$include, attributes=$attributes)"
+    }
 }
