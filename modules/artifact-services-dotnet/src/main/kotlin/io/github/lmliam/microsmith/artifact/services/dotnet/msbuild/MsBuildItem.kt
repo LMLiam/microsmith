@@ -1,12 +1,30 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
 
-data class MsBuildItem(
+class MsBuildItem(
     val itemName: String,
     val include: String,
-    val attributes: Map<String, String> = emptyMap(),
+    attributes: Map<String, String> = emptyMap(),
 ) {
+    val attributes: Map<String, String> = attributes.toMap()
+
     init {
         MsBuildNames.requireItemName(itemName)
-        attributes.keys.forEach(MsBuildNames::requireAttributeName)
+        this.attributes.keys.forEach(MsBuildNames::requireAttributeName)
     }
+
+    override fun equals(other: Any?): Boolean =
+        other is MsBuildItem &&
+            itemName == other.itemName &&
+            include == other.include &&
+            attributes == other.attributes
+
+    override fun hashCode(): Int {
+        var result = itemName.hashCode()
+        result = 31 * result + include.hashCode()
+        result = 31 * result + attributes.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+        "MsBuildItem(itemName=$itemName, include=$include, attributes=$attributes)"
 }

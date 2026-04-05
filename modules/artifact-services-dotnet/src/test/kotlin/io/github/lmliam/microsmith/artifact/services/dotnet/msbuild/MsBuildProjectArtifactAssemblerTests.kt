@@ -133,6 +133,21 @@ class MsBuildProjectArtifactAssemblerTests :
             }
         }
 
+        "items snapshot attribute maps at construction time" {
+            val sourceAttributes = linkedMapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0")
+
+            val item =
+                MsBuildItem(
+                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                    include = "Serilog.AspNetCore",
+                    attributes = sourceAttributes,
+                )
+
+            sourceAttributes["Bad Attribute"] = "oops"
+
+            item.attributes shouldContainExactly mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0")
+        }
+
         "create preserves declared artifact identity" {
             val artifact = assembler.create(MsBuildProjectContribution(artifactId = artifactId))
 
