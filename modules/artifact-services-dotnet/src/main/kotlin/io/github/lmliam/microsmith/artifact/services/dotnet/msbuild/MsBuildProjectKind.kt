@@ -1,8 +1,7 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
 
-enum class MsBuildProjectKind(
-    val fileName: String,
-) {
-    DirectoryPackagesProps("Directory.Packages.props"),
-    DirectoryBuildProps("Directory.Build.props"),
+enum class MsBuildProjectKind {
+    DirectoryPackagesProps,
+    DirectoryBuildProps,
+    Project,
 }

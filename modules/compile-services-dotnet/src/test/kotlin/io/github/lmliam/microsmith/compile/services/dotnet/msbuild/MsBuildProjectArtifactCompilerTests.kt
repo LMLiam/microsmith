@@ -71,6 +71,29 @@ class MsBuildProjectArtifactCompilerTests :
             textContribution.contents.shouldContain("<PackageReference Include=\"Serilog.AspNetCore\"/>")
         }
 
+        "compile writes sdk-style project files into the project root" {
+            val artifact =
+                MsBuildProjectArtifact(
+                    id = MsBuildProjectArtifactId(
+                        solutionName = "Platform",
+                        projectName = "UserService.Api",
+                        kind = MsBuildProjectKind.Project,
+                    ),
+                    projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
+                    properties = mapOf(MsBuildNames.TARGET_FRAMEWORK_PROPERTY to "net8.0"),
+                    items = emptyList(),
+                )
+
+            val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
+            val textContribution = contribution as TextFileArtifactContribution
+
+            textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("UserService.Api.csproj")
+            textContribution.artifactId.outputRoot shouldBe
+                java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
+            textContribution.contents.shouldContain("""<Project Sdk="Microsoft.NET.Sdk.Web">""")
+            textContribution.contents.shouldContain("<TargetFramework>net8.0</TargetFramework>")
+        }
+
         "compile emits well-formed xml for escaped property and attribute values" {
             val artifact =
                 MsBuildProjectArtifact(

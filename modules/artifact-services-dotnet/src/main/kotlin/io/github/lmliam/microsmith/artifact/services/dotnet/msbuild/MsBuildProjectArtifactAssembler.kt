@@ -12,6 +12,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
         val contribution = requireContribution(first)
         return MsBuildProjectArtifact(
             id = contribution.artifactId,
+            projectAttributes = linkedMapOf<String, String>().apply { putAll(contribution.projectAttributes) },
             properties = linkedMapOf<String, String>().apply { putAll(contribution.properties) },
             items = contribution.items.toList(),
         )
@@ -22,6 +23,16 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
         contribution: ArtifactContribution<MsBuildProjectArtifact>,
     ): MsBuildProjectArtifact {
         val next = requireContribution(contribution)
+        val mergedProjectAttributes = linkedMapOf<String, String>().apply { putAll(current.projectAttributes) }
+        next.projectAttributes.forEach { (name, value) ->
+            val existing = mergedProjectAttributes[name]
+            require(existing == null || existing == value) {
+                "Conflicting MSBuild project attribute '$name' for '${current.id.kind}' in solution " +
+                    "'${current.id.solutionName}'${current.id.projectName?.let { " project '$it'" }.orEmpty()}."
+            }
+            mergedProjectAttributes[name] = value
+        }
+
         val mergedProperties = linkedMapOf<String, String>().apply { putAll(current.properties) }
         next.properties.forEach { (name, value) ->
             val existing = mergedProperties[name]
@@ -49,6 +60,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
         }
 
         return current.copy(
+            projectAttributes = mergedProjectAttributes,
             properties = mergedProperties,
             items = mergedItems.values.toList(),
         )

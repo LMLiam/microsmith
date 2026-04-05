@@ -19,7 +19,7 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
         return listOf(
             TextFileArtifactContribution(
                 artifactId = TextFileArtifactId(
-                    relativePath = Path.of(artifact.id.kind.fileName),
+                    relativePath = projectRelativePath(artifact),
                     outputRoot = artifact.outputRoot(),
                 ),
                 contents = MsBuildProjectXmlRenderer.render(artifact),
@@ -33,6 +33,16 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
             dotnetOutputRoot
                 .resolve(id.solutionName)
                 .resolve(requireNotNull(id.projectName))
+        MsBuildProjectKind.Project ->
+            dotnetOutputRoot
+                .resolve(id.solutionName)
+                .resolve(requireNotNull(id.projectName))
+    }
+
+    private fun projectRelativePath(artifact: MsBuildProjectArtifact): Path = when (artifact.id.kind) {
+        MsBuildProjectKind.DirectoryPackagesProps -> Path.of("Directory.Packages.props")
+        MsBuildProjectKind.DirectoryBuildProps -> Path.of("Directory.Build.props")
+        MsBuildProjectKind.Project -> Path.of("${requireNotNull(artifact.id.projectName)}.csproj")
     }
 
     private companion object {

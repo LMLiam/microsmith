@@ -12,6 +12,9 @@ internal object MsBuildProjectXmlRenderer {
         val writer = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
         try {
             writer.writeStartElement(PROJECT_ELEMENT_NAME)
+            artifact.projectAttributes.toSortedMap().forEach { (name, value) ->
+                writer.writeAttribute(name, value)
+            }
             renderProperties(writer, artifact)
             renderItems(writer, artifact)
             writer.writeCharacters(NEW_LINE)
