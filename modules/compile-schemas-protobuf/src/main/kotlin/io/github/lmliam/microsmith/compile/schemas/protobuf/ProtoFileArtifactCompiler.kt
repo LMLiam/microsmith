@@ -10,11 +10,10 @@ import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.core.SchemasArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.protobuf.render.ProtobufFileRenderer
 import java.nio.file.Path
-import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactCompiler::class)
 class ProtoFileArtifactCompiler : SchemasArtifactCompiler<ProtoFileArtifact> {
-    override val artifactType: KClass<ProtoFileArtifact> = ProtoFileArtifact::class
+    override val artifactType = ProtoFileArtifact::class
 
     override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> {
         return listOf(

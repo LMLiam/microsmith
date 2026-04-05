@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.cli.init
 
 internal data object PythonOnboardingProfile : OnboardingProfile {
-    override val id: OnboardingProfileId = "python"
-    override val displayName: String = "Python"
-    override val sampleMessageName: String = "PythonUserCreated"
-    override val recommendedOutputDirectory: String? = null
+    override val id = "python"
+    override val displayName = "Python"
+    override val sampleMessageName = "PythonUserCreated"
+    override val recommendedOutputDirectory = null
 }

@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.cli.init
 
 internal data object KotlinOnboardingProfile : OnboardingProfile {
-    override val id: OnboardingProfileId = "kotlin"
-    override val displayName: String = "Kotlin"
-    override val sampleMessageName: String = "KotlinUserCreated"
-    override val recommendedOutputDirectory: String? = null
+    override val id = "kotlin"
+    override val displayName = "Kotlin"
+    override val sampleMessageName = "KotlinUserCreated"
+    override val recommendedOutputDirectory = null
 }

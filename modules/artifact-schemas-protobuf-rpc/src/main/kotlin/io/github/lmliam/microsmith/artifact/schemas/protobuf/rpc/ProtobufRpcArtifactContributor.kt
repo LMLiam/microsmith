@@ -4,11 +4,10 @@ import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.core.ArtifactContributor
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
-import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactContributor::class)
 class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSchemaModel> {
-    override val resolvedType: KClass<ResolvedProtobufRpcSchemaModel> = ResolvedProtobufRpcSchemaModel::class
+    override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 
     override fun contribute(model: ResolvedProtobufRpcSchemaModel): List<ArtifactContribution<*>> {
         return model.schemas.map { schema ->

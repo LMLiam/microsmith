@@ -10,12 +10,11 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.resolve.core.DomainResolver
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
-import kotlin.reflect.KClass
 
 @ServiceProvider(DomainResolver::class)
 class ProtobufRpcSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
-    override val authoringType: KClass<SchemasExtension> = SchemasExtension::class
-    override val resolvedType: KClass<ResolvedProtobufRpcSchemaModel> = ResolvedProtobufRpcSchemaModel::class
+    override val authoringType = SchemasExtension::class
+    override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 
     override fun resolve(authoring: SchemasExtension): ResolvedProtobufRpcSchemaModel? {
         val schemas =

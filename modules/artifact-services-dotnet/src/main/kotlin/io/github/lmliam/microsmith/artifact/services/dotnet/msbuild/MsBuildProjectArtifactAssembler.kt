@@ -3,11 +3,10 @@ package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactAssembler::class)
 class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact> {
-    override val artifactType: KClass<MsBuildProjectArtifact> = MsBuildProjectArtifact::class
+    override val artifactType = MsBuildProjectArtifact::class
 
     override fun create(first: ArtifactContribution<MsBuildProjectArtifact>): MsBuildProjectArtifact {
         val contribution = requireContribution(first)

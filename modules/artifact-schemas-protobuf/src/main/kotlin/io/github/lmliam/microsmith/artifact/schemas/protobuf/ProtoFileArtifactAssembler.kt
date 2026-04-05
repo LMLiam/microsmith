@@ -3,11 +3,10 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import kotlin.reflect.KClass
 
 @ServiceProvider(ArtifactAssembler::class)
 class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
-    override val artifactType: KClass<ProtoFileArtifact> = ProtoFileArtifact::class
+    override val artifactType = ProtoFileArtifact::class
 
     override fun create(first: ArtifactContribution<ProtoFileArtifact>): ProtoFileArtifact {
         val contribution = requireContribution(first)
