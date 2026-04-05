@@ -16,6 +16,10 @@ import java.nio.file.Path
 
 @ServiceProvider(ArtifactCompiler::class)
 class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServiceArtifact> {
+    private companion object {
+        const val FIRST_NON_PRINTABLE_ASCII_CODE_POINT = 0x20
+    }
+
     override val artifactType = DotnetAspServiceArtifact::class
 
     override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> {
@@ -111,7 +115,7 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
                 '\r' -> escaped.append("\\r")
                 '\t' -> escaped.append("\\t")
                 else -> {
-                    if (char.code < 0x20) {
+                    if (char.code < FIRST_NON_PRINTABLE_ASCII_CODE_POINT) {
                         escaped.append("\\u%04x".format(char.code))
                     } else {
                         escaped.append(char)
