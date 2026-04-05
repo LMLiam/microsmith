@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.cli.init
 
 internal data object GenericOnboardingProfile : OnboardingProfile {
-    override val id: OnboardingProfileId = OnboardingProfileId("generic")
+    override val id: OnboardingProfileId = "generic"
     override val displayName: String = "Other"
     override val sampleMessageName: String = "UserCreated"
     override val recommendedOutputDirectory: String? = null

@@ -74,7 +74,7 @@ class OnboardingProfileDetectorTests :
         "uses the configured fallback profile when no markers match" {
             val customFallback =
                 object : OnboardingProfile {
-                    override val id: OnboardingProfileId = OnboardingProfileId("custom-fallback")
+                    override val id: OnboardingProfileId = "custom-fallback"
                     override val displayName: String = "Custom"
                     override val sampleMessageName: String = "CustomUserCreated"
                     override val recommendedOutputDirectory: String? = null
@@ -92,7 +92,7 @@ class OnboardingProfileDetectorTests :
         "formatting uses selection reason rather than generic profile identity" {
             val customFallback =
                 object : OnboardingProfile {
-                    override val id: OnboardingProfileId = OnboardingProfileId("custom-fallback")
+                    override val id: OnboardingProfileId = "custom-fallback"
                     override val displayName: String = "Custom"
                     override val sampleMessageName: String = "CustomUserCreated"
                     override val recommendedOutputDirectory: String? = null
@@ -122,14 +122,14 @@ class OnboardingProfileDetectorTests :
         "rejects conflicting profile definitions that reuse the same stable id" {
             val primaryProfile =
                 object : OnboardingProfile {
-                    override val id: OnboardingProfileId = OnboardingProfileId("python")
+                    override val id: OnboardingProfileId = "python"
                     override val displayName: String = "Python"
                     override val sampleMessageName: String = "PythonUserCreated"
                     override val recommendedOutputDirectory: String? = "./generated"
                 }
             val conflictingProfile =
                 object : OnboardingProfile {
-                    override val id: OnboardingProfileId = OnboardingProfileId("python")
+                    override val id: OnboardingProfileId = "python"
                     override val displayName: String = "Python Variant"
                     override val sampleMessageName: String = "PythonVariantUserCreated"
                     override val recommendedOutputDirectory: String? = "./generated"
@@ -152,14 +152,14 @@ class OnboardingProfileDetectorTests :
         "rejects fallback profile definitions that reuse a matcher stable id" {
             val primaryProfile =
                 object : OnboardingProfile {
-                    override val id: OnboardingProfileId = OnboardingProfileId("python")
+                    override val id: OnboardingProfileId = "python"
                     override val displayName: String = "Python"
                     override val sampleMessageName: String = "PythonUserCreated"
                     override val recommendedOutputDirectory: String? = "./generated"
                 }
             val conflictingFallback =
                 object : OnboardingProfile {
-                    override val id: OnboardingProfileId = OnboardingProfileId("python")
+                    override val id: OnboardingProfileId = "python"
                     override val displayName: String = "Python Fallback"
                     override val sampleMessageName: String = "PythonFallbackUserCreated"
                     override val recommendedOutputDirectory: String? = "./generated"

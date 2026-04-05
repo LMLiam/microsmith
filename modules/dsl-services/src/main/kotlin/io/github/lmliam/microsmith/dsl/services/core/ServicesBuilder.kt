@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
  */
 class ServicesBuilder : ServicesScope {
     private var model = ServicesModel.empty()
-    private val servicesByKey = linkedMapOf<ServiceKey, Service>()
+    private val servicesByKey = linkedMapOf<String, Service>()
     internal val services: Set<Service>
         get() = servicesByKey.values.toSet()
 
@@ -17,7 +17,7 @@ class ServicesBuilder : ServicesScope {
     }
 
     fun register(service: Service) {
-        val serviceKey = ServiceKey.of(service)
+        val serviceKey = service.serviceKey()
         require(serviceKey !in servicesByKey) {
             "Duplicate service registration for '$serviceKey'."
         }
@@ -28,7 +28,6 @@ class ServicesBuilder : ServicesScope {
     fun toExtension() = ServicesExtension(services, model)
 
     override fun String.invoke(block: ServiceScope.() -> Unit) {
-        require(isNotBlank()) { "Service name cannot be blank." }
-        register(ServiceBuilder(this).apply(block).build())
+        register(ServiceBuilder(serviceKey(this)).apply(block).build())
     }
 }

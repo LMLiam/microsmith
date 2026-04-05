@@ -8,6 +8,13 @@ data class Service(
     val model: ServiceModel,
 ) {
     init {
-        require(name.isNotBlank()) { "Service name cannot be blank." }
+        serviceKey(name)
     }
 }
+
+internal fun serviceKey(name: String): String {
+    require(name.isNotBlank()) { "Service name cannot be blank." }
+    return name
+}
+
+internal fun Service.serviceKey(): String = serviceKey(name)

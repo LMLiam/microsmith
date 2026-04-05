@@ -207,4 +207,44 @@ class DotnetPackageDslTests :
                 }
             }
         }
+
+        "dotnet package ownership requires a resolved leaf version" {
+            val builder = MicrosmithBuilder()
+
+            shouldThrow<IllegalStateException> {
+                builder.services {
+                    dotnet {
+                        solutions {
+                            "Platform" {
+                                packages {
+                                    +"Serilog.AspNetCore"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        "dotnet service packages reject duplicate resolved package identifiers" {
+            val builder = MicrosmithBuilder()
+
+            shouldThrow<IllegalArgumentException> {
+                builder.services {
+                    "UserService" {
+                        dotnet {
+                            solution("Platform")
+                            project("UserService.Api")
+                            packages {
+                                "Serilog" {
+                                    +"AspNetCore"
+                                }
+
+                                +"Serilog.AspNetCore"
+                            }
+                        }
+                    }
+                }
+            }
+        }
     })

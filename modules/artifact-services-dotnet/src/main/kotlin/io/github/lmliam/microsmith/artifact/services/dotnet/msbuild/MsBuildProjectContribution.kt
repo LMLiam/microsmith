@@ -4,6 +4,10 @@ import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
 
 data class MsBuildProjectContribution(
     override val artifactId: MsBuildProjectArtifactId,
-    val properties: Map<MsBuildPropertyName, String> = emptyMap(),
+    val properties: Map<String, String> = emptyMap(),
     val items: List<MsBuildItem> = emptyList(),
-) : ArtifactContribution<MsBuildProjectArtifact>
+) : ArtifactContribution<MsBuildProjectArtifact> {
+    init {
+        properties.keys.forEach(MsBuildNames::requirePropertyName)
+    }
+}

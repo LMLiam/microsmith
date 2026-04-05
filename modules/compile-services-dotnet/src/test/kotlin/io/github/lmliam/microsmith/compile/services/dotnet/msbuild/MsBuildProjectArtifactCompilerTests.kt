@@ -1,13 +1,11 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
 
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItemName
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildPropertyName
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -24,13 +22,13 @@ class MsBuildProjectArtifactCompilerTests :
                         solutionName = "Platform",
                         kind = MsBuildProjectKind.DirectoryPackagesProps,
                     ),
-                    properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true"),
+                    properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
                     items =
                     listOf(
                         MsBuildItem(
-                            itemName = MsBuildItemName.PackageVersion,
+                            itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
                             include = "Serilog.AspNetCore",
-                            attributes = mapOf(MsBuildAttributeName.Version to "9.0.0 & preview"),
+                            attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0 & preview"),
                         ),
                     ),
                 )
@@ -57,7 +55,7 @@ class MsBuildProjectArtifactCompilerTests :
                     items =
                     listOf(
                         MsBuildItem(
-                            itemName = MsBuildItemName.PackageReference,
+                            itemName = MsBuildNames.PACKAGE_REFERENCE_ITEM,
                             include = "Serilog.AspNetCore",
                             attributes = emptyMap(),
                         ),
@@ -80,13 +78,13 @@ class MsBuildProjectArtifactCompilerTests :
                         solutionName = "Platform",
                         kind = MsBuildProjectKind.DirectoryPackagesProps,
                     ),
-                    properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "A&B<true>"),
+                    properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "A&B<true>"),
                     items =
                     listOf(
                         MsBuildItem(
-                            itemName = MsBuildItemName.PackageVersion,
+                            itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
                             include = "Serilog.\"AspNetCore\"",
-                            attributes = mapOf(MsBuildAttributeName.Version to "9.0.0 & preview"),
+                            attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0 & preview"),
                         ),
                     ),
                 )

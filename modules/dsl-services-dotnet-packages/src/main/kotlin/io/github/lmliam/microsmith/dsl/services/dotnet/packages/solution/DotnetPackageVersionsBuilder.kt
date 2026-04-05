@@ -1,7 +1,5 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.DotnetPackageDeclarationNode
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.flattenOwnedPackages
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.normalizeDotnetPackagePath
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.validateDotnetPackageVersion
 
@@ -32,16 +30,33 @@ internal class DotnetPackageVersionsBuilder(
     }
 
     fun build(): DotnetPackageVersionsExtension {
-        return DotnetPackageVersionsExtension(
-            packages = flattenOwnedPackages(buildNode()),
-        )
+        val packages = linkedMapOf<String, DotnetPackageVersionDeclaration>()
+        collectPackages(inheritedVersion = null, packages = packages)
+        return DotnetPackageVersionsExtension(packages = packages.values.toList())
     }
 
-    private fun buildNode(): DotnetPackageDeclarationNode {
-        return DotnetPackageDeclarationNode(
-            pathSegments = pathSegments,
-            version = version,
-            childPackages = children.values.map { it.buildNode() },
-        )
+    private fun collectPackages(
+        inheritedVersion: String?,
+        packages: MutableMap<String, DotnetPackageVersionDeclaration>,
+    ) {
+        val currentVersion = version ?: inheritedVersion
+
+        if (pathSegments.isNotEmpty() && children.isEmpty()) {
+            val packageName = pathSegments.joinToString(".")
+            val resolvedVersion =
+                currentVersion
+                    ?: error("Dotnet package '$packageName' must declare a version.")
+
+            require(packageName !in packages) {
+                "Duplicate .NET package ownership declaration for '$packageName'."
+            }
+
+            packages[packageName] = DotnetPackageVersionDeclaration(name = packageName, version = resolvedVersion)
+            return
+        }
+
+        children.values.forEach { child ->
+            child.collectPackages(inheritedVersion = currentVersion, packages = packages)
+        }
     }
 }

@@ -36,6 +36,14 @@ class ServicesExtensionTests :
             }
         }
 
+        "find throws when service name is blank" {
+            val ext = ServicesExtension(emptySet())
+
+            shouldThrow<IllegalArgumentException> {
+                ext.find(" ")
+            }
+        }
+
         "merge throws when duplicate service key exists across extensions" {
             val left = ServicesExtension(setOf(Service(name = "UserService", model = ServiceModel.empty())))
             val right = ServicesExtension(setOf(Service(name = "UserService", model = ServiceModel.empty())))

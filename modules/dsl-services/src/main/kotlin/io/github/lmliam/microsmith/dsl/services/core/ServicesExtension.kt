@@ -13,10 +13,9 @@ data class ServicesExtension(
     init {
         val duplicateKeys =
             services
-                .groupBy(ServiceKey::of)
+                .groupBy(Service::serviceKey)
                 .filterValues { it.size > 1 }
                 .keys
-                .map(ServiceKey::toString)
                 .sorted()
 
         require(duplicateKeys.isEmpty()) {
@@ -24,12 +23,13 @@ data class ServicesExtension(
         }
     }
 
-    private val index = services.associateBy(ServiceKey::of)
+    private val index = services.associateBy(Service::serviceKey)
 
-    fun find(name: String) = index[ServiceKey(name)]
+    fun find(name: String) = index[serviceKey(name)]
 
     fun require(name: String): Service {
-        return find(name) ?: error("Service not found: ${ServiceKey(name)}")
+        val serviceKey = serviceKey(name)
+        return index[serviceKey] ?: error("Service not found: $serviceKey")
     }
 
     fun all() = services
@@ -44,12 +44,11 @@ data class ServicesExtension(
     )
 
     fun merge(other: ServicesExtension): ServicesExtension {
-        val existingKeys = services.mapTo(mutableSetOf(), ServiceKey::of)
+        val existingKeys = services.mapTo(mutableSetOf(), Service::serviceKey)
         val collisions =
             other.services
-                .map(ServiceKey::of)
+                .map(Service::serviceKey)
                 .filter { it in existingKeys }
-                .map(ServiceKey::toString)
                 .distinct()
                 .sorted()
 

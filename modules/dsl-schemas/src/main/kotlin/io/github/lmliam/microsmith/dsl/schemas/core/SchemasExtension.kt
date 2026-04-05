@@ -9,10 +9,10 @@ data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
     init {
         val duplicateKeys =
             schemas
-                .groupBy(SchemaKey::of)
+                .groupBy(Schema::schemaKey)
                 .filterValues { it.size > 1 }
                 .keys
-                .map(SchemaKey::toString)
+                .map { (type, name) -> schemaDisplayKey(type, name) }
                 .sorted()
 
         require(duplicateKeys.isEmpty()) {
@@ -21,14 +21,14 @@ data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
     }
 
     // Precompute an index for efficient lookups
-    private val index = schemas.associateBy(SchemaKey::of)
+    private val index = schemas.associateBy(Schema::schemaKey)
 
     /**
      * Find a schema by [type] and [name].
      *
      * @return the matching [Schema], or `null` if not found.
      */
-    fun find(type: SchemaType, name: String) = index[SchemaKey(type, name)]
+    fun find(type: SchemaType, name: String) = index[schemaKey(type, name)]
 
     /**
      * Require a schema by [type] and [name].
@@ -37,7 +37,7 @@ data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
      * type and name exists.
      */
     fun require(type: SchemaType, name: String) =
-        find(type, name) ?: error("Schema not found: ${SchemaKey(type, name)}")
+        find(type, name) ?: error("Schema not found: ${schemaDisplayKey(type, name)}")
 
     /**
      * Convenience: return all schemas of a given [type].
@@ -45,12 +45,12 @@ data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
     fun allOf(type: SchemaType) = schemas.filter { it.type == type }.toSet()
 
     fun merge(other: SchemasExtension): SchemasExtension {
-        val existingKeys = schemas.mapTo(mutableSetOf(), SchemaKey::of)
+        val existingKeys = schemas.mapTo(mutableSetOf(), Schema::schemaKey)
         val collisions =
             other.schemas
-                .map(SchemaKey::of)
+                .map(Schema::schemaKey)
                 .filter { it in existingKeys }
-                .map(SchemaKey::toString)
+                .map { (type, name) -> schemaDisplayKey(type, name) }
                 .distinct()
                 .sorted()
 
