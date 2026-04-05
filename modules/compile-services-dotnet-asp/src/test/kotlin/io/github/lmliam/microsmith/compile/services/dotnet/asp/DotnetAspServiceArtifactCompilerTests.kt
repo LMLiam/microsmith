@@ -11,6 +11,7 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import java.nio.file.Path
 
 class DotnetAspServiceArtifactCompilerTests :
@@ -49,11 +50,35 @@ class DotnetAspServiceArtifactCompilerTests :
             }
             textFiles.single { it.artifactId.relativePath.toString() == "Program.cs" }.contents
                 .shouldContain("AddControllers")
+            textFiles.single { it.artifactId.relativePath.toString() == "Program.cs" }.contents
+                .shouldContain("public partial class Program { }")
             textFiles.single { it.artifactId.relativePath.toString() == "appsettings.json" }.contents
                 .shouldContain(
                     "\"ServiceName\": \"UserService\"",
                 )
             textFiles.single { it.artifactId.relativePath.toString() == "Properties/launchSettings.json" }.contents
                 .shouldContain("http://localhost:5000;https://localhost:5001")
+        }
+
+        "compile escapes service names before embedding them in appsettings json" {
+            val artifact =
+                DotnetAspServiceArtifact(
+                    id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "UserService.Api"),
+                    serviceName = "User\"Service\\Api",
+                    targetFrameworkMoniker = "net8.0",
+                    outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),
+                    httpPort = 5000,
+                    httpsPort = 5001,
+                )
+
+            val appSettings =
+                DotnetAspServiceArtifactCompiler()
+                    .compile(artifact)
+                    .filterIsInstance<TextFileArtifactContribution>()
+                    .single { it.artifactId.relativePath.toString() == "appsettings.json" }
+                    .contents
+
+            appSettings.shouldContain("\"ServiceName\": \"User\\\"Service\\\\Api\"")
+            appSettings.shouldNotContain("\"ServiceName\": \"User\"Service\\Api\"")
         }
     })

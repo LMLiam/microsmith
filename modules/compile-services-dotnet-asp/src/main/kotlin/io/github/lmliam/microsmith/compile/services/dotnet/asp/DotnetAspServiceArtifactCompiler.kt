@@ -64,13 +64,13 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
 
         app.Run();
 
-        public partial class Program;
+        public partial class Program { }
     """.trimIndent()
 
     private fun renderAppSettingsFile(artifact: DotnetAspServiceArtifact): String = """
         {
           "Microsmith": {
-            "ServiceName": "${artifact.serviceName}"
+            "ServiceName": "${escapeJsonString(artifact.serviceName)}"
           },
           "Logging": {
             "LogLevel": {
@@ -98,4 +98,27 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
           }
         }
     """.trimIndent()
+
+    private fun escapeJsonString(value: String): String {
+        val escaped = StringBuilder(value.length)
+        value.forEach { char ->
+            when (char) {
+                '\\' -> escaped.append("\\\\")
+                '"' -> escaped.append("\\\"")
+                '\b' -> escaped.append("\\b")
+                '\u000C' -> escaped.append("\\f")
+                '\n' -> escaped.append("\\n")
+                '\r' -> escaped.append("\\r")
+                '\t' -> escaped.append("\\t")
+                else -> {
+                    if (char.code < 0x20) {
+                        escaped.append("\\u%04x".format(char.code))
+                    } else {
+                        escaped.append(char)
+                    }
+                }
+            }
+        }
+        return escaped.toString()
+    }
 }
