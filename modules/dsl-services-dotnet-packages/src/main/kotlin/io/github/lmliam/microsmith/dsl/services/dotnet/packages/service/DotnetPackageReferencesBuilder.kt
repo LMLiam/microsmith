@@ -1,7 +1,5 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages.service
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.DotnetPackageDeclarationNode
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.flattenReferencedPackages
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.normalizeDotnetPackagePath
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.validateDotnetPackageVersion
 
@@ -32,16 +30,30 @@ internal class DotnetPackageReferencesBuilder(
     }
 
     fun build(): DotnetPackageReferencesExtension {
-        return DotnetPackageReferencesExtension(
-            packages = flattenReferencedPackages(buildNode()),
-        )
+        val packages = linkedMapOf<String, DotnetPackageReferenceDeclaration>()
+        collectPackages(inheritedVersion = null, packages = packages)
+        return DotnetPackageReferencesExtension(packages = packages.values.toList())
     }
 
-    private fun buildNode(): DotnetPackageDeclarationNode {
-        return DotnetPackageDeclarationNode(
-            pathSegments = pathSegments,
-            version = version,
-            childPackages = children.values.map { it.buildNode() },
-        )
+    private fun collectPackages(
+        inheritedVersion: String?,
+        packages: MutableMap<String, DotnetPackageReferenceDeclaration>,
+    ) {
+        val currentVersion = version ?: inheritedVersion
+
+        if (pathSegments.isNotEmpty() && children.isEmpty()) {
+            val packageName = pathSegments.joinToString(".")
+
+            require(packageName !in packages) {
+                "Duplicate .NET package reference declaration for '$packageName'."
+            }
+
+            packages[packageName] = DotnetPackageReferenceDeclaration(name = packageName, version = currentVersion)
+            return
+        }
+
+        children.values.forEach { child ->
+            child.collectPackages(inheritedVersion = currentVersion, packages = packages)
+        }
     }
 }

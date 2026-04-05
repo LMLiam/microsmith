@@ -4,6 +4,10 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.core.DotnetArtifact
 
 data class MsBuildProjectArtifact(
     override val id: MsBuildProjectArtifactId,
-    val properties: Map<MsBuildPropertyName, String>,
+    val properties: Map<String, String>,
     val items: List<MsBuildItem>,
-) : DotnetArtifact
+) : DotnetArtifact {
+    init {
+        properties.keys.forEach(MsBuildNames::requirePropertyName)
+    }
+}

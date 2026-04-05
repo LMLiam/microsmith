@@ -13,7 +13,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
         val contribution = requireContribution(first)
         return MsBuildProjectArtifact(
             id = contribution.artifactId,
-            properties = linkedMapOf<MsBuildPropertyName, String>().apply { putAll(contribution.properties) },
+            properties = linkedMapOf<String, String>().apply { putAll(contribution.properties) },
             items = contribution.items.toList(),
         )
     }
@@ -23,11 +23,11 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
         contribution: ArtifactContribution<MsBuildProjectArtifact>,
     ): MsBuildProjectArtifact {
         val next = requireContribution(contribution)
-        val mergedProperties = linkedMapOf<MsBuildPropertyName, String>().apply { putAll(current.properties) }
+        val mergedProperties = linkedMapOf<String, String>().apply { putAll(current.properties) }
         next.properties.forEach { (name, value) ->
             val existing = mergedProperties[name]
             require(existing == null || existing == value) {
-                "Conflicting MSBuild property '${name.value}' for '${current.id.kind}' in solution " +
+                "Conflicting MSBuild property '$name' for '${current.id.kind}' in solution " +
                     "'${current.id.solutionName}'${current.id.projectName?.let { " project '$it'" }.orEmpty()}."
             }
             mergedProperties[name] = value
@@ -41,7 +41,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
             val key = MsBuildItemIdentity(item.itemName, item.include)
             val existing = mergedItems[key]
             require(existing == null || existing == item) {
-                "Conflicting MSBuild item '${item.itemName.value}:${item.include}' for " +
+                "Conflicting MSBuild item '${item.itemName}:${item.include}' for " +
                     "'${current.id.kind}' in solution '${current.id.solutionName}'" +
                     current.id.projectName?.let { " project '$it'" }.orEmpty() +
                     "."
@@ -66,6 +66,6 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
 }
 
 private data class MsBuildItemIdentity(
-    val itemName: MsBuildItemName,
+    val itemName: String,
     val include: String,
 )

@@ -3,9 +3,8 @@ package io.github.lmliam.microsmith.compile.services.dotnet.packages
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.core.Artifact
 import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItemName
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
@@ -29,10 +28,10 @@ class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetP
                 ),
                 items = artifact.packages.sortedBy(DotnetPackageReference::name).map { packageReference ->
                     MsBuildItem(
-                        itemName = MsBuildItemName.PackageReference,
+                        itemName = MsBuildNames.PACKAGE_REFERENCE_ITEM,
                         include = packageReference.name,
                         attributes = packageReference.version
-                            ?.let { mapOf(MsBuildAttributeName.Version to it) }
+                            ?.let { mapOf(MsBuildNames.VERSION_ATTRIBUTE to it) }
                             .orEmpty(),
                     )
                 },

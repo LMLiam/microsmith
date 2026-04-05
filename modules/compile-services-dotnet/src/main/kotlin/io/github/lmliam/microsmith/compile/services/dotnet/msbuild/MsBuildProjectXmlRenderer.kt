@@ -1,8 +1,7 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
 
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildAttributeName
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildPropertyName
 import java.io.StringWriter
 import javax.xml.stream.XMLOutputFactory
 import javax.xml.stream.XMLStreamWriter
@@ -27,8 +26,8 @@ internal object MsBuildProjectXmlRenderer {
     private fun renderProperties(writer: XMLStreamWriter, artifact: MsBuildProjectArtifact) {
         if (artifact.properties.isNotEmpty()) {
             writer.writeIndentedStartElement(PROPERTY_GROUP_ELEMENT_NAME, level = 1)
-            artifact.properties.toSortedMap(compareBy(MsBuildPropertyName::value)).forEach { (name, value) ->
-                writer.writeIndentedStartElement(name.value, level = 2)
+            artifact.properties.toSortedMap().forEach { (name, value) ->
+                writer.writeIndentedStartElement(name, level = 2)
                 writer.writeCharacters(value)
                 writer.writeEndElement()
             }
@@ -41,10 +40,10 @@ internal object MsBuildProjectXmlRenderer {
             writer.writeIndentedStartElement(ITEM_GROUP_ELEMENT_NAME, level = 1)
             artifact.items.forEach { item ->
                 writer.writeIndent(level = 2)
-                writer.writeEmptyElement(item.itemName.value)
-                writer.writeAttribute(INCLUDE_ATTRIBUTE_NAME, item.include)
-                item.attributes.toSortedMap(compareBy(MsBuildAttributeName::value)).forEach { (key, value) ->
-                    writer.writeAttribute(key.value, value)
+                writer.writeEmptyElement(item.itemName)
+                writer.writeAttribute(MsBuildNames.requireAttributeName(INCLUDE_ATTRIBUTE_NAME), item.include)
+                item.attributes.toSortedMap().forEach { (name, value) ->
+                    writer.writeAttribute(name, value)
                 }
             }
             writer.writeIndentedEndElement(level = 1)

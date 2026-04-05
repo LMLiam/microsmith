@@ -19,13 +19,13 @@ class MsBuildProjectArtifactAssemblerTests :
                 assembler.create(
                     MsBuildProjectContribution(
                         artifactId = artifactId,
-                        properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true"),
+                        properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
                         items =
                         listOf(
                             MsBuildItem(
-                                itemName = MsBuildItemName.PackageVersion,
+                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
                                 include = "Serilog.AspNetCore",
-                                attributes = mapOf(MsBuildAttributeName.Version to "9.0.0"),
+                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
                             ),
                         ),
                     ),
@@ -36,30 +36,30 @@ class MsBuildProjectArtifactAssemblerTests :
                     initial,
                     MsBuildProjectContribution(
                         artifactId = artifactId,
-                        properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true"),
+                        properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
                         items =
                         listOf(
                             MsBuildItem(
-                                itemName = MsBuildItemName.PackageVersion,
+                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
                                 include = "FluentValidation.AspNetCore",
-                                attributes = mapOf(MsBuildAttributeName.Version to "12.0.0"),
+                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "12.0.0"),
                             ),
                         ),
                     ),
                 )
 
             merged.properties shouldContainExactly
-                mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true")
+                mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true")
             merged.items shouldContainExactly listOf(
                 MsBuildItem(
-                    itemName = MsBuildItemName.PackageVersion,
+                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
                     include = "Serilog.AspNetCore",
-                    attributes = mapOf(MsBuildAttributeName.Version to "9.0.0"),
+                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
                 ),
                 MsBuildItem(
-                    itemName = MsBuildItemName.PackageVersion,
+                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
                     include = "FluentValidation.AspNetCore",
-                    attributes = mapOf(MsBuildAttributeName.Version to "12.0.0"),
+                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "12.0.0"),
                 ),
             )
         }
@@ -69,13 +69,13 @@ class MsBuildProjectArtifactAssemblerTests :
                 assembler.create(
                     MsBuildProjectContribution(
                         artifactId = artifactId,
-                        properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "true"),
+                        properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
                         items =
                         listOf(
                             MsBuildItem(
-                                itemName = MsBuildItemName.PackageVersion,
+                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
                                 include = "Serilog.AspNetCore",
-                                attributes = mapOf(MsBuildAttributeName.Version to "9.0.0"),
+                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
                             ),
                         ),
                     ),
@@ -86,7 +86,7 @@ class MsBuildProjectArtifactAssemblerTests :
                     current,
                     MsBuildProjectContribution(
                         artifactId = artifactId,
-                        properties = mapOf(MsBuildPropertyName.ManagePackageVersionsCentrally to "false"),
+                        properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "false"),
                     ),
                 )
             }
@@ -99,12 +99,36 @@ class MsBuildProjectArtifactAssemblerTests :
                         items =
                         listOf(
                             MsBuildItem(
-                                itemName = MsBuildItemName.PackageVersion,
+                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
                                 include = "Serilog.AspNetCore",
-                                attributes = mapOf(MsBuildAttributeName.Version to "9.0.1"),
+                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.1"),
                             ),
                         ),
                     ),
+                )
+            }
+        }
+
+        "contributions and items reject invalid msbuild names" {
+            shouldThrow<IllegalArgumentException> {
+                MsBuildProjectContribution(
+                    artifactId = artifactId,
+                    properties = mapOf("Bad Property" to "true"),
+                )
+            }
+
+            shouldThrow<IllegalArgumentException> {
+                MsBuildItem(
+                    itemName = "",
+                    include = "Serilog.AspNetCore",
+                )
+            }
+
+            shouldThrow<IllegalArgumentException> {
+                MsBuildItem(
+                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                    include = "Serilog.AspNetCore",
+                    attributes = mapOf("Bad Attribute" to "9.0.0"),
                 )
             }
         }
