@@ -1,0 +1,10 @@
+apply plugin: 'org.jetbrains.kotlin.kapt'
+
+dependencies {
+    implementation project(":dsl")
+    implementation project(":resolve")
+    implementation project(":resolve-services-dotnet")
+    implementation project(":dsl-services-dotnet-asp")
+    api libs.spi.tooling.annotations
+    kapt libs.spi.tooling.processor
+}
