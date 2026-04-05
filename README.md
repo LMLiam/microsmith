@@ -288,6 +288,8 @@ This keeps the layering explicit:
 - Prefer immutable data, `val`, and expression-oriented control flow by default.
 - Prefer guard clauses and early returns for preconditions, invalid state handling, and fast exits when they reduce nesting and make the main path easier to read.
 - Default to the narrowest visibility that keeps the API honest. Widen visibility only when a real caller or extension point requires it.
+- Omit explicit property types when an inherited contract already fixes the type or when the initializer is unambiguous and self-describing, such as `Foo::class`, a matching concrete constructor call, or a simple literal on an implementation override.
+- Keep explicit types when they define a public contract, prevent ambiguous inference, stabilize a non-obvious declaration, or materially improve readability.
 - Use `sealed interface`, `data object`, `value class`, exhaustive `when`, and null-safety where they make state and invariants clearer.
 - Use extension functions when they improve discoverability for a well-scoped domain operation and avoid creating utility dumping grounds.
 - Use infix functions only for DSL-facing APIs when readability is clearly better than the non-infix equivalent.
