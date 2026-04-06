@@ -22,5 +22,15 @@ data class DotnetAspHeadersBinding(
             "ASP.NET headers binding '$name' declares duplicate headers: " +
                 duplicateHeaders.joinToString(", ") + "."
         }
+        val duplicateFields =
+            headers
+                .groupBy(DotnetAspHeaderField::name)
+                .filterValues { it.size > 1 }
+                .keys
+                .sorted()
+        require(duplicateFields.isEmpty()) {
+            "ASP.NET headers binding '$name' declares headers with colliding field names: " +
+                duplicateFields.joinToString(", ") + "."
+        }
     }
 }

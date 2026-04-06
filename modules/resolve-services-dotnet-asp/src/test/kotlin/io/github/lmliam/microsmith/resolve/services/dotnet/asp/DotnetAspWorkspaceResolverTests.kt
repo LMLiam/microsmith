@@ -163,6 +163,57 @@ class DotnetAspWorkspaceResolverTests :
             }
         }
 
+        "resolve rejects duplicate method and route mappings across endpoints" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                dotnet {
+                    target(NET8)
+                    solutions {
+                        "Platform" {}
+                    }
+                }
+
+                "UserService" {
+                    dotnet {
+                        solution("Platform")
+                        project("UserService.Api")
+                        models {
+                            "User" {
+                                string("id")
+                            }
+                        }
+                        asp {
+                            rest {
+                                "/users" {
+                                    get("ListUsers") {
+                                        responses {
+                                            ok("User")
+                                        }
+                                    }
+                                }
+
+                                "/users" {
+                                    get("GetUsersDuplicate") {
+                                        responses {
+                                            ok("User")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    DotnetAspWorkspaceResolver().resolve(builder.requireServicesExtension())
+                }
+
+            error.message.shouldContain("declares duplicate REST endpoints: GET /users")
+        }
+
         "resolve rejects path binding mismatches against route placeholders" {
             val builder = MicrosmithBuilder()
 

@@ -32,6 +32,16 @@ internal class DotnetAspRestResolver {
             "ASP.NET service '$serviceName' declares duplicate operation names: " +
                 operationCollisions.joinToString(", ") + "."
         }
+        val routeCollisions =
+            endpoints
+                .groupBy { "${it.method} ${it.route}" }
+                .filterValues { it.size > 1 }
+                .keys
+                .sorted()
+        require(routeCollisions.isEmpty()) {
+            "ASP.NET service '$serviceName' declares duplicate REST endpoints: " +
+                routeCollisions.joinToString(", ") + "."
+        }
 
         val sortedEndpoints =
             endpoints.sortedWith(

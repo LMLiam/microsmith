@@ -9,9 +9,11 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.asp
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.aspNet
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 
 private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
@@ -142,5 +144,36 @@ class DotnetAspDslTests :
             val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
 
             requireNotNull(asp.rest).groups.single().endpoints.single().operationName shouldBe "GetHealth"
+        }
+
+        "headers bindings reject colliding derived field names" {
+            val builder = MicrosmithBuilder()
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            get("ListUsers") {
+                                                headers("RequestHeaders") {
+                                                    header("X-Trace-Id")
+                                                    header("X_Trace_Id")
+                                                }
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            error.message.shouldContain("declares headers with colliding field names: xTraceId")
         }
     })
