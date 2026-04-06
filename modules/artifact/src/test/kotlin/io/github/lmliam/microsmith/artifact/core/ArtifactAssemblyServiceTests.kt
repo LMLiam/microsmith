@@ -8,6 +8,7 @@ import io.github.lmliam.microsmith.resolve.core.ResolvedModel
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
 import java.nio.file.Path
 
 private data class AlphaResolved(val name: String) : ResolvedModel
@@ -36,6 +37,13 @@ private class BetaContributor : ArtifactContributor<BetaResolved> {
     )
 }
 
+@Suppress("UNCHECKED_CAST")
+private class MisdeclaredContributor : ArtifactContributor<AlphaResolved> {
+    override val resolvedType = BetaResolved::class as kotlin.reflect.KClass<AlphaResolved>
+
+    override fun contribute(model: AlphaResolved): List<ArtifactContribution<out Artifact>> = emptyList()
+}
+
 class ArtifactAssemblyServiceTests :
     StringSpec({
         "contribution service resolves contributors by resolved model type in deterministic order" {
@@ -57,6 +65,18 @@ class ArtifactAssemblyServiceTests :
                     "alpha.txt",
                     "beta.txt",
                 )
+        }
+
+        "contributor registry rejects registrations whose declared resolvedType does not match the generic contract" {
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    ArtifactContributorRegistry(listOf(MisdeclaredContributor()))
+                }
+
+            error.message shouldBe
+                "io.github.lmliam.microsmith.artifact.core.MisdeclaredContributor declares " +
+                "resolvedType io.github.lmliam.microsmith.artifact.core.BetaResolved, but implements " +
+                "ArtifactContributor<io.github.lmliam.microsmith.artifact.core.AlphaResolved>."
         }
 
         "assembly service merges identical text contributions and rejects conflicting ones" {
