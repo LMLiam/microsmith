@@ -35,7 +35,7 @@ internal object TopLevelKotlinLineScanner {
                     }
 
                     currentTripleQuotedString -> {
-                        val tripleQuoteEnd = line.indexOf(TRIPLE_QUOTE, index)
+                        val tripleQuoteEnd = line.indexOf(KOTLIN_TRIPLE_QUOTE, index)
                         if (tripleQuoteEnd == -1) {
                             return copy(
                                 braceDepth = currentBraceDepth,
@@ -44,7 +44,7 @@ internal object TopLevelKotlinLineScanner {
                             )
                         }
                         currentTripleQuotedString = false
-                        index = tripleQuoteEnd + TRIPLE_QUOTE.length
+                        index = tripleQuoteEnd + KOTLIN_TRIPLE_QUOTE.length
                     }
 
                     line.startsWith(LINE_COMMENT_MARKER, index) -> break
@@ -53,9 +53,9 @@ internal object TopLevelKotlinLineScanner {
                         index += BLOCK_COMMENT_START_MARKER.length
                     }
 
-                    line.startsWith(TRIPLE_QUOTE, index) -> {
+                    line.startsWith(KOTLIN_TRIPLE_QUOTE, index) -> {
                         currentTripleQuotedString = true
-                        index += TRIPLE_QUOTE.length
+                        index += KOTLIN_TRIPLE_QUOTE.length
                     }
 
                     line[index] == '"' -> {
@@ -88,23 +88,7 @@ internal object TopLevelKotlinLineScanner {
         }
     }
 
-    private fun String.consumeQuotedLiteral(startIndex: Int, quote: Char): Int? {
-        var index = startIndex + 1
-        while (index < length) {
-            if (this[index] == '\\') {
-                index += 2
-                continue
-            }
-            if (this[index] == quote) {
-                return index + 1
-            }
-            index += 1
-        }
-        return null
-    }
-
     private const val LINE_COMMENT_MARKER = "//"
     private const val BLOCK_COMMENT_START_MARKER = "/*"
     private const val BLOCK_COMMENT_END_MARKER = "*/"
-    private const val TRIPLE_QUOTE = "\"\"\""
 }

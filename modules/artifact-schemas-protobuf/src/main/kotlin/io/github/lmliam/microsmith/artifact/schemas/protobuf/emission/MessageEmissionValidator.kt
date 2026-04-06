@@ -18,39 +18,19 @@ internal object MessageEmissionValidator {
     }
 
     private fun requireUniqueFieldNames(message: Message) {
-        val duplicates =
-            collectFieldNameUsages(message)
-                .groupBy(keySelector = Pair<String, String>::first, valueTransform = Pair<String, String>::second)
-                .filterValues { it.size > 1 }
-
-        require(duplicates.isEmpty()) {
-            val details =
-                duplicates
-                    .toSortedMap()
-                    .entries
-                    .joinToString("; ") { (duplicateName, locations) ->
-                        "$duplicateName (${locations.joinToString()})"
-                    }
-            "Duplicate field names in message '${message.name}': $details"
-        }
+        requireUniqueUsages(
+            messageName = message.name,
+            label = "field names",
+            usages = collectFieldNameUsages(message),
+        )
     }
 
     private fun requireUniqueFieldNumbers(message: Message) {
-        val duplicates =
-            collectFieldNumberUsages(message)
-                .groupBy(keySelector = Pair<Int, String>::first, valueTransform = Pair<Int, String>::second)
-                .filterValues { it.size > 1 }
-
-        require(duplicates.isEmpty()) {
-            val details =
-                duplicates
-                    .toSortedMap()
-                    .entries
-                    .joinToString("; ") { (duplicateNumber, locations) ->
-                        "$duplicateNumber (${locations.joinToString()})"
-                    }
-            "Duplicate field numbers in message '${message.name}': $details"
-        }
+        requireUniqueUsages(
+            messageName = message.name,
+            label = "field numbers",
+            usages = collectFieldNumberUsages(message),
+        )
     }
 
     private fun requireUniqueOneofNames(message: Message) {
@@ -76,6 +56,28 @@ internal object MessageEmissionValidator {
             oneof.fields.forEach { field ->
                 add(field.index to "oneof '${oneof.name}' field '${field.name}'")
             }
+        }
+    }
+
+    private fun <Key : Comparable<Key>> requireUniqueUsages(
+        messageName: String,
+        label: String,
+        usages: List<Pair<Key, String>>,
+    ) {
+        val duplicates =
+            usages
+                .groupBy(keySelector = Pair<Key, String>::first, valueTransform = Pair<Key, String>::second)
+                .filterValues { it.size > 1 }
+
+        require(duplicates.isEmpty()) {
+            val details =
+                duplicates
+                    .toSortedMap()
+                    .entries
+                    .joinToString("; ") { (duplicateKey, locations) ->
+                        "$duplicateKey (${locations.joinToString()})"
+                    }
+            "Duplicate $label in message '$messageName': $details"
         }
     }
 }
