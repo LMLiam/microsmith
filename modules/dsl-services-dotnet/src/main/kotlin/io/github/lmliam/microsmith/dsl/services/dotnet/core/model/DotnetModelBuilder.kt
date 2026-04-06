@@ -12,9 +12,4 @@ internal class DotnetModelBuilder(
             fields = buildFields(),
         )
     }
-
-    override fun fieldNameLabel(): String = "Field name"
-
-    override fun duplicateFieldMessage(fieldName: String): String =
-        "Duplicate .NET field registration for '$fieldName'."
 }

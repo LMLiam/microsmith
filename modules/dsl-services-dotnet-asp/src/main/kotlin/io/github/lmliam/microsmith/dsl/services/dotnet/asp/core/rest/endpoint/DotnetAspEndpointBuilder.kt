@@ -15,9 +15,14 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModelSco
 
 internal class DotnetAspEndpointBuilder(
     private val method: DotnetAspHttpMethod,
-    private val path: String,
+    private val path: String?,
     private val operationName: String,
 ) : DotnetAspEndpointScope {
+    constructor(
+        method: DotnetAspHttpMethod,
+        operationName: String,
+    ) : this(method = method, path = null, operationName = operationName)
+
     private var pathBinding: DotnetAspRequestBinding? = null
     private var queryBinding: DotnetAspRequestBinding? = null
     private var headersBinding: DotnetAspHeadersBinding? = null
@@ -70,7 +75,7 @@ internal class DotnetAspEndpointBuilder(
 
     fun build() = DotnetAspEndpoint(
         method = method,
-        path = path,
+        path = path.orEmpty(),
         operationName = operationName,
         bindings = DotnetAspEndpointBindings(
             path = pathBinding,

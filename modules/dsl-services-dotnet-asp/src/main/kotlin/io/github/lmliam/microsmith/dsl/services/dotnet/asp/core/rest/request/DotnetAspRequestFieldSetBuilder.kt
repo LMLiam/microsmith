@@ -4,8 +4,9 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetConfigur
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetIdentifier
 
-internal abstract class DotnetAspRequestFieldSetBuilder :
-    DotnetConfigurableTypedFieldScope<DotnetAspRequestField, DotnetAspRequestFieldScope> {
+internal abstract class DotnetAspRequestFieldSetBuilder(
+    private val fieldContainerLabel: String,
+) : DotnetConfigurableTypedFieldScope<DotnetAspRequestField, DotnetAspRequestFieldScope> {
     private val fieldsByName = linkedMapOf<String, DotnetAspRequestField>()
 
     override fun string(name: String, block: DotnetAspRequestFieldScope.() -> Unit) =
@@ -80,8 +81,6 @@ internal abstract class DotnetAspRequestFieldSetBuilder :
 
     protected fun buildFields(): List<DotnetAspRequestField> = fieldsByName.values.toList()
 
-    protected abstract fun fieldContainerLabel(): String
-
     protected open fun createField(
         name: String,
         type: DotnetFieldType,
@@ -113,7 +112,7 @@ internal abstract class DotnetAspRequestFieldSetBuilder :
 
     private fun register(field: DotnetAspRequestField): DotnetAspRequestField {
         require(field.name !in fieldsByName) {
-            "Duplicate ASP.NET request field '${field.name}' in ${fieldContainerLabel()}."
+            "Duplicate ASP.NET request field '${field.name}' in $fieldContainerLabel."
         }
         fieldsByName[field.name] = field
         return field

@@ -19,7 +19,7 @@ internal class DotnetAspRouteGroupBuilder(
     }
 
     override fun get(operationName: String, block: DotnetAspEndpointScope.() -> Unit) {
-        endpoints += buildEndpoint(DotnetAspHttpMethod.GET, "", operationName, block)
+        endpoints += buildEndpoint(DotnetAspHttpMethod.GET, operationName, block)
     }
 
     override fun get(path: String, operationName: String, block: DotnetAspEndpointScope.() -> Unit) {
@@ -27,7 +27,7 @@ internal class DotnetAspRouteGroupBuilder(
     }
 
     override fun post(operationName: String, block: DotnetAspEndpointScope.() -> Unit) {
-        endpoints += buildEndpoint(DotnetAspHttpMethod.POST, "", operationName, block)
+        endpoints += buildEndpoint(DotnetAspHttpMethod.POST, operationName, block)
     }
 
     override fun post(path: String, operationName: String, block: DotnetAspEndpointScope.() -> Unit) {
@@ -35,7 +35,7 @@ internal class DotnetAspRouteGroupBuilder(
     }
 
     override fun put(operationName: String, block: DotnetAspEndpointScope.() -> Unit) {
-        endpoints += buildEndpoint(DotnetAspHttpMethod.PUT, "", operationName, block)
+        endpoints += buildEndpoint(DotnetAspHttpMethod.PUT, operationName, block)
     }
 
     override fun put(path: String, operationName: String, block: DotnetAspEndpointScope.() -> Unit) {
@@ -43,7 +43,7 @@ internal class DotnetAspRouteGroupBuilder(
     }
 
     override fun patch(operationName: String, block: DotnetAspEndpointScope.() -> Unit) {
-        endpoints += buildEndpoint(DotnetAspHttpMethod.PATCH, "", operationName, block)
+        endpoints += buildEndpoint(DotnetAspHttpMethod.PATCH, operationName, block)
     }
 
     override fun patch(path: String, operationName: String, block: DotnetAspEndpointScope.() -> Unit) {
@@ -51,7 +51,7 @@ internal class DotnetAspRouteGroupBuilder(
     }
 
     override fun delete(operationName: String, block: DotnetAspEndpointScope.() -> Unit) {
-        endpoints += buildEndpoint(DotnetAspHttpMethod.DELETE, "", operationName, block)
+        endpoints += buildEndpoint(DotnetAspHttpMethod.DELETE, operationName, block)
     }
 
     override fun delete(path: String, operationName: String, block: DotnetAspEndpointScope.() -> Unit) {
@@ -63,6 +63,16 @@ internal class DotnetAspRouteGroupBuilder(
         groups = groups.toList(),
         endpoints = endpoints.toList(),
     )
+
+    private fun buildEndpoint(
+        method: DotnetAspHttpMethod,
+        operationName: String,
+        block: DotnetAspEndpointScope.() -> Unit,
+    ): DotnetAspEndpoint {
+        val builder = DotnetAspEndpointBuilder(method, operationName)
+        builder.block()
+        return builder.build()
+    }
 
     private fun buildEndpoint(
         method: DotnetAspHttpMethod,

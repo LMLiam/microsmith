@@ -2,7 +2,12 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.core.model
 
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetIdentifier
 
-open class DotnetFieldSetBuilder : DotnetTypedFieldScope<DotnetField> {
+open class DotnetFieldSetBuilder(
+    private val fieldNameLabel: String = "Field name",
+    private val duplicateFieldMessage: (String) -> String = { fieldName ->
+        "Duplicate .NET field registration for '$fieldName'."
+    },
+) : DotnetTypedFieldScope<DotnetField> {
     private val fieldsByName = linkedMapOf<String, DotnetField>()
 
     override fun string(name: String) = addField(name, DotnetFieldType.String)
@@ -56,7 +61,7 @@ open class DotnetFieldSetBuilder : DotnetTypedFieldScope<DotnetField> {
     protected fun buildFields(): List<DotnetField> = fieldsByName.values.toList()
 
     protected fun addField(name: String, type: DotnetFieldType): DotnetField {
-        val fieldName = validateDotnetIdentifier(name, fieldNameLabel())
+        val fieldName = validateDotnetIdentifier(name, fieldNameLabel)
         require(fieldName !in fieldsByName) {
             duplicateFieldMessage(fieldName)
         }
@@ -68,9 +73,4 @@ open class DotnetFieldSetBuilder : DotnetTypedFieldScope<DotnetField> {
 
     protected fun addReference(name: String, target: String): DotnetField =
         addField(name, DotnetFieldType.Reference(target))
-
-    protected open fun fieldNameLabel(): String = "Field name"
-
-    protected open fun duplicateFieldMessage(fieldName: String): String =
-        "Duplicate .NET field registration for '$fieldName'."
 }

@@ -5,7 +5,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotn
 
 data class DotnetAspEndpoint(
     val method: DotnetAspHttpMethod,
-    val path: String = "",
+    val path: String,
     val operationName: String,
     val bindings: DotnetAspEndpointBindings = DotnetAspEndpointBindings(),
     val responses: List<DotnetAspResponse>,
