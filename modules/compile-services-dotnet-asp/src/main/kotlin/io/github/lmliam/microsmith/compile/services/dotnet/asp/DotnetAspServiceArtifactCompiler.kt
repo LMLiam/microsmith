@@ -16,37 +16,49 @@ import java.nio.file.Path
 
 @ServiceProvider(ArtifactCompiler::class)
 class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServiceArtifact> {
-    private companion object {
-        const val FIRST_NON_PRINTABLE_ASCII_CODE_POINT = 0x20
-    }
+    private val endpointRenderer = DotnetAspEndpointTextFileRenderer()
 
     override val artifactType = DotnetAspServiceArtifact::class
 
-    override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> = listOf(
-        MsBuildProjectContribution(
-            artifactId = MsBuildProjectArtifactId(
-                solutionName = artifact.id.solutionName,
-                projectName = artifact.id.projectName,
-                kind = MsBuildProjectKind.Project,
+    override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> = buildList {
+        add(
+            MsBuildProjectContribution(
+                artifactId =
+                MsBuildProjectArtifactId(
+                    solutionName = artifact.id.solutionName,
+                    projectName = artifact.id.projectName,
+                    kind = MsBuildProjectKind.Project,
+                ),
+                projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
+                properties =
+                mapOf(
+                    MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
+                    MsBuildNames.NULLABLE_PROPERTY to "enable",
+                    MsBuildNames.TARGET_FRAMEWORK_PROPERTY to artifact.targetFrameworkMoniker,
+                ),
             ),
-            projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
-            properties = mapOf(
-                MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
-                MsBuildNames.NULLABLE_PROPERTY to "enable",
-                MsBuildNames.TARGET_FRAMEWORK_PROPERTY to artifact.targetFrameworkMoniker,
+        )
+        add(textContribution(artifact, "Program.cs", renderProgramFile()))
+        add(textContribution(artifact, "appsettings.json", renderAppSettingsFile(artifact)))
+        add(
+            textContribution(
+                artifact,
+                "Properties/launchSettings.json",
+                renderLaunchSettingsFile(artifact),
             ),
-        ),
-        textContribution(artifact, "Program.cs", renderProgramFile()),
-        textContribution(artifact, "appsettings.json", renderAppSettingsFile(artifact)),
-        textContribution(artifact, "Properties/launchSettings.json", renderLaunchSettingsFile(artifact)),
-    )
+        )
+        endpointRenderer.render(artifact).forEach { (relativePath, contents) ->
+            add(textContribution(artifact, relativePath, contents))
+        }
+    }
 
     private fun textContribution(
         artifact: DotnetAspServiceArtifact,
         relativePath: String,
         contents: String,
     ): TextFileArtifactContribution = TextFileArtifactContribution(
-        artifactId = TextFileArtifactId(
+        artifactId =
+        TextFileArtifactId(
             relativePath = Path.of(relativePath),
             outputRoot = artifact.outputRoot,
         ),
@@ -70,7 +82,7 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
     private fun renderAppSettingsFile(artifact: DotnetAspServiceArtifact): String = """
         {
           "Microsmith": {
-            "ServiceName": "${escapeJsonString(artifact.serviceName)}"
+            "ServiceName": "${dotnetAspEscapeStringContents(artifact.serviceName)}"
           },
           "Logging": {
             "LogLevel": {
@@ -90,7 +102,8 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
               "commandName": "Project",
               "dotnetRunMessages": true,
               "launchBrowser": false,
-              "applicationUrl": "http://localhost:${artifact.httpPort};https://localhost:${artifact.httpsPort}",
+              "applicationUrl":
+                "http://localhost:${artifact.httpPort};https://localhost:${artifact.httpsPort}",
               "environmentVariables": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
               }
@@ -98,34 +111,4 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
           }
         }
     """.trimIndent()
-
-    private fun escapeJsonString(value: String): String {
-        val escaped = StringBuilder(value.length)
-        value.forEach { char ->
-            when (char) {
-                '\\' -> escaped.append("\\\\")
-
-                '"' -> escaped.append("\\\"")
-
-                '\b' -> escaped.append("\\b")
-
-                '\u000C' -> escaped.append("\\f")
-
-                '\n' -> escaped.append("\\n")
-
-                '\r' -> escaped.append("\\r")
-
-                '\t' -> escaped.append("\\t")
-
-                else -> {
-                    if (char.code < FIRST_NON_PRINTABLE_ASCII_CODE_POINT) {
-                        escaped.append("\\u%04x".format(char.code))
-                    } else {
-                        escaped.append(char)
-                    }
-                }
-            }
-        }
-        return escaped.toString()
-    }
 }

@@ -7,13 +7,14 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.asp
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import java.nio.file.Files
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 class DotnetAspGenerationIntegrationTests :
     StringSpec({
-        "generateTo emits the base ASP.NET scaffold layout" {
+        "generateTo emits the ASP.NET scaffold and endpoint extension surface" {
             val outputDir = Files.createTempDirectory("microsmith-dotnet-asp-output-")
             val model =
                 microsmith {
@@ -29,7 +30,63 @@ class DotnetAspGenerationIntegrationTests :
                             dotnet {
                                 solution("Platform")
                                 project("UserService.Api")
-                                asp { }
+                                models {
+                                    "User" {
+                                        string("id")
+                                        string("email")
+                                    }
+
+                                    "Problem" {
+                                        string("message")
+                                    }
+                                }
+
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            get("/{id}", "GetUser") {
+                                                path("GetUserPath") {
+                                                    string("id")
+                                                }
+
+                                                responses {
+                                                    ok("User")
+                                                    notFound("Problem") {
+                                                        headers {
+                                                            header("X-Trace-Id")
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            post("CreateUser") {
+                                                query("CreateUserQuery") {
+                                                    bool("dryRun") {
+                                                        optional()
+                                                        default(false)
+                                                    }
+                                                }
+
+                                                body("Body") {
+                                                    string("email")
+                                                }
+
+                                                responses {
+                                                    created("User") {
+                                                        headers {
+                                                            header("Location")
+                                                        }
+                                                    }
+                                                    badRequest("Problem") {
+                                                        model {
+                                                            string("message")
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -42,11 +99,24 @@ class DotnetAspGenerationIntegrationTests :
             Files.exists(projectRoot.resolve("Program.cs")) shouldBe true
             Files.exists(projectRoot.resolve("appsettings.json")) shouldBe true
             Files.exists(projectRoot.resolve("Properties/launchSettings.json")) shouldBe true
+            Files.exists(projectRoot.resolve("Generated/Contracts/ServiceModels.cs")) shouldBe true
+            Files.exists(projectRoot.resolve("Generated/Contracts/RequestModels.cs")) shouldBe true
+            Files.exists(projectRoot.resolve("Generated/Contracts/ResponseModels.cs")) shouldBe true
+            Files.exists(
+                projectRoot.resolve("Generated/Controllers/UserServiceApiControllerBase.cs"),
+            ) shouldBe true
+            Files.exists(
+                projectRoot.resolve("Controllers/UserServiceApiController.cs"),
+            ) shouldBe false
             projectRoot.resolve("Program.cs").readText().shouldContain("Generated by Microsmith")
             projectRoot.resolve("Program.cs").readText().shouldContain("MapControllers")
+            projectRoot.resolve("Generated/Controllers/UserServiceApiControllerBase.cs").readText()
+                .shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync(")
+            projectRoot.resolve("Generated/Contracts/RequestModels.cs").readText()
+                .shouldContain("public bool DryRun { get; set; } = false;")
         }
 
-        "generateTo overwrites existing generator-owned ASP.NET scaffold files on rerun" {
+        "generateTo overwrites generated ASP.NET endpoint files on rerun" {
             val outputDir = Files.createTempDirectory("microsmith-dotnet-asp-rerun-")
             val model =
                 microsmith {
@@ -62,7 +132,27 @@ class DotnetAspGenerationIntegrationTests :
                             dotnet {
                                 solution("Platform")
                                 project("UserService.Api")
-                                asp { }
+                                models {
+                                    "User" {
+                                        string("id")
+                                    }
+                                }
+
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            get("/{id}", "GetUser") {
+                                                path("GetUserPath") {
+                                                    string("id")
+                                                }
+
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -70,11 +160,15 @@ class DotnetAspGenerationIntegrationTests :
 
             model.generateTo(outputDir)
 
-            val programFile = outputDir.resolve("dotnet/Platform/UserService.Api/Program.cs")
-            programFile.writeText("stale")
+            val controllerBaseFile =
+                outputDir
+                    .resolve("dotnet/Platform/UserService.Api")
+                    .resolve("Generated/Controllers/UserServiceApiControllerBase.cs")
+            controllerBaseFile.writeText("stale")
 
             model.generateTo(outputDir)
 
-            programFile.readText().shouldContain("AddControllers")
+            controllerBaseFile.readText().shouldContain("OnGetUserAsync")
+            controllerBaseFile.readText().shouldNotContain("stale")
         }
     })
