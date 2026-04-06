@@ -528,9 +528,9 @@ REST DSL contract notes:
 - route groups can be nested, verb helpers are lower-case, and every endpoint requires an explicit operation name
 - request bindings are modeled explicitly through `path(...)`, `query(...)`, `headers(...)`, and `body(...)`
 - inline body and response models stay endpoint-local in the normalized model; shared service models must be declared under `models { ... }`
-- route placeholders are validated against `path(...)` bindings, response/header declarations are normalized, and invalid REST declarations fail during resolution before any ASP.NET endpoint code is generated
+- route placeholders are validated against `path(...)` bindings, response/header declarations are normalized, and invalid REST declarations fail before Microsmith emits ASP.NET endpoint glue
 
-The base ASP.NET scaffold currently emits this canonical layout under the run output root:
+The ASP.NET scaffold currently emits this canonical layout under the run output root:
 
 ```text
 dotnet/
@@ -541,13 +541,22 @@ dotnet/
       appsettings.json
       Properties/
         launchSettings.json
+      Generated/
+        Contracts/
+          ServiceModels.cs
+          RequestModels.cs
+          ResponseModels.cs
+        Controllers/
+          UserServiceApiControllerBase.cs
 ```
 
 Canonical scaffold policy:
 
 - `Program.cs` uses top-level hosting with `WebApplication.CreateBuilder(args)`, `AddControllers()`, `MapControllers()`, and `Run()`
-- the scaffold above is generator-owned and is overwritten in place on rerun
-- user-authored ASP.NET extension code should live under `Controllers/`; this base scaffold does not emit or rewrite that area yet
+- `Generated/Contracts/*.cs` contains Microsmith-owned service-local models, request bindings, inline response models, and typed per-operation result contracts
+- `Generated/Controllers/*ControllerBase.cs` contains Microsmith-owned route attributes, request binding glue, and response mapping that forwards to abstract handler methods such as `OnGetUserAsync(...)`
+- everything under `Generated/` is owned by Microsmith and is overwritten in place on rerun
+- user-authored ASP.NET implementation code should live outside `Generated/`, for example under `Controllers/`, by deriving from the generated base controller and implementing the abstract handlers
 
 ### Script defaults
 
