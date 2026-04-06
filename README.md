@@ -455,12 +455,80 @@ microsmith {
             dotnet {
                 solution("Platform")
                 project("UserService.Api")
-                asp { }
+                models {
+                    "User" {
+                        string("id")
+                        string("email")
+                    }
+                    "Problem" {
+                        string("detail")
+                    }
+                }
+                asp {
+                    rest {
+                        "/users" {
+                            get("ListUsers") {
+                                query("ListUsersQuery") {
+                                    string("cursor") {
+                                        optional()
+                                    }
+                                }
+                                responses {
+                                    ok("User")
+                                }
+                            }
+
+                            "/{id}" {
+                                get("GetUser") {
+                                    path("GetUserPath") {
+                                        string("id")
+                                    }
+                                    headers("GetUserHeaders") {
+                                        header("X-Correlation-Id")
+                                    }
+                                    responses {
+                                        ok("User") {
+                                            headers {
+                                                header("ETag")
+                                            }
+                                        }
+                                        notFound("Problem")
+                                    }
+                                }
+                            }
+
+                            post("CreateUser") {
+                                body("CreateUserBody") {
+                                    string("email")
+                                }
+                                responses {
+                                    created("CreateUserResponse") {
+                                        model {
+                                            string("id")
+                                        }
+                                        headers {
+                                            header("Location")
+                                        }
+                                    }
+                                    badRequest("Problem")
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
 ```
+
+REST DSL contract notes:
+
+- `asp { ... }` is the canonical surface; `aspNet { ... }` is supported as an alias when the longer spelling reads better in a script
+- route groups can be nested, verb helpers are lower-case, and every endpoint requires an explicit operation name
+- request bindings are modeled explicitly through `path(...)`, `query(...)`, `headers(...)`, and `body(...)`
+- inline body and response models stay endpoint-local in the normalized model; shared service models must be declared under `models { ... }`
+- route placeholders are validated against `path(...)` bindings, response/header declarations are normalized, and invalid REST declarations fail during resolution before any ASP.NET endpoint code is generated
 
 The base ASP.NET scaffold currently emits this canonical layout under the run output root:
 

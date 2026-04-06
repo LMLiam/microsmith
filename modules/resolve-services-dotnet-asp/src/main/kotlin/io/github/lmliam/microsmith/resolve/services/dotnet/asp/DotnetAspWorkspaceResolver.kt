@@ -12,6 +12,8 @@ import java.nio.file.Path
 class DotnetAspWorkspaceResolver(
     private val dotnetWorkspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver(),
 ) {
+    private val restResolver = DotnetAspRestResolver()
+
     fun resolve(extension: ServicesExtension): DotnetAspWorkspace {
         val aspServiceNames =
             extension.services
@@ -31,12 +33,32 @@ class DotnetAspWorkspaceResolver(
                 .values
                 .sortedBy { it.name }
                 .map { resolvedService ->
+                    val aspExtension =
+                        requireNotNull(
+                            extension
+                                .require(resolvedService.name)
+                                .model
+                                .get<DotnetServiceExtension>()
+                                ?.get<DotnetAspServiceExtension>(),
+                        )
                     ResolvedDotnetAspService(
                         name = resolvedService.name,
                         solutionName = resolvedService.solution.name,
                         projectName = resolvedService.project,
                         targetFrameworkMoniker = resolvedService.target.moniker,
-                        outputRoot = Path.of("dotnet", resolvedService.solution.name, resolvedService.project),
+                        outputRoot =
+                        Path.of(
+                            "dotnet",
+                            resolvedService.solution.name,
+                            resolvedService.project,
+                        ),
+                        models = resolvedService.models,
+                        rest =
+                        restResolver.resolve(
+                            resolvedService.name,
+                            resolvedService.models,
+                            aspExtension.rest,
+                        ),
                     )
                 }
 
