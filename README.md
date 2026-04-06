@@ -556,7 +556,7 @@ Canonical scaffold policy:
 - Microsmith does not generate `Program.cs`; the ASP.NET entrypoint is user-owned
 - `Generated/Hosting/MicrosmithHostingExtensions.cs` contains Microsmith-owned hosting extensions for `builder.AddMicrosmith()` and `app.MapMicrosmith()`
 - `Generated/Contracts/*.cs` contains Microsmith-owned service-local models, request bindings, inline response models, and typed per-operation result contracts
-- `Generated/Controllers/*ControllerBase.cs` contains Microsmith-owned route attributes, request binding glue, and response mapping that forwards to abstract handler methods such as `OnGetUserAsync(...)`
+- `Generated/Controllers/*ControllerBase.cs` contains Microsmith-owned route attributes, request binding glue, request-header extraction through generated `ReadHeader(...)`, and response mapping that forwards to abstract handler methods such as `OnGetUserAsync(...)`
 - everything under `Generated/` is owned by Microsmith and is overwritten in place on rerun
 - user-authored ASP.NET implementation code should live outside `Generated/`, for example under `Controllers/`, by deriving from the generated base controller and implementing the abstract handlers
 

@@ -11,13 +11,13 @@ internal fun renderResultMapper(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
     attributes = emptyList(),
     parameters = listOf(csharpParameter(resultBaseTypeName(endpoint), "result")),
     body = CSharp.codeBlock {
-        returnStatement(
+        line(
             """
-            result switch
+            return result switch
             {
                 ${renderResponseSwitchArms(endpoint)},
                 ${renderUnsupportedResultArm(endpoint)}
-            }
+            };
             """.trimIndent(),
         )
     },
@@ -67,11 +67,11 @@ internal fun renderReadHeaderHelper(): CSharp.Method = CSharp.Method(
     attributes = emptyList(),
     parameters = listOf(csharpParameter("string", "headerName")),
     body = CSharp.codeBlock {
-        returnStatement(
+        line(
             """
-            Request.Headers.TryGetValue(headerName, out var values)
+            return Request.Headers.TryGetValue(headerName, out var values)
                 ? values.ToString()
-                : null
+                : null;
             """.trimIndent(),
         )
     },
@@ -96,6 +96,6 @@ private fun responseHeadersArguments(response: ResolvedDotnetAspResponse): Strin
 
 private fun renderUnsupportedResultArm(endpoint: ResolvedDotnetAspEndpoint): String = """
     _ => throw new InvalidOperationException(
-        "Unsupported ${endpoint.operationName} result type '${'$'}{result.GetType().FullName}'."
+            "Unsupported ${endpoint.operationName} result type '${'$'}{result.GetType().FullName}'."
     )
 """.trimIndent()
