@@ -62,7 +62,7 @@ class DotnetAspServiceArtifactCompilerTests :
             textFiles.single { it.artifactId.relativePath.toString() == "Program.cs" }.contents
                 .shouldContain("AddControllers")
             textFiles.single { it.artifactId.relativePath.toString() == "Program.cs" }.contents
-                .shouldContain("public partial class Program { }")
+                .shouldContain("public static void Main(string[] args)")
             textFiles
                 .single { it.artifactId.relativePath.toString() == "appsettings.json" }
                 .contents
