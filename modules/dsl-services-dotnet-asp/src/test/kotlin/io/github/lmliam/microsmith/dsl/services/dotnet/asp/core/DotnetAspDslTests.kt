@@ -243,6 +243,39 @@ class DotnetAspDslTests :
             error.message.shouldContain("already declares a path binding")
         }
 
+        "duplicate query bindings are rejected during DSL authoring" {
+            val builder = MicrosmithBuilder()
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            get("ListUsers") {
+                                                query("ListUsersQuery") {
+                                                    string("search")
+                                                }
+                                                query("DuplicateQuery") {
+                                                    string("page")
+                                                }
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            error.message.shouldContain("already declares a query binding")
+        }
+
         "duplicate body bindings are rejected during DSL authoring" {
             val builder = MicrosmithBuilder()
 
