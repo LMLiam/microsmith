@@ -209,4 +209,98 @@ class DotnetAspDslTests :
 
             responses.map { it.statusCode } shouldContainExactly listOf(202, 799)
         }
+
+        "duplicate path bindings are rejected during DSL authoring" {
+            val builder = MicrosmithBuilder()
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/users/{id}" {
+                                            get("GetUser") {
+                                                path("GetUserPath") {
+                                                    string("id")
+                                                }
+                                                path("DuplicatePath") {
+                                                    string("id")
+                                                }
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            error.message.shouldContain("already declares a path binding")
+        }
+
+        "duplicate body bindings are rejected during DSL authoring" {
+            val builder = MicrosmithBuilder()
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            post("CreateUser") {
+                                                body("CreateUserBody")
+                                                body("InlineBody") {
+                                                    string("email")
+                                                }
+                                                responses {
+                                                    created("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            error.message.shouldContain("already declares a body binding")
+        }
+
+        "duplicate responses blocks are rejected during DSL authoring" {
+            val builder = MicrosmithBuilder()
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/health" {
+                                            get("GetHealth") {
+                                                responses {
+                                                    ok("Status")
+                                                }
+                                                responses {
+                                                    accepted("AcceptedStatus")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            error.message.shouldContain("already declares responses")
+        }
     })
