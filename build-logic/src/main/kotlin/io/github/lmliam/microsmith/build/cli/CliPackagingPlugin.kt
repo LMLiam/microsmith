@@ -456,7 +456,7 @@ private fun launcherCopySpec(shadowJarArchiveName: String): Action<CopySpec> = A
         ReplaceTokens::class.java,
     )
     copySpec.filePermissions(
-        Action<ConfigurableFilePermissions> { permissions ->
+        Action { permissions ->
             permissions.unix("rwxr-xr-x")
         },
     )
@@ -473,7 +473,7 @@ private fun windowsLauncherCopySpec(shadowJarArchiveName: String): Action<CopySp
 private fun executableFileCopySpec(): Action<CopySpec> = Action { copySpec ->
     copySpec.into(".")
     copySpec.filePermissions(
-        Action<ConfigurableFilePermissions> { permissions ->
+        Action { permissions ->
             permissions.unix("rwxr-xr-x")
         },
     )
