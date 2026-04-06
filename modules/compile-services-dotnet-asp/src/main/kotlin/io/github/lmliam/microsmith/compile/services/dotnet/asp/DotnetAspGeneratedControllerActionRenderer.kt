@@ -8,7 +8,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
     name = endpoint.operationName,
     modifiers = listOf("public", "async"),
-    returnType = "Task<IActionResult>",
+    returnType = csharpGenericType("Task", csharpType("IActionResult")),
     attributes = listOf(
         csharpAttribute(
             httpMethodAttribute(endpoint.method),
@@ -34,20 +34,23 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
         }
         add(csharpParameter("CancellationToken", "cancellationToken"))
     },
-    body = buildString {
+    body = CSharp.codeBlock {
         renderHeadersPrelude(endpoint)?.let { prelude ->
-            appendLine(prelude)
-            appendLine()
+            line(prelude)
+            blankLine()
         }
-        appendLine("var result = await On${endpoint.operationName}Async(${handlerArguments(endpoint)});")
-        append("return Map${endpoint.operationName}Result(result);")
+        local(
+            name = "result",
+            initializer = "await On${endpoint.operationName}Async(${handlerArguments(endpoint)})",
+        )
+        returnStatement("Map${endpoint.operationName}Result(result)")
     },
 )
 
 internal fun renderAbstractHandler(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
     name = "On${endpoint.operationName}Async",
     modifiers = listOf("protected", "abstract"),
-    returnType = "Task<${resultBaseTypeName(endpoint)}>",
+    returnType = csharpGenericType("Task", csharpType(resultBaseTypeName(endpoint))),
     attributes = emptyList(),
     parameters = buildList {
         endpoint.bindings.path?.let { add(csharpParameter(it.name, "path")) }

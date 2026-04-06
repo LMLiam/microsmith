@@ -28,7 +28,7 @@ internal fun resolveResponseModelTypeName(
 }
 
 private fun renderModelFieldProperty(field: DotnetField): CSharp.Property = CSharp.Property(
-    type = dotnetAspCSharpType(field.type),
+    type = csharpType(dotnetAspCSharpType(field.type)),
     name = dotnetAspPascalIdentifier(field.name),
     modifiers = listOf("public"),
     attributes = emptyList(),

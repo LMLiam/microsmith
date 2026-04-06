@@ -24,7 +24,7 @@ private fun renderType(type: CSharp.Type): String = buildString {
     append(renderPrimaryConstructor(type.primaryConstructorParameters))
     if (type.baseTypes.isNotEmpty()) {
         append(" : ")
-        append(type.baseTypes.joinToString(", "))
+        append(type.baseTypes.joinToString(", ", transform = ::renderTypeRef))
     }
     if (type.members.isEmpty()) {
         append(";")
@@ -57,7 +57,7 @@ private fun renderProperty(property: CSharp.Property): String = buildString {
     renderAttributes(property.attributes).forEach(::appendLine)
     append(property.modifiers.joinToString(" "))
     append(" ")
-    append(property.type)
+    append(renderTypeRef(property.type))
     append(" ")
     append(property.name)
     append(" { ")
@@ -76,7 +76,7 @@ private fun renderMethod(method: CSharp.Method): String = buildString {
     renderAttributes(method.attributes).forEach(::appendLine)
     append(method.modifiers.joinToString(" "))
     append(" ")
-    append(method.returnType)
+    append(renderTypeRef(method.returnType))
     append(" ")
     append(method.name)
     append(renderMethodParameters(method.parameters))
@@ -87,7 +87,7 @@ private fun renderMethod(method: CSharp.Method): String = buildString {
     }
     appendLine()
     appendLine("{")
-    append(indent(body))
+    append(renderCodeBlock(body))
     appendLine()
     append("}")
 }
@@ -114,7 +114,7 @@ private fun renderParameter(parameter: CSharp.Parameter): String = buildString {
         append(parameter.modifiers.joinToString(" "))
         append(" ")
     }
-    append(parameter.type)
+    append(renderTypeRef(parameter.type))
     append(" ")
     append(parameter.name)
     parameter.defaultValue?.let { defaultValue ->
@@ -124,18 +124,3 @@ private fun renderParameter(parameter: CSharp.Parameter): String = buildString {
 }
 
 private fun renderAttributes(attributes: List<CSharp.Attribute>): List<String> = attributes.map(::renderAttribute)
-
-private fun renderAttribute(attribute: CSharp.Attribute): String =
-    attribute.arguments?.let { arguments -> "[${attribute.name}($arguments)]" }
-        ?: "[${attribute.name}]"
-
-private fun indent(text: String, spaces: Int = 4): String {
-    val padding = " ".repeat(spaces)
-    return text.lineSequence().joinToString("\n") { line ->
-        if (line.isEmpty()) {
-            line
-        } else {
-            padding + line
-        }
-    }
-}

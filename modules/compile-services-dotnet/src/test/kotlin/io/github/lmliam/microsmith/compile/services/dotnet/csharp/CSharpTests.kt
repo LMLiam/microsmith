@@ -12,22 +12,25 @@ class CSharpTests :
                 classType(
                     name = "UsersControllerBase",
                     modifiers = listOf("public", "abstract"),
-                    baseTypes = listOf("ControllerBase"),
+                    baseTypes = listOf(CSharp.type("ControllerBase")),
                     attributes = listOf(CSharp.Attribute("ApiController")),
                 ) {
                     property(
-                        type = "string",
+                        type = CSharp.type("string"),
                         name = "Name",
                         modifiers = listOf("public"),
                         initializer = "\"Users\"",
                     )
                     method(
                         name = "GetUserAsync",
-                        returnType = "Task<IActionResult>",
+                        returnType = CSharp.genericType(
+                            "Task",
+                            CSharp.type("IActionResult"),
+                        ),
                         modifiers = listOf("public", "abstract"),
                         parameters = listOf(
                             CSharp.Parameter(
-                                type = "CancellationToken",
+                                type = CSharp.type("CancellationToken"),
                                 name = "cancellationToken",
                                 modifiers = emptyList(),
                                 attributes = emptyList(),
@@ -65,21 +68,21 @@ class CSharpTests :
                     modifiers = listOf("public", "sealed"),
                     primaryConstructorParameters = listOf(
                         CSharp.Parameter(
-                            type = "GetUserBody",
+                            type = CSharp.type("GetUserBody"),
                             name = "Body",
                             modifiers = emptyList(),
                             attributes = emptyList(),
                             defaultValue = null,
                         ),
                         CSharp.Parameter(
-                            type = "string?",
+                            type = CSharp.nullable(CSharp.type("string")),
                             name = "ETag",
                             modifiers = emptyList(),
                             attributes = emptyList(),
                             defaultValue = "null",
                         ),
                     ),
-                    baseTypes = listOf("GetUserResult"),
+                    baseTypes = listOf(CSharp.type("GetUserResult")),
                 )
             }
 
@@ -89,6 +92,59 @@ class CSharpTests :
                 public abstract record GetUserResult;
 
                 public sealed record GetUserOk(GetUserBody Body, string? ETag = null) : GetUserResult;
+            """.trimIndent()
+        }
+
+        "render emits structured code blocks with control flow" {
+            val file = CSharp.file("Platform.Api.Generated") {
+                classType(
+                    name = "Responder",
+                    modifiers = listOf("public", "sealed"),
+                ) {
+                    method(
+                        name = "Respond",
+                        returnType = CSharp.type("string"),
+                        modifiers = listOf("public"),
+                        parameters = listOf(
+                            CSharp.Parameter(
+                                type = CSharp.array(CSharp.type("string")),
+                                name = "headers",
+                                modifiers = emptyList(),
+                                attributes = emptyList(),
+                                defaultValue = null,
+                            ),
+                        ),
+                        body = CSharp.codeBlock {
+                            foreach("var header in headers") {
+                                ifStatement("header.Length > 0") {
+                                    expression("Console.WriteLine(header)")
+                                }
+                            }
+                            blankLine()
+                            returnStatement("\"ok\"")
+                        },
+                    )
+                }
+            }
+
+            CSharp.render(file).trim() shouldBe """
+                namespace Platform.Api.Generated;
+
+                public sealed class Responder
+                {
+                    public string Respond(string[] headers)
+                    {
+                        foreach (var header in headers)
+                        {
+                            if (header.Length > 0)
+                            {
+                                Console.WriteLine(header);
+                            }
+                        }
+
+                        return "ok";
+                    }
+                }
             """.trimIndent()
         }
     })

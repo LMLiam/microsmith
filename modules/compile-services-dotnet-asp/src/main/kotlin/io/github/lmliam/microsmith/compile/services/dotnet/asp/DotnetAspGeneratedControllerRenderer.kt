@@ -35,7 +35,7 @@ internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): Strin
             classType(
                 name = "${controllerPrefix(artifact)}ControllerBase",
                 modifiers = listOf("public", "abstract"),
-                baseTypes = listOf("ControllerBase"),
+                baseTypes = listOf(csharpType("ControllerBase")),
                 attributes = listOf(CSharp.Attribute("ApiController")),
             ) {
                 sections.forEach(::addMember)

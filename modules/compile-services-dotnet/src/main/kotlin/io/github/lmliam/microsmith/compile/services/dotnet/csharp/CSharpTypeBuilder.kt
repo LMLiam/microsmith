@@ -5,7 +5,7 @@ class CSharpTypeBuilder internal constructor(
     private val kind: CSharp.TypeKind,
     private val name: String,
     private val modifiers: List<String>,
-    private val baseTypes: List<String>,
+    private val baseTypes: List<CSharp.TypeRef>,
     private val attributes: List<CSharp.Attribute>,
     private val primaryConstructorParameters: List<CSharp.Parameter>,
 ) {
@@ -16,7 +16,7 @@ class CSharpTypeBuilder internal constructor(
     }
 
     fun property(
-        type: String,
+        type: CSharp.TypeRef,
         name: String,
         modifiers: List<String>,
         attributes: List<CSharp.Attribute> = emptyList(),
@@ -37,11 +37,11 @@ class CSharpTypeBuilder internal constructor(
 
     fun method(
         name: String,
-        returnType: String,
+        returnType: CSharp.TypeRef,
         modifiers: List<String>,
         attributes: List<CSharp.Attribute> = emptyList(),
         parameters: List<CSharp.Parameter> = emptyList(),
-        body: String? = null,
+        body: CSharp.CodeBlock? = null,
     ) {
         members += CSharp.Method(
             name = name,
@@ -62,4 +62,42 @@ class CSharpTypeBuilder internal constructor(
         primaryConstructorParameters = primaryConstructorParameters,
         members = members,
     )
+
+    fun property(
+        type: String,
+        name: String,
+        modifiers: List<String>,
+        attributes: List<CSharp.Attribute> = emptyList(),
+        getter: String = "get;",
+        setter: String = "set;",
+        initializer: String? = null,
+    ) {
+        property(
+            type = CSharp.type(type),
+            name = name,
+            modifiers = modifiers,
+            attributes = attributes,
+            getter = getter,
+            setter = setter,
+            initializer = initializer,
+        )
+    }
+
+    fun method(
+        name: String,
+        returnType: String,
+        modifiers: List<String>,
+        attributes: List<CSharp.Attribute> = emptyList(),
+        parameters: List<CSharp.Parameter> = emptyList(),
+        body: CSharp.CodeBlock? = null,
+    ) {
+        method(
+            name = name,
+            returnType = CSharp.type(returnType),
+            modifiers = modifiers,
+            attributes = attributes,
+            parameters = parameters,
+            body = body,
+        )
+    }
 }

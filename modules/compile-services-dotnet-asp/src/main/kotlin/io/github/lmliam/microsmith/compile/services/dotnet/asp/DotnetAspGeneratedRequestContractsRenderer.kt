@@ -25,7 +25,7 @@ internal fun renderHeadersBindingClass(binding: ResolvedDotnetAspHeadersBinding)
     primaryConstructorParameters = emptyList(),
     members = binding.headers.map { header ->
         CSharp.Property(
-            type = "string?",
+            type = csharpNullableType("string"),
             name = dotnetAspPascalIdentifier(header.name),
             modifiers = listOf("public"),
             attributes = emptyList(),
@@ -39,7 +39,7 @@ internal fun renderHeadersBindingClass(binding: ResolvedDotnetAspHeadersBinding)
 private fun renderRequestFieldProperty(field: ResolvedDotnetAspRequestField): CSharp.Property {
     val nullable = field.optional && field.defaultValue == null
     return CSharp.Property(
-        type = dotnetAspCSharpType(field.type, nullable = nullable),
+        type = csharpType(dotnetAspCSharpType(field.type, nullable = nullable)),
         name = dotnetAspPascalIdentifier(field.name),
         modifiers = listOf("public"),
         attributes = emptyList(),

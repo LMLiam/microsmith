@@ -14,23 +14,23 @@ internal fun renderHostingExtensionsFile(artifact: DotnetAspServiceArtifact): St
             ) {
                 method(
                     name = "AddMicrosmith",
-                    returnType = "WebApplicationBuilder",
+                    returnType = csharpType("WebApplicationBuilder"),
                     modifiers = listOf("public", "static"),
                     parameters = listOf(extensionParameter("WebApplicationBuilder", "builder")),
-                    body = """
-                        builder.Services.AddControllers();
-                        return builder;
-                    """.trimIndent(),
+                    body = CSharp.codeBlock {
+                        expression("builder.Services.AddControllers()")
+                        returnStatement("builder")
+                    },
                 )
                 method(
                     name = "MapMicrosmith",
-                    returnType = "WebApplication",
+                    returnType = csharpType("WebApplication"),
                     modifiers = listOf("public", "static"),
                     parameters = listOf(extensionParameter("WebApplication", "app")),
-                    body = """
-                        app.MapControllers();
-                        return app;
-                    """.trimIndent(),
+                    body = CSharp.codeBlock {
+                        expression("app.MapControllers()")
+                        returnStatement("app")
+                    },
                 )
             }
         },

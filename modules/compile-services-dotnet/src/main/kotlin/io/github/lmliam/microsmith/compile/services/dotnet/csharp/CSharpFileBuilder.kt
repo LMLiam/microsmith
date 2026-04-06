@@ -18,7 +18,7 @@ class CSharpFileBuilder internal constructor(
     fun classType(
         name: String,
         modifiers: List<String>,
-        baseTypes: List<String> = emptyList(),
+        baseTypes: List<CSharp.TypeRef> = emptyList(),
         attributes: List<CSharp.Attribute> = emptyList(),
         build: CSharpTypeBuilder.() -> Unit = {},
     ) {
@@ -36,7 +36,7 @@ class CSharpFileBuilder internal constructor(
         name: String,
         modifiers: List<String>,
         primaryConstructorParameters: List<CSharp.Parameter> = emptyList(),
-        baseTypes: List<String> = emptyList(),
+        baseTypes: List<CSharp.TypeRef> = emptyList(),
         attributes: List<CSharp.Attribute> = emptyList(),
         build: CSharpTypeBuilder.() -> Unit = {},
     ) {
