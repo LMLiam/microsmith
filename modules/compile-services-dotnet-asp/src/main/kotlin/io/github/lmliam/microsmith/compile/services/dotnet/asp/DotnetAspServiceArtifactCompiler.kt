@@ -82,15 +82,15 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
         }
     """.trimIndent()
 
-    private fun renderLaunchSettingsFile(artifact: DotnetAspServiceArtifact): String = $$"""
+    private fun renderLaunchSettingsFile(artifact: DotnetAspServiceArtifact): String = """
         {
-          "$schema": "http://json.schemastore.org/launchsettings.json",
+          "${'$'}schema": "http://json.schemastore.org/launchsettings.json",
           "profiles": {
-            "$${artifact.id.projectName}": {
+            "${artifact.id.projectName}": {
               "commandName": "Project",
               "dotnetRunMessages": true,
               "launchBrowser": false,
-              "applicationUrl": "http://localhost:$${artifact.httpPort};https://localhost:$${artifact.httpsPort}",
+              "applicationUrl": "http://localhost:${artifact.httpPort};https://localhost:${artifact.httpsPort}",
               "environmentVariables": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
               }
