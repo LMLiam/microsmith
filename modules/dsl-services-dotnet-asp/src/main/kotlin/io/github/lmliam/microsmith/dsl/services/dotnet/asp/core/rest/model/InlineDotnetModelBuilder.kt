@@ -12,7 +12,8 @@ internal class InlineDotnetModelBuilder(
     duplicateFieldMessage = { fieldName ->
         "Duplicate ASP.NET inline model field '$fieldName' in model '$modelName'."
     },
-), DotnetModelScope {
+),
+    DotnetModelScope {
     fun build() = DotnetModel(
         name = validateDotnetIdentifier(modelName, "ASP.NET inline model name"),
         fields = buildFields(),

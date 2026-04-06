@@ -4,7 +4,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetConfigur
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetIdentifier
 
-internal abstract class DotnetAspRequestFieldSetBuilder(
+internal open class DotnetAspRequestFieldSetBuilder(
     private val fieldContainerLabel: String,
 ) : DotnetConfigurableTypedFieldScope<DotnetAspRequestField, DotnetAspRequestFieldScope> {
     private val fieldsByName = linkedMapOf<String, DotnetAspRequestField>()
