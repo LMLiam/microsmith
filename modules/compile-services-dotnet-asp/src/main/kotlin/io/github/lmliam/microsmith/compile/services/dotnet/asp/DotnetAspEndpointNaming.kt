@@ -10,6 +10,9 @@ internal fun contractsNamespace(artifact: DotnetAspServiceArtifact) = "${artifac
 internal fun controllersNamespace(artifact: DotnetAspServiceArtifact) =
     "${artifact.id.projectName}.Generated.Controllers"
 
+internal fun hostingNamespace(artifact: DotnetAspServiceArtifact): String =
+    "${artifact.id.projectName}.Generated.Hosting"
+
 internal fun controllerPrefix(artifact: DotnetAspServiceArtifact) = dotnetAspTypeName(artifact.id.projectName)
 
 internal fun httpMethodAttribute(method: DotnetAspHttpMethod): String = when (method) {

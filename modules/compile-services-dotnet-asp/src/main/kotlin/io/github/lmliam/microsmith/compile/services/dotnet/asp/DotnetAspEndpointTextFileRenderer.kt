@@ -7,6 +7,7 @@ internal class DotnetAspEndpointTextFileRenderer {
         validateEndpointGenerationInputs(artifact)
 
         return buildList {
+            add("Generated/Hosting/MicrosmithHostingExtensions.cs" to renderHostingExtensionsFile(artifact))
             renderSharedModelsFile(artifact)?.let {
                 add("Generated/Contracts/ServiceModels.cs" to it)
             }

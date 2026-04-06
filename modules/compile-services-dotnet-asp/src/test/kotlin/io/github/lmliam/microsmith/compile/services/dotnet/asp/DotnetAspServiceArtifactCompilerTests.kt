@@ -51,18 +51,24 @@ class DotnetAspServiceArtifactCompilerTests :
             textFiles.map { it.artifactId.relativePath.toString() }
                 .shouldContainExactlyInAnyOrder(
                     listOf(
-                        "Program.cs",
                         "appsettings.json",
                         "Properties/launchSettings.json",
+                        "Generated/Hosting/MicrosmithHostingExtensions.cs",
                     ),
                 )
             textFiles.forEach {
                 it.artifactId.outputRoot shouldBe Path.of("dotnet", "Platform", "UserService.Api")
             }
-            textFiles.single { it.artifactId.relativePath.toString() == "Program.cs" }.contents
-                .shouldContain("AddControllers")
-            textFiles.single { it.artifactId.relativePath.toString() == "Program.cs" }.contents
-                .shouldContain("public static void Main(string[] args)")
+            textFiles
+                .single {
+                    it.artifactId.relativePath.toString() == "Generated/Hosting/MicrosmithHostingExtensions.cs"
+                }.contents
+                .shouldContain("public static WebApplicationBuilder AddMicrosmith")
+            textFiles
+                .single {
+                    it.artifactId.relativePath.toString() == "Generated/Hosting/MicrosmithHostingExtensions.cs"
+                }.contents
+                .shouldContain("public static WebApplication MapMicrosmith")
             textFiles
                 .single { it.artifactId.relativePath.toString() == "appsettings.json" }
                 .contents
@@ -230,9 +236,9 @@ class DotnetAspServiceArtifactCompilerTests :
                     .associateBy { it.artifactId.relativePath.toString() }
 
             textFiles.keys shouldContainExactlyInAnyOrder listOf(
-                "Program.cs",
                 "appsettings.json",
                 "Properties/launchSettings.json",
+                "Generated/Hosting/MicrosmithHostingExtensions.cs",
                 "Generated/Contracts/ServiceModels.cs",
                 "Generated/Contracts/RequestModels.cs",
                 "Generated/Contracts/ResponseModels.cs",
@@ -267,6 +273,10 @@ class DotnetAspServiceArtifactCompilerTests :
                 .shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync(")
             textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
                 .shouldContain("CreateUserBadRequest response => Respond(response.Body, 400)")
+            textFiles.getValue("Generated/Hosting/MicrosmithHostingExtensions.cs").contents
+                .shouldContain("builder.Services.AddControllers();")
+            textFiles.getValue("Generated/Hosting/MicrosmithHostingExtensions.cs").contents
+                .shouldContain("app.MapControllers();")
         }
 
         "compile emits assignable literals for ushort request defaults" {

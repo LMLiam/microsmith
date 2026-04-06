@@ -39,7 +39,6 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
                 ),
             ),
         )
-        add(textContribution(artifact, "Program.cs", renderProgramFile()))
         add(textContribution(artifact, "appsettings.json", renderAppSettingsFile(artifact)))
         add(
             textContribution(
@@ -65,8 +64,6 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
         ),
         contents = contents,
     )
-
-    private fun renderProgramFile(): String = loadTemplate("Program.cs.template")
 
     private fun renderAppSettingsFile(artifact: DotnetAspServiceArtifact): String = renderTemplate(
         name = "appsettings.json.template",
