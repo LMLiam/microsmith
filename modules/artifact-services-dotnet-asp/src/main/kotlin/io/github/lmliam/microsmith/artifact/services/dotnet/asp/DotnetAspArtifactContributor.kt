@@ -21,6 +21,8 @@ class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {
                 outputRoot = service.outputRoot,
                 httpPort = httpPort,
                 httpsPort = httpPort + 1,
+                models = service.models,
+                rest = service.rest,
             )
         }
 

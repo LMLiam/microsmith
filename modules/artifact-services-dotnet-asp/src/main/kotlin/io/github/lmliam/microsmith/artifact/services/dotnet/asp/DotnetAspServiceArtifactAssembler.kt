@@ -17,6 +17,8 @@ class DotnetAspServiceArtifactAssembler : ArtifactAssembler<DotnetAspServiceArti
             outputRoot = contribution.outputRoot,
             httpPort = contribution.httpPort,
             httpsPort = contribution.httpsPort,
+            models = contribution.models,
+            rest = contribution.rest,
         )
     }
 
