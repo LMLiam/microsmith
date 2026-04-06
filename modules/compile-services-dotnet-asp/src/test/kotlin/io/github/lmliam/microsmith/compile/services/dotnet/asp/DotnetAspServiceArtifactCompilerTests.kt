@@ -21,6 +21,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponseHeader
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRest
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
@@ -267,6 +268,131 @@ class DotnetAspServiceArtifactCompilerTests :
             textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
                 .shouldContain("CreateUserBadRequest response => Respond(response.Body, 400)")
         }
+
+        "compile emits assignable literals for ushort request defaults" {
+            val artifact =
+                emptyArtifact(
+                    rest = ResolvedDotnetAspRest(
+                        listOf(
+                            ResolvedDotnetAspEndpoint(
+                                method = DotnetAspHttpMethod.GET,
+                                route = "/users",
+                                routePlaceholders = emptyList(),
+                                operationName = "ListUsers",
+                                bindings = ResolvedDotnetAspEndpointBindings(
+                                    query = ResolvedDotnetAspRequestBinding(
+                                        name = "ListUsersQuery",
+                                        fields = listOf(
+                                            ResolvedDotnetAspRequestField(
+                                                name = "rank",
+                                                type = DotnetFieldType.UnsignedShort,
+                                                optional = true,
+                                                defaultValue = 1,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                responses = listOf(
+                                    sharedResponse(
+                                        statusCode = 200,
+                                        modelName = "User",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    models = singleStringModel("User"),
+                )
+
+            val requestModels =
+                DotnetAspServiceArtifactCompiler()
+                    .compile(artifact)
+                    .filterIsInstance<TextFileArtifactContribution>()
+                    .single {
+                        it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs"
+                    }
+                    .contents
+
+            requestModels.shouldContain("public ushort Rank { get; set; } = 1;")
+            requestModels.shouldNotContain("public ushort Rank { get; set; } = 1u;")
+        }
+
+        "compile sanitizes response header names into valid csharp identifiers" {
+            val artifact =
+                emptyArtifact(
+                    models = singleStringModel("User"),
+                    rest = ResolvedDotnetAspRest(
+                        listOf(
+                            ResolvedDotnetAspEndpoint(
+                                method = DotnetAspHttpMethod.GET,
+                                route = "/users/{id}",
+                                routePlaceholders = listOf("id"),
+                                operationName = "GetUser",
+                                bindings = ResolvedDotnetAspEndpointBindings(
+                                    path = ResolvedDotnetAspRequestBinding(
+                                        name = "GetUserPath",
+                                        fields = listOf(
+                                            ResolvedDotnetAspRequestField(
+                                                name = "id",
+                                                type = DotnetFieldType.String,
+                                                optional = false,
+                                                defaultValue = null,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                responses = listOf(
+                                    sharedResponse(
+                                        statusCode = 200,
+                                        modelName = "User",
+                                        headers = listOf("X.Trace-Id"),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+
+            val textFiles =
+                DotnetAspServiceArtifactCompiler()
+                    .compile(artifact)
+                    .filterIsInstance<TextFileArtifactContribution>()
+                    .associateBy { it.artifactId.relativePath.toString() }
+
+            textFiles.getValue("Generated/Contracts/ResponseModels.cs").contents
+                .shouldContain("string? XTraceId = null")
+            textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
+                .shouldContain("response.XTraceId")
+        }
+
+        "compile rejects response headers that collide after csharp identifier sanitization" {
+            val artifact =
+                emptyArtifact(
+                    models = singleStringModel("User"),
+                    rest = ResolvedDotnetAspRest(
+                        listOf(
+                            ResolvedDotnetAspEndpoint(
+                                method = DotnetAspHttpMethod.GET,
+                                route = "/users",
+                                routePlaceholders = emptyList(),
+                                operationName = "GetUser",
+                                bindings = ResolvedDotnetAspEndpointBindings(),
+                                responses = listOf(
+                                    sharedResponse(
+                                        statusCode = 200,
+                                        modelName = "User",
+                                        headers = listOf("X-Trace-Id", "X.Trace Id"),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+
+            shouldThrow<IllegalArgumentException> {
+                DotnetAspServiceArtifactCompiler().compile(artifact)
+            }.message.shouldContain("colliding generated property names")
+        }
     })
 
 private fun emptyArtifact(
@@ -282,4 +408,24 @@ private fun emptyArtifact(
     httpsPort = 5001,
     models = models,
     rest = rest,
+)
+
+private fun singleStringModel(modelName: String): Map<String, DotnetModel> = mapOf(
+    modelName to DotnetModel(
+        name = modelName,
+        fields = listOf(DotnetField("id", DotnetFieldType.String)),
+    ),
+)
+
+private fun sharedResponse(
+    statusCode: Int,
+    modelName: String,
+    headers: List<String> = emptyList(),
+): ResolvedDotnetAspResponse = ResolvedDotnetAspResponse(
+    statusCode = statusCode,
+    model = ResolvedDotnetAspModel(
+        locality = ResolvedDotnetAspModelLocality.SHARED,
+        model = requireNotNull(singleStringModel(modelName)[modelName]),
+    ),
+    headers = headers.map(::ResolvedDotnetAspResponseHeader),
 )

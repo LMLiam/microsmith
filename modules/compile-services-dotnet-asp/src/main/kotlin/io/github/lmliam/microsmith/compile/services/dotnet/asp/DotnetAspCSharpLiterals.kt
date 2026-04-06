@@ -52,7 +52,7 @@ private fun dotnetAspIntegerLiteral(type: DotnetFieldType, value: Number): Strin
         return value.toShort().toString()
     }
     if (type == DotnetFieldType.UnsignedShort) {
-        return "${value.toInt()}u"
+        return value.toInt().toString()
     }
     if (type == DotnetFieldType.Int) {
         return value.toInt().toString()

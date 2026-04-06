@@ -38,11 +38,17 @@ internal fun dotnetAspTypeName(raw: String): String = raw
 
 internal fun dotnetAspHeaderPropertyName(headerName: String): String = headerName
     .trim()
-    .split('-', '_', ' ')
+    .split(HEADER_PROPERTY_DELIMITER_PATTERN)
     .filter(String::isNotBlank)
     .joinToString("") { segment ->
         segment.lowercase(Locale.ROOT).replaceFirstChar { firstChar ->
             firstChar.titlecase(Locale.ROOT)
+        }
+    }.let { identifier ->
+        if (identifier.firstOrNull()?.isDigit() == true) {
+            "Header$identifier"
+        } else {
+            identifier
         }
     }.ifBlank {
         error("Unable to derive an ASP.NET response header property name from '$headerName'.")
@@ -61,3 +67,5 @@ internal fun dotnetAspStatusName(statusCode: Int): String = when (statusCode) {
     HTTP_STATUS_INTERNAL_SERVER_ERROR -> "InternalServerError"
     else -> "Status$statusCode"
 }
+
+private val HEADER_PROPERTY_DELIMITER_PATTERN = Regex("[^A-Za-z0-9]+")
