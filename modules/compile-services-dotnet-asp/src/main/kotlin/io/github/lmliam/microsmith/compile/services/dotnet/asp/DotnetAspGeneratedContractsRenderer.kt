@@ -64,10 +64,14 @@ internal fun renderResponseModelsFile(artifact: DotnetAspServiceArtifact): Strin
     return buildContractsFile(artifact, sections.joinToString("\n\n"))
 }
 
-internal fun buildContractsFile(artifact: DotnetAspServiceArtifact, body: String): String = buildString {
-    appendLine("using System;")
-    appendLine()
-    appendLine("namespace ${contractsNamespace(artifact)};")
-    appendLine()
-    append(body)
-}
+internal fun buildContractsFile(
+    artifact: DotnetAspServiceArtifact,
+    body: String,
+    usings: Set<String> = setOf("System"),
+): String = renderCSharpFile(
+    CSharpFile(
+        namespace = contractsNamespace(artifact),
+        usings = usings,
+        members = listOf(body),
+    ),
+)

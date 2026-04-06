@@ -18,23 +18,27 @@ internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): Strin
         }
     }
 
-    return buildString {
-        appendLine("using System;")
-        appendLine("using System.Threading;")
-        appendLine("using System.Threading.Tasks;")
-        appendLine("using Microsoft.AspNetCore.Mvc;")
-        appendLine("using ${contractsNamespace(artifact)};")
-        appendLine()
-        appendLine("namespace ${controllersNamespace(artifact)};")
-        appendLine()
-        appendLine("[ApiController]")
-        appendLine(
-            "public abstract class ${controllerPrefix(artifact)}ControllerBase : " +
-                "ControllerBase",
-        )
-        appendLine("{")
-        append(dotnetAspIndent(sections.joinToString("\n\n")))
-        appendLine()
-        appendLine("}")
-    }
+    return renderCSharpFile(
+        CSharpFile(
+            namespace = controllersNamespace(artifact),
+            usings = setOf(
+                "System",
+                "System.Threading",
+                "System.Threading.Tasks",
+                "Microsoft.AspNetCore.Mvc",
+                contractsNamespace(artifact),
+            ),
+            members = listOf(
+                renderCSharpType(
+                    CSharpType(
+                        declaration =
+                        "public abstract class ${controllerPrefix(artifact)}ControllerBase : " +
+                            "ControllerBase",
+                        members = sections,
+                        attributes = listOf("[ApiController]"),
+                    ),
+                ),
+            ),
+        ),
+    )
 }

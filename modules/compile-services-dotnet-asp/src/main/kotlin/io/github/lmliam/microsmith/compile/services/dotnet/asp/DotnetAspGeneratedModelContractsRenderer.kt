@@ -6,13 +6,12 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspModelLocality
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
 
-internal fun renderModelClass(name: String, fields: List<DotnetField>): String = buildString {
-    appendLine("public sealed class $name")
-    appendLine("{")
-    append(dotnetAspIndent(fields.joinToString("\n\n", transform = ::renderModelFieldProperty)))
-    appendLine()
-    append("}")
-}
+internal fun renderModelClass(name: String, fields: List<DotnetField>): String = renderCSharpType(
+    CSharpType(
+        declaration = "public sealed class $name",
+        members = fields.map(::renderModelFieldProperty),
+    ),
+)
 
 internal fun resolveResponseModelTypeName(
     endpoint: ResolvedDotnetAspEndpoint,

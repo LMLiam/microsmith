@@ -32,47 +32,71 @@ internal fun dotnetAspLiteral(type: DotnetFieldType, value: Any): String = when 
         error("ASP.NET request defaults cannot target shared model '${type.target}'.")
 }
 private fun dotnetAspNumericLiteral(type: DotnetFieldType, value: Number): String {
-    if (type == DotnetFieldType.Float) {
-        return "${dotnetAspFloatingLiteral(value)}f"
+    return when (type) {
+        DotnetFieldType.Float -> "${dotnetAspFloatingLiteral(value)}f"
+        DotnetFieldType.Double -> dotnetAspFloatingLiteral(value)
+        DotnetFieldType.Decimal -> "${dotnetAspDecimalLiteral(value)}m"
+        DotnetFieldType.Byte,
+        DotnetFieldType.SignedByte,
+        DotnetFieldType.Short,
+        DotnetFieldType.UnsignedShort,
+        DotnetFieldType.Int,
+        DotnetFieldType.UnsignedInt,
+        DotnetFieldType.Long,
+        DotnetFieldType.UnsignedLong,
+        DotnetFieldType.NativeInt,
+        DotnetFieldType.UnsignedNativeInt,
+        -> dotnetAspIntegerLiteral(type, value)
+
+        DotnetFieldType.String,
+        DotnetFieldType.Char,
+        DotnetFieldType.Bool,
+        DotnetFieldType.Guid,
+        DotnetFieldType.DateOnly,
+        DotnetFieldType.TimeOnly,
+        DotnetFieldType.DateTime,
+        DotnetFieldType.DateTimeOffset,
+        DotnetFieldType.TimeSpan,
+        is DotnetFieldType.Reference,
+        -> error("Unsupported ASP.NET numeric literal type '$type'.")
     }
-    if (type == DotnetFieldType.Double) {
-        return dotnetAspFloatingLiteral(value)
-    }
-    if (type == DotnetFieldType.Decimal) {
-        return "${dotnetAspDecimalLiteral(value)}m"
-    }
-    return dotnetAspIntegerLiteral(type, value)
 }
 
 private fun dotnetAspIntegerLiteral(type: DotnetFieldType, value: Number): String {
-    if (type == DotnetFieldType.Byte || type == DotnetFieldType.SignedByte) {
-        return value.toByte().toString()
+    return when (type) {
+        DotnetFieldType.Byte,
+        DotnetFieldType.SignedByte,
+        -> value.toByte().toString()
+
+        DotnetFieldType.Short -> value.toShort().toString()
+
+        DotnetFieldType.UnsignedShort,
+        DotnetFieldType.Int,
+        -> value.toInt().toString()
+
+        DotnetFieldType.UnsignedInt,
+        DotnetFieldType.UnsignedNativeInt,
+        -> "${value.toLong()}u"
+
+        DotnetFieldType.Long -> "${value.toLong()}L"
+        DotnetFieldType.UnsignedLong -> "${value.toLong()}UL"
+        DotnetFieldType.NativeInt -> value.toLong().toString()
+
+        DotnetFieldType.Float,
+        DotnetFieldType.Double,
+        DotnetFieldType.Decimal,
+        DotnetFieldType.String,
+        DotnetFieldType.Char,
+        DotnetFieldType.Bool,
+        DotnetFieldType.Guid,
+        DotnetFieldType.DateOnly,
+        DotnetFieldType.TimeOnly,
+        DotnetFieldType.DateTime,
+        DotnetFieldType.DateTimeOffset,
+        DotnetFieldType.TimeSpan,
+        is DotnetFieldType.Reference,
+        -> error("Unsupported ASP.NET integer literal type '$type'.")
     }
-    if (type == DotnetFieldType.Short) {
-        return value.toShort().toString()
-    }
-    if (type == DotnetFieldType.UnsignedShort) {
-        return value.toInt().toString()
-    }
-    if (type == DotnetFieldType.Int) {
-        return value.toInt().toString()
-    }
-    if (type == DotnetFieldType.UnsignedInt) {
-        return "${value.toLong()}u"
-    }
-    if (type == DotnetFieldType.Long) {
-        return "${value.toLong()}L"
-    }
-    if (type == DotnetFieldType.UnsignedLong) {
-        return "${value.toLong()}UL"
-    }
-    if (type == DotnetFieldType.NativeInt) {
-        return value.toLong().toString()
-    }
-    if (type == DotnetFieldType.UnsignedNativeInt) {
-        return "${value.toLong()}u"
-    }
-    error("Unsupported ASP.NET integer literal type '$type'.")
 }
 
 private fun dotnetAspFloatingLiteral(value: Number): String {
@@ -84,10 +108,10 @@ private fun dotnetAspFloatingLiteral(value: Number): String {
     }
 }
 
-private fun dotnetAspDecimalLiteral(value: Any): String = when (value) {
-    is BigDecimal -> value.toPlainString()
-    is Number -> value.toString()
-    else -> value.toString()
+private fun dotnetAspDecimalLiteral(value: Any): String = if (value is BigDecimal) {
+    value.toPlainString()
+} else {
+    value.toString()
 }
 
 private fun Any.number(): Number {

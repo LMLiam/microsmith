@@ -9,19 +9,19 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 internal fun dotnetAspGuidLiteral(value: Any): String =
-    "Guid.Parse(${dotnetAspStringLiteral(dotnetAspGuidValue(value))})"
+    "Guid.Parse(${dotnetAspStringLiteral(value.stringLiteralValue())})"
 
 internal fun dotnetAspDateOnlyLiteral(value: Any): String =
-    "DateOnly.Parse(${dotnetAspStringLiteral(dotnetAspDateOnlyValue(value))})"
+    "DateOnly.Parse(${dotnetAspStringLiteral(value.stringLiteralValue())})"
 
 internal fun dotnetAspTimeOnlyLiteral(value: Any): String =
-    "TimeOnly.Parse(${dotnetAspStringLiteral(dotnetAspTimeOnlyValue(value))})"
+    "TimeOnly.Parse(${dotnetAspStringLiteral(value.stringLiteralValue())})"
 
 internal fun dotnetAspDateTimeLiteral(value: Any): String =
-    "DateTime.Parse(${dotnetAspStringLiteral(dotnetAspDateTimeValue(value))})"
+    "DateTime.Parse(${dotnetAspStringLiteral(value.stringLiteralValue())})"
 
 internal fun dotnetAspDateTimeOffsetLiteral(value: Any): String =
-    "DateTimeOffset.Parse(${dotnetAspStringLiteral(dotnetAspDateTimeOffsetValue(value))})"
+    "DateTimeOffset.Parse(${dotnetAspStringLiteral(value.stringLiteralValue())})"
 
 internal fun dotnetAspTimeSpanLiteral(value: Any): String = when (value) {
     is Duration ->
@@ -31,29 +31,14 @@ internal fun dotnetAspTimeSpanLiteral(value: Any): String = when (value) {
         "TimeSpan.Parse(${dotnetAspStringLiteral(value.toString())})"
 }
 
-private fun dotnetAspGuidValue(value: Any): String = when (value) {
-    is UUID -> value.toString()
-    else -> value.toString()
-}
+private fun Any.stringLiteralValue(): String = when (this) {
+    is UUID,
+    is LocalDate,
+    is LocalTime,
+    is LocalDateTime,
+    is Instant,
+    is OffsetDateTime,
+    -> toString()
 
-private fun dotnetAspDateOnlyValue(value: Any): String = when (value) {
-    is LocalDate -> value.toString()
-    else -> value.toString()
-}
-
-private fun dotnetAspTimeOnlyValue(value: Any): String = when (value) {
-    is LocalTime -> value.toString()
-    else -> value.toString()
-}
-
-private fun dotnetAspDateTimeValue(value: Any): String = when (value) {
-    is LocalDateTime -> value.toString()
-    is Instant -> value.toString()
-    else -> value.toString()
-}
-
-private fun dotnetAspDateTimeOffsetValue(value: Any): String = when (value) {
-    is OffsetDateTime -> value.toString()
-    is Instant -> value.toString()
-    else -> value.toString()
+    else -> toString()
 }

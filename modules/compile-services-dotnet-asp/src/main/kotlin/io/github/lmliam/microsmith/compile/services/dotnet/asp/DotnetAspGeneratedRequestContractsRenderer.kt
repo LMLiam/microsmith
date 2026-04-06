@@ -5,30 +5,24 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRequestBinding
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRequestField
 
-internal fun renderRequestBindingClass(binding: ResolvedDotnetAspRequestBinding): String = buildString {
-    appendLine("public sealed class ${binding.name}")
-    appendLine("{")
-    append(
-        dotnetAspIndent(
-            binding.fields.joinToString("\n\n", transform = ::renderRequestFieldProperty),
+internal fun renderRequestBindingClass(binding: ResolvedDotnetAspRequestBinding): String {
+    return renderCSharpType(
+        CSharpType(
+            declaration = "public sealed class ${binding.name}",
+            members = binding.fields.map(::renderRequestFieldProperty),
         ),
     )
-    appendLine()
-    append("}")
 }
 
-internal fun renderHeadersBindingClass(binding: ResolvedDotnetAspHeadersBinding): String = buildString {
-    appendLine("public sealed class ${binding.name}")
-    appendLine("{")
-    append(
-        dotnetAspIndent(
-            binding.headers.joinToString("\n\n") { header ->
+internal fun renderHeadersBindingClass(binding: ResolvedDotnetAspHeadersBinding): String {
+    return renderCSharpType(
+        CSharpType(
+            declaration = "public sealed class ${binding.name}",
+            members = binding.headers.map { header ->
                 "public string? ${dotnetAspPascalIdentifier(header.name)} { get; set; }"
             },
         ),
     )
-    appendLine()
-    append("}")
 }
 
 private fun renderRequestFieldProperty(field: ResolvedDotnetAspRequestField): String {
