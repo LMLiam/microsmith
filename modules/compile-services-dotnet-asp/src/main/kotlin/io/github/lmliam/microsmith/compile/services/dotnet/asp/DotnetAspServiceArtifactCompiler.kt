@@ -12,6 +12,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
+import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 
 @ServiceProvider(ArtifactCompiler::class)
@@ -65,50 +66,37 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
         contents = contents,
     )
 
-    private fun renderProgramFile(): String = """
-        var builder = WebApplication.CreateBuilder(args);
+    private fun renderProgramFile(): String = loadTemplate("Program.cs.template")
 
-        builder.Services.AddControllers();
+    private fun renderAppSettingsFile(artifact: DotnetAspServiceArtifact): String = renderTemplate(
+        name = "appsettings.json.template",
+        substitutions = mapOf(
+            "{{SERVICE_NAME}}" to dotnetAspEscapeStringContents(artifact.serviceName),
+        ),
+    )
 
-        var app = builder.Build();
+    private fun renderLaunchSettingsFile(artifact: DotnetAspServiceArtifact): String = renderTemplate(
+        name = "launchSettings.json.template",
+        substitutions = mapOf(
+            "{{PROJECT_NAME}}" to artifact.id.projectName,
+            "{{HTTP_PORT}}" to artifact.httpPort.toString(),
+            "{{HTTPS_PORT}}" to artifact.httpsPort.toString(),
+        ),
+    )
 
-        app.MapControllers();
-
-        app.Run();
-
-        public partial class Program { }
-    """.trimIndent()
-
-    private fun renderAppSettingsFile(artifact: DotnetAspServiceArtifact): String = """
-        {
-          "Microsmith": {
-            "ServiceName": "${dotnetAspEscapeStringContents(artifact.serviceName)}"
-          },
-          "Logging": {
-            "LogLevel": {
-              "Default": "Information",
-              "Microsoft.AspNetCore": "Warning"
-            }
-          },
-          "AllowedHosts": "*"
+    private fun renderTemplate(name: String, substitutions: Map<String, String>): String =
+        substitutions.entries.fold(loadTemplate(name)) { rendered, (placeholder, replacement) ->
+            rendered.replace(placeholder, replacement)
         }
-    """.trimIndent()
 
-    private fun renderLaunchSettingsFile(artifact: DotnetAspServiceArtifact): String = """
-        {
-          "${'$'}schema": "http://json.schemastore.org/launchsettings.json",
-          "profiles": {
-            "${artifact.id.projectName}": {
-              "commandName": "Project",
-              "dotnetRunMessages": true,
-              "launchBrowser": false,
-              "applicationUrl":
-                "http://localhost:${artifact.httpPort};https://localhost:${artifact.httpsPort}",
-              "environmentVariables": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-              }
-            }
-          }
-        }
-    """.trimIndent()
+    private fun loadTemplate(name: String): String = javaClass
+        .getResourceAsStream("$TEMPLATE_RESOURCE_ROOT/$name")
+        ?.readBytes()
+        ?.toString(StandardCharsets.UTF_8)
+        ?: error("Missing ASP.NET template resource '$name'.")
+
+    private companion object {
+        const val TEMPLATE_RESOURCE_ROOT =
+            "/io/github/lmliam/microsmith/compile/services/dotnet/asp/templates"
+    }
 }
