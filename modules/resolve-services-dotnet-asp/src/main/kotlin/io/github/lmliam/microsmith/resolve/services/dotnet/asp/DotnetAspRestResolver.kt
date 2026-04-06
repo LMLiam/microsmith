@@ -76,6 +76,7 @@ internal class DotnetAspRestResolver {
         parentSegments: List<String>,
         models: Map<String, DotnetModel>,
     ): ResolvedDotnetAspEndpoint {
+        val context = DotnetAspOperationContext(serviceName, endpoint.operationName)
         val routeSegments =
             parentSegments + routeResolver.parseDeclaredRoute(
                 endpoint.path,
@@ -87,16 +88,16 @@ internal class DotnetAspRestResolver {
 
         require(placeholders.isEmpty() == (endpoint.bindings.path == null)) {
             if (placeholders.isEmpty()) {
-                "ASP.NET endpoint '${endpoint.operationName}' in service '$serviceName' " +
+                "ASP.NET endpoint '${context.operationName}' in service '${context.serviceName}' " +
                     "declares a path binding but route '$route' has no placeholders."
             } else {
-                "ASP.NET endpoint '${endpoint.operationName}' in service '$serviceName' " +
+                "ASP.NET endpoint '${context.operationName}' in service '${context.serviceName}' " +
                     "must declare a path binding for route '$route'."
             }
         }
         val pathBinding =
             endpoint.bindings.path?.let {
-                bindingResolver.resolvePathBinding(serviceName, endpoint, placeholders, it, models)
+                bindingResolver.resolvePathBinding(context, placeholders, it, models)
             }
 
         return ResolvedDotnetAspEndpoint(
@@ -108,12 +109,12 @@ internal class DotnetAspRestResolver {
                 path = pathBinding,
                 query =
                 endpoint.bindings.query?.let {
-                    bindingResolver.resolveRequestBinding(serviceName, endpoint.operationName, it, models)
+                    bindingResolver.resolveRequestBinding(context, it, models)
                 },
                 headers = endpoint.bindings.headers?.let(bindingResolver::resolveHeadersBinding),
                 body =
                 endpoint.bindings.body?.let {
-                    bindingResolver.resolveModelReference(serviceName, endpoint.operationName, models, it)
+                    bindingResolver.resolveModelReference(context, models, it)
                 },
             ),
             responses = endpoint.responses.map { response ->
@@ -121,8 +122,7 @@ internal class DotnetAspRestResolver {
                     statusCode = response.statusCode,
                     model =
                     bindingResolver.resolveModelReference(
-                        serviceName,
-                        endpoint.operationName,
+                        context,
                         models,
                         response.model,
                     ),

@@ -1,6 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.DotnetAspEndpoint
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.DotnetAspModelReference
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspHeadersBinding
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspRequestBinding
@@ -9,17 +8,16 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 
 internal class DotnetAspBindingResolver {
     fun resolvePathBinding(
-        serviceName: String,
-        endpoint: DotnetAspEndpoint,
+        context: DotnetAspOperationContext,
         placeholders: List<String>,
         binding: DotnetAspRequestBinding,
         models: Map<String, DotnetModel>,
     ): ResolvedDotnetAspRequestBinding {
-        val resolved = resolveRequestBinding(serviceName, endpoint.operationName, binding, models)
+        val resolved = resolveRequestBinding(context, binding, models)
 
         resolved.fields.forEach { field ->
             require(!field.optional && field.defaultValue == null) {
-                "ASP.NET path binding '${binding.name}' in operation '${endpoint.operationName}' " +
+                "ASP.NET path binding '${binding.name}' in operation '${context.operationName}' " +
                     "cannot declare optional/default fields."
             }
         }
@@ -27,7 +25,7 @@ internal class DotnetAspBindingResolver {
         val bindingFields = resolved.fields.mapTo(mutableSetOf(), ResolvedDotnetAspRequestField::name)
         val placeholderSet = placeholders.toSet()
         require(bindingFields == placeholderSet) {
-            "ASP.NET path binding '${binding.name}' in operation '${endpoint.operationName}' " +
+            "ASP.NET path binding '${binding.name}' in operation '${context.operationName}' " +
                 "must match route placeholders ${placeholders.joinToString(", ")}, " +
                 "but declared ${resolved.fields.joinToString(", ", transform = ResolvedDotnetAspRequestField::name)}."
         }
@@ -36,8 +34,7 @@ internal class DotnetAspBindingResolver {
     }
 
     fun resolveRequestBinding(
-        serviceName: String,
-        operationName: String,
+        context: DotnetAspOperationContext,
         binding: DotnetAspRequestBinding,
         models: Map<String, DotnetModel>,
     ): ResolvedDotnetAspRequestBinding {
@@ -45,8 +42,8 @@ internal class DotnetAspBindingResolver {
             .mapNotNull { it.type as? DotnetFieldType.Reference }
             .forEach { reference ->
                 require(reference.target in models) {
-                    "ASP.NET request binding '${binding.name}' in operation '$operationName' " +
-                        "for service '$serviceName' references unknown shared model '${reference.target}'."
+                    "ASP.NET request binding '${binding.name}' in operation '${context.operationName}' " +
+                        "for service '${context.serviceName}' references unknown shared model '${reference.target}'."
                 }
             }
 
@@ -71,29 +68,27 @@ internal class DotnetAspBindingResolver {
     )
 
     fun resolveModelReference(
-        serviceName: String,
-        operationName: String,
+        context: DotnetAspOperationContext,
         models: Map<String, DotnetModel>,
         reference: DotnetAspModelReference,
     ): ResolvedDotnetAspModel = when (reference) {
         is DotnetAspModelReference.Inline -> ResolvedDotnetAspModel(
             locality = ResolvedDotnetAspModelLocality.INLINE,
-            model = validateInlineReferences(serviceName, operationName, reference.model, models),
+            model = validateInlineReferences(context, reference.model, models),
         )
 
         is DotnetAspModelReference.Shared -> ResolvedDotnetAspModel(
             locality = ResolvedDotnetAspModelLocality.SHARED,
             model =
             requireNotNull(models[reference.target]) {
-                "ASP.NET operation '$operationName' in service '$serviceName' " +
+                "ASP.NET operation '${context.operationName}' in service '${context.serviceName}' " +
                     "references unknown model '${reference.target}'."
             },
         )
     }
 
     private fun validateInlineReferences(
-        serviceName: String,
-        operationName: String,
+        context: DotnetAspOperationContext,
         model: DotnetModel,
         models: Map<String, DotnetModel>,
     ): DotnetModel {
@@ -101,8 +96,8 @@ internal class DotnetAspBindingResolver {
             .mapNotNull { it.type as? DotnetFieldType.Reference }
             .forEach { reference ->
                 require(reference.target in models) {
-                    "ASP.NET inline model '${model.name}' in operation '$operationName' " +
-                        "for service '$serviceName' references unknown shared model '${reference.target}'."
+                    "ASP.NET inline model '${model.name}' in operation '${context.operationName}' " +
+                        "for service '${context.serviceName}' references unknown shared model '${reference.target}'."
                 }
             }
 
