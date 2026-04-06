@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.DotnetAspEndpoint
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.DotnetAspRest
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.DotnetAspRouteGroup
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.DotnetAspEndpoint
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.route.DotnetAspRouteGroup
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service.DotnetAspRest
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 
 internal class DotnetAspRestResolver {

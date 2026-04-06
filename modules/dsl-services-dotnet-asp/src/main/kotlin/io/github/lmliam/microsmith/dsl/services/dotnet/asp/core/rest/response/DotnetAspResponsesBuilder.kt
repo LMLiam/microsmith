@@ -1,5 +1,7 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest
+package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.response
 
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.DotnetAspModelReference
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.InlineDotnetModelBuilder
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModelScope
 

@@ -1,5 +1,16 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest
+package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint
 
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.DotnetAspModelReference
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.InlineDotnetModelBuilder
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspHeadersBinding
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspHeadersBindingBuilder
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspHeadersBindingScope
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspRequestBinding
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspRequestBindingBuilder
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspRequestBindingScope
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.response.DotnetAspResponse
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.response.DotnetAspResponsesBuilder
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.response.DotnetAspResponsesScope
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModelScope
 
 internal class DotnetAspEndpointBuilder(

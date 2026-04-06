@@ -1,4 +1,6 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest
+package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.response
+
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.DotnetAspModelReference
 
 private const val MIN_HTTP_STATUS_CODE = 100
 private const val MAX_HTTP_STATUS_CODE = 599

@@ -1,9 +1,9 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.DotnetAspEndpoint
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.DotnetAspHeadersBinding
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.DotnetAspModelReference
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.DotnetAspRequestBinding
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.DotnetAspEndpoint
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.DotnetAspModelReference
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspHeadersBinding
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspRequestBinding
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 

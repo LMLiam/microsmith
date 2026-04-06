@@ -1,4 +1,6 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest
+package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.route
+
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.DotnetAspEndpoint
 
 data class DotnetAspRouteGroup(
     val path: String,

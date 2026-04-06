@@ -1,4 +1,11 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest
+package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service
+
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.DotnetAspEndpoint
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.DotnetAspEndpointBuilder
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.DotnetAspEndpointScope
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.DotnetAspHttpMethod
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.route.DotnetAspRouteGroup
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.route.DotnetAspRouteScope
 
 internal class DotnetAspRestBuilder : DotnetAspRestScope {
     private val groups = mutableListOf<DotnetAspRouteGroup>()

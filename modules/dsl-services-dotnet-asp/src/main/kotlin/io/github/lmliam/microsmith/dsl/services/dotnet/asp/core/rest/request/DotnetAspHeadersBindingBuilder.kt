@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest
+package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request
 
 internal class DotnetAspHeadersBindingBuilder(
     private val name: String,

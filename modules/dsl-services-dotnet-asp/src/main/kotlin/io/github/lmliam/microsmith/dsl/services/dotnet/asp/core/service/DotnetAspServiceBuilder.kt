@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.service
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.DotnetAspRest
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.DotnetAspRestBuilder
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.DotnetAspRestScope
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service.DotnetAspRest
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service.DotnetAspRestBuilder
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service.DotnetAspRestScope
 
 internal class DotnetAspServiceBuilder : DotnetAspServiceScope {
     private var rest: DotnetAspRest? = null
