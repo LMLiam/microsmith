@@ -4,6 +4,7 @@ import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.core.services
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.DotnetAspModelReference
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.service.DotnetAspPorts
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.service.DotnetAspServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
@@ -147,6 +148,29 @@ class DotnetAspDslTests :
             val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
 
             requireNotNull(asp.rest).groups.single().endpoints.single().operationName shouldBe "GetHealth"
+        }
+
+        "asp blocks capture explicit launch ports" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                "UserService" {
+                    dotnet {
+                        asp {
+                            ports {
+                                http(7000)
+                                https(7443)
+                            }
+                        }
+                    }
+                }
+            }
+
+            val services = builder.requireServicesExtension()
+            val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
+            val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+
+            requireNotNull(asp.ports) shouldBe DotnetAspPorts(http = 7000, https = 7443)
         }
 
         "headers bindings reject colliding derived field names" {

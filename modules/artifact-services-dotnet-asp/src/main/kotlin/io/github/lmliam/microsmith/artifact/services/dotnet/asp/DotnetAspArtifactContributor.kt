@@ -19,20 +19,25 @@ class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {
                     { (_, artifactId) -> artifactId.projectName },
                 ),
             )
-            .also { serviceArtifacts ->
-                validateUniqueDotnetAspPorts(serviceArtifacts.map { (_, artifactId) -> artifactId })
-            }.map { (service, artifactId) ->
-                val httpPort = dotnetAspHttpPortFor(artifactId)
-                DotnetAspServiceContribution(
-                    artifactId = artifactId,
-                    serviceName = service.name,
-                    targetFrameworkMoniker = service.targetFrameworkMoniker,
-                    outputRoot = service.outputRoot,
-                    httpPort = httpPort,
-                    httpsPort = httpPort + 1,
-                    models = service.models,
-                    rest = service.rest,
-                )
+            .let { serviceArtifacts ->
+                val allocatedPorts =
+                    serviceArtifacts.associate { (service, artifactId) ->
+                        artifactId to allocateDotnetAspPorts(artifactId, service.ports)
+                    }
+                validateUniqueDotnetAspPorts(allocatedPorts.toList())
+                serviceArtifacts.map { (service, artifactId) ->
+                    val ports = requireNotNull(allocatedPorts[artifactId])
+                    DotnetAspServiceContribution(
+                        artifactId = artifactId,
+                        serviceName = service.name,
+                        targetFrameworkMoniker = service.targetFrameworkMoniker,
+                        outputRoot = service.outputRoot,
+                        httpPort = ports.http,
+                        httpsPort = ports.https,
+                        models = service.models,
+                        rest = service.rest,
+                    )
+                }
             }
     }
 }

@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp
 
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspPorts
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRest
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspService
 import io.kotest.assertions.throwables.shouldThrow
@@ -62,17 +63,45 @@ class DotnetAspArtifactContributorTests :
                     contributor.contribute(workspace)
                 }
 
-            error.message.shouldContain("colliding generated launch ports")
+            error.message.shouldContain("colliding launch ports")
+        }
+
+        "contribute respects explicit service ports" {
+            val contributor = DotnetAspArtifactContributor()
+            val workspace =
+                DotnetAspWorkspace(
+                    servicesByName =
+                    linkedMapOf(
+                        "UserService" to resolvedAspService(
+                            name = "UserService",
+                            projectName = "UserService.Api",
+                            ports = ResolvedDotnetAspPorts(http = 7000, https = 7443),
+                        ),
+                    ),
+                )
+
+            val contribution =
+                contributor
+                    .contribute(workspace)
+                    .single() as DotnetAspServiceContribution
+
+            contribution.httpPort shouldBe 7000
+            contribution.httpsPort shouldBe 7443
         }
     })
 
-private fun resolvedAspService(name: String, projectName: String): ResolvedDotnetAspService {
+private fun resolvedAspService(
+    name: String,
+    projectName: String,
+    ports: ResolvedDotnetAspPorts? = null,
+): ResolvedDotnetAspService {
     return ResolvedDotnetAspService(
         name = name,
         solutionName = "Platform",
         projectName = projectName,
         targetFrameworkMoniker = "net8.0",
         outputRoot = Path.of("dotnet", "Platform", projectName),
+        ports = ports,
         models = emptyMap(),
         rest = ResolvedDotnetAspRest.empty(),
     )

@@ -8,5 +8,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service.Dot
  */
 @MicrosmithDsl
 interface DotnetAspServiceScope {
+    fun ports(block: DotnetAspPortsScope.() -> Unit)
+
     fun rest(block: DotnetAspRestScope.() -> Unit)
 }

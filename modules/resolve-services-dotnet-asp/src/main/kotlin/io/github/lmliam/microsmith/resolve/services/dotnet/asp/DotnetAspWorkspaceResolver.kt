@@ -52,6 +52,12 @@ class DotnetAspWorkspaceResolver(
                             resolvedService.solution.name,
                             resolvedService.project,
                         ),
+                        ports = aspExtension.ports?.let {
+                            ResolvedDotnetAspPorts(
+                                http = it.http,
+                                https = it.https,
+                            )
+                        },
                         models = resolvedService.models,
                         rest =
                         restResolver.resolve(
