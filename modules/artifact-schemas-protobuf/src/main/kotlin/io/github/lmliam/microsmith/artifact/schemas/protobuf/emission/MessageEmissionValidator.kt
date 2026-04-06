@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
 
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Field
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 
@@ -41,23 +42,11 @@ internal object MessageEmissionValidator {
         }
     }
 
-    private fun collectFieldNameUsages(message: Message): List<Pair<String, String>> = buildList {
-        message.fields.forEach { add(it.name to "field '${it.name}'") }
-        message.oneofs.forEach { oneof ->
-            oneof.fields.forEach { field ->
-                add(field.name to "oneof '${oneof.name}' field '${field.name}'")
-            }
-        }
-    }
+    private fun collectFieldNameUsages(message: Message): List<Pair<String, String>> =
+        collectFieldUsages(message, keySelector = { it.name })
 
-    private fun collectFieldNumberUsages(message: Message): List<Pair<Int, String>> = buildList {
-        message.fields.forEach { add(it.index to "field '${it.name}'") }
-        message.oneofs.forEach { oneof ->
-            oneof.fields.forEach { field ->
-                add(field.index to "oneof '${oneof.name}' field '${field.name}'")
-            }
-        }
-    }
+    private fun collectFieldNumberUsages(message: Message): List<Pair<Int, String>> =
+        collectFieldUsages(message, keySelector = { it.index })
 
     private fun <Key : Comparable<Key>> requireUniqueUsages(
         messageName: String,
@@ -80,4 +69,14 @@ internal object MessageEmissionValidator {
             "Duplicate $label in message '$messageName': $details"
         }
     }
+
+    private fun <Key> collectFieldUsages(message: Message, keySelector: (Field) -> Key): List<Pair<Key, String>> =
+        buildList {
+            message.fields.forEach { add(keySelector(it) to "field '${it.name}'") }
+            message.oneofs.forEach { oneof ->
+                oneof.fields.forEach { field ->
+                    add(keySelector(field) to "oneof '${oneof.name}' field '${field.name}'")
+                }
+            }
+        }
 }

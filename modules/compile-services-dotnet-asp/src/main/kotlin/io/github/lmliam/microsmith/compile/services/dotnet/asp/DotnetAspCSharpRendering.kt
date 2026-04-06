@@ -4,10 +4,8 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldTyp
 
 internal fun dotnetAspCSharpType(type: DotnetFieldType, nullable: Boolean = false): String {
     val baseType = type.csharpType
-    return if (nullable && type !is DotnetFieldType.String) {
+    return if (nullable) {
         "$baseType?"
-    } else if (nullable && type is DotnetFieldType.String) {
-        "string?"
     } else {
         baseType
     }
