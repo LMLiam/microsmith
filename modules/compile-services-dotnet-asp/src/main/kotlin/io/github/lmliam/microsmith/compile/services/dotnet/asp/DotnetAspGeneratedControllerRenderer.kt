@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 
 internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): String? {
     val endpoints = artifact.rest.endpoints
@@ -8,37 +9,37 @@ internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): Strin
         return null
     }
 
-    val sections = buildList {
-        add(endpoints.joinToString("\n\n", transform = ::renderActionMethod))
-        add(endpoints.joinToString("\n\n", transform = ::renderAbstractHandler))
-        add(endpoints.joinToString("\n\n", transform = ::renderResultMapper))
+    val sections = buildList<CSharp.Member> {
+        endpoints.forEach { endpoint ->
+            add(renderActionMethod(endpoint))
+        }
+        endpoints.forEach { endpoint ->
+            add(renderAbstractHandler(endpoint))
+        }
+        endpoints.forEach { endpoint ->
+            add(renderResultMapper(endpoint))
+        }
         add(renderRespondHelper())
         if (endpoints.any { it.bindings.headers != null }) {
             add(renderReadHeaderHelper())
         }
     }
 
-    return renderCSharpFile(
-        CSharpFile(
-            namespace = controllersNamespace(artifact),
-            usings = setOf(
-                "System",
-                "System.Threading",
-                "System.Threading.Tasks",
-                "Microsoft.AspNetCore.Mvc",
-                contractsNamespace(artifact),
-            ),
-            members = listOf(
-                renderCSharpType(
-                    CSharpType(
-                        declaration =
-                        "public abstract class ${controllerPrefix(artifact)}ControllerBase : " +
-                            "ControllerBase",
-                        members = sections,
-                        attributes = listOf("[ApiController]"),
-                    ),
-                ),
-            ),
-        ),
+    return CSharp.render(
+        CSharp.file(controllersNamespace(artifact)) {
+            using("System")
+            using("System.Threading")
+            using("System.Threading.Tasks")
+            using("Microsoft.AspNetCore.Mvc")
+            using(contractsNamespace(artifact))
+            classType(
+                name = "${controllerPrefix(artifact)}ControllerBase",
+                modifiers = listOf("public", "abstract"),
+                baseTypes = listOf("ControllerBase"),
+                attributes = listOf(CSharp.Attribute("ApiController")),
+            ) {
+                sections.forEach(::addMember)
+            }
+        },
     )
 }

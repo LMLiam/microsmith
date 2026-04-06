@@ -1,20 +1,52 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 
-internal fun renderOperationResultTypes(endpoint: ResolvedDotnetAspEndpoint): String = buildString {
-    appendLine("public abstract record ${resultBaseTypeName(endpoint)};")
-    appendLine()
-    append(
-        endpoint.responses.joinToString("\n\n") { response ->
-            val parameters = buildList {
-                add(resolveResponseModelTypeName(endpoint, response))
-                response.headers.forEach { header ->
-                    add("string? ${dotnetAspHeaderPropertyName(header.name)} = null")
-                }
-            }.joinToString(", ")
-            "public sealed record ${resultVariantTypeName(endpoint, response)}($parameters) : " +
-                "${resultBaseTypeName(endpoint)};"
-        },
+internal fun renderOperationResultTypes(endpoint: ResolvedDotnetAspEndpoint): List<CSharp.Type> = buildList {
+    add(
+        CSharp.Type(
+            kind = CSharp.TypeKind.RECORD,
+            name = resultBaseTypeName(endpoint),
+            modifiers = listOf("public", "abstract"),
+            baseTypes = emptyList(),
+            attributes = emptyList(),
+            primaryConstructorParameters = emptyList(),
+            members = emptyList(),
+        ),
     )
+    endpoint.responses.forEach { response ->
+        add(
+            CSharp.Type(
+                kind = CSharp.TypeKind.RECORD,
+                name = resultVariantTypeName(endpoint, response),
+                modifiers = listOf("public", "sealed"),
+                baseTypes = listOf(resultBaseTypeName(endpoint)),
+                attributes = emptyList(),
+                primaryConstructorParameters = buildList {
+                    add(
+                        CSharp.Parameter(
+                            type = resolveResponseModelTypeName(endpoint, response),
+                            name = "Body",
+                            modifiers = emptyList(),
+                            attributes = emptyList(),
+                            defaultValue = null,
+                        ),
+                    )
+                    response.headers.forEach { header ->
+                        add(
+                            CSharp.Parameter(
+                                type = "string?",
+                                name = dotnetAspHeaderPropertyName(header.name),
+                                modifiers = emptyList(),
+                                attributes = emptyList(),
+                                defaultValue = "null",
+                            ),
+                        )
+                    }
+                },
+                members = emptyList(),
+            ),
+        )
+    }
 }

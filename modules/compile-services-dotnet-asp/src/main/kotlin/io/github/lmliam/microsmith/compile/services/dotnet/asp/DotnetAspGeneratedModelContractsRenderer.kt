@@ -1,36 +1,43 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspModelLocality
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
 
-internal fun renderModelClass(name: String, fields: List<DotnetField>): String = renderCSharpType(
-    CSharpType(
-        declaration = "public sealed class $name",
-        members = fields.map(::renderModelFieldProperty),
-    ),
+internal fun renderModelClass(name: String, fields: List<DotnetField>): CSharp.Type = CSharp.Type(
+    kind = CSharp.TypeKind.CLASS,
+    name = name,
+    modifiers = listOf("public", "sealed"),
+    baseTypes = emptyList(),
+    attributes = emptyList(),
+    primaryConstructorParameters = emptyList(),
+    members = fields.map(::renderModelFieldProperty),
 )
 
 internal fun resolveResponseModelTypeName(
     endpoint: ResolvedDotnetAspEndpoint,
     response: ResolvedDotnetAspResponse,
 ): String {
-    val typeName = when (response.model.locality) {
+    return when (response.model.locality) {
         ResolvedDotnetAspModelLocality.SHARED -> response.model.model.name
         ResolvedDotnetAspModelLocality.INLINE -> inlineResponseTypeName(endpoint, response)
     }
-    return "$typeName Body"
 }
 
-private fun renderModelFieldProperty(field: DotnetField): String {
-    val type = dotnetAspCSharpType(field.type)
-    val initializer =
-        if (field.type is DotnetFieldType.String || field.type is DotnetFieldType.Reference) {
-            " = null!;"
-        } else {
-            ""
-        }
-    return "public $type ${dotnetAspPascalIdentifier(field.name)} { get; set; }$initializer"
-}
+private fun renderModelFieldProperty(field: DotnetField): CSharp.Property = CSharp.Property(
+    type = dotnetAspCSharpType(field.type),
+    name = dotnetAspPascalIdentifier(field.name),
+    modifiers = listOf("public"),
+    attributes = emptyList(),
+    getter = "get;",
+    setter = "set;",
+    initializer =
+    if (field.type is DotnetFieldType.String || field.type is DotnetFieldType.Reference) {
+        "null!"
+    } else {
+        null
+    },
+)

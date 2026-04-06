@@ -1,42 +1,38 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 
 internal fun renderHostingExtensionsFile(artifact: DotnetAspServiceArtifact): String {
-    return renderCSharpFile(
-        CSharpFile(
-            namespace = hostingNamespace(artifact),
-            usings = setOf(
-                "Microsoft.AspNetCore.Builder",
-                "Microsoft.Extensions.DependencyInjection",
-            ),
-            members = listOf(
-                renderCSharpType(
-                    CSharpType(
-                        declaration = "public static class MicrosmithHostingExtensions",
-                        members = listOf(
-                            renderAddMicrosmithMethod(),
-                            renderMapMicrosmithMethod(),
-                        ),
-                    ),
-                ),
-            ),
-        ),
+    return CSharp.render(
+        CSharp.file(hostingNamespace(artifact)) {
+            using("Microsoft.AspNetCore.Builder")
+            using("Microsoft.Extensions.DependencyInjection")
+            classType(
+                name = "MicrosmithHostingExtensions",
+                modifiers = listOf("public", "static"),
+            ) {
+                method(
+                    name = "AddMicrosmith",
+                    returnType = "WebApplicationBuilder",
+                    modifiers = listOf("public", "static"),
+                    parameters = listOf(extensionParameter("WebApplicationBuilder", "builder")),
+                    body = """
+                        builder.Services.AddControllers();
+                        return builder;
+                    """.trimIndent(),
+                )
+                method(
+                    name = "MapMicrosmith",
+                    returnType = "WebApplication",
+                    modifiers = listOf("public", "static"),
+                    parameters = listOf(extensionParameter("WebApplication", "app")),
+                    body = """
+                        app.MapControllers();
+                        return app;
+                    """.trimIndent(),
+                )
+            }
+        },
     )
 }
-
-private fun renderAddMicrosmithMethod(): String = """
-    public static WebApplicationBuilder AddMicrosmith(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddControllers();
-        return builder;
-    }
-""".trimIndent()
-
-private fun renderMapMicrosmithMethod(): String = """
-    public static WebApplication MapMicrosmith(this WebApplication app)
-    {
-        app.MapControllers();
-        return app;
-    }
-""".trimIndent()

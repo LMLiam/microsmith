@@ -1,50 +1,63 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspHeadersBinding
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspModelLocality
 
-internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): String = buildString {
-    appendLine(
-        "[${httpMethodAttribute(endpoint.method)}(" +
+internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
+    name = endpoint.operationName,
+    modifiers = listOf("public", "async"),
+    returnType = "Task<IActionResult>",
+    attributes = listOf(
+        csharpAttribute(
+            httpMethodAttribute(endpoint.method),
             "${dotnetAspRouteLiteral(endpoint.route)}, " +
-            "Name = ${dotnetAspRouteLiteral(endpoint.operationName)})]",
-    )
-    appendLine("public async Task<IActionResult> ${endpoint.operationName}(")
-    append(dotnetAspIndent(renderActionSignatureParameters(endpoint), spaces = 4))
-    appendLine()
-    appendLine(")")
-    appendLine("{")
-    renderHeadersPrelude(endpoint)?.let { prelude ->
-        append(dotnetAspIndent(prelude))
-        appendLine()
-        appendLine()
-    }
-    appendLine(
-        dotnetAspIndent(
-            "var result = await On${endpoint.operationName}Async(${handlerArguments(endpoint)});",
+                "Name = ${dotnetAspRouteLiteral(endpoint.operationName)}",
         ),
-    )
-    appendLine(dotnetAspIndent("return Map${endpoint.operationName}Result(result);"))
-    append("}")
-}
+    ),
+    parameters = buildList {
+        endpoint.bindings.path?.let {
+            add(csharpParameter(it.name, "path", attributes = listOf(csharpAttribute("FromRoute"))))
+        }
+        endpoint.bindings.query?.let {
+            add(csharpParameter(it.name, "query", attributes = listOf(csharpAttribute("FromQuery"))))
+        }
+        endpoint.bindings.body?.let {
+            add(
+                csharpParameter(
+                    resolveBodyTypeName(endpoint),
+                    "body",
+                    attributes = listOf(csharpAttribute("FromBody")),
+                ),
+            )
+        }
+        add(csharpParameter("CancellationToken", "cancellationToken"))
+    },
+    body = buildString {
+        renderHeadersPrelude(endpoint)?.let { prelude ->
+            appendLine(prelude)
+            appendLine()
+        }
+        appendLine("var result = await On${endpoint.operationName}Async(${handlerArguments(endpoint)});")
+        append("return Map${endpoint.operationName}Result(result);")
+    },
+)
 
-internal fun renderAbstractHandler(endpoint: ResolvedDotnetAspEndpoint): String = buildString {
-    appendLine(
-        "protected abstract Task<${resultBaseTypeName(endpoint)}> " +
-            "On${endpoint.operationName}Async(",
-    )
-    append(dotnetAspIndent(renderHandlerParameters(endpoint), spaces = 4))
-    appendLine()
-    append(");")
-}
-
-private fun renderActionSignatureParameters(endpoint: ResolvedDotnetAspEndpoint): String = buildList {
-    endpoint.bindings.path?.let { add("[FromRoute] ${it.name} path") }
-    endpoint.bindings.query?.let { add("[FromQuery] ${it.name} query") }
-    endpoint.bindings.body?.let { add("[FromBody] ${resolveBodyTypeName(endpoint)} body") }
-    add("CancellationToken cancellationToken")
-}.joinToString(",\n")
+internal fun renderAbstractHandler(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
+    name = "On${endpoint.operationName}Async",
+    modifiers = listOf("protected", "abstract"),
+    returnType = "Task<${resultBaseTypeName(endpoint)}>",
+    attributes = emptyList(),
+    parameters = buildList {
+        endpoint.bindings.path?.let { add(csharpParameter(it.name, "path")) }
+        endpoint.bindings.query?.let { add(csharpParameter(it.name, "query")) }
+        endpoint.bindings.headers?.let { add(csharpParameter(it.name, "headers")) }
+        endpoint.bindings.body?.let { add(csharpParameter(resolveBodyTypeName(endpoint), "body")) }
+        add(csharpParameter("CancellationToken", "cancellationToken"))
+    },
+    body = null,
+)
 
 internal fun handlerArguments(endpoint: ResolvedDotnetAspEndpoint): String = buildList {
     endpoint.bindings.path?.let { add("path") }
@@ -56,14 +69,6 @@ internal fun handlerArguments(endpoint: ResolvedDotnetAspEndpoint): String = bui
 
 private fun renderHeadersPrelude(endpoint: ResolvedDotnetAspEndpoint): String? =
     endpoint.bindings.headers?.let(::renderHeadersInstantiation)
-
-private fun renderHandlerParameters(endpoint: ResolvedDotnetAspEndpoint): String = buildList {
-    endpoint.bindings.path?.let { add("${it.name} path") }
-    endpoint.bindings.query?.let { add("${it.name} query") }
-    endpoint.bindings.headers?.let { add("${it.name} headers") }
-    endpoint.bindings.body?.let { add("${resolveBodyTypeName(endpoint)} body") }
-    add("CancellationToken cancellationToken")
-}.joinToString(",\n")
 
 private fun renderHeadersInstantiation(binding: ResolvedDotnetAspHeadersBinding): String = buildString {
     appendLine("var headers = new ${binding.name}")

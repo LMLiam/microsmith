@@ -1,30 +1,35 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
 
-internal fun renderResultMapper(endpoint: ResolvedDotnetAspEndpoint): String = buildString {
-    appendLine(
-        "private IActionResult Map${endpoint.operationName}Result(" +
-            "${resultBaseTypeName(endpoint)} result)",
-    )
-    appendLine("{")
-    appendLine(dotnetAspIndent("return result switch"))
-    appendLine(dotnetAspIndent("{"))
-    append(dotnetAspIndent(renderResponseSwitchArms(endpoint), spaces = 8))
-    appendLine(",")
-    appendLine(dotnetAspIndent(renderUnsupportedResultArm(endpoint), spaces = 8))
-    appendLine(dotnetAspIndent("};"))
-    append("}")
-}
+internal fun renderResultMapper(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
+    name = "Map${endpoint.operationName}Result",
+    modifiers = listOf("private"),
+    returnType = "IActionResult",
+    attributes = emptyList(),
+    parameters = listOf(csharpParameter(resultBaseTypeName(endpoint), "result")),
+    body = """
+        return result switch
+        {
+            ${renderResponseSwitchArms(endpoint)},
+            ${renderUnsupportedResultArm(endpoint)}
+        };
+    """.trimIndent(),
+)
 
-internal fun renderRespondHelper(): String = """
-    private IActionResult Respond(
-        object body,
-        int statusCode,
-        params (string Name, string? Value)[] headers
-    )
-    {
+internal fun renderRespondHelper(): CSharp.Method = CSharp.Method(
+    name = "Respond",
+    modifiers = listOf("private"),
+    returnType = "IActionResult",
+    attributes = emptyList(),
+    parameters = listOf(
+        csharpParameter("object", "body"),
+        csharpParameter("int", "statusCode"),
+        csharpParameter("(string Name, string? Value)[]", "headers", modifiers = listOf("params")),
+    ),
+    body = """
         foreach (var (name, value) in headers)
         {
             if (value is not null)
@@ -37,17 +42,21 @@ internal fun renderRespondHelper(): String = """
         {
             StatusCode = statusCode,
         };
-    }
-""".trimIndent()
+    """.trimIndent(),
+)
 
-internal fun renderReadHeaderHelper(): String = """
-    private string? ReadHeader(string headerName)
-    {
+internal fun renderReadHeaderHelper(): CSharp.Method = CSharp.Method(
+    name = "ReadHeader",
+    modifiers = listOf("private"),
+    returnType = "string?",
+    attributes = emptyList(),
+    parameters = listOf(csharpParameter("string", "headerName")),
+    body = """
         return Request.Headers.TryGetValue(headerName, out var values)
             ? values.ToString()
             : null;
-    }
-""".trimIndent()
+    """.trimIndent(),
+)
 
 private fun renderResponseSwitchArms(endpoint: ResolvedDotnetAspEndpoint): String =
     endpoint.responses.joinToString(",\n") { response ->

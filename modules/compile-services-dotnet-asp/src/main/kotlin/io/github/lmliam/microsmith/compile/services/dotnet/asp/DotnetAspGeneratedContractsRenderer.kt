@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpFileBuilder
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspModelLocality
 
@@ -9,15 +11,15 @@ internal fun renderSharedModelsFile(artifact: DotnetAspServiceArtifact): String?
         return null
     }
 
-    val models = artifact.models.values.sortedBy(DotnetModel::name).joinToString("\n\n") { model ->
-        renderModelClass(model.name, model.fields)
+    return buildContractsFile(artifact) {
+        artifact.models.values.sortedBy(DotnetModel::name).forEach { model ->
+            addType(renderModelClass(model.name, model.fields))
+        }
     }
-
-    return buildContractsFile(artifact, models)
 }
 
 internal fun renderRequestModelsFile(artifact: DotnetAspServiceArtifact): String? {
-    val requestTypes = buildList {
+    val requestTypes = buildList<CSharp.Type> {
         artifact.rest.endpoints.forEach { endpoint ->
             endpoint.bindings.path?.let { add(renderRequestBindingClass(it)) }
             endpoint.bindings.query?.let { add(renderRequestBindingClass(it)) }
@@ -28,8 +30,10 @@ internal fun renderRequestModelsFile(artifact: DotnetAspServiceArtifact): String
         }
     }.distinct()
 
-    return requestTypes.takeIf(List<String>::isNotEmpty)?.joinToString("\n\n")?.let { body ->
-        buildContractsFile(artifact, body)
+    return requestTypes.takeIf(List<CSharp.Type>::isNotEmpty)?.let { types ->
+        buildContractsFile(artifact) {
+            types.forEach(::addType)
+        }
     }
 }
 
@@ -39,7 +43,7 @@ internal fun renderResponseModelsFile(artifact: DotnetAspServiceArtifact): Strin
         return null
     }
 
-    val inlineResponseModels = buildList {
+    val inlineResponseModels = buildList<CSharp.Type> {
         endpoints.forEach { endpoint ->
             endpoint.responses
                 .filter { it.model.locality == ResolvedDotnetAspModelLocality.INLINE }
@@ -54,24 +58,23 @@ internal fun renderResponseModelsFile(artifact: DotnetAspServiceArtifact): Strin
         }
     }.distinct()
 
-    val sections = buildList {
+    return buildContractsFile(artifact) {
         if (inlineResponseModels.isNotEmpty()) {
-            add(inlineResponseModels.joinToString("\n\n"))
+            inlineResponseModels.forEach(::addType)
         }
-        add(endpoints.joinToString("\n\n", transform = ::renderOperationResultTypes))
+        endpoints.forEach { endpoint ->
+            renderOperationResultTypes(endpoint).forEach(::addType)
+        }
     }
-
-    return buildContractsFile(artifact, sections.joinToString("\n\n"))
 }
 
 internal fun buildContractsFile(
     artifact: DotnetAspServiceArtifact,
-    body: String,
     usings: Set<String> = setOf("System"),
-): String = renderCSharpFile(
-    CSharpFile(
-        namespace = contractsNamespace(artifact),
-        usings = usings,
-        members = listOf(body),
-    ),
+    build: CSharpFileBuilder.() -> Unit,
+): String = CSharp.render(
+    CSharp.file(contractsNamespace(artifact)) {
+        usings.forEach(::using)
+        build()
+    },
 )
