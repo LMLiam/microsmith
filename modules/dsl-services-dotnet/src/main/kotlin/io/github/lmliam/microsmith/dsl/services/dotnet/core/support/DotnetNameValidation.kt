@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.core.support
 
-internal fun validateDotnetIdentifier(value: String, label: String): String {
+fun validateDotnetIdentifier(value: String, label: String): String {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }
     require(isDotnetIdentifier(normalized)) {
@@ -10,7 +10,7 @@ internal fun validateDotnetIdentifier(value: String, label: String): String {
     return normalized
 }
 
-internal fun validateDotnetQualifiedIdentifier(value: String, label: String): String {
+fun validateDotnetQualifiedIdentifier(value: String, label: String): String {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }
     require(isDotnetQualifiedIdentifier(normalized)) {

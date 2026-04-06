@@ -530,8 +530,6 @@ REST DSL contract notes:
 - inline body and response models stay endpoint-local in the normalized model; shared service models must be declared under `models { ... }`
 - route placeholders are validated against `path(...)` bindings, response/header declarations are normalized, and invalid REST declarations fail during resolution before any ASP.NET endpoint code is generated
 
-This issue establishes and validates the REST contract only. The current generator still emits the base ASP.NET scaffold, not concrete controller or endpoint implementations.
-
 The base ASP.NET scaffold currently emits this canonical layout under the run output root:
 
 ```text

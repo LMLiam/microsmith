@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.service
 import io.github.lmliam.microsmith.dsl.core.MergeableExtension
 import io.github.lmliam.microsmith.dsl.services.core.ServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service.DotnetAspRest
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service.mergeDotnetAspRest
 
 /**
  * Per-service ASP.NET scaffold opt-in declared under `asp { ... }`.
@@ -15,7 +16,7 @@ data class DotnetAspServiceExtension(
         when {
             rest == null -> other.rest
             other.rest == null -> rest
-            else -> rest.merge(other.rest)
+            else -> mergeDotnetAspRest(rest, other.rest)
         },
     )
 }

@@ -1,13 +1,12 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetIdentifier
 
 sealed interface DotnetAspModelReference {
     data class Shared(val target: String) : DotnetAspModelReference {
         init {
-            DotnetField(target, DotnetFieldType.String)
+            validateDotnetIdentifier(target, "ASP.NET shared model reference")
         }
     }
 

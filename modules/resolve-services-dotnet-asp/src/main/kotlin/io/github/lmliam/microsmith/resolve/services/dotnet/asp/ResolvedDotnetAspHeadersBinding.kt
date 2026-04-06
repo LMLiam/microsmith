@@ -1,13 +1,12 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetIdentifier
 
 data class ResolvedDotnetAspHeadersBinding(
     val name: String,
     val headers: List<ResolvedDotnetAspHeaderField>,
 ) {
     init {
-        DotnetField(name, DotnetFieldType.String)
+        validateDotnetIdentifier(name, "ASP.NET headers binding name")
     }
 }

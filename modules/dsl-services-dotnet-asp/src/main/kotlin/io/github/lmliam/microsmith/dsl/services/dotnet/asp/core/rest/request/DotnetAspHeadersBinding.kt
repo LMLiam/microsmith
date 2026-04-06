@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetIdentifier
 
 data class DotnetAspHeadersBinding(
     val name: String,
@@ -11,7 +10,7 @@ data class DotnetAspHeadersBinding(
         require(headers.isNotEmpty()) {
             "ASP.NET headers binding '$name' must declare at least one header."
         }
-        DotnetField(name, DotnetFieldType.String)
+        validateDotnetIdentifier(name, "ASP.NET headers binding name")
         val duplicateHeaders =
             headers
                 .groupBy { it.headerName.lowercase() }

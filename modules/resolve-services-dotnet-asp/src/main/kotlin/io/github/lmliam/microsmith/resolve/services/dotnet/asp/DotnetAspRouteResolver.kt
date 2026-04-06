@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetIdentifier
 
 internal class DotnetAspRouteResolver {
     fun parseDeclaredRoute(route: String, label: String, allowEmpty: Boolean = false): List<String> {
@@ -74,7 +73,7 @@ internal class DotnetAspRouteResolver {
         require(placeholder.isNotBlank() && placeholder == placeholder.trim()) {
             "$label contains blank or padded placeholder '$segment' in '$route'."
         }
-        DotnetField(placeholder, DotnetFieldType.String)
+        validateDotnetIdentifier(placeholder, "Route placeholder")
         return segment
     }
 }

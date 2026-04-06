@@ -6,6 +6,9 @@ import io.github.lmliam.microsmith.dsl.services.core.services
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.DotnetAspModelReference
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.service.DotnetAspServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.asp
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.aspNet
@@ -66,12 +69,12 @@ class DotnetAspDslTests :
             getUser.path shouldBe "/{id}"
             requireNotNull(getUser.bindings.path).fields.map { it.name } shouldContainExactly listOf("id")
             createUser.bindings.body shouldBe DotnetAspModelReference.Inline(
-                io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel(
+                DotnetModel(
                     name = "CreateUserRequest",
                     fields = listOf(
-                        io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField(
+                        DotnetField(
                             name = "email",
-                            type = io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType.String,
+                            type = DotnetFieldType.String,
                         ),
                     ),
                 ),
@@ -175,5 +178,35 @@ class DotnetAspDslTests :
                 }
 
             error.message.shouldContain("declares headers with colliding field names: xTraceId")
+        }
+
+        "responses support named helpers and custom status codes outside the standard range" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                "UserService" {
+                    dotnet {
+                        asp {
+                            rest {
+                                "/health" {
+                                    get("GetHealth") {
+                                        responses {
+                                            accepted("AcceptedStatus")
+                                            status(799, "ProbeStatus")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            val services = builder.requireServicesExtension()
+            val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
+            val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+            val responses = requireNotNull(asp.rest).groups.single().endpoints.single().responses
+
+            responses.map { it.statusCode } shouldContainExactly listOf(202, 799)
         }
     })
