@@ -572,6 +572,27 @@ app.MapMicrosmith();
 app.Run();
 ```
 
+Typical user-owned controller shape:
+
+```csharp
+using System.Threading;
+using System.Threading.Tasks;
+using UserService.Api.Generated.Controllers;
+using UserService.Api.Generated.Contracts;
+
+namespace UserService.Api.Controllers;
+
+public sealed class UserServiceApiController : UserServiceApiControllerBase
+{
+    protected override Task<GetUserResult> OnGetUserAsync(
+        GetUserPath path,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+}
+```
+
 ### Script defaults
 
 Inside `.microsmith.kts` scripts:
