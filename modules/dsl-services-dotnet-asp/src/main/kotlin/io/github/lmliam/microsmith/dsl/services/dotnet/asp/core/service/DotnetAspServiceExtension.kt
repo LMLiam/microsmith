@@ -8,9 +8,9 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service.mer
 /**
  * Per-service ASP.NET scaffold opt-in declared under `asp { ... }`.
  */
-data class DotnetAspServiceExtension(
-    val rest: DotnetAspRest? = null,
-) : ServiceExtension, MergeableExtension<DotnetAspServiceExtension> {
+data class DotnetAspServiceExtension(val rest: DotnetAspRest? = null) :
+    ServiceExtension,
+    MergeableExtension<DotnetAspServiceExtension> {
     override fun merge(other: DotnetAspServiceExtension) = DotnetAspServiceExtension(
         rest =
         when {

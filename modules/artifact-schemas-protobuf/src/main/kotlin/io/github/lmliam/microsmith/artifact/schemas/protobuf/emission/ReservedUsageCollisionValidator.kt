@@ -86,14 +86,17 @@ internal object ReservedUsageCollisionValidator {
             description = reserved.index.toString(),
             range = reserved.index..reserved.index,
         )
+
         is ReservedRange -> ReservedSpan(
             description = "${reserved.indexRange.first} to ${reserved.indexRange.last}",
             range = reserved.indexRange,
         )
+
         is ReservedToMax -> ReservedSpan(
             description = "${reserved.from} to max",
             range = reserved.from..ProtobufFieldNumbers.MAX_FIELD_NUMBER,
         )
+
         is ReservedName -> error("Reserved names do not produce numeric spans.")
     }
 }

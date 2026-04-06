@@ -9,8 +9,8 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobuf
 class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSchemaModel> {
     override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 
-    override fun contribute(model: ResolvedProtobufRpcSchemaModel): List<ArtifactContribution<*>> {
-        return model.schemas.map { schema ->
+    override fun contribute(model: ResolvedProtobufRpcSchemaModel): List<ArtifactContribution<*>> =
+        model.schemas.map { schema ->
             ProtobufRpcServiceContribution(
                 artifactId = ProtobufRpcServiceArtifactId(
                     packageName = schema.qualifiedName.packageName,
@@ -32,5 +32,4 @@ class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSc
                 },
             )
         }
-    }
 }

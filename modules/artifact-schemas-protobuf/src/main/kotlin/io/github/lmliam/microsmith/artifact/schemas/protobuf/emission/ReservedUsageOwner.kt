@@ -1,15 +1,10 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
 
-internal data class ReservedUsageOwner(
-    val kind: Kind,
-    val name: String,
-) {
+internal data class ReservedUsageOwner(val kind: Kind, val name: String) {
     val displayName: String
         get() = kind.displayName
 
-    enum class Kind(
-        val displayName: String,
-    ) {
+    enum class Kind(val displayName: String) {
         MESSAGE("Message"),
         ENUM("Enum"),
     }

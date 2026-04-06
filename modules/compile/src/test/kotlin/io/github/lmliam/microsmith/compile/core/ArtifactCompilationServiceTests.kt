@@ -67,21 +67,14 @@ class ArtifactCompilationServiceTests :
         }
     })
 
-private data class StageOneArtifact(
-    override val id: StageOneId,
-    val contents: String,
-) : Artifact
+private data class StageOneArtifact(override val id: StageOneId, val contents: String) : Artifact
 
-private data class StageOneId(
-    val name: String,
-) : ArtifactId<StageOneArtifact> {
+private data class StageOneId(val name: String) : ArtifactId<StageOneArtifact> {
     override val artifactType = StageOneArtifact::class
 }
 
-private data class StageOneContribution(
-    override val artifactId: StageOneId,
-    val contents: String,
-) : ArtifactContribution<StageOneArtifact>
+private data class StageOneContribution(override val artifactId: StageOneId, val contents: String) :
+    ArtifactContribution<StageOneArtifact>
 
 private class StageOneArtifactAssembler : ArtifactAssembler<StageOneArtifact> {
     override val artifactType = StageOneArtifact::class
@@ -104,21 +97,14 @@ private class StageOneArtifactAssembler : ArtifactAssembler<StageOneArtifact> {
     }
 }
 
-private data class StageTwoArtifact(
-    override val id: StageTwoId,
-    val contents: String,
-) : Artifact
+private data class StageTwoArtifact(override val id: StageTwoId, val contents: String) : Artifact
 
-private data class StageTwoId(
-    val name: String,
-) : ArtifactId<StageTwoArtifact> {
+private data class StageTwoId(val name: String) : ArtifactId<StageTwoArtifact> {
     override val artifactType = StageTwoArtifact::class
 }
 
-private data class StageTwoContribution(
-    override val artifactId: StageTwoId,
-    val contents: String,
-) : ArtifactContribution<StageTwoArtifact>
+private data class StageTwoContribution(override val artifactId: StageTwoId, val contents: String) :
+    ArtifactContribution<StageTwoArtifact>
 
 private class StageTwoArtifactAssembler : ArtifactAssembler<StageTwoArtifact> {
     override val artifactType = StageTwoArtifact::class
@@ -144,39 +130,34 @@ private class StageTwoArtifactAssembler : ArtifactAssembler<StageTwoArtifact> {
 private class StageOneCompiler : ArtifactCompiler<StageOneArtifact> {
     override val artifactType = StageOneArtifact::class
 
-    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> {
-        return listOf(StageTwoContribution(StageTwoId("middle"), artifact.contents))
-    }
+    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> =
+        listOf(StageTwoContribution(StageTwoId("middle"), artifact.contents))
 }
 
 private class StageTwoCompiler : ArtifactCompiler<StageTwoArtifact> {
     override val artifactType = StageTwoArtifact::class
 
-    override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<out Artifact>> {
-        return listOf(TextFileArtifactContribution(TextFileArtifactId(Path.of("result.txt")), artifact.contents))
-    }
+    override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<out Artifact>> =
+        listOf(TextFileArtifactContribution(TextFileArtifactId(Path.of("result.txt")), artifact.contents))
 }
 
 private class SelfCyclingCompiler : ArtifactCompiler<StageOneArtifact> {
     override val artifactType = StageOneArtifact::class
 
-    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> {
-        return listOf(StageOneContribution(StageOneId("cycle"), artifact.contents))
-    }
+    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> =
+        listOf(StageOneContribution(StageOneId("cycle"), artifact.contents))
 }
 
 private class StageOneToStageTwoCompiler : ArtifactCompiler<StageOneArtifact> {
     override val artifactType = StageOneArtifact::class
 
-    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> {
-        return listOf(StageTwoContribution(StageTwoId(artifact.id.name), artifact.contents))
-    }
+    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> =
+        listOf(StageTwoContribution(StageTwoId(artifact.id.name), artifact.contents))
 }
 
 private class StageTwoToStageOneCompiler : ArtifactCompiler<StageTwoArtifact> {
     override val artifactType = StageTwoArtifact::class
 
-    override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<out Artifact>> {
-        return listOf(StageOneContribution(StageOneId(artifact.id.name), artifact.contents))
-    }
+    override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<out Artifact>> =
+        listOf(StageOneContribution(StageOneId(artifact.id.name), artifact.contents))
 }

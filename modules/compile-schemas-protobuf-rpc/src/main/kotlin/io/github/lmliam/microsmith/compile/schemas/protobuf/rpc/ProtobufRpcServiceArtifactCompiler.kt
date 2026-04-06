@@ -14,22 +14,20 @@ import io.github.lmliam.microsmith.compile.schemas.core.SchemasArtifactCompiler
 class ProtobufRpcServiceArtifactCompiler : SchemasArtifactCompiler<ProtobufRpcServiceArtifact> {
     override val artifactType = ProtobufRpcServiceArtifact::class
 
-    override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> {
-        return listOf(
-            ProtoFileContribution(
-                artifactId = ProtoFileArtifactId(
-                    packageName = artifact.id.packageName,
-                    typeName = artifact.id.serviceName,
-                ),
+    override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> = listOf(
+        ProtoFileContribution(
+            artifactId = ProtoFileArtifactId(
                 packageName = artifact.id.packageName,
-                imports = artifact.imports,
-                declarations = listOf(
-                    ProtoDeclaration(
-                        name = artifact.id.serviceName,
-                        contents = ProtobufServiceRenderer.render(artifact),
-                    ),
+                typeName = artifact.id.serviceName,
+            ),
+            packageName = artifact.id.packageName,
+            imports = artifact.imports,
+            declarations = listOf(
+                ProtoDeclaration(
+                    name = artifact.id.serviceName,
+                    contents = ProtobufServiceRenderer.render(artifact),
                 ),
             ),
-        )
-    }
+        ),
+    )
 }

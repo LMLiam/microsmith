@@ -5,9 +5,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.Inlin
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModelScope
 
-internal class DotnetAspResponseBuilder(
-    private val modelName: String,
-) : DotnetAspResponseScope {
+internal class DotnetAspResponseBuilder(private val modelName: String) : DotnetAspResponseScope {
     private var inlineModel: DotnetModel? = null
     private var headers: List<DotnetAspResponseHeader> = emptyList()
 

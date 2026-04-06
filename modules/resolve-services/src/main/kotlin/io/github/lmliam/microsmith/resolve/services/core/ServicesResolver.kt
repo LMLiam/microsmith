@@ -9,7 +9,6 @@ class ServicesResolver : DomainResolver<ServicesExtension, ResolvedServicesModel
     override val authoringType = ServicesExtension::class
     override val resolvedType = ResolvedServicesModel::class
 
-    override fun resolve(authoring: ServicesExtension): ResolvedServicesModel {
-        return ResolvedServicesModel(authoring.services)
-    }
+    override fun resolve(authoring: ServicesExtension): ResolvedServicesModel =
+        ResolvedServicesModel(authoring.services)
 }

@@ -3,18 +3,15 @@ package io.github.lmliam.microsmith.artifact.core
 import java.util.ServiceLoader
 import kotlin.reflect.KClass
 
-internal class ArtifactAssemblerRegistry(
-    assemblers: List<ArtifactAssembler<*>> = loadArtifactAssemblers(),
-) {
+internal class ArtifactAssemblerRegistry(assemblers: List<ArtifactAssembler<*>> = loadArtifactAssemblers()) {
     private val assemblersByType = indexAssemblers(assemblers)
 
-    fun resolve(artifactId: ArtifactId<out Artifact>): ArtifactAssembler<Artifact> {
-        return assemblersByType[artifactId.artifactType]
+    fun resolve(artifactId: ArtifactId<out Artifact>): ArtifactAssembler<Artifact> =
+        assemblersByType[artifactId.artifactType]
             ?.cast()
             ?: error(
                 "No artifact assembler found for artifact type: ${artifactId.artifactType}",
             )
-    }
 
     private fun indexAssemblers(
         assemblers: List<ArtifactAssembler<*>>,
@@ -32,9 +29,7 @@ internal class ArtifactAssemblerRegistry(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun ArtifactAssembler<*>.cast(): ArtifactAssembler<Artifact> {
-        return this as ArtifactAssembler<Artifact>
-    }
+    private fun ArtifactAssembler<*>.cast(): ArtifactAssembler<Artifact> = this as ArtifactAssembler<Artifact>
 
     private fun formatType(type: KClass<out Artifact>): String = type.qualifiedName ?: type.toString()
 }

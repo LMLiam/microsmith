@@ -63,15 +63,13 @@ class DotnetPackageWorkspaceResolver(
         solutionName: String,
         references: List<DotnetPackageReferenceDeclaration>,
         centrallyManagedPackagesByName: Map<String, ResolvedDotnetPackageVersion>,
-    ): List<ResolvedDotnetPackageReference> {
-        return references.map { reference ->
-            resolveServicePackageReference(
-                serviceName = serviceName,
-                solutionName = solutionName,
-                reference = reference,
-                centrallyManagedPackagesByName = centrallyManagedPackagesByName,
-            )
-        }
+    ): List<ResolvedDotnetPackageReference> = references.map { reference ->
+        resolveServicePackageReference(
+            serviceName = serviceName,
+            solutionName = solutionName,
+            reference = reference,
+            centrallyManagedPackagesByName = centrallyManagedPackagesByName,
+        )
     }
 
     private fun resolveServicePackageReference(

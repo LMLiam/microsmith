@@ -28,9 +28,7 @@ class ProtobufDeclarationHandlerRegistryTests :
         }
     })
 
-private data class TestType(
-    override val name: String = "Test",
-) : Type
+private data class TestType(override val name: String = "Test") : Type
 
 private object TestDeclarationHandler : ProtobufDeclarationHandler<TestType> {
     override val type = TestType::class

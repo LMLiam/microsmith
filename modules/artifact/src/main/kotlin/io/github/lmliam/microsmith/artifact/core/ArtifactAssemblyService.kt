@@ -15,9 +15,8 @@ class ArtifactAssemblyService {
         this.assemblerRegistry = assemblerRegistry
     }
 
-    fun assemble(contributions: List<ArtifactContribution<out Artifact>>): ArtifactAssembly {
-        return assembleRetaining(emptyList(), contributions)
-    }
+    fun assemble(contributions: List<ArtifactContribution<out Artifact>>): ArtifactAssembly =
+        assembleRetaining(emptyList(), contributions)
 
     fun assembleRetaining(
         retainedArtifacts: List<Artifact>,
@@ -49,7 +48,6 @@ class ArtifactAssemblyService {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun ArtifactContribution<out Artifact>.cast(): ArtifactContribution<Artifact> {
-        return this as ArtifactContribution<Artifact>
-    }
+    private fun ArtifactContribution<out Artifact>.cast(): ArtifactContribution<Artifact> =
+        this as ArtifactContribution<Artifact>
 }

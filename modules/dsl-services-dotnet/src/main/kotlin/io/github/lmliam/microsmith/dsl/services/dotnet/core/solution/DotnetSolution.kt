@@ -7,10 +7,7 @@ import kotlin.reflect.KClass
 /**
  * A named .NET solution declared in the services-level dotnet defaults scope.
  */
-data class DotnetSolution(
-    val name: String,
-    val model: DotnetSolutionModel = DotnetSolutionModel.empty(),
-) {
+data class DotnetSolution(val name: String, val model: DotnetSolutionModel = DotnetSolutionModel.empty()) {
     init {
         validateDotnetQualifiedIdentifier(name, "Solution name")
     }

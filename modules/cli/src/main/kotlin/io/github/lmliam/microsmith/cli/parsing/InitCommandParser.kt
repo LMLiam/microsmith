@@ -32,10 +32,12 @@ private fun parseInitOptions(args: List<String>, startIndex: Int): ParsedInitOpt
                 DIAGNOSTICS_OPTION -> ParsedToken(
                     index + diagnosticOptions.consumeDiagnostics(args = args, index = index),
                 )
+
                 VERBOSE_OPTION ->
                     ParsedToken(
                         index + diagnosticOptions.consumeVerbose(),
                     )
+
                 REPO_ROOT_OPTION ->
                     parseRepoRootOption(
                         args = args,
@@ -45,6 +47,7 @@ private fun parseInitOptions(args: List<String>, startIndex: Int): ParsedInitOpt
                         projectRoot = parsedProjectRoot
                         projectRootSpecified = true
                     }
+
                 FORCE_OPTION ->
                     parseSingleOccurrenceFlag(
                         index = index,
@@ -53,6 +56,7 @@ private fun parseInitOptions(args: List<String>, startIndex: Int): ParsedInitOpt
                     ) {
                         force = true
                     }
+
                 SKIP_IDE_HELPER_OPTION ->
                     parseSingleOccurrenceFlag(
                         index = index,
@@ -61,6 +65,7 @@ private fun parseInitOptions(args: List<String>, startIndex: Int): ParsedInitOpt
                     ) {
                         skipIdeHelper = true
                     }
+
                 else -> ParsedToken(nextIndex = index, error = "Unknown option '$token'.")
             }
         if (parsedToken.error != null) {

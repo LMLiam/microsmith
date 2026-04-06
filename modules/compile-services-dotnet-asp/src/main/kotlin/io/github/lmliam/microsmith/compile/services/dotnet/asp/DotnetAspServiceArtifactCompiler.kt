@@ -22,40 +22,36 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
 
     override val artifactType = DotnetAspServiceArtifact::class
 
-    override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> {
-        return listOf(
-            MsBuildProjectContribution(
-                artifactId = MsBuildProjectArtifactId(
-                    solutionName = artifact.id.solutionName,
-                    projectName = artifact.id.projectName,
-                    kind = MsBuildProjectKind.Project,
-                ),
-                projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
-                properties = mapOf(
-                    MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
-                    MsBuildNames.NULLABLE_PROPERTY to "enable",
-                    MsBuildNames.TARGET_FRAMEWORK_PROPERTY to artifact.targetFrameworkMoniker,
-                ),
+    override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> = listOf(
+        MsBuildProjectContribution(
+            artifactId = MsBuildProjectArtifactId(
+                solutionName = artifact.id.solutionName,
+                projectName = artifact.id.projectName,
+                kind = MsBuildProjectKind.Project,
             ),
-            textContribution(artifact, "Program.cs", renderProgramFile()),
-            textContribution(artifact, "appsettings.json", renderAppSettingsFile(artifact)),
-            textContribution(artifact, "Properties/launchSettings.json", renderLaunchSettingsFile(artifact)),
-        )
-    }
+            projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
+            properties = mapOf(
+                MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
+                MsBuildNames.NULLABLE_PROPERTY to "enable",
+                MsBuildNames.TARGET_FRAMEWORK_PROPERTY to artifact.targetFrameworkMoniker,
+            ),
+        ),
+        textContribution(artifact, "Program.cs", renderProgramFile()),
+        textContribution(artifact, "appsettings.json", renderAppSettingsFile(artifact)),
+        textContribution(artifact, "Properties/launchSettings.json", renderLaunchSettingsFile(artifact)),
+    )
 
     private fun textContribution(
         artifact: DotnetAspServiceArtifact,
         relativePath: String,
         contents: String,
-    ): TextFileArtifactContribution {
-        return TextFileArtifactContribution(
-            artifactId = TextFileArtifactId(
-                relativePath = Path.of(relativePath),
-                outputRoot = artifact.outputRoot,
-            ),
-            contents = contents,
-        )
-    }
+    ): TextFileArtifactContribution = TextFileArtifactContribution(
+        artifactId = TextFileArtifactId(
+            relativePath = Path.of(relativePath),
+            outputRoot = artifact.outputRoot,
+        ),
+        contents = contents,
+    )
 
     private fun renderProgramFile(): String = """
         var builder = WebApplication.CreateBuilder(args);
@@ -108,12 +104,19 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
         value.forEach { char ->
             when (char) {
                 '\\' -> escaped.append("\\\\")
+
                 '"' -> escaped.append("\\\"")
+
                 '\b' -> escaped.append("\\b")
+
                 '\u000C' -> escaped.append("\\f")
+
                 '\n' -> escaped.append("\\n")
+
                 '\r' -> escaped.append("\\r")
+
                 '\t' -> escaped.append("\\t")
+
                 else -> {
                     if (char.code < FIRST_NON_PRINTABLE_ASCII_CODE_POINT) {
                         escaped.append("\\u%04x".format(char.code))

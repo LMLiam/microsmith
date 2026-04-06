@@ -5,10 +5,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotn
 /**
  * A single .NET model field.
  */
-data class DotnetField(
-    val name: String,
-    val type: DotnetFieldType,
-) {
+data class DotnetField(val name: String, val type: DotnetFieldType) {
     init {
         validateDotnetIdentifier(name, "Field name")
     }

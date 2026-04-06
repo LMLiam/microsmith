@@ -7,9 +7,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.Do
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.route.DotnetAspRouteGroup
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.route.DotnetAspRouteScope
 
-internal class DotnetAspRouteGroupBuilder(
-    private val path: String,
-) : DotnetAspRouteScope {
+internal class DotnetAspRouteGroupBuilder(private val path: String) : DotnetAspRouteScope {
     private val groups = mutableListOf<DotnetAspRouteGroup>()
     private val endpoints = mutableListOf<DotnetAspEndpoint>()
 

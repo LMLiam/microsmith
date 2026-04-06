@@ -27,31 +27,29 @@ internal object DoctorEnvironmentChecks {
         )
     }
 
-    fun checkProviderDiscovery(providerValidator: () -> List<String>): DoctorCheckResult {
-        return try {
-            val errors = providerValidator()
-            if (errors.isEmpty()) {
-                DoctorCheckResult(
-                    id = "provider-discovery",
-                    status = DoctorCheckStatus.PASS,
-                    message = "Required built-in service providers are available.",
-                )
-            } else {
-                DoctorCheckResult(
-                    id = "provider-discovery",
-                    status = DoctorCheckStatus.FAIL,
-                    message = "Required built-in service providers are missing.",
-                    details = mapOf("errors" to errors.joinToString(" | ")),
-                )
-            }
-        } catch (error: ServiceConfigurationError) {
+    fun checkProviderDiscovery(providerValidator: () -> List<String>): DoctorCheckResult = try {
+        val errors = providerValidator()
+        if (errors.isEmpty()) {
+            DoctorCheckResult(
+                id = "provider-discovery",
+                status = DoctorCheckStatus.PASS,
+                message = "Required built-in service providers are available.",
+            )
+        } else {
             DoctorCheckResult(
                 id = "provider-discovery",
                 status = DoctorCheckStatus.FAIL,
-                message = "Service provider loading failed.",
-                details = mapOf("error" to (error.message ?: error::class.simpleName.orEmpty())),
+                message = "Required built-in service providers are missing.",
+                details = mapOf("errors" to errors.joinToString(" | ")),
             )
         }
+    } catch (error: ServiceConfigurationError) {
+        DoctorCheckResult(
+            id = "provider-discovery",
+            status = DoctorCheckStatus.FAIL,
+            message = "Service provider loading failed.",
+            details = mapOf("error" to (error.message ?: error::class.simpleName.orEmpty())),
+        )
     }
 
     fun checkDirectoryWritable(id: String, directory: Path): DoctorCheckResult = runCatching {

@@ -1396,18 +1396,18 @@ microsmith run schema.microsmith.kts --plugin com.acme:private-emitter:1.2.3
 
 ### Environment variables
 
-| Variable                                 | Purpose                                                               |
-|------------------------------------------|-----------------------------------------------------------------------|
-| `MICROSMITH_REPOSITORY_ALLOWLIST`        | Comma-separated additional allowed repository base URIs.              |
-| `MICROSMITH_ALLOW_FILE_REPOSITORIES`     | Set to `true` to allow `file://` repositories for plugin coordinates. |
-| `MICROSMITH_REPOSITORY_CREDENTIALS_FILE` | Path to a repository credentials file.                                |
-| `MICROSMITH_REPOSITORY_USERNAME`         | Default username for authenticated repository access.                 |
-| `MICROSMITH_REPOSITORY_PASSWORD`         | Default password or token for authenticated repository access.        |
-| `MICROSMITH_GITHUB_PACKAGES_USER`        | Username for GitHub Packages repository access.                       |
-| `MICROSMITH_GITHUB_PACKAGES_TOKEN`       | Token for GitHub Packages repository access.                          |
+| Variable                                 | Purpose                                                                                                               |
+|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `MICROSMITH_REPOSITORY_ALLOWLIST`        | Comma-separated additional allowed repository base URIs.                                                              |
+| `MICROSMITH_ALLOW_FILE_REPOSITORIES`     | Set to `true` to allow `file://` repositories for plugin coordinates.                                                 |
+| `MICROSMITH_REPOSITORY_CREDENTIALS_FILE` | Path to a repository credentials file.                                                                                |
+| `MICROSMITH_REPOSITORY_USERNAME`         | Default username for authenticated repository access.                                                                 |
+| `MICROSMITH_REPOSITORY_PASSWORD`         | Default password or token for authenticated repository access.                                                        |
+| `MICROSMITH_GITHUB_PACKAGES_USER`        | Username for GitHub Packages repository access.                                                                       |
+| `MICROSMITH_GITHUB_PACKAGES_TOKEN`       | Token for GitHub Packages repository access.                                                                          |
 | `MICROSMITH_PLUGIN_ALLOWLIST_FILE`       | Path to checksum allowlist file entries in the form `<code>&lt;kind&gt;&#124;&lt;key&gt;&#124;&lt;sha256&gt;</code>`. |
-| `MICROSMITH_SCRIPT_CACHE_DIR`            | Override the script compilation cache directory.                      |
-| `MICROSMITH_PLUGIN_CACHE_DIR`            | Override the plugin resolution cache directory.                       |
+| `MICROSMITH_SCRIPT_CACHE_DIR`            | Override the script compilation cache directory.                                                                      |
+| `MICROSMITH_PLUGIN_CACHE_DIR`            | Override the plugin resolution cache directory.                                                                       |
 
 ## CI examples
 
@@ -1559,41 +1559,41 @@ jobs:
 The repository includes fixture repositories under `examples/non-gradle/`, `examples/jvm/`, `examples/gradle/`, and `examples/maven/`.
 CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flows. Native Gradle fixtures exercise `./gradlew microsmithGenerate`. Native Maven fixtures exercise `mvn microsmith:generate`. Native sbt fixtures exercise `sbt microsmithGenerate`.
 
-| Fixture | Directory                    | Local command from fixture root                                                   | CI workflow                                                   |
-|---------|------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------|
-| Java (native Gradle)   | `examples/gradle/java`      | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                      | `examples/gradle/java/.github/workflows/microsmith.yml`       |
-| Kotlin (native Gradle) | `examples/gradle/kotlin`   | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                      | `examples/gradle/kotlin/.github/workflows/microsmith.yml`     |
-| Scala (native Gradle)  | `examples/gradle/scala`    | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                      | `examples/gradle/scala/.github/workflows/microsmith.yml`      |
-| Java (native Maven)    | `examples/maven/java`      | `mvn microsmith:generate -Dmicrosmith.version=<version>`                          | `examples/maven/java/.github/workflows/microsmith.yml`        |
-| Kotlin (native Maven)  | `examples/maven/kotlin`    | `mvn microsmith:generate -Dmicrosmith.version=<version>`                          | `examples/maven/kotlin/.github/workflows/microsmith.yml`      |
-| Scala (native Maven)   | `examples/maven/scala`     | `mvn microsmith:generate -Dmicrosmith.version=<version>`                          | `examples/maven/scala/.github/workflows/microsmith.yml`       |
-| Scala (native sbt)     | `examples/sbt/scala`       | `sbt -Dmicrosmith.version=<version> microsmithGenerate`                           | `examples/sbt/scala/.github/workflows/microsmith.yml`         |
-| Java    | `examples/jvm/java-maven`    | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/jvm/java-maven/.github/workflows/microsmith.yml`    |
-| Kotlin  | `examples/jvm/kotlin-gradle` | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/jvm/kotlin-gradle/.github/workflows/microsmith.yml` |
-| Scala   | `examples/jvm/scala-sbt`     | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/jvm/scala-sbt/.github/workflows/microsmith.yml`     |
-| Node    | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
-| Go      | `examples/non-gradle/go`     | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/non-gradle/go/.github/workflows/microsmith.yml`     |
-| Python  | `examples/non-gradle/python` | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/non-gradle/python/.github/workflows/microsmith.yml` |
-| Ruby    | `examples/non-gradle/ruby`   | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/non-gradle/ruby/.github/workflows/microsmith.yml`   |
-| Rust    | `examples/non-gradle/rust`   | `microsmith init` then `microsmith run build.microsmith.kts`    | `examples/non-gradle/rust/.github/workflows/microsmith.yml`   |
-| .NET    | `examples/non-gradle/dotnet` | `microsmith init` then `microsmith run build.microsmith.kts --out .\Generated`    | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
+| Fixture                | Directory                    | Local command from fixture root                                                | CI workflow                                                   |
+|------------------------|------------------------------|--------------------------------------------------------------------------------|---------------------------------------------------------------|
+| Java (native Gradle)   | `examples/gradle/java`       | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/java/.github/workflows/microsmith.yml`       |
+| Kotlin (native Gradle) | `examples/gradle/kotlin`     | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/kotlin/.github/workflows/microsmith.yml`     |
+| Scala (native Gradle)  | `examples/gradle/scala`      | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/scala/.github/workflows/microsmith.yml`      |
+| Java (native Maven)    | `examples/maven/java`        | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/java/.github/workflows/microsmith.yml`        |
+| Kotlin (native Maven)  | `examples/maven/kotlin`      | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/kotlin/.github/workflows/microsmith.yml`      |
+| Scala (native Maven)   | `examples/maven/scala`       | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/scala/.github/workflows/microsmith.yml`       |
+| Scala (native sbt)     | `examples/sbt/scala`         | `sbt -Dmicrosmith.version=<version> microsmithGenerate`                        | `examples/sbt/scala/.github/workflows/microsmith.yml`         |
+| Java                   | `examples/jvm/java-maven`    | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/java-maven/.github/workflows/microsmith.yml`    |
+| Kotlin                 | `examples/jvm/kotlin-gradle` | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/kotlin-gradle/.github/workflows/microsmith.yml` |
+| Scala                  | `examples/jvm/scala-sbt`     | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/scala-sbt/.github/workflows/microsmith.yml`     |
+| Node                   | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
+| Go                     | `examples/non-gradle/go`     | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/go/.github/workflows/microsmith.yml`     |
+| Python                 | `examples/non-gradle/python` | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/python/.github/workflows/microsmith.yml` |
+| Ruby                   | `examples/non-gradle/ruby`   | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/ruby/.github/workflows/microsmith.yml`   |
+| Rust                   | `examples/non-gradle/rust`   | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/rust/.github/workflows/microsmith.yml`   |
+| .NET                   | `examples/non-gradle/dotnet` | `microsmith init` then `microsmith run build.microsmith.kts --out .\Generated` | `examples/non-gradle/dotnet/.github/workflows/microsmith.yml` |
 
 ## Validation matrix and release checklist
 
 ### Automated validation matrix
 
-| Surface                        | Coverage source                                      | Evidence                                                                                   |
-|--------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| CLI help and README contract   | `build-and-qodana` on Ubuntu                         | `scripts/verify_readme_cli_usage.py` compares the README usage block to built `--help`.   |
-| CLI distribution smoke         | `cli-smoke` on Ubuntu, macOS, and Windows            | Dist launcher, generation, process isolation, and `doctor --diagnostics json`.             |
-| Installer and bootstrap smoke  | `cli-smoke` on Ubuntu, macOS, and Windows            | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.        |
-| Native Gradle fixture smoke    | `build-and-qodana` on Ubuntu                         | Publishes required packages to `mavenLocal`, then runs `microsmithGenerate` for Java, Kotlin, and Scala Gradle fixtures. |
-| Native Maven fixture smoke     | `build-and-qodana` on Ubuntu                         | Publishes required packages to `mavenLocal`, then runs `mvn microsmith:generate` for Java, Kotlin, and Scala Maven fixtures. |
-| Native sbt fixture smoke       | `build-and-qodana` on Ubuntu                         | Publishes required packages to `mavenLocal`, then runs `sbt microsmithGenerate` for the Scala sbt fixture. |
-| Consumer fixture onboarding    | `cli-smoke` on Ubuntu and Windows                    | Ubuntu covers Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust fixtures; Windows covers the .NET fixture. |
-| JetBrains helper lifecycle     | `cli-smoke` on Ubuntu and Windows                    | Ubuntu runs `ide refresh` and `ide doctor` for Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust fixtures; Windows runs the .NET helper path. |
-| Fallback artifact packaging    | `build-and-qodana` on Ubuntu                         | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`. |
-| Resolver, auth, lock, offline  | `./gradlew build` and module regression suites       | `:cli:jvmKotest` covers authenticated repositories, lockfiles, cache policy, and offline behavior. |
+| Surface                       | Coverage source                                | Evidence                                                                                                                                          |
+|-------------------------------|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| CLI help and README contract  | `build-and-qodana` on Ubuntu                   | `scripts/verify_readme_cli_usage.py` compares the README usage block to built `--help`.                                                           |
+| CLI distribution smoke        | `cli-smoke` on Ubuntu, macOS, and Windows      | Dist launcher, generation, process isolation, and `doctor --diagnostics json`.                                                                    |
+| Installer and bootstrap smoke | `cli-smoke` on Ubuntu, macOS, and Windows      | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.                                                                |
+| Native Gradle fixture smoke   | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `microsmithGenerate` for Java, Kotlin, and Scala Gradle fixtures.                          |
+| Native Maven fixture smoke    | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `mvn microsmith:generate` for Java, Kotlin, and Scala Maven fixtures.                      |
+| Native sbt fixture smoke      | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `sbt microsmithGenerate` for the Scala sbt fixture.                                        |
+| Consumer fixture onboarding   | `cli-smoke` on Ubuntu and Windows              | Ubuntu covers Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust fixtures; Windows covers the .NET fixture.                                    |
+| JetBrains helper lifecycle    | `cli-smoke` on Ubuntu and Windows              | Ubuntu runs `ide refresh` and `ide doctor` for Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust fixtures; Windows runs the .NET helper path. |
+| Fallback artifact packaging   | `build-and-qodana` on Ubuntu                   | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`.                                                  |
+| Resolver, auth, lock, offline | `./gradlew build` and module regression suites | `:cli:jvmKotest` covers authenticated repositories, lockfiles, cache policy, and offline behavior.                                                |
 
 Automated gates are required on every release candidate commit:
 
@@ -1614,24 +1614,24 @@ Support policy:
 
 ### Native Gradle IDE validation
 
-| Product                    | Fixture root                | Required validation path |
-|---------------------------|-----------------------------|--------------------------|
-| IntelliJ IDEA            | `examples/gradle/java`      | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
-| IntelliJ IDEA            | `examples/gradle/kotlin`    | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
-| IntelliJ IDEA + Scala plugin | `examples/gradle/scala` | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
+| Product                      | Fixture root             | Required validation path                                                                                                                                             |
+|------------------------------|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| IntelliJ IDEA                | `examples/gradle/java`   | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
+| IntelliJ IDEA                | `examples/gradle/kotlin` | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
+| IntelliJ IDEA + Scala plugin | `examples/gradle/scala`  | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
 
 ### Native Maven IDE validation
 
-| Product                    | Fixture root              | Required validation path |
-|---------------------------|---------------------------|--------------------------|
-| IntelliJ IDEA            | `examples/maven/java`     | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
-| IntelliJ IDEA            | `examples/maven/kotlin`   | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
-| IntelliJ IDEA + Scala plugin | `examples/maven/scala` | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
+| Product                      | Fixture root            | Required validation path                                                                                                                                                       |
+|------------------------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| IntelliJ IDEA                | `examples/maven/java`   | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
+| IntelliJ IDEA                | `examples/maven/kotlin` | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
+| IntelliJ IDEA + Scala plugin | `examples/maven/scala`  | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
 
 ### Native sbt IDE validation
 
-| Product                    | Fixture root           | Required validation path |
-|---------------------------|------------------------|--------------------------|
+| Product                      | Fixture root         | Required validation path                                                                                                                                                                                                                                                                                                                                                      |
+|------------------------------|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | IntelliJ IDEA + Scala plugin | `examples/sbt/scala` | Import the fixture root as an sbt project, reload sbt indexing, and confirm the `Provided` `runtime-scripting` dependency exposes the built-in Microsmith DSL symbols in `build.microsmith.kts`. If imported sbt indexing still leaves `.microsmith.kts` unresolved, confirm the helper or fallback path restores resolution without changing the native sbt generation path. |
 
 Native Gradle checklist:
@@ -1661,17 +1661,17 @@ Native sbt checklist:
 
 ### Helper and fallback IDE validation
 
-| Product         | Fixture root                    | Required helper smoke path                              | Required fallback smoke path                             |
-|-----------------|---------------------------------|---------------------------------------------------------|----------------------------------------------------------|
-| WebStorm        | `examples/non-gradle/node`      | Run the helper checklist below against the Node fixture. | Run the fallback checklist below against the Node fixture. |
-| IntelliJ IDEA   | `examples/jvm/java-maven`       | Run the helper checklist below against the Java fixture. | Run the fallback checklist below against the Java fixture. |
-| IntelliJ IDEA   | `examples/jvm/kotlin-gradle`    | Run the helper checklist below against the Kotlin fixture. | Run the fallback checklist below against the Kotlin fixture. |
-| IntelliJ IDEA   | `examples/jvm/scala-sbt`        | Run the helper checklist below against the Scala fixture. | Run the fallback checklist below against the Scala fixture. |
-| GoLand          | `examples/non-gradle/go`        | Run the helper checklist below against the Go fixture.   | Run the fallback checklist below against the Go fixture.   |
-| PyCharm         | `examples/non-gradle/python`    | Run the helper checklist below against the Python fixture. | Run the fallback checklist below against the Python fixture. |
-| RubyMine        | `examples/non-gradle/ruby`      | Run the helper checklist below against the Ruby fixture. | Run the fallback checklist below against the Ruby fixture. |
-| RustRover       | `examples/non-gradle/rust`      | Run the helper checklist below against the Rust fixture. | Run the fallback checklist below against the Rust fixture. |
-| Rider           | `examples/non-gradle/dotnet`    | Run the helper checklist below against the .NET fixture. | Run the fallback checklist below against the .NET fixture. |
+| Product       | Fixture root                 | Required helper smoke path                                 | Required fallback smoke path                                 |
+|---------------|------------------------------|------------------------------------------------------------|--------------------------------------------------------------|
+| WebStorm      | `examples/non-gradle/node`   | Run the helper checklist below against the Node fixture.   | Run the fallback checklist below against the Node fixture.   |
+| IntelliJ IDEA | `examples/jvm/java-maven`    | Run the helper checklist below against the Java fixture.   | Run the fallback checklist below against the Java fixture.   |
+| IntelliJ IDEA | `examples/jvm/kotlin-gradle` | Run the helper checklist below against the Kotlin fixture. | Run the fallback checklist below against the Kotlin fixture. |
+| IntelliJ IDEA | `examples/jvm/scala-sbt`     | Run the helper checklist below against the Scala fixture.  | Run the fallback checklist below against the Scala fixture.  |
+| GoLand        | `examples/non-gradle/go`     | Run the helper checklist below against the Go fixture.     | Run the fallback checklist below against the Go fixture.     |
+| PyCharm       | `examples/non-gradle/python` | Run the helper checklist below against the Python fixture. | Run the fallback checklist below against the Python fixture. |
+| RubyMine      | `examples/non-gradle/ruby`   | Run the helper checklist below against the Ruby fixture.   | Run the fallback checklist below against the Ruby fixture.   |
+| RustRover     | `examples/non-gradle/rust`   | Run the helper checklist below against the Rust fixture.   | Run the fallback checklist below against the Rust fixture.   |
+| Rider         | `examples/non-gradle/dotnet` | Run the helper checklist below against the .NET fixture.   | Run the fallback checklist below against the .NET fixture.   |
 
 ### Manual IDE release checklist
 
@@ -1791,12 +1791,12 @@ The DSL surface stays the same; the execution boundary changes.
 
 ### Command mapping
 
-| Previous pattern                 | CLI replacement                                          |
-|----------------------------------|----------------------------------------------------------|
-| Gradle task invoking generation  | `microsmith run build.microsmith.kts`                      |
-| Gradle-managed plugin dependency | `--plugin group:artifact:version`                        |
-| local classpath jar wiring       | `--plugin-jar ./path/to/plugin.jar`                      |
-| Gradle offline mode              | `--offline`                                              |
+| Previous pattern                 | CLI replacement                       |
+|----------------------------------|---------------------------------------|
+| Gradle task invoking generation  | `microsmith run build.microsmith.kts` |
+| Gradle-managed plugin dependency | `--plugin group:artifact:version`     |
+| local classpath jar wiring       | `--plugin-jar ./path/to/plugin.jar`   |
+| Gradle offline mode              | `--offline`                           |
 
 ### Recommended migration sequence to the standalone CLI
 

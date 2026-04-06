@@ -2,7 +2,6 @@ package io.github.lmliam.microsmith.build.runtime
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-
 import java.io.File
 import java.nio.charset.StandardCharsets
 
@@ -27,9 +26,8 @@ internal object RuntimeScriptingSourceFiles {
     private const val COMPILATION_CONFIGURATION_MARKER = "compilationConfiguration ="
     private const val IMPLICIT_RECEIVER_MARKER = "implicitReceivers("
 
-    fun annotatedKotlinScriptSourceFile(project: Project, fileExtension: String): File {
-        return annotatedKotlinScriptSourceFile(sourceRoot(project), fileExtension)
-    }
+    fun annotatedKotlinScriptSourceFile(project: Project, fileExtension: String): File =
+        annotatedKotlinScriptSourceFile(sourceRoot(project), fileExtension)
 
     fun annotatedKotlinScriptSourceFile(sourceRoot: File, fileExtension: String): File {
         val sourceFiles =
@@ -44,16 +42,17 @@ internal object RuntimeScriptingSourceFiles {
 
         if (sourceFiles.size != 1) {
             throw GradleException(
-                "Expected exactly one Kotlin script template source for extension '$fileExtension' but found ${sourceFiles.map { it.path }}",
+                "Expected exactly one Kotlin script template source for extension '$fileExtension' but found ${sourceFiles.map {
+                    it.path
+                }}",
             )
         }
 
         return sourceFiles.single()
     }
 
-    fun sourceFileByTopLevelDeclaration(project: Project, declarationName: String): File {
-        return sourceFileByTopLevelDeclaration(sourceRoot(project), declarationName)
-    }
+    fun sourceFileByTopLevelDeclaration(project: Project, declarationName: String): File =
+        sourceFileByTopLevelDeclaration(sourceRoot(project), declarationName)
 
     fun sourceFileByTopLevelDeclaration(sourceRoot: File, declarationName: String): File {
         val sourceFiles = sourceRoot
@@ -64,7 +63,9 @@ internal object RuntimeScriptingSourceFiles {
 
         if (sourceFiles.size != 1) {
             throw GradleException(
-                "Expected exactly one source file declaring '$declarationName' but found ${sourceFiles.map { it.path }}",
+                "Expected exactly one source file declaring '$declarationName' but found ${sourceFiles.map {
+                    it.path
+                }}",
             )
         }
 
@@ -85,27 +86,17 @@ internal object RuntimeScriptingSourceFiles {
         } ?: throw GradleException("Source file '${sourceFile.path}' did not declare a package.")
     }
 
-    fun topLevelDeclarationNameFromSourceFile(sourceFile: File): String {
-        return topLevelDeclarationNameOrNull(sourceFile)
-            ?: throw GradleException("Source file '${sourceFile.path}' did not declare a top level class or object.")
-    }
+    fun topLevelDeclarationNameFromSourceFile(sourceFile: File): String = topLevelDeclarationNameOrNull(sourceFile)
+        ?: throw GradleException("Source file '${sourceFile.path}' did not declare a top level class or object.")
 
-    fun fqcnFromSourceFile(sourceFile: File): String {
-        return "${packageNameFromSourceFile(sourceFile)}.${topLevelDeclarationNameFromSourceFile(sourceFile)}"
-    }
+    fun fqcnFromSourceFile(sourceFile: File): String =
+        "${packageNameFromSourceFile(sourceFile)}.${topLevelDeclarationNameFromSourceFile(sourceFile)}"
 
-    fun compilationConfigurationSourceFileFromScriptTemplateSourceFile(
-        project: Project,
-        sourceFile: File,
-    ): File {
-        return compilationConfigurationSourceFileFromScriptTemplateSourceFile(sourceRoot(project), sourceFile)
-    }
+    fun compilationConfigurationSourceFileFromScriptTemplateSourceFile(project: Project, sourceFile: File): File =
+        compilationConfigurationSourceFileFromScriptTemplateSourceFile(sourceRoot(project), sourceFile)
 
-    fun compilationConfigurationSourceFileFromScriptTemplateSourceFile(
-        sourceRoot: File,
-        sourceFile: File,
-    ): File {
-        return sourceFileByTopLevelDeclaration(
+    fun compilationConfigurationSourceFileFromScriptTemplateSourceFile(sourceRoot: File, sourceFile: File): File =
+        sourceFileByTopLevelDeclaration(
             sourceRoot,
             referencedTypeSimpleNameFromSourceFile(
                 sourceFile,
@@ -113,20 +104,12 @@ internal object RuntimeScriptingSourceFiles {
                 "compilation configuration",
             ),
         )
-    }
 
-    fun contextSourceFileFromCompilationConfigurationSourceFile(
-        project: Project,
-        sourceFile: File,
-    ): File {
-        return contextSourceFileFromCompilationConfigurationSourceFile(sourceRoot(project), sourceFile)
-    }
+    fun contextSourceFileFromCompilationConfigurationSourceFile(project: Project, sourceFile: File): File =
+        contextSourceFileFromCompilationConfigurationSourceFile(sourceRoot(project), sourceFile)
 
-    fun contextSourceFileFromCompilationConfigurationSourceFile(
-        sourceRoot: File,
-        sourceFile: File,
-    ): File {
-        return sourceFileByTopLevelDeclaration(
+    fun contextSourceFileFromCompilationConfigurationSourceFile(sourceRoot: File, sourceFile: File): File =
+        sourceFileByTopLevelDeclaration(
             sourceRoot,
             referencedTypeSimpleNameFromSourceFile(
                 sourceFile,
@@ -134,12 +117,13 @@ internal object RuntimeScriptingSourceFiles {
                 "script context",
             ),
         )
-    }
 
     private fun topLevelDeclarationNameOrNull(sourceFile: File): String? {
         return firstMatchingLine(sourceFile) { line ->
             val trimmedLine = line.trimStart()
-            if (trimmedLine.isBlank() || trimmedLine.startsWith("//") || trimmedLine.startsWith("/*") || trimmedLine.startsWith("*")) {
+            if (trimmedLine.isBlank() || trimmedLine.startsWith("//") || trimmedLine.startsWith("/*") ||
+                trimmedLine.startsWith("*")
+            ) {
                 return@firstMatchingLine null
             }
             if (trimmedLine.startsWith("@")) {
@@ -150,18 +134,16 @@ internal object RuntimeScriptingSourceFiles {
             when {
                 declarationLine.startsWith(CLASS_DECLARATION_PREFIX) ->
                     extractDeclarationName(declarationLine, CLASS_DECLARATION_PREFIX)
+
                 declarationLine.startsWith(OBJECT_DECLARATION_PREFIX) ->
                     extractDeclarationName(declarationLine, OBJECT_DECLARATION_PREFIX)
+
                 else -> null
             }
         }
     }
 
-    private fun referencedTypeSimpleNameFromSourceFile(
-        sourceFile: File,
-        marker: String,
-        description: String,
-    ): String {
+    private fun referencedTypeSimpleNameFromSourceFile(sourceFile: File, marker: String, description: String): String {
         val sourceText = sourceFile.readText(StandardCharsets.UTF_8)
         val markerIndex = sourceText.indexOf(marker)
         if (markerIndex < 0) {
@@ -177,7 +159,10 @@ internal object RuntimeScriptingSourceFiles {
             .substring(markerIndex + marker.length, classIndex)
             .trim()
             .trimEnd(',', ')')
-        val simpleName = referencedType.substringAfterLast('.').takeWhile { char -> char.isLetterOrDigit() || char == '_' }
+        val simpleName = referencedType.substringAfterLast('.').takeWhile { char ->
+            char.isLetterOrDigit() ||
+                char == '_'
+        }
         if (simpleName.isBlank()) {
             throw GradleException("Source file '${sourceFile.path}' did not reference a valid $description type.")
         }
@@ -187,7 +172,7 @@ internal object RuntimeScriptingSourceFiles {
 
     private fun firstMatchingLine(sourceFile: File, matcher: (String) -> String?): String? {
         val sourceText = sourceFile.readText(StandardCharsets.UTF_8)
-        return sourceText.lineSequence().mapNotNull(matcher).firstOrNull()
+        return sourceText.lineSequence().firstNotNullOfOrNull(matcher)
     }
 
     private fun removeLeadingDeclarationModifiers(line: String): String {

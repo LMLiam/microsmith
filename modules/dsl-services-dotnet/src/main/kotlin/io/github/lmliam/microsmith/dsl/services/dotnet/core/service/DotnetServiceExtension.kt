@@ -16,7 +16,8 @@ data class DotnetServiceExtension(
     val project: String? = null,
     val models: Map<String, DotnetModel> = emptyMap(),
     val model: DotnetServiceModel = DotnetServiceModel.empty(),
-) : ServiceExtension, MergeableExtension<DotnetServiceExtension> {
+) : ServiceExtension,
+    MergeableExtension<DotnetServiceExtension> {
     fun findModel(name: String) = models[name]
 
     fun requireModel(name: String): DotnetModel {

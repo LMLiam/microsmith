@@ -23,10 +23,12 @@ internal object MicrosmithGradleFunctionalTestRuntimeClasspath {
                 ?.takeIf(String::isNotBlank)
                 ?: error("Expected a non-empty java.class.path for Gradle functional tests.")
         return classpath.split(FilePathSeparator.value)
+            .asSequence()
             .filter(String::isNotBlank)
             .map(Path::of)
             .map(Path::toAbsolutePath)
             .map(Path::normalize)
             .distinct()
+            .toList()
     }
 }

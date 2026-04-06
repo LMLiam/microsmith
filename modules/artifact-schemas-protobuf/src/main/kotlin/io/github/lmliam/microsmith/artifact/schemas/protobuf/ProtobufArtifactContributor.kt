@@ -12,8 +12,8 @@ class ProtobufArtifactContributor : ArtifactContributor<ResolvedProtobufSchemaMo
 
     override val resolvedType = ResolvedProtobufSchemaModel::class
 
-    override fun contribute(model: ResolvedProtobufSchemaModel): List<ArtifactContribution<*>> {
-        return model.schemas.map { resolvedSchema ->
+    override fun contribute(model: ResolvedProtobufSchemaModel): List<ArtifactContribution<*>> =
+        model.schemas.map { resolvedSchema ->
             val declarationHandler = declarationHandlerRegistry.resolve(resolvedSchema.schema.schema)
             declarationHandler.validate(resolvedSchema.schema, resolvedSchema.qualifiedName)
 
@@ -32,5 +32,4 @@ class ProtobufArtifactContributor : ArtifactContributor<ResolvedProtobufSchemaMo
                 ),
             )
         }
-    }
 }

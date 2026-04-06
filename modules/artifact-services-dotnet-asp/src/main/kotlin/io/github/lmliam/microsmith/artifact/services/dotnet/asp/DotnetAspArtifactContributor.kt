@@ -9,8 +9,10 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspac
 class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {
     override val resolvedType = DotnetAspWorkspace::class
 
-    override fun contribute(model: DotnetAspWorkspace): List<ArtifactContribution<*>> {
-        return model.servicesByName.values.sortedBy { it.name }.mapIndexed { index, service ->
+    override fun contribute(model: DotnetAspWorkspace): List<ArtifactContribution<*>> =
+        model.servicesByName.values.sortedBy {
+            it.name
+        }.mapIndexed { index, service ->
             val httpPort = BASE_HTTP_PORT + (index * PORT_STRIDE)
             DotnetAspServiceContribution(
                 artifactId = DotnetAspServiceArtifactId(service.solutionName, service.projectName),
@@ -21,7 +23,6 @@ class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {
                 httpsPort = httpPort + 1,
             )
         }
-    }
 
     private companion object {
         const val BASE_HTTP_PORT = 5000

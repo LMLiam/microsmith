@@ -5,11 +5,7 @@ import kotlin.io.path.Path
 /**
  * Parsed protobuf schema name with separated package/type segments.
  */
-data class QualifiedSchemaName(
-    val fullyQualifiedName: String,
-    val packageName: String?,
-    val typeName: String,
-) {
+data class QualifiedSchemaName(val fullyQualifiedName: String, val packageName: String?, val typeName: String) {
     fun relativePath(): java.nio.file.Path = buildRelativePath(prefix = Path("proto"))
 
     fun buildRelativePath(prefix: java.nio.file.Path): java.nio.file.Path = packageName

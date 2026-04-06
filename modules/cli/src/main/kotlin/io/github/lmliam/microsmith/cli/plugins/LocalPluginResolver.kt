@@ -3,9 +3,7 @@ package io.github.lmliam.microsmith.cli.plugins
 import java.nio.file.Files
 import java.nio.file.Path
 
-internal class LocalPluginResolver(
-    private val checksumCalculator: (Path) -> String = ::sha256,
-) {
+internal class LocalPluginResolver(private val checksumCalculator: (Path) -> String = ::sha256) {
     fun resolveValidated(pluginJars: Set<Path>): List<LocalPluginJar> {
         val localPluginJars =
             pluginJars

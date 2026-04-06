@@ -6,9 +6,9 @@ import io.github.lmliam.microsmith.dsl.services.helpers.require
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
-private data class MergeableTestSharedExtension(
-    val values: List<String>,
-) : MicrosmithExtension, MergeableExtension<MergeableTestSharedExtension> {
+private data class MergeableTestSharedExtension(val values: List<String>) :
+    MicrosmithExtension,
+    MergeableExtension<MergeableTestSharedExtension> {
     override fun merge(other: MergeableTestSharedExtension) = MergeableTestSharedExtension(values + other.values)
 }
 

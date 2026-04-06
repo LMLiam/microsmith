@@ -8,16 +8,15 @@ import java.nio.file.Path
 import java.util.Locale
 
 class MicrosmithSbtResultInterpreter {
-    fun interpret(outputDirectory: Path, result: ScriptRunResult): MicrosmithSbtExecutionOutcome {
-        return when (result) {
-            is ScriptRunSuccess -> MicrosmithSbtExecutionOutcome(
-                outputDirectory = outputDirectory,
-                warnings = result.warnings,
-                cacheHit = result.cacheHit,
-                elapsedMillis = result.elapsedMillis,
-            )
-            is ScriptRunFailure -> throw buildFailure(result)
-        }
+    fun interpret(outputDirectory: Path, result: ScriptRunResult): MicrosmithSbtExecutionOutcome = when (result) {
+        is ScriptRunSuccess -> MicrosmithSbtExecutionOutcome(
+            outputDirectory = outputDirectory,
+            warnings = result.warnings,
+            cacheHit = result.cacheHit,
+            elapsedMillis = result.elapsedMillis,
+        )
+
+        is ScriptRunFailure -> throw buildFailure(result)
     }
 
     private fun buildFailure(result: ScriptRunFailure): RuntimeException {
@@ -27,6 +26,7 @@ class MicrosmithSbtResultInterpreter {
             ScriptFailureType.COMPILATION,
             ScriptFailureType.EVALUATION,
             -> MicrosmithSbtScriptFailureException(message)
+
             ScriptFailureType.HOST -> MicrosmithSbtHostFailureException(message)
         }
     }

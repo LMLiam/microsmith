@@ -3,10 +3,8 @@ package io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufDeclarationContext
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 
-internal class ServiceBuilder(
-    private val name: String,
-    private val declarationContext: ProtobufDeclarationContext,
-) : ServiceScope {
+internal class ServiceBuilder(private val name: String, private val declarationContext: ProtobufDeclarationContext) :
+    ServiceScope {
     private val routeNames = mutableSetOf<String>()
     private val rpcs = mutableListOf<Rpc>()
 
@@ -21,10 +19,8 @@ internal class ServiceBuilder(
     fun build(): Service = Service(name = name, rpcs = rpcs.toList())
 }
 
-private class RpcBuilder(
-    private val name: String,
-    private val declarationContext: ProtobufDeclarationContext,
-) : RpcScope {
+private class RpcBuilder(private val name: String, private val declarationContext: ProtobufDeclarationContext) :
+    RpcScope {
     private var request: RpcEndpoint? = null
     private var response: RpcEndpoint? = null
     private var declarationStyle: RpcDeclarationStyle? = null

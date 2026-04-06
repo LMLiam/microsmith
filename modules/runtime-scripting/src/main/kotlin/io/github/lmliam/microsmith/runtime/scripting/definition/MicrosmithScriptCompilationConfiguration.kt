@@ -38,10 +38,7 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
             )
         }
     },
-) {
-    @Suppress("unused")
-    private fun readResolve(): Any = MicrosmithScriptCompilationConfiguration
-}
+)
 
 private fun importFromPackageOf(owner: KClass<*>, symbol: KFunction<*>): String =
     "${owner.java.packageName}.${symbol.name}"

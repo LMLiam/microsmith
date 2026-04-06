@@ -5,9 +5,7 @@ import java.nio.file.Path
 
 private val defaultTextFileOutputRoot = Path.of(".")
 
-data class TextFileArtifactId(
-    val relativePath: Path,
-    val outputRoot: Path = defaultTextFileOutputRoot,
-) : ArtifactId<TextFileArtifact> {
+data class TextFileArtifactId(val relativePath: Path, val outputRoot: Path = defaultTextFileOutputRoot) :
+    ArtifactId<TextFileArtifact> {
     override val artifactType = TextFileArtifact::class
 }

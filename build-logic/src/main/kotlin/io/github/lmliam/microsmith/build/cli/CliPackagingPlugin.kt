@@ -8,9 +8,9 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.ConfigurableFilePermissions
 import org.gradle.api.file.CopySpec
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.SourceSetContainer
@@ -19,7 +19,6 @@ import org.gradle.api.tasks.bundling.Compression
 import org.gradle.api.tasks.bundling.Tar
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.jvm.tasks.Jar
-
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.jar.JarFile
@@ -99,7 +98,10 @@ class CliPackagingPlugin : Plugin<Project> {
             project.tasks.register(CliTaskNames.GENERATE_BUNDLED_PLUGIN_CATALOG, DefaultTask::class.java) { task ->
                 task.dependsOn(bundledPluginJarTasks)
                 task.inputs.property("cliVersion", cliVersion)
-                task.inputs.property("catalogFormatVersion", CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION)
+                task.inputs.property(
+                    "catalogFormatVersion",
+                    CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
+                )
                 task.inputs.files(bundledPlugins.map { it.archiveFile })
                 task.outputs.file(bundledPluginCatalogOutput)
 
@@ -130,7 +132,7 @@ class CliPackagingPlugin : Plugin<Project> {
             task.dependsOn(generateBundledPluginCatalogTask)
             task.from(
                 bundledPluginCatalogOutput,
-                Action<CopySpec> { copySpec ->
+                Action { copySpec ->
                     copySpec.into("META-INF/microsmith")
                 },
             )
@@ -181,7 +183,9 @@ class CliPackagingPlugin : Plugin<Project> {
                     JarFile(shadedJar).use { jarFile ->
                         expectedServiceProvidersByDescriptor.forEach { (servicePath, expectedProviders) ->
                             val entry = jarFile.getJarEntry(servicePath)
-                                ?: throw GradleException("Missing merged service descriptor '$servicePath' in ${shadedJar.name}.")
+                                ?: throw GradleException(
+                                    "Missing merged service descriptor '$servicePath' in ${shadedJar.name}.",
+                                )
                             val providers =
                                 jarFile.getInputStream(entry)
                                     .bufferedReader(StandardCharsets.UTF_8)
@@ -201,13 +205,17 @@ class CliPackagingPlugin : Plugin<Project> {
                         }
 
                         val catalogEntry = jarFile.getJarEntry(bundledPluginCatalogJarEntry)
-                            ?: throw GradleException("Missing bundled plugin catalog '$bundledPluginCatalogJarEntry' in ${shadedJar.name}.")
+                            ?: throw GradleException(
+                                "Missing bundled plugin catalog '$bundledPluginCatalogJarEntry' in ${shadedJar.name}.",
+                            )
                         val actualCatalogText =
                             jarFile.getInputStream(catalogEntry)
                                 .bufferedReader(StandardCharsets.UTF_8)
                                 .use { reader -> reader.readText() }
                         if (actualCatalogText != expectedCatalogText) {
-                            throw GradleException("Bundled plugin catalog in ${shadedJar.name} does not match generated metadata.")
+                            throw GradleException(
+                                "Bundled plugin catalog in ${shadedJar.name} does not match generated metadata.",
+                            )
                         }
                         CliBundledPluginCatalogVerifier.validate(
                             actualCatalogText,
@@ -231,7 +239,7 @@ class CliPackagingPlugin : Plugin<Project> {
                 task.into(distDirectory)
                 task.from(
                     shadowJarArchive,
-                    Action<CopySpec> { copySpec ->
+                    Action { copySpec ->
                         copySpec.into("lib")
                     },
                 )
@@ -245,13 +253,13 @@ class CliPackagingPlugin : Plugin<Project> {
                 )
                 task.from(
                     project.file("src/dist/README.txt"),
-                    Action<CopySpec> { copySpec ->
+                    Action { copySpec ->
                         copySpec.into(".")
                     },
                 )
                 task.from(
                     bundledPluginCatalogOutput,
-                    Action<CopySpec> { copySpec ->
+                    Action { copySpec ->
                         copySpec.into(".")
                     },
                 )
@@ -266,7 +274,7 @@ class CliPackagingPlugin : Plugin<Project> {
                 task.destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
                 task.from(
                     distDirectory,
-                    Action<CopySpec> { copySpec ->
+                    Action { copySpec ->
                         copySpec.into(distRootName)
                     },
                 )
@@ -282,7 +290,7 @@ class CliPackagingPlugin : Plugin<Project> {
                 task.destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
                 task.from(
                     distDirectory,
-                    Action<CopySpec> { copySpec ->
+                    Action { copySpec ->
                         copySpec.into(distRootName)
                     },
                 )
@@ -303,7 +311,10 @@ class CliPackagingPlugin : Plugin<Project> {
                     val expectedCatalogText = bundledPluginCatalogOutput.get().asFile.readText(StandardCharsets.UTF_8)
                     val bundledServiceEntries = collectBundledServiceEntries()
                     val distRootDirectory = distDirectory.get().asFile
-                    val distCatalogFile = java.io.File(distRootDirectory, CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME)
+                    val distCatalogFile = java.io.File(
+                        distRootDirectory,
+                        CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME,
+                    )
                     if (!distCatalogFile.isFile) {
                         throw GradleException(
                             "Distribution directory is missing '${CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}' at ${distCatalogFile.path}.",
@@ -333,20 +344,24 @@ class CliPackagingPlugin : Plugin<Project> {
                         }
                         val launcherText = launcher.readText(StandardCharsets.UTF_8)
                         if (launcherText.contains("@CLI_JAR@")) {
-                            throw GradleException("Launcher '${launcher.path}' still contains unresolved @CLI_JAR@ token.")
+                            throw GradleException(
+                                "Launcher '${launcher.path}' still contains unresolved @CLI_JAR@ token.",
+                            )
                         }
                         if (!launcherText.contains(shadowJarArchiveName)) {
-                            throw GradleException("Launcher '${launcher.path}' does not reference '${shadowJarArchiveName}'.")
+                            throw GradleException(
+                                "Launcher '${launcher.path}' does not reference '$shadowJarArchiveName'.",
+                            )
                         }
                     }
 
                     val expectedEntries =
                         setOf(
-                            "${distRootName}/${CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}",
-                            "${distRootName}/README.txt",
-                            "${distRootName}/bin/microsmith",
-                            "${distRootName}/bin/microsmith.bat",
-                            "${distRootName}/lib/$shadowJarArchiveName",
+                            "$distRootName/${CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}",
+                            "$distRootName/README.txt",
+                            "$distRootName/bin/microsmith",
+                            "$distRootName/bin/microsmith.bat",
+                            "$distRootName/lib/$shadowJarArchiveName",
                         )
 
                     mapOf(
@@ -356,7 +371,9 @@ class CliPackagingPlugin : Plugin<Project> {
                         val missingEntries = expectedEntries.filterNot(entries::contains)
                         if (missingEntries.isNotEmpty()) {
                             throw GradleException(
-                                "Archive $archiveName is missing expected distribution entries: ${missingEntries.joinToString(", ")}",
+                                "Archive $archiveName is missing expected distribution entries: ${missingEntries.joinToString(
+                                    ", ",
+                                )}",
                             )
                         }
                     }
@@ -376,7 +393,7 @@ class CliPackagingPlugin : Plugin<Project> {
                 )
                 task.from(
                     project.file("src/install/microsmith-install.ps1"),
-                    Action<CopySpec> { copySpec ->
+                    Action { copySpec ->
                         copySpec.into(".")
                     },
                 )
@@ -399,12 +416,17 @@ class CliPackagingPlugin : Plugin<Project> {
                         ?.sortedBy { file -> file.name }
                         .orEmpty()
                 if (sourceFiles.isEmpty()) {
-                    throw GradleException("Release assets directory '${releaseDir.path}' did not contain files to checksum.")
+                    throw GradleException(
+                        "Release assets directory '${releaseDir.path}' did not contain files to checksum.",
+                    )
                 }
 
                 sourceFiles.forEach { file ->
                     val checksum = MessageDigest.getInstance("SHA-256").digest(file.readBytes()).encodeHex()
-                    java.io.File(releaseDir, "${file.name}.sha256").writeText("$checksum  ${file.name}\n", StandardCharsets.UTF_8)
+                    java.io.File(
+                        releaseDir,
+                        "${file.name}.sha256",
+                    ).writeText("$checksum  ${file.name}\n", StandardCharsets.UTF_8)
                 }
             }
         }
@@ -427,33 +449,34 @@ private object CliTaskNames {
     const val RELEASE_ARTIFACTS = "releaseArtifacts"
 }
 
-private fun launcherCopySpec(shadowJarArchiveName: String): Action<CopySpec> =
-    Action { copySpec ->
-        copySpec.into("bin")
-        copySpec.filter(
-            mapOf("tokens" to mapOf("CLI_JAR" to shadowJarArchiveName)),
-            ReplaceTokens::class.java,
-        )
-        copySpec.filePermissions(Action<ConfigurableFilePermissions> { permissions ->
+private fun launcherCopySpec(shadowJarArchiveName: String): Action<CopySpec> = Action { copySpec ->
+    copySpec.into("bin")
+    copySpec.filter(
+        mapOf("tokens" to mapOf("CLI_JAR" to shadowJarArchiveName)),
+        ReplaceTokens::class.java,
+    )
+    copySpec.filePermissions(
+        Action<ConfigurableFilePermissions> { permissions ->
             permissions.unix("rwxr-xr-x")
-        })
-    }
+        },
+    )
+}
 
-private fun windowsLauncherCopySpec(shadowJarArchiveName: String): Action<CopySpec> =
-    Action { copySpec ->
-        copySpec.into("bin")
-        copySpec.filter(
-            mapOf("tokens" to mapOf("CLI_JAR" to shadowJarArchiveName)),
-            ReplaceTokens::class.java,
-        )
-    }
+private fun windowsLauncherCopySpec(shadowJarArchiveName: String): Action<CopySpec> = Action { copySpec ->
+    copySpec.into("bin")
+    copySpec.filter(
+        mapOf("tokens" to mapOf("CLI_JAR" to shadowJarArchiveName)),
+        ReplaceTokens::class.java,
+    )
+}
 
-private fun executableFileCopySpec(): Action<CopySpec> =
-    Action { copySpec ->
-        copySpec.into(".")
-        copySpec.filePermissions(Action<ConfigurableFilePermissions> { permissions ->
+private fun executableFileCopySpec(): Action<CopySpec> = Action { copySpec ->
+    copySpec.into(".")
+    copySpec.filePermissions(
+        Action<ConfigurableFilePermissions> { permissions ->
             permissions.unix("rwxr-xr-x")
-        })
-    }
+        },
+    )
+}
 
 private fun ByteArray.encodeHex(): String = joinToString(separator = "") { byte -> "%02x".format(byte) }

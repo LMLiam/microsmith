@@ -3,7 +3,7 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.core
 /**
  * User-facing target aliases exposed directly on .NET DSL scopes.
  */
-@Suppress("VariableNaming")
+@Suppress("VariableNaming", "PropertyName")
 interface DotnetTargetAliases {
     val NET5: DotnetTarget
         get() = DotnetTarget.NET5

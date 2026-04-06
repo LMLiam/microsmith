@@ -5,7 +5,6 @@ import io.github.lmliam.microsmith.cli.ide.IdeHelperConflictException
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe

@@ -21,7 +21,9 @@ private fun parseDoctorOptions(args: List<String>, startIndex: Int): ParsedDocto
         val consumed =
             when (val token = args[index]) {
                 DIAGNOSTICS_OPTION -> state.consumeDiagnostics(args = args, index = index)
+
                 VERBOSE_OPTION -> state.consumeVerbose()
+
                 else -> {
                     state.consumeUnknownOption(token)
                     0

@@ -9,7 +9,9 @@ internal class ScriptEvaluationModelEmitter {
     fun ensureGenerated(evaluationResult: EvaluationResult, scriptContext: MicrosmithScriptContext) {
         when (val returnValue = evaluationResult.returnValue) {
             is ResultValue.Error -> rethrow(returnValue.error)
+
             is ResultValue.Value -> emitReturnedModelIfNeeded(returnValue.value, scriptContext)
+
             is ResultValue.Unit,
             ResultValue.NotEvaluated,
             -> requireGenerated(scriptContext)

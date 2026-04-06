@@ -29,7 +29,7 @@ internal class DotnetAspBindingResolver {
         require(bindingFields == placeholderSet) {
             "ASP.NET path binding '${binding.name}' in operation '${endpoint.operationName}' " +
                 "must match route placeholders ${placeholders.joinToString(", ")}, " +
-                "but declared ${resolved.fields.map(ResolvedDotnetAspRequestField::name).joinToString(", ")}."
+                "but declared ${resolved.fields.joinToString(", ", transform = ResolvedDotnetAspRequestField::name)}."
         }
 
         return resolved

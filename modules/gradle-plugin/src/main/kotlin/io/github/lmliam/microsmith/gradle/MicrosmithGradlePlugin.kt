@@ -52,8 +52,7 @@ class MicrosmithGradlePlugin : Plugin<Project> {
             }
 
         project.plugins.withType(JavaBasePlugin::class.java) {
-            project.configurations.named(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).configure {
-                    configuration ->
+            project.configurations.named(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).configure { configuration ->
                 configuration.extendsFrom(microsmithIde.get())
             }
         }

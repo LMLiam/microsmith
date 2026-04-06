@@ -10,6 +10,7 @@ internal class ManagedIdeHelperFileWriter {
     fun ensureManagedDirectory(path: Path) {
         when {
             managedPathExists(path) && isManagedDirectory(path) -> return
+
             managedPathExists(path) ->
                 throw IdeHelperConflictException("IDE helper directory '$path' exists but is not a directory.")
 
@@ -32,18 +33,16 @@ internal class ManagedIdeHelperFileWriter {
 
     private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
 
-    private fun managedFileContentMatches(path: Path, normalizedContent: String): Boolean {
-        return try {
-            if (!isManagedRegularFile(path)) {
-                false
-            } else {
-                Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n") == normalizedContent
-            }
-        } catch (_: IOException) {
+    private fun managedFileContentMatches(path: Path, normalizedContent: String): Boolean = try {
+        if (!isManagedRegularFile(path)) {
             false
-        } catch (_: SecurityException) {
-            false
+        } else {
+            Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n") == normalizedContent
         }
+    } catch (_: IOException) {
+        false
+    } catch (_: SecurityException) {
+        false
     }
 
     private fun isManagedDirectory(path: Path): Boolean = Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)

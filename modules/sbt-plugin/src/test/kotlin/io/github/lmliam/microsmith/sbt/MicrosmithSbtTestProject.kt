@@ -3,9 +3,7 @@ package io.github.lmliam.microsmith.sbt
 import java.nio.file.Files
 import java.nio.file.Path
 
-class MicrosmithSbtTestProject private constructor(
-    private val rootDirectory: Path,
-) {
+class MicrosmithSbtTestProject private constructor(private val rootDirectory: Path) {
     fun writeFile(relativePath: String, contents: String) {
         val file = file(relativePath)
         Files.createDirectories(checkNotNull(file.parent))

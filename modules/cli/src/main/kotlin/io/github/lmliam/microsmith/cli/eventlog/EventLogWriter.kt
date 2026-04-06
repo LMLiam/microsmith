@@ -1,10 +1,10 @@
 package io.github.lmliam.microsmith.cli.eventlog
 
 import io.github.lmliam.microsmith.cli.diagnostics.toJsonValue
+import io.github.lmliam.microsmith.cli.support.sha256IfRegularFile
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
-import java.security.MessageDigest
 import java.time.Instant
 
 internal object EventLogWriter {
@@ -16,7 +16,7 @@ internal object EventLogWriter {
                 "status" to event.status.wireValue,
                 "exitCode" to event.exitCode,
                 "scriptPath" to event.scriptPath.toAbsolutePath().normalize().toString(),
-                "scriptSha256" to sha256IfPresent(event.scriptPath),
+                "scriptSha256" to sha256IfRegularFile(event.scriptPath),
                 "outputPath" to event.outputPath.toAbsolutePath().normalize().toString(),
                 "pluginCoordinates" to event.pluginCoordinates.toList().sorted(),
                 "pluginJars" to event.pluginJars.map { it.toAbsolutePath().normalize().toString() }.sorted(),
@@ -38,25 +38,5 @@ internal object EventLogWriter {
             StandardOpenOption.APPEND,
             StandardOpenOption.WRITE,
         )
-    }
-
-    private fun sha256IfPresent(path: Path): String? {
-        val normalized = path.toAbsolutePath().normalize()
-        if (!Files.exists(normalized) || !Files.isRegularFile(normalized)) {
-            return null
-        }
-
-        val digest = MessageDigest.getInstance("SHA-256")
-        Files.newInputStream(normalized).use { input ->
-            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-            while (true) {
-                val read = input.read(buffer)
-                if (read == -1) {
-                    break
-                }
-                digest.update(buffer, 0, read)
-            }
-        }
-        return digest.digest().joinToString(separator = "") { "%02x".format(it) }
     }
 }

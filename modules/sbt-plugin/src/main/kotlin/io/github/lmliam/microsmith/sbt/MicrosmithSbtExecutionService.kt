@@ -25,7 +25,9 @@ class MicrosmithSbtExecutionService(
 
     private fun RuntimeException.toHostFailure(): RuntimeException = when (this) {
         is MicrosmithSbtScriptFailureException -> this
+
         is MicrosmithSbtHostFailureException -> this
+
         else -> MicrosmithSbtHostFailureException(
             "Microsmith sbt plugin failed before generation completed.",
             this,
