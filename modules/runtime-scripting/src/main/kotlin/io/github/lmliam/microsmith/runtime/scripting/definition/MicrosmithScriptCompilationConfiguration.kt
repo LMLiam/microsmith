@@ -38,9 +38,7 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
             )
         }
     },
-) {
-    private fun readResolve(): Any = MicrosmithScriptCompilationConfiguration
-}
+)
 
 private fun importFromPackageOf(owner: KClass<*>, symbol: KFunction<*>): String =
     "${owner.java.packageName}.${symbol.name}"
