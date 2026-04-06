@@ -15,13 +15,10 @@ internal class ReferenceResolutionContext(schemas: Set<ProtobufSchema>) : Protob
     private val schemasByName = schemas.associateBy(ProtobufSchema::name)
     private val errors = mutableListOf<String>()
 
-    fun resolve(schema: ProtobufSchema): ProtobufSchema {
-        val schemaType = schema.schema
-        return when (schemaType) {
-            is Message -> schema.copy(schema = schemaType.resolveMessage())
-            is ProtobufReferenceResolvableType -> schema.copy(schema = schemaType.resolveReferences(this))
-            else -> schema
-        }
+    fun resolve(schema: ProtobufSchema): ProtobufSchema = when (val schemaType = schema.schema) {
+        is Message -> schema.copy(schema = schemaType.resolveMessage())
+        is ProtobufReferenceResolvableType -> schema.copy(schema = schemaType.resolveReferences(this))
+        else -> schema
     }
 
     fun failOnUnresolvedReferences() {

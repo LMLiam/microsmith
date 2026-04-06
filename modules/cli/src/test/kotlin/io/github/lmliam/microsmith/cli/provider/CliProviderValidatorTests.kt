@@ -168,17 +168,13 @@ private class TextFileAssemblerStub : ArtifactAssembler<TextFileArtifact> {
 private class ProtoFileCompilerStub : ArtifactCompiler<ProtoFileArtifact> {
     override val artifactType = ProtoFileArtifact::class
 
-    override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> {
-        return emptyList()
-    }
+    override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> = emptyList()
 }
 
 private class ProtobufRpcCompilerStub : ArtifactCompiler<ProtobufRpcServiceArtifact> {
     override val artifactType = ProtobufRpcServiceArtifact::class
 
-    override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> {
-        return emptyList()
-    }
+    override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> = emptyList()
 }
 
 private class TextFileRendererStub : ArtifactRenderer<TextFileArtifact> {

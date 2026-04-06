@@ -10,40 +10,38 @@ import java.nio.file.attribute.BasicFileAttributes
 import kotlin.io.path.isRegularFile
 
 internal object JvmOnboardingMarkerFinder {
-    fun find(projectRoot: Path, buildMarkers: List<Path>, sourceRootMatcher: (Path) -> Boolean): List<String> {
-        return try {
-            val matchedBuildMarkers =
-                buildMarkers
-                    .filter { markerPath ->
-                        projectRoot.resolve(markerPath).isRegularFile()
-                    }.map(Path::toString)
-            val rootSourceMarkers = findRootSourceMarkers(projectRoot, sourceRootMatcher)
+    fun find(projectRoot: Path, buildMarkers: List<Path>, sourceRootMatcher: (Path) -> Boolean): List<String> = try {
+        val matchedBuildMarkers =
+            buildMarkers
+                .filter { markerPath ->
+                    projectRoot.resolve(markerPath).isRegularFile()
+                }.map(Path::toString)
+        val rootSourceMarkers = findRootSourceMarkers(projectRoot, sourceRootMatcher)
 
-            when {
-                rootSourceMarkers.isNotEmpty() -> {
-                    (matchedBuildMarkers + rootSourceMarkers).sorted()
-                }
+        when {
+            rootSourceMarkers.isNotEmpty() -> {
+                (matchedBuildMarkers + rootSourceMarkers).sorted()
+            }
 
-                matchedBuildMarkers.isEmpty() -> {
+            matchedBuildMarkers.isEmpty() -> {
+                emptyList()
+            }
+
+            else -> {
+                val matchedModuleSourceMarkers = findModuleSourceMarkers(projectRoot, sourceRootMatcher)
+                if (matchedModuleSourceMarkers.isEmpty()) {
                     emptyList()
-                }
-
-                else -> {
-                    val matchedModuleSourceMarkers = findModuleSourceMarkers(projectRoot, sourceRootMatcher)
-                    if (matchedModuleSourceMarkers.isEmpty()) {
-                        emptyList()
-                    } else {
-                        (matchedBuildMarkers + matchedModuleSourceMarkers).sorted()
-                    }
+                } else {
+                    (matchedBuildMarkers + matchedModuleSourceMarkers).sorted()
                 }
             }
-        } catch (_: IOException) {
-            emptyList()
-        } catch (_: UncheckedIOException) {
-            emptyList()
-        } catch (_: SecurityException) {
-            emptyList()
         }
+    } catch (_: IOException) {
+        emptyList()
+    } catch (_: UncheckedIOException) {
+        emptyList()
+    } catch (_: SecurityException) {
+        emptyList()
     }
 
     private fun findRootSourceMarkers(projectRoot: Path, sourceRootMatcher: (Path) -> Boolean): List<String> {
@@ -108,16 +106,14 @@ internal object JvmOnboardingMarkerFinder {
         return matchedMarkers.sorted()
     }
 
-    private fun isRootSourceMarker(relativeDirectory: Path, sourceRootMatcher: (Path) -> Boolean): Boolean {
-        return relativeDirectory.nameCount == ROOT_SOURCE_MARKER_DEPTH &&
+    private fun isRootSourceMarker(relativeDirectory: Path, sourceRootMatcher: (Path) -> Boolean): Boolean =
+        relativeDirectory.nameCount == ROOT_SOURCE_MARKER_DEPTH &&
             relativeDirectory.getName(0).toString() == SOURCE_ROOT_DIRECTORY_NAME &&
             sourceRootMatcher(relativeDirectory)
-    }
 
-    private fun isIgnoredNestedScanRootDirectory(relativeDirectory: Path): Boolean {
-        return relativeDirectory.nameCount == INFRASTRUCTURE_DIRECTORY_DEPTH &&
+    private fun isIgnoredNestedScanRootDirectory(relativeDirectory: Path): Boolean =
+        relativeDirectory.nameCount == INFRASTRUCTURE_DIRECTORY_DEPTH &&
             relativeDirectory.getName(0).toString() in IGNORED_NESTED_SCAN_ROOT_DIRECTORIES
-    }
 }
 
 private const val MODULE_SOURCE_SEARCH_DEPTH = 6

@@ -76,7 +76,4 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
     }
 }
 
-private data class MsBuildItemIdentity(
-    val itemName: String,
-    val include: String,
-)
+private data class MsBuildItemIdentity(val itemName: String, val include: String)

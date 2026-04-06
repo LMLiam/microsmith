@@ -2,9 +2,7 @@ package io.github.lmliam.microsmith.cli.plugins
 
 import java.nio.file.Path
 
-internal class RemotePluginResolutionAccumulator(
-    private val checksumCalculator: (Path) -> String = ::sha256,
-) {
+internal class RemotePluginResolutionAccumulator(private val checksumCalculator: (Path) -> String = ::sha256) {
     fun resolve(
         coordinates: List<Coordinate>,
         offline: Boolean,

@@ -13,20 +13,16 @@ class ArtifactContributionService {
         this.contributorRegistry = contributorRegistry
     }
 
-    fun contribute(models: List<ResolvedModel>): List<ArtifactContribution<out Artifact>> {
-        return models
-            .sortedBy { it::class.qualifiedName ?: it::class.toString() }
-            .flatMap { model ->
-                contributorRegistry.resolve(model).flatMap { contributor ->
-                    contributor.contributeUnchecked(model)
-                }
+    fun contribute(models: List<ResolvedModel>): List<ArtifactContribution<out Artifact>> = models
+        .sortedBy { it::class.qualifiedName ?: it::class.toString() }
+        .flatMap { model ->
+            contributorRegistry.resolve(model).flatMap { contributor ->
+                contributor.contributeUnchecked(model)
             }
-    }
+        }
 }
 
 @Suppress("UNCHECKED_CAST")
 private fun ArtifactContributor<ResolvedModel>.contributeUnchecked(
     model: ResolvedModel,
-): List<ArtifactContribution<out Artifact>> {
-    return (this as ArtifactContributor<ResolvedModel>).contribute(model)
-}
+): List<ArtifactContribution<out Artifact>> = (this as ArtifactContributor<ResolvedModel>).contribute(model)

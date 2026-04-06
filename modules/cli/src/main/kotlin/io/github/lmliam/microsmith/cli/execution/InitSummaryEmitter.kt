@@ -86,11 +86,13 @@ internal object InitSummaryEmitter {
                     "IDE support: apply plugin id '$GRADLE_PLUGIN_ID', configure 'microsmith { ... }', " +
                     "and run './gradlew microsmithGenerate'.",
             )
+
             JvmNativeBuildSystem.MAVEN -> emitter.info(
                 "Maven repository detected. Prefer the native Maven plugin path when you want imported-project " +
                     "IDE support: add '$MICROSMITH_RUNTIME_SCRIPTING_COORDINATE' as a provided dependency, " +
                     "configure '$MICROSMITH_MAVEN_PLUGIN_COORDINATE', and run 'mvn microsmith:generate'.",
             )
+
             JvmNativeBuildSystem.SBT -> emitter.info(
                 "sbt repository detected. Prefer the native sbt plugin path when you want build-aligned " +
                     "generation: add '$MICROSMITH_GROUP' % '$MICROSMITH_SBT_PLUGIN_ARTIFACT' in project/plugins.sbt, " +

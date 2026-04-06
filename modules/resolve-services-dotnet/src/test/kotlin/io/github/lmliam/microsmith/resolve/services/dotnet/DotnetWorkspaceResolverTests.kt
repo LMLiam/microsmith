@@ -7,7 +7,6 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
 private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =

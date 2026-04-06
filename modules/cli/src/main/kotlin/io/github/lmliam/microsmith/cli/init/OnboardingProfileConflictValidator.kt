@@ -12,13 +12,11 @@ internal object OnboardingProfileConflictValidator {
     private fun conflictingProfileIds(
         matchers: List<OnboardingProfileMatcher>,
         fallbackProfile: OnboardingProfile,
-    ): List<OnboardingProfileId> {
-        return matchers
-            .map(OnboardingProfileMatcher::profile)
-            .plus(fallbackProfile)
-            .groupBy(OnboardingProfile::id)
-            .filterValues { groupedProfiles -> groupedProfiles.distinct().size > 1 }
-            .keys
-            .sorted()
-    }
+    ): List<OnboardingProfileId> = matchers
+        .map(OnboardingProfileMatcher::profile)
+        .plus(fallbackProfile)
+        .groupBy(OnboardingProfile::id)
+        .filterValues { groupedProfiles -> groupedProfiles.distinct().size > 1 }
+        .keys
+        .sorted()
 }

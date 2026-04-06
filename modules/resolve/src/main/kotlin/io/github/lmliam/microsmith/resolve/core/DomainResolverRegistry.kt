@@ -4,17 +4,14 @@ import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
 import java.util.ServiceLoader
 import kotlin.reflect.KClass
 
-class DomainResolverRegistry(
-    resolvers: List<DomainResolver<*, *>> = loadDomainResolvers(),
-) {
+class DomainResolverRegistry(resolvers: List<DomainResolver<*, *>> = loadDomainResolvers()) {
     private val resolversByAuthoringType: Map<KClass<out MicrosmithExtension>, List<DomainResolver<*, *>>> =
         indexResolvers(resolvers)
 
-    fun resolve(extension: MicrosmithExtension): List<DomainResolver<MicrosmithExtension, ResolvedModel>> {
-        return resolversByAuthoringType[extension::class]
+    fun resolve(extension: MicrosmithExtension): List<DomainResolver<MicrosmithExtension, ResolvedModel>> =
+        resolversByAuthoringType[extension::class]
             ?.map { it.cast() }
             .orEmpty()
-    }
 
     private fun indexResolvers(
         resolvers: List<DomainResolver<*, *>>,
@@ -36,7 +33,7 @@ class DomainResolverRegistry(
 
         return byAuthoringType.mapValues { (_, registrations) ->
             registrations.sortedWith(
-                compareBy<DomainResolver<*, *>>(
+                compareBy(
                     { it.resolvedType.qualifiedName ?: it.resolvedType.toString() },
                     { it::class.qualifiedName ?: it::class.toString() },
                 ),

@@ -3,15 +3,11 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 import kotlin.reflect.KClass
 
-internal class ProtobufDeclarationHandlerRegistry(
-    handlers: List<ProtobufDeclarationHandler<*>> = defaultHandlers,
-) {
+internal class ProtobufDeclarationHandlerRegistry(handlers: List<ProtobufDeclarationHandler<*>> = defaultHandlers) {
     private val handlersByType = indexHandlers(handlers)
 
-    fun resolve(type: Type): ProtobufDeclarationHandler<Type> {
-        return handlersByType[type::class]?.cast()
-            ?: error("No protobuf declaration support registered for ${type::class.qualifiedName}.")
-    }
+    fun resolve(type: Type): ProtobufDeclarationHandler<Type> = handlersByType[type::class]?.cast()
+        ?: error("No protobuf declaration support registered for ${type::class.qualifiedName}.")
 
     private fun indexHandlers(
         handlers: List<ProtobufDeclarationHandler<*>>,
@@ -26,9 +22,8 @@ internal class ProtobufDeclarationHandlerRegistry(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun ProtobufDeclarationHandler<*>.cast(): ProtobufDeclarationHandler<Type> {
-        return this as ProtobufDeclarationHandler<Type>
-    }
+    private fun ProtobufDeclarationHandler<*>.cast(): ProtobufDeclarationHandler<Type> =
+        this as ProtobufDeclarationHandler<Type>
 
     private companion object {
         val defaultHandlers = listOf(MessageDeclarationHandler, EnumDeclarationHandler)

@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.build.maven
 
 import org.gradle.api.artifacts.Configuration
-
 import java.io.File
 import java.nio.charset.StandardCharsets
 
@@ -102,41 +101,41 @@ internal object MavenPluginDescriptorWriter {
                                     4,
                                     "projectBaseDirectory",
                                     implementation = "java.io.File",
-                                    defaultValue = "\${project.basedir}",
-                                    value = "\${project.basedir}",
+                                    defaultValue = $$"${project.basedir}",
+                                    value = $$"${project.basedir}",
                                 )
                                 appendConfigurationElement(
                                     4,
                                     "scriptFile",
                                     implementation = "java.io.File",
-                                    defaultValue = "\${project.basedir}/build.microsmith.kts",
-                                    value = "\${microsmith.scriptFile}",
+                                    defaultValue = $$"${project.basedir}/build.microsmith.kts",
+                                    value = $$"${microsmith.scriptFile}",
                                 )
                                 appendConfigurationElement(
                                     4,
                                     "outputDirectory",
                                     implementation = "java.io.File",
-                                    defaultValue = "\${project.build.directory}/generated/microsmith",
-                                    value = "\${microsmith.outputDirectory}",
+                                    defaultValue = $$"${project.build.directory}/generated/microsmith",
+                                    value = $$"${microsmith.outputDirectory}",
                                 )
                                 appendConfigurationElement(
                                     4,
                                     "cacheDirectory",
                                     implementation = "java.io.File",
-                                    defaultValue = "\${project.build.directory}/tmp/microsmith/cache",
-                                    value = "\${microsmith.cacheDirectory}",
+                                    defaultValue = $$"${project.build.directory}/tmp/microsmith/cache",
+                                    value = $$"${microsmith.cacheDirectory}",
                                 )
                                 appendConfigurationElement(
                                     4,
                                     "variables",
                                     implementation = "java.util.Properties",
-                                    value = "\${microsmith.variables}",
+                                    value = $$"${microsmith.variables}",
                                 )
                                 appendConfigurationElement(
                                     4,
                                     "flags",
                                     implementation = "java.util.List",
-                                    value = "\${microsmith.flags}",
+                                    value = $$"${microsmith.flags}",
                                 )
                             }
                         }
@@ -234,16 +233,15 @@ private fun StringBuilder.appendIndent(level: Int) {
     }
 }
 
-private fun escapeXml(value: String): String =
-    buildString(value.length) {
-        value.forEach { char ->
-            when (char) {
-                '&' -> append("&amp;")
-                '<' -> append("&lt;")
-                '>' -> append("&gt;")
-                '"' -> append("&quot;")
-                '\'' -> append("&apos;")
-                else -> append(char)
-            }
+private fun escapeXml(value: String): String = buildString(value.length) {
+    value.forEach { char ->
+        when (char) {
+            '&' -> append("&amp;")
+            '<' -> append("&lt;")
+            '>' -> append("&gt;")
+            '"' -> append("&quot;")
+            '\'' -> append("&apos;")
+            else -> append(char)
         }
     }
+}

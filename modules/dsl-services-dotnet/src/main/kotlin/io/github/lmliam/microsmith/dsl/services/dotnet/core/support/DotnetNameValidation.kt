@@ -20,9 +20,7 @@ fun validateDotnetQualifiedIdentifier(value: String, label: String): String {
     return normalized
 }
 
-private fun isDotnetQualifiedIdentifier(value: String): Boolean {
-    return value.split('.').all(::isDotnetIdentifier)
-}
+private fun isDotnetQualifiedIdentifier(value: String): Boolean = value.split('.').all(::isDotnetIdentifier)
 
 private fun isDotnetIdentifier(value: String): Boolean {
     val candidate = value.removePrefix("@")
@@ -38,9 +36,7 @@ private fun isDotnetIdentifier(value: String): Boolean {
     return candidate.asCodePoints().drop(1).all(Int::isDotnetIdentifierPart)
 }
 
-private fun String.firstCodePoint(): Int {
-    return codePointAt(0)
-}
+private fun String.firstCodePoint(): Int = codePointAt(0)
 
 private fun String.asCodePoints(): Sequence<Int> = sequence {
     var index = 0
@@ -51,22 +47,18 @@ private fun String.asCodePoints(): Sequence<Int> = sequence {
     }
 }
 
-private fun Int.isDotnetIdentifierStart(): Boolean {
-    return this == '_'.code ||
-        Character.isLetter(this) ||
-        Character.getType(this).toInt() == Character.LETTER_NUMBER.toInt()
-}
+private fun Int.isDotnetIdentifierStart(): Boolean = this == '_'.code ||
+    Character.isLetter(this) ||
+    Character.getType(this).toInt() == Character.LETTER_NUMBER.toInt()
 
-private fun Int.isDotnetIdentifierPart(): Boolean {
-    return isDotnetIdentifierStart() ||
-        when (Character.getType(this).toInt()) {
-            Character.NON_SPACING_MARK.toInt(),
-            Character.COMBINING_SPACING_MARK.toInt(),
-            Character.DECIMAL_DIGIT_NUMBER.toInt(),
-            Character.CONNECTOR_PUNCTUATION.toInt(),
-            Character.FORMAT.toInt(),
-            -> true
+private fun Int.isDotnetIdentifierPart(): Boolean = isDotnetIdentifierStart() ||
+    when (Character.getType(this).toInt()) {
+        Character.NON_SPACING_MARK.toInt(),
+        Character.COMBINING_SPACING_MARK.toInt(),
+        Character.DECIMAL_DIGIT_NUMBER.toInt(),
+        Character.CONNECTOR_PUNCTUATION.toInt(),
+        Character.FORMAT.toInt(),
+        -> true
 
-            else -> false
-        }
-}
+        else -> false
+    }

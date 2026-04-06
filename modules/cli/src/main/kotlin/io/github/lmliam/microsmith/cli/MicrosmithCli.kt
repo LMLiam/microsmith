@@ -98,15 +98,20 @@ internal class MicrosmithCli(
         }
 
         is ErrorCommand -> usageErrorHandler.execute(parsed)
+
         is RunCommand -> runCommandHandler.execute(parsed)
+
         is DoctorCommand -> doctorCommandHandler.execute(parsed)
+
         is VersionCommand -> {
             stdout("microsmith ${versionProvider()}")
             0
         }
 
         is InitCommand -> initCommandHandler.execute(parsed)
+
         is IdeRefreshCommand -> ideRefreshCommandHandler.execute(parsed)
+
         is IdeDoctorCommand -> ideDoctorCommandHandler.execute(parsed)
     }
 }

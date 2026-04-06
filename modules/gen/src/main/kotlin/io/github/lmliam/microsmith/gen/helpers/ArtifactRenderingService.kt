@@ -7,9 +7,7 @@ import io.github.lmliam.microsmith.gen.files.GeneratedFile
 internal class ArtifactRenderingService(
     private val rendererRegistry: ArtifactRendererRegistry = ArtifactRendererRegistry(),
 ) {
-    fun render(assembly: ArtifactAssembly): List<GeneratedFile> {
-        return assembly.artifacts().map { artifact ->
-            rendererRegistry.resolve(artifact).run { render(artifact) }
-        }
+    fun render(assembly: ArtifactAssembly): List<GeneratedFile> = assembly.artifacts().map { artifact ->
+        rendererRegistry.resolve(artifact).run { render(artifact) }
     }
 }

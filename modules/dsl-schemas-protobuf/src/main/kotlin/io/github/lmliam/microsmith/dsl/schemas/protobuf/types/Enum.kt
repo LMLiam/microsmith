@@ -6,7 +6,8 @@ data class Enum(
     override val name: String,
     val values: List<EnumValue>,
     override val reserved: List<Reserved> = emptyList(),
-) : Type, ReservedDeclarationOwner {
+) : Type,
+    ReservedDeclarationOwner {
     companion object {
         internal const val UNSPECIFIED = "UNSPECIFIED"
     }

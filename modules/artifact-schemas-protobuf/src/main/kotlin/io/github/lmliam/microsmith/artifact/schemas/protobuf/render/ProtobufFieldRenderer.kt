@@ -19,8 +19,11 @@ internal object ProtobufFieldRenderer {
             is ScalarField -> append(
                 "${ProtobufValueTypeRenderer.render(field.primitive)} ${field.name} = ${field.index};",
             )
+
             is ReferenceField -> append("${field.reference.name} ${field.name} = ${field.index};")
+
             is MapField -> append("${ProtobufValueTypeRenderer.render(field.type)} ${field.name} = ${field.index};")
+
             is OneofField -> invalidTopLevelOneofField(field.name)
         }
     }

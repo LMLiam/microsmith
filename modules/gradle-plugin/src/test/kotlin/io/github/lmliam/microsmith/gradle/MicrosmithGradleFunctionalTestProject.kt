@@ -5,9 +5,7 @@ import org.gradle.testkit.runner.GradleRunner
 import java.nio.file.Files
 import java.nio.file.Path
 
-internal class MicrosmithGradleFunctionalTestProject private constructor(
-    private val rootDirectory: Path,
-) {
+internal class MicrosmithGradleFunctionalTestProject private constructor(private val rootDirectory: Path) {
     fun writeFile(relativePath: String, contents: String) {
         val file = rootDirectory.resolve(relativePath)
         val parent = file.parent

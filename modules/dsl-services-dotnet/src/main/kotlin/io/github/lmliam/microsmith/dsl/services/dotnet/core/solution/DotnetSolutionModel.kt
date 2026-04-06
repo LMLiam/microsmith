@@ -29,9 +29,7 @@ class DotnetSolutionModel internal constructor(
 
     fun keys() = extensions.keys
 
-    override fun equals(other: Any?): Boolean {
-        return other is DotnetSolutionModel && extensions == other.extensions
-    }
+    override fun equals(other: Any?): Boolean = other is DotnetSolutionModel && extensions == other.extensions
 
     override fun hashCode(): Int = extensions.hashCode()
 

@@ -1,8 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request
 
-internal class DotnetAspHeadersBindingBuilder(
-    private val name: String,
-) : DotnetAspHeadersBindingScope {
+internal class DotnetAspHeadersBindingBuilder(private val name: String) : DotnetAspHeadersBindingScope {
     private val headers = mutableListOf<DotnetAspHeaderField>()
 
     override fun header(name: String): DotnetAspHeaderField {
@@ -32,9 +30,7 @@ internal class DotnetAspHeadersBindingBuilder(
                     }
                 }.joinToString("")
 
-        return if (candidate.isNotBlank()) {
-            candidate
-        } else {
+        return candidate.ifBlank {
             error("Unable to derive an ASP.NET header field name from '$headerName'.")
         }
     }

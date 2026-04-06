@@ -4,9 +4,7 @@ import io.github.lmliam.microsmith.artifact.core.Artifact
 import java.util.ServiceLoader
 import kotlin.reflect.KClass
 
-internal class ArtifactCompilerRegistry(
-    compilers: List<ArtifactCompiler<*>> = loadArtifactCompilers(),
-) {
+internal class ArtifactCompilerRegistry(compilers: List<ArtifactCompiler<*>> = loadArtifactCompilers()) {
     private val compilersByType = indexCompilers(compilers)
 
     fun resolveOrNull(artifact: Artifact): ArtifactCompiler<Artifact>? =

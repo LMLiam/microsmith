@@ -18,7 +18,6 @@ internal class AetherRemoteRepositoryFactory {
     }
 }
 
-@Suppress("UsePropertyAccessSyntax")
 private fun RemoteRepository.Builder.applyAuthentication(credentials: RepositoryCredentials) {
     /*
      * Kotlin property syntax is not usable here: the Java type exposes a package-private field and

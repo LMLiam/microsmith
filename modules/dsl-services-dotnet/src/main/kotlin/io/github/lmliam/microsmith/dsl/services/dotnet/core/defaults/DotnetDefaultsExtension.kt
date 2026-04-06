@@ -14,7 +14,8 @@ data class DotnetDefaultsExtension(
     val target: DotnetTarget? = null,
     val solutions: Map<String, DotnetSolution> = emptyMap(),
     val model: DotnetDefaultsModel = DotnetDefaultsModel.empty(),
-) : MicrosmithExtension, MergeableExtension<DotnetDefaultsExtension> {
+) : MicrosmithExtension,
+    MergeableExtension<DotnetDefaultsExtension> {
     fun findSolution(name: String) = solutions[name]
 
     fun requireSolution(name: String): DotnetSolution {

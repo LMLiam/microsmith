@@ -4,9 +4,7 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.core
  * Validated .NET target framework monikers for the DSL.
  */
 @JvmInline
-value class DotnetTarget(
-    val moniker: String,
-) {
+value class DotnetTarget(val moniker: String) {
     init {
         require(moniker in supportedMonikers) {
             "Unsupported .NET target framework moniker: '$moniker'."

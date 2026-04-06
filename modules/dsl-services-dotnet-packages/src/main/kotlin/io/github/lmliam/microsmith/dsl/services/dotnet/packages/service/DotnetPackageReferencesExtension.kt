@@ -8,12 +8,12 @@ import io.github.lmliam.microsmith.dsl.services.core.ServiceExtension
  * A null value means the package reference is versionless at the service level and must be
  * satisfied by central package ownership during resolution.
  */
-data class DotnetPackageReferencesExtension(
-    val packages: List<DotnetPackageReferenceDeclaration> = emptyList(),
-) : ServiceExtension, MergeableExtension<DotnetPackageReferencesExtension> {
+data class DotnetPackageReferencesExtension(val packages: List<DotnetPackageReferenceDeclaration> = emptyList()) :
+    ServiceExtension,
+    MergeableExtension<DotnetPackageReferencesExtension> {
     fun findPackage(name: String): String? = packages.find { it.name == name }?.version
 
-    fun requirePackage(name: String): String? {
+    fun requirePackage(name: String): String {
         require(name.isNotBlank()) { "Package name cannot be blank." }
         return findPackage(name) ?: error("Dotnet package not found: $name")
     }

@@ -39,7 +39,6 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
         }
     },
 ) {
-    @Suppress("unused")
     private fun readResolve(): Any = MicrosmithScriptCompilationConfiguration
 }
 

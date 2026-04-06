@@ -106,9 +106,8 @@ class PluginResolverGuardrailTests :
                                 error("resolve() should not be called when sensitive value initialization fails.")
                             }
 
-                            override fun sensitiveValues(): Set<String> {
+                            override fun sensitiveValues(): Set<String> =
                                 throw IllegalArgumentException("Repository credentials file is invalid.")
-                            }
                         },
                     )
 
@@ -140,11 +139,9 @@ class PluginResolverGuardrailTests :
                                 error("resolve() should not be called when sensitive value initialization fails.")
                             }
 
-                            override fun sensitiveValues(): Set<String> {
-                                throw UncheckedIOException(
-                                    IOException("Repository credentials file could not be read."),
-                                )
-                            }
+                            override fun sensitiveValues(): Set<String> = throw UncheckedIOException(
+                                IOException("Repository credentials file could not be read."),
+                            )
                         },
                     )
 

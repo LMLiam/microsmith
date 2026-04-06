@@ -46,13 +46,13 @@ data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
 
     fun merge(other: SchemasExtension): SchemasExtension {
         val existingKeys = schemas.mapTo(mutableSetOf(), Schema::schemaKey)
-        val collisions =
-            other.schemas
-                .map(Schema::schemaKey)
-                .filter { it in existingKeys }
-                .map { (type, name) -> schemaDisplayKey(type, name) }
-                .distinct()
-                .sorted()
+        val collisions = other.schemas.asSequence()
+            .map(Schema::schemaKey)
+            .filter { it in existingKeys }
+            .map { (type, name) -> schemaDisplayKey(type, name) }
+            .distinct()
+            .sorted()
+            .toList()
 
         require(collisions.isEmpty()) {
             "Duplicate schema keys while merging SchemasExtension: ${collisions.joinToString(", ")}"

@@ -10,13 +10,9 @@ private data object AlphaExtension : MicrosmithExtension
 
 private data object BetaExtension : MicrosmithExtension
 
-private data class AlphaResolvedModel(
-    val value: String,
-) : ResolvedModel
+private data class AlphaResolvedModel(val value: String) : ResolvedModel
 
-private data class BetaResolvedModel(
-    val value: String,
-) : ResolvedModel
+private data class BetaResolvedModel(val value: String) : ResolvedModel
 
 private class AlphaFirstResolver : DomainResolver<AlphaExtension, AlphaResolvedModel> {
     override val authoringType = AlphaExtension::class

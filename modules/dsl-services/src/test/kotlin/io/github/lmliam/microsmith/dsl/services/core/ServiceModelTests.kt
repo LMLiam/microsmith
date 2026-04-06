@@ -7,9 +7,9 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
 private data class TestServiceExtension(val value: String) : ServiceExtension
-private data class MergeableTestServiceExtension(
-    val values: List<String>,
-) : ServiceExtension, MergeableExtension<MergeableTestServiceExtension> {
+private data class MergeableTestServiceExtension(val values: List<String>) :
+    ServiceExtension,
+    MergeableExtension<MergeableTestServiceExtension> {
     override fun merge(other: MergeableTestServiceExtension) = MergeableTestServiceExtension(values + other.values)
 }
 

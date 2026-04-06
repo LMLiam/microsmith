@@ -11,7 +11,8 @@ class DotnetAspWorkspaceDomainResolver(
     override val authoringType = ServicesExtension::class
     override val resolvedType = DotnetAspWorkspace::class
 
-    override fun resolve(authoring: ServicesExtension): DotnetAspWorkspace? {
-        return workspaceResolver.resolve(authoring).takeIf { it.servicesByName.isNotEmpty() }
-    }
+    override fun resolve(authoring: ServicesExtension): DotnetAspWorkspace? =
+        workspaceResolver.resolve(authoring).takeIf {
+            it.servicesByName.isNotEmpty()
+        }
 }

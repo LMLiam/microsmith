@@ -31,7 +31,9 @@ internal class ProcessIsolationResultCodec {
 
         return when (properties.getProperty(ProcessIsolationPropertyNames.RESULT_STATUS)?.trim()) {
             ProcessIsolationPropertyNames.RESULT_STATUS_SUCCESS -> readSuccess(properties)
+
             ProcessIsolationPropertyNames.RESULT_STATUS_FAILURE -> readFailure(properties)
+
             else -> error(
                 "Missing or invalid '${ProcessIsolationPropertyNames.RESULT_STATUS}' in process isolation result.",
             )

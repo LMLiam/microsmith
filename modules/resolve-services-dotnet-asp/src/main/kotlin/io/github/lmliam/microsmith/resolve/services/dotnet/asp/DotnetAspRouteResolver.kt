@@ -23,12 +23,10 @@ internal class DotnetAspRouteResolver {
             .map { segment -> validateRouteSegment(segment, route, label) }
     }
 
-    fun normalizeRoute(segments: List<String>): String {
-        return if (segments.isEmpty()) {
-            "/"
-        } else {
-            "/" + segments.joinToString("/")
-        }
+    fun normalizeRoute(segments: List<String>): String = if (segments.isEmpty()) {
+        "/"
+    } else {
+        "/" + segments.joinToString("/")
     }
 
     fun extractRoutePlaceholders(segments: List<String>, route: String): List<String> {

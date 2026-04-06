@@ -19,9 +19,9 @@ import io.kotest.matchers.shouldBe
 private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
 
-private data class TestSolutionExtension(
-    val values: List<String>,
-) : MicrosmithExtension, MergeableExtension<TestSolutionExtension> {
+private data class TestSolutionExtension(val values: List<String>) :
+    MicrosmithExtension,
+    MergeableExtension<TestSolutionExtension> {
     override fun merge(other: TestSolutionExtension) = TestSolutionExtension(values + other.values)
 }
 

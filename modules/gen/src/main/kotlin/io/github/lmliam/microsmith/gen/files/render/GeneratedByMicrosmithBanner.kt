@@ -67,10 +67,10 @@ internal object GeneratedByMicrosmithBanner {
     private fun resolveComment(path: Path): String? {
         val fileName = path.fileName.toString()
         val extension = fileName.substringAfterLast('.', missingDelimiterValue = "")
-        return when {
-            extension in xmlExtensions -> "<!-- $HEADER_TEXT -->"
-            extension in slashCommentExtensions -> "// $HEADER_TEXT"
-            extension in hashCommentExtensions -> "# $HEADER_TEXT"
+        return when (extension) {
+            in xmlExtensions -> "<!-- $HEADER_TEXT -->"
+            in slashCommentExtensions -> "// $HEADER_TEXT"
+            in hashCommentExtensions -> "# $HEADER_TEXT"
             else -> null
         }
     }

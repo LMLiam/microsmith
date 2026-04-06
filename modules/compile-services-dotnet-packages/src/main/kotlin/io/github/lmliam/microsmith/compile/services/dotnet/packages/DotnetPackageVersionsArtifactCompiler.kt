@@ -17,22 +17,20 @@ import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompile
 class DotnetPackageVersionsArtifactCompiler : ServicesArtifactCompiler<DotnetPackageVersionsArtifact> {
     override val artifactType = DotnetPackageVersionsArtifact::class
 
-    override fun compile(artifact: DotnetPackageVersionsArtifact): List<ArtifactContribution<out Artifact>> {
-        return listOf(
-            MsBuildProjectContribution(
-                artifactId = MsBuildProjectArtifactId(
-                    solutionName = artifact.id.solutionName,
-                    kind = MsBuildProjectKind.DirectoryPackagesProps,
-                ),
-                properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
-                items = artifact.packages.sortedBy(DotnetPackageVersion::name).map { packageVersion ->
-                    MsBuildItem(
-                        itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                        include = packageVersion.name,
-                        attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to packageVersion.version),
-                    )
-                },
+    override fun compile(artifact: DotnetPackageVersionsArtifact): List<ArtifactContribution<out Artifact>> = listOf(
+        MsBuildProjectContribution(
+            artifactId = MsBuildProjectArtifactId(
+                solutionName = artifact.id.solutionName,
+                kind = MsBuildProjectKind.DirectoryPackagesProps,
             ),
-        )
-    }
+            properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
+            items = artifact.packages.sortedBy(DotnetPackageVersion::name).map { packageVersion ->
+                MsBuildItem(
+                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                    include = packageVersion.name,
+                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to packageVersion.version),
+                )
+            },
+        ),
+    )
 }

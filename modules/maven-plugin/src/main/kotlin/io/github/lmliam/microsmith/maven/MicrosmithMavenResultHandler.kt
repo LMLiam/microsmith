@@ -34,6 +34,7 @@ internal class MicrosmithMavenResultHandler {
             ScriptFailureType.COMPILATION,
             ScriptFailureType.EVALUATION,
             -> MojoFailureException(message)
+
             ScriptFailureType.HOST -> MojoExecutionException(message)
         }
     }

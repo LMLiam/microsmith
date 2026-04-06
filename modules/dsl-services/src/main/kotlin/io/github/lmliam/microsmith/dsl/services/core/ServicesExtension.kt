@@ -6,10 +6,8 @@ import kotlin.reflect.KClass
 /**
  * Root extension that holds all declared services and shared services-scoped extensions.
  */
-data class ServicesExtension(
-    val services: Set<Service>,
-    val model: ServicesModel = ServicesModel.empty(),
-) : MicrosmithExtension {
+data class ServicesExtension(val services: Set<Service>, val model: ServicesModel = ServicesModel.empty()) :
+    MicrosmithExtension {
     init {
         val duplicateKeys =
             services

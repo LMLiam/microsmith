@@ -2,10 +2,7 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request
 
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetIdentifier
 
-data class DotnetAspHeadersBinding(
-    val name: String,
-    val headers: List<DotnetAspHeaderField>,
-) {
+data class DotnetAspHeadersBinding(val name: String, val headers: List<DotnetAspHeaderField>) {
     init {
         require(headers.isNotEmpty()) {
             "ASP.NET headers binding '$name' must declare at least one header."

@@ -92,9 +92,7 @@ class ProtobufRpcSchemasResolver : DomainResolver<SchemasExtension, ResolvedProt
     }
 }
 
-private fun ResolvedProtobufRpcEndpoint.importPath(current: QualifiedSchemaName): String? {
-    return qualifiedTypeName
-        .takeUnless { it == current.fullyQualifiedName }
-        ?.replace('.', '/')
-        ?.plus(".proto")
-}
+private fun ResolvedProtobufRpcEndpoint.importPath(current: QualifiedSchemaName): String? = qualifiedTypeName
+    .takeUnless { it == current.fullyQualifiedName }
+    ?.replace('.', '/')
+    ?.plus(".proto")

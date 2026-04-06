@@ -29,9 +29,7 @@ class ServicesModel internal constructor(
 
     fun keys() = extensions.keys
 
-    override fun equals(other: Any?): Boolean {
-        return other is ServicesModel && extensions == other.extensions
-    }
+    override fun equals(other: Any?): Boolean = other is ServicesModel && extensions == other.extensions
 
     override fun hashCode(): Int = extensions.hashCode()
 

@@ -29,9 +29,7 @@ class DotnetServiceModel internal constructor(
 
     fun keys() = extensions.keys
 
-    override fun equals(other: Any?): Boolean {
-        return other is DotnetServiceModel && extensions == other.extensions
-    }
+    override fun equals(other: Any?): Boolean = other is DotnetServiceModel && extensions == other.extensions
 
     override fun hashCode(): Int = extensions.hashCode()
 
@@ -43,7 +41,9 @@ class DotnetServiceModel internal constructor(
 @Suppress("UNCHECKED_CAST")
 private fun <T : ServiceExtension> mergeServiceExtension(existing: T?, incoming: T): T = when {
     existing == null -> incoming
+
     existing::class == incoming::class && existing is MergeableExtension<*> ->
         (existing as MergeableExtension<T>).merge(incoming)
+
     else -> incoming
 }

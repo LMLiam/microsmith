@@ -3,9 +3,8 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.packages.service
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.normalizeDotnetPackagePath
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.validateDotnetPackageVersion
 
-internal class DotnetPackageReferencesBuilder(
-    private val pathSegments: List<String> = emptyList(),
-) : DotnetPackageReferencesScope {
+internal class DotnetPackageReferencesBuilder(private val pathSegments: List<String> = emptyList()) :
+    DotnetPackageReferencesScope {
     private var version: String? = null
     private val children = linkedMapOf<String, DotnetPackageReferencesBuilder>()
 

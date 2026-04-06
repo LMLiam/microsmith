@@ -129,12 +129,14 @@ internal object DoctorBootstrapStateCheck {
         .map(Path::toString)
         .sorted()
 
-    private fun invalidManagedFiles(projectRoot: Path, managedFiles: List<Path>): List<String> = managedFiles
-        .filter(::managedPathExists)
-        .filterNot(::isManagedRegularFile)
-        .map(projectRoot::relativize)
-        .map(Path::toString)
-        .sorted()
+    private fun invalidManagedFiles(projectRoot: Path, managedFiles: List<Path>): List<String> =
+        managedFiles.asSequence()
+            .filter(::managedPathExists)
+            .filterNot(::isManagedRegularFile)
+            .map(projectRoot::relativize)
+            .map(Path::toString)
+            .sorted()
+            .toList()
 
     private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
 

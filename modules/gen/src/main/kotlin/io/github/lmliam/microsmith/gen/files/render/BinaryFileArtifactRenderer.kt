@@ -9,11 +9,9 @@ import io.github.lmliam.microsmith.gen.files.GeneratedFile
 class BinaryFileArtifactRenderer : ArtifactRenderer<BinaryFileArtifact> {
     override val artifactType = BinaryFileArtifact::class
 
-    override fun render(artifact: BinaryFileArtifact): GeneratedFile {
-        return GeneratedFile(
-            relativePath = artifact.id.relativePath,
-            contents = artifact.copiedContents,
-            outputRoot = artifact.id.outputRoot,
-        )
-    }
+    override fun render(artifact: BinaryFileArtifact): GeneratedFile = GeneratedFile(
+        relativePath = artifact.id.relativePath,
+        contents = artifact.copiedContents,
+        outputRoot = artifact.id.outputRoot,
+    )
 }

@@ -4,16 +4,13 @@ import io.github.lmliam.microsmith.resolve.core.ResolvedModel
 import java.util.ServiceLoader
 import kotlin.reflect.KClass
 
-internal class ArtifactContributorRegistry(
-    contributors: List<ArtifactContributor<*>> = loadArtifactContributors(),
-) {
+internal class ArtifactContributorRegistry(contributors: List<ArtifactContributor<*>> = loadArtifactContributors()) {
     private val contributorsByResolvedType = indexContributors(contributors)
 
-    fun resolve(model: ResolvedModel): List<ArtifactContributor<ResolvedModel>> {
-        return contributorsByResolvedType[model::class]
+    fun resolve(model: ResolvedModel): List<ArtifactContributor<ResolvedModel>> =
+        contributorsByResolvedType[model::class]
             ?.map { it.cast() }
             .orEmpty()
-    }
 
     private fun indexContributors(
         contributors: List<ArtifactContributor<*>>,
@@ -40,9 +37,8 @@ internal class ArtifactContributorRegistry(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun ArtifactContributor<*>.cast(): ArtifactContributor<ResolvedModel> {
-        return this as ArtifactContributor<ResolvedModel>
-    }
+    private fun ArtifactContributor<*>.cast(): ArtifactContributor<ResolvedModel> =
+        this as ArtifactContributor<ResolvedModel>
 
     private fun formatType(type: KClass<out ResolvedModel>): String = type.qualifiedName ?: type.toString()
 }

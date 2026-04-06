@@ -6,9 +6,7 @@ import kotlin.reflect.KClass
 /**
  * Immutable snapshot of the service-scoped extension payloads attached to a service.
  */
-class ServiceModel internal constructor(
-    private val extensions: Map<KClass<out ServiceExtension>, ServiceExtension>,
-) {
+class ServiceModel internal constructor(private val extensions: Map<KClass<out ServiceExtension>, ServiceExtension>) {
     @Suppress("UNCHECKED_CAST")
     fun <T : ServiceExtension> get(type: KClass<T>) = extensions[type] as? T?
 
@@ -28,9 +26,7 @@ class ServiceModel internal constructor(
 
     fun keys() = extensions.keys
 
-    override fun equals(other: Any?): Boolean {
-        return other is ServiceModel && extensions == other.extensions
-    }
+    override fun equals(other: Any?): Boolean = other is ServiceModel && extensions == other.extensions
 
     override fun hashCode(): Int = extensions.hashCode()
 

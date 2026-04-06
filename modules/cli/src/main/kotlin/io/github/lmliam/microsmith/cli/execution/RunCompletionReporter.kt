@@ -10,9 +10,7 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import java.nio.file.Path
 
-internal class RunCompletionReporter(
-    private val eventLogWriter: (Path, RunEventLogEntry) -> Unit,
-) {
+internal class RunCompletionReporter(private val eventLogWriter: (Path, RunEventLogEntry) -> Unit) {
     fun complete(
         command: RunCommand,
         emitter: CliDiagnosticEmitter,

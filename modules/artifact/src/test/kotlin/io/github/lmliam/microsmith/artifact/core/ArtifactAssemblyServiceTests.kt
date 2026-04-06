@@ -10,38 +10,30 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import java.nio.file.Path
 
-private data class AlphaResolved(
-    val name: String,
-) : ResolvedModel
+private data class AlphaResolved(val name: String) : ResolvedModel
 
-private data class BetaResolved(
-    val name: String,
-) : ResolvedModel
+private data class BetaResolved(val name: String) : ResolvedModel
 
 private class AlphaContributor : ArtifactContributor<AlphaResolved> {
     override val resolvedType = AlphaResolved::class
 
-    override fun contribute(model: AlphaResolved): List<ArtifactContribution<out Artifact>> {
-        return listOf(
-            TextFileArtifactContribution(
-                artifactId = TextFileArtifactId(relativePath = Path.of("alpha.txt")),
-                contents = model.name,
-            ),
-        )
-    }
+    override fun contribute(model: AlphaResolved): List<ArtifactContribution<out Artifact>> = listOf(
+        TextFileArtifactContribution(
+            artifactId = TextFileArtifactId(relativePath = Path.of("alpha.txt")),
+            contents = model.name,
+        ),
+    )
 }
 
 private class BetaContributor : ArtifactContributor<BetaResolved> {
     override val resolvedType = BetaResolved::class
 
-    override fun contribute(model: BetaResolved): List<ArtifactContribution<out Artifact>> {
-        return listOf(
-            TextFileArtifactContribution(
-                artifactId = TextFileArtifactId(relativePath = Path.of("beta.txt")),
-                contents = model.name,
-            ),
-        )
-    }
+    override fun contribute(model: BetaResolved): List<ArtifactContribution<out Artifact>> = listOf(
+        TextFileArtifactContribution(
+            artifactId = TextFileArtifactId(relativePath = Path.of("beta.txt")),
+            contents = model.name,
+        ),
+    )
 }
 
 class ArtifactAssemblyServiceTests :

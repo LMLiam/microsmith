@@ -7,9 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.nio.file.Files
 
-internal class GeneratedOutputWriter(
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-) {
+internal class GeneratedOutputWriter(private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) {
     suspend fun write(outputs: List<GeneratedFile>, space: FileSpace) {
         withContext(ioDispatcher) {
             outputs.forEach { output ->

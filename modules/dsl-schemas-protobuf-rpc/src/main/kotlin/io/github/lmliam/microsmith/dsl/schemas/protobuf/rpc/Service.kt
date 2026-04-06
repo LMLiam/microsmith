@@ -4,10 +4,9 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.ProtobufReferenc
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.ProtobufReferenceResolver
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 
-data class Service(
-    override val name: String,
-    val rpcs: List<Rpc>,
-) : Type, ProtobufReferenceResolvableType {
+data class Service(override val name: String, val rpcs: List<Rpc>) :
+    Type,
+    ProtobufReferenceResolvableType {
     override fun resolveReferences(resolver: ProtobufReferenceResolver): Type = copy(
         rpcs = rpcs.map { rpc -> rpc.resolveReferences(resolver, name) },
     )
