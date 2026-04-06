@@ -16,7 +16,7 @@ internal fun renderCSharp(file: CSharp.File): String = buildString {
 
 private fun renderType(type: CSharp.Type): String = buildString {
     renderAttributes(type.attributes).forEach(::appendLine)
-    append(type.modifiers.joinToString(" "))
+    append(type.modifiers.joinToString(" ", transform = CSharp.Modifier::keyword))
     append(" ")
     append(type.kind.name.lowercase())
     append(" ")
@@ -55,7 +55,7 @@ private fun renderMember(member: CSharp.Member): String {
 
 private fun renderProperty(property: CSharp.Property): String = buildString {
     renderAttributes(property.attributes).forEach(::appendLine)
-    append(property.modifiers.joinToString(" "))
+    append(property.modifiers.joinToString(" ", transform = CSharp.Modifier::keyword))
     append(" ")
     append(renderTypeRef(property.type))
     append(" ")
@@ -74,7 +74,7 @@ private fun renderProperty(property: CSharp.Property): String = buildString {
 
 private fun renderMethod(method: CSharp.Method): String = buildString {
     renderAttributes(method.attributes).forEach(::appendLine)
-    append(method.modifiers.joinToString(" "))
+    append(method.modifiers.joinToString(" ", transform = CSharp.Modifier::keyword))
     append(" ")
     append(renderTypeRef(method.returnType))
     append(" ")
@@ -111,7 +111,7 @@ private fun renderParameter(parameter: CSharp.Parameter): String = buildString {
         append(" ")
     }
     if (parameter.modifiers.isNotEmpty()) {
-        append(parameter.modifiers.joinToString(" "))
+        append(parameter.modifiers.joinToString(" ", transform = CSharp.Modifier::keyword))
         append(" ")
     }
     append(renderTypeRef(parameter.type))

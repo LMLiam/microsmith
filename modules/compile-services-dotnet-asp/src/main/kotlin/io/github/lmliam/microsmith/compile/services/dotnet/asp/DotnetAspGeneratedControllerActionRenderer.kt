@@ -7,8 +7,14 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 
 internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
     name = endpoint.operationName,
-    modifiers = listOf("public", "async"),
-    returnType = csharpGenericType("Task", csharpType("IActionResult")),
+    modifiers = DotnetAspCSharpModifiers.publicAsync,
+    returnType = csharpGenericType(
+        "Task",
+        csharpGenericType(
+            DotnetAspCSharpTypes.ACTION_RESULT,
+            csharpType(resultBaseTypeName(endpoint)),
+        ),
+    ),
     attributes = listOf(
         csharpAttribute(
             httpMethodAttribute(endpoint.method),
@@ -32,7 +38,7 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
                 ),
             )
         }
-        add(csharpParameter("CancellationToken", "cancellationToken"))
+        add(csharpParameter(DotnetAspCSharpTypes.CANCELLATION_TOKEN, "cancellationToken"))
     },
     body = CSharp.codeBlock {
         renderHeadersPrelude(endpoint)?.let { prelude ->
@@ -49,7 +55,7 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
 
 internal fun renderAbstractHandler(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
     name = "On${endpoint.operationName}Async",
-    modifiers = listOf("protected", "abstract"),
+    modifiers = DotnetAspCSharpModifiers.protectedAbstract,
     returnType = csharpGenericType("Task", csharpType(resultBaseTypeName(endpoint))),
     attributes = emptyList(),
     parameters = buildList {
@@ -57,7 +63,7 @@ internal fun renderAbstractHandler(endpoint: ResolvedDotnetAspEndpoint): CSharp.
         endpoint.bindings.query?.let { add(csharpParameter(it.name, "query")) }
         endpoint.bindings.headers?.let { add(csharpParameter(it.name, "headers")) }
         endpoint.bindings.body?.let { add(csharpParameter(resolveBodyTypeName(endpoint), "body")) }
-        add(csharpParameter("CancellationToken", "cancellationToken"))
+        add(csharpParameter(DotnetAspCSharpTypes.CANCELLATION_TOKEN, "cancellationToken"))
     },
     body = null,
 )

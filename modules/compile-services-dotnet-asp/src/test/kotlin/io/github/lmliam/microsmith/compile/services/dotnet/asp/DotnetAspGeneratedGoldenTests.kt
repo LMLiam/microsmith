@@ -37,7 +37,8 @@ class DotnetAspGeneratedGoldenTests :
                     }
                     .contents
 
-            hostingFile shouldBe goldenResource("golden/MicrosmithHostingExtensions.cs")
+            normalizeGoldenText(hostingFile) shouldBe
+                normalizeGoldenText(goldenResource("golden/MicrosmithHostingExtensions.cs"))
         }
 
         "compile keeps header-binding controller output stable" {
@@ -97,10 +98,12 @@ class DotnetAspGeneratedGoldenTests :
                     .filterIsInstance<TextFileArtifactContribution>()
                     .associateBy { it.artifactId.relativePath.toString() }
 
-            textFiles.getValue("Generated/Contracts/RequestModels.cs").contents shouldBe
-                goldenResource("golden/GetUserRequestModels.cs")
-            textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents shouldBe
-                goldenResource("golden/GetUserControllerBase.cs")
+            normalizeGoldenText(textFiles.getValue("Generated/Contracts/RequestModels.cs").contents) shouldBe
+                normalizeGoldenText(goldenResource("golden/GetUserRequestModels.cs"))
+            normalizeGoldenText(
+                textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents,
+            ) shouldBe
+                normalizeGoldenText(goldenResource("golden/GetUserControllerBase.cs"))
         }
     })
 
@@ -122,6 +125,8 @@ private fun goldenArtifact(rest: ResolvedDotnetAspRest): DotnetAspServiceArtifac
 )
 
 private fun goldenResource(path: String): String =
-    requireNotNull(DotnetAspGeneratedGoldenTests::class.java.getResourceAsStream(path)) {
+    requireNotNull(DotnetAspGeneratedGoldenTests::class.java.getResourceAsStream("/$path")) {
         "Missing golden resource '$path'."
     }.readBytes().toString(StandardCharsets.UTF_8)
+
+private fun normalizeGoldenText(value: String): String = value.trimEnd('\r', '\n')

@@ -8,7 +8,7 @@ internal fun renderOperationResultTypes(endpoint: ResolvedDotnetAspEndpoint): Li
         CSharp.Type(
             kind = CSharp.TypeKind.RECORD,
             name = resultBaseTypeName(endpoint),
-            modifiers = listOf("public", "abstract"),
+            modifiers = DotnetAspCSharpModifiers.publicAbstract,
             baseTypes = emptyList(),
             attributes = emptyList(),
             primaryConstructorParameters = emptyList(),
@@ -20,7 +20,7 @@ internal fun renderOperationResultTypes(endpoint: ResolvedDotnetAspEndpoint): Li
             CSharp.Type(
                 kind = CSharp.TypeKind.RECORD,
                 name = resultVariantTypeName(endpoint, response),
-                modifiers = listOf("public", "sealed"),
+                modifiers = DotnetAspCSharpModifiers.publicSealed,
                 baseTypes = listOf(csharpType(resultBaseTypeName(endpoint))),
                 attributes = emptyList(),
                 primaryConstructorParameters = buildList {
@@ -36,7 +36,7 @@ internal fun renderOperationResultTypes(endpoint: ResolvedDotnetAspEndpoint): Li
                     response.headers.forEach { header ->
                         add(
                             CSharp.Parameter(
-                                type = csharpNullableType("string"),
+                                type = csharpNullableType(DotnetAspCSharpTypes.STRING),
                                 name = dotnetAspHeaderPropertyName(header.name),
                                 modifiers = emptyList(),
                                 attributes = emptyList(),

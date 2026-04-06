@@ -15,17 +15,8 @@ internal fun dotnetAspStringLiteral(value: String): String = buildString {
     append('"')
 }
 
-internal fun dotnetAspCharLiteral(value: Any): String {
-    val char = when (value) {
-        is Char -> value
-        else -> {
-            val stringValue = value.toString()
-            require(stringValue.length == 1) {
-                "ASP.NET char defaults must contain exactly one character, but was '$value'."
-            }
-            stringValue.single()
-        }
-    }
+internal fun dotnetAspCharLiteral(value: Char): String {
+    val char = value
     val escaped = when (char) {
         '\\' -> "\\\\"
         '\'' -> "\\'"

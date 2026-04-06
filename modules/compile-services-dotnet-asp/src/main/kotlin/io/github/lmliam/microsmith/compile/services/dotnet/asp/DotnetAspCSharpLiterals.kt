@@ -1,12 +1,13 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspDefaultValue
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import java.math.BigDecimal
 import java.util.Locale
 
-internal fun dotnetAspLiteral(type: DotnetFieldType, value: Any): String = when (type) {
-    DotnetFieldType.String -> dotnetAspStringLiteral(value.toString())
-    DotnetFieldType.Char -> dotnetAspCharLiteral(value)
+internal fun dotnetAspLiteral(type: DotnetFieldType, value: DotnetAspDefaultValue): String = when (type) {
+    DotnetFieldType.String -> dotnetAspStringLiteral(value.requireString())
+    DotnetFieldType.Char -> dotnetAspCharLiteral(value.requireChar())
     DotnetFieldType.Byte,
     DotnetFieldType.SignedByte,
     DotnetFieldType.Short,
@@ -20,8 +21,8 @@ internal fun dotnetAspLiteral(type: DotnetFieldType, value: Any): String = when 
     DotnetFieldType.Float,
     DotnetFieldType.Double,
     DotnetFieldType.Decimal,
-    -> dotnetAspNumericLiteral(type, value.number())
-    DotnetFieldType.Bool -> value.toString().lowercase(Locale.ROOT)
+    -> dotnetAspNumericLiteral(type, value.requireNumber())
+    DotnetFieldType.Bool -> value.requireBoolean().toString().lowercase(Locale.ROOT)
     DotnetFieldType.Guid -> dotnetAspGuidLiteral(value)
     DotnetFieldType.DateOnly -> dotnetAspDateOnlyLiteral(value)
     DotnetFieldType.TimeOnly -> dotnetAspTimeOnlyLiteral(value)
@@ -108,15 +109,8 @@ private fun dotnetAspFloatingLiteral(value: Number): String {
     }
 }
 
-private fun dotnetAspDecimalLiteral(value: Any): String = if (value is BigDecimal) {
+private fun dotnetAspDecimalLiteral(value: Number): String = if (value is BigDecimal) {
     value.toPlainString()
 } else {
     value.toString()
-}
-
-private fun Any.number(): Number {
-    require(this is Number) {
-        "ASP.NET request defaults for numeric fields must be numeric, but was '$this'."
-    }
-    return this
 }

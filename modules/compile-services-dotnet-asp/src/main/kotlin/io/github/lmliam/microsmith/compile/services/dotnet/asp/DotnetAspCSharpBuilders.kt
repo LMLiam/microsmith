@@ -8,7 +8,7 @@ internal fun csharpAttribute(name: String, arguments: String? = null): CSharp.At
 internal fun csharpParameter(
     type: CSharp.TypeRef,
     name: String,
-    modifiers: List<String> = emptyList(),
+    modifiers: List<CSharp.Modifier> = emptyList(),
     attributes: List<CSharp.Attribute> = emptyList(),
     defaultValue: String? = null,
 ): CSharp.Parameter = CSharp.Parameter(
@@ -22,7 +22,7 @@ internal fun csharpParameter(
 internal fun csharpParameter(
     type: String,
     name: String,
-    modifiers: List<String> = emptyList(),
+    modifiers: List<CSharp.Modifier> = emptyList(),
     attributes: List<CSharp.Attribute> = emptyList(),
     defaultValue: String? = null,
 ): CSharp.Parameter = csharpParameter(
@@ -50,5 +50,5 @@ internal fun csharpTupleElement(type: CSharp.TypeRef, name: String? = null): CSh
 internal fun extensionParameter(type: String, name: String): CSharp.Parameter = csharpParameter(
     type = type,
     name = name,
-    modifiers = listOf("this"),
+    modifiers = listOf(CSharp.Modifier.THIS),
 )

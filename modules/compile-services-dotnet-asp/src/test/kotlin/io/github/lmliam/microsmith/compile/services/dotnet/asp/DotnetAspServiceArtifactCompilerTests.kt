@@ -7,6 +7,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.DotnetAspHttpMethod
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspDefaultValue
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
@@ -185,7 +186,7 @@ class DotnetAspServiceArtifactCompilerTests :
                                                 name = "dryRun",
                                                 type = DotnetFieldType.Bool,
                                                 optional = true,
-                                                defaultValue = false,
+                                                defaultValue = DotnetAspDefaultValue.BooleanValue(false),
                                             ),
                                         ),
                                     ),
@@ -297,7 +298,7 @@ class DotnetAspServiceArtifactCompilerTests :
                                                 name = "rank",
                                                 type = DotnetFieldType.UnsignedShort,
                                                 optional = true,
-                                                defaultValue = 1,
+                                                defaultValue = DotnetAspDefaultValue.NumericValue(1),
                                             ),
                                         ),
                                     ),

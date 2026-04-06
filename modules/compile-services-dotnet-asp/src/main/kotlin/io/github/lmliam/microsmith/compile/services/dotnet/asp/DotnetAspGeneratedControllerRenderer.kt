@@ -27,15 +27,15 @@ internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): Strin
 
     return CSharp.render(
         CSharp.file(controllersNamespace(artifact)) {
-            using("System")
-            using("System.Threading")
-            using("System.Threading.Tasks")
-            using("Microsoft.AspNetCore.Mvc")
+            using(DotnetAspCSharpNamespaces.SYSTEM)
+            using(DotnetAspCSharpNamespaces.SYSTEM_THREADING)
+            using(DotnetAspCSharpNamespaces.SYSTEM_THREADING_TASKS)
+            using(DotnetAspCSharpNamespaces.MICROSOFT_ASPNETCORE_MVC)
             using(contractsNamespace(artifact))
             classType(
                 name = "${controllerPrefix(artifact)}ControllerBase",
-                modifiers = listOf("public", "abstract"),
-                baseTypes = listOf(csharpType("ControllerBase")),
+                modifiers = DotnetAspCSharpModifiers.publicAbstract,
+                baseTypes = listOf(csharpType(DotnetAspCSharpTypes.CONTROLLER_BASE)),
                 attributes = listOf(CSharp.Attribute("ApiController")),
             ) {
                 sections.forEach(::addMember)

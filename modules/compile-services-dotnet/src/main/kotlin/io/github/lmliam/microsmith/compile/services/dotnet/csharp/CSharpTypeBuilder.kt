@@ -4,7 +4,7 @@ package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 class CSharpTypeBuilder internal constructor(
     private val kind: CSharp.TypeKind,
     private val name: String,
-    private val modifiers: List<String>,
+    private val modifiers: List<CSharp.Modifier>,
     private val baseTypes: List<CSharp.TypeRef>,
     private val attributes: List<CSharp.Attribute>,
     private val primaryConstructorParameters: List<CSharp.Parameter>,
@@ -18,7 +18,7 @@ class CSharpTypeBuilder internal constructor(
     fun property(
         type: CSharp.TypeRef,
         name: String,
-        modifiers: List<String>,
+        modifiers: List<CSharp.Modifier>,
         attributes: List<CSharp.Attribute> = emptyList(),
         getter: String = "get;",
         setter: String = "set;",
@@ -38,7 +38,7 @@ class CSharpTypeBuilder internal constructor(
     fun method(
         name: String,
         returnType: CSharp.TypeRef,
-        modifiers: List<String>,
+        modifiers: List<CSharp.Modifier>,
         attributes: List<CSharp.Attribute> = emptyList(),
         parameters: List<CSharp.Parameter> = emptyList(),
         body: CSharp.CodeBlock? = null,
@@ -66,7 +66,7 @@ class CSharpTypeBuilder internal constructor(
     fun property(
         type: String,
         name: String,
-        modifiers: List<String>,
+        modifiers: List<CSharp.Modifier>,
         attributes: List<CSharp.Attribute> = emptyList(),
         getter: String = "get;",
         setter: String = "set;",
@@ -86,7 +86,7 @@ class CSharpTypeBuilder internal constructor(
     fun method(
         name: String,
         returnType: String,
-        modifiers: List<String>,
+        modifiers: List<CSharp.Modifier>,
         attributes: List<CSharp.Attribute> = emptyList(),
         parameters: List<CSharp.Parameter> = emptyList(),
         body: CSharp.CodeBlock? = null,

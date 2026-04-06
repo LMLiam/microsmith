@@ -11,23 +11,23 @@ class CSharpTests :
                 using("Microsoft.AspNetCore.Mvc")
                 classType(
                     name = "UsersControllerBase",
-                    modifiers = listOf("public", "abstract"),
+                    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
                     baseTypes = listOf(CSharp.type("ControllerBase")),
                     attributes = listOf(CSharp.Attribute("ApiController")),
                 ) {
                     property(
                         type = CSharp.type("string"),
                         name = "Name",
-                        modifiers = listOf("public"),
+                        modifiers = listOf(CSharp.Modifier.PUBLIC),
                         initializer = "\"Users\"",
                     )
                     method(
                         name = "GetUserAsync",
                         returnType = CSharp.genericType(
                             "Task",
-                            CSharp.type("IActionResult"),
+                            CSharp.genericType("ActionResult", CSharp.type("User")),
                         ),
-                        modifiers = listOf("public", "abstract"),
+                        modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
                         parameters = listOf(
                             CSharp.Parameter(
                                 type = CSharp.type("CancellationToken"),
@@ -52,7 +52,7 @@ class CSharpTests :
                 {
                     public string Name { get; set; } = "Users";
 
-                    public abstract Task<IActionResult> GetUserAsync(CancellationToken cancellationToken);
+                    public abstract Task<ActionResult<User>> GetUserAsync(CancellationToken cancellationToken);
                 }
             """.trimIndent()
         }
@@ -61,11 +61,11 @@ class CSharpTests :
             val file = CSharp.file("Platform.Api.Generated.Contracts") {
                 recordType(
                     name = "GetUserResult",
-                    modifiers = listOf("public", "abstract"),
+                    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
                 )
                 recordType(
                     name = "GetUserOk",
-                    modifiers = listOf("public", "sealed"),
+                    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.SEALED),
                     primaryConstructorParameters = listOf(
                         CSharp.Parameter(
                             type = CSharp.type("GetUserBody"),
@@ -99,12 +99,12 @@ class CSharpTests :
             val file = CSharp.file("Platform.Api.Generated") {
                 classType(
                     name = "Responder",
-                    modifiers = listOf("public", "sealed"),
+                    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.SEALED),
                 ) {
                     method(
                         name = "Respond",
                         returnType = CSharp.type("string"),
-                        modifiers = listOf("public"),
+                        modifiers = listOf(CSharp.Modifier.PUBLIC),
                         parameters = listOf(
                             CSharp.Parameter(
                                 type = CSharp.array(CSharp.type("string")),

@@ -10,7 +10,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 internal fun renderModelClass(name: String, fields: List<DotnetField>): CSharp.Type = CSharp.Type(
     kind = CSharp.TypeKind.CLASS,
     name = name,
-    modifiers = listOf("public", "sealed"),
+    modifiers = DotnetAspCSharpModifiers.publicSealed,
     baseTypes = emptyList(),
     attributes = emptyList(),
     primaryConstructorParameters = emptyList(),
@@ -30,7 +30,7 @@ internal fun resolveResponseModelTypeName(
 private fun renderModelFieldProperty(field: DotnetField): CSharp.Property = CSharp.Property(
     type = csharpType(dotnetAspCSharpType(field.type)),
     name = dotnetAspPascalIdentifier(field.name),
-    modifiers = listOf("public"),
+    modifiers = DotnetAspCSharpModifiers.public,
     attributes = emptyList(),
     getter = "get;",
     setter = "set;",

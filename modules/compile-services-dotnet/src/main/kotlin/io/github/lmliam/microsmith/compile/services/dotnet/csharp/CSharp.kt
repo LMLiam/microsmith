@@ -13,7 +13,7 @@ object CSharp {
     data class Type(
         val kind: TypeKind,
         val name: String,
-        val modifiers: List<String>,
+        val modifiers: List<Modifier>,
         val baseTypes: List<TypeRef>,
         val attributes: List<Attribute>,
         val primaryConstructorParameters: List<Parameter>,
@@ -23,6 +23,20 @@ object CSharp {
     enum class TypeKind {
         CLASS,
         RECORD,
+    }
+
+    enum class Modifier(
+        val keyword: String,
+    ) {
+        PUBLIC("public"),
+        PRIVATE("private"),
+        PROTECTED("protected"),
+        ABSTRACT("abstract"),
+        STATIC("static"),
+        SEALED("sealed"),
+        ASYNC("async"),
+        THIS("this"),
+        PARAMS("params"),
     }
 
     sealed interface Member
@@ -58,7 +72,7 @@ object CSharp {
     data class Property(
         val type: TypeRef,
         val name: String,
-        val modifiers: List<String>,
+        val modifiers: List<Modifier>,
         val attributes: List<Attribute>,
         val getter: String,
         val setter: String,
@@ -67,7 +81,7 @@ object CSharp {
 
     data class Method(
         val name: String,
-        val modifiers: List<String>,
+        val modifiers: List<Modifier>,
         val returnType: TypeRef,
         val attributes: List<Attribute>,
         val parameters: List<Parameter>,
@@ -82,7 +96,7 @@ object CSharp {
     data class Parameter(
         val type: TypeRef,
         val name: String,
-        val modifiers: List<String>,
+        val modifiers: List<Modifier>,
         val attributes: List<Attribute>,
         val defaultValue: String?,
     )

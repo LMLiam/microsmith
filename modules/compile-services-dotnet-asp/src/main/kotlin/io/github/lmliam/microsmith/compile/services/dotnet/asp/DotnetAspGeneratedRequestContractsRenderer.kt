@@ -9,7 +9,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 internal fun renderRequestBindingClass(binding: ResolvedDotnetAspRequestBinding): CSharp.Type = CSharp.Type(
     kind = CSharp.TypeKind.CLASS,
     name = binding.name,
-    modifiers = listOf("public", "sealed"),
+    modifiers = DotnetAspCSharpModifiers.publicSealed,
     baseTypes = emptyList(),
     attributes = emptyList(),
     primaryConstructorParameters = emptyList(),
@@ -19,15 +19,15 @@ internal fun renderRequestBindingClass(binding: ResolvedDotnetAspRequestBinding)
 internal fun renderHeadersBindingClass(binding: ResolvedDotnetAspHeadersBinding): CSharp.Type = CSharp.Type(
     kind = CSharp.TypeKind.CLASS,
     name = binding.name,
-    modifiers = listOf("public", "sealed"),
+    modifiers = DotnetAspCSharpModifiers.publicSealed,
     baseTypes = emptyList(),
     attributes = emptyList(),
     primaryConstructorParameters = emptyList(),
     members = binding.headers.map { header ->
         CSharp.Property(
-            type = csharpNullableType("string"),
+            type = csharpNullableType(DotnetAspCSharpTypes.STRING),
             name = dotnetAspPascalIdentifier(header.name),
-            modifiers = listOf("public"),
+            modifiers = DotnetAspCSharpModifiers.public,
             attributes = emptyList(),
             getter = "get;",
             setter = "set;",
@@ -41,7 +41,7 @@ private fun renderRequestFieldProperty(field: ResolvedDotnetAspRequestField): CS
     return CSharp.Property(
         type = csharpType(dotnetAspCSharpType(field.type, nullable = nullable)),
         name = dotnetAspPascalIdentifier(field.name),
-        modifiers = listOf("public"),
+        modifiers = DotnetAspCSharpModifiers.public,
         attributes = emptyList(),
         getter = "get;",
         setter = "set;",
