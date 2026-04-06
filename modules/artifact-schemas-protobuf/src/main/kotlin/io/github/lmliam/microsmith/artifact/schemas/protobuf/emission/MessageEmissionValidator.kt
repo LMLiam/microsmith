@@ -42,20 +42,23 @@ internal object MessageEmissionValidator {
         }
     }
 
-    private fun collectFieldNameUsages(message: Message): List<Pair<String, String>> =
+    private fun collectFieldNameUsages(message: Message): List<FieldUsage<String>> =
         collectFieldUsages(message, keySelector = { it.name })
 
-    private fun collectFieldNumberUsages(message: Message): List<Pair<Int, String>> =
+    private fun collectFieldNumberUsages(message: Message): List<FieldUsage<Int>> =
         collectFieldUsages(message, keySelector = { it.index })
 
-    private fun <Key : Comparable<Key>> requireUniqueUsages(
+    private fun <K : Comparable<K>> requireUniqueUsages(
         messageName: String,
         label: String,
-        usages: List<Pair<Key, String>>,
+        usages: List<FieldUsage<K>>,
     ) {
         val duplicates =
             usages
-                .groupBy(keySelector = Pair<Key, String>::first, valueTransform = Pair<Key, String>::second)
+                .groupBy(
+                    keySelector = FieldUsage<K>::key,
+                    valueTransform = FieldUsage<K>::location,
+                )
                 .filterValues { it.size > 1 }
 
         require(duplicates.isEmpty()) {
@@ -70,13 +73,28 @@ internal object MessageEmissionValidator {
         }
     }
 
-    private fun <Key> collectFieldUsages(message: Message, keySelector: (Field) -> Key): List<Pair<Key, String>> =
-        buildList {
-            message.fields.forEach { add(keySelector(it) to "field '${it.name}'") }
+    /**
+     * Collects each effective field usage key together with where that key was declared in the
+     * message tree so duplicate diagnostics can explain the conflicting locations.
+     */
+    private fun <K> collectFieldUsages(message: Message, keySelector: (Field) -> K): List<FieldUsage<K>> {
+        return buildList {
+            message.fields.forEach { add(FieldUsage(keySelector(it), "field '${it.name}'")) }
             message.oneofs.forEach { oneof ->
                 oneof.fields.forEach { field ->
-                    add(keySelector(field) to "oneof '${oneof.name}' field '${field.name}'")
+                    add(
+                        FieldUsage(
+                            key = keySelector(field),
+                            location = "oneof '${oneof.name}' field '${field.name}'",
+                        ),
+                    )
                 }
             }
         }
+    }
 }
+
+private data class FieldUsage<K>(
+    val key: K,
+    val location: String,
+)
