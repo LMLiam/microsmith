@@ -8,9 +8,9 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
 
 internal fun renderModelClass(name: String, fields: List<DotnetField>): CSharp.Type = CSharp.Type(
-    kind = CSharp.TypeKind.CLASS,
+    kind = CSharp.TypeKind.RECORD,
     name = name,
-    modifiers = DotnetAspCSharpModifiers.publicSealed,
+    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.SEALED),
     baseTypes = emptyList(),
     attributes = emptyList(),
     primaryConstructorParameters = emptyList(),
@@ -27,17 +27,18 @@ internal fun resolveResponseModelTypeName(
     }
 }
 
-private fun renderModelFieldProperty(field: DotnetField): CSharp.Property = CSharp.Property(
-    type = csharpType(dotnetAspCSharpType(field.type)),
-    name = dotnetAspPascalIdentifier(field.name),
-    modifiers = DotnetAspCSharpModifiers.public,
-    attributes = emptyList(),
-    getter = "get;",
-    setter = "set;",
-    initializer =
-    if (field.type is DotnetFieldType.String || field.type is DotnetFieldType.Reference) {
-        "null!"
-    } else {
-        null
-    },
-)
+private fun renderModelFieldProperty(field: DotnetField): CSharp.Property {
+    val initializer =
+        if (field.type is DotnetFieldType.String || field.type is DotnetFieldType.Reference) {
+            "null!"
+        } else {
+            null
+        }
+
+    return csharpAutoProperty(
+        type = csharpType(dotnetAspCSharpType(field.type)),
+        name = dotnetAspPascalIdentifier(field.name),
+        modifiers = listOf(CSharp.Modifier.PUBLIC),
+        initializer = initializer,
+    )
+}

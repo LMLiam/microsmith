@@ -70,7 +70,7 @@ internal fun renderResponseModelsFile(artifact: DotnetAspServiceArtifact): Strin
 
 internal fun buildContractsFile(
     artifact: DotnetAspServiceArtifact,
-    usings: Set<String> = setOf("System"),
+    usings: Set<DotnetAspCSharpNamespace> = setOf(DotnetAspCSharpNamespaces.System.Root),
     build: CSharpFileBuilder.() -> Unit,
 ): String = CSharp.render(
     CSharp.file(contractsNamespace(artifact)) {

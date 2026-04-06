@@ -20,8 +20,7 @@ class CSharpTypeBuilder internal constructor(
         name: String,
         modifiers: List<CSharp.Modifier>,
         attributes: List<CSharp.Attribute> = emptyList(),
-        getter: String = "get;",
-        setter: String = "set;",
+        accessors: CSharp.PropertyAccessors = CSharp.PropertyAccessors.READ_WRITE,
         initializer: String? = null,
     ) {
         members += CSharp.Property(
@@ -29,8 +28,7 @@ class CSharpTypeBuilder internal constructor(
             name = name,
             modifiers = modifiers,
             attributes = attributes,
-            getter = getter,
-            setter = setter,
+            accessors = accessors,
             initializer = initializer,
         )
     }
@@ -68,8 +66,7 @@ class CSharpTypeBuilder internal constructor(
         name: String,
         modifiers: List<CSharp.Modifier>,
         attributes: List<CSharp.Attribute> = emptyList(),
-        getter: String = "get;",
-        setter: String = "set;",
+        accessors: CSharp.PropertyAccessors = CSharp.PropertyAccessors.READ_WRITE,
         initializer: String? = null,
     ) {
         property(
@@ -77,8 +74,7 @@ class CSharpTypeBuilder internal constructor(
             name = name,
             modifiers = modifiers,
             attributes = attributes,
-            getter = getter,
-            setter = setter,
+            accessors = accessors,
             initializer = initializer,
         )
     }

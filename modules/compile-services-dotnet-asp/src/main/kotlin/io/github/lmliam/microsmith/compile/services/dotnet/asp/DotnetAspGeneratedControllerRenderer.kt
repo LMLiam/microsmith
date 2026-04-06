@@ -19,26 +19,42 @@ internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): Strin
         endpoints.forEach { endpoint ->
             add(renderResultMapper(endpoint))
         }
-        add(renderRespondHelper())
-        if (endpoints.any { it.bindings.headers != null }) {
-            add(renderReadHeaderHelper())
-        }
     }
 
     return CSharp.render(
         CSharp.file(controllersNamespace(artifact)) {
-            using(DotnetAspCSharpNamespaces.SYSTEM)
-            using(DotnetAspCSharpNamespaces.SYSTEM_THREADING)
-            using(DotnetAspCSharpNamespaces.SYSTEM_THREADING_TASKS)
-            using(DotnetAspCSharpNamespaces.MICROSOFT_ASPNETCORE_MVC)
+            using(DotnetAspCSharpNamespaces.System.Root)
+            using(DotnetAspCSharpNamespaces.System.Threading.Root)
+            using(DotnetAspCSharpNamespaces.System.Threading.Tasks)
+            using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Mvc)
             using(contractsNamespace(artifact))
             classType(
                 name = "${controllerPrefix(artifact)}ControllerBase",
-                modifiers = DotnetAspCSharpModifiers.publicAbstract,
-                baseTypes = listOf(csharpType(DotnetAspCSharpTypes.CONTROLLER_BASE)),
+                modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
+                baseTypes = listOf(csharpType("MicrosmithControllerBase")),
                 attributes = listOf(CSharp.Attribute("ApiController")),
             ) {
                 sections.forEach(::addMember)
+            }
+        },
+    )
+}
+
+internal fun renderMicrosmithControllerBaseFile(artifact: DotnetAspServiceArtifact): String? {
+    if (artifact.rest.endpoints.isEmpty()) {
+        return null
+    }
+
+    return CSharp.render(
+        CSharp.file(controllersNamespace(artifact)) {
+            using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Mvc)
+            classType(
+                name = "MicrosmithControllerBase",
+                modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
+                baseTypes = listOf(csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ControllerBase)),
+            ) {
+                addMember(renderRespondHelper())
+                addMember(renderReadHeaderHelper())
             }
         },
     )

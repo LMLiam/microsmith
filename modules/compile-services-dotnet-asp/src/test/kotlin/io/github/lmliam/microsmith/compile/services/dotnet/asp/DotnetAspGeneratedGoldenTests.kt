@@ -101,6 +101,10 @@ class DotnetAspGeneratedGoldenTests :
             normalizeGoldenText(textFiles.getValue("Generated/Contracts/RequestModels.cs").contents) shouldBe
                 normalizeGoldenText(goldenResource("golden/GetUserRequestModels.cs"))
             normalizeGoldenText(
+                textFiles.getValue("Generated/Controllers/MicrosmithControllerBase.cs").contents,
+            ) shouldBe
+                normalizeGoldenText(goldenResource("golden/MicrosmithControllerBase.cs"))
+            normalizeGoldenText(
                 textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents,
             ) shouldBe
                 normalizeGoldenText(goldenResource("golden/GetUserControllerBase.cs"))

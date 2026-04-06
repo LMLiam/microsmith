@@ -6,9 +6,9 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 
 internal fun renderResultMapper(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
     name = "Map${endpoint.operationName}Result",
-    modifiers = DotnetAspCSharpModifiers.private,
+    modifiers = listOf(CSharp.Modifier.PRIVATE),
     returnType = csharpGenericType(
-        DotnetAspCSharpTypes.ACTION_RESULT,
+        DotnetAspCSharpTypes.AspNetCore.Mvc.ActionResult,
         csharpType(resultBaseTypeName(endpoint)),
     ),
     attributes = emptyList(),
@@ -23,21 +23,21 @@ internal fun renderResultMapper(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
 
 internal fun renderRespondHelper(): CSharp.Method = CSharp.Method(
     name = "Respond",
-    modifiers = DotnetAspCSharpModifiers.private,
-    returnType = csharpType(DotnetAspCSharpTypes.OBJECT_RESULT),
+    modifiers = listOf(CSharp.Modifier.PROTECTED),
+    returnType = csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ObjectResult),
     attributes = emptyList(),
     parameters = listOf(
-        csharpParameter(DotnetAspCSharpTypes.OBJECT, "body"),
-        csharpParameter("int", "statusCode"),
+        csharpParameter(DotnetAspCSharpTypes.Primitives.Object, "body"),
+        csharpParameter(DotnetAspCSharpTypes.Primitives.Int, "statusCode"),
         csharpParameter(
             csharpArrayType(
                 csharpTupleType(
-                    csharpTupleElement(csharpType(DotnetAspCSharpTypes.STRING), "Name"),
-                    csharpTupleElement(csharpNullableType(DotnetAspCSharpTypes.STRING), "Value"),
+                    csharpTupleElement(csharpType(DotnetAspCSharpTypes.Primitives.String), "Name"),
+                    csharpTupleElement(csharpNullableType(DotnetAspCSharpTypes.Primitives.String), "Value"),
                 ),
             ),
             "headers",
-            modifiers = DotnetAspCSharpModifiers.params,
+            modifiers = listOf(CSharp.Modifier.PARAMS),
         ),
     ),
     body = CSharp.codeBlock {
@@ -49,7 +49,7 @@ internal fun renderRespondHelper(): CSharp.Method = CSharp.Method(
         blankLine()
         returnStatement(
             """
-            new ObjectResult(body)
+            new ${DotnetAspCSharpTypes.AspNetCore.Mvc.ObjectResult}(body)
             {
                 StatusCode = statusCode,
             }
@@ -60,10 +60,10 @@ internal fun renderRespondHelper(): CSharp.Method = CSharp.Method(
 
 internal fun renderReadHeaderHelper(): CSharp.Method = CSharp.Method(
     name = "ReadHeader",
-    modifiers = DotnetAspCSharpModifiers.private,
-    returnType = csharpNullableType(DotnetAspCSharpTypes.STRING),
+    modifiers = listOf(CSharp.Modifier.PROTECTED),
+    returnType = csharpNullableType(DotnetAspCSharpTypes.Primitives.String),
     attributes = emptyList(),
-    parameters = listOf(csharpParameter(DotnetAspCSharpTypes.STRING, "headerName")),
+    parameters = listOf(csharpParameter(DotnetAspCSharpTypes.Primitives.String, "headerName")),
     body = CSharp.codeBlock {
         line(
             """

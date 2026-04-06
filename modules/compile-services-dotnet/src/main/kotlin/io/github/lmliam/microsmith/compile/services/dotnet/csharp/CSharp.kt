@@ -39,6 +39,12 @@ object CSharp {
         PARAMS("params"),
     }
 
+    enum class PropertyAccessors {
+        READ_ONLY,
+        READ_WRITE,
+        READ_INIT,
+    }
+
     sealed interface Member
 
     sealed interface TypeRef
@@ -74,8 +80,7 @@ object CSharp {
         val name: String,
         val modifiers: List<Modifier>,
         val attributes: List<Attribute>,
-        val getter: String,
-        val setter: String,
+        val accessors: PropertyAccessors,
         val initializer: String?,
     ) : Member
 

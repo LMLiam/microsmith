@@ -17,6 +17,9 @@ internal class DotnetAspEndpointTextFileRenderer {
             renderResponseModelsFile(artifact)?.let {
                 add("Generated/Contracts/ResponseModels.cs" to it)
             }
+            renderMicrosmithControllerBaseFile(artifact)?.let {
+                add("Generated/Controllers/MicrosmithControllerBase.cs" to it)
+            }
             renderControllerBaseFile(artifact)?.let {
                 add("Generated/Controllers/${controllerPrefix(artifact)}ControllerBase.cs" to it)
             }

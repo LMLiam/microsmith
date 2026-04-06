@@ -7,9 +7,9 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRequestField
 
 internal fun renderRequestBindingClass(binding: ResolvedDotnetAspRequestBinding): CSharp.Type = CSharp.Type(
-    kind = CSharp.TypeKind.CLASS,
+    kind = CSharp.TypeKind.RECORD,
     name = binding.name,
-    modifiers = DotnetAspCSharpModifiers.publicSealed,
+    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.SEALED),
     baseTypes = emptyList(),
     attributes = emptyList(),
     primaryConstructorParameters = emptyList(),
@@ -17,20 +17,17 @@ internal fun renderRequestBindingClass(binding: ResolvedDotnetAspRequestBinding)
 )
 
 internal fun renderHeadersBindingClass(binding: ResolvedDotnetAspHeadersBinding): CSharp.Type = CSharp.Type(
-    kind = CSharp.TypeKind.CLASS,
+    kind = CSharp.TypeKind.RECORD,
     name = binding.name,
-    modifiers = DotnetAspCSharpModifiers.publicSealed,
+    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.SEALED),
     baseTypes = emptyList(),
     attributes = emptyList(),
     primaryConstructorParameters = emptyList(),
     members = binding.headers.map { header ->
-        CSharp.Property(
-            type = csharpNullableType(DotnetAspCSharpTypes.STRING),
+        csharpAutoProperty(
+            type = csharpNullableType(DotnetAspCSharpTypes.Primitives.String),
             name = dotnetAspPascalIdentifier(header.name),
-            modifiers = DotnetAspCSharpModifiers.public,
-            attributes = emptyList(),
-            getter = "get;",
-            setter = "set;",
+            modifiers = listOf(CSharp.Modifier.PUBLIC),
             initializer = null,
         )
     },
@@ -38,13 +35,10 @@ internal fun renderHeadersBindingClass(binding: ResolvedDotnetAspHeadersBinding)
 
 private fun renderRequestFieldProperty(field: ResolvedDotnetAspRequestField): CSharp.Property {
     val nullable = field.optional && field.defaultValue == null
-    return CSharp.Property(
+    return csharpAutoProperty(
         type = csharpType(dotnetAspCSharpType(field.type, nullable = nullable)),
         name = dotnetAspPascalIdentifier(field.name),
-        modifiers = DotnetAspCSharpModifiers.public,
-        attributes = emptyList(),
-        getter = "get;",
-        setter = "set;",
+        modifiers = listOf(CSharp.Modifier.PUBLIC),
         initializer = requestFieldInitializer(field, nullable),
     )
 }

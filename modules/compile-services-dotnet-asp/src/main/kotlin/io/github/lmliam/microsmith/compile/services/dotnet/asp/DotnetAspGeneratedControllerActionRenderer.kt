@@ -7,11 +7,11 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 
 internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
     name = endpoint.operationName,
-    modifiers = DotnetAspCSharpModifiers.publicAsync,
+    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ASYNC),
     returnType = csharpGenericType(
-        "Task",
+        DotnetAspCSharpTypes.Threading.Task,
         csharpGenericType(
-            DotnetAspCSharpTypes.ACTION_RESULT,
+            DotnetAspCSharpTypes.AspNetCore.Mvc.ActionResult,
             csharpType(resultBaseTypeName(endpoint)),
         ),
     ),
@@ -38,7 +38,7 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
                 ),
             )
         }
-        add(csharpParameter(DotnetAspCSharpTypes.CANCELLATION_TOKEN, "cancellationToken"))
+        add(csharpParameter(DotnetAspCSharpTypes.Threading.CancellationToken, "cancellationToken"))
     },
     body = CSharp.codeBlock {
         renderHeadersPrelude(endpoint)?.let { prelude ->
@@ -55,15 +55,15 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
 
 internal fun renderAbstractHandler(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
     name = "On${endpoint.operationName}Async",
-    modifiers = DotnetAspCSharpModifiers.protectedAbstract,
-    returnType = csharpGenericType("Task", csharpType(resultBaseTypeName(endpoint))),
+    modifiers = listOf(CSharp.Modifier.PROTECTED, CSharp.Modifier.ABSTRACT),
+    returnType = csharpGenericType(DotnetAspCSharpTypes.Threading.Task, csharpType(resultBaseTypeName(endpoint))),
     attributes = emptyList(),
     parameters = buildList {
         endpoint.bindings.path?.let { add(csharpParameter(it.name, "path")) }
         endpoint.bindings.query?.let { add(csharpParameter(it.name, "query")) }
         endpoint.bindings.headers?.let { add(csharpParameter(it.name, "headers")) }
         endpoint.bindings.body?.let { add(csharpParameter(resolveBodyTypeName(endpoint), "body")) }
-        add(csharpParameter(DotnetAspCSharpTypes.CANCELLATION_TOKEN, "cancellationToken"))
+        add(csharpParameter(DotnetAspCSharpTypes.Threading.CancellationToken, "cancellationToken"))
     },
     body = null,
 )

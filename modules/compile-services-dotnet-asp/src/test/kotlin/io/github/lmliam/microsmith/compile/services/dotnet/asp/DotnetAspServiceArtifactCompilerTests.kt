@@ -243,19 +243,20 @@ class DotnetAspServiceArtifactCompilerTests :
                 "Generated/Contracts/ServiceModels.cs",
                 "Generated/Contracts/RequestModels.cs",
                 "Generated/Contracts/ResponseModels.cs",
+                "Generated/Controllers/MicrosmithControllerBase.cs",
                 "Generated/Controllers/UserServiceApiControllerBase.cs",
             )
 
             textFiles
                 .getValue("Generated/Contracts/ServiceModels.cs")
                 .contents
-                .shouldContain("public sealed class User")
+                .shouldContain("public sealed record User")
             textFiles.getValue("Generated/Contracts/RequestModels.cs").contents
-                .shouldContain("public sealed class GetUserPath")
+                .shouldContain("public sealed record GetUserPath")
             textFiles.getValue("Generated/Contracts/RequestModels.cs").contents
                 .shouldContain("public bool DryRun { get; set; } = false;")
             textFiles.getValue("Generated/Contracts/RequestModels.cs").contents
-                .shouldContain("public sealed class CreateUserBody")
+                .shouldContain("public sealed record CreateUserBody")
             textFiles.getValue("Generated/Contracts/ResponseModels.cs").contents
                 .shouldContain("public abstract record GetUserResult;")
             textFiles.getValue("Generated/Contracts/ResponseModels.cs").contents
@@ -265,11 +266,17 @@ class DotnetAspServiceArtifactCompilerTests :
                         ") : CreateUserResult;",
                 )
             textFiles.getValue("Generated/Contracts/ResponseModels.cs").contents
-                .shouldContain("public sealed class CreateUserBadRequestProblem")
+                .shouldContain("public sealed record CreateUserBadRequestProblem")
+            textFiles.getValue("Generated/Controllers/MicrosmithControllerBase.cs").contents
+                .shouldContain("public abstract class MicrosmithControllerBase : ControllerBase")
+            textFiles.getValue("Generated/Controllers/MicrosmithControllerBase.cs").contents
+                .shouldContain("protected ObjectResult Respond(")
             textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
                 .shouldContain("[HttpGet(\"/users/{id}\", Name = \"GetUser\")]")
             textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
                 .shouldContain("var headers = new GetUserHeaders")
+            textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
+                .shouldContain("public abstract class UserServiceApiControllerBase : MicrosmithControllerBase")
             textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
                 .shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync(")
             textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents

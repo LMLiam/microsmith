@@ -6,18 +6,18 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 internal fun renderHostingExtensionsFile(artifact: DotnetAspServiceArtifact): String {
     return CSharp.render(
         CSharp.file(hostingNamespace(artifact)) {
-            using(DotnetAspCSharpNamespaces.MICROSOFT_ASPNETCORE_BUILDER)
-            using(DotnetAspCSharpNamespaces.MICROSOFT_EXTENSIONS_DEPENDENCY_INJECTION)
+            using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Builder)
+            using(DotnetAspCSharpNamespaces.Microsoft.Extensions.DependencyInjection)
             classType(
                 name = "MicrosmithHostingExtensions",
-                modifiers = DotnetAspCSharpModifiers.publicStatic,
+                modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.STATIC),
             ) {
                 method(
                     name = "AddMicrosmith",
-                    returnType = csharpType(DotnetAspCSharpTypes.WEB_APPLICATION_BUILDER),
-                    modifiers = DotnetAspCSharpModifiers.publicStatic,
+                    returnType = csharpType(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplicationBuilder),
+                    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.STATIC),
                     parameters = listOf(
-                        extensionParameter(DotnetAspCSharpTypes.WEB_APPLICATION_BUILDER, "builder"),
+                        extensionParameter(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplicationBuilder, "builder"),
                     ),
                     body = CSharp.codeBlock {
                         expression("builder.Services.AddControllers()")
@@ -26,10 +26,10 @@ internal fun renderHostingExtensionsFile(artifact: DotnetAspServiceArtifact): St
                 )
                 method(
                     name = "MapMicrosmith",
-                    returnType = csharpType(DotnetAspCSharpTypes.WEB_APPLICATION),
-                    modifiers = DotnetAspCSharpModifiers.publicStatic,
+                    returnType = csharpType(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplication),
+                    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.STATIC),
                     parameters = listOf(
-                        extensionParameter(DotnetAspCSharpTypes.WEB_APPLICATION, "app"),
+                        extensionParameter(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplication, "app"),
                     ),
                     body = CSharp.codeBlock {
                         expression("app.MapControllers()")

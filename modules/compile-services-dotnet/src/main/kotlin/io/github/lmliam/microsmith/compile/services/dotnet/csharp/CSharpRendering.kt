@@ -61,14 +61,20 @@ private fun renderProperty(property: CSharp.Property): String = buildString {
     append(" ")
     append(property.name)
     append(" { ")
-    append(property.getter)
-    append(" ")
-    append(property.setter)
+    append(renderPropertyAccessors(property.accessors))
     append(" }")
     property.initializer?.let { initializer ->
         append(" = ")
         append(initializer)
         append(";")
+    }
+}
+
+private fun renderPropertyAccessors(accessors: CSharp.PropertyAccessors): String {
+    return when (accessors) {
+        CSharp.PropertyAccessors.READ_ONLY -> "get;"
+        CSharp.PropertyAccessors.READ_WRITE -> "get; set;"
+        CSharp.PropertyAccessors.READ_INIT -> "get; init;"
     }
 }
 

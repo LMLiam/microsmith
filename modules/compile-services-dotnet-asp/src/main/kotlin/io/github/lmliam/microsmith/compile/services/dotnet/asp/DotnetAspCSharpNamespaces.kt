@@ -1,10 +1,37 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 internal object DotnetAspCSharpNamespaces {
-    const val SYSTEM = "System"
-    const val SYSTEM_THREADING = "System.Threading"
-    const val SYSTEM_THREADING_TASKS = "System.Threading.Tasks"
-    const val MICROSOFT_ASPNETCORE_MVC = "Microsoft.AspNetCore.Mvc"
-    const val MICROSOFT_ASPNETCORE_BUILDER = "Microsoft.AspNetCore.Builder"
-    const val MICROSOFT_EXTENSIONS_DEPENDENCY_INJECTION = "Microsoft.Extensions.DependencyInjection"
+    object System {
+        data object Root : DotnetAspCSharpNamespace {
+            override val value = "System"
+        }
+
+        object Threading {
+            data object Root : DotnetAspCSharpNamespace {
+                override val value = "System.Threading"
+            }
+
+            data object Tasks : DotnetAspCSharpNamespace {
+                override val value = "System.Threading.Tasks"
+            }
+        }
+    }
+
+    object Microsoft {
+        object AspNetCore {
+            data object Builder : DotnetAspCSharpNamespace {
+                override val value = "Microsoft.AspNetCore.Builder"
+            }
+
+            data object Mvc : DotnetAspCSharpNamespace {
+                override val value = "Microsoft.AspNetCore.Mvc"
+            }
+        }
+
+        object Extensions {
+            data object DependencyInjection : DotnetAspCSharpNamespace {
+                override val value = "Microsoft.Extensions.DependencyInjection"
+            }
+        }
+    }
 }
