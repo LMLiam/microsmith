@@ -41,15 +41,25 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
         add(csharpParameter(DotnetAspCSharpTypes.Threading.CancellationToken, "cancellationToken"))
     },
     body = CSharp.codeBlock {
-        renderHeadersPrelude(endpoint)?.let { prelude ->
-            line(prelude)
+        renderHeadersPrelude(endpoint)?.let { headerInitializer ->
+            local(name = "headers", initializer = headerInitializer)
             blankLine()
         }
         local(
             name = "result",
-            initializer = "await On${endpoint.operationName}Async(${handlerArguments(endpoint)})",
+            initializer = CSharp.await(
+                CSharp.call(
+                    CSharp.identifier("On${endpoint.operationName}Async"),
+                    handlerArguments(endpoint),
+                ),
+            ),
         )
-        returnStatement("Map${endpoint.operationName}Result(result)")
+        returnStatement(
+            CSharp.call(
+                CSharp.identifier("Map${endpoint.operationName}Result"),
+                CSharp.identifier("result"),
+            ),
+        )
     },
 )
 
@@ -68,31 +78,30 @@ internal fun renderAbstractHandler(endpoint: ResolvedDotnetAspEndpoint): CSharp.
     body = null,
 )
 
-internal fun handlerArguments(endpoint: ResolvedDotnetAspEndpoint): String = buildList {
-    endpoint.bindings.path?.let { add("path") }
-    endpoint.bindings.query?.let { add("query") }
-    endpoint.bindings.headers?.let { add("headers") }
-    endpoint.bindings.body?.let { add("body") }
-    add("cancellationToken")
-}.joinToString(", ")
+internal fun handlerArguments(endpoint: ResolvedDotnetAspEndpoint): List<CSharp.Expression> = buildList {
+    endpoint.bindings.path?.let { add(CSharp.identifier("path")) }
+    endpoint.bindings.query?.let { add(CSharp.identifier("query")) }
+    endpoint.bindings.headers?.let { add(CSharp.identifier("headers")) }
+    endpoint.bindings.body?.let { add(CSharp.identifier("body")) }
+    add(CSharp.identifier("cancellationToken"))
+}
 
-private fun renderHeadersPrelude(endpoint: ResolvedDotnetAspEndpoint): String? =
+private fun renderHeadersPrelude(endpoint: ResolvedDotnetAspEndpoint): CSharp.Expression? =
     endpoint.bindings.headers?.let(::renderHeadersInstantiation)
 
-private fun renderHeadersInstantiation(binding: ResolvedDotnetAspHeadersBinding): String = buildString {
-    appendLine("var headers = new ${binding.name}")
-    appendLine("{")
-    append(
-        dotnetAspIndent(
-            binding.headers.joinToString(",\n") { header ->
-                "${dotnetAspPascalIdentifier(header.name)} = " +
-                    "ReadHeader(${dotnetAspRouteLiteral(header.headerName)})"
-            },
-            spaces = 4,
-        ),
+private fun renderHeadersInstantiation(binding: ResolvedDotnetAspHeadersBinding): CSharp.Expression {
+    return CSharp.new(
+        type = csharpType(binding.name),
+        initializers = binding.headers.map { header ->
+            CSharp.init(
+                memberName = dotnetAspPascalIdentifier(header.name),
+                value = CSharp.call(
+                    CSharp.identifier("ReadHeader"),
+                    CSharp.rawExpression(dotnetAspRouteLiteral(header.headerName)),
+                ),
+            )
+        },
     )
-    appendLine()
-    append("};")
 }
 
 internal fun resolveBodyTypeName(endpoint: ResolvedDotnetAspEndpoint): String =

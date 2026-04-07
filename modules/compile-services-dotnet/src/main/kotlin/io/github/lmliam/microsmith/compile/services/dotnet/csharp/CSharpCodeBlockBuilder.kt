@@ -12,15 +12,23 @@ class CSharpCodeBlockBuilder internal constructor() {
         statements += CSharp.RawStatement(text)
     }
 
-    fun expression(text: String) {
-        statements += CSharp.ExpressionStatement(text)
+    fun expression(expression: CSharp.Expression) {
+        statements += CSharp.ExpressionStatement(expression)
     }
 
-    fun returnStatement(expression: String) {
+    fun expression(text: String) {
+        expression(CSharp.rawExpression(text))
+    }
+
+    fun returnStatement(expression: CSharp.Expression) {
         statements += CSharp.ReturnStatement(expression)
     }
 
-    fun local(keyword: String = "var", name: String, initializer: String) {
+    fun returnStatement(expression: String) {
+        returnStatement(CSharp.rawExpression(expression))
+    }
+
+    fun local(keyword: String = "var", name: String, initializer: CSharp.Expression) {
         statements += CSharp.LocalDeclaration(
             keyword = keyword,
             name = name,
@@ -28,11 +36,19 @@ class CSharpCodeBlockBuilder internal constructor() {
         )
     }
 
-    fun ifStatement(condition: String, build: CSharpCodeBlockBuilder.() -> Unit) {
+    fun local(keyword: String = "var", name: String, initializer: String) {
+        local(keyword = keyword, name = name, initializer = CSharp.rawExpression(initializer))
+    }
+
+    fun ifStatement(condition: CSharp.Expression, build: CSharpCodeBlockBuilder.() -> Unit) {
         statements += CSharp.IfStatement(
             condition = condition,
             body = CSharpCodeBlockBuilder().apply(build).build(),
         )
+    }
+
+    fun ifStatement(condition: String, build: CSharpCodeBlockBuilder.() -> Unit) {
+        ifStatement(CSharp.rawExpression(condition), build)
     }
 
     fun foreach(signature: String, build: CSharpCodeBlockBuilder.() -> Unit) {

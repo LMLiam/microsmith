@@ -147,4 +147,85 @@ class CSharpTests :
                 }
             """.trimIndent()
         }
+
+        "render emits structured expressions for calls object initializers and switch expressions" {
+            val file = CSharp.file("Platform.Api.Generated") {
+                classType(
+                    name = "Responder",
+                    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.SEALED),
+                ) {
+                    method(
+                        name = "Map",
+                        returnType = CSharp.type("ObjectResult"),
+                        modifiers = listOf(CSharp.Modifier.PUBLIC),
+                        parameters = listOf(
+                            CSharp.Parameter(
+                                type = CSharp.type("ResultBase"),
+                                name = "result",
+                                modifiers = emptyList(),
+                                attributes = emptyList(),
+                                defaultValue = null,
+                            ),
+                            CSharp.Parameter(
+                                type = CSharp.type("object"),
+                                name = "body",
+                                modifiers = emptyList(),
+                                attributes = emptyList(),
+                                defaultValue = null,
+                            ),
+                        ),
+                        body = CSharp.codeBlock {
+                            local(
+                                name = "response",
+                                initializer = CSharp.new(
+                                    type = CSharp.type("ObjectResult"),
+                                    arguments = listOf(CSharp.identifier("body")),
+                                    initializers = listOf(
+                                        CSharp.init("StatusCode", CSharp.rawExpression("200")),
+                                    ),
+                                ),
+                            )
+                            blankLine()
+                            returnStatement(
+                                CSharp.switch(
+                                    CSharp.identifier("result"),
+                                    CSharp.switchArm(
+                                        "OkResult ok",
+                                        CSharp.call(
+                                            CSharp.identifier("Respond"),
+                                            CSharp.identifier("ok"),
+                                        ),
+                                    ),
+                                    CSharp.switchArm(
+                                        "_",
+                                        CSharp.identifier("response"),
+                                    ),
+                                ),
+                            )
+                        },
+                    )
+                }
+            }
+
+            CSharp.render(file).trim() shouldBe """
+                namespace Platform.Api.Generated;
+
+                public sealed class Responder
+                {
+                    public ObjectResult Map(ResultBase result, object body)
+                    {
+                        var response = new ObjectResult(body)
+                        {
+                            StatusCode = 200
+                        };
+
+                        return result switch
+                        {
+                            OkResult ok => Respond(ok),
+                            _ => response
+                        };
+                    }
+                }
+            """.trimIndent()
+        }
     })

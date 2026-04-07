@@ -20,8 +20,15 @@ internal fun renderHostingExtensionsFile(artifact: DotnetAspServiceArtifact): St
                         extensionParameter(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplicationBuilder, "builder"),
                     ),
                     body = CSharp.codeBlock {
-                        expression("builder.Services.AddControllers()")
-                        returnStatement("builder")
+                        expression(
+                            CSharp.call(
+                                CSharp.member(
+                                    CSharp.member(CSharp.identifier("builder"), "Services"),
+                                    "AddControllers",
+                                ),
+                            ),
+                        )
+                        returnStatement(CSharp.identifier("builder"))
                     },
                 )
                 method(
@@ -32,8 +39,12 @@ internal fun renderHostingExtensionsFile(artifact: DotnetAspServiceArtifact): St
                         extensionParameter(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplication, "app"),
                     ),
                     body = CSharp.codeBlock {
-                        expression("app.MapControllers()")
-                        returnStatement("app")
+                        expression(
+                            CSharp.call(
+                                CSharp.member(CSharp.identifier("app"), "MapControllers"),
+                            ),
+                        )
+                        returnStatement(CSharp.identifier("app"))
                     },
                 )
             }

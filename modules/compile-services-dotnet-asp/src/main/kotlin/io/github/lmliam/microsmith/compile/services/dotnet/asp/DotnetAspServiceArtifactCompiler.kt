@@ -47,8 +47,14 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
                 renderLaunchSettingsFile(artifact),
             ),
         )
-        endpointRenderer.render(artifact).forEach { (relativePath, contents) ->
-            add(textContribution(artifact, relativePath, contents))
+        endpointRenderer.render(artifact).forEach { generatedFile ->
+            add(
+                textContribution(
+                    artifact = artifact,
+                    relativePath = generatedFile.relativePath,
+                    contents = generatedFile.contents,
+                ),
+            )
         }
     }
 

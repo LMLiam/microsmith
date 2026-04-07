@@ -3,25 +3,35 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
 
 internal class DotnetAspEndpointTextFileRenderer {
-    fun render(artifact: DotnetAspServiceArtifact): List<Pair<String, String>> {
+    fun render(artifact: DotnetAspServiceArtifact): List<DotnetAspGeneratedTextFile> {
         validateEndpointGenerationInputs(artifact)
 
         return buildList {
-            add("Generated/Hosting/MicrosmithHostingExtensions.cs" to renderHostingExtensionsFile(artifact))
+            add(
+                DotnetAspGeneratedTextFile(
+                    relativePath = "Generated/Hosting/MicrosmithHostingExtensions.cs",
+                    contents = renderHostingExtensionsFile(artifact),
+                ),
+            )
             renderSharedModelsFile(artifact)?.let {
-                add("Generated/Contracts/ServiceModels.cs" to it)
+                add(DotnetAspGeneratedTextFile("Generated/Contracts/ServiceModels.cs", it))
             }
             renderRequestModelsFile(artifact)?.let {
-                add("Generated/Contracts/RequestModels.cs" to it)
+                add(DotnetAspGeneratedTextFile("Generated/Contracts/RequestModels.cs", it))
             }
             renderResponseModelsFile(artifact)?.let {
-                add("Generated/Contracts/ResponseModels.cs" to it)
+                add(DotnetAspGeneratedTextFile("Generated/Contracts/ResponseModels.cs", it))
             }
             renderMicrosmithControllerBaseFile(artifact)?.let {
-                add("Generated/Controllers/MicrosmithControllerBase.cs" to it)
+                add(DotnetAspGeneratedTextFile("Generated/Controllers/MicrosmithControllerBase.cs", it))
             }
             renderControllerBaseFile(artifact)?.let {
-                add("Generated/Controllers/${controllerPrefix(artifact)}ControllerBase.cs" to it)
+                add(
+                    DotnetAspGeneratedTextFile(
+                        relativePath = "Generated/Controllers/${controllerPrefix(artifact)}ControllerBase.cs",
+                        contents = it,
+                    ),
+                )
             }
         }
     }
