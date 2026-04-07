@@ -31,6 +31,15 @@ internal data class RepositoryQualityPolicy(
                                 "the temporary headroom is explicit until a narrower extraction " +
                                 "is warranted.",
                     ),
+                "modules/compile-services-dotnet/src/main/kotlin/io/github/lmliam/microsmith/compile/" +
+                    "services/dotnet/csharp/CSharp.kt" to
+                    ProductionFileLineOverride(
+                        maxLines = 320,
+                        rationale =
+                            "The shared C# DSL intentionally keeps its core model and factory " +
+                                "surface together; splitting it further made the generator API " +
+                                "harder to read and use.",
+                    ),
             ),
             multiDeclarationExemptions = emptyMap(),
             forbiddenPackageSegments = setOf("util", "utils", "misc"),
