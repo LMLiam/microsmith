@@ -95,14 +95,23 @@ private fun renderMethod(method: CSharp.Method): String = buildString {
 private fun renderMethodParameters(parameters: List<CSharp.Parameter>): String = when {
     parameters.isEmpty() -> "()"
 
-    parameters.size == 1 -> "(${renderParameter(parameters.single())})"
-
-    else -> parameters.joinToString(
-        prefix = "(\n",
-        postfix = "\n)",
-        separator = ",\n",
-        transform = { parameter -> indent(renderParameter(parameter), spaces = 4) },
-    )
+    else -> {
+        val singleLine = parameters.joinToString(
+            prefix = "(",
+            postfix = ")",
+            transform = ::renderParameter,
+        )
+        if (singleLine.length <= MAX_INLINE_METHOD_PARAMETER_LENGTH) {
+            singleLine
+        } else {
+            parameters.joinToString(
+                prefix = "(\n",
+                postfix = "\n)",
+                separator = ",\n",
+                transform = { parameter -> indent(renderParameter(parameter), spaces = 4) },
+            )
+        }
+    }
 }
 
 private fun renderParameter(parameter: CSharp.Parameter): String = buildString {
@@ -124,3 +133,5 @@ private fun renderParameter(parameter: CSharp.Parameter): String = buildString {
 }
 
 private fun renderAttributes(attributes: List<CSharp.Attribute>): List<String> = attributes.map(::renderAttribute)
+
+private const val MAX_INLINE_METHOD_PARAMETER_LENGTH = 100

@@ -1,7 +1,19 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 
-internal fun renderCodeBlock(block: CSharp.CodeBlock): String =
-    indent(block.statements.joinToString("\n", transform = ::renderStatement))
+internal fun renderCodeBlock(block: CSharp.CodeBlock): String = indent(
+    buildString {
+        block.statements.forEachIndexed { index, statement ->
+            if (index > 0) {
+                val previous = block.statements[index - 1]
+                appendLine()
+                if (shouldInsertSpacerLine(previous, statement)) {
+                    appendLine()
+                }
+            }
+            append(renderStatement(statement))
+        }
+    },
+)
 
 private fun renderStatement(statement: CSharp.Statement): String = when (statement) {
     CSharp.BlankLine -> ""
@@ -101,7 +113,7 @@ private fun renderObjectCreation(expression: CSharp.ObjectCreation): String = bu
         appendLine("{")
         append(
             indent(
-                expression.initializers.joinToString(",\n", postfix = ",") { initializer ->
+                expression.initializers.joinToString(",\n") { initializer ->
                     "${initializer.memberName} = ${renderExpression(initializer.value)}"
                 },
             ),

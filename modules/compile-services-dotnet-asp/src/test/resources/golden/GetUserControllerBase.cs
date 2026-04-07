@@ -10,25 +10,18 @@ namespace UserService.Api.Generated.Controllers;
 public abstract class UserServiceApiControllerBase : MicrosmithControllerBase
 {
     [HttpGet("/users/{id}", Name = "GetUser")]
-    public async Task<ActionResult<GetUserResult>> GetUser(
-        [FromRoute] GetUserPath path,
-        CancellationToken cancellationToken
-    )
+    public async Task<ActionResult<GetUserResult>> GetUser([FromRoute] GetUserPath path, CancellationToken cancellationToken)
     {
         var headers = new GetUserHeaders()
         {
-            XCorrelationId = ReadHeader("X-Correlation-Id"),
+            XCorrelationId = ReadHeader("X-Correlation-Id")
         };
 
         var result = await OnGetUserAsync(path, headers, cancellationToken);
         return MapGetUserResult(result);
     }
 
-    protected abstract Task<GetUserResult> OnGetUserAsync(
-        GetUserPath path,
-        GetUserHeaders headers,
-        CancellationToken cancellationToken
-    );
+    protected abstract Task<GetUserResult> OnGetUserAsync(GetUserPath path, GetUserHeaders headers, CancellationToken cancellationToken);
 
     private ActionResult<GetUserResult> MapGetUserResult(GetUserResult result)
     {

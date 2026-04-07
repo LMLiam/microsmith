@@ -4,11 +4,7 @@ namespace UserService.Api.Generated.Controllers;
 
 public abstract class MicrosmithControllerBase : ControllerBase
 {
-    protected ObjectResult Respond(
-        object body,
-        int statusCode,
-        params (string Name, string? Value)[] headers
-    )
+    protected ObjectResult Respond(object body, int statusCode, params (string Name, string? Value)[] headers)
     {
         foreach (var (name, value) in headers)
         {
@@ -20,7 +16,7 @@ public abstract class MicrosmithControllerBase : ControllerBase
 
         return new ObjectResult(body)
         {
-            StatusCode = statusCode,
+            StatusCode = statusCode
         };
     }
 
