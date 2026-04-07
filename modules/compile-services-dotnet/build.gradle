@@ -3,6 +3,7 @@ apply plugin: 'org.jetbrains.kotlin.kapt'
 dependencies {
     api project(":compile-services")
     api project(":artifact-services-dotnet")
+    api project(":dsl-services-dotnet")
     api libs.spi.tooling.annotations
     kapt libs.spi.tooling.processor
 }
