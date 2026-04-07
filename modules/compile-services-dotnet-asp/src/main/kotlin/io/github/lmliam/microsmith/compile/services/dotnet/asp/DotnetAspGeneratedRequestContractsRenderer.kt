@@ -10,9 +10,6 @@ internal fun renderRequestBindingClass(binding: ResolvedDotnetAspRequestBinding)
     kind = CSharp.TypeKind.RECORD,
     name = binding.name,
     modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.SEALED),
-    baseTypes = emptyList(),
-    attributes = emptyList(),
-    primaryConstructorParameters = emptyList(),
     members = binding.fields.map(::renderRequestFieldProperty),
 )
 
@@ -20,15 +17,11 @@ internal fun renderHeadersBindingClass(binding: ResolvedDotnetAspHeadersBinding)
     kind = CSharp.TypeKind.RECORD,
     name = binding.name,
     modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.SEALED),
-    baseTypes = emptyList(),
-    attributes = emptyList(),
-    primaryConstructorParameters = emptyList(),
     members = binding.headers.map { header ->
         csharpAutoProperty(
             type = csharpNullableType(DotnetAspCSharpTypes.Primitives.String),
             name = dotnetAspPascalIdentifier(header.name),
             modifiers = listOf(CSharp.Modifier.PUBLIC),
-            initializer = null,
         )
     },
 )

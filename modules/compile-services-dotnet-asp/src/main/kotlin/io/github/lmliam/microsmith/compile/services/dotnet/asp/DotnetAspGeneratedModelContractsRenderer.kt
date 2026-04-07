@@ -11,9 +11,6 @@ internal fun renderModelClass(name: String, fields: List<DotnetField>): CSharp.T
     kind = CSharp.TypeKind.RECORD,
     name = name,
     modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.SEALED),
-    baseTypes = emptyList(),
-    attributes = emptyList(),
-    primaryConstructorParameters = emptyList(),
     members = fields.map(::renderModelFieldProperty),
 )
 

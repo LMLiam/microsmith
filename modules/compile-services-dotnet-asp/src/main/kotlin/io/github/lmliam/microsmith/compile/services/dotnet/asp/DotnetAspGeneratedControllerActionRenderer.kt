@@ -16,25 +16,37 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
         ),
     ),
     attributes = listOf(
-        csharpAttribute(
-            httpMethodAttribute(endpoint.method),
-            "${dotnetAspRouteLiteral(endpoint.route)}, " +
-                "Name = ${dotnetAspRouteLiteral(endpoint.operationName)}",
+        DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.endpointRoute(
+            method = endpoint.method,
+            route = endpoint.route,
+            operationName = endpoint.operationName,
         ),
     ),
     parameters = buildList {
         endpoint.bindings.path?.let {
-            add(csharpParameter(it.name, "path", attributes = listOf(csharpAttribute("FromRoute"))))
+            add(
+                csharpParameter(
+                    it.name,
+                    "path",
+                    attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.FromRoute),
+                ),
+            )
         }
         endpoint.bindings.query?.let {
-            add(csharpParameter(it.name, "query", attributes = listOf(csharpAttribute("FromQuery"))))
+            add(
+                csharpParameter(
+                    it.name,
+                    "query",
+                    attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.FromQuery),
+                ),
+            )
         }
         endpoint.bindings.body?.let {
             add(
                 csharpParameter(
                     resolveBodyTypeName(endpoint),
                     "body",
-                    attributes = listOf(csharpAttribute("FromBody")),
+                    attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.FromBody),
                 ),
             )
         }
@@ -48,7 +60,7 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
         local(
             name = "result",
             initializer = CSharp.await(
-                CSharp.call(
+                CSharp.callValues(
                     CSharp.identifier("On${endpoint.operationName}Async"),
                     handlerArguments(endpoint),
                 ),
@@ -67,7 +79,6 @@ internal fun renderAbstractHandler(endpoint: ResolvedDotnetAspEndpoint): CSharp.
     name = "On${endpoint.operationName}Async",
     modifiers = listOf(CSharp.Modifier.PROTECTED, CSharp.Modifier.ABSTRACT),
     returnType = csharpGenericType(DotnetAspCSharpTypes.Threading.Task, csharpType(resultBaseTypeName(endpoint))),
-    attributes = emptyList(),
     parameters = buildList {
         endpoint.bindings.path?.let { add(csharpParameter(it.name, "path")) }
         endpoint.bindings.query?.let { add(csharpParameter(it.name, "query")) }
@@ -75,7 +86,6 @@ internal fun renderAbstractHandler(endpoint: ResolvedDotnetAspEndpoint): CSharp.
         endpoint.bindings.body?.let { add(csharpParameter(resolveBodyTypeName(endpoint), "body")) }
         add(csharpParameter(DotnetAspCSharpTypes.Threading.CancellationToken, "cancellationToken"))
     },
-    body = null,
 )
 
 internal fun handlerArguments(endpoint: ResolvedDotnetAspEndpoint): List<CSharp.Expression> = buildList {
@@ -97,7 +107,7 @@ private fun renderHeadersInstantiation(binding: ResolvedDotnetAspHeadersBinding)
                 memberName = dotnetAspPascalIdentifier(header.name),
                 value = CSharp.call(
                     CSharp.identifier("ReadHeader"),
-                    CSharp.rawExpression(dotnetAspRouteLiteral(header.headerName)),
+                    CSharp.stringLiteral(header.headerName),
                 ),
             )
         },

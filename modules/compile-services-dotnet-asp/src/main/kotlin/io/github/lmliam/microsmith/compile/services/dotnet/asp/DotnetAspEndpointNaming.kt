@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint.DotnetAspHttpMethod
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
 
@@ -14,14 +13,6 @@ internal fun hostingNamespace(artifact: DotnetAspServiceArtifact): String =
     "${artifact.id.projectName}.Generated.Hosting"
 
 internal fun controllerPrefix(artifact: DotnetAspServiceArtifact) = dotnetAspTypeName(artifact.id.projectName)
-
-internal fun httpMethodAttribute(method: DotnetAspHttpMethod): String = when (method) {
-    DotnetAspHttpMethod.GET -> "HttpGet"
-    DotnetAspHttpMethod.POST -> "HttpPost"
-    DotnetAspHttpMethod.PUT -> "HttpPut"
-    DotnetAspHttpMethod.PATCH -> "HttpPatch"
-    DotnetAspHttpMethod.DELETE -> "HttpDelete"
-}
 
 internal fun resultBaseTypeName(endpoint: ResolvedDotnetAspEndpoint) = "${endpoint.operationName}Result"
 

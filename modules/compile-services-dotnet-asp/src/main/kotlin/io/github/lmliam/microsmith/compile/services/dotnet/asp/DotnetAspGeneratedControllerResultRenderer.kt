@@ -11,7 +11,6 @@ internal fun renderResultMapper(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
         DotnetAspCSharpTypes.AspNetCore.Mvc.ActionResult,
         csharpType(resultBaseTypeName(endpoint)),
     ),
-    attributes = emptyList(),
     parameters = listOf(csharpParameter(resultBaseTypeName(endpoint), "result")),
     body = CSharp.codeBlock {
         returnStatement(
@@ -24,7 +23,6 @@ internal fun renderRespondHelper(): CSharp.Method = CSharp.Method(
     name = "Respond",
     modifiers = listOf(CSharp.Modifier.PROTECTED),
     returnType = csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ObjectResult),
-    attributes = emptyList(),
     parameters = listOf(
         csharpParameter(DotnetAspCSharpTypes.Primitives.Object, "body"),
         csharpParameter(DotnetAspCSharpTypes.Primitives.Int, "statusCode"),
@@ -40,12 +38,12 @@ internal fun renderRespondHelper(): CSharp.Method = CSharp.Method(
         ),
     ),
     body = CSharp.codeBlock {
-        foreach("var (name, value) in headers") {
+        foreachDeconstruction("name", "value", source = CSharp.identifier("headers")) {
             ifStatement(
                 CSharp.binary(
                     CSharp.identifier("value"),
-                    "is not",
-                    CSharp.rawExpression("null"),
+                    CSharp.BinaryOperator.IS_NOT,
+                    CSharp.nullLiteral(),
                 ),
             ) {
                 expression(
@@ -79,16 +77,24 @@ internal fun renderReadHeaderHelper(): CSharp.Method = CSharp.Method(
     name = "ReadHeader",
     modifiers = listOf(CSharp.Modifier.PROTECTED),
     returnType = csharpNullableType(DotnetAspCSharpTypes.Primitives.String),
-    attributes = emptyList(),
     parameters = listOf(csharpParameter(DotnetAspCSharpTypes.Primitives.String, "headerName")),
     body = CSharp.codeBlock {
         returnStatement(
             CSharp.conditional(
-                condition = CSharp.rawExpression("Request.Headers.TryGetValue(headerName, out var values)"),
+                condition = CSharp.call(
+                    callee = CSharp.member(
+                        CSharp.member(CSharp.identifier("Request"), "Headers"),
+                        "TryGetValue",
+                    ),
+                    arguments = listOf(
+                        CSharp.argument(CSharp.identifier("headerName")),
+                        CSharp.outVariable("values"),
+                    ),
+                ),
                 whenTrue = CSharp.call(
                     CSharp.member(CSharp.identifier("values"), "ToString"),
                 ),
-                whenFalse = CSharp.rawExpression("null"),
+                whenFalse = CSharp.nullLiteral(),
             ),
         )
     },
@@ -103,7 +109,7 @@ private fun renderResponseSwitchArms(endpoint: ResolvedDotnetAspEndpoint): List<
     endpoint.responses.map { response ->
         CSharp.switchArm(
             pattern = "${resultVariantTypeName(endpoint, response)} response",
-            expression = CSharp.call(
+            expression = CSharp.callValues(
                 CSharp.identifier("Respond"),
                 responseArguments(response),
             ),
@@ -112,26 +118,30 @@ private fun renderResponseSwitchArms(endpoint: ResolvedDotnetAspEndpoint): List<
 
 private fun responseArguments(response: ResolvedDotnetAspResponse): List<CSharp.Expression> = buildList {
     add(CSharp.member(CSharp.identifier("response"), "Body"))
-    add(CSharp.rawExpression(response.statusCode.toString()))
+    add(CSharp.intLiteral(response.statusCode))
     addAll(responseHeaderArguments(response))
 }
 
 private fun responseHeaderArguments(response: ResolvedDotnetAspResponse): List<CSharp.Expression> =
     response.headers.map { header ->
-        CSharp.rawExpression(
-            "(${dotnetAspRouteLiteral(header.name)}, response.${dotnetAspHeaderPropertyName(header.name)})",
+        CSharp.tupleLiteral(
+            CSharp.stringLiteral(header.name),
+            CSharp.member(CSharp.identifier("response"), dotnetAspHeaderPropertyName(header.name)),
         )
     }
 
 private fun renderUnsupportedResultArm(endpoint: ResolvedDotnetAspEndpoint): CSharp.SwitchArm {
     return CSharp.switchArm(
         pattern = "_",
-        expression = CSharp.rawExpression(
-            """
-            throw new InvalidOperationException(
-                "Unsupported ${endpoint.operationName} result type '${'$'}{result.GetType().FullName}'."
-            )
-            """.trimIndent(),
+        expression = CSharp.throwExpression(
+            CSharp.new(
+                type = csharpType(DotnetAspCSharpTypes.System.InvalidOperationException),
+                arguments = listOf(
+                    CSharp.rawExpression(
+                        "\"Unsupported ${endpoint.operationName} result type '${'$'}{result.GetType().FullName}'.\"",
+                    ),
+                ),
+            ),
         ),
     )
 }

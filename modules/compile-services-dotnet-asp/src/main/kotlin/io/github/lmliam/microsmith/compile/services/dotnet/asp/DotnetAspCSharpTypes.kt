@@ -1,6 +1,12 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 internal object DotnetAspCSharpTypes {
+    object System {
+        data object InvalidOperationException : DotnetAspCSharpTypeName {
+            override val value = "InvalidOperationException"
+        }
+    }
+
     object Primitives {
         data object String : DotnetAspCSharpTypeName {
             override val value = "string"
