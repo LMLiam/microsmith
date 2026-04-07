@@ -55,6 +55,11 @@ class DotnetAspServiceArtifactCompilerTests :
                         "appsettings.json",
                         "Properties/launchSettings.json",
                         "Generated/Hosting/MicrosmithHostingExtensions.cs",
+                        "Generated/Contracts/ServiceModels.cs",
+                        "Generated/Contracts/RequestModels.cs",
+                        "Generated/Contracts/ResponseModels.cs",
+                        "Generated/Controllers/MicrosmithControllerBase.cs",
+                        "Generated/Controllers/UserServiceApiControllerBase.cs",
                     ),
                 )
             textFiles.forEach {
@@ -70,6 +75,16 @@ class DotnetAspServiceArtifactCompilerTests :
                     it.artifactId.relativePath.toString() == "Generated/Hosting/MicrosmithHostingExtensions.cs"
                 }.contents
                 .shouldContain("public static WebApplication MapMicrosmith")
+            textFiles
+                .single {
+                    it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs"
+                }.contents
+                .shouldContain("namespace UserService.Api.Generated.Contracts;")
+            textFiles
+                .single {
+                    it.artifactId.relativePath.toString() == "Generated/Controllers/UserServiceApiControllerBase.cs"
+                }.contents
+                .shouldContain("public abstract class UserServiceApiControllerBase : MicrosmithControllerBase;")
             textFiles
                 .single { it.artifactId.relativePath.toString() == "appsettings.json" }
                 .contents
@@ -333,6 +348,76 @@ class DotnetAspServiceArtifactCompilerTests :
 
             requestModels.shouldContain("public ushort Rank { get; set; } = 1;")
             requestModels.shouldNotContain("public ushort Rank { get; set; } = 1u;")
+        }
+
+        "compile rejects out-of-range integer request defaults instead of truncating them" {
+            val artifact =
+                emptyArtifact(
+                    rest = ResolvedDotnetAspRest(
+                        listOf(
+                            ResolvedDotnetAspEndpoint(
+                                method = DotnetAspHttpMethod.GET,
+                                route = "/users",
+                                routePlaceholders = emptyList(),
+                                operationName = "ListUsers",
+                                bindings = ResolvedDotnetAspEndpointBindings(
+                                    query = ResolvedDotnetAspRequestBinding(
+                                        name = "ListUsersQuery",
+                                        fields = listOf(
+                                            ResolvedDotnetAspRequestField(
+                                                name = "rank",
+                                                type = DotnetFieldType.Byte,
+                                                optional = true,
+                                                defaultValue = DotnetAspDefaultValue.NumericValue(256),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                responses = listOf(sharedResponse(statusCode = 200, modelName = "User")),
+                            ),
+                        ),
+                    ),
+                    models = singleStringModel("User"),
+                )
+
+            shouldThrow<IllegalArgumentException> {
+                DotnetAspServiceArtifactCompiler().compile(artifact)
+            }.message.shouldContain("out of range for integer type 'byte'")
+        }
+
+        "compile rejects fractional integer request defaults instead of coercing them" {
+            val artifact =
+                emptyArtifact(
+                    rest = ResolvedDotnetAspRest(
+                        listOf(
+                            ResolvedDotnetAspEndpoint(
+                                method = DotnetAspHttpMethod.GET,
+                                route = "/users",
+                                routePlaceholders = emptyList(),
+                                operationName = "ListUsers",
+                                bindings = ResolvedDotnetAspEndpointBindings(
+                                    query = ResolvedDotnetAspRequestBinding(
+                                        name = "ListUsersQuery",
+                                        fields = listOf(
+                                            ResolvedDotnetAspRequestField(
+                                                name = "page",
+                                                type = DotnetFieldType.Int,
+                                                optional = true,
+                                                defaultValue = DotnetAspDefaultValue.NumericValue(1.5),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                responses = listOf(sharedResponse(statusCode = 200, modelName = "User")),
+                            ),
+                        ),
+                    ),
+                    models = singleStringModel("User"),
+                )
+
+            shouldThrow<IllegalArgumentException> {
+                DotnetAspServiceArtifactCompiler().compile(artifact)
+            }.message.shouldContain("is not representable as integer type 'int'")
         }
 
         "compile sanitizes response header names into valid csharp identifiers" {

@@ -74,41 +74,40 @@ private fun dotnetAspNumericLiteral(type: DotnetFieldType, value: Number): Strin
     -> error("Unsupported ASP.NET numeric literal type '$type'.")
 }
 
-private fun dotnetAspIntegerLiteral(type: DotnetFieldType, value: Number): String = when (type) {
-    DotnetFieldType.Byte,
-    DotnetFieldType.SignedByte,
-    -> value.toByte().toString()
+private fun dotnetAspIntegerLiteral(type: DotnetFieldType, value: Number): String {
+    val integer = requireRepresentableInteger(type, value)
+    return when (type) {
+        DotnetFieldType.Byte,
+        DotnetFieldType.SignedByte,
+        DotnetFieldType.Short,
+        DotnetFieldType.UnsignedShort,
+        DotnetFieldType.Int,
+        DotnetFieldType.NativeInt,
+        -> integer.toString()
 
-    DotnetFieldType.Short -> value.toShort().toString()
+        DotnetFieldType.UnsignedInt,
+        DotnetFieldType.UnsignedNativeInt,
+        -> "${integer}u"
 
-    DotnetFieldType.UnsignedShort,
-    DotnetFieldType.Int,
-    -> value.toInt().toString()
+        DotnetFieldType.Long -> "${integer}L"
 
-    DotnetFieldType.UnsignedInt,
-    DotnetFieldType.UnsignedNativeInt,
-    -> "${value.toLong()}u"
+        DotnetFieldType.UnsignedLong -> "${integer}UL"
 
-    DotnetFieldType.Long -> "${value.toLong()}L"
-
-    DotnetFieldType.UnsignedLong -> "${value.toLong()}UL"
-
-    DotnetFieldType.NativeInt -> value.toLong().toString()
-
-    DotnetFieldType.Float,
-    DotnetFieldType.Double,
-    DotnetFieldType.Decimal,
-    DotnetFieldType.String,
-    DotnetFieldType.Char,
-    DotnetFieldType.Bool,
-    DotnetFieldType.Guid,
-    DotnetFieldType.DateOnly,
-    DotnetFieldType.TimeOnly,
-    DotnetFieldType.DateTime,
-    DotnetFieldType.DateTimeOffset,
-    DotnetFieldType.TimeSpan,
-    is DotnetFieldType.Reference,
-    -> error("Unsupported ASP.NET integer literal type '$type'.")
+        DotnetFieldType.Float,
+        DotnetFieldType.Double,
+        DotnetFieldType.Decimal,
+        DotnetFieldType.String,
+        DotnetFieldType.Char,
+        DotnetFieldType.Bool,
+        DotnetFieldType.Guid,
+        DotnetFieldType.DateOnly,
+        DotnetFieldType.TimeOnly,
+        DotnetFieldType.DateTime,
+        DotnetFieldType.DateTimeOffset,
+        DotnetFieldType.TimeSpan,
+        is DotnetFieldType.Reference,
+        -> error("Unsupported ASP.NET integer literal type '$type'.")
+    }
 }
 
 private fun dotnetAspFloatingLiteral(value: Number): String {

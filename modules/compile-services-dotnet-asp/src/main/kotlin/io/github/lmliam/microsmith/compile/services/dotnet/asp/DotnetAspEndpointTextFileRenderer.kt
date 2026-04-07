@@ -6,33 +6,31 @@ internal class DotnetAspEndpointTextFileRenderer {
     fun render(artifact: DotnetAspServiceArtifact): List<DotnetAspGeneratedTextFile> {
         validateEndpointGenerationInputs(artifact)
 
-        return buildList {
-            add(
-                DotnetAspGeneratedTextFile(
-                    relativePath = "Generated/Hosting/MicrosmithHostingExtensions.cs",
-                    contents = renderHostingExtensionsFile(artifact),
-                ),
-            )
-            renderSharedModelsFile(artifact)?.let {
-                add(DotnetAspGeneratedTextFile("Generated/Contracts/ServiceModels.cs", it))
-            }
-            renderRequestModelsFile(artifact)?.let {
-                add(DotnetAspGeneratedTextFile("Generated/Contracts/RequestModels.cs", it))
-            }
-            renderResponseModelsFile(artifact)?.let {
-                add(DotnetAspGeneratedTextFile("Generated/Contracts/ResponseModels.cs", it))
-            }
-            renderMicrosmithControllerBaseFile(artifact)?.let {
-                add(DotnetAspGeneratedTextFile("Generated/Controllers/MicrosmithControllerBase.cs", it))
-            }
-            renderControllerBaseFile(artifact)?.let {
-                add(
-                    DotnetAspGeneratedTextFile(
-                        relativePath = "Generated/Controllers/${controllerPrefix(artifact)}ControllerBase.cs",
-                        contents = it,
-                    ),
-                )
-            }
-        }
+        return listOf(
+            DotnetAspGeneratedTextFile(
+                relativePath = "Generated/Hosting/MicrosmithHostingExtensions.cs",
+                contents = renderHostingExtensionsFile(artifact),
+            ),
+            DotnetAspGeneratedTextFile(
+                relativePath = "Generated/Contracts/ServiceModels.cs",
+                contents = renderSharedModelsFile(artifact),
+            ),
+            DotnetAspGeneratedTextFile(
+                relativePath = "Generated/Contracts/RequestModels.cs",
+                contents = renderRequestModelsFile(artifact),
+            ),
+            DotnetAspGeneratedTextFile(
+                relativePath = "Generated/Contracts/ResponseModels.cs",
+                contents = renderResponseModelsFile(artifact),
+            ),
+            DotnetAspGeneratedTextFile(
+                relativePath = "Generated/Controllers/MicrosmithControllerBase.cs",
+                contents = renderMicrosmithControllerBaseFile(artifact),
+            ),
+            DotnetAspGeneratedTextFile(
+                relativePath = "Generated/Controllers/${controllerPrefix(artifact)}ControllerBase.cs",
+                contents = renderControllerBaseFile(artifact),
+            ),
+        )
     }
 }

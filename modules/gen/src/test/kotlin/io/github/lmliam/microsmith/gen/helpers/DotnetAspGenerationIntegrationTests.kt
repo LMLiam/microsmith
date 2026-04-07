@@ -123,7 +123,7 @@ class DotnetAspGenerationIntegrationTests :
 
         "generateTo overwrites generated ASP.NET endpoint files on rerun" {
             val outputDir = Files.createTempDirectory("microsmith-dotnet-asp-rerun-")
-            val model =
+            val initialModel =
                 microsmith {
                     services {
                         dotnet {
@@ -163,17 +163,53 @@ class DotnetAspGenerationIntegrationTests :
                     }
                 }
 
-            model.generateTo(outputDir)
+            initialModel.generateTo(outputDir)
 
             val controllerBaseFile =
                 outputDir
                     .resolve("dotnet/Platform/UserService.Api")
                     .resolve("Generated/Controllers/UserServiceApiControllerBase.cs")
+            val requestModelsFile =
+                outputDir
+                    .resolve("dotnet/Platform/UserService.Api")
+                    .resolve("Generated/Contracts/RequestModels.cs")
             controllerBaseFile.writeText("stale")
+            requestModelsFile.writeText("stale")
 
-            model.generateTo(outputDir)
+            val updatedModel =
+                microsmith {
+                    services {
+                        dotnet {
+                            target(NET8)
+                            solutions {
+                                "Platform" {}
+                            }
+                        }
 
-            controllerBaseFile.readText().shouldContain("OnGetUserAsync")
+                        "UserService" {
+                            dotnet {
+                                solution("Platform")
+                                project("UserService.Api")
+                                models {
+                                    "User" {
+                                        string("id")
+                                    }
+                                }
+
+                                asp {}
+                            }
+                        }
+                    }
+                }
+
+            updatedModel.generateTo(outputDir)
+
+            controllerBaseFile.readText()
+                .shouldContain("public abstract class UserServiceApiControllerBase : MicrosmithControllerBase;")
             controllerBaseFile.readText().shouldNotContain("stale")
+            controllerBaseFile.readText().shouldNotContain("OnGetUserAsync")
+            requestModelsFile.readText().shouldContain("namespace UserService.Api.Generated.Contracts;")
+            requestModelsFile.readText().shouldNotContain("stale")
+            requestModelsFile.readText().shouldNotContain("GetUserPath")
         }
     })

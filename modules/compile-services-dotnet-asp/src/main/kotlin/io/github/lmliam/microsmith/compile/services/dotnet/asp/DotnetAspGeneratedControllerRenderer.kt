@@ -3,12 +3,8 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 
-internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): String? {
+internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): String {
     val endpoints = artifact.rest.endpoints
-    if (endpoints.isEmpty()) {
-        return null
-    }
-
     val sections = buildList<CSharp.Member> {
         endpoints.forEach { endpoint ->
             add(renderActionMethod(endpoint))
@@ -40,22 +36,16 @@ internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): Strin
     )
 }
 
-internal fun renderMicrosmithControllerBaseFile(artifact: DotnetAspServiceArtifact): String? {
-    if (artifact.rest.endpoints.isEmpty()) {
-        return null
-    }
-
-    return CSharp.render(
-        CSharp.file(controllersNamespace(artifact)) {
-            using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Mvc)
-            classType(
-                name = "MicrosmithControllerBase",
-                modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
-                baseTypes = listOf(csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ControllerBase)),
-            ) {
-                addMember(renderRespondHelper())
-                addMember(renderReadHeaderHelper())
-            }
-        },
-    )
-}
+internal fun renderMicrosmithControllerBaseFile(artifact: DotnetAspServiceArtifact): String = CSharp.render(
+    CSharp.file(controllersNamespace(artifact)) {
+        using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Mvc)
+        classType(
+            name = "MicrosmithControllerBase",
+            modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
+            baseTypes = listOf(csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ControllerBase)),
+        ) {
+            addMember(renderRespondHelper())
+            addMember(renderReadHeaderHelper())
+        }
+    },
+)
