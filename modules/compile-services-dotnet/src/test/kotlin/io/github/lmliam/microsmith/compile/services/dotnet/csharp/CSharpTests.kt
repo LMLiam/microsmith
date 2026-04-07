@@ -13,7 +13,7 @@ class CSharpTests :
                     name = "UsersControllerBase",
                     modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
                     baseTypes = listOf(CSharp.type("ControllerBase")),
-                    attributes = listOf(CSharp.Attribute("ApiController")),
+                    attributes = listOf(CSharp.attribute("ApiController")),
                 ) {
                     property(
                         type = CSharp.type("string"),
@@ -32,9 +32,6 @@ class CSharpTests :
                             CSharp.Parameter(
                                 type = CSharp.type("CancellationToken"),
                                 name = "cancellationToken",
-                                modifiers = emptyList(),
-                                attributes = emptyList(),
-                                defaultValue = null,
                             ),
                         ),
                     )
@@ -70,15 +67,10 @@ class CSharpTests :
                         CSharp.Parameter(
                             type = CSharp.type("GetUserBody"),
                             name = "Body",
-                            modifiers = emptyList(),
-                            attributes = emptyList(),
-                            defaultValue = null,
                         ),
                         CSharp.Parameter(
                             type = CSharp.nullable(CSharp.type("string")),
                             name = "ETag",
-                            modifiers = emptyList(),
-                            attributes = emptyList(),
                             defaultValue = "null",
                         ),
                     ),
@@ -109,13 +101,10 @@ class CSharpTests :
                             CSharp.Parameter(
                                 type = CSharp.array(CSharp.type("string")),
                                 name = "headers",
-                                modifiers = emptyList(),
-                                attributes = emptyList(),
-                                defaultValue = null,
                             ),
                         ),
                         body = CSharp.codeBlock {
-                            foreach("var header in headers") {
+                            foreach("header", CSharp.identifier("headers")) {
                                 ifStatement("header.Length > 0") {
                                     expression("Console.WriteLine(header)")
                                 }
@@ -162,16 +151,10 @@ class CSharpTests :
                             CSharp.Parameter(
                                 type = CSharp.type("ResultBase"),
                                 name = "result",
-                                modifiers = emptyList(),
-                                attributes = emptyList(),
-                                defaultValue = null,
                             ),
                             CSharp.Parameter(
                                 type = CSharp.type("object"),
                                 name = "body",
-                                modifiers = emptyList(),
-                                attributes = emptyList(),
-                                defaultValue = null,
                             ),
                         ),
                         body = CSharp.codeBlock {
@@ -181,7 +164,7 @@ class CSharpTests :
                                     type = CSharp.type("ObjectResult"),
                                     arguments = listOf(CSharp.identifier("body")),
                                     initializers = listOf(
-                                        CSharp.init("StatusCode", CSharp.rawExpression("200")),
+                                        CSharp.init("StatusCode", CSharp.intLiteral(200)),
                                     ),
                                 ),
                             )
@@ -224,6 +207,81 @@ class CSharpTests :
                             OkResult ok => Respond(ok),
                             _ => response
                         };
+                    }
+                }
+            """.trimIndent()
+        }
+
+        "render emits structured attributes out arguments and throw expressions" {
+            val file = CSharp.file("Platform.Api.Generated") {
+                classType(
+                    name = "UsersControllerBase",
+                    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
+                ) {
+                    method(
+                        name = "GetUser",
+                        returnType = CSharp.type("string?"),
+                        modifiers = listOf(CSharp.Modifier.PUBLIC),
+                        attributes = listOf(
+                            CSharp.attribute(
+                                "HttpGet",
+                                CSharp.positionalArgument(CSharp.stringLiteral("/users/{id}")),
+                                CSharp.namedArgument("Name", CSharp.stringLiteral("GetUser")),
+                            ),
+                        ),
+                        parameters = listOf(
+                            CSharp.Parameter(
+                                type = CSharp.type("string"),
+                                name = "id",
+                                attributes = listOf(CSharp.attribute("FromRoute")),
+                            ),
+                        ),
+                        body = CSharp.codeBlock {
+                            ifStatement(
+                                CSharp.call(
+                                    callee = CSharp.member(
+                                        CSharp.member(CSharp.identifier("Request"), "Headers"),
+                                        "TryGetValue",
+                                    ),
+                                    arguments = listOf(
+                                        CSharp.argument(CSharp.stringLiteral("X-Correlation-Id")),
+                                        CSharp.outVariable("values"),
+                                    ),
+                                ),
+                            ) {
+                                returnStatement(
+                                    CSharp.call(
+                                        CSharp.member(CSharp.identifier("values"), "ToString"),
+                                    ),
+                                )
+                            }
+                            returnStatement(
+                                CSharp.throwExpression(
+                                    CSharp.new(
+                                        type = CSharp.type("InvalidOperationException"),
+                                        arguments = listOf(CSharp.stringLiteral("Missing header")),
+                                    ),
+                                ),
+                            )
+                        },
+                    )
+                }
+            }
+
+            CSharp.render(file).trim() shouldBe """
+                namespace Platform.Api.Generated;
+
+                public abstract class UsersControllerBase
+                {
+                    [HttpGet("/users/{id}", Name = "GetUser")]
+                    public string? GetUser([FromRoute] string id)
+                    {
+                        if (Request.Headers.TryGetValue("X-Correlation-Id", out var values))
+                        {
+                            return values.ToString();
+                        }
+
+                        return throw new InvalidOperationException("Missing header");
                     }
                 }
             """.trimIndent()

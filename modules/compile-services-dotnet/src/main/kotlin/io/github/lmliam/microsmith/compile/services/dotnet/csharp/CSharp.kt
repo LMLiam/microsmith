@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 
+@Suppress("TooManyFunctions")
 object CSharp {
     @DslMarker
     annotation class Dsl
@@ -14,10 +15,10 @@ object CSharp {
         val kind: TypeKind,
         val name: String,
         val modifiers: List<Modifier>,
-        val baseTypes: List<TypeRef>,
-        val attributes: List<Attribute>,
-        val primaryConstructorParameters: List<Parameter>,
-        val members: List<Member>,
+        val baseTypes: List<TypeRef> = emptyList(),
+        val attributes: List<Attribute> = emptyList(),
+        val primaryConstructorParameters: List<Parameter> = emptyList(),
+        val members: List<Member> = emptyList(),
     )
 
     enum class TypeKind {
@@ -79,31 +80,42 @@ object CSharp {
         val type: TypeRef,
         val name: String,
         val modifiers: List<Modifier>,
-        val attributes: List<Attribute>,
-        val accessors: PropertyAccessors,
-        val initializer: String?,
+        val attributes: List<Attribute> = emptyList(),
+        val accessors: PropertyAccessors = PropertyAccessors.READ_WRITE,
+        val initializer: String? = null,
     ) : Member
 
     data class Method(
         val name: String,
         val modifiers: List<Modifier>,
         val returnType: TypeRef,
-        val attributes: List<Attribute>,
-        val parameters: List<Parameter>,
-        val body: CodeBlock?,
+        val attributes: List<Attribute> = emptyList(),
+        val parameters: List<Parameter> = emptyList(),
+        val body: CodeBlock? = null,
     ) : Member
 
     data class Attribute(
         val name: String,
-        val arguments: String? = null,
+        val arguments: List<AttributeArgument> = emptyList(),
     )
+
+    sealed interface AttributeArgument
+
+    data class PositionalAttributeArgument(
+        val expression: Expression,
+    ) : AttributeArgument
+
+    data class NamedAttributeArgument(
+        val name: String,
+        val expression: Expression,
+    ) : AttributeArgument
 
     data class Parameter(
         val type: TypeRef,
         val name: String,
-        val modifiers: List<Modifier>,
-        val attributes: List<Attribute>,
-        val defaultValue: String?,
+        val modifiers: List<Modifier> = emptyList(),
+        val attributes: List<Attribute> = emptyList(),
+        val defaultValue: String? = null,
     )
 
     data class CodeBlock(
@@ -116,6 +128,16 @@ object CSharp {
         val text: String,
     ) : Expression
 
+    data class StringLiteral(
+        val value: String,
+    ) : Expression
+
+    data class IntLiteral(
+        val value: Int,
+    ) : Expression
+
+    data object NullLiteral : Expression
+
     data class Identifier(
         val name: String,
     ) : Expression
@@ -127,8 +149,18 @@ object CSharp {
 
     data class Call(
         val callee: Expression,
-        val arguments: List<Expression>,
+        val arguments: List<CallArgument>,
     ) : Expression
+
+    sealed interface CallArgument
+
+    data class ValueCallArgument(
+        val expression: Expression,
+    ) : CallArgument
+
+    data class OutVariableCallArgument(
+        val name: String,
+    ) : CallArgument
 
     data class Await(
         val expression: Expression,
@@ -146,9 +178,15 @@ object CSharp {
 
     data class BinaryOperation(
         val left: Expression,
-        val operator: String,
+        val operator: BinaryOperator,
         val right: Expression,
     ) : Expression
+
+    enum class BinaryOperator(
+        val keyword: String,
+    ) {
+        IS_NOT("is not"),
+    }
 
     data class Conditional(
         val condition: Expression,
@@ -177,6 +215,14 @@ object CSharp {
         val expression: Expression,
     )
 
+    data class Throw(
+        val expression: Expression,
+    ) : Expression
+
+    data class TupleLiteral(
+        val elements: List<Expression>,
+    ) : Expression
+
     sealed interface Statement
 
     data class RawStatement(
@@ -202,7 +248,25 @@ object CSharp {
         val body: CodeBlock,
     ) : Statement
 
-    data class ForeachStatement(
+    data class StructuredForeachStatement(
+        val target: ForeachTarget,
+        val source: Expression,
+        val body: CodeBlock,
+    ) : Statement
+
+    sealed interface ForeachTarget
+
+    data class ForeachIdentifier(
+        val name: String,
+        val useVarKeyword: Boolean = true,
+    ) : ForeachTarget
+
+    data class ForeachDeconstruction(
+        val names: List<String>,
+        val useVarKeyword: Boolean = true,
+    ) : ForeachTarget
+
+    data class RawForeachStatement(
         val signature: String,
         val body: CodeBlock,
     ) : Statement
@@ -233,13 +297,31 @@ object CSharp {
 
     fun rawExpression(text: String): Expression = RawExpression(text)
 
+    fun stringLiteral(value: String): Expression = StringLiteral(value)
+
+    fun intLiteral(value: Int): Expression = IntLiteral(value)
+
+    fun nullLiteral(): Expression = NullLiteral
+
     fun identifier(name: String): Expression = Identifier(name)
 
     fun member(target: Expression, memberName: String): Expression = MemberAccess(target, memberName)
 
-    fun call(callee: Expression, vararg arguments: Expression): Expression = call(callee, arguments.toList())
+    fun call(callee: Expression): Expression = Call(callee, emptyList())
 
-    fun call(callee: Expression, arguments: List<Expression>): Expression = Call(callee, arguments)
+    fun call(callee: Expression, vararg arguments: Expression): Expression = call(
+        callee = callee,
+        arguments = arguments.map(::ValueCallArgument),
+    )
+
+    fun callValues(callee: Expression, arguments: List<Expression>): Expression = call(
+        callee = callee,
+        arguments = arguments.map(::ValueCallArgument),
+    )
+
+    fun call(callee: Expression, vararg arguments: CallArgument): Expression = call(callee, arguments.toList())
+
+    fun call(callee: Expression, arguments: List<CallArgument>): Expression = Call(callee, arguments)
 
     fun await(expression: Expression): Expression = Await(expression)
 
@@ -250,7 +332,7 @@ object CSharp {
         arguments = arguments.toList(),
     )
 
-    fun binary(left: Expression, operator: String, right: Expression): Expression = BinaryOperation(
+    fun binary(left: Expression, operator: BinaryOperator, right: Expression): Expression = BinaryOperation(
         left = left,
         operator = operator,
         right = right,
@@ -276,6 +358,26 @@ object CSharp {
     fun switch(subject: Expression, arms: List<SwitchArm>): Expression = SwitchExpression(subject, arms)
 
     fun switchArm(pattern: String, expression: Expression): SwitchArm = SwitchArm(pattern, expression)
+
+    fun throwExpression(expression: Expression): Expression = Throw(expression)
+
+    fun tupleLiteral(vararg elements: Expression): Expression = TupleLiteral(elements.toList())
+
+    fun attribute(name: String, vararg arguments: AttributeArgument): Attribute = Attribute(
+        name = name,
+        arguments = arguments.toList(),
+    )
+
+    fun positionalArgument(expression: Expression): AttributeArgument = PositionalAttributeArgument(expression)
+
+    fun namedArgument(name: String, expression: Expression): AttributeArgument = NamedAttributeArgument(
+        name = name,
+        expression = expression,
+    )
+
+    fun argument(expression: Expression): CallArgument = ValueCallArgument(expression)
+
+    fun outVariable(name: String): CallArgument = OutVariableCallArgument(name)
 
     fun render(file: File): String = renderCSharp(file)
 }

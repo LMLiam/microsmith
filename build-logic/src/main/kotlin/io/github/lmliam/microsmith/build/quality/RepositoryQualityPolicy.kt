@@ -34,7 +34,7 @@ internal data class RepositoryQualityPolicy(
                 "modules/compile-services-dotnet/src/main/kotlin/io/github/lmliam/microsmith/compile/" +
                     "services/dotnet/csharp/CSharp.kt" to
                     ProductionFileLineOverride(
-                        maxLines = 320,
+                        maxLines = 400,
                         rationale =
                             "The shared C# DSL intentionally keeps its core model and factory " +
                                 "surface together; splitting it further made the generator API " +

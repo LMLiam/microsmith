@@ -28,7 +28,6 @@ class CSharpFileBuilder internal constructor(
             modifiers = modifiers,
             baseTypes = baseTypes,
             attributes = attributes,
-            primaryConstructorParameters = emptyList(),
         ).apply(build).build()
     }
 

@@ -52,8 +52,28 @@ class CSharpCodeBlockBuilder internal constructor() {
     }
 
     fun foreach(signature: String, build: CSharpCodeBlockBuilder.() -> Unit) {
-        statements += CSharp.ForeachStatement(
+        statements += CSharp.RawForeachStatement(
             signature = signature,
+            body = CSharpCodeBlockBuilder().apply(build).build(),
+        )
+    }
+
+    fun foreach(name: String, source: CSharp.Expression, build: CSharpCodeBlockBuilder.() -> Unit) {
+        statements += CSharp.StructuredForeachStatement(
+            target = CSharp.ForeachIdentifier(name),
+            source = source,
+            body = CSharpCodeBlockBuilder().apply(build).build(),
+        )
+    }
+
+    fun foreachDeconstruction(
+        vararg names: String,
+        source: CSharp.Expression,
+        build: CSharpCodeBlockBuilder.() -> Unit,
+    ) {
+        statements += CSharp.StructuredForeachStatement(
+            target = CSharp.ForeachDeconstruction(names.toList()),
+            source = source,
             body = CSharpCodeBlockBuilder().apply(build).build(),
         )
     }

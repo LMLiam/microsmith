@@ -8,8 +8,15 @@ private fun renderStatement(statement: CSharp.Statement): String {
     return when (statement) {
         CSharp.BlankLine -> ""
         is CSharp.ExpressionStatement -> "${renderExpression(statement.expression)};"
-        is CSharp.ForeachStatement -> buildString {
+        is CSharp.RawForeachStatement -> buildString {
             appendLine("foreach (${statement.signature})")
+            appendLine("{")
+            append(renderCodeBlock(statement.body))
+            appendLine()
+            append("}")
+        }
+        is CSharp.StructuredForeachStatement -> buildString {
+            appendLine("foreach (${renderForeachTarget(statement.target)} in ${renderExpression(statement.source)})")
             appendLine("{")
             append(renderCodeBlock(statement.body))
             appendLine()
@@ -29,72 +36,130 @@ private fun renderStatement(statement: CSharp.Statement): String {
     }
 }
 
+@Suppress("CyclomaticComplexMethod")
 private fun renderExpression(expression: CSharp.Expression): String {
     return when (expression) {
-        is CSharp.Assignment ->
-            "${renderExpression(expression.target)} = ${renderExpression(expression.value)}"
-        is CSharp.Await -> "await ${renderExpression(expression.expression)}"
-        is CSharp.BinaryOperation ->
-            "${renderExpression(expression.left)} ${expression.operator} ${renderExpression(expression.right)}"
-
-        is CSharp.Call -> buildString {
-            append(renderExpression(expression.callee))
-            append("(")
-            append(expression.arguments.joinToString(", ", transform = ::renderExpression))
-            append(")")
-        }
-        is CSharp.Conditional -> buildString {
-            append(renderExpression(expression.condition))
-            appendLine()
-            append("? ")
-            append(renderExpression(expression.whenTrue))
-            appendLine()
-            append(": ")
-            append(renderExpression(expression.whenFalse))
-        }
+        is CSharp.Assignment -> renderAssignment(expression)
+        is CSharp.Await -> renderAwait(expression)
+        is CSharp.BinaryOperation -> renderBinaryOperation(expression)
+        is CSharp.Call -> renderCall(expression)
+        is CSharp.Conditional -> renderConditional(expression)
         is CSharp.Identifier -> expression.name
-        is CSharp.IndexAccess -> buildString {
-            append(renderExpression(expression.target))
-            append("[")
-            append(expression.arguments.joinToString(", ", transform = ::renderExpression))
-            append("]")
-        }
-
+        is CSharp.IntLiteral -> expression.value.toString()
+        is CSharp.IndexAccess -> renderIndexAccess(expression)
         is CSharp.MemberAccess -> "${renderExpression(expression.target)}.${expression.memberName}"
-        is CSharp.ObjectCreation -> buildString {
-            append("new ")
-            append(renderTypeRef(expression.type))
-            append("(")
-            append(expression.arguments.joinToString(", ", transform = ::renderExpression))
-            append(")")
-            if (expression.initializers.isNotEmpty()) {
-                appendLine()
-                appendLine("{")
-                append(
-                    indent(
-                        expression.initializers.joinToString(",\n") { initializer ->
-                            "${initializer.memberName} = ${renderExpression(initializer.value)}"
-                        },
-                    ),
-                )
-                appendLine()
-                append("}")
-            }
-        }
+        CSharp.NullLiteral -> "null"
+        is CSharp.ObjectCreation -> renderObjectCreation(expression)
         is CSharp.RawExpression -> expression.text
-        is CSharp.SwitchExpression -> buildString {
-            append(renderExpression(expression.subject))
-            appendLine(" switch")
+        is CSharp.StringLiteral -> renderStringLiteral(expression.value)
+        is CSharp.SwitchExpression -> renderSwitchExpression(expression)
+        is CSharp.Throw -> "throw ${renderExpression(expression.expression)}"
+        is CSharp.TupleLiteral -> renderTupleLiteral(expression)
+    }
+}
+
+private fun renderAssignment(expression: CSharp.Assignment): String {
+    return "${renderExpression(expression.target)} = ${renderExpression(expression.value)}"
+}
+
+private fun renderAwait(expression: CSharp.Await): String {
+    return "await ${renderExpression(expression.expression)}"
+}
+
+private fun renderBinaryOperation(expression: CSharp.BinaryOperation): String {
+    return "${renderExpression(expression.left)} ${expression.operator.keyword} ${renderExpression(expression.right)}"
+}
+
+private fun renderCall(expression: CSharp.Call): String {
+    return buildString {
+        append(renderExpression(expression.callee))
+        append("(")
+        append(expression.arguments.joinToString(", ", transform = ::renderCallArgument))
+        append(")")
+    }
+}
+
+private fun renderConditional(expression: CSharp.Conditional): String {
+    return buildString {
+        append(renderExpression(expression.condition))
+        appendLine()
+        append("? ")
+        append(renderExpression(expression.whenTrue))
+        appendLine()
+        append(": ")
+        append(renderExpression(expression.whenFalse))
+    }
+}
+
+private fun renderIndexAccess(expression: CSharp.IndexAccess): String {
+    return buildString {
+        append(renderExpression(expression.target))
+        append("[")
+        append(expression.arguments.joinToString(", ", transform = ::renderExpression))
+        append("]")
+    }
+}
+
+private fun renderObjectCreation(expression: CSharp.ObjectCreation): String {
+    return buildString {
+        append("new ")
+        append(renderTypeRef(expression.type))
+        append("(")
+        append(expression.arguments.joinToString(", ", transform = ::renderExpression))
+        append(")")
+        if (expression.initializers.isNotEmpty()) {
+            appendLine()
             appendLine("{")
             append(
                 indent(
-                    expression.arms.joinToString(",\n") { arm ->
-                        "${arm.pattern} => ${renderExpression(arm.expression)}"
+                    expression.initializers.joinToString(",\n") { initializer ->
+                        "${initializer.memberName} = ${renderExpression(initializer.value)}"
                     },
                 ),
             )
             appendLine()
             append("}")
+        }
+    }
+}
+
+private fun renderSwitchExpression(expression: CSharp.SwitchExpression): String {
+    return buildString {
+        append(renderExpression(expression.subject))
+        appendLine(" switch")
+        appendLine("{")
+        append(
+            indent(
+                expression.arms.joinToString(",\n") { arm ->
+                    "${arm.pattern} => ${renderExpression(arm.expression)}"
+                },
+            ),
+        )
+        appendLine()
+        append("}")
+    }
+}
+
+private fun renderTupleLiteral(expression: CSharp.TupleLiteral): String {
+    return "(" + expression.elements.joinToString(", ", transform = ::renderExpression) + ")"
+}
+
+private fun renderCallArgument(argument: CSharp.CallArgument): String {
+    return when (argument) {
+        is CSharp.OutVariableCallArgument -> "out var ${argument.name}"
+        is CSharp.ValueCallArgument -> renderExpression(argument.expression)
+    }
+}
+
+private fun renderForeachTarget(target: CSharp.ForeachTarget): String {
+    return when (target) {
+        is CSharp.ForeachDeconstruction -> {
+            val prefix = if (target.useVarKeyword) "var " else ""
+            prefix + "(" + target.names.joinToString(", ") + ")"
+        }
+        is CSharp.ForeachIdentifier -> {
+            val prefix = if (target.useVarKeyword) "var " else ""
+            prefix + target.name
         }
     }
 }

@@ -5,9 +5,9 @@ class CSharpTypeBuilder internal constructor(
     private val kind: CSharp.TypeKind,
     private val name: String,
     private val modifiers: List<CSharp.Modifier>,
-    private val baseTypes: List<CSharp.TypeRef>,
-    private val attributes: List<CSharp.Attribute>,
-    private val primaryConstructorParameters: List<CSharp.Parameter>,
+    private val baseTypes: List<CSharp.TypeRef> = emptyList(),
+    private val attributes: List<CSharp.Attribute> = emptyList(),
+    private val primaryConstructorParameters: List<CSharp.Parameter> = emptyList(),
 ) {
     private val members = mutableListOf<CSharp.Member>()
 
