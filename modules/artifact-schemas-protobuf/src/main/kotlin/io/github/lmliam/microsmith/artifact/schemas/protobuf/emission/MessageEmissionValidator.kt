@@ -77,24 +77,19 @@ internal object MessageEmissionValidator {
      * Collects each effective field usage key together with where that key was declared in the
      * message tree so duplicate diagnostics can explain the conflicting locations.
      */
-    private fun <K> collectFieldUsages(message: Message, keySelector: (Field) -> K): List<FieldUsage<K>> {
-        return buildList {
-            message.fields.forEach { add(FieldUsage(keySelector(it), "field '${it.name}'")) }
-            message.oneofs.forEach { oneof ->
-                oneof.fields.forEach { field ->
-                    add(
-                        FieldUsage(
-                            key = keySelector(field),
-                            location = "oneof '${oneof.name}' field '${field.name}'",
-                        ),
-                    )
-                }
+    private fun <K> collectFieldUsages(message: Message, keySelector: (Field) -> K): List<FieldUsage<K>> = buildList {
+        message.fields.forEach { add(FieldUsage(keySelector(it), "field '${it.name}'")) }
+        message.oneofs.forEach { oneof ->
+            oneof.fields.forEach { field ->
+                add(
+                    FieldUsage(
+                        key = keySelector(field),
+                        location = "oneof '${oneof.name}' field '${field.name}'",
+                    ),
+                )
             }
         }
     }
 }
 
-private data class FieldUsage<K>(
-    val key: K,
-    val location: String,
-)
+private data class FieldUsage<K>(val key: K, val location: String)

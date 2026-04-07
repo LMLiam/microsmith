@@ -17,11 +17,9 @@ internal fun renderModelClass(name: String, fields: List<DotnetField>): CSharp.T
 internal fun resolveResponseModelTypeName(
     endpoint: ResolvedDotnetAspEndpoint,
     response: ResolvedDotnetAspResponse,
-): String {
-    return when (response.model.locality) {
-        ResolvedDotnetAspModelLocality.SHARED -> response.model.model.name
-        ResolvedDotnetAspModelLocality.INLINE -> inlineResponseTypeName(endpoint, response)
-    }
+): String = when (response.model.locality) {
+    ResolvedDotnetAspModelLocality.SHARED -> response.model.model.name
+    ResolvedDotnetAspModelLocality.INLINE -> inlineResponseTypeName(endpoint, response)
 }
 
 private fun renderModelFieldProperty(field: DotnetField): CSharp.Property {

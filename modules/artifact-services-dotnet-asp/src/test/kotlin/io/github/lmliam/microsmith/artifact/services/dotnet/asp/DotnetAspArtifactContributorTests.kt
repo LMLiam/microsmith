@@ -94,18 +94,16 @@ private fun resolvedAspService(
     name: String,
     projectName: String,
     ports: ResolvedDotnetAspPorts? = null,
-): ResolvedDotnetAspService {
-    return ResolvedDotnetAspService(
-        name = name,
-        solutionName = "Platform",
-        projectName = projectName,
-        targetFrameworkMoniker = "net8.0",
-        outputRoot = Path.of("dotnet", "Platform", projectName),
-        ports = ports,
-        models = emptyMap(),
-        rest = ResolvedDotnetAspRest.empty(),
-    )
-}
+): ResolvedDotnetAspService = ResolvedDotnetAspService(
+    name = name,
+    solutionName = "Platform",
+    projectName = projectName,
+    targetFrameworkMoniker = "net8.0",
+    outputRoot = Path.of("dotnet", "Platform", projectName),
+    ports = ports,
+    models = emptyMap(),
+    rest = ResolvedDotnetAspRest.empty(),
+)
 
 private fun findCollidingServiceIds(): Pair<DotnetAspServiceArtifactId, DotnetAspServiceArtifactId>? {
     val byPort = mutableMapOf<Int, DotnetAspServiceArtifactId>()

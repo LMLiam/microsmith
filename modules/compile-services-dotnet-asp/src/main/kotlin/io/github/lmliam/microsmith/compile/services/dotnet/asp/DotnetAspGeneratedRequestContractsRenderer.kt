@@ -40,9 +40,12 @@ private fun requestFieldInitializer(field: ResolvedDotnetAspRequestField, nullab
     val defaultValue = field.defaultValue
     return when {
         defaultValue != null -> dotnetAspLiteral(field.type, defaultValue)
+
         nullable -> null
+
         field.type is DotnetFieldType.String ||
             field.type is DotnetFieldType.Reference -> "null!"
+
         else -> null
     }
 }

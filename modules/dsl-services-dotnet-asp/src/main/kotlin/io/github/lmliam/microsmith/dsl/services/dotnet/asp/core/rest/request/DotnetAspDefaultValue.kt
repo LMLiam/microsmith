@@ -46,16 +46,27 @@ sealed interface DotnetAspDefaultValue {
 
 internal fun dotnetAspDefaultValue(value: Any): DotnetAspDefaultValue = when (value) {
     is String -> DotnetAspDefaultValue.StringValue(value)
+
     is Char -> DotnetAspDefaultValue.CharValue(value)
+
     is Number -> DotnetAspDefaultValue.NumericValue(value)
+
     is Boolean -> DotnetAspDefaultValue.BooleanValue(value)
+
     is UUID -> DotnetAspDefaultValue.UuidValue(value)
+
     is LocalDate -> DotnetAspDefaultValue.LocalDateValue(value)
+
     is LocalTime -> DotnetAspDefaultValue.LocalTimeValue(value)
+
     is LocalDateTime -> DotnetAspDefaultValue.LocalDateTimeValue(value)
+
     is Instant -> DotnetAspDefaultValue.InstantValue(value)
+
     is OffsetDateTime -> DotnetAspDefaultValue.OffsetDateTimeValue(value)
+
     is Duration -> DotnetAspDefaultValue.DurationValue(value)
+
     else ->
         error(
             "Unsupported ASP.NET request default value type " +
@@ -125,30 +136,22 @@ private fun DotnetFieldType.isNumeric(): Boolean = when (this) {
     -> false
 }
 
-private fun DotnetAspDefaultValue.isGuidCompatible(): Boolean {
-    return this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.UuidValue
-}
+private fun DotnetAspDefaultValue.isGuidCompatible(): Boolean =
+    this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.UuidValue
 
-private fun DotnetAspDefaultValue.isDateOnlyCompatible(): Boolean {
-    return this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.LocalDateValue
-}
+private fun DotnetAspDefaultValue.isDateOnlyCompatible(): Boolean =
+    this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.LocalDateValue
 
-private fun DotnetAspDefaultValue.isTimeOnlyCompatible(): Boolean {
-    return this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.LocalTimeValue
-}
+private fun DotnetAspDefaultValue.isTimeOnlyCompatible(): Boolean =
+    this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.LocalTimeValue
 
-private fun DotnetAspDefaultValue.isDateTimeCompatible(): Boolean {
-    return this is DotnetAspDefaultValue.StringValue ||
-        this is DotnetAspDefaultValue.LocalDateTimeValue ||
-        this is DotnetAspDefaultValue.InstantValue
-}
+private fun DotnetAspDefaultValue.isDateTimeCompatible(): Boolean = this is DotnetAspDefaultValue.StringValue ||
+    this is DotnetAspDefaultValue.LocalDateTimeValue ||
+    this is DotnetAspDefaultValue.InstantValue
 
-private fun DotnetAspDefaultValue.isDateTimeOffsetCompatible(): Boolean {
-    return this is DotnetAspDefaultValue.StringValue ||
-        this is DotnetAspDefaultValue.OffsetDateTimeValue ||
-        this is DotnetAspDefaultValue.InstantValue
-}
+private fun DotnetAspDefaultValue.isDateTimeOffsetCompatible(): Boolean = this is DotnetAspDefaultValue.StringValue ||
+    this is DotnetAspDefaultValue.OffsetDateTimeValue ||
+    this is DotnetAspDefaultValue.InstantValue
 
-private fun DotnetAspDefaultValue.isTimeSpanCompatible(): Boolean {
-    return this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.DurationValue
-}
+private fun DotnetAspDefaultValue.isTimeSpanCompatible(): Boolean =
+    this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.DurationValue

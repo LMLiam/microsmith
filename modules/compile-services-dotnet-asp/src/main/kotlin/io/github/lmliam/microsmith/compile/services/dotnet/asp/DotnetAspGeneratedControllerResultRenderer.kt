@@ -130,18 +130,16 @@ private fun responseHeaderArguments(response: ResolvedDotnetAspResponse): List<C
         )
     }
 
-private fun renderUnsupportedResultArm(endpoint: ResolvedDotnetAspEndpoint): CSharp.SwitchArm {
-    return CSharp.switchArm(
-        pattern = "_",
-        expression = CSharp.throwExpression(
-            CSharp.new(
-                type = csharpType(DotnetAspCSharpTypes.System.InvalidOperationException),
-                arguments = listOf(
-                    CSharp.rawExpression(
-                        "\"Unsupported ${endpoint.operationName} result type '${'$'}{result.GetType().FullName}'.\"",
-                    ),
+private fun renderUnsupportedResultArm(endpoint: ResolvedDotnetAspEndpoint): CSharp.SwitchArm = CSharp.switchArm(
+    pattern = "_",
+    expression = CSharp.throwExpression(
+        CSharp.new(
+            type = csharpType(DotnetAspCSharpTypes.System.InvalidOperationException),
+            arguments = listOf(
+                CSharp.rawExpression(
+                    "\"Unsupported ${endpoint.operationName} result type '${'$'}{result.GetType().FullName}'.\"",
                 ),
             ),
         ),
-    )
-}
+    ),
+)

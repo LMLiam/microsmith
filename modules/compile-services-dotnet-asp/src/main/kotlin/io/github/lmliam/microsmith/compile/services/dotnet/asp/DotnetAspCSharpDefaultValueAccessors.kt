@@ -4,6 +4,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.Dot
 
 internal fun DotnetAspDefaultValue.requireString(): String = when (this) {
     is DotnetAspDefaultValue.StringValue -> value
+
     is DotnetAspDefaultValue.CharValue,
     is DotnetAspDefaultValue.NumericValue,
     is DotnetAspDefaultValue.BooleanValue,
@@ -19,6 +20,7 @@ internal fun DotnetAspDefaultValue.requireString(): String = when (this) {
 
 internal fun DotnetAspDefaultValue.requireChar(): Char = when (this) {
     is DotnetAspDefaultValue.CharValue -> value
+
     is DotnetAspDefaultValue.StringValue,
     is DotnetAspDefaultValue.NumericValue,
     is DotnetAspDefaultValue.BooleanValue,
@@ -34,6 +36,7 @@ internal fun DotnetAspDefaultValue.requireChar(): Char = when (this) {
 
 internal fun DotnetAspDefaultValue.requireNumber(): Number = when (this) {
     is DotnetAspDefaultValue.NumericValue -> value
+
     is DotnetAspDefaultValue.StringValue,
     is DotnetAspDefaultValue.CharValue,
     is DotnetAspDefaultValue.BooleanValue,
@@ -49,6 +52,7 @@ internal fun DotnetAspDefaultValue.requireNumber(): Number = when (this) {
 
 internal fun DotnetAspDefaultValue.requireBoolean(): Boolean = when (this) {
     is DotnetAspDefaultValue.BooleanValue -> value
+
     is DotnetAspDefaultValue.StringValue,
     is DotnetAspDefaultValue.CharValue,
     is DotnetAspDefaultValue.NumericValue,

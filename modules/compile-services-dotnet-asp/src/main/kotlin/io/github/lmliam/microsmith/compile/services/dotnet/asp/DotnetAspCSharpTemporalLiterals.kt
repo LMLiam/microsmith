@@ -20,6 +20,7 @@ internal fun dotnetAspDateTimeOffsetLiteral(value: DotnetAspDefaultValue): Strin
 internal fun dotnetAspTimeSpanLiteral(value: DotnetAspDefaultValue): String = when (value) {
     is DotnetAspDefaultValue.DurationValue ->
         "System.Xml.XmlConvert.ToTimeSpan(${dotnetAspStringLiteral(value.value.toString())})"
+
     is DotnetAspDefaultValue.StringValue,
     is DotnetAspDefaultValue.UuidValue,
     is DotnetAspDefaultValue.LocalDateValue,
@@ -29,6 +30,7 @@ internal fun dotnetAspTimeSpanLiteral(value: DotnetAspDefaultValue): String = wh
     is DotnetAspDefaultValue.OffsetDateTimeValue,
     ->
         "TimeSpan.Parse(${dotnetAspStringLiteral(value.temporalTextValue())})"
+
     is DotnetAspDefaultValue.CharValue,
     is DotnetAspDefaultValue.NumericValue,
     is DotnetAspDefaultValue.BooleanValue,
@@ -37,13 +39,21 @@ internal fun dotnetAspTimeSpanLiteral(value: DotnetAspDefaultValue): String = wh
 
 private fun DotnetAspDefaultValue.temporalTextValue(): String = when (this) {
     is DotnetAspDefaultValue.StringValue -> value
+
     is DotnetAspDefaultValue.UuidValue -> value.toString()
+
     is DotnetAspDefaultValue.LocalDateValue -> value.toString()
+
     is DotnetAspDefaultValue.LocalTimeValue -> value.toString()
+
     is DotnetAspDefaultValue.LocalDateTimeValue -> value.toString()
+
     is DotnetAspDefaultValue.InstantValue -> value.toString()
+
     is DotnetAspDefaultValue.OffsetDateTimeValue -> value.toString()
+
     is DotnetAspDefaultValue.DurationValue -> value.toString()
+
     is DotnetAspDefaultValue.CharValue,
     is DotnetAspDefaultValue.NumericValue,
     is DotnetAspDefaultValue.BooleanValue,

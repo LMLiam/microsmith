@@ -99,20 +99,18 @@ internal fun handlerArguments(endpoint: ResolvedDotnetAspEndpoint): List<CSharp.
 private fun renderHeadersPrelude(endpoint: ResolvedDotnetAspEndpoint): CSharp.Expression? =
     endpoint.bindings.headers?.let(::renderHeadersInstantiation)
 
-private fun renderHeadersInstantiation(binding: ResolvedDotnetAspHeadersBinding): CSharp.Expression {
-    return CSharp.new(
-        type = csharpType(binding.name),
-        initializers = binding.headers.map { header ->
-            CSharp.init(
-                memberName = dotnetAspPascalIdentifier(header.name),
-                value = CSharp.call(
-                    CSharp.identifier("ReadHeader"),
-                    CSharp.stringLiteral(header.headerName),
-                ),
-            )
-        },
-    )
-}
+private fun renderHeadersInstantiation(binding: ResolvedDotnetAspHeadersBinding): CSharp.Expression = CSharp.new(
+    type = csharpType(binding.name),
+    initializers = binding.headers.map { header ->
+        CSharp.init(
+            memberName = dotnetAspPascalIdentifier(header.name),
+            value = CSharp.call(
+                CSharp.identifier("ReadHeader"),
+                CSharp.stringLiteral(header.headerName),
+            ),
+        )
+    },
+)
 
 internal fun resolveBodyTypeName(endpoint: ResolvedDotnetAspEndpoint): String =
     when (endpoint.bindings.body?.locality) {

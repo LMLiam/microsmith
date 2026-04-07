@@ -99,6 +99,7 @@ private fun Type.findArtifactContributorType(): ParameterizedType? = when (this)
         }
 
     is Class<*> -> findArtifactContributorType()
+
     else -> null
 }
 

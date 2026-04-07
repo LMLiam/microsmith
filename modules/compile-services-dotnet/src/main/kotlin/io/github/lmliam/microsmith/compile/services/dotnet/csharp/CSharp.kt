@@ -5,11 +5,7 @@ object CSharp {
     @DslMarker
     annotation class Dsl
 
-    data class File(
-        val namespace: String,
-        val usings: Set<String>,
-        val types: List<Type>,
-    )
+    data class File(val namespace: String, val usings: Set<String>, val types: List<Type>)
 
     data class Type(
         val kind: TypeKind,
@@ -26,9 +22,7 @@ object CSharp {
         RECORD,
     }
 
-    enum class Modifier(
-        val keyword: String,
-    ) {
+    enum class Modifier(val keyword: String) {
         PUBLIC("public"),
         PRIVATE("private"),
         PROTECTED("protected"),
@@ -50,31 +44,17 @@ object CSharp {
 
     sealed interface TypeRef
 
-    data class NamedType(
-        val name: String,
-    ) : TypeRef
+    data class NamedType(val name: String) : TypeRef
 
-    data class GenericType(
-        val name: String,
-        val arguments: List<TypeRef>,
-    ) : TypeRef
+    data class GenericType(val name: String, val arguments: List<TypeRef>) : TypeRef
 
-    data class NullableType(
-        val underlying: TypeRef,
-    ) : TypeRef
+    data class NullableType(val underlying: TypeRef) : TypeRef
 
-    data class ArrayType(
-        val elementType: TypeRef,
-    ) : TypeRef
+    data class ArrayType(val elementType: TypeRef) : TypeRef
 
-    data class TupleType(
-        val elements: List<TupleElement>,
-    ) : TypeRef
+    data class TupleType(val elements: List<TupleElement>) : TypeRef
 
-    data class TupleElement(
-        val type: TypeRef,
-        val name: String? = null,
-    )
+    data class TupleElement(val type: TypeRef, val name: String? = null)
 
     data class Property(
         val type: TypeRef,
@@ -94,21 +74,13 @@ object CSharp {
         val body: CodeBlock? = null,
     ) : Member
 
-    data class Attribute(
-        val name: String,
-        val arguments: List<AttributeArgument> = emptyList(),
-    )
+    data class Attribute(val name: String, val arguments: List<AttributeArgument> = emptyList())
 
     sealed interface AttributeArgument
 
-    data class PositionalAttributeArgument(
-        val expression: Expression,
-    ) : AttributeArgument
+    data class PositionalAttributeArgument(val expression: Expression) : AttributeArgument
 
-    data class NamedAttributeArgument(
-        val name: String,
-        val expression: Expression,
-    ) : AttributeArgument
+    data class NamedAttributeArgument(val name: String, val expression: Expression) : AttributeArgument
 
     data class Parameter(
         val type: TypeRef,
@@ -118,81 +90,43 @@ object CSharp {
         val defaultValue: String? = null,
     )
 
-    data class CodeBlock(
-        val statements: List<Statement>,
-    )
+    data class CodeBlock(val statements: List<Statement>)
 
     sealed interface Expression
 
-    data class RawExpression(
-        val text: String,
-    ) : Expression
+    data class RawExpression(val text: String) : Expression
 
-    data class StringLiteral(
-        val value: String,
-    ) : Expression
+    data class StringLiteral(val value: String) : Expression
 
-    data class IntLiteral(
-        val value: Int,
-    ) : Expression
+    data class IntLiteral(val value: Int) : Expression
 
     data object NullLiteral : Expression
 
-    data class Identifier(
-        val name: String,
-    ) : Expression
+    data class Identifier(val name: String) : Expression
 
-    data class MemberAccess(
-        val target: Expression,
-        val memberName: String,
-    ) : Expression
+    data class MemberAccess(val target: Expression, val memberName: String) : Expression
 
-    data class Call(
-        val callee: Expression,
-        val arguments: List<CallArgument>,
-    ) : Expression
+    data class Call(val callee: Expression, val arguments: List<CallArgument>) : Expression
 
     sealed interface CallArgument
 
-    data class ValueCallArgument(
-        val expression: Expression,
-    ) : CallArgument
+    data class ValueCallArgument(val expression: Expression) : CallArgument
 
-    data class OutVariableCallArgument(
-        val name: String,
-    ) : CallArgument
+    data class OutVariableCallArgument(val name: String) : CallArgument
 
-    data class Await(
-        val expression: Expression,
-    ) : Expression
+    data class Await(val expression: Expression) : Expression
 
-    data class Assignment(
-        val target: Expression,
-        val value: Expression,
-    ) : Expression
+    data class Assignment(val target: Expression, val value: Expression) : Expression
 
-    data class IndexAccess(
-        val target: Expression,
-        val arguments: List<Expression>,
-    ) : Expression
+    data class IndexAccess(val target: Expression, val arguments: List<Expression>) : Expression
 
-    data class BinaryOperation(
-        val left: Expression,
-        val operator: BinaryOperator,
-        val right: Expression,
-    ) : Expression
+    data class BinaryOperation(val left: Expression, val operator: BinaryOperator, val right: Expression) : Expression
 
-    enum class BinaryOperator(
-        val keyword: String,
-    ) {
+    enum class BinaryOperator(val keyword: String) {
         IS_NOT("is not"),
     }
 
-    data class Conditional(
-        val condition: Expression,
-        val whenTrue: Expression,
-        val whenFalse: Expression,
-    ) : Expression
+    data class Conditional(val condition: Expression, val whenTrue: Expression, val whenFalse: Expression) : Expression
 
     data class ObjectCreation(
         val type: TypeRef,
@@ -200,76 +134,38 @@ object CSharp {
         val initializers: List<MemberInitializer> = emptyList(),
     ) : Expression
 
-    data class MemberInitializer(
-        val memberName: String,
-        val value: Expression,
-    )
+    data class MemberInitializer(val memberName: String, val value: Expression)
 
-    data class SwitchExpression(
-        val subject: Expression,
-        val arms: List<SwitchArm>,
-    ) : Expression
+    data class SwitchExpression(val subject: Expression, val arms: List<SwitchArm>) : Expression
 
-    data class SwitchArm(
-        val pattern: String,
-        val expression: Expression,
-    )
+    data class SwitchArm(val pattern: String, val expression: Expression)
 
-    data class Throw(
-        val expression: Expression,
-    ) : Expression
+    data class Throw(val expression: Expression) : Expression
 
-    data class TupleLiteral(
-        val elements: List<Expression>,
-    ) : Expression
+    data class TupleLiteral(val elements: List<Expression>) : Expression
 
     sealed interface Statement
 
-    data class RawStatement(
-        val text: String,
-    ) : Statement
+    data class RawStatement(val text: String) : Statement
 
-    data class ExpressionStatement(
-        val expression: Expression,
-    ) : Statement
+    data class ExpressionStatement(val expression: Expression) : Statement
 
-    data class ReturnStatement(
-        val expression: Expression,
-    ) : Statement
+    data class ReturnStatement(val expression: Expression) : Statement
 
-    data class LocalDeclaration(
-        val keyword: String,
-        val name: String,
-        val initializer: Expression,
-    ) : Statement
+    data class LocalDeclaration(val keyword: String, val name: String, val initializer: Expression) : Statement
 
-    data class IfStatement(
-        val condition: Expression,
-        val body: CodeBlock,
-    ) : Statement
+    data class IfStatement(val condition: Expression, val body: CodeBlock) : Statement
 
-    data class StructuredForeachStatement(
-        val target: ForeachTarget,
-        val source: Expression,
-        val body: CodeBlock,
-    ) : Statement
+    data class StructuredForeachStatement(val target: ForeachTarget, val source: Expression, val body: CodeBlock) :
+        Statement
 
     sealed interface ForeachTarget
 
-    data class ForeachIdentifier(
-        val name: String,
-        val useVarKeyword: Boolean = true,
-    ) : ForeachTarget
+    data class ForeachIdentifier(val name: String, val useVarKeyword: Boolean = true) : ForeachTarget
 
-    data class ForeachDeconstruction(
-        val names: List<String>,
-        val useVarKeyword: Boolean = true,
-    ) : ForeachTarget
+    data class ForeachDeconstruction(val names: List<String>, val useVarKeyword: Boolean = true) : ForeachTarget
 
-    data class RawForeachStatement(
-        val signature: String,
-        val body: CodeBlock,
-    ) : Statement
+    data class RawForeachStatement(val signature: String, val body: CodeBlock) : Statement
 
     data object BlankLine : Statement
 
@@ -291,9 +187,7 @@ object CSharp {
 
     fun tupleElement(type: TypeRef, name: String? = null): TupleElement = TupleElement(type, name)
 
-    fun codeBlock(build: CSharpCodeBlockBuilder.() -> Unit): CodeBlock {
-        return CSharpCodeBlockBuilder().apply(build).build()
-    }
+    fun codeBlock(build: CSharpCodeBlockBuilder.() -> Unit): CodeBlock = CSharpCodeBlockBuilder().apply(build).build()
 
     fun rawExpression(text: String): Expression = RawExpression(text)
 

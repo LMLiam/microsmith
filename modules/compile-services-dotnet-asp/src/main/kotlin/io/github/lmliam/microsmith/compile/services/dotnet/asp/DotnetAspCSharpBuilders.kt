@@ -3,9 +3,8 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpFileBuilder
 
-internal fun csharpAttribute(name: String, vararg arguments: CSharp.AttributeArgument): CSharp.Attribute {
-    return CSharp.attribute(name, *arguments)
-}
+internal fun csharpAttribute(name: String, vararg arguments: CSharp.AttributeArgument): CSharp.Attribute =
+    CSharp.attribute(name, *arguments)
 
 internal fun csharpParameter(
     type: CSharp.TypeRef,

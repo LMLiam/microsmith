@@ -1,9 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.service
 
-data class DotnetAspPorts(
-    val http: Int? = null,
-    val https: Int? = null,
-) {
+data class DotnetAspPorts(val http: Int? = null, val https: Int? = null) {
     init {
         validatePort(http, "HTTP")
         validatePort(https, "HTTPS")

@@ -32,12 +32,19 @@ internal fun dotnetAspCharLiteral(value: Char): String {
 
 private fun dotnetAspEscapedCharacter(char: Char): String = when (char) {
     '\\' -> "\\\\"
+
     '"' -> "\\\""
+
     '\b' -> "\\b"
+
     '\u000C' -> "\\f"
+
     '\n' -> "\\n"
+
     '\r' -> "\\r"
+
     '\t' -> "\\t"
+
     else ->
         if (char.code < FIRST_PRINTABLE_ASCII_CODE_POINT) {
             "\\u${char.code.toString(radix = 16).padStart(UNICODE_ESCAPE_WIDTH, '0')}"
