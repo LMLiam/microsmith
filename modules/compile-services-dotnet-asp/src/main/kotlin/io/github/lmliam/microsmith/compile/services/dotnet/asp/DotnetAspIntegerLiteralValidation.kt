@@ -7,13 +7,13 @@ import java.math.BigInteger
 internal fun requireRepresentableInteger(type: DotnetFieldType, value: Number): BigInteger {
     val integer = value.toExactBigDecimal().stripTrailingZeros().let { normalized ->
         require(normalized.scale() <= 0) {
-            "ASP.NET request default '$value' is not representable as integer type '$type'."
+            "ASP.NET request default '$value' is not representable as integer type '${csharpIntegerTypeName(type)}'."
         }
         normalized.toBigIntegerExact()
     }
 
     require(integer in integerRangeFor(type)) {
-        "ASP.NET request default '$value' is out of range for integer type '$type'."
+        "ASP.NET request default '$value' is out of range for integer type '${csharpIntegerTypeName(type)}'."
     }
 
     return integer
@@ -49,6 +49,37 @@ private fun integerRangeFor(type: DotnetFieldType): ClosedRange<BigInteger> = wh
     DotnetFieldType.UnsignedLong,
     DotnetFieldType.UnsignedNativeInt,
     -> BigInteger.ZERO..ULONG_MAX
+
+    DotnetFieldType.Float,
+    DotnetFieldType.Double,
+    DotnetFieldType.Decimal,
+    DotnetFieldType.String,
+    DotnetFieldType.Char,
+    DotnetFieldType.Bool,
+    DotnetFieldType.Guid,
+    DotnetFieldType.DateOnly,
+    DotnetFieldType.TimeOnly,
+    DotnetFieldType.DateTime,
+    DotnetFieldType.DateTimeOffset,
+    DotnetFieldType.TimeSpan,
+    is DotnetFieldType.Reference,
+    -> error("Unsupported ASP.NET integer literal type '$type'.")
+}
+
+private fun csharpIntegerTypeName(type: DotnetFieldType): String = when (type) {
+    DotnetFieldType.Byte -> "byte"
+    DotnetFieldType.SignedByte -> "sbyte"
+    DotnetFieldType.Short -> "short"
+    DotnetFieldType.UnsignedShort -> "ushort"
+    DotnetFieldType.Int -> "int"
+    DotnetFieldType.UnsignedInt -> "uint"
+    DotnetFieldType.Long,
+    DotnetFieldType.NativeInt,
+    -> "long"
+
+    DotnetFieldType.UnsignedLong,
+    DotnetFieldType.UnsignedNativeInt,
+    -> "ulong"
 
     DotnetFieldType.Float,
     DotnetFieldType.Double,

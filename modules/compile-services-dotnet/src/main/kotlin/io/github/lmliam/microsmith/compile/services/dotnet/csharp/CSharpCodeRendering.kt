@@ -78,11 +78,9 @@ private fun renderCall(expression: CSharp.Call): String = buildString {
 private fun renderConditional(expression: CSharp.Conditional): String = buildString {
     append(renderExpression(expression.condition))
     appendLine()
-    append("? ")
-    append(renderExpression(expression.whenTrue))
+    append(indent("? ${renderExpression(expression.whenTrue)}"))
     appendLine()
-    append(": ")
-    append(renderExpression(expression.whenFalse))
+    append(indent(": ${renderExpression(expression.whenFalse)}"))
 }
 
 private fun renderIndexAccess(expression: CSharp.IndexAccess): String = buildString {
@@ -103,7 +101,7 @@ private fun renderObjectCreation(expression: CSharp.ObjectCreation): String = bu
         appendLine("{")
         append(
             indent(
-                expression.initializers.joinToString(",\n") { initializer ->
+                expression.initializers.joinToString(",\n", postfix = ",") { initializer ->
                     "${initializer.memberName} = ${renderExpression(initializer.value)}"
                 },
             ),
