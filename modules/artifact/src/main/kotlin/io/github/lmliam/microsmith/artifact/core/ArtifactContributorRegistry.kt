@@ -83,10 +83,7 @@ internal class ArtifactContributorRegistry(contributors: List<ArtifactContributo
 
 private fun Class<*>.findArtifactContributorType(): ParameterizedType? {
     val interfaceContributorType =
-        genericInterfaces
-            .asSequence()
-            .mapNotNull(Type::findArtifactContributorType)
-            .firstOrNull()
+        genericInterfaces.asSequence().firstNotNullOfOrNull(Type::findArtifactContributorType)
     return interfaceContributorType ?: genericSuperclass?.findArtifactContributorType()
 }
 

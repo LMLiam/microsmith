@@ -16,8 +16,7 @@ internal fun dotnetAspStringLiteral(value: String): String = buildString {
 }
 
 internal fun dotnetAspCharLiteral(value: Char): String {
-    val char = value
-    val escaped = when (char) {
+    val escaped = when (value) {
         '\\' -> "\\\\"
         '\'' -> "\\'"
         '\b' -> "\\b"
@@ -25,7 +24,7 @@ internal fun dotnetAspCharLiteral(value: Char): String {
         '\n' -> "\\n"
         '\r' -> "\\r"
         '\t' -> "\\t"
-        else -> char.toString()
+        else -> value.toString()
     }
     return "'$escaped'"
 }

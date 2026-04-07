@@ -38,13 +38,11 @@ private fun renderType(type: CSharp.Type): String = buildString {
 }
 
 private fun renderPrimaryConstructor(parameters: List<CSharp.Parameter>): String =
-    parameters.takeIf(List<CSharp.Parameter>::isNotEmpty)?.let { items ->
-        items.joinToString(
-            prefix = "(",
-            postfix = ")",
-            transform = ::renderParameter,
-        )
-    }.orEmpty()
+    parameters.takeIf(List<CSharp.Parameter>::isNotEmpty)?.joinToString(
+        prefix = "(",
+        postfix = ")",
+        transform = ::renderParameter,
+    ).orEmpty()
 
 private fun renderMember(member: CSharp.Member): String = when (member) {
     is CSharp.Method -> renderMethod(member)

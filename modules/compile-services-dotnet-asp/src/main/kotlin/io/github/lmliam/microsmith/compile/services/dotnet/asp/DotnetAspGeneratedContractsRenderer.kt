@@ -15,7 +15,7 @@ internal fun renderSharedModelsFile(artifact: DotnetAspServiceArtifact): String 
 }
 
 internal fun renderRequestModelsFile(artifact: DotnetAspServiceArtifact): String {
-    val requestTypes = buildList<CSharp.Type> {
+    val requestTypes = buildList {
         artifact.rest.endpoints.forEach { endpoint ->
             endpoint.bindings.path?.let { add(renderRequestBindingClass(it)) }
             endpoint.bindings.query?.let { add(renderRequestBindingClass(it)) }
@@ -33,7 +33,7 @@ internal fun renderRequestModelsFile(artifact: DotnetAspServiceArtifact): String
 
 internal fun renderResponseModelsFile(artifact: DotnetAspServiceArtifact): String {
     val endpoints = artifact.rest.endpoints
-    val inlineResponseModels = buildList<CSharp.Type> {
+    val inlineResponseModels = buildList {
         endpoints.forEach { endpoint ->
             endpoint.responses
                 .filter { it.model.locality == ResolvedDotnetAspModelLocality.INLINE }
