@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.requireDotnetRepresentableInteger
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspDefaultValue
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import java.math.BigDecimal
@@ -75,7 +76,7 @@ private fun dotnetAspNumericLiteral(type: DotnetFieldType, value: Number): Strin
 }
 
 private fun dotnetAspIntegerLiteral(type: DotnetFieldType, value: Number): String {
-    val integer = requireRepresentableInteger(type, value)
+    val integer = requireDotnetRepresentableInteger(type, value, "ASP.NET request default")
     return when (type) {
         DotnetFieldType.Byte,
         DotnetFieldType.SignedByte,

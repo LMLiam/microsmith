@@ -1,6 +1,14 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpArrayType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpGenericType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpNullableType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpTupleElement
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpTupleType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
 
@@ -24,13 +32,13 @@ internal fun renderRespondHelper(): CSharp.Method = CSharp.Method(
     modifiers = listOf(CSharp.Modifier.PROTECTED),
     returnType = csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ObjectResult),
     parameters = listOf(
-        csharpParameter(DotnetAspCSharpTypes.Primitives.Object, "body"),
-        csharpParameter(DotnetAspCSharpTypes.Primitives.Int, "statusCode"),
+        csharpParameter(DotnetCSharpTypes.Primitives.Object, "body"),
+        csharpParameter(DotnetCSharpTypes.Primitives.Int, "statusCode"),
         csharpParameter(
             csharpArrayType(
                 csharpTupleType(
-                    csharpTupleElement(csharpType(DotnetAspCSharpTypes.Primitives.String), "Name"),
-                    csharpTupleElement(csharpNullableType(DotnetAspCSharpTypes.Primitives.String), "Value"),
+                    csharpTupleElement(csharpType(DotnetCSharpTypes.Primitives.String), "Name"),
+                    csharpTupleElement(csharpNullableType(DotnetCSharpTypes.Primitives.String), "Value"),
                 ),
             ),
             "headers",
@@ -76,8 +84,8 @@ internal fun renderRespondHelper(): CSharp.Method = CSharp.Method(
 internal fun renderReadHeaderHelper(): CSharp.Method = CSharp.Method(
     name = "ReadHeader",
     modifiers = listOf(CSharp.Modifier.PROTECTED),
-    returnType = csharpNullableType(DotnetAspCSharpTypes.Primitives.String),
-    parameters = listOf(csharpParameter(DotnetAspCSharpTypes.Primitives.String, "headerName")),
+    returnType = csharpNullableType(DotnetCSharpTypes.Primitives.String),
+    parameters = listOf(csharpParameter(DotnetCSharpTypes.Primitives.String, "headerName")),
     body = CSharp.codeBlock {
         returnStatement(
             CSharp.conditional(
@@ -134,7 +142,7 @@ private fun renderUnsupportedResultArm(endpoint: ResolvedDotnetAspEndpoint): CSh
     pattern = "_",
     expression = CSharp.throwExpression(
         CSharp.new(
-            type = csharpType(DotnetAspCSharpTypes.System.InvalidOperationException),
+            type = csharpType(DotnetCSharpTypes.System.InvalidOperationException),
             arguments = listOf(
                 CSharp.rawExpression(
                     "\"Unsupported ${endpoint.operationName} result type '${'$'}{result.GetType().FullName}'.\"",

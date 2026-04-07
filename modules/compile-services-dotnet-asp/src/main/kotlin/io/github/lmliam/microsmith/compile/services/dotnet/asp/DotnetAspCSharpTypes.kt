@@ -1,57 +1,29 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypeName
+
 internal object DotnetAspCSharpTypes {
-    object System {
-        data object InvalidOperationException : DotnetAspCSharpTypeName {
-            override val value = "InvalidOperationException"
-        }
-    }
-
-    object Primitives {
-        data object String : DotnetAspCSharpTypeName {
-            override val value = "string"
-        }
-
-        data object Int : DotnetAspCSharpTypeName {
-            override val value = "int"
-        }
-
-        data object Object : DotnetAspCSharpTypeName {
-            override val value = "object"
-        }
-    }
-
-    object Threading {
-        data object CancellationToken : DotnetAspCSharpTypeName {
-            override val value = "CancellationToken"
-        }
-
-        data object Task : DotnetAspCSharpTypeName {
-            override val value = "Task"
-        }
-    }
-
     object AspNetCore {
         object Mvc {
-            data object ActionResult : DotnetAspCSharpTypeName {
+            data object ActionResult : DotnetCSharpTypeName {
                 override val value = "ActionResult"
             }
 
-            data object ControllerBase : DotnetAspCSharpTypeName {
+            data object ControllerBase : DotnetCSharpTypeName {
                 override val value = "ControllerBase"
             }
 
-            data object ObjectResult : DotnetAspCSharpTypeName {
+            data object ObjectResult : DotnetCSharpTypeName {
                 override val value = "ObjectResult"
             }
         }
 
         object Builder {
-            data object WebApplication : DotnetAspCSharpTypeName {
+            data object WebApplication : DotnetCSharpTypeName {
                 override val value = "WebApplication"
             }
 
-            data object WebApplicationBuilder : DotnetAspCSharpTypeName {
+            data object WebApplicationBuilder : DotnetCSharpTypeName {
                 override val value = "WebApplicationBuilder"
             }
         }

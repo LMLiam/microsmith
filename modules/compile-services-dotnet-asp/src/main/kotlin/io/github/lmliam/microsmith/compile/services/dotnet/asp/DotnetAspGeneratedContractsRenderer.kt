@@ -3,6 +3,9 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpFileBuilder
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpNamespace
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpNamespaces
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.using
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspModelLocality
 
@@ -58,7 +61,7 @@ internal fun renderResponseModelsFile(artifact: DotnetAspServiceArtifact): Strin
 
 internal fun buildContractsFile(
     artifact: DotnetAspServiceArtifact,
-    usings: Set<DotnetAspCSharpNamespace> = setOf(DotnetAspCSharpNamespaces.System.Root),
+    usings: Set<DotnetCSharpNamespace> = setOf(DotnetCSharpNamespaces.System.Root),
     build: CSharpFileBuilder.() -> Unit,
 ): String = CSharp.render(
     CSharp.file(contractsNamespace(artifact)) {

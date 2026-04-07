@@ -2,6 +2,9 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpNamespaces
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.using
 
 internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): String {
     val endpoints = artifact.rest.endpoints
@@ -19,9 +22,9 @@ internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): Strin
 
     return CSharp.render(
         CSharp.file(controllersNamespace(artifact)) {
-            using(DotnetAspCSharpNamespaces.System.Root)
-            using(DotnetAspCSharpNamespaces.System.Threading.Root)
-            using(DotnetAspCSharpNamespaces.System.Threading.Tasks)
+            using(DotnetCSharpNamespaces.System.Root)
+            using(DotnetCSharpNamespaces.System.Threading.Root)
+            using(DotnetCSharpNamespaces.System.Threading.Tasks)
             using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Mvc)
             using(contractsNamespace(artifact))
             classType(

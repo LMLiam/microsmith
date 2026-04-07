@@ -1,35 +1,21 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpNamespace
+
 internal object DotnetAspCSharpNamespaces {
-    object System {
-        data object Root : DotnetAspCSharpNamespace {
-            override val value = "System"
-        }
-
-        object Threading {
-            data object Root : DotnetAspCSharpNamespace {
-                override val value = "System.Threading"
-            }
-
-            data object Tasks : DotnetAspCSharpNamespace {
-                override val value = "System.Threading.Tasks"
-            }
-        }
-    }
-
     object Microsoft {
         object AspNetCore {
-            data object Builder : DotnetAspCSharpNamespace {
+            data object Builder : DotnetCSharpNamespace {
                 override val value = "Microsoft.AspNetCore.Builder"
             }
 
-            data object Mvc : DotnetAspCSharpNamespace {
+            data object Mvc : DotnetCSharpNamespace {
                 override val value = "Microsoft.AspNetCore.Mvc"
             }
         }
 
         object Extensions {
-            data object DependencyInjection : DotnetAspCSharpNamespace {
+            data object DependencyInjection : DotnetCSharpNamespace {
                 override val value = "Microsoft.Extensions.DependencyInjection"
             }
         }

@@ -1,6 +1,10 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpGenericType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspHeadersBinding
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspModelLocality
@@ -9,7 +13,7 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
     name = endpoint.operationName,
     modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ASYNC),
     returnType = csharpGenericType(
-        DotnetAspCSharpTypes.Threading.Task,
+        DotnetCSharpTypes.Threading.Task,
         csharpGenericType(
             DotnetAspCSharpTypes.AspNetCore.Mvc.ActionResult,
             csharpType(resultBaseTypeName(endpoint)),
@@ -50,7 +54,7 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
                 ),
             )
         }
-        add(csharpParameter(DotnetAspCSharpTypes.Threading.CancellationToken, "cancellationToken"))
+        add(csharpParameter(DotnetCSharpTypes.Threading.CancellationToken, "cancellationToken"))
     },
     body = CSharp.codeBlock {
         renderHeadersPrelude(endpoint)?.let { headerInitializer ->
@@ -78,13 +82,13 @@ internal fun renderActionMethod(endpoint: ResolvedDotnetAspEndpoint): CSharp.Met
 internal fun renderAbstractHandler(endpoint: ResolvedDotnetAspEndpoint): CSharp.Method = CSharp.Method(
     name = "On${endpoint.operationName}Async",
     modifiers = listOf(CSharp.Modifier.PROTECTED, CSharp.Modifier.ABSTRACT),
-    returnType = csharpGenericType(DotnetAspCSharpTypes.Threading.Task, csharpType(resultBaseTypeName(endpoint))),
+    returnType = csharpGenericType(DotnetCSharpTypes.Threading.Task, csharpType(resultBaseTypeName(endpoint))),
     parameters = buildList {
         endpoint.bindings.path?.let { add(csharpParameter(it.name, "path")) }
         endpoint.bindings.query?.let { add(csharpParameter(it.name, "query")) }
         endpoint.bindings.headers?.let { add(csharpParameter(it.name, "headers")) }
         endpoint.bindings.body?.let { add(csharpParameter(resolveBodyTypeName(endpoint), "body")) }
-        add(csharpParameter(DotnetAspCSharpTypes.Threading.CancellationToken, "cancellationToken"))
+        add(csharpParameter(DotnetCSharpTypes.Threading.CancellationToken, "cancellationToken"))
     },
 )
 

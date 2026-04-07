@@ -15,9 +15,9 @@ public abstract class UserServiceApiControllerBase : MicrosmithControllerBase
         CancellationToken cancellationToken
     )
     {
-        var headers = new GetUserHeaders
+        var headers = new GetUserHeaders()
         {
-            XCorrelationId = ReadHeader("X-Correlation-Id")
+            XCorrelationId = ReadHeader("X-Correlation-Id"),
         };
 
         var result = await OnGetUserAsync(path, headers, cancellationToken);
@@ -35,9 +35,7 @@ public abstract class UserServiceApiControllerBase : MicrosmithControllerBase
         return result switch
         {
             GetUserOk response => Respond(response.Body, 200),
-            _ => throw new InvalidOperationException(
-                "Unsupported GetUser result type '${result.GetType().FullName}'."
-            )
+            _ => throw new InvalidOperationException("Unsupported GetUser result type '${result.GetType().FullName}'.")
         };
     }
 }

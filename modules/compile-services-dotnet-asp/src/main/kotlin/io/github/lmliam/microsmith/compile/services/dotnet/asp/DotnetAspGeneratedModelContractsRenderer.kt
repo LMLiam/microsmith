@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpAutoProperty
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint

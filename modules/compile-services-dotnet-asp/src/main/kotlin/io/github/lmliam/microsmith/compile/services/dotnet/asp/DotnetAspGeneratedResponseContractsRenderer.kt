@@ -1,6 +1,9 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpNullableType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 
 internal fun renderOperationResultTypes(endpoint: ResolvedDotnetAspEndpoint): List<CSharp.Type> = buildList {
@@ -28,7 +31,7 @@ internal fun renderOperationResultTypes(endpoint: ResolvedDotnetAspEndpoint): Li
                     response.headers.forEach { header ->
                         add(
                             CSharp.Parameter(
-                                type = csharpNullableType(DotnetAspCSharpTypes.Primitives.String),
+                                type = csharpNullableType(DotnetCSharpTypes.Primitives.String),
                                 name = dotnetAspHeaderPropertyName(header.name),
                                 defaultValue = "null",
                             ),

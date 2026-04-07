@@ -2,6 +2,9 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.extensionParameter
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.using
 
 internal fun renderHostingExtensionsFile(artifact: DotnetAspServiceArtifact): String = CSharp.render(
     CSharp.file(hostingNamespace(artifact)) {

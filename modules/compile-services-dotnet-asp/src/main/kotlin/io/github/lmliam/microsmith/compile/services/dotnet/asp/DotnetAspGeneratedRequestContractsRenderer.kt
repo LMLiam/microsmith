@@ -1,6 +1,10 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpAutoProperty
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpNullableType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspHeadersBinding
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRequestBinding
@@ -19,7 +23,7 @@ internal fun renderHeadersBindingClass(binding: ResolvedDotnetAspHeadersBinding)
     modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.SEALED),
     members = binding.headers.map { header ->
         csharpAutoProperty(
-            type = csharpNullableType(DotnetAspCSharpTypes.Primitives.String),
+            type = csharpNullableType(DotnetCSharpTypes.Primitives.String),
             name = dotnetAspPascalIdentifier(header.name),
             modifiers = listOf(CSharp.Modifier.PUBLIC),
         )
