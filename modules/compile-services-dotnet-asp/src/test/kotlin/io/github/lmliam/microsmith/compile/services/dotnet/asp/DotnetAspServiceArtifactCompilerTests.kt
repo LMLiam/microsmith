@@ -84,7 +84,7 @@ class DotnetAspServiceArtifactCompilerTests :
                 .single {
                     it.artifactId.relativePath.toString() == "Generated/Controllers/UserServiceApiControllerBase.cs"
                 }.contents
-                .shouldContain("public abstract class UserServiceApiControllerBase : MicrosmithControllerBase;")
+                .shouldContain("public abstract class UserServiceApiControllerBase : MicrosmithControllerBase\n{}")
             textFiles
                 .single { it.artifactId.relativePath.toString() == "appsettings.json" }
                 .contents
@@ -296,6 +296,10 @@ class DotnetAspServiceArtifactCompilerTests :
                 .shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync(")
             textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
                 .shouldContain("CreateUserBadRequest response => Respond(response.Body, 400)")
+            textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
+                .shouldContain(
+                    """throw new InvalidOperationException($"Unsupported GetUser result type '{result.GetType().FullName}'.")""",
+                )
             textFiles.getValue("Generated/Hosting/MicrosmithHostingExtensions.cs").contents
                 .shouldContain("builder.Services.AddControllers();")
             textFiles.getValue("Generated/Hosting/MicrosmithHostingExtensions.cs").contents

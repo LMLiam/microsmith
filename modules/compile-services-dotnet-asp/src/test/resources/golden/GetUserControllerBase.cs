@@ -28,7 +28,7 @@ public abstract class UserServiceApiControllerBase : MicrosmithControllerBase
         return result switch
         {
             GetUserOk response => Respond(response.Body, 200),
-            _ => throw new InvalidOperationException("Unsupported GetUser result type '${result.GetType().FullName}'.")
+            _ => throw new InvalidOperationException($"Unsupported GetUser result type '{result.GetType().FullName}'.")
         };
     }
 }

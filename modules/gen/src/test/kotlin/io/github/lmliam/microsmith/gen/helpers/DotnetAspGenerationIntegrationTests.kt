@@ -205,7 +205,7 @@ class DotnetAspGenerationIntegrationTests :
             updatedModel.generateTo(outputDir)
 
             controllerBaseFile.readText()
-                .shouldContain("public abstract class UserServiceApiControllerBase : MicrosmithControllerBase;")
+                .shouldContain("public abstract class UserServiceApiControllerBase : MicrosmithControllerBase\n{}")
             controllerBaseFile.readText().shouldNotContain("stale")
             controllerBaseFile.readText().shouldNotContain("OnGetUserAsync")
             requestModelsFile.readText().shouldContain("namespace UserService.Api.Generated.Contracts;")

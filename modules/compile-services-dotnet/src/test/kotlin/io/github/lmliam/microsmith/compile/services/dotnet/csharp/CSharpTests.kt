@@ -87,6 +87,29 @@ class CSharpTests :
             """.trimIndent()
         }
 
+        "render emits braces for empty classes and semicolons for empty records" {
+            val file = CSharp.file("Platform.Api.Generated") {
+                classType(
+                    name = "UsersControllerBase",
+                    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
+                    baseTypes = listOf(CSharp.type("ControllerBase")),
+                )
+                recordType(
+                    name = "GetUserResult",
+                    modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
+                )
+            }
+
+            CSharp.render(file).trim() shouldBe """
+                namespace Platform.Api.Generated;
+
+                public abstract class UsersControllerBase : ControllerBase
+                {}
+
+                public abstract record GetUserResult;
+            """.trimIndent()
+        }
+
         "render emits structured code blocks with control flow" {
             val file = CSharp.file("Platform.Api.Generated") {
                 classType(

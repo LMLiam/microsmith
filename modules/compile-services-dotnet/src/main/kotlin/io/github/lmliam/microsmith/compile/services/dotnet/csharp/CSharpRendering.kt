@@ -27,7 +27,12 @@ private fun renderType(type: CSharp.Type): String = buildString {
         append(type.baseTypes.joinToString(", ", transform = ::renderTypeRef))
     }
     if (type.members.isEmpty()) {
-        append(";")
+        if (type.kind == CSharp.TypeKind.RECORD) {
+            append(";")
+            return@buildString
+        }
+        appendLine()
+        append("{}")
         return@buildString
     }
     appendLine()

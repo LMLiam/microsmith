@@ -145,7 +145,7 @@ private fun renderUnsupportedResultArm(endpoint: ResolvedDotnetAspEndpoint): CSh
             type = csharpType(DotnetCSharpTypes.System.InvalidOperationException),
             arguments = listOf(
                 CSharp.rawExpression(
-                    "\"Unsupported ${endpoint.operationName} result type '${'$'}{result.GetType().FullName}'.\"",
+                    "${'$'}\"Unsupported ${endpoint.operationName} result type '{result.GetType().FullName}'.\"",
                 ),
             ),
         ),
