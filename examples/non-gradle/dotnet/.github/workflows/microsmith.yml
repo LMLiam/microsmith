@@ -18,12 +18,30 @@ jobs:
         shell: pwsh
         working-directory: examples/non-gradle/dotnet
         run: microsmith init
-      - name: Generate protobuf
+      - name: Generate protobuf and ASP.NET scaffold
         shell: pwsh
         working-directory: examples/non-gradle/dotnet
         run: |
           microsmith run build.microsmith.kts --out .\Generated
           if (-not (Test-Path .\Generated\proto\DotnetUserCreated.proto)) {
             Write-Error "Expected Generated\\proto\\DotnetUserCreated.proto to exist."
+            exit 1
+          }
+          $generatedProjectRoot = '.\Generated\dotnet\Platform\UserService.Api'
+          if (-not (Test-Path "$generatedProjectRoot\UserService.Api.csproj")) {
+            Write-Error "Expected generated ASP.NET project file to exist."
+            exit 1
+          }
+          if (-not (Test-Path "$generatedProjectRoot\Generated\Hosting\MicrosmithHostingExtensions.cs")) {
+            Write-Error "Expected generated hosting extensions to exist."
+            exit 1
+          }
+          if (-not (Test-Path "$generatedProjectRoot\Generated\Controllers\UserServiceApiControllerBase.cs")) {
+            Write-Error "Expected generated controller base to exist."
+            exit 1
+          }
+          $hostingExtensions = Get-Content -Path "$generatedProjectRoot\Generated\Hosting\MicrosmithHostingExtensions.cs" -Raw
+          if ($hostingExtensions -notmatch 'AddMicrosmith' -or $hostingExtensions -notmatch 'MapMicrosmith') {
+            Write-Error "Expected generated hosting extensions to expose AddMicrosmith and MapMicrosmith."
             exit 1
           }

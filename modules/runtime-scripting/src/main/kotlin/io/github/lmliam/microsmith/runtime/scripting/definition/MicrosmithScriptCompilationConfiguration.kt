@@ -8,6 +8,15 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufScope
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.ServiceScope
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service
+import io.github.lmliam.microsmith.dsl.services.core.ServicesScope
+import io.github.lmliam.microsmith.dsl.services.core.services
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceScope
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.asp
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.packages
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolutionScope
+import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.packages
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -25,6 +34,11 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
             importFromPackageOf(SchemasScope::class, MicrosmithScope::schemas),
             importFromPackageOf(ProtobufScope::class, SchemasScope::protobuf),
             importFromPackageOf(ServiceScope::class, ProtobufScope::service),
+            importFromPackageOf(ServicesScope::class, MicrosmithScope::services),
+            importFromPackageOf(DotnetTarget::class, ServicesScope::dotnet),
+            importFromPackageOf(DotnetServiceScope::class, DotnetServiceScope::asp),
+            importFromPackageOf(DotnetServiceScope::class, DotnetServiceScope::packages),
+            importFromPackageOf(DotnetSolutionScope::class, DotnetSolutionScope::packages),
         )
 
         implicitReceivers(MicrosmithScriptContext::class)

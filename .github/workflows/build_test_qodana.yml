@@ -391,3 +391,30 @@ jobs:
             Write-Error "Expected Generated\\proto\\DotnetUserCreated.proto to exist for the .NET fixture."
             exit 1
           }
+          $generatedProjectRoot = '.\examples\non-gradle\dotnet\Generated\dotnet\Platform\UserService.Api'
+          if (-not (Test-Path "$generatedProjectRoot\UserService.Api.csproj")) {
+            Write-Error "Expected generated ASP.NET project file to exist for the .NET fixture."
+            exit 1
+          }
+          if (-not (Test-Path "$generatedProjectRoot\Generated\Hosting\MicrosmithHostingExtensions.cs")) {
+            Write-Error "Expected generated hosting extensions to exist for the .NET fixture."
+            exit 1
+          }
+          if (-not (Test-Path "$generatedProjectRoot\Generated\Controllers\UserServiceApiControllerBase.cs")) {
+            Write-Error "Expected generated controller base to exist for the .NET fixture."
+            exit 1
+          }
+          if (-not (Test-Path "$generatedProjectRoot\Generated\Contracts\RequestModels.cs")) {
+            Write-Error "Expected generated request contracts to exist for the .NET fixture."
+            exit 1
+          }
+          $hostingExtensions = Get-Content -Path "$generatedProjectRoot\Generated\Hosting\MicrosmithHostingExtensions.cs" -Raw
+          if ($hostingExtensions -notmatch 'AddMicrosmith' -or $hostingExtensions -notmatch 'MapMicrosmith') {
+            Write-Error "Expected generated hosting extensions to expose AddMicrosmith and MapMicrosmith."
+            exit 1
+          }
+          $controllerBase = Get-Content -Path "$generatedProjectRoot\Generated\Controllers\UserServiceApiControllerBase.cs" -Raw
+          if ($controllerBase -notmatch 'OnGetUserAsync') {
+            Write-Error "Expected generated controller base to expose OnGetUserAsync."
+            exit 1
+          }

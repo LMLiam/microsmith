@@ -76,6 +76,78 @@ class MicrosmithScriptHostTests :
             }
         }
 
+        "runs script returning ASP NET service output with bundled .NET DSL imports" {
+            val tempDir = createTempDirectory("microsmith-script-host-dotnet-asp")
+            try {
+                val script = tempDir.resolve("service.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val cache = tempDir.resolve("cache")
+
+                script.writeText(
+                    """
+                    microsmith {
+                        services {
+                            dotnet {
+                                target(NET8)
+                                solutions {
+                                    "Platform" {}
+                                }
+                            }
+
+                            "UserService" {
+                                dotnet {
+                                    solution("Platform")
+                                    project("UserService.Api")
+                                    models {
+                                        "User" {
+                                            string("id")
+                                        }
+                                    }
+
+                                    asp {
+                                        rest {
+                                            "/users" {
+                                                get("/{id}", "GetUser") {
+                                                    path("GetUserPath") {
+                                                        string("id")
+                                                    }
+
+                                                    responses {
+                                                        ok("User")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    """.trimIndent(),
+                )
+
+                val host = MicrosmithScriptHost(cacheDirectory = cache)
+                val result =
+                    host.run(
+                        ScriptRunRequest(
+                            script = script,
+                            outputDir = output,
+                            variables = emptyMap(),
+                            flags = emptySet(),
+                        ),
+                    )
+
+                result.shouldBeTypeOf<ScriptRunSuccess>()
+                val generatedFile =
+                    output.resolve("dotnet/Platform/UserService.Api/Generated/Hosting/MicrosmithHostingExtensions.cs")
+                generatedFile.exists() shouldBe true
+                generatedFile.readText().shouldContain("AddMicrosmith")
+                generatedFile.readText().shouldContain("MapMicrosmith")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
         "supports emit helper with vars and flags from CLI context" {
             val tempDir = createTempDirectory("microsmith-script-host-context")
             try {
