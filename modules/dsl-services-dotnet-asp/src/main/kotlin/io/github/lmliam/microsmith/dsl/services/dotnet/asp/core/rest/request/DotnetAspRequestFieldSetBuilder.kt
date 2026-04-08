@@ -88,7 +88,7 @@ internal open class DotnetAspRequestFieldSetBuilder(private val fieldContainerLa
         name = name,
         type = type,
         optional = options.optional,
-        defaultValue = options.defaultValue,
+        defaultValue = requireCompatibleDotnetAspDefaultValue(type, options.defaultValue),
     )
 
     protected open fun createReference(name: String, target: String): DotnetAspRequestField =

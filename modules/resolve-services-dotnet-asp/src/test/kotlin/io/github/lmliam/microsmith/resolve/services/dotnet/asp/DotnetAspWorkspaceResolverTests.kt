@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.core.services
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspDefaultValue
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.asp
@@ -51,7 +52,7 @@ class DotnetAspWorkspaceResolverTests :
                                                 string("id")
                                             }
                                             query("GetUserQuery") {
-                                                string("includeDetails") {
+                                                bool("includeDetails") {
                                                     optional()
                                                     default(false)
                                                 }
@@ -99,8 +100,10 @@ class DotnetAspWorkspaceResolverTests :
             getUser.route shouldBe "/users/{id}"
             getUser.routePlaceholders shouldContainExactly listOf("id")
             requireNotNull(getUser.bindings.path).fields.single().type shouldBe DotnetFieldType.String
+            requireNotNull(getUser.bindings.query).fields.single().type shouldBe DotnetFieldType.Bool
             requireNotNull(getUser.bindings.query).fields.single().optional shouldBe true
-            requireNotNull(getUser.bindings.query).fields.single().defaultValue shouldBe false
+            requireNotNull(getUser.bindings.query).fields.single().defaultValue shouldBe
+                DotnetAspDefaultValue.BooleanValue(false)
             requireNotNull(getUser.bindings.headers).headers.single().headerName shouldBe "X-Correlation-Id"
             getUser.responses.map { it.statusCode } shouldContainExactly listOf(200, 404)
             getUser.responses.first().headers.map { it.name } shouldContainExactly listOf("ETag")
@@ -113,6 +116,51 @@ class DotnetAspWorkspaceResolverTests :
                 .fields
                 .map { it.name } shouldContainExactly listOf("email", "manager")
             createUser.responses.single().model.locality shouldBe ResolvedDotnetAspModelLocality.SHARED
+        }
+
+        "resolve preserves explicit asp net ports" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                dotnet {
+                    target(NET8)
+                    solutions {
+                        "Platform" {}
+                    }
+                }
+
+                "UserService" {
+                    dotnet {
+                        solution("Platform")
+                        project("UserService.Api")
+                        asp {
+                            ports {
+                                http(7000)
+                                https(7443)
+                            }
+                            rest {
+                                "/health" {
+                                    get("GetHealth") {
+                                        responses {
+                                            ok("Status")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        models {
+                            "Status" {
+                                string("value")
+                            }
+                        }
+                    }
+                }
+            }
+
+            val workspace = DotnetAspWorkspaceResolver().resolve(builder.requireServicesExtension())
+
+            requireNotNull(workspace.servicesByName["UserService"]).ports shouldBe
+                ResolvedDotnetAspPorts(http = 7000, https = 7443)
         }
 
         "resolve rejects duplicate operation names across grouped routes" {

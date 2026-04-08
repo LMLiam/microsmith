@@ -12,120 +12,94 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
+import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 
 @ServiceProvider(ArtifactCompiler::class)
 class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServiceArtifact> {
-    private companion object {
-        const val FIRST_NON_PRINTABLE_ASCII_CODE_POINT = 0x20
-    }
+    private val endpointRenderer = DotnetAspEndpointTextFileRenderer()
 
     override val artifactType = DotnetAspServiceArtifact::class
 
-    override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> = listOf(
-        MsBuildProjectContribution(
-            artifactId = MsBuildProjectArtifactId(
-                solutionName = artifact.id.solutionName,
-                projectName = artifact.id.projectName,
-                kind = MsBuildProjectKind.Project,
+    override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> = buildList {
+        add(
+            MsBuildProjectContribution(
+                artifactId =
+                MsBuildProjectArtifactId(
+                    solutionName = artifact.id.solutionName,
+                    projectName = artifact.id.projectName,
+                    kind = MsBuildProjectKind.Project,
+                ),
+                projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
+                properties =
+                mapOf(
+                    MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
+                    MsBuildNames.NULLABLE_PROPERTY to "enable",
+                    MsBuildNames.TARGET_FRAMEWORK_PROPERTY to artifact.targetFrameworkMoniker,
+                ),
             ),
-            projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
-            properties = mapOf(
-                MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
-                MsBuildNames.NULLABLE_PROPERTY to "enable",
-                MsBuildNames.TARGET_FRAMEWORK_PROPERTY to artifact.targetFrameworkMoniker,
+        )
+        add(textContribution(artifact, "appsettings.json", renderAppSettingsFile(artifact)))
+        add(
+            textContribution(
+                artifact,
+                "Properties/launchSettings.json",
+                renderLaunchSettingsFile(artifact),
             ),
-        ),
-        textContribution(artifact, "Program.cs", renderProgramFile()),
-        textContribution(artifact, "appsettings.json", renderAppSettingsFile(artifact)),
-        textContribution(artifact, "Properties/launchSettings.json", renderLaunchSettingsFile(artifact)),
-    )
+        )
+        endpointRenderer.render(artifact).forEach { generatedFile ->
+            add(
+                textContribution(
+                    artifact = artifact,
+                    relativePath = generatedFile.relativePath,
+                    contents = generatedFile.contents,
+                ),
+            )
+        }
+    }
 
     private fun textContribution(
         artifact: DotnetAspServiceArtifact,
         relativePath: String,
         contents: String,
     ): TextFileArtifactContribution = TextFileArtifactContribution(
-        artifactId = TextFileArtifactId(
+        artifactId =
+        TextFileArtifactId(
             relativePath = Path.of(relativePath),
             outputRoot = artifact.outputRoot,
         ),
         contents = contents,
     )
 
-    private fun renderProgramFile(): String = """
-        var builder = WebApplication.CreateBuilder(args);
+    private fun renderAppSettingsFile(artifact: DotnetAspServiceArtifact): String = renderTemplate(
+        name = "appsettings.json.template",
+        substitutions = mapOf(
+            "{{SERVICE_NAME}}" to dotnetAspEscapeStringContents(artifact.serviceName),
+        ),
+    )
 
-        builder.Services.AddControllers();
+    private fun renderLaunchSettingsFile(artifact: DotnetAspServiceArtifact): String = renderTemplate(
+        name = "launchSettings.json.template",
+        substitutions = mapOf(
+            "{{PROJECT_NAME}}" to artifact.id.projectName,
+            "{{HTTP_PORT}}" to artifact.httpPort.toString(),
+            "{{HTTPS_PORT}}" to artifact.httpsPort.toString(),
+        ),
+    )
 
-        var app = builder.Build();
-
-        app.MapControllers();
-
-        app.Run();
-
-        public partial class Program { }
-    """.trimIndent()
-
-    private fun renderAppSettingsFile(artifact: DotnetAspServiceArtifact): String = """
-        {
-          "Microsmith": {
-            "ServiceName": "${escapeJsonString(artifact.serviceName)}"
-          },
-          "Logging": {
-            "LogLevel": {
-              "Default": "Information",
-              "Microsoft.AspNetCore": "Warning"
-            }
-          },
-          "AllowedHosts": "*"
+    private fun renderTemplate(name: String, substitutions: Map<String, String>): String =
+        substitutions.entries.fold(loadTemplate(name)) { rendered, (placeholder, replacement) ->
+            rendered.replace(placeholder, replacement)
         }
-    """.trimIndent()
 
-    private fun renderLaunchSettingsFile(artifact: DotnetAspServiceArtifact): String = """
-        {
-          "${'$'}schema": "http://json.schemastore.org/launchsettings.json",
-          "profiles": {
-            "${artifact.id.projectName}": {
-              "commandName": "Project",
-              "dotnetRunMessages": true,
-              "launchBrowser": false,
-              "applicationUrl": "http://localhost:${artifact.httpPort};https://localhost:${artifact.httpsPort}",
-              "environmentVariables": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-              }
-            }
-          }
-        }
-    """.trimIndent()
+    private fun loadTemplate(name: String): String = javaClass
+        .getResourceAsStream("$TEMPLATE_RESOURCE_ROOT/$name")
+        ?.readBytes()
+        ?.toString(StandardCharsets.UTF_8)
+        ?: error("Missing ASP.NET template resource '$name'.")
 
-    private fun escapeJsonString(value: String): String {
-        val escaped = StringBuilder(value.length)
-        value.forEach { char ->
-            when (char) {
-                '\\' -> escaped.append("\\\\")
-
-                '"' -> escaped.append("\\\"")
-
-                '\b' -> escaped.append("\\b")
-
-                '\u000C' -> escaped.append("\\f")
-
-                '\n' -> escaped.append("\\n")
-
-                '\r' -> escaped.append("\\r")
-
-                '\t' -> escaped.append("\\t")
-
-                else -> {
-                    if (char.code < FIRST_NON_PRINTABLE_ASCII_CODE_POINT) {
-                        escaped.append("\\u%04x".format(char.code))
-                    } else {
-                        escaped.append(char)
-                    }
-                }
-            }
-        }
-        return escaped.toString()
+    private companion object {
+        const val TEMPLATE_RESOURCE_ROOT =
+            "/io/github/lmliam/microsmith/compile/services/dotnet/asp/templates"
     }
 }

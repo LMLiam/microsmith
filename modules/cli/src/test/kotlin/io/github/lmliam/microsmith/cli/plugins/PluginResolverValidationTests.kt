@@ -78,7 +78,7 @@ class PluginResolverValidationTests :
                         ),
                         repositoryCredentialsResolver =
                         object : RepositoryCredentialsResolver {
-                            override fun resolve(repositoryUri: String): RepositoryCredentials? =
+                            override fun resolve(repositoryUri: String): RepositoryCredentials =
                                 throw IllegalArgumentException("Repository credentials are invalid.")
                         },
                         remotePluginResolver =

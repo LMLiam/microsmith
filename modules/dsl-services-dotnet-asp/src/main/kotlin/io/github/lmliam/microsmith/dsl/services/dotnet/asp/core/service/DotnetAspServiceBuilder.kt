@@ -6,12 +6,18 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service.Dot
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.service.mergeDotnetAspRest
 
 internal class DotnetAspServiceBuilder : DotnetAspServiceScope {
+    private var ports: DotnetAspPorts? = null
     private var rest: DotnetAspRest? = null
+
+    override fun ports(block: DotnetAspPortsScope.() -> Unit) {
+        val declaredPorts = DotnetAspPortsBuilder().apply(block).build()
+        ports = ports?.let { mergeDotnetAspPorts(it, declaredPorts) } ?: declaredPorts
+    }
 
     override fun rest(block: DotnetAspRestScope.() -> Unit) {
         val declaredRest = DotnetAspRestBuilder().apply(block).build()
         rest = rest?.let { mergeDotnetAspRest(it, declaredRest) } ?: declaredRest
     }
 
-    fun build() = DotnetAspServiceExtension(rest = rest)
+    fun build() = DotnetAspServiceExtension(ports = ports, rest = rest)
 }

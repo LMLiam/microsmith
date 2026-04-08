@@ -35,18 +35,34 @@ class CliPackagingPlugin : Plugin<Project> {
         project.dependencies.apply {
             add("implementation", project.project(":runtime-scripting"))
             add("implementation", project.project(":dsl"))
+            add("implementation", project.project(":dsl-services"))
+            add("implementation", project.project(":dsl-services-dotnet"))
+            add("implementation", project.project(":dsl-services-dotnet-asp"))
+            add("implementation", project.project(":dsl-services-dotnet-packages"))
             add("implementation", project.project(":dsl-schemas"))
             add("implementation", project.project(":dsl-schemas-protobuf"))
             add("implementation", project.project(":dsl-schemas-protobuf-rpc"))
             add("implementation", project.project(":resolve"))
+            add("implementation", project.project(":resolve-services"))
+            add("implementation", project.project(":resolve-services-dotnet"))
+            add("implementation", project.project(":resolve-services-dotnet-asp"))
+            add("implementation", project.project(":resolve-services-dotnet-packages"))
             add("implementation", project.project(":resolve-schemas"))
             add("implementation", project.project(":resolve-schemas-protobuf"))
             add("implementation", project.project(":resolve-schemas-protobuf-rpc"))
             add("implementation", project.project(":artifact"))
+            add("implementation", project.project(":artifact-services"))
+            add("implementation", project.project(":artifact-services-dotnet"))
+            add("implementation", project.project(":artifact-services-dotnet-asp"))
+            add("implementation", project.project(":artifact-services-dotnet-packages"))
             add("implementation", project.project(":artifact-schemas"))
             add("implementation", project.project(":artifact-schemas-protobuf"))
             add("implementation", project.project(":artifact-schemas-protobuf-rpc"))
             add("implementation", project.project(":compile"))
+            add("implementation", project.project(":compile-services"))
+            add("implementation", project.project(":compile-services-dotnet"))
+            add("implementation", project.project(":compile-services-dotnet-asp"))
+            add("implementation", project.project(":compile-services-dotnet-packages"))
             add("implementation", project.project(":compile-schemas"))
             add("implementation", project.project(":compile-schemas-protobuf"))
             add("implementation", project.project(":compile-schemas-protobuf-rpc"))
@@ -456,7 +472,7 @@ private fun launcherCopySpec(shadowJarArchiveName: String): Action<CopySpec> = A
         ReplaceTokens::class.java,
     )
     copySpec.filePermissions(
-        Action<ConfigurableFilePermissions> { permissions ->
+        Action { permissions ->
             permissions.unix("rwxr-xr-x")
         },
     )
@@ -473,7 +489,7 @@ private fun windowsLauncherCopySpec(shadowJarArchiveName: String): Action<CopySp
 private fun executableFileCopySpec(): Action<CopySpec> = Action { copySpec ->
     copySpec.into(".")
     copySpec.filePermissions(
-        Action<ConfigurableFilePermissions> { permissions ->
+        Action { permissions ->
             permissions.unix("rwxr-xr-x")
         },
     )

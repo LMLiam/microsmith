@@ -103,6 +103,43 @@ class InitBootstrapTests :
             }
         }
 
+        "creates repo-aware bootstrap files for .NET repositories with ASP.NET sample generation" {
+            val repoRoot = createTempDirectory("microsmith-init-bootstrap-dotnet")
+            repoRoot.resolve("MicrosmithFixture.csproj").writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
+            try {
+                val helperRoot = repoRoot.resolve(".microsmith/ide")
+                val result =
+                    runInitBootstrap(
+                        command = InitCommand(projectRoot = repoRoot),
+                        ideRefreshRunner = { command ->
+                            IdeHelperRefreshResult(
+                                projectRoot = command.projectRoot.toAbsolutePath().normalize(),
+                                helperRoot = helperRoot,
+                                updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
+                                classpathEntries = listOf(repoRoot.resolve("runtime/microsmith-cli-all.jar")),
+                            )
+                        },
+                    )
+
+                result.repositoryDetection.profile shouldBe DotnetOnboardingProfile
+                result.repositoryDetection.matchedMarkers shouldBe listOf("MicrosmithFixture.csproj")
+                val buildScript = repoRoot.resolve("build.microsmith.kts").readText()
+                val settingsScript = repoRoot.resolve("settings.microsmith.kts").readText()
+
+                buildScript.shouldContain("DotnetUserCreated")
+                buildScript.shouldContain("target(NET8)")
+                buildScript.shouldContain("project(\"UserService.Api\")")
+                buildScript.shouldContain("asp {")
+                buildScript.shouldContain("get(\"/{id}\", \"GetUser\")")
+                buildScript.shouldContain("ok(\"User\")")
+                buildScript.shouldContain("Common repository-native output path:")
+                buildScript.shouldContain("./Generated")
+                settingsScript.shouldContain("Detected repository profile: .NET")
+            } finally {
+                runCatching { repoRoot.deleteRecursively() }
+            }
+        }
+
         "creates repo-aware bootstrap files for Rust workspace roots without a repository-native output override" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-rust")
             repoRoot.resolve("crates/app/src").createDirectories()

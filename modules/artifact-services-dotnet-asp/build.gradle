@@ -4,8 +4,9 @@ dependencies {
     api project(":artifact")
     api project(":artifact-services")
     api project(":artifact-services-dotnet")
+    api project(":dsl-services-dotnet")
+    api project(":resolve-services-dotnet-asp")
     implementation project(":resolve")
-    implementation project(":resolve-services-dotnet-asp")
     api libs.spi.tooling.annotations
     kapt libs.spi.tooling.processor
 }

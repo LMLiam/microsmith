@@ -528,26 +528,72 @@ REST DSL contract notes:
 - route groups can be nested, verb helpers are lower-case, and every endpoint requires an explicit operation name
 - request bindings are modeled explicitly through `path(...)`, `query(...)`, `headers(...)`, and `body(...)`
 - inline body and response models stay endpoint-local in the normalized model; shared service models must be declared under `models { ... }`
-- route placeholders are validated against `path(...)` bindings, response/header declarations are normalized, and invalid REST declarations fail during resolution before any ASP.NET endpoint code is generated
+- route placeholders are validated against `path(...)` bindings, response/header declarations are normalized, and invalid REST declarations fail before Microsmith emits ASP.NET endpoint glue
 
-The base ASP.NET scaffold currently emits this canonical layout under the run output root:
+The ASP.NET scaffold currently emits this canonical layout under the run output root:
 
 ```text
 dotnet/
   Platform/
     UserService.Api/
       UserService.Api.csproj
-      Program.cs
       appsettings.json
       Properties/
         launchSettings.json
+      Generated/
+        Hosting/
+          MicrosmithHostingExtensions.cs
+        Contracts/
+          ServiceModels.cs
+          RequestModels.cs
+          ResponseModels.cs
+        Controllers/
+          MicrosmithControllerBase.cs
+          UserServiceApiControllerBase.cs
 ```
 
 Canonical scaffold policy:
 
-- `Program.cs` uses top-level hosting with `WebApplication.CreateBuilder(args)`, `AddControllers()`, `MapControllers()`, and `Run()`
-- the scaffold above is generator-owned and is overwritten in place on rerun
-- user-authored ASP.NET extension code should live under `Controllers/`; this base scaffold does not emit or rewrite that area yet
+- Microsmith does not generate `Program.cs`; the ASP.NET entrypoint is user-owned
+- `Generated/Hosting/MicrosmithHostingExtensions.cs` contains Microsmith-owned hosting extensions for `builder.AddMicrosmith()` and `app.MapMicrosmith()`
+- `Generated/Contracts/*.cs` contains Microsmith-owned service-local records, request bindings, inline response models, and typed per-operation result contracts
+- `Generated/Controllers/MicrosmithControllerBase.cs` contains Microsmith-owned shared controller helpers such as `Respond(...)` and `ReadHeader(...)`
+- `Generated/Controllers/*ControllerBase.cs` contains Microsmith-owned route attributes, request binding glue, and response mapping that forwards to abstract handler methods such as `OnGetUserAsync(...)`
+- everything under `Generated/` is owned by Microsmith and is overwritten in place on rerun
+- user-authored ASP.NET implementation code should live outside `Generated/`, for example under `Controllers/`, by deriving from the generated base controller and implementing the abstract handlers
+
+Typical user-owned `Program.cs` shape:
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+builder.AddMicrosmith();
+
+var app = builder.Build();
+app.MapMicrosmith();
+
+app.Run();
+```
+
+Typical user-owned controller shape:
+
+```csharp
+using System.Threading;
+using System.Threading.Tasks;
+using UserService.Api.Generated.Controllers;
+using UserService.Api.Generated.Contracts;
+
+namespace UserService.Api.Controllers;
+
+public sealed class UserServiceApiController : UserServiceApiControllerBase
+{
+    protected override Task<GetUserResult> OnGetUserAsync(
+        GetUserPath path,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+}
+```
 
 ### Script defaults
 

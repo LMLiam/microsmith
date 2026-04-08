@@ -7,7 +7,7 @@ data class DotnetAspRequestField(
     val name: String,
     val type: DotnetFieldType,
     val optional: Boolean = false,
-    val defaultValue: Any? = null,
+    val defaultValue: DotnetAspDefaultValue? = null,
 ) {
     init {
         validateDotnetIdentifier(name, "ASP.NET request field name")

@@ -4,6 +4,7 @@ import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.core.services
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.model.DotnetAspModelReference
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.service.DotnetAspPorts
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.service.DotnetAspServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
@@ -149,6 +150,29 @@ class DotnetAspDslTests :
             requireNotNull(asp.rest).groups.single().endpoints.single().operationName shouldBe "GetHealth"
         }
 
+        "asp blocks capture explicit launch ports" {
+            val builder = MicrosmithBuilder()
+
+            builder.services {
+                "UserService" {
+                    dotnet {
+                        asp {
+                            ports {
+                                http(7000)
+                                https(7443)
+                            }
+                        }
+                    }
+                }
+            }
+
+            val services = builder.requireServicesExtension()
+            val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
+            val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+
+            requireNotNull(asp.ports) shouldBe DotnetAspPorts(http = 7000, https = 7443)
+        }
+
         "headers bindings reject colliding derived field names" {
             val builder = MicrosmithBuilder()
 
@@ -208,5 +232,132 @@ class DotnetAspDslTests :
             val responses = requireNotNull(asp.rest).groups.single().endpoints.single().responses
 
             responses.map { it.statusCode } shouldContainExactly listOf(202, 799)
+        }
+
+        "duplicate path bindings are rejected during DSL authoring" {
+            val builder = MicrosmithBuilder()
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/users/{id}" {
+                                            get("GetUser") {
+                                                path("GetUserPath") {
+                                                    string("id")
+                                                }
+                                                path("DuplicatePath") {
+                                                    string("id")
+                                                }
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            error.message.shouldContain("already declares a path binding")
+        }
+
+        "duplicate query bindings are rejected during DSL authoring" {
+            val builder = MicrosmithBuilder()
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            get("ListUsers") {
+                                                query("ListUsersQuery") {
+                                                    string("search")
+                                                }
+                                                query("DuplicateQuery") {
+                                                    string("page")
+                                                }
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            error.message.shouldContain("already declares a query binding")
+        }
+
+        "duplicate body bindings are rejected during DSL authoring" {
+            val builder = MicrosmithBuilder()
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            post("CreateUser") {
+                                                body("CreateUserBody")
+                                                body("InlineBody") {
+                                                    string("email")
+                                                }
+                                                responses {
+                                                    created("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            error.message.shouldContain("already declares a body binding")
+        }
+
+        "duplicate responses blocks are rejected during DSL authoring" {
+            val builder = MicrosmithBuilder()
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/health" {
+                                            get("GetHealth") {
+                                                responses {
+                                                    ok("Status")
+                                                }
+                                                responses {
+                                                    accepted("AcceptedStatus")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            error.message.shouldContain("already declares responses")
         }
     })

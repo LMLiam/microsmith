@@ -9,23 +9,33 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspac
 class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {
     override val resolvedType = DotnetAspWorkspace::class
 
-    override fun contribute(model: DotnetAspWorkspace): List<ArtifactContribution<*>> =
-        model.servicesByName.values.sortedBy {
-            it.name
-        }.mapIndexed { index, service ->
-            val httpPort = BASE_HTTP_PORT + (index * PORT_STRIDE)
-            DotnetAspServiceContribution(
-                artifactId = DotnetAspServiceArtifactId(service.solutionName, service.projectName),
-                serviceName = service.name,
-                targetFrameworkMoniker = service.targetFrameworkMoniker,
-                outputRoot = service.outputRoot,
-                httpPort = httpPort,
-                httpsPort = httpPort + 1,
-            )
+    override fun contribute(model: DotnetAspWorkspace): List<ArtifactContribution<*>> = model.servicesByName.values
+        .map { service ->
+            service to DotnetAspServiceArtifactId(service.solutionName, service.projectName)
+        }.sortedWith(
+            compareBy(
+                { (_, artifactId) -> artifactId.solutionName },
+                { (_, artifactId) -> artifactId.projectName },
+            ),
+        )
+        .let { serviceArtifacts ->
+            val allocatedPorts =
+                serviceArtifacts.associate { (service, artifactId) ->
+                    artifactId to allocateDotnetAspPorts(artifactId, service.ports)
+                }
+            validateUniqueDotnetAspPorts(allocatedPorts.toList())
+            serviceArtifacts.map { (service, artifactId) ->
+                val ports = requireNotNull(allocatedPorts[artifactId])
+                DotnetAspServiceContribution(
+                    artifactId = artifactId,
+                    serviceName = service.name,
+                    targetFrameworkMoniker = service.targetFrameworkMoniker,
+                    outputRoot = service.outputRoot,
+                    httpPort = ports.http,
+                    httpsPort = ports.https,
+                    models = service.models,
+                    rest = service.rest,
+                )
+            }
         }
-
-    private companion object {
-        const val BASE_HTTP_PORT = 5000
-        const val PORT_STRIDE = 10
-    }
 }
