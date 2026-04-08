@@ -25,7 +25,9 @@ fun requireDotnetRepresentableInteger(
 
 private fun Number.toExactBigDecimal(): BigDecimal = when (this) {
     is BigDecimal -> this
+
     is BigInteger -> BigDecimal(this)
+
     is Byte,
     is Short,
     is Int,
@@ -41,11 +43,17 @@ private fun Number.toExactBigDecimal(): BigDecimal = when (this) {
 
 private fun integerRangeFor(type: DotnetFieldType): ClosedRange<BigInteger> = when (type) {
     DotnetFieldType.Byte -> BigInteger.ZERO..BYTE_MAX
+
     DotnetFieldType.SignedByte -> SBYTE_MIN..SBYTE_MAX
+
     DotnetFieldType.Short -> BigInteger.valueOf(Short.MIN_VALUE.toLong())..BigInteger.valueOf(Short.MAX_VALUE.toLong())
+
     DotnetFieldType.UnsignedShort -> BigInteger.ZERO..USHORT_MAX
+
     DotnetFieldType.Int -> BigInteger.valueOf(Int.MIN_VALUE.toLong())..BigInteger.valueOf(Int.MAX_VALUE.toLong())
+
     DotnetFieldType.UnsignedInt -> BigInteger.ZERO..UINT_MAX
+
     DotnetFieldType.Long,
     DotnetFieldType.NativeInt,
     -> BigInteger.valueOf(Long.MIN_VALUE)..BigInteger.valueOf(Long.MAX_VALUE)
@@ -72,11 +80,17 @@ private fun integerRangeFor(type: DotnetFieldType): ClosedRange<BigInteger> = wh
 
 private fun csharpIntegerTypeName(type: DotnetFieldType): String = when (type) {
     DotnetFieldType.Byte -> "byte"
+
     DotnetFieldType.SignedByte -> "sbyte"
+
     DotnetFieldType.Short -> "short"
+
     DotnetFieldType.UnsignedShort -> "ushort"
+
     DotnetFieldType.Int -> "int"
+
     DotnetFieldType.UnsignedInt -> "uint"
+
     DotnetFieldType.Long,
     DotnetFieldType.NativeInt,
     -> "long"
