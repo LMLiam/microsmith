@@ -76,7 +76,8 @@ class ArtifactAssemblyServiceTests :
             error.message shouldBe
                 "io.github.lmliam.microsmith.artifact.core.MisdeclaredContributor declares " +
                 "resolvedType io.github.lmliam.microsmith.artifact.core.BetaResolved, but implements " +
-                "ArtifactContributor<io.github.lmliam.microsmith.artifact.core.AlphaResolved>."
+                "ArtifactContributor<io.github.lmliam.microsmith.artifact.core.AlphaResolved>. " +
+                "Ensure resolvedType matches the ArtifactContributor<R> generic type."
         }
 
         "assembly service merges identical text contributions and rejects conflicting ones" {

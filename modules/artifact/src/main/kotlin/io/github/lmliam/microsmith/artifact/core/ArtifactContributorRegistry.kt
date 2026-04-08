@@ -49,7 +49,8 @@ internal class ArtifactContributorRegistry(contributors: List<ArtifactContributo
         val genericType = contributor.findGenericResolvedType()
         require(genericType == declaredType) {
             "$contributorName declares resolvedType ${formatType(declaredType)}, but implements " +
-                "ArtifactContributor<${formatType(genericType)}>."
+                "ArtifactContributor<${formatType(genericType)}>. Ensure resolvedType matches " +
+                "the ArtifactContributor<R> generic type."
         }
     }
 
