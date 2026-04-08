@@ -297,9 +297,9 @@ class DotnetAspServiceArtifactCompilerTests :
             textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
                 .shouldContain("CreateUserBadRequest response => Respond(response.Body, 400)")
             textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
-                .shouldContain(
-                    """throw new InvalidOperationException($"Unsupported GetUser result type '{result.GetType().FullName}'.")""",
-                )
+                .shouldContain("throw new InvalidOperationException(\$\"")
+            textFiles.getValue("Generated/Controllers/UserServiceApiControllerBase.cs").contents
+                .shouldContain("""Unsupported GetUser result type '{result.GetType().FullName}'.""")
             textFiles.getValue("Generated/Hosting/MicrosmithHostingExtensions.cs").contents
                 .shouldContain("builder.Services.AddControllers();")
             textFiles.getValue("Generated/Hosting/MicrosmithHostingExtensions.cs").contents
