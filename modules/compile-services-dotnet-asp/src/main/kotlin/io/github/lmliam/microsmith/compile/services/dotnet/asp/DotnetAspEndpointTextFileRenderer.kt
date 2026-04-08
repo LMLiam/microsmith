@@ -24,11 +24,11 @@ internal class DotnetAspEndpointTextFileRenderer {
                 contents = renderResponseModelsFile(artifact),
             ),
             DotnetAspGeneratedTextFile(
-                relativePath = "Generated/Controllers/MicrosmithControllerBase.cs",
+                relativePath = microsmithControllerBaseRelativePath(),
                 contents = renderMicrosmithControllerBaseFile(artifact),
             ),
             DotnetAspGeneratedTextFile(
-                relativePath = "Generated/Controllers/${controllerPrefix(artifact)}ControllerBase.cs",
+                relativePath = controllerBaseRelativePath(artifact),
                 contents = renderControllerBaseFile(artifact),
             ),
         )

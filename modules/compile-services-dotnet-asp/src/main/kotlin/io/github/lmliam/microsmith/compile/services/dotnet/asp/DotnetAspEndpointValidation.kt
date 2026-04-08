@@ -10,6 +10,7 @@ internal fun validateEndpointGenerationInputs(artifact: DotnetAspServiceArtifact
     validateRequestBindings(artifact)
     validateResponseHeaderNames(artifact)
     validateGeneratedContractTypeNames(artifact)
+    validateGeneratedControllerTypeNames(artifact)
 }
 
 private fun validateRequestBindings(artifact: DotnetAspServiceArtifact) {
@@ -31,8 +32,19 @@ private fun validateRequestBindings(artifact: DotnetAspServiceArtifact) {
 private fun validateResponseHeaderNames(artifact: DotnetAspServiceArtifact) {
     artifact.rest.endpoints.forEach { endpoint ->
         endpoint.responses.forEach { response ->
+            val headerPropertyNames = response.headers.map { header ->
+                val generatedName = dotnetAspHeaderPropertyName(header.name)
+                require(generatedName != RESULT_BODY_PROPERTY_NAME) {
+                    "ASP.NET response ${response.statusCode} in operation " +
+                        "'${endpoint.operationName}' declares header '${header.name}', " +
+                        "which collides with the generated result body property " +
+                        "'$RESULT_BODY_PROPERTY_NAME'."
+                }
+                generatedName
+            }
             val collisions = response.headers
-                .groupBy { dotnetAspHeaderPropertyName(it.name) }
+                .zip(headerPropertyNames)
+                .groupBy({ (_, generatedName) -> generatedName }, { (header, _) -> header })
                 .filterValues { it.size > 1 }
                 .keys
                 .sorted()
@@ -42,6 +54,15 @@ private fun validateResponseHeaderNames(artifact: DotnetAspServiceArtifact) {
                     "generated property names: ${collisions.joinToString(", ")}."
             }
         }
+    }
+}
+
+private fun validateGeneratedControllerTypeNames(artifact: DotnetAspServiceArtifact) {
+    require(controllerBaseTypeName(artifact) != MICROSMITH_CONTROLLER_BASE_TYPE_NAME) {
+        "ASP.NET service '${artifact.serviceName}' project '${artifact.id.projectName}' " +
+            "generates controller base type '${controllerBaseTypeName(artifact)}', " +
+            "which collides with shared generated controller base type " +
+            "'$MICROSMITH_CONTROLLER_BASE_TYPE_NAME'."
     }
 }
 

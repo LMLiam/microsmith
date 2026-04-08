@@ -25,7 +25,7 @@ internal fun renderOperationResultTypes(endpoint: ResolvedDotnetAspEndpoint): Li
                     add(
                         CSharp.Parameter(
                             type = csharpType(resolveResponseModelTypeName(endpoint, response)),
-                            name = "Body",
+                            name = RESULT_BODY_PROPERTY_NAME,
                         ),
                     )
                     response.headers.forEach { header ->

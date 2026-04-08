@@ -7,6 +7,7 @@ internal object DotnetAspCSharpAttributes {
     object Microsoft {
         object AspNetCore {
             object Mvc {
+                val ApiController: CSharp.Attribute = CSharp.attribute("ApiController")
                 val FromBody: CSharp.Attribute = CSharp.attribute("FromBody")
                 val FromQuery: CSharp.Attribute = CSharp.attribute("FromQuery")
                 val FromRoute: CSharp.Attribute = CSharp.attribute("FromRoute")

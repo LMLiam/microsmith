@@ -28,10 +28,10 @@ internal fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): Strin
             using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Mvc)
             using(contractsNamespace(artifact))
             classType(
-                name = "${controllerPrefix(artifact)}ControllerBase",
+                name = controllerBaseTypeName(artifact),
                 modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
-                baseTypes = listOf(csharpType("MicrosmithControllerBase")),
-                attributes = listOf(CSharp.Attribute("ApiController")),
+                baseTypes = listOf(csharpType(MICROSMITH_CONTROLLER_BASE_TYPE_NAME)),
+                attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.ApiController),
             ) {
                 sections.forEach(::addMember)
             }
@@ -43,7 +43,7 @@ internal fun renderMicrosmithControllerBaseFile(artifact: DotnetAspServiceArtifa
     CSharp.file(controllersNamespace(artifact)) {
         using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Mvc)
         classType(
-            name = "MicrosmithControllerBase",
+            name = MICROSMITH_CONTROLLER_BASE_TYPE_NAME,
             modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
             baseTypes = listOf(csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ControllerBase)),
         ) {

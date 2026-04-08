@@ -13,6 +13,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRequestBinding
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRequestField
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponseHeader
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRest
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -79,13 +80,91 @@ class DotnetAspEndpointValidationTests :
             error.message.shouldContain("shared model 'GetUserResult'")
             error.message.shouldContain("result base for operation 'GetUser'")
         }
+
+        "validation rejects response headers that collide with the generated Body property" {
+            val artifact =
+                validationArtifact(
+                    models =
+                    mapOf(
+                        "User" to DotnetModel(
+                            name = "User",
+                            fields = listOf(DotnetField("id", DotnetFieldType.String)),
+                        ),
+                    ),
+                    rest = ResolvedDotnetAspRest(
+                        listOf(
+                            ResolvedDotnetAspEndpoint(
+                                method = DotnetAspHttpMethod.GET,
+                                route = "/users/{id}",
+                                routePlaceholders = listOf("id"),
+                                operationName = "GetUser",
+                                bindings = ResolvedDotnetAspEndpointBindings(
+                                    path = ResolvedDotnetAspRequestBinding(
+                                        name = "GetUserPath",
+                                        fields = listOf(
+                                            ResolvedDotnetAspRequestField(
+                                                name = "id",
+                                                type = DotnetFieldType.String,
+                                                optional = false,
+                                                defaultValue = null,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                responses = listOf(
+                                    ResolvedDotnetAspResponse(
+                                        statusCode = 200,
+                                        model = ResolvedDotnetAspModel(
+                                            locality = ResolvedDotnetAspModelLocality.SHARED,
+                                            model = DotnetModel(
+                                                name = "User",
+                                                fields = listOf(DotnetField("id", DotnetFieldType.String)),
+                                            ),
+                                        ),
+                                        headers = listOf(
+                                            ResolvedDotnetAspResponseHeader("body"),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    validateEndpointGenerationInputs(artifact)
+                }
+
+            error.message.shouldContain("collides with the generated result body property 'Body'")
+            error.message.shouldContain("header 'body'")
+        }
+
+        "validation rejects project names that collide with the shared controller base type" {
+            val artifact =
+                validationArtifact(
+                    models = emptyMap(),
+                    projectName = "Microsmith",
+                    rest = ResolvedDotnetAspRest.empty(),
+                )
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    validateEndpointGenerationInputs(artifact)
+                }
+
+            error.message.shouldContain("collides with shared generated controller base type")
+            error.message.shouldContain("project 'Microsmith'")
+            error.message.shouldContain("MicrosmithControllerBase")
+        }
     })
 
 private fun validationArtifact(
     models: Map<String, DotnetModel>,
+    projectName: String = "UserService.Api",
     rest: ResolvedDotnetAspRest,
 ): DotnetAspServiceArtifact = DotnetAspServiceArtifact(
-    id = DotnetAspServiceArtifactId("Platform", "UserService.Api"),
+    id = DotnetAspServiceArtifactId("Platform", projectName),
     serviceName = "UserService",
     targetFrameworkMoniker = "net8.0",
     outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),

@@ -125,7 +125,7 @@ private fun renderResponseSwitchArms(endpoint: ResolvedDotnetAspEndpoint): List<
     }
 
 private fun responseArguments(response: ResolvedDotnetAspResponse): List<CSharp.Expression> = buildList {
-    add(CSharp.member(CSharp.identifier("response"), "Body"))
+    add(CSharp.member(CSharp.identifier("response"), RESULT_BODY_PROPERTY_NAME))
     add(CSharp.intLiteral(response.statusCode))
     addAll(responseHeaderArguments(response))
 }
