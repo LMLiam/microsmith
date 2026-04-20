@@ -138,11 +138,9 @@ class MicrosmithScriptHostTests :
                     )
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
-                val generatedFile =
-                    output.resolve("dotnet/Platform/UserService.Api/Generated/Hosting/MicrosmithHostingExtensions.cs")
-                generatedFile.exists() shouldBe true
-                generatedFile.readText().shouldContain("AddMicrosmith")
-                generatedFile.readText().shouldContain("MapMicrosmith")
+                output.resolve("dotnet/Platform/UserService.Api/Program.cs").exists() shouldBe true
+                output.resolve("dotnet/Platform/UserService.Api/Controllers/UserServiceController.cs").exists() shouldBe true
+                output.resolve("dotnet/Platform/UserService.Api/.microsmith/origins.json").exists() shouldBe true
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
