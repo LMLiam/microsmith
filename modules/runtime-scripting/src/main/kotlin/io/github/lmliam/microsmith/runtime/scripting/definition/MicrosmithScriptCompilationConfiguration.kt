@@ -1,25 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.definition
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithScope
-import io.github.lmliam.microsmith.dsl.core.microsmith
-import io.github.lmliam.microsmith.dsl.schemas.core.SchemasScope
-import io.github.lmliam.microsmith.dsl.schemas.core.schemas
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.ServiceScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service
-import io.github.lmliam.microsmith.dsl.services.core.ServicesScope
-import io.github.lmliam.microsmith.dsl.services.core.services
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceScope
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.asp
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.packages
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolutionScope
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.packages
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
-import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.defaultImports
 import kotlin.script.experimental.api.implicitReceivers
@@ -30,15 +11,16 @@ import kotlin.script.experimental.jvm.util.classpathFromClassloader
 object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration(
     {
         defaultImports(
-            importFromPackageOf(MicrosmithScope::class, ::microsmith),
-            importFromPackageOf(SchemasScope::class, MicrosmithScope::schemas),
-            importFromPackageOf(ProtobufScope::class, SchemasScope::protobuf),
-            importFromPackageOf(ServiceScope::class, ProtobufScope::service),
-            importFromPackageOf(ServicesScope::class, MicrosmithScope::services),
-            importFromPackageOf(DotnetTarget::class, ServicesScope::dotnet),
-            importFromPackageOf(DotnetServiceScope::class, DotnetServiceScope::asp),
-            importFromPackageOf(DotnetServiceScope::class, DotnetServiceScope::packages),
-            importFromPackageOf(DotnetSolutionScope::class, DotnetSolutionScope::packages),
+            "io.github.lmliam.microsmith.dsl.core.microsmith",
+            "io.github.lmliam.microsmith.dsl.services.core.services",
+            "io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet",
+            "io.github.lmliam.microsmith.dsl.services.dotnet.core.service.asp",
+            "io.github.lmliam.microsmith.dsl.services.dotnet.core.service.aspNet",
+            "io.github.lmliam.microsmith.dsl.services.dotnet.core.service.packages",
+            "io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.packages",
+            "io.github.lmliam.microsmith.dsl.schemas.core.schemas",
+            "io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf",
+            "io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service",
         )
 
         implicitReceivers(MicrosmithScriptContext::class)
@@ -52,10 +34,4 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
             )
         }
     },
-) {
-    @Suppress("unused")
-    private fun readResolve(): Any = MicrosmithScriptCompilationConfiguration
-}
-
-private fun importFromPackageOf(owner: KClass<*>, symbol: KFunction<*>): String =
-    "${owner.java.packageName}.${symbol.name}"
+)

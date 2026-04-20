@@ -103,9 +103,17 @@ class InitBootstrapTests :
             }
         }
 
-        "creates repo-aware bootstrap files for .NET repositories with ASP.NET sample generation" {
+        "creates ASP.NET bootstrap files for .NET repositories" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-dotnet")
-            repoRoot.resolve("MicrosmithFixture.csproj").writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
+            repoRoot.resolve("MicrosmithFixture.csproj").writeText(
+                """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <PropertyGroup>
+                    <TargetFramework>net9.0</TargetFramework>
+                  </PropertyGroup>
+                </Project>
+                """.trimIndent() + "\n",
+            )
             try {
                 val helperRoot = repoRoot.resolve(".microsmith/ide")
                 val result =
@@ -122,18 +130,19 @@ class InitBootstrapTests :
                     )
 
                 result.repositoryDetection.profile shouldBe DotnetOnboardingProfile
-                result.repositoryDetection.matchedMarkers shouldBe listOf("MicrosmithFixture.csproj")
+                result.repositoryDetection.matchedMarkers shouldContainExactly listOf("MicrosmithFixture.csproj")
                 val buildScript = repoRoot.resolve("build.microsmith.kts").readText()
                 val settingsScript = repoRoot.resolve("settings.microsmith.kts").readText()
 
-                buildScript.shouldContain("DotnetUserCreated")
+                buildScript.shouldContain("// Bootstrapped Microsmith ASP.NET service generation for this .NET repository.")
+                buildScript.shouldContain("// microsmith run build.microsmith.kts --out ./Generated")
+                buildScript.shouldContain("services {")
                 buildScript.shouldContain("target(NET8)")
                 buildScript.shouldContain("project(\"UserService.Api\")")
                 buildScript.shouldContain("asp {")
-                buildScript.shouldContain("get(\"/{id}\", \"GetUser\")")
-                buildScript.shouldContain("ok(\"User\")")
-                buildScript.shouldContain("Common repository-native output path:")
-                buildScript.shouldContain("./Generated")
+                buildScript.shouldContain("header(\"ETag\")")
+                buildScript.shouldContain("guid(\"reportId\")")
+                buildScript.shouldContain("dateTimeOffset(\"requestedAt\")")
                 settingsScript.shouldContain("Detected repository profile: .NET")
             } finally {
                 runCatching { repoRoot.deleteRecursively() }

@@ -196,6 +196,82 @@ class MicrosmithScriptHostTests :
             }
         }
 
+        "runs service scripts and generates ASP.NET outputs" {
+            val tempDir = createTempDirectory("microsmith-script-host-dotnet-asp")
+            try {
+                val script = tempDir.resolve("service.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val cache = tempDir.resolve("cache")
+
+                script.writeText(
+                    """
+                    microsmith {
+                        services {
+                            dotnet {
+                                target(NET8)
+                                solutions {
+                                    "Platform" {}
+                                }
+                            }
+
+                            "UserService" {
+                                dotnet {
+                                    solution("Platform")
+                                    project("UserService.Api")
+                                    models {
+                                        "User" {
+                                            string("id")
+                                            string("email")
+                                        }
+                                        "Problem" {
+                                            string("detail")
+                                        }
+                                    }
+                                    asp {
+                                        rest {
+                                            "/users" {
+                                                get("/{id}", "GetUser") {
+                                                    path("GetUserPath") {
+                                                        string("id")
+                                                    }
+                                                    responses {
+                                                        ok("User")
+                                                        notFound("Problem")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    """.trimIndent(),
+                )
+
+                val host = MicrosmithScriptHost(cacheDirectory = cache)
+                val result =
+                    host.run(
+                        ScriptRunRequest(
+                            script = script,
+                            outputDir = output,
+                            variables = emptyMap(),
+                            flags = emptySet(),
+                        ),
+                    )
+
+                result.shouldBeTypeOf<ScriptRunSuccess>()
+                output.resolve("dotnet/Platform/UserService.Api/Program.cs").exists() shouldBe true
+                output.resolve("dotnet/Platform/UserService.Api/Controllers/UserServiceController.cs").exists() shouldBe true
+                output.resolve("dotnet/Platform/UserService.Api/.microsmith/origins.json").exists() shouldBe true
+                output.resolve("dotnet/Platform/UserService.Api/Controllers/UserServiceController.cs")
+                    .readText()
+                    .shouldContain("""[HttpGet("/users/{id}", Name = "GetUser")]""")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
         "returns deterministic diagnostics for script errors" {
             val tempDir = createTempDirectory("microsmith-script-host-error")
             try {
