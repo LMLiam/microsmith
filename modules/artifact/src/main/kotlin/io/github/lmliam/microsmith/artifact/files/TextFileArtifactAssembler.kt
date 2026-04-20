@@ -13,6 +13,7 @@ class TextFileArtifactAssembler : ArtifactAssembler<TextFileArtifact> {
         return TextFileArtifact(
             id = contribution.artifactId,
             contents = contribution.contents,
+            origins = contribution.origins,
         )
     }
 
@@ -25,7 +26,10 @@ class TextFileArtifactAssembler : ArtifactAssembler<TextFileArtifact> {
             "Conflicting text artifact contributions for '${current.id.relativePath}' " +
                 "under '${current.id.outputRoot}'."
         }
-        return current
+        if (current.origins == next.origins) {
+            return current
+        }
+        return current.copy(origins = current.origins + next.origins)
     }
 
     private fun requireContribution(

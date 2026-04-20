@@ -34,6 +34,10 @@ class DotnetPackageArtifactCompilerTests :
             contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryPackagesProps
             contribution.properties shouldContainExactly
                 mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true")
+            contribution.origins shouldContainExactly setOf(
+                "services.solutions.Platform.packages.Serilog.AspNetCore",
+                "services.solutions.Platform.packages.Serilog.Settings.Configuration",
+            )
             contribution.items.map { it.include to it.attributes } shouldContainExactly listOf(
                 "Serilog.AspNetCore" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
                 "Serilog.Settings.Configuration" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.1"),
@@ -59,6 +63,10 @@ class DotnetPackageArtifactCompilerTests :
             contribution.artifactId.projectName shouldBe "UserService.Api"
             contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryBuildProps
             contribution.properties shouldBe emptyMap()
+            contribution.origins shouldContainExactly setOf(
+                "services.UserService.packages.Serilog.AspNetCore",
+                "services.UserService.packages.Serilog.Settings.Configuration",
+            )
             contribution.items.map { it.include to it.attributes } shouldContainExactly listOf(
                 "Serilog.AspNetCore" to emptyMap(),
                 "Serilog.Settings.Configuration" to emptyMap(),
@@ -84,6 +92,10 @@ class DotnetPackageArtifactCompilerTests :
             contribution.artifactId.projectName shouldBe "UserService.Api"
             contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryBuildProps
             contribution.properties shouldBe emptyMap()
+            contribution.origins shouldContainExactly setOf(
+                "services.UserService.packages.Serilog.AspNetCore",
+                "services.UserService.packages.Serilog.Settings.Configuration",
+            )
             contribution.items.map { it.include to it.attributes } shouldContainExactly listOf(
                 "Serilog.AspNetCore" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
                 "Serilog.Settings.Configuration" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.1"),

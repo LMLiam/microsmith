@@ -31,6 +31,9 @@ class DotnetPackageVersionsArtifactCompiler : ServicesArtifactCompiler<DotnetPac
                     attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to packageVersion.version),
                 )
             },
+            origins = artifact.packages.mapTo(linkedSetOf()) { packageVersion ->
+                "services.solutions.${artifact.id.solutionName}.packages.${packageVersion.name}"
+            },
         ),
     )
 }

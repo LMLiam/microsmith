@@ -16,6 +16,11 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.name
 
 @DisableCachingByDefault(
     because = "Microsmith maintains its own compilation cache and task-level caching needs deeper normalization.",
@@ -76,7 +81,7 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
 
     private fun reportSuccess(result: MicrosmithGradleWorkerSuccess) {
         result.warnings.forEach(logger::warn)
-        val generatedOutputRoot = outputDirectory.get().asFile.toPath().toAbsolutePath().normalize().resolve("proto")
+        val generatedOutputRoot = describeGeneratedOutputRoot(outputDirectory.get().asFile.toPath())
         logger.lifecycle(
             "Generated Microsmith outputs into '$generatedOutputRoot'. " +
                 "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)",
@@ -87,4 +92,39 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
         appendLine("Microsmith generation failed (${result.type.lowercase()}).")
         result.diagnostics.forEach(::appendLine)
     }.trimEnd()
+
+    private fun describeGeneratedOutputRoot(outputDirectory: Path): String {
+        val normalizedOutputDirectory = outputDirectory.toAbsolutePath().normalize()
+        val generatedRoots = locateGeneratedRoots(normalizedOutputDirectory)
+        return when (generatedRoots.size) {
+            0 -> normalizedOutputDirectory.toString()
+            1 -> generatedRoots.single().toString()
+            else -> buildString {
+                append(normalizedOutputDirectory)
+                append(" (roots: ")
+                append(generatedRoots.joinToString())
+                append(')')
+            }
+        }
+    }
+
+    private fun locateGeneratedRoots(outputDirectory: Path): List<Path> {
+        if (!outputDirectory.exists()) {
+            return emptyList()
+        }
+
+        Files.walk(outputDirectory).use { paths ->
+            return paths
+                .filter { path ->
+                    path.isRegularFile() &&
+                        path.name == "origins.json" &&
+                        path.parent?.name == ".microsmith"
+                }.map { manifestPath ->
+                    manifestPath.parent?.parent ?: outputDirectory
+                }.map(Path::normalize)
+                .distinct()
+                .sorted()
+                .toList()
+        }
+    }
 }

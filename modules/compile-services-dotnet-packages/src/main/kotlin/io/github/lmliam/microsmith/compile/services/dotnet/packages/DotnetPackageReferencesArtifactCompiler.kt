@@ -33,6 +33,9 @@ class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetP
                         .orEmpty(),
                 )
             },
+            origins = artifact.packages.mapTo(linkedSetOf()) { packageReference ->
+                "services.${artifact.id.serviceName}.packages.${packageReference.name}"
+            },
         ),
     )
 }

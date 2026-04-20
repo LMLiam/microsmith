@@ -39,6 +39,7 @@ class MsBuildProjectArtifactCompilerTests :
 
             textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("Directory.Packages.props")
             textContribution.artifactId.outputRoot shouldBe java.nio.file.Path.of("dotnet", "Platform")
+            textContribution.origins shouldBe setOf("dotnet.solutions.Platform.DirectoryPackagesProps")
             contents.shouldContain("<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>")
             contents.shouldContain("<PackageVersion Include=\"Serilog.AspNetCore\" Version=\"9.0.0 &amp; preview\"/>")
         }
@@ -68,6 +69,7 @@ class MsBuildProjectArtifactCompilerTests :
             textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("Directory.Build.props")
             textContribution.artifactId.outputRoot shouldBe
                 java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
+            textContribution.origins shouldBe setOf("dotnet.solutions.Platform.projects.UserService.Api.DirectoryBuildProps")
             textContribution.contents.shouldContain("<PackageReference Include=\"Serilog.AspNetCore\"/>")
         }
 
@@ -90,6 +92,7 @@ class MsBuildProjectArtifactCompilerTests :
             textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("UserService.Api.csproj")
             textContribution.artifactId.outputRoot shouldBe
                 java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
+            textContribution.origins shouldBe setOf("dotnet.solutions.Platform.projects.UserService.Api.Project")
             textContribution.contents.shouldContain("""<Project Sdk="Microsoft.NET.Sdk.Web">""")
             textContribution.contents.shouldContain("<TargetFramework>net8.0</TargetFramework>")
         }

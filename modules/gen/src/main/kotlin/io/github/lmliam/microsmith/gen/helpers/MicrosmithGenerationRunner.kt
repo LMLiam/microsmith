@@ -25,10 +25,11 @@ internal class MicrosmithGenerationRunner(
                 val contributions = artifactContributionService.contribute(resolvedModels)
                 val assembly = artifactAssemblyService.assemble(contributions)
                 val compiledAssembly = artifactCompilationService.compile(assembly)
-                val generated = artifactRenderingService.render(compiledAssembly)
-                outputUniquenessValidator.requireUniqueOutputPaths(generated)
-                outputWriter.write(generated, tempSpace)
-                generated
+                val generatedWithOriginsManifest =
+                    GeneratedOriginsManifestBuilder.appendTo(artifactRenderingService.render(compiledAssembly))
+                outputUniquenessValidator.requireUniqueOutputPaths(generatedWithOriginsManifest)
+                outputWriter.write(generatedWithOriginsManifest, tempSpace)
+                generatedWithOriginsManifest
             }
 
         outputWriter.write(outputs, finalDir)

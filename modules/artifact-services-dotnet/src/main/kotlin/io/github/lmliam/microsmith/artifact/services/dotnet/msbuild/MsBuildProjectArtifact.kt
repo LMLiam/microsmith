@@ -7,6 +7,7 @@ data class MsBuildProjectArtifact(
     val projectAttributes: Map<String, String> = emptyMap(),
     val properties: Map<String, String>,
     val items: List<MsBuildItem>,
+    val origins: Set<String> = emptySet(),
 ) : DotnetArtifact {
     init {
         projectAttributes.keys.forEach(MsBuildNames::requireAttributeName)
