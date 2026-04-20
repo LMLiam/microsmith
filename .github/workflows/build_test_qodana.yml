@@ -29,6 +29,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 24
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Build
@@ -41,7 +45,7 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="$(./gradlew -q properties | sed -n 's/^version: //p' | head -n 1)"
-          validate_gradle_fixture() {
+          validate_gradle_proto_fixture() {
             local repo_root="$1"
             local generated_root="$repo_root/proto"
 
@@ -50,32 +54,58 @@ jobs:
             find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
           }
 
-          validate_gradle_fixture examples/gradle/java
-          validate_gradle_fixture examples/gradle/kotlin
-          validate_gradle_fixture examples/gradle/scala
+          validate_gradle_dotnet_fixture() {
+            local repo_root="$1"
+            local project_root="$repo_root/Generated/dotnet/Platform/UserService.Api"
+
+            ./gradlew -p "$repo_root" microsmithGenerate -PmicrosmithVersion="$VERSION" --stacktrace
+            test -f "$project_root/UserService.Api.csproj"
+            test -f "$project_root/Controllers/UserServiceController.cs"
+            test -f "$project_root/Models/Report.cs"
+            test -f "$project_root/.microsmith/origins.json"
+            dotnet build "$project_root/UserService.Api.csproj"
+          }
+
+          validate_gradle_proto_fixture examples/gradle/java
+          validate_gradle_proto_fixture examples/gradle/kotlin
+          validate_gradle_proto_fixture examples/gradle/scala
+          validate_gradle_dotnet_fixture examples/gradle/dotnet
       - name: Validate native Maven fixtures
         run: |
           set -euo pipefail
           VERSION="$(./gradlew -q properties | sed -n 's/^version: //p' | head -n 1)"
 
-          validate_maven_fixture() {
+          validate_maven_proto_fixture() {
             local repo_root="$1"
-            local generated_root="$repo_root/target/generated/microsmith/proto"
+            local generated_root="$repo_root/proto"
 
             mvn -B -f "$repo_root/pom.xml" microsmith:generate -Dmicrosmith.version="$VERSION"
             test -d "$generated_root"
             find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
           }
 
-          validate_maven_fixture examples/maven/java
-          validate_maven_fixture examples/maven/kotlin
-          validate_maven_fixture examples/maven/scala
+          validate_maven_dotnet_fixture() {
+            local repo_root="$1"
+            local project_root="$repo_root/Generated/dotnet/Platform/UserService.Api"
+
+            mvn -B -f "$repo_root/pom.xml" microsmith:generate -Dmicrosmith.version="$VERSION"
+            test -f "$project_root/UserService.Api.csproj"
+            test -f "$project_root/Controllers/UserServiceController.cs"
+            test -f "$project_root/Models/Report.cs"
+            test -f "$project_root/.microsmith/origins.json"
+            dotnet build "$project_root/UserService.Api.csproj"
+          }
+
+          validate_maven_proto_fixture examples/maven/java
+          validate_maven_proto_fixture examples/maven/kotlin
+          validate_maven_proto_fixture examples/maven/scala
+          validate_maven_dotnet_fixture examples/maven/dotnet
       - name: Validate native sbt fixtures
         run: |
           set -euo pipefail
           VERSION="$(./gradlew -q properties | sed -n 's/^version: //p' | head -n 1)"
 
-          validate_sbt_fixture() {
+          validate_sbt_proto_fixture() {
             local repo_root="$1"
             local generated_root="$repo_root/proto"
 
@@ -84,7 +114,20 @@ jobs:
             find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
           }
 
-          validate_sbt_fixture examples/sbt/scala
+          validate_sbt_dotnet_fixture() {
+            local repo_root="$1"
+            local project_root="$repo_root/Generated/dotnet/Platform/UserService.Api"
+
+            (cd "$repo_root" && sbt -batch -Dsbt.supershell=false -Dmicrosmith.version="$VERSION" microsmithGenerate)
+            test -f "$project_root/UserService.Api.csproj"
+            test -f "$project_root/Controllers/UserServiceController.cs"
+            test -f "$project_root/Models/Report.cs"
+            test -f "$project_root/.microsmith/origins.json"
+            dotnet build "$project_root/UserService.Api.csproj"
+          }
+
+          validate_sbt_proto_fixture examples/sbt/scala
+          validate_sbt_dotnet_fixture examples/sbt/dotnet
       - name: Validate IDE fallback release assets
         run: |
           ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
@@ -132,6 +175,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 24
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Build CLI release assets (Unix)
@@ -169,6 +216,15 @@ jobs:
           test -f proto/CiSmoke.proto
           ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --isolation process
           test -f proto/CiSmoke.proto
+      - name: Smoke test dist ASP.NET generation (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run examples/non-gradle/dotnet/schema.microsmith.kts --out aspnet-dist
+          test -f aspnet-dist/dotnet/Platform/UserService.Api/UserService.Api.csproj
+          test -f aspnet-dist/dotnet/Platform/UserService.Api/Controllers/UserServiceController.cs
+          test -f aspnet-dist/dotnet/Platform/UserService.Api/Models/Report.cs
+          test -f aspnet-dist/dotnet/Platform/UserService.Api/.microsmith/origins.json
+          dotnet build aspnet-dist/dotnet/Platform/UserService.Api/UserService.Api.csproj
       - name: Smoke test dist doctor diagnostics mode (Unix)
         if: runner.os != 'Windows'
         run: |
@@ -219,6 +275,32 @@ jobs:
             Write-Error "Expected generated-process\\proto\\CiSmoke.proto to exist."
             exit 1
           }
+      - name: Smoke test dist ASP.NET generation (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run examples/non-gradle/dotnet\schema.microsmith.kts --out aspnet-dist
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          $projectRoot = ".\aspnet-dist\dotnet\Platform\UserService.Api"
+          if (-not (Test-Path "$projectRoot\UserService.Api.csproj")) {
+            Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\UserService.Api.csproj to exist."
+            exit 1
+          }
+          if (-not (Test-Path "$projectRoot\Controllers\UserServiceController.cs")) {
+            Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\Controllers\\UserServiceController.cs to exist."
+            exit 1
+          }
+          if (-not (Test-Path "$projectRoot\Models\Report.cs")) {
+            Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\Models\\Report.cs to exist."
+            exit 1
+          }
+          if (-not (Test-Path "$projectRoot\.microsmith\origins.json")) {
+            Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\.microsmith\\origins.json to exist."
+            exit 1
+          }
+          dotnet build "$projectRoot\UserService.Api.csproj"
       - name: Smoke test dist doctor diagnostics mode (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -255,7 +337,7 @@ jobs:
           test -f install-smoke-repo/build.microsmith.kts
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts
-            test -f proto/UserCreated.proto
+          test -f proto/UserCreated.proto
       - name: Smoke test Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
         if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
         run: |
@@ -288,6 +370,26 @@ jobs:
           smoke_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
           smoke_unix_fixture ruby examples/non-gradle/ruby RubyUserCreated.proto ruby-ide-doctor.json
           smoke_unix_fixture rust examples/non-gradle/rust RustUserCreated.proto rust-ide-doctor.json
+      - name: Smoke test .NET onboarding fixture (Unix)
+        if: ${{ always() && runner.os != 'Windows' && steps.install-unix.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/dotnet
+          ./.microsmith-bin/microsmith init --repo-root examples/non-gradle/dotnet
+          test -f examples/non-gradle/dotnet/build.microsmith.kts
+          test -f examples/non-gradle/dotnet/settings.microsmith.kts
+          test -f examples/non-gradle/dotnet/.microsmith/ide/build.gradle.kts
+          test -f examples/non-gradle/dotnet/.microsmith/ide/README.md
+          ./.microsmith-bin/microsmith ide refresh --repo-root examples/non-gradle/dotnet
+          ./.microsmith-bin/microsmith ide doctor --repo-root examples/non-gradle/dotnet --diagnostics json > dotnet-ide-doctor.json
+          grep -q "JetBrains IDE helper doctor checks passed." dotnet-ide-doctor.json
+          ./.microsmith-bin/microsmith run examples/non-gradle/dotnet/build.microsmith.kts --out examples/non-gradle/dotnet/Generated
+          project_root="examples/non-gradle/dotnet/Generated/dotnet/Platform/UserService.Api"
+          test -f "$project_root/UserService.Api.csproj"
+          test -f "$project_root/Controllers/UserServiceController.cs"
+          test -f "$project_root/Models/Report.cs"
+          test -f "$project_root/.microsmith/origins.json"
+          dotnet build "$project_root/UserService.Api.csproj"
       - name: Install and verify from installer (Windows)
         id: install-windows
         if: ${{ always() && runner.os == 'Windows' && steps.build-release-windows.outcome == 'success' }}
@@ -387,34 +489,24 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
-          if (-not (Test-Path .\examples\non-gradle\dotnet\Generated\proto\DotnetUserCreated.proto)) {
-            Write-Error "Expected Generated\\proto\\DotnetUserCreated.proto to exist for the .NET fixture."
+          $projectRoot = ".\examples\non-gradle\dotnet\Generated\dotnet\Platform\UserService.Api"
+          if (-not (Test-Path "$projectRoot\UserService.Api.csproj")) {
+            Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\UserService.Api.csproj to exist for the .NET fixture."
             exit 1
           }
-          $generatedProjectRoot = '.\examples\non-gradle\dotnet\Generated\dotnet\Platform\UserService.Api'
-          if (-not (Test-Path "$generatedProjectRoot\UserService.Api.csproj")) {
-            Write-Error "Expected generated ASP.NET project file to exist for the .NET fixture."
+          if (-not (Test-Path "$projectRoot\Controllers\UserServiceController.cs")) {
+            Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\Controllers\\UserServiceController.cs to exist for the .NET fixture."
             exit 1
           }
-          if (-not (Test-Path "$generatedProjectRoot\Generated\Hosting\MicrosmithHostingExtensions.cs")) {
-            Write-Error "Expected generated hosting extensions to exist for the .NET fixture."
+          if (-not (Test-Path "$projectRoot\Models\Report.cs")) {
+            Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\Models\\Report.cs to exist for the .NET fixture."
             exit 1
           }
-          if (-not (Test-Path "$generatedProjectRoot\Generated\Controllers\UserServiceApiControllerBase.cs")) {
-            Write-Error "Expected generated controller base to exist for the .NET fixture."
+          if (-not (Test-Path "$projectRoot\.microsmith\origins.json")) {
+            Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\.microsmith\\origins.json to exist for the .NET fixture."
             exit 1
           }
-          if (-not (Test-Path "$generatedProjectRoot\Generated\Contracts\RequestModels.cs")) {
-            Write-Error "Expected generated request contracts to exist for the .NET fixture."
-            exit 1
-          }
-          $hostingExtensions = Get-Content -Path "$generatedProjectRoot\Generated\Hosting\MicrosmithHostingExtensions.cs" -Raw
-          if ($hostingExtensions -notmatch 'AddMicrosmith' -or $hostingExtensions -notmatch 'MapMicrosmith') {
-            Write-Error "Expected generated hosting extensions to expose AddMicrosmith and MapMicrosmith."
-            exit 1
-          }
-          $controllerBase = Get-Content -Path "$generatedProjectRoot\Generated\Controllers\UserServiceApiControllerBase.cs" -Raw
-          if ($controllerBase -notmatch 'OnGetUserAsync') {
-            Write-Error "Expected generated controller base to expose OnGetUserAsync."
-            exit 1
+          dotnet build "$projectRoot\UserService.Api.csproj"
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
           }

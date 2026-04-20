@@ -117,6 +117,64 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
             project.file("custom-generated/proto/GradleConfiguredUserCreated.proto").toFile().shouldExist()
         }
 
+        "microsmithGenerate supports ASP.NET service generation" {
+            val project = MicrosmithGradleFunctionalTestProject.create(
+                name = "microsmith-gradle-plugin-dotnet-asp",
+                buildScript = """
+                plugins {
+                    id("io.github.lmliam.microsmith")
+                }
+                """.trimIndent(),
+            )
+            project.writeFile(
+                "build.microsmith.kts",
+                """
+                microsmith {
+                    services {
+                        dotnet {
+                            target(NET8)
+                            solutions {
+                                "Platform" {}
+                            }
+                        }
+
+                        "UserService" {
+                            dotnet {
+                                solution("Platform")
+                                project("UserService.Api")
+                                models {
+                                    "User" {
+                                        string("id")
+                                    }
+                                }
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            get("/{id}", "GetUser") {
+                                                path("GetUserPath") {
+                                                    string("id")
+                                                }
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+
+            val result = project.build("microsmithGenerate")
+
+            result.task(":microsmithGenerate")?.outcome shouldBe TaskOutcome.SUCCESS
+            project.file("dotnet/Platform/UserService.Api/Program.cs").toFile().shouldExist()
+            project.file("dotnet/Platform/UserService.Api/Controllers/UserServiceController.cs").toFile().shouldExist()
+        }
+
         "microsmithGenerate fails with script diagnostics" {
             val project = MicrosmithGradleFunctionalTestProject.create(
                 name = "microsmith-gradle-plugin-failure",
