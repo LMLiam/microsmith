@@ -143,6 +143,7 @@ class InitBootstrapTests :
                 buildScript.shouldContain("header(\"ETag\")")
                 buildScript.shouldContain("guid(\"reportId\")")
                 buildScript.shouldContain("dateTimeOffset(\"requestedAt\")")
+                Regex("""\bservices\s*\{""").findAll(buildScript).count() shouldBe 1
                 settingsScript.shouldContain("Detected repository profile: .NET")
             } finally {
                 runCatching { repoRoot.deleteRecursively() }
