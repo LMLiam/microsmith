@@ -30,12 +30,13 @@ import java.nio.file.Path
 
 class DotnetAspServiceArtifactCompilerTests :
     StringSpec({
-        "compile emits the generated ASP.NET project layout" {
+        "compile emits the abstract ASP.NET extension surface" {
             val artifact = sampleArtifact()
 
             val contributions = DotnetAspServiceArtifactCompiler().compile(artifact)
             val msbuild = contributions.filterIsInstance<MsBuildProjectContribution>().single()
             val textFiles = contributions.filterIsInstance<TextFileArtifactContribution>()
+            val byPath = textFiles.associateBy { it.artifactId.relativePath.toString() }
 
             msbuild.artifactId.kind shouldBe MsBuildProjectKind.Project
             msbuild.projectAttributes shouldContainExactly
@@ -51,45 +52,49 @@ class DotnetAspServiceArtifactCompilerTests :
                 "Program.cs",
                 "appsettings.json",
                 "Properties/launchSettings.json",
-                "Controllers/UserServiceController.cs",
-                "Models/User.cs",
-                "Models/Problem.cs",
-                "Models/CreateUserBody.cs",
-                "Bindings/GetUserPath.cs",
-                "Bindings/GetUserQuery.cs",
-                "Bindings/GetUserHeaders.cs",
-                "Generated/MicrosmithRequestParser.cs",
+                "Generated/Hosting/MicrosmithHostingExtensions.cs",
+                "Generated/Contracts/ServiceModels.cs",
+                "Generated/Contracts/RequestModels.cs",
+                "Generated/Contracts/ResponseModels.cs",
+                "Generated/Controllers/MicrosmithControllerBase.cs",
+                "Generated/Controllers/UserServiceApiControllerBase.cs",
             )
             textFiles.forEach {
                 it.artifactId.outputRoot shouldBe Path.of("dotnet", "Platform", "UserService.Api")
             }
 
-            textFiles.single { it.artifactId.relativePath.toString() == "Program.cs" }.contents
-                .shouldContain("AddControllers")
-            textFiles.single { it.artifactId.relativePath.toString() == "Program.cs" }.contents
-                .shouldContain("public partial class Program { }")
-            textFiles.single { it.artifactId.relativePath.toString() == "Program.cs" }.contents
-                .shouldContain("StatusCodes.Status400BadRequest")
+            byPath.getValue("Program.cs").contents.shouldContain("builder.AddMicrosmith();")
+            byPath.getValue("Program.cs").contents.shouldContain("app.MapMicrosmith();")
+            byPath.getValue("Generated/Hosting/MicrosmithHostingExtensions.cs").contents
+                .shouldContain("builder.Services.AddControllers();")
 
-            val controller = textFiles.single { it.artifactId.relativePath.toString() == "Controllers/UserServiceController.cs" }
+            val controller = byPath.getValue("Generated/Controllers/UserServiceApiControllerBase.cs")
             controller.contents.shouldContain("""[HttpGet("/users/{id}", Name = "GetUser")]""")
-            controller.contents.shouldContain("""[HttpPost("/users", Name = "CreateUser")]""")
-            controller.contents.shouldContain("MicrosmithRequestParser.ReadRouteValue")
-            controller.contents.shouldContain("""Response.Headers["Location"] = "sample-location";""")
+            controller.contents.shouldContain("""[ProducesResponseType(typeof(User), 200)]""")
+            controller.contents.shouldContain("""[ProducesResponseType(typeof(Problem), 404)]""")
+            controller.contents.shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync")
+            controller.contents.shouldContain("CreateUserCreated response => Respond(response.Body, 201, (\"Location\", response.Location))")
+            controller.contents.shouldNotContain("X-Microsmith-Response-Status")
+            controller.contents.shouldNotContain("sample-location")
             controller.origins shouldContain "services.UserService.rest.GetUser"
             controller.origins shouldContain "services.UserService.rest.CreateUser.body.CreateUserBody"
-            controller.origins shouldContain "services.UserService.rest.GetUser.responses.200"
 
-            textFiles.single { it.artifactId.relativePath.toString() == "Models/CreateUserBody.cs" }.contents
-                .shouldContain("public sealed class CreateUserBody")
-            textFiles.single { it.artifactId.relativePath.toString() == "Controllers/UserServiceController.cs" }.contents
-                .shouldContain("?? false")
-            textFiles.single { it.artifactId.relativePath.toString() == "Generated/MicrosmithRequestParser.cs" }.contents
-                .shouldContain("internal static bool? OptionalBool")
-            textFiles.single { it.artifactId.relativePath.toString() == "appsettings.json" }.contents
-                .shouldContain("\"ServiceName\": \"UserService\"")
-            textFiles.single { it.artifactId.relativePath.toString() == "Properties/launchSettings.json" }.contents
-                .shouldContain("http://localhost:5000;https://localhost:5001")
+            byPath.getValue("Generated/Contracts/RequestModels.cs").contents
+                .shouldContain("public bool IncludeDetails { get; set; } = false;")
+            byPath.getValue("Generated/Contracts/RequestModels.cs").contents
+                .shouldContain("[BindRequired]")
+            byPath.getValue("Generated/Contracts/ResponseModels.cs").contents
+                .shouldContain("public sealed record CreateUserCreated(User Body, string? Location = null) : CreateUserResult;")
+        }
+
+        "compile emits nuint defaults with a 64-bit-safe literal" {
+            val requestModels = DotnetAspServiceArtifactCompiler()
+                .compile(unsignedNativeIntDefaultArtifact())
+                .filterIsInstance<TextFileArtifactContribution>()
+                .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
+                .contents
+
+            requestModels.shouldContain("public nuint MaxValue { get; set; } = (nuint)4294967296UL;")
         }
 
         "compile escapes service names before embedding them in appsettings json" {
@@ -102,29 +107,6 @@ class DotnetAspServiceArtifactCompilerTests :
 
             appSettings.shouldContain("\"ServiceName\": \"User\\\"Service\\\\Api\"")
             appSettings.shouldNotContain("\"ServiceName\": \"User\"Service\\Api\"")
-        }
-
-        "compile emits typed request bindings for supported scalar inputs" {
-            val artifact = typedBindingArtifact()
-
-            val textFiles = DotnetAspServiceArtifactCompiler()
-                .compile(artifact)
-                .filterIsInstance<TextFileArtifactContribution>()
-
-            val controller = textFiles.single { it.artifactId.relativePath.toString() == "Controllers/ReportServiceController.cs" }.contents
-            val parser = textFiles.single { it.artifactId.relativePath.toString() == "Generated/MicrosmithRequestParser.cs" }.contents
-
-            controller.shouldContain("""MicrosmithRequestParser.RequireGuid(MicrosmithRequestParser.ReadRouteValue(RouteData.Values, "reportId"), "path.reportId")""")
-            controller.shouldContain("""MicrosmithRequestParser.RequireInt(MicrosmithRequestParser.ReadQueryValue(Request.Query, "days"), "query.days")""")
-            controller.shouldContain("""MicrosmithRequestParser.RequireDateOnly(MicrosmithRequestParser.ReadQueryValue(Request.Query, "since"), "query.since")""")
-            controller.shouldContain("""MicrosmithRequestParser.RequireDateTimeOffset(MicrosmithRequestParser.ReadQueryValue(Request.Query, "requestedAt"), "query.requestedAt")""")
-            controller.shouldContain("""(MicrosmithRequestParser.OptionalDecimal(MicrosmithRequestParser.ReadQueryValue(Request.Query, "threshold"), "query.threshold") ?? 1.5M)""")
-            controller.shouldContain("""MicrosmithRequestParser.OptionalTimeSpan(MicrosmithRequestParser.ReadQueryValue(Request.Query, "window"), "query.window")""")
-
-            parser.shouldContain("internal static Guid RequireGuid")
-            parser.shouldContain("internal static DateOnly RequireDateOnly")
-            parser.shouldContain("internal static DateTimeOffset RequireDateTimeOffset")
-            parser.shouldContain("internal static TimeSpan? OptionalTimeSpan")
         }
     })
 
@@ -185,7 +167,7 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
                         name = "GetUserHeaders",
                         headers = listOf(
                             DotnetAspHeaderFieldArtifact(
-                                name = "correlationId",
+                                name = "xCorrelationId",
                                 headerName = "X-Correlation-Id",
                             ),
                         ),
@@ -233,72 +215,30 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
     )
 }
 
-private fun typedBindingArtifact(): DotnetAspServiceArtifact {
-    val reportModel = sharedModel("Report", "services.ReportService.models.Report") {
-        stringField("id")
-        stringField("title")
-    }
-
-    return DotnetAspServiceArtifact(
+private fun unsignedNativeIntDefaultArtifact(): DotnetAspServiceArtifact =
+    DotnetAspServiceArtifact(
         id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "ReportService.Api"),
         serviceName = "ReportService",
         targetFrameworkMoniker = "net8.0",
         outputRoot = Path.of("dotnet", "Platform", "ReportService.Api"),
         httpPort = 5002,
         httpsPort = 5003,
-        contractModels = listOf(reportModel),
+        contractModels = emptyList(),
         endpoints = listOf(
             DotnetAspEndpointArtifact(
                 method = "GET",
-                route = "/reports/{reportId}",
+                route = "/reports",
                 operationName = "GetReport",
                 bindings = DotnetAspEndpointBindingsArtifact(
-                    path = DotnetAspRequestBindingArtifact(
-                        typeName = "GetReportPath",
-                        name = "GetReportPath",
-                        fields = listOf(
-                            DotnetAspRequestFieldArtifact(
-                                name = "reportId",
-                                type = DotnetFieldType.Guid,
-                                optional = false,
-                                defaultValue = null,
-                            ),
-                        ),
-                        origins = setOf("services.ReportService.rest.GetReport.path.GetReportPath"),
-                    ),
                     query = DotnetAspRequestBindingArtifact(
                         typeName = "GetReportQuery",
                         name = "GetReportQuery",
                         fields = listOf(
                             DotnetAspRequestFieldArtifact(
-                                name = "days",
-                                type = DotnetFieldType.Int,
+                                name = "maxValue",
+                                type = DotnetFieldType.UnsignedNativeInt,
                                 optional = false,
-                                defaultValue = null,
-                            ),
-                            DotnetAspRequestFieldArtifact(
-                                name = "since",
-                                type = DotnetFieldType.DateOnly,
-                                optional = false,
-                                defaultValue = null,
-                            ),
-                            DotnetAspRequestFieldArtifact(
-                                name = "requestedAt",
-                                type = DotnetFieldType.DateTimeOffset,
-                                optional = false,
-                                defaultValue = null,
-                            ),
-                            DotnetAspRequestFieldArtifact(
-                                name = "threshold",
-                                type = DotnetFieldType.Decimal,
-                                optional = true,
-                                defaultValue = 1.5,
-                            ),
-                            DotnetAspRequestFieldArtifact(
-                                name = "window",
-                                type = DotnetFieldType.TimeSpan,
-                                optional = true,
-                                defaultValue = null,
+                                defaultValue = 4294967296L,
                             ),
                         ),
                         origins = setOf("services.ReportService.rest.GetReport.query.GetReportQuery"),
@@ -307,7 +247,7 @@ private fun typedBindingArtifact(): DotnetAspServiceArtifact {
                 responses = listOf(
                     DotnetAspResponseArtifact(
                         statusCode = 200,
-                        model = reportModel,
+                        model = inlineModel("EmptyReport", "services.ReportService.rest.GetReport.responses.200.EmptyReport") {},
                         headers = emptyList(),
                         origins = setOf("services.ReportService.rest.GetReport.responses.200"),
                     ),
@@ -316,27 +256,26 @@ private fun typedBindingArtifact(): DotnetAspServiceArtifact {
             ),
         ),
     )
-}
 
 private fun sharedModel(
-    name: String,
+    typeName: String,
     origin: String,
     fields: MutableList<DotnetField>.() -> Unit,
 ): DotnetAspModelArtifact = DotnetAspModelArtifact(
-    typeName = name,
+    typeName = typeName,
     locality = DotnetAspModelLocality.SHARED,
-    model = DotnetModel(name = name, fields = buildList(fields)),
+    model = DotnetModel(name = typeName, fields = buildList(fields)),
     origins = setOf(origin),
 )
 
 private fun inlineModel(
-    name: String,
+    typeName: String,
     origin: String,
     fields: MutableList<DotnetField>.() -> Unit,
 ): DotnetAspModelArtifact = DotnetAspModelArtifact(
-    typeName = name,
+    typeName = typeName,
     locality = DotnetAspModelLocality.INLINE,
-    model = DotnetModel(name = name, fields = buildList(fields)),
+    model = DotnetModel(name = typeName, fields = buildList(fields)),
     origins = setOf(origin),
 )
 

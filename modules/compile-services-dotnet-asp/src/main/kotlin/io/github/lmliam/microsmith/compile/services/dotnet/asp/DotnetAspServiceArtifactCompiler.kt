@@ -5,10 +5,7 @@ import io.github.lmliam.microsmith.artifact.core.Artifact
 import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeadersBindingArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestBindingArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
@@ -27,9 +24,22 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
     override val artifactType = DotnetAspServiceArtifact::class
 
     override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> {
+        validateEndpointGenerationInputs(artifact)
         val serviceOrigin = setOf("services.${artifact.serviceName}")
-        val requestBindings = artifact.requestBindings()
-        val headerBindings = artifact.headerBindings()
+        val requestModelOrigins = serviceOrigin +
+            collectRequestBindings(artifact).flatMapTo(linkedSetOf()) { it.origins } +
+            collectHeaderBindings(artifact).flatMapTo(linkedSetOf()) { it.origins } +
+            artifact.endpoints.mapNotNull { endpoint ->
+                endpoint.bindings.body
+                    ?.takeIf { it.locality == io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelLocality.INLINE }
+                    ?.origins
+            }.flatten()
+        val responseModelOrigins = serviceOrigin +
+            artifact.endpoints.flatMapTo(linkedSetOf()) { endpoint ->
+                endpoint.responses.flatMap { response ->
+                    response.origins + response.model.origins
+                }
+            }
         val controllerOrigins = serviceOrigin +
             artifact.endpoints.flatMapTo(linkedSetOf()) { endpoint ->
                 endpoint.origins +
@@ -59,7 +69,14 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
                     origins = serviceOrigin,
                 ),
             )
-            add(textContribution(artifact, "Program.cs", DotnetAspProjectRenderer.renderProgramFile(), serviceOrigin))
+            add(
+                textContribution(
+                    artifact,
+                    "Program.cs",
+                    DotnetAspProjectRenderer.renderProgramFile(artifact),
+                    serviceOrigin,
+                ),
+            )
             add(textContribution(artifact, "appsettings.json", renderAppSettingsFile(artifact), serviceOrigin))
             add(
                 textContribution(
@@ -72,46 +89,51 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
             add(
                 textContribution(
                     artifact,
-                    "Controllers/${artifact.serviceName}Controller.cs",
-                    DotnetAspProjectRenderer.renderControllerFile(artifact),
-                    controllerOrigins,
+                    "Generated/Hosting/MicrosmithHostingExtensions.cs",
+                    DotnetAspProjectRenderer.renderHostingExtensionsFile(artifact),
+                    serviceOrigin,
                 ),
             )
-            artifact.contractModels.distinctBy(DotnetAspModelArtifact::typeName).forEach { model ->
-                add(
-                    textContribution(
-                        artifact,
-                        "Models/${model.typeName}.cs",
-                        DotnetAspProjectRenderer.renderModelFile(artifact.id.projectName, model),
-                        model.origins,
-                    ),
-                )
-            }
-            requestBindings.forEach { binding ->
-                add(
-                    textContribution(
-                        artifact,
-                        "Bindings/${binding.typeName}.cs",
-                        DotnetAspProjectRenderer.renderRequestBindingFile(artifact.id.projectName, binding),
-                        binding.origins,
-                    ),
-                )
-            }
-            headerBindings.forEach { binding ->
-                add(
-                    textContribution(
-                        artifact,
-                        "Bindings/${binding.typeName}.cs",
-                        DotnetAspProjectRenderer.renderHeadersBindingFile(artifact.id.projectName, binding),
-                        binding.origins,
-                    ),
-                )
-            }
             add(
                 textContribution(
                     artifact,
-                    "Generated/MicrosmithRequestParser.cs",
-                    DotnetAspProjectRenderer.renderRequestParserFile(artifact.id.projectName),
+                    "Generated/Contracts/ServiceModels.cs",
+                    DotnetAspProjectRenderer.renderServiceModelsFile(artifact),
+                    artifact.contractModels
+                        .distinctBy(DotnetAspModelArtifact::typeName)
+                        .filter { it.locality == io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelLocality.SHARED }
+                        .flatMapTo(linkedSetOf()) { it.origins } + serviceOrigin,
+                ),
+            )
+            add(
+                textContribution(
+                    artifact,
+                    "Generated/Contracts/RequestModels.cs",
+                    DotnetAspProjectRenderer.renderRequestModelsFile(artifact),
+                    requestModelOrigins,
+                ),
+            )
+            add(
+                textContribution(
+                    artifact,
+                    "Generated/Contracts/ResponseModels.cs",
+                    DotnetAspProjectRenderer.renderResponseModelsFile(artifact),
+                    responseModelOrigins,
+                ),
+            )
+            add(
+                textContribution(
+                    artifact,
+                    microsmithControllerBaseRelativePath(),
+                    DotnetAspProjectRenderer.renderMicrosmithControllerBaseFile(artifact),
+                    serviceOrigin,
+                ),
+            )
+            add(
+                textContribution(
+                    artifact,
+                    controllerBaseRelativePath(artifact),
+                    DotnetAspProjectRenderer.renderControllerBaseFile(artifact),
                     controllerOrigins,
                 ),
             )
@@ -187,13 +209,4 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
         return escaped.toString()
     }
 
-    private fun DotnetAspServiceArtifact.requestBindings(): List<DotnetAspRequestBindingArtifact> = endpoints
-        .flatMap { endpoint ->
-            listOfNotNull(endpoint.bindings.path, endpoint.bindings.query)
-        }.distinctBy(DotnetAspRequestBindingArtifact::typeName)
-
-    private fun DotnetAspServiceArtifact.headerBindings(): List<DotnetAspHeadersBindingArtifact> = endpoints
-        .map(DotnetAspEndpointArtifact::bindings)
-        .mapNotNull { it.headers }
-        .distinctBy(DotnetAspHeadersBindingArtifact::typeName)
 }
