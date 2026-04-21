@@ -360,4 +360,34 @@ class DotnetAspDslTests :
 
             error.message.shouldContain("already declares responses")
         }
+
+        "request bindings reject reference-typed transport fields during DSL authoring" {
+            val builder = MicrosmithBuilder()
+
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/users/{id}" {
+                                            get("GetUser") {
+                                                query("GetUserQuery") {
+                                                    "user" ref "User"
+                                                }
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            error.message.shouldContain("ASP.NET request bindings cannot declare reference field 'user' to 'User'")
+        }
     })
