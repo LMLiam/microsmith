@@ -172,7 +172,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
 
             result.task(":microsmithGenerate")?.outcome shouldBe TaskOutcome.SUCCESS
             project.file("dotnet/Platform/UserService.Api/Program.cs").toFile().shouldExist()
-            project.file("dotnet/Platform/UserService.Api/Controllers/UserServiceController.cs").toFile().shouldExist()
+            project.file("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs").toFile().shouldExist()
         }
 
         "microsmithGenerate fails with script diagnostics" {

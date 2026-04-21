@@ -60,8 +60,8 @@ jobs:
 
             ./gradlew -p "$repo_root" microsmithGenerate -PmicrosmithVersion="$VERSION" --stacktrace
             test -f "$project_root/UserService.Api.csproj"
-            test -f "$project_root/Controllers/UserServiceController.cs"
-            test -f "$project_root/Models/Report.cs"
+            test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
+            test -f "$project_root/Generated/Contracts/ResponseModels.cs"
             test -f "$project_root/.microsmith/origins.json"
             dotnet build "$project_root/UserService.Api.csproj"
           }
@@ -90,8 +90,8 @@ jobs:
 
             mvn -B -f "$repo_root/pom.xml" microsmith:generate -Dmicrosmith.version="$VERSION"
             test -f "$project_root/UserService.Api.csproj"
-            test -f "$project_root/Controllers/UserServiceController.cs"
-            test -f "$project_root/Models/Report.cs"
+            test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
+            test -f "$project_root/Generated/Contracts/ResponseModels.cs"
             test -f "$project_root/.microsmith/origins.json"
             dotnet build "$project_root/UserService.Api.csproj"
           }
@@ -120,8 +120,8 @@ jobs:
 
             (cd "$repo_root" && sbt -batch -Dsbt.supershell=false -Dmicrosmith.version="$VERSION" microsmithGenerate)
             test -f "$project_root/UserService.Api.csproj"
-            test -f "$project_root/Controllers/UserServiceController.cs"
-            test -f "$project_root/Models/Report.cs"
+            test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
+            test -f "$project_root/Generated/Contracts/ResponseModels.cs"
             test -f "$project_root/.microsmith/origins.json"
             dotnet build "$project_root/UserService.Api.csproj"
           }
@@ -221,8 +221,8 @@ jobs:
         run: |
           ./modules/cli/build/microsmith-cli-dist/bin/microsmith run examples/non-gradle/dotnet/schema.microsmith.kts --out aspnet-dist
           test -f aspnet-dist/dotnet/Platform/UserService.Api/UserService.Api.csproj
-          test -f aspnet-dist/dotnet/Platform/UserService.Api/Controllers/UserServiceController.cs
-          test -f aspnet-dist/dotnet/Platform/UserService.Api/Models/Report.cs
+          test -f aspnet-dist/dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs
+          test -f aspnet-dist/dotnet/Platform/UserService.Api/Generated/Contracts/ResponseModels.cs
           test -f aspnet-dist/dotnet/Platform/UserService.Api/.microsmith/origins.json
           dotnet build aspnet-dist/dotnet/Platform/UserService.Api/UserService.Api.csproj
       - name: Smoke test dist doctor diagnostics mode (Unix)
@@ -288,12 +288,12 @@ jobs:
             Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\UserService.Api.csproj to exist."
             exit 1
           }
-          if (-not (Test-Path "$projectRoot\Controllers\UserServiceController.cs")) {
-            Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\Controllers\\UserServiceController.cs to exist."
+          if (-not (Test-Path "$projectRoot\Generated\Controllers\UserServiceApiControllerBase.cs")) {
+            Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\Generated\\Controllers\\UserServiceApiControllerBase.cs to exist."
             exit 1
           }
-          if (-not (Test-Path "$projectRoot\Models\Report.cs")) {
-            Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\Models\\Report.cs to exist."
+          if (-not (Test-Path "$projectRoot\Generated\Contracts\ResponseModels.cs")) {
+            Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\Generated\\Contracts\\ResponseModels.cs to exist."
             exit 1
           }
           if (-not (Test-Path "$projectRoot\.microsmith\origins.json")) {
@@ -386,8 +386,8 @@ jobs:
           ./.microsmith-bin/microsmith run examples/non-gradle/dotnet/build.microsmith.kts --out examples/non-gradle/dotnet/Generated
           project_root="examples/non-gradle/dotnet/Generated/dotnet/Platform/UserService.Api"
           test -f "$project_root/UserService.Api.csproj"
-          test -f "$project_root/Controllers/UserServiceController.cs"
-          test -f "$project_root/Models/Report.cs"
+          test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
+          test -f "$project_root/Generated/Contracts/ResponseModels.cs"
           test -f "$project_root/.microsmith/origins.json"
           dotnet build "$project_root/UserService.Api.csproj"
       - name: Install and verify from installer (Windows)
@@ -494,12 +494,12 @@ jobs:
             Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\UserService.Api.csproj to exist for the .NET fixture."
             exit 1
           }
-          if (-not (Test-Path "$projectRoot\Controllers\UserServiceController.cs")) {
-            Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\Controllers\\UserServiceController.cs to exist for the .NET fixture."
+          if (-not (Test-Path "$projectRoot\Generated\Controllers\UserServiceApiControllerBase.cs")) {
+            Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\Generated\\Controllers\\UserServiceApiControllerBase.cs to exist for the .NET fixture."
             exit 1
           }
-          if (-not (Test-Path "$projectRoot\Models\Report.cs")) {
-            Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\Models\\Report.cs to exist for the .NET fixture."
+          if (-not (Test-Path "$projectRoot\Generated\Contracts\ResponseModels.cs")) {
+            Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\Generated\\Contracts\\ResponseModels.cs to exist for the .NET fixture."
             exit 1
           }
           if (-not (Test-Path "$projectRoot\.microsmith\origins.json")) {

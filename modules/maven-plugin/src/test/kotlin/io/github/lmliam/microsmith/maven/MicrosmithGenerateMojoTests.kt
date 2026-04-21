@@ -122,7 +122,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
             fixture.createMojo().execute()
 
             fixture.file("dotnet/Platform/UserService.Api/Program.cs").toFile().shouldExist()
-            fixture.file("dotnet/Platform/UserService.Api/Controllers/UserServiceController.cs").toFile().shouldExist()
+            fixture.file("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs").toFile().shouldExist()
         }
 
         "script compilation failures surface as MojoFailureException" {

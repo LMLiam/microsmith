@@ -18,7 +18,7 @@ class GeneratedOriginsManifestBuilderTests :
                     origins = setOf("schemas.protobuf.pkg.User"),
                 ),
                 GeneratedFile(
-                    relativePath = Path("Controllers/UserServiceController.cs"),
+                    relativePath = Path("Generated/Controllers/UserServiceApiControllerBase.cs"),
                     contents = byteArrayOf(2),
                     outputRoot = Path("repo-a"),
                     origins = setOf("services.UserService.rest.GetUser"),
@@ -36,7 +36,7 @@ class GeneratedOriginsManifestBuilderTests :
 
             manifests.size shouldBe 2
             String(manifests.single { it.outputRoot == Path("repo-a") }.contents, StandardCharsets.UTF_8)
-                .shouldContain("Controllers/UserServiceController.cs")
+                .shouldContain("Generated/Controllers/UserServiceApiControllerBase.cs")
             String(manifests.single { it.outputRoot == Path("repo-a") }.contents, StandardCharsets.UTF_8)
                 .shouldContain("schemas.protobuf.pkg.User")
             String(manifests.single { it.outputRoot == Path("repo-b") }.contents, StandardCharsets.UTF_8)

@@ -539,14 +539,16 @@ dotnet/
       UserService.Api.csproj
       Program.cs
       appsettings.json
-      Controllers/
-        UserServiceController.cs
-      Models/
-        ...
-      Bindings/
-        ...
       Generated/
-        MicrosmithRequestParser.cs
+        Hosting/
+          MicrosmithHostingExtensions.cs
+        Contracts/
+          ServiceModels.cs
+          RequestModels.cs
+          ResponseModels.cs
+        Controllers/
+          MicrosmithControllerBase.cs
+          UserServiceApiControllerBase.cs
       Properties/
         launchSettings.json
       .microsmith/
@@ -555,9 +557,10 @@ dotnet/
 
 Canonical generation policy:
 
-- `Program.cs` uses top-level hosting with `WebApplication.CreateBuilder(args)`, `AddControllers()`, a bad-request guard for generated request parsing, `MapControllers()`, and `Run()`
-- controller actions, request binding DTOs, response DTOs, and the request parser helper are generated from the normalized REST model
-- generated files under the project root are generator-owned and are overwritten in place on rerun
+- `Program.cs` uses top-level hosting and delegates ASP.NET registration through generated hosting extensions
+- generated files under `Generated/` provide the contract records, abstract controller base, and response/result mapping surface derived from the normalized REST model
+- handwritten service behavior belongs outside `Generated/`, typically in a user-authored controller that derives from the generated base type
+- generated files are overwritten in place on rerun; handwritten files outside `Generated/` are not generator-owned
 - `.microsmith/origins.json` records the structural Microsmith origins associated with each generated file
 
 ### Script defaults

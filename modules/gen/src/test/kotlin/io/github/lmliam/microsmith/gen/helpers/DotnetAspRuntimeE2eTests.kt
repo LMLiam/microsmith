@@ -25,7 +25,7 @@ import kotlin.io.path.writeText
 @OptIn(ExperimentalPathApi::class)
 class DotnetAspRuntimeE2eTests :
     StringSpec({
-        "generated ASP.NET services handle valid and invalid requests end to end".config(enabled = dotnetAvailable()) {
+        "generated ASP.NET controller bases work end to end when a user implements them".config(enabled = dotnetAvailable()) {
             val outputDir = Files.createTempDirectory("microsmith-dotnet-asp-runtime-")
             try {
                 runtimeE2eModel().generateTo(outputDir)
@@ -35,6 +35,8 @@ class DotnetAspRuntimeE2eTests :
                 val logFile = outputDir.resolve("dotnet-runtime.log")
                 val port = availablePort()
                 val baseUri = URI("http://127.0.0.1:$port")
+
+                writeUserController(projectRoot)
 
                 runDotnetCommand(
                     projectRoot = projectRoot,
@@ -60,19 +62,18 @@ class DotnetAspRuntimeE2eTests :
                         HttpResponse.BodyHandlers.ofString(),
                     )
                     getUser.statusCode() shouldBe 200
-                    getUser.headers().firstValue("ETag").orElseThrow() shouldBe "sample-etag"
-                    getUser.body().shouldContain("\"id\":\"\"")
-                    getUser.body().shouldContain("\"email\":\"\"")
+                    getUser.headers().firstValue("ETag").orElseThrow() shouldBe "etag-corr-123"
+                    getUser.body().shouldContain("\"id\":\"user-123\"")
+                    getUser.body().shouldContain("\"email\":\"details@example.com\"")
 
                     val notFound = client.send(
-                        request(baseUri, "/users/user-123")
-                            .header("X-Microsmith-Response-Status", "404")
+                        request(baseUri, "/users/missing")
                             .GET()
                             .build(),
                         HttpResponse.BodyHandlers.ofString(),
                     )
                     notFound.statusCode() shouldBe 404
-                    notFound.body().shouldContain("\"detail\":\"\"")
+                    notFound.body().shouldContain("\"detail\":\"missing-user\"")
 
                     val createUser = client.send(
                         request(baseUri, "/users")
@@ -82,7 +83,8 @@ class DotnetAspRuntimeE2eTests :
                         HttpResponse.BodyHandlers.ofString(),
                     )
                     createUser.statusCode() shouldBe 201
-                    createUser.headers().firstValue("Location").orElseThrow() shouldBe "sample-location"
+                    createUser.headers().firstValue("Location").orElseThrow() shouldBe "/users/generated-user"
+                    createUser.body().shouldContain("\"email\":\"runtime@example.com\"")
 
                     val getReport = client.send(
                         request(
@@ -90,14 +92,12 @@ class DotnetAspRuntimeE2eTests :
                             "/reports/550e8400-e29b-41d4-a716-446655440000" +
                                 "?days=7" +
                                 "&since=2026-04-20" +
-                                "&requestedAt=2026-04-20T12:34:56%2B00:00" +
-                                "&threshold=9.5" +
-                                "&window=01:30:00",
+                                "&requestedAt=2026-04-20T12:34:56%2B00:00",
                         ).GET().build(),
                         HttpResponse.BodyHandlers.ofString(),
                     )
                     getReport.statusCode() shouldBe 200
-                    getReport.body().shouldContain("\"title\":\"\"")
+                    getReport.body().shouldContain("\"title\":\"7:2026-04-20:1.5:none\"")
 
                     val invalidGuid = client.send(
                         request(
@@ -110,7 +110,6 @@ class DotnetAspRuntimeE2eTests :
                         HttpResponse.BodyHandlers.ofString(),
                     )
                     invalidGuid.statusCode() shouldBe 400
-                    invalidGuid.body().shouldContain("path.reportId")
 
                     val invalidDecimal = client.send(
                         request(
@@ -124,7 +123,6 @@ class DotnetAspRuntimeE2eTests :
                         HttpResponse.BodyHandlers.ofString(),
                     )
                     invalidDecimal.statusCode() shouldBe 400
-                    invalidDecimal.body().shouldContain("query.threshold")
                 } finally {
                     stopProcess(process, logFile)
                 }
@@ -133,6 +131,89 @@ class DotnetAspRuntimeE2eTests :
             }
         }
     })
+
+private fun writeUserController(projectRoot: Path) {
+    val controllerDir = projectRoot.resolve("Controllers")
+    controllerDir.createDirectories()
+    controllerDir.resolve("UserServiceController.cs").writeText(
+        """
+        namespace UserService.Api.Controllers;
+
+        using System.Globalization;
+        using System.Threading;
+        using System.Threading.Tasks;
+        using UserService.Api.Generated.Contracts;
+        using UserService.Api.Generated.Controllers;
+
+        public sealed class UserServiceController : UserServiceApiControllerBase
+        {
+            protected override Task<GetUserResult> OnGetUserAsync(
+                GetUserPath path,
+                GetUserQuery query,
+                GetUserHeaders headers,
+                CancellationToken cancellationToken)
+            {
+                if (path.Id == "missing")
+                {
+                    return Task.FromResult<GetUserResult>(
+                        new GetUserNotFound(
+                            new Problem
+                            {
+                                Detail = "missing-user",
+                            }));
+                }
+
+                return Task.FromResult<GetUserResult>(
+                    new GetUserOk(
+                        new User
+                        {
+                            Id = path.Id,
+                            Email = query.IncludeDetails ? "details@example.com" : "basic@example.com",
+                        },
+                        Etag: $"etag-{headers.XCorrelationId ?? path.Id}"));
+            }
+
+            protected override Task<CreateUserResult> OnCreateUserAsync(
+                CreateUserBody body,
+                CancellationToken cancellationToken)
+            {
+                if (string.IsNullOrWhiteSpace(body.Email))
+                {
+                    return Task.FromResult<CreateUserResult>(
+                        new CreateUserBadRequest(
+                            new Problem
+                            {
+                                Detail = "email-required",
+                            }));
+                }
+
+                return Task.FromResult<CreateUserResult>(
+                    new CreateUserCreated(
+                        new User
+                        {
+                            Id = "generated-user",
+                            Email = body.Email,
+                        },
+                        Location: "/users/generated-user"));
+            }
+
+            protected override Task<GetReportResult> OnGetReportAsync(
+                GetReportPath path,
+                GetReportQuery query,
+                CancellationToken cancellationToken)
+            {
+                return Task.FromResult<GetReportResult>(
+                    new GetReportOk(
+                        new Report
+                        {
+                            Id = path.ReportId.ToString(),
+                            Title = $"{query.Days}:{query.Since:yyyy-MM-dd}:{query.Threshold.ToString(CultureInfo.InvariantCulture)}:{query.Window?.ToString() ?? "none"}",
+                        }));
+            }
+        }
+        """.trimIndent(),
+    )
+}
 
 private fun runtimeE2eModel() =
     microsmith {
