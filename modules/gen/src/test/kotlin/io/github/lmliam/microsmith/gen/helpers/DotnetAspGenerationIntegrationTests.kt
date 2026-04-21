@@ -36,6 +36,12 @@ class DotnetAspGenerationIntegrationTests :
                 .shouldContain("""[HttpGet("/users/{id}", Name = "GetUser")]""")
             projectRoot.resolve("Generated/Controllers/UserServiceApiControllerBase.cs").readText()
                 .shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync")
+            projectRoot.resolve("Generated/Contracts/RequestModels.cs").readText()
+                .shouldContain("public bool IncludeDetails { get; set; } = false;")
+            projectRoot.resolve("Generated/Contracts/RequestModels.cs").readText()
+                .shouldContain("public decimal Threshold { get; set; } = 1.5M;")
+            projectRoot.resolve("Generated/Contracts/RequestModels.cs").readText()
+                .shouldContain("public TimeSpan? Window { get; set; } = null;")
             projectRoot.resolve(".microsmith/origins.json").readText()
                 .shouldContain("services.UserService.rest.GetUser")
             projectRoot.resolve(".microsmith/origins.json").readText()
@@ -117,6 +123,29 @@ private fun sampleDotnetAspModel() =
                                             }
                                         }
                                         badRequest("Problem")
+                                    }
+                                }
+                            }
+
+                            "/reports" {
+                                get("/{reportId}", "GetReport") {
+                                    path("GetReportPath") {
+                                        guid("reportId")
+                                    }
+                                    query("GetReportQuery") {
+                                        int("days")
+                                        dateOnly("since")
+                                        dateTimeOffset("requestedAt")
+                                        decimal("threshold") {
+                                            optional()
+                                            default(1.5)
+                                        }
+                                        timeSpan("window") {
+                                            optional()
+                                        }
+                                    }
+                                    responses {
+                                        ok("User")
                                     }
                                 }
                             }

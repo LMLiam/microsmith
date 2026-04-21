@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp
 
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspDefaultValue
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspHeadersBinding
@@ -73,7 +74,7 @@ internal class DotnetAspServiceArtifactFactory(
                 name = field.name,
                 type = field.type,
                 optional = field.optional,
-                defaultValue = field.defaultValue,
+                defaultValue = field.defaultValue?.unwrapDotnetAspDefaultValue(),
             )
         },
         origins = setOf("services.${service.name}.rest.${endpoint.operationName}.$bindingLabel.$name"),
@@ -139,4 +140,18 @@ private fun allocateDotnetAspTypeName(usedTypeNames: MutableSet<String>, vararg 
         }
         suffix += 1
     }
+}
+
+private fun DotnetAspDefaultValue.unwrapDotnetAspDefaultValue(): Any = when (this) {
+    is DotnetAspDefaultValue.StringValue -> value
+    is DotnetAspDefaultValue.CharValue -> value
+    is DotnetAspDefaultValue.NumericValue -> value
+    is DotnetAspDefaultValue.BooleanValue -> value
+    is DotnetAspDefaultValue.UuidValue -> value
+    is DotnetAspDefaultValue.LocalDateValue -> value
+    is DotnetAspDefaultValue.LocalTimeValue -> value
+    is DotnetAspDefaultValue.LocalDateTimeValue -> value
+    is DotnetAspDefaultValue.InstantValue -> value
+    is DotnetAspDefaultValue.OffsetDateTimeValue -> value
+    is DotnetAspDefaultValue.DurationValue -> value
 }
