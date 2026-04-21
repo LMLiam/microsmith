@@ -20,9 +20,9 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -39,9 +39,10 @@ class DotnetAspServiceArtifactCompilerTests :
             val byPath = textFiles.associateBy { it.artifactId.relativePath.toString() }
 
             msbuild.artifactId.kind shouldBe MsBuildProjectKind.Project
-            msbuild.projectAttributes shouldContainExactly
-                mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web")
-            msbuild.properties shouldContainExactly mapOf(
+            msbuild.projectAttributes shouldBe mapOf(
+                MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web",
+            )
+            msbuild.properties shouldBe mapOf(
                 MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
                 MsBuildNames.NULLABLE_PROPERTY to "enable",
                 MsBuildNames.TARGET_FRAMEWORK_PROPERTY to "net8.0",
@@ -83,6 +84,8 @@ class DotnetAspServiceArtifactCompilerTests :
                 .shouldContain("public bool IncludeDetails { get; set; } = false;")
             byPath.getValue("Generated/Contracts/RequestModels.cs").contents
                 .shouldContain("[BindRequired]")
+            byPath.getValue("Generated/Contracts/RequestModels.cs").contents
+                .shouldContain("using System;")
             byPath.getValue("Generated/Contracts/ResponseModels.cs").contents
                 .shouldContain("public sealed record CreateUserCreated(User Body, string? Location = null) : CreateUserResult;")
         }
@@ -95,6 +98,25 @@ class DotnetAspServiceArtifactCompilerTests :
                 .contents
 
             requestModels.shouldContain("public nuint MaxValue { get; set; } = (nuint)4294967296UL;")
+        }
+
+        "compile emits CLR usings before the contract namespace when request bindings use system types" {
+            val requestModels = DotnetAspServiceArtifactCompiler()
+                .compile(requestBindingTypesArtifact())
+                .filterIsInstance<TextFileArtifactContribution>()
+                .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
+                .contents
+
+            requestModels.lines().take(4) shouldContainExactly listOf(
+                "using System;",
+                "using Microsoft.AspNetCore.Mvc.ModelBinding;",
+                "",
+                "namespace UserService.Api.Generated.Contracts;",
+            )
+            requestModels.shouldContain("public Guid ReportId { get; set; } = Guid.Empty;")
+            requestModels.shouldContain("public DateOnly Since { get; set; } = DateOnly.MinValue;")
+            requestModels.shouldContain("public DateTimeOffset RequestedAt { get; set; } = DateTimeOffset.UnixEpoch;")
+            requestModels.shouldContain("public TimeSpan? Window { get; set; } = null;")
         }
 
         "compile escapes service names before embedding them in appsettings json" {
@@ -253,6 +275,73 @@ private fun unsignedNativeIntDefaultArtifact(): DotnetAspServiceArtifact =
                     ),
                 ),
                 origins = setOf("services.ReportService.rest.GetReport"),
+            ),
+        ),
+    )
+
+private fun requestBindingTypesArtifact(): DotnetAspServiceArtifact =
+    DotnetAspServiceArtifact(
+        id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "UserService.Api"),
+        serviceName = "UserService",
+        targetFrameworkMoniker = "net8.0",
+        outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),
+        httpPort = 5000,
+        httpsPort = 5001,
+        contractModels = emptyList(),
+        endpoints = listOf(
+            DotnetAspEndpointArtifact(
+                method = "GET",
+                route = "/reports/{reportId}",
+                operationName = "GetReport",
+                bindings = DotnetAspEndpointBindingsArtifact(
+                    path = DotnetAspRequestBindingArtifact(
+                        typeName = "GetReportPath",
+                        name = "GetReportPath",
+                        fields = listOf(
+                            DotnetAspRequestFieldArtifact(
+                                name = "reportId",
+                                type = DotnetFieldType.Guid,
+                                optional = false,
+                                defaultValue = null,
+                            ),
+                        ),
+                        origins = setOf("services.UserService.rest.GetReport.path.GetReportPath"),
+                    ),
+                    query = DotnetAspRequestBindingArtifact(
+                        typeName = "GetReportQuery",
+                        name = "GetReportQuery",
+                        fields = listOf(
+                            DotnetAspRequestFieldArtifact(
+                                name = "since",
+                                type = DotnetFieldType.DateOnly,
+                                optional = false,
+                                defaultValue = null,
+                            ),
+                            DotnetAspRequestFieldArtifact(
+                                name = "requestedAt",
+                                type = DotnetFieldType.DateTimeOffset,
+                                optional = false,
+                                defaultValue = null,
+                            ),
+                            DotnetAspRequestFieldArtifact(
+                                name = "window",
+                                type = DotnetFieldType.TimeSpan,
+                                optional = true,
+                                defaultValue = null,
+                            ),
+                        ),
+                        origins = setOf("services.UserService.rest.GetReport.query.GetReportQuery"),
+                    ),
+                ),
+                responses = listOf(
+                    DotnetAspResponseArtifact(
+                        statusCode = 200,
+                        model = inlineModel("Report", "services.UserService.rest.GetReport.responses.200.Report") {},
+                        headers = emptyList(),
+                        origins = setOf("services.UserService.rest.GetReport.responses.200"),
+                    ),
+                ),
+                origins = setOf("services.UserService.rest.GetReport"),
             ),
         ),
     )
