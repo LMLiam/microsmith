@@ -18,12 +18,31 @@ class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {
     override val resolvedType = DotnetAspWorkspace::class
 
     override fun contribute(model: DotnetAspWorkspace): List<ArtifactContribution<*>> =
-        model.servicesByName.values.sortedBy {
-            it.name
-        }.mapIndexed(::toContribution)
+        model.servicesByName.values
+            .map { service ->
+                service to DotnetAspServiceArtifactId(service.solutionName, service.projectName)
+            }.sortedWith(
+                compareBy(
+                    { (_, artifactId) -> artifactId.solutionName },
+                    { (_, artifactId) -> artifactId.projectName },
+                ),
+            ).let { serviceArtifacts ->
+                val allocatedPorts =
+                    serviceArtifacts.associate { (service, artifactId) ->
+                        artifactId to allocateDotnetAspPorts(artifactId, service.ports)
+                    }
+                validateUniqueDotnetAspPorts(allocatedPorts.toList())
+                serviceArtifacts.map { (service, artifactId) ->
+                    val ports = requireNotNull(allocatedPorts[artifactId])
+                    toContribution(service, artifactId, ports)
+                }
+            }
 
-    private fun toContribution(index: Int, service: ResolvedDotnetAspService): DotnetAspServiceContribution {
-            val httpPort = BASE_HTTP_PORT + (index * PORT_STRIDE)
+    private fun toContribution(
+        service: ResolvedDotnetAspService,
+        artifactId: DotnetAspServiceArtifactId,
+        ports: DotnetAspAllocatedPorts,
+    ): DotnetAspServiceContribution {
             val usedTypeNames = linkedSetOf<String>()
             val sharedModelsByName = service.models.values
                 .sortedBy(DotnetModel::name)
@@ -86,21 +105,16 @@ class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {
             }
 
             return DotnetAspServiceContribution(
-                artifactId = DotnetAspServiceArtifactId(service.solutionName, service.projectName),
+                artifactId = artifactId,
                 serviceName = service.name,
                 targetFrameworkMoniker = service.targetFrameworkMoniker,
                 outputRoot = service.outputRoot,
-                httpPort = httpPort,
-                httpsPort = httpPort + 1,
+                httpPort = ports.http,
+                httpsPort = ports.https,
                 contractModels = contractModels.toList(),
                 endpoints = endpoints,
             )
         }
-
-    private companion object {
-        const val BASE_HTTP_PORT = 5000
-        const val PORT_STRIDE = 10
-    }
 
     private fun ResolvedDotnetAspRequestBinding.toRequestBindingArtifact(
         serviceName: String,
