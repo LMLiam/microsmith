@@ -25,111 +25,112 @@ import kotlin.io.path.writeText
 @OptIn(ExperimentalPathApi::class)
 class DotnetAspRuntimeE2eTests :
     StringSpec({
-        "generated ASP.NET controller bases work end to end when a user implements them".config(enabled = dotnetAvailable()) {
-            val outputDir = Files.createTempDirectory("microsmith-dotnet-asp-runtime-")
-            try {
-                runtimeE2eModel().generateTo(outputDir)
-
-                val projectRoot = outputDir.resolve("dotnet/Platform/UserService.Api")
-                val projectFile = projectRoot.resolve("UserService.Api.csproj")
-                val logFile = outputDir.resolve("dotnet-runtime.log")
-                val port = availablePort()
-                val baseUri = URI("http://127.0.0.1:$port")
-
-                writeUserController(projectRoot)
-
-                runDotnetCommand(
-                    projectRoot = projectRoot,
-                    logFile = logFile,
-                    "build",
-                    projectFile.toString(),
-                    "--nologo",
-                )
-
-                val process = startDotnetService(projectFile, port, logFile)
+        "generated ASP.NET controller bases work end to end when a user implements them"
+            .config(enabled = dotnetAvailable()) {
+                val outputDir = Files.createTempDirectory("microsmith-dotnet-asp-runtime-")
                 try {
-                    val client = HttpClient.newBuilder()
-                        .connectTimeout(Duration.ofSeconds(2))
-                        .build()
+                    runtimeE2eModel().generateTo(outputDir)
 
-                    awaitServiceReady(client, baseUri, logFile, process)
+                    val projectRoot = outputDir.resolve("dotnet/Platform/UserService.Api")
+                    val projectFile = projectRoot.resolve("UserService.Api.csproj")
+                    val logFile = outputDir.resolve("dotnet-runtime.log")
+                    val port = availablePort()
+                    val baseUri = URI("http://127.0.0.1:$port")
 
-                    val getUser = client.send(
-                        request(baseUri, "/users/user-123?includeDetails=true")
-                            .header("X-Correlation-Id", "corr-123")
-                            .GET()
-                            .build(),
-                        HttpResponse.BodyHandlers.ofString(),
+                    writeUserController(projectRoot)
+
+                    runDotnetCommand(
+                        projectRoot = projectRoot,
+                        logFile = logFile,
+                        "build",
+                        projectFile.toString(),
+                        "--nologo",
                     )
-                    getUser.statusCode() shouldBe 200
-                    getUser.headers().firstValue("ETag").orElseThrow() shouldBe "etag-corr-123"
-                    getUser.body().shouldContain("\"id\":\"user-123\"")
-                    getUser.body().shouldContain("\"email\":\"details@example.com\"")
 
-                    val notFound = client.send(
-                        request(baseUri, "/users/missing")
-                            .GET()
-                            .build(),
-                        HttpResponse.BodyHandlers.ofString(),
-                    )
-                    notFound.statusCode() shouldBe 404
-                    notFound.body().shouldContain("\"detail\":\"missing-user\"")
+                    val process = startDotnetService(projectFile, port, logFile)
+                    try {
+                        val client = HttpClient.newBuilder()
+                            .connectTimeout(Duration.ofSeconds(2))
+                            .build()
 
-                    val createUser = client.send(
-                        request(baseUri, "/users")
-                            .header("Content-Type", "application/json")
-                            .POST(HttpRequest.BodyPublishers.ofString("""{"email":"runtime@example.com"}"""))
-                            .build(),
-                        HttpResponse.BodyHandlers.ofString(),
-                    )
-                    createUser.statusCode() shouldBe 201
-                    createUser.headers().firstValue("Location").orElseThrow() shouldBe "/users/generated-user"
-                    createUser.body().shouldContain("\"email\":\"runtime@example.com\"")
+                        awaitServiceReady(client, baseUri, logFile, process)
 
-                    val getReport = client.send(
-                        request(
-                            baseUri,
-                            "/reports/550e8400-e29b-41d4-a716-446655440000" +
-                                "?days=7" +
-                                "&since=2026-04-20" +
-                                "&requestedAt=2026-04-20T12:34:56%2B00:00",
-                        ).GET().build(),
-                        HttpResponse.BodyHandlers.ofString(),
-                    )
-                    getReport.statusCode() shouldBe 200
-                    getReport.body().shouldContain("\"title\":\"7:2026-04-20:1.5:none\"")
+                        val getUser = client.send(
+                            request(baseUri, "/users/user-123?includeDetails=true")
+                                .header("X-Correlation-Id", "corr-123")
+                                .GET()
+                                .build(),
+                            HttpResponse.BodyHandlers.ofString(),
+                        )
+                        getUser.statusCode() shouldBe 200
+                        getUser.headers().firstValue("ETag").orElseThrow() shouldBe "etag-corr-123"
+                        getUser.body().shouldContain("\"id\":\"user-123\"")
+                        getUser.body().shouldContain("\"email\":\"details@example.com\"")
 
-                    val invalidGuid = client.send(
-                        request(
-                            baseUri,
-                            "/reports/not-a-guid" +
-                                "?days=7" +
-                                "&since=2026-04-20" +
-                                "&requestedAt=2026-04-20T12:34:56%2B00:00",
-                        ).GET().build(),
-                        HttpResponse.BodyHandlers.ofString(),
-                    )
-                    invalidGuid.statusCode() shouldBe 400
+                        val notFound = client.send(
+                            request(baseUri, "/users/missing")
+                                .GET()
+                                .build(),
+                            HttpResponse.BodyHandlers.ofString(),
+                        )
+                        notFound.statusCode() shouldBe 404
+                        notFound.body().shouldContain("\"detail\":\"missing-user\"")
 
-                    val invalidDecimal = client.send(
-                        request(
-                            baseUri,
-                            "/reports/550e8400-e29b-41d4-a716-446655440000" +
-                                "?days=7" +
-                                "&since=2026-04-20" +
-                                "&requestedAt=2026-04-20T12:34:56%2B00:00" +
-                                "&threshold=bad",
-                        ).GET().build(),
-                        HttpResponse.BodyHandlers.ofString(),
-                    )
-                    invalidDecimal.statusCode() shouldBe 400
+                        val createUser = client.send(
+                            request(baseUri, "/users")
+                                .header("Content-Type", "application/json")
+                                .POST(HttpRequest.BodyPublishers.ofString("""{"email":"runtime@example.com"}"""))
+                                .build(),
+                            HttpResponse.BodyHandlers.ofString(),
+                        )
+                        createUser.statusCode() shouldBe 201
+                        createUser.headers().firstValue("Location").orElseThrow() shouldBe "/users/generated-user"
+                        createUser.body().shouldContain("\"email\":\"runtime@example.com\"")
+
+                        val getReport = client.send(
+                            request(
+                                baseUri,
+                                "/reports/550e8400-e29b-41d4-a716-446655440000" +
+                                    "?days=7" +
+                                    "&since=2026-04-20" +
+                                    "&requestedAt=2026-04-20T12:34:56%2B00:00",
+                            ).GET().build(),
+                            HttpResponse.BodyHandlers.ofString(),
+                        )
+                        getReport.statusCode() shouldBe 200
+                        getReport.body().shouldContain("\"title\":\"7:2026-04-20:1.5:none\"")
+
+                        val invalidGuid = client.send(
+                            request(
+                                baseUri,
+                                "/reports/not-a-guid" +
+                                    "?days=7" +
+                                    "&since=2026-04-20" +
+                                    "&requestedAt=2026-04-20T12:34:56%2B00:00",
+                            ).GET().build(),
+                            HttpResponse.BodyHandlers.ofString(),
+                        )
+                        invalidGuid.statusCode() shouldBe 400
+
+                        val invalidDecimal = client.send(
+                            request(
+                                baseUri,
+                                "/reports/550e8400-e29b-41d4-a716-446655440000" +
+                                    "?days=7" +
+                                    "&since=2026-04-20" +
+                                    "&requestedAt=2026-04-20T12:34:56%2B00:00" +
+                                    "&threshold=bad",
+                            ).GET().build(),
+                            HttpResponse.BodyHandlers.ofString(),
+                        )
+                        invalidDecimal.statusCode() shouldBe 400
+                    } finally {
+                        stopProcess(process, logFile)
+                    }
                 } finally {
-                    stopProcess(process, logFile)
+                    runCatching { outputDir.deleteRecursively() }
                 }
-            } finally {
-                runCatching { outputDir.deleteRecursively() }
             }
-        }
     })
 
 private fun writeUserController(projectRoot: Path) {
@@ -215,94 +216,92 @@ private fun writeUserController(projectRoot: Path) {
     )
 }
 
-private fun runtimeE2eModel() =
-    microsmith {
-        services {
-            dotnet {
-                target(NET8)
-                solutions {
-                    "Platform" {}
-                }
+private fun runtimeE2eModel() = microsmith {
+    services {
+        dotnet {
+            target(NET8)
+            solutions {
+                "Platform" {}
             }
+        }
 
-            "UserService" {
-                dotnet {
-                    solution("Platform")
-                    project("UserService.Api")
-                    models {
-                        "User" {
-                            string("id")
-                            string("email")
-                        }
-                        "Problem" {
-                            string("detail")
-                        }
-                        "Report" {
-                            string("id")
-                            string("title")
-                        }
+        "UserService" {
+            dotnet {
+                solution("Platform")
+                project("UserService.Api")
+                models {
+                    "User" {
+                        string("id")
+                        string("email")
                     }
-                    asp {
-                        rest {
-                            "/users" {
-                                get("/{id}", "GetUser") {
-                                    path("GetUserPath") {
-                                        string("id")
-                                    }
-                                    query("GetUserQuery") {
-                                        bool("includeDetails") {
-                                            optional()
-                                            default(false)
-                                        }
-                                    }
-                                    headers("GetUserHeaders") {
-                                        header("X-Correlation-Id")
-                                    }
-                                    responses {
-                                        ok("User") {
-                                            headers {
-                                                header("ETag")
-                                            }
-                                        }
-                                        notFound("Problem")
+                    "Problem" {
+                        string("detail")
+                    }
+                    "Report" {
+                        string("id")
+                        string("title")
+                    }
+                }
+                asp {
+                    rest {
+                        "/users" {
+                            get("/{id}", "GetUser") {
+                                path("GetUserPath") {
+                                    string("id")
+                                }
+                                query("GetUserQuery") {
+                                    bool("includeDetails") {
+                                        optional()
+                                        default(false)
                                     }
                                 }
-
-                                post("CreateUser") {
-                                    body("CreateUserBody") {
-                                        string("email")
-                                    }
-                                    responses {
-                                        created("User") {
-                                            headers {
-                                                header("Location")
-                                            }
+                                headers("GetUserHeaders") {
+                                    header("X-Correlation-Id")
+                                }
+                                responses {
+                                    ok("User") {
+                                        headers {
+                                            header("ETag")
                                         }
-                                        badRequest("Problem")
                                     }
+                                    notFound("Problem")
                                 }
                             }
 
-                            "/reports" {
-                                get("/{reportId}", "GetReport") {
-                                    path("GetReportPath") {
-                                        guid("reportId")
-                                    }
-                                    query("GetReportQuery") {
-                                        int("days")
-                                        dateOnly("since")
-                                        dateTimeOffset("requestedAt")
-                                        decimal("threshold") {
-                                            optional()
-                                            default(1.5)
-                                        }
-                                        timeSpan("window") {
-                                            optional()
+                            post("CreateUser") {
+                                body("CreateUserBody") {
+                                    string("email")
+                                }
+                                responses {
+                                    created("User") {
+                                        headers {
+                                            header("Location")
                                         }
                                     }
-                                    responses {
-                                        ok("Report")
+                                    badRequest("Problem")
+                                }
+                            }
+                        }
+
+                        "/reports" {
+                            get("/{reportId}", "GetReport") {
+                                path("GetReportPath") {
+                                    guid("reportId")
+                                }
+                                query("GetReportQuery") {
+                                    int("days")
+                                    dateOnly("since")
+                                    dateTimeOffset("requestedAt")
+                                    decimal("threshold") {
+                                        optional()
+                                        default(1.5)
                                     }
+                                    timeSpan("window") {
+                                        optional()
+                                    }
+                                }
+                                responses {
+                                    ok("Report")
                                 }
                             }
                         }
@@ -311,6 +310,7 @@ private fun runtimeE2eModel() =
             }
         }
     }
+}
 
 private fun availablePort(): Int = ServerSocket(0).use { socket -> socket.localPort }
 

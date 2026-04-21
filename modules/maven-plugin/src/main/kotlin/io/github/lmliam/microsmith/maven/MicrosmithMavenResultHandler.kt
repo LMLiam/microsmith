@@ -21,7 +21,7 @@ internal class MicrosmithMavenResultHandler {
 
     private fun handleSuccess(log: Log, outputDirectory: Path, result: ScriptRunSuccess) {
         result.warnings.forEach(log::warn)
-        val generatedOutputRoot = GeneratedOutputRootsLocator.describe(outputDirectory)
+        val generatedOutputRoot = GeneratedOutputRootsLocator.describe(outputDirectory, result.generatedRoots)
         log.info(
             "Generated Microsmith outputs into '$generatedOutputRoot'. " +
                 "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)",

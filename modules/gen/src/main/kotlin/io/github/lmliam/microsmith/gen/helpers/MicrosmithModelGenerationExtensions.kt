@@ -8,11 +8,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
 
-suspend fun MicrosmithModel.generate(finalDir: FileSpace) {
-    MicrosmithGenerationRunner().generate(this, finalDir)
+suspend fun MicrosmithModel.generate(finalDir: FileSpace): List<Path> {
+    return MicrosmithGenerationRunner().generate(this, finalDir)
 }
 
-suspend fun MicrosmithModel.generateTo(outputDir: Path, ioDispatcher: CoroutineDispatcher = Dispatchers.IO) {
+suspend fun MicrosmithModel.generateTo(
+    outputDir: Path,
+    ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+): List<Path> {
     val directorySpace = withContext(ioDispatcher) { DirectorySpace.from(outputDir) }
-    generate(directorySpace)
+    return generate(directorySpace)
 }

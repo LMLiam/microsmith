@@ -46,7 +46,7 @@ internal class RunCompletionReporter(private val eventLogWriter: (Path, RunEvent
             emitter.warn(warning)
         }
         val cacheState = if (runResult.cacheHit) "hit" else "miss"
-        val generatedOutputRoot = GeneratedOutputRootsLocator.describe(command.outputDir)
+        val generatedOutputRoot = GeneratedOutputRootsLocator.describe(command.outputDir, runResult.generatedRoots)
         emitter.info(
             "Generated script '${command.script}' into '$generatedOutputRoot' " +
                 "(compile-cache=$cacheState, elapsed=${runResult.elapsedMillis}ms).",

@@ -19,6 +19,8 @@ internal object ProcessIsolationPropertyNames {
     const val RESULT_CACHE_HIT = "result.cacheHit"
     const val RESULT_WARNING_COUNT = "result.warnings.count"
     const val RESULT_WARNING_PREFIX = "result.warnings."
+    const val RESULT_GENERATED_ROOT_COUNT = "result.generatedRoots.count"
+    const val RESULT_GENERATED_ROOT_PREFIX = "result.generatedRoots."
     const val RESULT_DIAGNOSTIC_COUNT = "result.diagnostics.count"
     const val RESULT_DIAGNOSTIC_PREFIX = "result.diagnostics."
     const val RESULT_FAILURE_TYPE = "result.failure.type"

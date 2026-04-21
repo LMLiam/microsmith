@@ -117,7 +117,12 @@ class MicrosmithSbtExecutionServiceTests : StringSpec() {
 
             result.outputDirectory shouldBe fixture.file(".").normalize()
             fixture.file("dotnet/Platform/UserService.Api/Program.cs").toFile().shouldExist()
-            fixture.file("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs").toFile().shouldExist()
+            fixture
+                .file(
+                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
+                        "UserServiceApiControllerBase.cs",
+                ).toFile()
+                .shouldExist()
         }
 
         "script compilation failures surface as MicrosmithSbtScriptFailureException" {

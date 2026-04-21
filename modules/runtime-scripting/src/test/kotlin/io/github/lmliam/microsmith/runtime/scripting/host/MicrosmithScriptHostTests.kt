@@ -139,7 +139,10 @@ class MicrosmithScriptHostTests :
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
                 output.resolve("dotnet/Platform/UserService.Api/Program.cs").exists() shouldBe true
-                output.resolve("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs").exists() shouldBe true
+                output.resolve(
+                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
+                        "UserServiceApiControllerBase.cs",
+                ).exists() shouldBe true
                 output.resolve("dotnet/Platform/UserService.Api/.microsmith/origins.json").exists() shouldBe true
             } finally {
                 runCatching { tempDir.deleteRecursively() }
@@ -260,7 +263,10 @@ class MicrosmithScriptHostTests :
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
                 output.resolve("dotnet/Platform/UserService.Api/Program.cs").exists() shouldBe true
-                output.resolve("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs").exists() shouldBe true
+                output.resolve(
+                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
+                        "UserServiceApiControllerBase.cs",
+                ).exists() shouldBe true
                 output.resolve("dotnet/Platform/UserService.Api/.microsmith/origins.json").exists() shouldBe true
                 output.resolve("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs")
                     .readText()

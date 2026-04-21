@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 
 internal object GeneratedOriginsManifestBuilder {
+    private const val FIRST_PRINTABLE_CHARACTER_CODE = 0x20
     private val manifestRelativePath = Path.of(".microsmith", "origins.json")
 
     fun appendTo(outputs: List<GeneratedFile>): List<GeneratedFile> {
@@ -14,7 +15,10 @@ internal object GeneratedOriginsManifestBuilder {
                 val tracedFiles = files
                     .filter { it.relativePath != manifestRelativePath }
                     .map { file ->
-                        TracedFile(relativePath = file.relativePath.toString().replace('\\', '/'), origins = file.origins.toList().sorted())
+                        TracedFile(
+                            relativePath = file.relativePath.toString().replace('\\', '/'),
+                            origins = file.origins.toList().sorted(),
+                        )
                     }.sortedBy(TracedFile::relativePath)
                 if (tracedFiles.isEmpty()) {
                     return@mapNotNull null
@@ -60,7 +64,7 @@ internal object GeneratedOriginsManifestBuilder {
                 '\r' -> append("\\r")
                 '\t' -> append("\\t")
                 else -> {
-                    if (char.code < 0x20) {
+                    if (char.code < FIRST_PRINTABLE_CHARACTER_CODE) {
                         append("\\u%04x".format(char.code))
                     } else {
                         append(char)

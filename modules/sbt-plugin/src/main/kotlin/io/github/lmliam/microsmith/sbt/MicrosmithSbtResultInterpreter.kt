@@ -14,6 +14,7 @@ class MicrosmithSbtResultInterpreter {
             warnings = result.warnings,
             cacheHit = result.cacheHit,
             elapsedMillis = result.elapsedMillis,
+            generatedRoots = result.generatedRoots,
         )
 
         is ScriptRunFailure -> throw buildFailure(result)

@@ -83,8 +83,8 @@ object MicrosmithSbtPlugin extends AutoPlugin {
     try {
       val outcome = executionService.execute(configuration)
       outcome.getWarnings.asScala.foreach(message => logger.warn(message))
-      val generatedRoots = GeneratedOutputRootsLocator.locate(outcome.getOutputDirectory).asScala.toSeq
-      val generatedOutputRoot = GeneratedOutputRootsLocator.describe(outcome.getOutputDirectory)
+      val generatedRoots = outcome.getGeneratedRoots.asScala.toSeq
+      val generatedOutputRoot = GeneratedOutputRootsLocator.describe(outcome.getOutputDirectory, outcome.getGeneratedRoots.asScala.toList.asJava)
       logger.info(
         s"Generated Microsmith outputs into '$generatedOutputRoot'. " +
           s"(compile-cache=${if (outcome.getCacheHit) "hit" else "miss"}, elapsed=${outcome.getElapsedMillis}ms)"

@@ -7,6 +7,7 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import kotlin.io.path.createTempDirectory
@@ -18,12 +19,16 @@ class ScriptEvaluationSuccessFinalizerTests :
     StringSpec({
         "returns success and auto-emits a returned model when nothing was emitted explicitly" {
             val emittedModels = mutableListOf<MicrosmithModel>()
+            val generatedRoot = createTempDirectory("microsmith-script-generated-root")
             val scriptContext =
                 MicrosmithScriptContext(
                     outDir = createTempDirectory("microsmith-script-eval-success"),
                     vars = emptyMap(),
                     flags = emptySet(),
-                    emitHandler = emittedModels::add,
+                    emitHandler = { model ->
+                        emittedModels.add(model)
+                        listOf(generatedRoot)
+                    },
                 )
             val evaluationResult =
                 EvaluationResult(
@@ -51,6 +56,38 @@ class ScriptEvaluationSuccessFinalizerTests :
             result.warnings shouldBe listOf("warning")
             result.cacheHit shouldBe true
             result.elapsedMillis shouldBe 42
+            result.generatedRoots.shouldContainExactly(listOf(generatedRoot))
+        }
+
+        "returns success with every generated root when a script emits multiple models" {
+            val generatedRootOne = createTempDirectory("microsmith-script-generated-root-one")
+            val generatedRootTwo = createTempDirectory("microsmith-script-generated-root-two")
+            val emittedRoots = ArrayDeque(listOf(generatedRootOne, generatedRootTwo))
+            val scriptContext =
+                MicrosmithScriptContext(
+                    outDir = createTempDirectory("microsmith-script-eval-multi-emit"),
+                    vars = emptyMap(),
+                    flags = emptySet(),
+                    emitHandler = { listOf(emittedRoots.removeFirst()) },
+                )
+            scriptContext.emit(MicrosmithModel.empty())
+            scriptContext.generate(MicrosmithModel.empty())
+            val evaluationResult =
+                EvaluationResult(
+                    returnValue = ResultValue.Unit(Any::class, Any()),
+                    configuration = ScriptEvaluationConfiguration {},
+                )
+
+            val result =
+                ScriptEvaluationSuccessFinalizer().complete(
+                    evaluationResult = evaluationResult,
+                    scriptContext = scriptContext,
+                    warnings = emptyList(),
+                    cacheHit = false,
+                    elapsedMillis = 9,
+                ).shouldBeTypeOf<ScriptRunSuccess>()
+
+            result.generatedRoots.shouldContainExactly(listOf(generatedRootOne, generatedRootTwo).sorted())
         }
 
         "returns evaluation failure when no model is returned or emitted" {

@@ -54,7 +54,11 @@ class DotnetAspGenerationIntegrationTests :
 
             model.generateTo(outputDir)
 
-            val controllerFile = outputDir.resolve("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs")
+            val controllerFile =
+                outputDir.resolve(
+                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
+                        "UserServiceApiControllerBase.cs",
+                )
             controllerFile.writeText("stale")
 
             model.generateTo(outputDir)
@@ -63,90 +67,88 @@ class DotnetAspGenerationIntegrationTests :
         }
     })
 
-private fun sampleDotnetAspModel() =
-    microsmith {
-        services {
-            dotnet {
-                target(NET8)
-                solutions {
-                    "Platform" {}
-                }
+private fun sampleDotnetAspModel() = microsmith {
+    services {
+        dotnet {
+            target(NET8)
+            solutions {
+                "Platform" {}
             }
+        }
 
-            "UserService" {
-                dotnet {
-                    solution("Platform")
-                    project("UserService.Api")
-                    models {
-                        "User" {
-                            string("id")
-                            string("email")
-                        }
-                        "Problem" {
-                            string("detail")
-                        }
+        "UserService" {
+            dotnet {
+                solution("Platform")
+                project("UserService.Api")
+                models {
+                    "User" {
+                        string("id")
+                        string("email")
                     }
-                    asp {
-                        rest {
-                            "/users" {
-                                get("/{id}", "GetUser") {
-                                    path("GetUserPath") {
-                                        string("id")
-                                    }
-                                    query("GetUserQuery") {
-                                        bool("includeDetails") {
-                                            optional()
-                                            default(false)
-                                        }
-                                    }
-                                    headers("GetUserHeaders") {
-                                        header("X-Correlation-Id")
-                                    }
-                                    responses {
-                                        ok("User") {
-                                            headers {
-                                                header("ETag")
-                                            }
-                                        }
-                                        notFound("Problem")
+                    "Problem" {
+                        string("detail")
+                    }
+                }
+                asp {
+                    rest {
+                        "/users" {
+                            get("/{id}", "GetUser") {
+                                path("GetUserPath") {
+                                    string("id")
+                                }
+                                query("GetUserQuery") {
+                                    bool("includeDetails") {
+                                        optional()
+                                        default(false)
                                     }
                                 }
-
-                                post("CreateUser") {
-                                    body("CreateUserBody") {
-                                        string("email")
-                                    }
-                                    responses {
-                                        created("User") {
-                                            headers {
-                                                header("Location")
-                                            }
+                                headers("GetUserHeaders") {
+                                    header("X-Correlation-Id")
+                                }
+                                responses {
+                                    ok("User") {
+                                        headers {
+                                            header("ETag")
                                         }
-                                        badRequest("Problem")
                                     }
+                                    notFound("Problem")
                                 }
                             }
 
-                            "/reports" {
-                                get("/{reportId}", "GetReport") {
-                                    path("GetReportPath") {
-                                        guid("reportId")
-                                    }
-                                    query("GetReportQuery") {
-                                        int("days")
-                                        dateOnly("since")
-                                        dateTimeOffset("requestedAt")
-                                        decimal("threshold") {
-                                            optional()
-                                            default(1.5)
-                                        }
-                                        timeSpan("window") {
-                                            optional()
+                            post("CreateUser") {
+                                body("CreateUserBody") {
+                                    string("email")
+                                }
+                                responses {
+                                    created("User") {
+                                        headers {
+                                            header("Location")
                                         }
                                     }
-                                    responses {
-                                        ok("User")
+                                    badRequest("Problem")
+                                }
+                            }
+                        }
+
+                        "/reports" {
+                            get("/{reportId}", "GetReport") {
+                                path("GetReportPath") {
+                                    guid("reportId")
+                                }
+                                query("GetReportQuery") {
+                                    int("days")
+                                    dateOnly("since")
+                                    dateTimeOffset("requestedAt")
+                                    decimal("threshold") {
+                                        optional()
+                                        default(1.5)
                                     }
+                                    timeSpan("window") {
+                                        optional()
+                                    }
+                                }
+                                responses {
+                                    ok("User")
                                 }
                             }
                         }
@@ -155,3 +157,4 @@ private fun sampleDotnetAspModel() =
             }
         }
     }
+}

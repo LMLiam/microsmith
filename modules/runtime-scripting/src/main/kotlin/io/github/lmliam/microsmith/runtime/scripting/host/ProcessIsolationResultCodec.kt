@@ -45,8 +45,12 @@ internal class ProcessIsolationResultCodec {
         properties[ProcessIsolationPropertyNames.RESULT_ELAPSED_MILLIS] = result.elapsedMillis.toString()
         properties[ProcessIsolationPropertyNames.RESULT_CACHE_HIT] = result.cacheHit.toString()
         properties[ProcessIsolationPropertyNames.RESULT_WARNING_COUNT] = result.warnings.size.toString()
+        properties[ProcessIsolationPropertyNames.RESULT_GENERATED_ROOT_COUNT] = result.generatedRoots.size.toString()
         result.warnings.forEachIndexed { index, warning ->
             properties["${ProcessIsolationPropertyNames.RESULT_WARNING_PREFIX}$index"] = warning
+        }
+        result.generatedRoots.forEachIndexed { index, generatedRoot ->
+            properties["${ProcessIsolationPropertyNames.RESULT_GENERATED_ROOT_PREFIX}$index"] = generatedRoot.toString()
         }
     }
 
@@ -67,6 +71,11 @@ internal class ProcessIsolationResultCodec {
         ),
         cacheHit = properties.requiredBoolean(ProcessIsolationPropertyNames.RESULT_CACHE_HIT),
         elapsedMillis = properties.requiredLong(ProcessIsolationPropertyNames.RESULT_ELAPSED_MILLIS),
+        generatedRoots =
+        properties.readIndexedList(
+            countKey = ProcessIsolationPropertyNames.RESULT_GENERATED_ROOT_COUNT,
+            keyPrefix = ProcessIsolationPropertyNames.RESULT_GENERATED_ROOT_PREFIX,
+        ).map(Path::of),
     )
 
     private fun readFailure(properties: Properties): ScriptRunFailure = ScriptRunFailure(
