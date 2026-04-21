@@ -1,10 +1,13 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeadersBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
 import java.util.Locale
 
 internal object DotnetAspControllerFileRenderer {
-    fun renderControllerBaseFile(artifact: io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact): String = buildString {
+    fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): String = buildString {
         appendLine("using System;")
         appendLine("using System.Threading;")
         appendLine("using System.Threading.Tasks;")
@@ -14,7 +17,10 @@ internal object DotnetAspControllerFileRenderer {
         appendLine("namespace ${controllersNamespace(artifact)};")
         appendLine()
         appendLine("[ApiController]")
-        appendLine("public abstract class ${controllerBaseTypeName(artifact)} : $MICROSMITH_CONTROLLER_BASE_TYPE_NAME")
+        appendLine(
+            "public abstract class ${controllerBaseTypeName(artifact)} : " +
+                MICROSMITH_CONTROLLER_BASE_TYPE_NAME,
+        )
         appendLine("{")
         artifact.endpoints.forEach { endpoint ->
             append(renderActionMethod(endpoint))
@@ -28,7 +34,11 @@ internal object DotnetAspControllerFileRenderer {
     }
 
     private fun renderActionMethod(endpoint: DotnetAspEndpointArtifact): String = buildString {
-        appendLine("    [${httpAttributeName(endpoint.method)}(${escapeDotnetAspCsharpStringLiteral(endpoint.route)}, Name = ${escapeDotnetAspCsharpStringLiteral(endpoint.operationName)})]")
+        val routeLiteral = escapeDotnetAspCsharpStringLiteral(endpoint.route)
+        val operationNameLiteral = escapeDotnetAspCsharpStringLiteral(endpoint.operationName)
+        appendLine(
+            "    [${httpAttributeName(endpoint.method)}($routeLiteral, Name = $operationNameLiteral)]",
+        )
         endpoint.responses.forEach { response ->
             appendLine(
                 "    [ProducesResponseType(typeof(${responseAttributeType(response)}), ${response.statusCode})]",
@@ -42,7 +52,11 @@ internal object DotnetAspControllerFileRenderer {
             append(renderHeadersInitializer(binding))
             appendLine()
         }
-        appendLine("        var result = await On${endpoint.operationName}Async(${handlerArguments(endpoint).joinToString(", ")});")
+        appendLine(
+            "        var result = await On${endpoint.operationName}Async(" +
+                handlerArguments(endpoint).joinToString(", ") +
+                ");",
+        )
         appendLine("        return Map${endpoint.operationName}Result(result);")
         appendLine("    }")
     }
@@ -54,37 +68,41 @@ internal object DotnetAspControllerFileRenderer {
     }
 
     private fun renderResultMapper(endpoint: DotnetAspEndpointArtifact): String = buildString {
-        appendLine("    private ActionResult<${resultBaseTypeName(endpoint)}> Map${endpoint.operationName}Result(${resultBaseTypeName(endpoint)} result)")
+        appendLine(
+            "    private ActionResult<${resultBaseTypeName(endpoint)}> " +
+                "Map${endpoint.operationName}Result(${resultBaseTypeName(endpoint)} result)",
+        )
         appendLine("    {")
         appendLine("        return result switch")
         appendLine("        {")
         endpoint.responses.forEach { response ->
             append("            ${resultVariantTypeName(endpoint, response)} response => Respond(")
-            append(if (response.statusCode == 204) "null" else "response.$RESULT_BODY_PROPERTY_NAME")
+            append(renderResponseBodyArgument(response))
             append(", ${response.statusCode}")
             response.headers.forEach { header ->
-                append(", (${escapeDotnetAspCsharpStringLiteral(header.name)}, response.${dotnetAspHeaderPropertyName(header.name)})")
+                append(
+                    ", (${escapeDotnetAspCsharpStringLiteral(header.name)}, " +
+                        "response.${dotnetAspHeaderPropertyName(header.name)})",
+                )
             }
             appendLine("),")
         }
-        appendLine(
-            "            _ => throw new InvalidOperationException(" +
-                "${escapeDotnetAspCsharpStringLiteral("Unsupported ${endpoint.operationName} result type.")} + " +
-                "result.GetType().FullName + \".\"),",
-        )
+        val unsupportedMessage =
+            escapeDotnetAspCsharpStringLiteral("Unsupported ${endpoint.operationName} result type.")
+        appendLine("            _ => throw new InvalidOperationException(")
+        appendLine("                $unsupportedMessage + result.GetType().FullName + \".\"),")
         appendLine("        };")
         appendLine("    }")
     }
 
-    private fun renderHeadersInitializer(binding: io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeadersBindingArtifact): String = buildString {
+    private fun renderHeadersInitializer(binding: DotnetAspHeadersBindingArtifact): String = buildString {
         appendLine("        var headers = new ${binding.typeName}")
         appendLine("        {")
         binding.headers.forEachIndexed { index, header ->
             val suffix = if (index == binding.headers.lastIndex) "" else ","
-            appendLine(
-                "            ${dotnetAspPascalIdentifier(header.name)} = " +
-                    "ReadHeader(${escapeDotnetAspCsharpStringLiteral(header.headerName)})$suffix",
-            )
+            val headerPropertyName = dotnetAspPascalIdentifier(header.name)
+            val headerLiteral = escapeDotnetAspCsharpStringLiteral(header.headerName)
+            appendLine("            $headerPropertyName = ReadHeader($headerLiteral)$suffix")
         }
         appendLine("        };")
     }
@@ -112,8 +130,11 @@ internal object DotnetAspControllerFileRenderer {
         add("cancellationToken")
     }
 
-    private fun responseAttributeType(response: io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseArtifact): String =
-        if (response.statusCode == 204) "void" else response.model.typeName
+    private fun responseAttributeType(response: DotnetAspResponseArtifact): String =
+        if (response.statusCode == HTTP_NO_CONTENT_STATUS_CODE) "void" else response.model.typeName
+
+    private fun renderResponseBodyArgument(response: DotnetAspResponseArtifact): String =
+        if (response.statusCode == HTTP_NO_CONTENT_STATUS_CODE) "null" else "response.$RESULT_BODY_PROPERTY_NAME"
 
     private fun httpAttributeName(method: String): String =
         "Http" + method.lowercase(Locale.ROOT).replaceFirstChar(Char::uppercase)

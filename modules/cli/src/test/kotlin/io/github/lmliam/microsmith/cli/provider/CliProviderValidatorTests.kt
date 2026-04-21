@@ -14,16 +14,16 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
-import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
+import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.gen.core.ArtifactRenderer
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import io.github.lmliam.microsmith.resolve.core.DomainResolver
 import io.github.lmliam.microsmith.resolve.core.ResolvedModel
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
-import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspace
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
@@ -258,12 +258,6 @@ private class TextFileAssemblerStub : ArtifactAssembler<TextFileArtifact> {
         current: TextFileArtifact,
         contribution: ArtifactContribution<TextFileArtifact>,
     ): TextFileArtifact = current
-}
-
-private class ProtoFileCompilerStub : ArtifactCompiler<ProtoFileArtifact> {
-    override val artifactType = ProtoFileArtifact::class
-
-    override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> = emptyList()
 }
 
 private class CompilerStub<T : Artifact>(override val artifactType: KClass<T>) : ArtifactCompiler<T> {

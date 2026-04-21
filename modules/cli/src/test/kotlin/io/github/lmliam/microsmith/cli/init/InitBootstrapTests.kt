@@ -134,7 +134,8 @@ class InitBootstrapTests :
                 val buildScript = repoRoot.resolve("build.microsmith.kts").readText()
                 val settingsScript = repoRoot.resolve("settings.microsmith.kts").readText()
 
-                buildScript.shouldContain("// Bootstrapped Microsmith ASP.NET service generation for this .NET repository.")
+                buildScript.shouldContain("// Bootstrapped Microsmith ASP.NET service generation")
+                buildScript.shouldContain("// for this .NET repository.")
                 buildScript.shouldContain("// microsmith run build.microsmith.kts --out ./Generated")
                 buildScript.shouldContain("services {")
                 buildScript.shouldContain("target(NET8)")

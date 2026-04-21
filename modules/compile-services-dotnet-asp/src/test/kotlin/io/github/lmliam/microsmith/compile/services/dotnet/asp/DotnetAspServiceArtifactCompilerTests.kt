@@ -20,9 +20,9 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -74,7 +74,10 @@ class DotnetAspServiceArtifactCompilerTests :
             controller.contents.shouldContain("""[ProducesResponseType(typeof(User), 200)]""")
             controller.contents.shouldContain("""[ProducesResponseType(typeof(Problem), 404)]""")
             controller.contents.shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync")
-            controller.contents.shouldContain("CreateUserCreated response => Respond(response.Body, 201, (\"Location\", response.Location))")
+            controller.contents.shouldContain(
+                "CreateUserCreated response => Respond(" +
+                    "response.Body, 201, (\"Location\", response.Location))",
+            )
             controller.contents.shouldNotContain("X-Microsmith-Response-Status")
             controller.contents.shouldNotContain("sample-location")
             controller.origins shouldContain "services.UserService.rest.GetUser"
@@ -87,7 +90,10 @@ class DotnetAspServiceArtifactCompilerTests :
             byPath.getValue("Generated/Contracts/RequestModels.cs").contents
                 .shouldContain("using System;")
             byPath.getValue("Generated/Contracts/ResponseModels.cs").contents
-                .shouldContain("public sealed record CreateUserCreated(User Body, string? Location = null) : CreateUserResult;")
+                .shouldContain(
+                    "public sealed record CreateUserCreated(" +
+                        "User Body, string? Location = null) : CreateUserResult;",
+                )
         }
 
         "compile emits nuint defaults with a 64-bit-safe literal" {
@@ -237,114 +243,115 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
     )
 }
 
-private fun unsignedNativeIntDefaultArtifact(): DotnetAspServiceArtifact =
-    DotnetAspServiceArtifact(
-        id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "ReportService.Api"),
-        serviceName = "ReportService",
-        targetFrameworkMoniker = "net8.0",
-        outputRoot = Path.of("dotnet", "Platform", "ReportService.Api"),
-        httpPort = 5002,
-        httpsPort = 5003,
-        contractModels = emptyList(),
-        endpoints = listOf(
-            DotnetAspEndpointArtifact(
-                method = "GET",
-                route = "/reports",
-                operationName = "GetReport",
-                bindings = DotnetAspEndpointBindingsArtifact(
-                    query = DotnetAspRequestBindingArtifact(
-                        typeName = "GetReportQuery",
-                        name = "GetReportQuery",
-                        fields = listOf(
-                            DotnetAspRequestFieldArtifact(
-                                name = "maxValue",
-                                type = DotnetFieldType.UnsignedNativeInt,
-                                optional = false,
-                                defaultValue = 4294967296L,
-                            ),
+private fun unsignedNativeIntDefaultArtifact(): DotnetAspServiceArtifact = DotnetAspServiceArtifact(
+    id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "ReportService.Api"),
+    serviceName = "ReportService",
+    targetFrameworkMoniker = "net8.0",
+    outputRoot = Path.of("dotnet", "Platform", "ReportService.Api"),
+    httpPort = 5002,
+    httpsPort = 5003,
+    contractModels = emptyList(),
+    endpoints = listOf(
+        DotnetAspEndpointArtifact(
+            method = "GET",
+            route = "/reports",
+            operationName = "GetReport",
+            bindings = DotnetAspEndpointBindingsArtifact(
+                query = DotnetAspRequestBindingArtifact(
+                    typeName = "GetReportQuery",
+                    name = "GetReportQuery",
+                    fields = listOf(
+                        DotnetAspRequestFieldArtifact(
+                            name = "maxValue",
+                            type = DotnetFieldType.UnsignedNativeInt,
+                            optional = false,
+                            defaultValue = 4294967296L,
                         ),
-                        origins = setOf("services.ReportService.rest.GetReport.query.GetReportQuery"),
                     ),
+                    origins = setOf("services.ReportService.rest.GetReport.query.GetReportQuery"),
                 ),
-                responses = listOf(
-                    DotnetAspResponseArtifact(
-                        statusCode = 200,
-                        model = inlineModel("EmptyReport", "services.ReportService.rest.GetReport.responses.200.EmptyReport") {},
-                        headers = emptyList(),
-                        origins = setOf("services.ReportService.rest.GetReport.responses.200"),
-                    ),
-                ),
-                origins = setOf("services.ReportService.rest.GetReport"),
             ),
+            responses = listOf(
+                DotnetAspResponseArtifact(
+                    statusCode = 200,
+                    model = inlineModel(
+                        "EmptyReport",
+                        "services.ReportService.rest.GetReport.responses.200.EmptyReport",
+                    ) {},
+                    headers = emptyList(),
+                    origins = setOf("services.ReportService.rest.GetReport.responses.200"),
+                ),
+            ),
+            origins = setOf("services.ReportService.rest.GetReport"),
         ),
-    )
+    ),
+)
 
-private fun requestBindingTypesArtifact(): DotnetAspServiceArtifact =
-    DotnetAspServiceArtifact(
-        id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "UserService.Api"),
-        serviceName = "UserService",
-        targetFrameworkMoniker = "net8.0",
-        outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),
-        httpPort = 5000,
-        httpsPort = 5001,
-        contractModels = emptyList(),
-        endpoints = listOf(
-            DotnetAspEndpointArtifact(
-                method = "GET",
-                route = "/reports/{reportId}",
-                operationName = "GetReport",
-                bindings = DotnetAspEndpointBindingsArtifact(
-                    path = DotnetAspRequestBindingArtifact(
-                        typeName = "GetReportPath",
-                        name = "GetReportPath",
-                        fields = listOf(
-                            DotnetAspRequestFieldArtifact(
-                                name = "reportId",
-                                type = DotnetFieldType.Guid,
-                                optional = false,
-                                defaultValue = null,
-                            ),
+private fun requestBindingTypesArtifact(): DotnetAspServiceArtifact = DotnetAspServiceArtifact(
+    id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "UserService.Api"),
+    serviceName = "UserService",
+    targetFrameworkMoniker = "net8.0",
+    outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),
+    httpPort = 5000,
+    httpsPort = 5001,
+    contractModels = emptyList(),
+    endpoints = listOf(
+        DotnetAspEndpointArtifact(
+            method = "GET",
+            route = "/reports/{reportId}",
+            operationName = "GetReport",
+            bindings = DotnetAspEndpointBindingsArtifact(
+                path = DotnetAspRequestBindingArtifact(
+                    typeName = "GetReportPath",
+                    name = "GetReportPath",
+                    fields = listOf(
+                        DotnetAspRequestFieldArtifact(
+                            name = "reportId",
+                            type = DotnetFieldType.Guid,
+                            optional = false,
+                            defaultValue = null,
                         ),
-                        origins = setOf("services.UserService.rest.GetReport.path.GetReportPath"),
                     ),
-                    query = DotnetAspRequestBindingArtifact(
-                        typeName = "GetReportQuery",
-                        name = "GetReportQuery",
-                        fields = listOf(
-                            DotnetAspRequestFieldArtifact(
-                                name = "since",
-                                type = DotnetFieldType.DateOnly,
-                                optional = false,
-                                defaultValue = null,
-                            ),
-                            DotnetAspRequestFieldArtifact(
-                                name = "requestedAt",
-                                type = DotnetFieldType.DateTimeOffset,
-                                optional = false,
-                                defaultValue = null,
-                            ),
-                            DotnetAspRequestFieldArtifact(
-                                name = "window",
-                                type = DotnetFieldType.TimeSpan,
-                                optional = true,
-                                defaultValue = null,
-                            ),
+                    origins = setOf("services.UserService.rest.GetReport.path.GetReportPath"),
+                ),
+                query = DotnetAspRequestBindingArtifact(
+                    typeName = "GetReportQuery",
+                    name = "GetReportQuery",
+                    fields = listOf(
+                        DotnetAspRequestFieldArtifact(
+                            name = "since",
+                            type = DotnetFieldType.DateOnly,
+                            optional = false,
+                            defaultValue = null,
                         ),
-                        origins = setOf("services.UserService.rest.GetReport.query.GetReportQuery"),
+                        DotnetAspRequestFieldArtifact(
+                            name = "requestedAt",
+                            type = DotnetFieldType.DateTimeOffset,
+                            optional = false,
+                            defaultValue = null,
+                        ),
+                        DotnetAspRequestFieldArtifact(
+                            name = "window",
+                            type = DotnetFieldType.TimeSpan,
+                            optional = true,
+                            defaultValue = null,
+                        ),
                     ),
+                    origins = setOf("services.UserService.rest.GetReport.query.GetReportQuery"),
                 ),
-                responses = listOf(
-                    DotnetAspResponseArtifact(
-                        statusCode = 200,
-                        model = inlineModel("Report", "services.UserService.rest.GetReport.responses.200.Report") {},
-                        headers = emptyList(),
-                        origins = setOf("services.UserService.rest.GetReport.responses.200"),
-                    ),
-                ),
-                origins = setOf("services.UserService.rest.GetReport"),
             ),
+            responses = listOf(
+                DotnetAspResponseArtifact(
+                    statusCode = 200,
+                    model = inlineModel("Report", "services.UserService.rest.GetReport.responses.200.Report") {},
+                    headers = emptyList(),
+                    origins = setOf("services.UserService.rest.GetReport.responses.200"),
+                ),
+            ),
+            origins = setOf("services.UserService.rest.GetReport"),
         ),
-    )
+    ),
+)
 
 private fun sharedModel(
     typeName: String,

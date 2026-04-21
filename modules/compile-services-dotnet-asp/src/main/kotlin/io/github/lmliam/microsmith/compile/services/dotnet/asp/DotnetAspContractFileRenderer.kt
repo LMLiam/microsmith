@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeaderFieldArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeadersBindingArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelLocality
@@ -83,10 +82,10 @@ internal object DotnetAspContractFileRenderer {
         appendLine("public sealed record $typeName")
         appendLine("{")
         fields.forEach { field ->
-            appendLine(
-                "    public ${renderDotnetAspModelPropertyType(field.type)} ${dotnetAspPascalIdentifier(field.name)} { get; set; }" +
-                    renderDotnetAspInitializer(field.type),
-            )
+            val propertyType = renderDotnetAspModelPropertyType(field.type)
+            val propertyName = dotnetAspPascalIdentifier(field.name)
+            val initializer = renderDotnetAspInitializer(field.type)
+            appendLine("    public $propertyType $propertyName { get; set; }$initializer")
         }
         appendLine("}")
     }
@@ -98,10 +97,10 @@ internal object DotnetAspContractFileRenderer {
             if (!field.optional && field.defaultValue == null) {
                 appendLine("    [BindRequired]")
             }
-            appendLine(
-                "    public ${renderDotnetAspBindingPropertyType(field)} ${dotnetAspPascalIdentifier(field.name)} { get; set; }" +
-                    renderDotnetAspBindingInitializer(field),
-            )
+            val propertyType = renderDotnetAspBindingPropertyType(field)
+            val propertyName = dotnetAspPascalIdentifier(field.name)
+            val initializer = renderDotnetAspBindingInitializer(field)
+            appendLine("    public $propertyType $propertyName { get; set; }$initializer")
         }
         appendLine("}")
     }
@@ -128,7 +127,7 @@ internal object DotnetAspContractFileRenderer {
     }
 
     private fun responseParameters(response: DotnetAspResponseArtifact): List<String> = buildList {
-        if (response.statusCode != 204) {
+        if (response.statusCode != HTTP_NO_CONTENT_STATUS_CODE) {
             add("${response.model.typeName} $RESULT_BODY_PROPERTY_NAME")
         }
         response.headers.forEach { header ->

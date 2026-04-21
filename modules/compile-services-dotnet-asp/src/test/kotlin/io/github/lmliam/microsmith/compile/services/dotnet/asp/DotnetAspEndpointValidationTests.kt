@@ -2,7 +2,6 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointBindingsArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeaderFieldArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelLocality
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestBindingArtifact

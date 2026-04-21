@@ -10,14 +10,14 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
-import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
+import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.gen.core.ArtifactRenderer
 import io.github.lmliam.microsmith.resolve.core.DomainResolver
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
-import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspace
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspace
 import java.util.ServiceLoader
 
 internal fun verifyBuiltinProviders(

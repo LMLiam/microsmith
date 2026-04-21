@@ -69,7 +69,8 @@ class MsBuildProjectArtifactCompilerTests :
             textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("Directory.Build.props")
             textContribution.artifactId.outputRoot shouldBe
                 java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
-            textContribution.origins shouldBe setOf("dotnet.solutions.Platform.projects.UserService.Api.DirectoryBuildProps")
+            textContribution.origins shouldBe
+                setOf("dotnet.solutions.Platform.projects.UserService.Api.DirectoryBuildProps")
             textContribution.contents.shouldContain("<PackageReference Include=\"Serilog.AspNetCore\"/>")
         }
 
