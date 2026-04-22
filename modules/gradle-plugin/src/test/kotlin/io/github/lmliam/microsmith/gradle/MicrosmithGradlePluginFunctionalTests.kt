@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import org.gradle.api.attributes.Bundling
 import org.gradle.testkit.runner.TaskOutcome
 
 class MicrosmithGradlePluginFunctionalTests : StringSpec() {
@@ -24,6 +25,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                         check(generateTask.group == "$TASK_GROUP_NAME")
 
                         val ide = project.configurations.getByName("microsmithIde")
+                        val runtime = project.configurations.getByName("microsmithRuntime")
                         val plugins = project.configurations.getByName("microsmithPlugins")
                         val compileOnly = project.configurations.getByName("compileOnly")
                         val extension = project.extensions.getByName("$EXTENSION_NAME")
@@ -31,6 +33,10 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                         check(ide.extendsFrom.contains(plugins))
                         check(compileOnly.extendsFrom.contains(ide))
                         check(!ide.isCanBeResolved)
+                        check(
+                            runtime.attributes.getAttribute(Bundling.BUNDLING_ATTRIBUTE)?.name ==
+                                Bundling.SHADOWED,
+                        )
                         check(extension is io.github.lmliam.microsmith.gradle.MicrosmithGradleExtension)
                     }
                 }

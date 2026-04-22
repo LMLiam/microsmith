@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.attributes.Bundling
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPlugin
 
@@ -33,6 +34,10 @@ class MicrosmithGradlePlugin : Plugin<Project> {
                 configuration.isVisible = false
                 configuration.description =
                     "Classpath for the isolated Microsmith worker JVM used by Gradle tasks."
+                configuration.attributes.attribute(
+                    Bundling.BUNDLING_ATTRIBUTE,
+                    project.objects.named(Bundling::class.java, Bundling.SHADOWED),
+                )
                 configuration.defaultDependencies { dependencies ->
                     dependencies.add(
                         project.dependencies.create(MicrosmithRuntimeDependencyNotation.runtimeScripting()),
