@@ -4,7 +4,6 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import org.gradle.api.attributes.Bundling
 import org.gradle.testkit.runner.TaskOutcome
 
 class MicrosmithGradlePluginFunctionalTests : StringSpec() {
