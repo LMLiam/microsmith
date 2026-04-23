@@ -1,6 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType

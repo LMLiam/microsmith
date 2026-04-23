@@ -1,6 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelLocality
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseArtifact
@@ -18,22 +17,21 @@ internal object DotnetAspContractFileRenderer {
                 .forEach { addType(renderRecordType(it.typeName, it.model.fields)) }
         }
 
-    fun renderRequestModelsFile(artifact: DotnetAspServiceArtifact): String =
-        renderContractsFile(
-            artifact,
-            usings = setOf(SYSTEM_NAMESPACE, MODEL_BINDING_NAMESPACE),
-        ) {
-            buildList {
-                collectRequestBindings(artifact).forEach { add(renderRequestBindingType(it)) }
-                collectHeaderBindings(artifact).forEach { add(renderHeadersBindingType(it)) }
-                artifact.endpoints.forEach { endpoint ->
-                    endpoint.bindings.body
-                        ?.takeIf { it.locality == DotnetAspModelLocality.INLINE }
-                        ?.let { add(renderRecordType(it.typeName, it.model.fields)) }
-                }
-            }.distinctBy(CSharp.Type::name)
-                .forEach(::addType)
-        }
+    fun renderRequestModelsFile(artifact: DotnetAspServiceArtifact): String = renderContractsFile(
+        artifact,
+        usings = setOf(SYSTEM_NAMESPACE, MODEL_BINDING_NAMESPACE),
+    ) {
+        buildList {
+            collectRequestBindings(artifact).forEach { add(renderRequestBindingType(it)) }
+            collectHeaderBindings(artifact).forEach { add(renderHeadersBindingType(it)) }
+            artifact.endpoints.forEach { endpoint ->
+                endpoint.bindings.body
+                    ?.takeIf { it.locality == DotnetAspModelLocality.INLINE }
+                    ?.let { add(renderRecordType(it.typeName, it.model.fields)) }
+            }
+        }.distinctBy(CSharp.Type::name)
+            .forEach(::addType)
+    }
 
     fun renderResponseModelsFile(artifact: DotnetAspServiceArtifact): String =
         renderContractsFile(artifact, usings = setOf(SYSTEM_NAMESPACE)) {
