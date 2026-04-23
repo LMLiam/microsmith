@@ -77,11 +77,13 @@ jobs:
 
           validate_maven_proto_fixture() {
             local repo_root="$1"
-            local generated_root="$repo_root/proto"
+            local output_root="$repo_root/target/generated/microsmith"
+            local generated_root="$output_root/proto"
 
             mvn -B -f "$repo_root/pom.xml" microsmith:generate -Dmicrosmith.version="$VERSION"
             test -d "$generated_root"
             find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
+            test -f "$output_root/.microsmith/origins.json"
           }
 
           validate_maven_dotnet_fixture() {
