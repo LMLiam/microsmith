@@ -11,7 +11,7 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 internal fun renderRespondHelper(): CSharp.Method = CSharp.Method(
     name = "Respond",
     modifiers = listOf(CSharp.Modifier.PROTECTED),
-    returnType = csharpType(CONTROLLER_ACTION_RESULT_TYPE_NAME),
+    returnType = csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ActionResult),
     parameters = listOf(
         csharpParameter(csharpNullableType("object"), "body"),
         csharpParameter("int", "statusCode"),
@@ -58,7 +58,7 @@ internal fun renderRespondHelper(): CSharp.Method = CSharp.Method(
         blankLine()
         returnStatement(
             CSharp.new(
-                type = csharpType(OBJECT_RESULT_TYPE_NAME),
+                type = csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ObjectResult),
                 arguments = listOf(CSharp.identifier("body")),
                 initializers = listOf(
                     CSharp.init("StatusCode", CSharp.identifier("statusCode")),

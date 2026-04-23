@@ -15,7 +15,7 @@ internal fun renderActionMethod(endpoint: DotnetAspEndpointArtifact): CSharp.Met
     modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ASYNC),
     returnType = csharpGenericType(
         DotnetCSharpTypes.Threading.Task,
-        csharpGenericType(ACTION_RESULT_TYPE_NAME, csharpType(resultBaseTypeName(endpoint))),
+        csharpGenericType(DotnetAspCSharpTypes.AspNetCore.Mvc.ActionResult, csharpType(resultBaseTypeName(endpoint))),
     ),
     attributes = buildList {
         add(renderRouteAttribute(endpoint))

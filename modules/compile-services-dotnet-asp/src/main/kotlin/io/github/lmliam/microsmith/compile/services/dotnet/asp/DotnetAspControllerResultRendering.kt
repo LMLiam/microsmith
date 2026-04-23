@@ -12,7 +12,7 @@ internal fun renderResultMapper(endpoint: DotnetAspEndpointArtifact): CSharp.Met
     name = "Map${endpoint.operationName}Result",
     modifiers = listOf(CSharp.Modifier.PRIVATE),
     returnType = csharpGenericType(
-        ACTION_RESULT_TYPE_NAME,
+        DotnetAspCSharpTypes.AspNetCore.Mvc.ActionResult,
         csharpType(resultBaseTypeName(endpoint)),
     ),
     parameters = listOf(csharpParameter(resultBaseTypeName(endpoint), "result")),

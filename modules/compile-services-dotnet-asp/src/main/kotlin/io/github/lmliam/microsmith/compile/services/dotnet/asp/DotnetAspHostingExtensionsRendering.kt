@@ -7,8 +7,8 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.extensionParam
 internal fun renderAddMicrosmithExtension(): CSharp.Method = CSharp.Method(
     name = "AddMicrosmith",
     modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.STATIC),
-    returnType = csharpType(WEB_APPLICATION_BUILDER_TYPE_NAME),
-    parameters = listOf(extensionParameter(WEB_APPLICATION_BUILDER_TYPE_NAME, "builder")),
+    returnType = csharpType(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplicationBuilder),
+    parameters = listOf(extensionParameter(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplicationBuilder, "builder")),
     body = CSharp.codeBlock {
         expression(
             CSharp.call(
@@ -25,8 +25,8 @@ internal fun renderAddMicrosmithExtension(): CSharp.Method = CSharp.Method(
 internal fun renderMapMicrosmithExtension(): CSharp.Method = CSharp.Method(
     name = "MapMicrosmith",
     modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.STATIC),
-    returnType = csharpType(WEB_APPLICATION_TYPE_NAME),
-    parameters = listOf(extensionParameter(WEB_APPLICATION_TYPE_NAME, "app")),
+    returnType = csharpType(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplication),
+    parameters = listOf(extensionParameter(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplication, "app")),
     body = CSharp.codeBlock {
         expression(
             CSharp.call(

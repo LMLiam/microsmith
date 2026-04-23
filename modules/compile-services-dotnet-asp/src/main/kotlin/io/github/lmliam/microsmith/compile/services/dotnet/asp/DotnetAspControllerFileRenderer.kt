@@ -8,10 +8,10 @@ internal object DotnetAspControllerFileRenderer {
     fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): String = CSharp.render(
         CSharp.file(controllersNamespace(artifact)) {
             using(contractsNamespace(artifact))
-            using(ASP_NET_MVC_NAMESPACE)
-            using(SYSTEM_NAMESPACE)
-            using(SYSTEM_THREADING_NAMESPACE)
-            using(SYSTEM_TASKS_NAMESPACE)
+            using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Mvc)
+            using(DotnetAspCSharpNamespaces.System)
+            using(DotnetAspCSharpNamespaces.SystemThreading.Root)
+            using(DotnetAspCSharpNamespaces.SystemThreading.Tasks)
             classType(
                 name = controllerBaseTypeName(artifact),
                 modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
@@ -32,14 +32,9 @@ internal object DotnetAspControllerFileRenderer {
     )
 }
 
-internal const val ACTION_RESULT_TYPE_NAME = "ActionResult"
 internal const val API_CONTROLLER_ATTRIBUTE = "ApiController"
 internal const val FROM_BODY_ATTRIBUTE = "FromBody"
 internal const val FROM_QUERY_ATTRIBUTE = "FromQuery"
 internal const val FROM_ROUTE_ATTRIBUTE = "FromRoute"
 internal const val PRODUCES_RESPONSE_TYPE_ATTRIBUTE = "ProducesResponseType"
 internal const val VOID_TYPE_NAME = "void"
-private const val ASP_NET_MVC_NAMESPACE = "Microsoft.AspNetCore.Mvc"
-private const val SYSTEM_NAMESPACE = "System"
-private const val SYSTEM_TASKS_NAMESPACE = "System.Threading.Tasks"
-private const val SYSTEM_THREADING_NAMESPACE = "System.Threading"

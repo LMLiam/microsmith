@@ -9,7 +9,7 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpFileBuil
 
 internal object DotnetAspContractFileRenderer {
     fun renderServiceModelsFile(artifact: DotnetAspServiceArtifact): String =
-        renderContractsFile(artifact, usings = setOf(SYSTEM_NAMESPACE)) {
+        renderContractsFile(artifact, usings = setOf(DotnetAspCSharpNamespaces.System)) {
             artifact.contractModels
                 .distinctBy(DotnetAspModelArtifact::typeName)
                 .filter { it.locality == DotnetAspModelLocality.SHARED }
@@ -19,7 +19,10 @@ internal object DotnetAspContractFileRenderer {
 
     fun renderRequestModelsFile(artifact: DotnetAspServiceArtifact): String = renderContractsFile(
         artifact,
-        usings = setOf(SYSTEM_NAMESPACE, MODEL_BINDING_NAMESPACE),
+        usings = setOf(
+            DotnetAspCSharpNamespaces.System,
+            DotnetAspCSharpNamespaces.Microsoft.AspNetCore.ModelBinding,
+        ),
     ) {
         buildList {
             collectRequestBindings(artifact).forEach { add(renderRequestBindingType(it)) }
@@ -34,7 +37,7 @@ internal object DotnetAspContractFileRenderer {
     }
 
     fun renderResponseModelsFile(artifact: DotnetAspServiceArtifact): String =
-        renderContractsFile(artifact, usings = setOf(SYSTEM_NAMESPACE)) {
+        renderContractsFile(artifact, usings = setOf(DotnetAspCSharpNamespaces.System)) {
             buildList {
                 artifact.endpoints.forEach { endpoint ->
                     endpoint.responses
@@ -55,7 +58,7 @@ internal object DotnetAspContractFileRenderer {
 
     private fun renderContractsFile(
         artifact: DotnetAspServiceArtifact,
-        usings: Set<String>,
+        usings: Set<io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpNamespace>,
         build: CSharpFileBuilder.() -> Unit,
     ): String = CSharp.render(
         CSharp.file(contractsNamespace(artifact)) {
@@ -64,6 +67,3 @@ internal object DotnetAspContractFileRenderer {
         },
     )
 }
-
-private const val MODEL_BINDING_NAMESPACE = "Microsoft.AspNetCore.Mvc.ModelBinding"
-private const val SYSTEM_NAMESPACE = "System"
