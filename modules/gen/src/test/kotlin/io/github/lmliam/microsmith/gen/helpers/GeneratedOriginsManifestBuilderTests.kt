@@ -42,4 +42,27 @@ class GeneratedOriginsManifestBuilderTests :
             String(manifests.single { it.outputRoot == Path("repo-b") }.contents, StandardCharsets.UTF_8)
                 .shouldContain("services.AdminService")
         }
+
+        "appendTo normalizes equivalent output roots before creating manifests" {
+            val outputs = listOf(
+                GeneratedFile(
+                    relativePath = Path("Program.cs"),
+                    contents = byteArrayOf(1),
+                    outputRoot = Path("dotnet/Platform/UserService.Api"),
+                    origins = setOf("services.UserService"),
+                ),
+                GeneratedFile(
+                    relativePath = Path("Generated/Contracts/RequestModels.cs"),
+                    contents = byteArrayOf(2),
+                    outputRoot = Path("dotnet/Platform/./UserService.Api"),
+                    origins = setOf("services.UserService.rest.GetUser.query.GetUserQuery"),
+                ),
+            )
+
+            val manifests = GeneratedOriginsManifestBuilder.appendTo(outputs)
+                .filter { it.relativePath == Path(".microsmith/origins.json") }
+
+            manifests.size shouldBe 1
+            manifests.single().outputRoot shouldBe Path("dotnet/Platform/UserService.Api")
+        }
     })

@@ -10,7 +10,7 @@ internal object GeneratedOriginsManifestBuilder {
 
     fun appendTo(outputs: List<GeneratedFile>): List<GeneratedFile> {
         val manifests = outputs
-            .groupBy(GeneratedFile::outputRoot)
+            .groupBy { generatedFile -> generatedFile.outputRoot.normalize() }
             .mapNotNull { (outputRoot, files) ->
                 val tracedFiles = files
                     .filter { it.relativePath != manifestRelativePath }
