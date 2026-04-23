@@ -7,6 +7,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldTyp
 
 internal fun validateEndpointGenerationInputs(artifact: DotnetAspServiceArtifact) {
     validateRequestBindings(artifact)
+    validateNoContentResponses(artifact)
     validateResponseHeaderNames(artifact)
     validateGeneratedContractTypeNames(artifact)
     validateGeneratedControllerTypeNames(artifact)
@@ -53,6 +54,21 @@ private fun validateResponseHeaderNames(artifact: DotnetAspServiceArtifact) {
                     "generated property names: ${collisions.joinToString(", ")}."
             }
         }
+    }
+}
+
+private fun validateNoContentResponses(artifact: DotnetAspServiceArtifact) {
+    artifact.endpoints.forEach { endpoint ->
+        endpoint.responses
+            .filter { response -> response.statusCode == HTTP_NO_CONTENT_STATUS_CODE }
+            .forEach { response ->
+                require(response.model.model.fields.isEmpty()) {
+                    "ASP.NET response ${response.statusCode} in operation " +
+                        "'${endpoint.operationName}' cannot declare response body fields " +
+                        "for model '${response.model.typeName}'. " +
+                        "HTTP 204 responses are emitted without a response body."
+                }
+            }
     }
 }
 

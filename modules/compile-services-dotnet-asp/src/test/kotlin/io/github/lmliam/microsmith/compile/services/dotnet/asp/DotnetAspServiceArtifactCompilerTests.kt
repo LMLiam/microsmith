@@ -19,6 +19,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
@@ -135,6 +136,16 @@ class DotnetAspServiceArtifactCompilerTests :
 
             appSettings.shouldContain("\"ServiceName\": \"User\\\"Service\\\\Api\"")
             appSettings.shouldNotContain("\"ServiceName\": \"User\"Service\\Api\"")
+        }
+
+        "compile rejects 204 responses that still declare response body fields" {
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    DotnetAspServiceArtifactCompiler().compile(noContentBodyArtifact())
+                }
+
+            error.message.shouldContain("ASP.NET response 204 in operation 'DeleteUser'")
+            error.message.shouldContain("cannot declare response body fields")
         }
     })
 
@@ -352,6 +363,42 @@ private fun requestBindingTypesArtifact(): DotnetAspServiceArtifact = DotnetAspS
         ),
     ),
 )
+
+private fun noContentBodyArtifact(): DotnetAspServiceArtifact {
+    val deletedUserModel = inlineModel(
+        "DeletedUser",
+        "services.UserService.rest.DeleteUser.responses.204.DeletedUser",
+    ) {
+        stringField("id")
+    }
+
+    return DotnetAspServiceArtifact(
+        id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "UserService.Api"),
+        serviceName = "UserService",
+        targetFrameworkMoniker = "net8.0",
+        outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),
+        httpPort = 5000,
+        httpsPort = 5001,
+        contractModels = listOf(deletedUserModel),
+        endpoints = listOf(
+            DotnetAspEndpointArtifact(
+                method = "DELETE",
+                route = "/users/{id}",
+                operationName = "DeleteUser",
+                bindings = DotnetAspEndpointBindingsArtifact(),
+                responses = listOf(
+                    DotnetAspResponseArtifact(
+                        statusCode = 204,
+                        model = deletedUserModel,
+                        headers = emptyList(),
+                        origins = setOf("services.UserService.rest.DeleteUser.responses.204"),
+                    ),
+                ),
+                origins = setOf("services.UserService.rest.DeleteUser"),
+            ),
+        ),
+    )
+}
 
 private fun sharedModel(
     typeName: String,

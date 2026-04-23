@@ -18,9 +18,10 @@ internal object GeneratedOutputUniquenessValidator {
 
     private fun outputPathKey(output: GeneratedFile): String {
         requireValidOutputRoot(output.outputRoot)
+        val normalizedRelativePath = requireValidRelativePath(output.relativePath)
 
         return output.outputRoot.normalize()
-            .resolve(output.relativePath.normalize())
+            .resolve(normalizedRelativePath)
             .normalize()
             .toString()
     }
@@ -34,5 +35,17 @@ internal object GeneratedOutputUniquenessValidator {
         require(!normalizedOutputRoot.startsWith(Path.of(".."))) {
             "Generated output root '$outputRoot' escapes the run output root."
         }
+    }
+
+    private fun requireValidRelativePath(relativePath: Path): Path {
+        require(!relativePath.isAbsolute) {
+            "Generated output path must be relative, but was '$relativePath'."
+        }
+
+        val normalizedRelativePath = relativePath.normalize()
+        require(!normalizedRelativePath.startsWith(Path.of(".."))) {
+            "Generated output path '$relativePath' escapes the run output root."
+        }
+        return normalizedRelativePath
     }
 }
