@@ -56,7 +56,9 @@ class GeneratedOutputUniquenessValidatorTests :
         }
 
         "requireUniqueOutputPaths rejects absolute generated file paths" {
-            val absolutePath = Files.createTempDirectory("microsmith-uniqueness-").resolve("User.proto").toAbsolutePath()
+            val absolutePath = Files.createTempDirectory("microsmith-uniqueness-")
+                .resolve("User.proto")
+                .toAbsolutePath()
 
             shouldThrow<IllegalArgumentException> {
                 GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(

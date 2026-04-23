@@ -107,7 +107,7 @@ class DotnetAspServiceArtifactCompilerTests :
             requestModels.shouldContain("public nuint MaxValue { get; set; } = (nuint)4294967296UL;")
         }
 
-        "compile emits CLR usings before the contract namespace when request bindings use system types" {
+        "compile emits sorted usings before the contract namespace when request bindings use system types" {
             val requestModels = DotnetAspServiceArtifactCompiler()
                 .compile(requestBindingTypesArtifact())
                 .filterIsInstance<TextFileArtifactContribution>()
@@ -115,8 +115,8 @@ class DotnetAspServiceArtifactCompilerTests :
                 .contents
 
             requestModels.lines().take(4) shouldContainExactly listOf(
-                "using System;",
                 "using Microsoft.AspNetCore.Mvc.ModelBinding;",
+                "using System;",
                 "",
                 "namespace UserService.Api.Generated.Contracts;",
             )

@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 
 internal object DotnetAspInfrastructureFileRenderer {
     fun renderProgramFile(artifact: DotnetAspServiceArtifact): String = """
@@ -16,62 +18,41 @@ internal object DotnetAspInfrastructureFileRenderer {
         public partial class Program { }
     """.trimIndent()
 
-    fun renderHostingExtensionsFile(artifact: DotnetAspServiceArtifact): String = """
-        using Microsoft.AspNetCore.Builder;
-        using Microsoft.Extensions.DependencyInjection;
-
-        namespace ${hostingNamespace(artifact)};
-
-        public static class MicrosmithHostingExtensions
-        {
-            public static WebApplicationBuilder AddMicrosmith(this WebApplicationBuilder builder)
-            {
-                builder.Services.AddControllers();
-                return builder;
+    fun renderHostingExtensionsFile(artifact: DotnetAspServiceArtifact): String = CSharp.render(
+        CSharp.file(hostingNamespace(artifact)) {
+            using(ASP_NET_BUILDER_NAMESPACE)
+            using(DEPENDENCY_INJECTION_NAMESPACE)
+            classType(
+                name = MICROSMITH_HOSTING_EXTENSIONS_TYPE_NAME,
+                modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.STATIC),
+            ) {
+                addMember(renderAddMicrosmithExtension())
+                addMember(renderMapMicrosmithExtension())
             }
+        },
+    )
 
-            public static WebApplication MapMicrosmith(this WebApplication app)
-            {
-                app.MapControllers();
-                return app;
+    fun renderMicrosmithControllerBaseFile(artifact: DotnetAspServiceArtifact): String = CSharp.render(
+        CSharp.file(controllersNamespace(artifact)) {
+            using(ASP_NET_MVC_NAMESPACE)
+            classType(
+                name = MICROSMITH_CONTROLLER_BASE_TYPE_NAME,
+                modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
+                baseTypes = listOf(csharpType(CONTROLLER_BASE_TYPE_NAME)),
+            ) {
+                addMember(renderRespondHelper())
+                addMember(renderReadHeaderHelper())
             }
-        }
-    """.trimIndent()
-
-    fun renderMicrosmithControllerBaseFile(artifact: DotnetAspServiceArtifact): String = """
-        using Microsoft.AspNetCore.Mvc;
-
-        namespace ${controllersNamespace(artifact)};
-
-        public abstract class $MICROSMITH_CONTROLLER_BASE_TYPE_NAME : ControllerBase
-        {
-            protected ActionResult Respond(object? body, int statusCode, params (string Name, string? Value)[] headers)
-            {
-                foreach (var (name, value) in headers)
-                {
-                    if (value is not null)
-                    {
-                        Response.Headers[name] = value;
-                    }
-                }
-
-                if (statusCode == 204)
-                {
-                    return StatusCode(statusCode);
-                }
-
-                return new ObjectResult(body)
-                {
-                    StatusCode = statusCode
-                };
-            }
-
-            protected string? ReadHeader(string headerName)
-            {
-                return Request.Headers.TryGetValue(headerName, out var values)
-                    ? values.ToString()
-                    : null;
-            }
-        }
-    """.trimIndent()
+        },
+    )
 }
+
+internal const val CONTROLLER_BASE_TYPE_NAME = "ControllerBase"
+internal const val CONTROLLER_ACTION_RESULT_TYPE_NAME = "ActionResult"
+internal const val OBJECT_RESULT_TYPE_NAME = "ObjectResult"
+internal const val WEB_APPLICATION_BUILDER_TYPE_NAME = "WebApplicationBuilder"
+internal const val WEB_APPLICATION_TYPE_NAME = "WebApplication"
+private const val ASP_NET_MVC_NAMESPACE = "Microsoft.AspNetCore.Mvc"
+private const val ASP_NET_BUILDER_NAMESPACE = "Microsoft.AspNetCore.Builder"
+private const val DEPENDENCY_INJECTION_NAMESPACE = "Microsoft.Extensions.DependencyInjection"
+private const val MICROSMITH_HOSTING_EXTENSIONS_TYPE_NAME = "MicrosmithHostingExtensions"
