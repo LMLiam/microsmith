@@ -8,7 +8,6 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTy
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpGenericType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
-import java.util.Locale
 
 internal fun renderActionMethod(endpoint: DotnetAspEndpointArtifact): CSharp.Method = CSharp.Method(
     name = endpoint.operationName,
@@ -70,17 +69,17 @@ private fun renderHeadersInitializer(binding: DotnetAspHeadersBindingArtifact): 
     },
 )
 
-private fun renderRouteAttribute(endpoint: DotnetAspEndpointArtifact): CSharp.Attribute = CSharp.attribute(
-    name = httpAttributeName(endpoint.method),
-    CSharp.positionalArgument(CSharp.stringLiteral(endpoint.route)),
-    CSharp.namedArgument("Name", CSharp.stringLiteral(endpoint.operationName)),
-)
+private fun renderRouteAttribute(endpoint: DotnetAspEndpointArtifact): CSharp.Attribute =
+    DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.endpointRoute(
+        method = endpoint.method,
+        route = endpoint.route,
+        operationName = endpoint.operationName,
+    )
 
 private fun renderProducesResponseTypeAttribute(response: DotnetAspResponseArtifact): CSharp.Attribute =
-    CSharp.attribute(
-        name = PRODUCES_RESPONSE_TYPE_ATTRIBUTE,
-        CSharp.positionalArgument(CSharp.rawExpression("typeof(${responseAttributeType(response)})")),
-        CSharp.positionalArgument(CSharp.intLiteral(response.statusCode)),
+    DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.producesResponseType(
+        typeName = responseAttributeType(response),
+        statusCode = response.statusCode,
     )
 
 private fun actionParameters(endpoint: DotnetAspEndpointArtifact): List<CSharp.Parameter> = buildList {
@@ -89,7 +88,7 @@ private fun actionParameters(endpoint: DotnetAspEndpointArtifact): List<CSharp.P
             csharpParameter(
                 type = it.typeName,
                 name = "path",
-                attributes = listOf(CSharp.attribute(FROM_ROUTE_ATTRIBUTE)),
+                attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.FromRoute),
             ),
         )
     }
@@ -98,7 +97,7 @@ private fun actionParameters(endpoint: DotnetAspEndpointArtifact): List<CSharp.P
             csharpParameter(
                 type = it.typeName,
                 name = "query",
-                attributes = listOf(CSharp.attribute(FROM_QUERY_ATTRIBUTE)),
+                attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.FromQuery),
             ),
         )
     }
@@ -107,7 +106,7 @@ private fun actionParameters(endpoint: DotnetAspEndpointArtifact): List<CSharp.P
             csharpParameter(
                 type = it.typeName,
                 name = "body",
-                attributes = listOf(CSharp.attribute(FROM_BODY_ATTRIBUTE)),
+                attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.FromBody),
             ),
         )
     }
@@ -132,6 +131,3 @@ private fun handlerArguments(endpoint: DotnetAspEndpointArtifact): List<CSharp.E
 
 private fun responseAttributeType(response: DotnetAspResponseArtifact): String =
     if (response.statusCode == HTTP_NO_CONTENT_STATUS_CODE) VOID_TYPE_NAME else response.model.typeName
-
-private fun httpAttributeName(method: String): String =
-    "Http" + method.lowercase(Locale.ROOT).replaceFirstChar(Char::uppercase)

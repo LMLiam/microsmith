@@ -16,7 +16,7 @@ internal object DotnetAspControllerFileRenderer {
                 name = controllerBaseTypeName(artifact),
                 modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
                 baseTypes = listOf(csharpType(MICROSMITH_CONTROLLER_BASE_TYPE_NAME)),
-                attributes = listOf(CSharp.attribute(API_CONTROLLER_ATTRIBUTE)),
+                attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.ApiController),
             ) {
                 artifact.endpoints.forEach { endpoint ->
                     addMember(renderActionMethod(endpoint))
@@ -32,9 +32,4 @@ internal object DotnetAspControllerFileRenderer {
     )
 }
 
-internal const val API_CONTROLLER_ATTRIBUTE = "ApiController"
-internal const val FROM_BODY_ATTRIBUTE = "FromBody"
-internal const val FROM_QUERY_ATTRIBUTE = "FromQuery"
-internal const val FROM_ROUTE_ATTRIBUTE = "FromRoute"
-internal const val PRODUCES_RESPONSE_TYPE_ATTRIBUTE = "ProducesResponseType"
 internal const val VOID_TYPE_NAME = "void"
