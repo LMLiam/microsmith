@@ -24,6 +24,7 @@ internal class ScriptEvaluationSuccessFinalizer(
                 warnings = warnings,
                 cacheHit = cacheHit,
                 elapsedMillis = elapsedMillis,
+                generatedRoots = scriptContext.generatedRoots(),
             )
         },
         onFailure = { error ->

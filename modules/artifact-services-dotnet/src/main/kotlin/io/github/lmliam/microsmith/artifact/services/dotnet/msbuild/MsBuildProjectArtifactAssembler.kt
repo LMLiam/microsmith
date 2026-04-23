@@ -15,6 +15,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
             projectAttributes = linkedMapOf<String, String>().apply { putAll(contribution.projectAttributes) },
             properties = linkedMapOf<String, String>().apply { putAll(contribution.properties) },
             items = contribution.items.toList(),
+            origins = contribution.origins,
         )
     }
 
@@ -63,6 +64,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
             projectAttributes = mergedProjectAttributes,
             properties = mergedProperties,
             items = mergedItems.values.toList(),
+            origins = current.origins + next.origins,
         )
     }
 

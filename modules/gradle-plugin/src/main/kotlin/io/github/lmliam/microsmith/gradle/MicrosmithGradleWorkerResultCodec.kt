@@ -22,6 +22,10 @@ internal class MicrosmithGradleWorkerResultCodec {
                 warnings = properties.readValues(RESULT_WARNING_COUNT, RESULT_WARNING_PREFIX),
                 cacheHit = properties.requiredBoolean(RESULT_CACHE_HIT),
                 elapsedMillis = properties.requiredLong(RESULT_ELAPSED_MILLIS),
+                generatedRoots =
+                properties
+                    .readValues(RESULT_GENERATED_ROOT_COUNT, RESULT_GENERATED_ROOT_PREFIX)
+                    .map(Path::of),
             )
 
             RESULT_STATUS_FAILURE -> MicrosmithGradleWorkerFailure(
@@ -38,8 +42,12 @@ internal class MicrosmithGradleWorkerResultCodec {
         this[RESULT_ELAPSED_MILLIS] = result.elapsedMillis.toString()
         this[RESULT_CACHE_HIT] = result.cacheHit.toString()
         this[RESULT_WARNING_COUNT] = result.warnings.size.toString()
+        this[RESULT_GENERATED_ROOT_COUNT] = result.generatedRoots.size.toString()
         result.warnings.forEachIndexed { index, warning ->
             this["$RESULT_WARNING_PREFIX$index"] = warning
+        }
+        result.generatedRoots.forEachIndexed { index, generatedRoot ->
+            this["$RESULT_GENERATED_ROOT_PREFIX$index"] = generatedRoot.toString()
         }
     }
 
@@ -60,6 +68,8 @@ private const val RESULT_ELAPSED_MILLIS = "result.elapsedMillis"
 private const val RESULT_CACHE_HIT = "result.cacheHit"
 private const val RESULT_WARNING_COUNT = "result.warnings.count"
 private const val RESULT_WARNING_PREFIX = "result.warning."
+private const val RESULT_GENERATED_ROOT_COUNT = "result.generatedRoots.count"
+private const val RESULT_GENERATED_ROOT_PREFIX = "result.generatedRoot."
 private const val RESULT_FAILURE_TYPE = "result.failureType"
 private const val RESULT_DIAGNOSTIC_COUNT = "result.diagnostics.count"
 private const val RESULT_DIAGNOSTIC_PREFIX = "result.diagnostic."

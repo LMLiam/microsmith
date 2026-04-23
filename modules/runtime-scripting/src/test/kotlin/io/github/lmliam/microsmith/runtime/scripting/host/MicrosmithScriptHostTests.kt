@@ -138,11 +138,12 @@ class MicrosmithScriptHostTests :
                     )
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
-                val generatedFile =
-                    output.resolve("dotnet/Platform/UserService.Api/Generated/Hosting/MicrosmithHostingExtensions.cs")
-                generatedFile.exists() shouldBe true
-                generatedFile.readText().shouldContain("AddMicrosmith")
-                generatedFile.readText().shouldContain("MapMicrosmith")
+                output.resolve("dotnet/Platform/UserService.Api/Program.cs").exists() shouldBe true
+                output.resolve(
+                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
+                        "UserServiceApiControllerBase.cs",
+                ).exists() shouldBe true
+                output.resolve("dotnet/Platform/UserService.Api/.microsmith/origins.json").exists() shouldBe true
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -191,6 +192,85 @@ class MicrosmithScriptHostTests :
                 val generatedFile = output.resolve("proto/EventRecord.proto")
                 Files.exists(generatedFile) shouldBe true
                 generatedFile.readText().shouldContain("message EventRecord")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "runs service scripts and generates ASP.NET outputs" {
+            val tempDir = createTempDirectory("microsmith-script-host-dotnet-asp")
+            try {
+                val script = tempDir.resolve("service.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val cache = tempDir.resolve("cache")
+
+                script.writeText(
+                    """
+                    microsmith {
+                        services {
+                            dotnet {
+                                target(NET8)
+                                solutions {
+                                    "Platform" {}
+                                }
+                            }
+
+                            "UserService" {
+                                dotnet {
+                                    solution("Platform")
+                                    project("UserService.Api")
+                                    models {
+                                        "User" {
+                                            string("id")
+                                            string("email")
+                                        }
+                                        "Problem" {
+                                            string("detail")
+                                        }
+                                    }
+                                    asp {
+                                        rest {
+                                            "/users" {
+                                                get("/{id}", "GetUser") {
+                                                    path("GetUserPath") {
+                                                        string("id")
+                                                    }
+                                                    responses {
+                                                        ok("User")
+                                                        notFound("Problem")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    """.trimIndent(),
+                )
+
+                val host = MicrosmithScriptHost(cacheDirectory = cache)
+                val result =
+                    host.run(
+                        ScriptRunRequest(
+                            script = script,
+                            outputDir = output,
+                            variables = emptyMap(),
+                            flags = emptySet(),
+                        ),
+                    )
+
+                result.shouldBeTypeOf<ScriptRunSuccess>()
+                output.resolve("dotnet/Platform/UserService.Api/Program.cs").exists() shouldBe true
+                output.resolve(
+                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
+                        "UserServiceApiControllerBase.cs",
+                ).exists() shouldBe true
+                output.resolve("dotnet/Platform/UserService.Api/.microsmith/origins.json").exists() shouldBe true
+                output.resolve("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs")
+                    .readText()
+                    .shouldContain("""[HttpGet("/users/{id}", Name = "GetUser")]""")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }

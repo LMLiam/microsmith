@@ -4,6 +4,7 @@ import io.github.lmliam.microsmith.cli.command.RunCommand
 import io.github.lmliam.microsmith.cli.diagnostics.CliDiagnosticEmitter
 import io.github.lmliam.microsmith.cli.diagnostics.CliFailureCode
 import io.github.lmliam.microsmith.cli.eventlog.RunEventLogEntry
+import io.github.lmliam.microsmith.runtime.scripting.model.GeneratedOutputRootsLocator
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
@@ -45,7 +46,7 @@ internal class RunCompletionReporter(private val eventLogWriter: (Path, RunEvent
             emitter.warn(warning)
         }
         val cacheState = if (runResult.cacheHit) "hit" else "miss"
-        val generatedOutputRoot = command.outputDir.toAbsolutePath().normalize().resolve("proto")
+        val generatedOutputRoot = GeneratedOutputRootsLocator.describe(command.outputDir, runResult.generatedRoots)
         emitter.info(
             "Generated script '${command.script}' into '$generatedOutputRoot' " +
                 "(compile-cache=$cacheState, elapsed=${runResult.elapsedMillis}ms).",

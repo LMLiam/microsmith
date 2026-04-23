@@ -1,18 +1,9 @@
 microsmith {
-    schemas {
-        protobuf {
-            message("DotnetUserCreated") {
-                int32("id") { index(1) }
-                string("email") { index(2) }
-            }
-        }
-    }
-
     services {
         dotnet {
             target(NET8)
             solutions {
-                "Platform" {}
+                "Platform" { }
             }
         }
 
@@ -25,8 +16,14 @@ microsmith {
                         string("id")
                         string("email")
                     }
+                    "Problem" {
+                        string("detail")
+                    }
+                    "Report" {
+                        string("id")
+                        string("title")
+                    }
                 }
-
                 asp {
                     rest {
                         "/users" {
@@ -34,9 +31,59 @@ microsmith {
                                 path("GetUserPath") {
                                     string("id")
                                 }
-
+                                query("GetUserQuery") {
+                                    bool("includeDetails") {
+                                        optional()
+                                        default(false)
+                                    }
+                                }
+                                headers("GetUserHeaders") {
+                                    header("X-Correlation-Id")
+                                }
                                 responses {
-                                    ok("User")
+                                    ok("User") {
+                                        headers {
+                                            header("ETag")
+                                        }
+                                    }
+                                    notFound("Problem")
+                                }
+                            }
+
+                            post("CreateUser") {
+                                body("CreateUserBody") {
+                                    string("email")
+                                }
+                                responses {
+                                    created("User") {
+                                        headers {
+                                            header("Location")
+                                        }
+                                    }
+                                    badRequest("Problem")
+                                }
+                            }
+                        }
+
+                        "/reports" {
+                            get("/{reportId}", "GetReport") {
+                                path("GetReportPath") {
+                                    guid("reportId")
+                                }
+                                query("GetReportQuery") {
+                                    int("days")
+                                    dateOnly("since")
+                                    dateTimeOffset("requestedAt")
+                                    decimal("threshold") {
+                                        optional()
+                                        default(1.5)
+                                    }
+                                    timeSpan("window") {
+                                        optional()
+                                    }
+                                }
+                                responses {
+                                    ok("Report")
                                 }
                             }
                         }

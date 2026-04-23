@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.sbt
 
+import io.github.lmliam.microsmith.runtime.scripting.model.GeneratedOutputRootsLocator
 import _root_.sbt._
 import _root_.sbt.Keys._
 import _root_.sbt.internal.util.MessageOnlyException
@@ -82,12 +83,13 @@ object MicrosmithSbtPlugin extends AutoPlugin {
     try {
       val outcome = executionService.execute(configuration)
       outcome.getWarnings.asScala.foreach(message => logger.warn(message))
-      val generatedOutputRoot = outcome.getOutputDirectory.toAbsolutePath.normalize.resolve("proto")
+      val generatedRoots = outcome.getGeneratedRoots.asScala.toSeq
+      val generatedOutputRoot = GeneratedOutputRootsLocator.describe(outcome.getOutputDirectory, outcome.getGeneratedRoots.asScala.toList.asJava)
       logger.info(
         s"Generated Microsmith outputs into '$generatedOutputRoot'. " +
           s"(compile-cache=${if (outcome.getCacheHit) "hit" else "miss"}, elapsed=${outcome.getElapsedMillis}ms)"
       )
-      generatedFiles(generatedOutputRoot.toFile)
+      generatedFiles(generatedRoots.map(_.toFile))
     } catch {
       case error: MicrosmithSbtScriptFailureException =>
         throw new MessageOnlyException(error.getMessage)
@@ -96,20 +98,20 @@ object MicrosmithSbtPlugin extends AutoPlugin {
     }
   }
 
-  private def generatedFiles(outputDirectory: File): Seq[File] = {
-    if (!outputDirectory.isDirectory) {
-      return Seq.empty
-    }
-
-    val stream = Files.walk(outputDirectory.toPath)
-    try {
-      stream.iterator.asScala
-        .filter(Files.isRegularFile(_))
-        .map(_.toFile)
-        .toVector
-        .sortBy(_.getAbsolutePath)
-    } finally {
-      stream.close()
-    }
-  }
+  private def generatedFiles(outputRoots: Seq[File]): Seq[File] =
+    outputRoots
+      .filter(_.isDirectory)
+      .flatMap { outputDirectory =>
+        val stream = Files.walk(outputDirectory.toPath)
+        try {
+          stream.iterator.asScala
+            .filter(Files.isRegularFile(_))
+            .map(_.toFile)
+            .toVector
+        } finally {
+          stream.close()
+        }
+      }
+      .distinct
+      .sortBy(_.getAbsolutePath)
 }

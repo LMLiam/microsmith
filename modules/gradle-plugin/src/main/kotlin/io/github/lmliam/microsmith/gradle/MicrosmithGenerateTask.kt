@@ -16,6 +16,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
+import java.nio.file.Path
 
 @DisableCachingByDefault(
     because = "Microsmith maintains its own compilation cache and task-level caching needs deeper normalization.",
@@ -76,7 +77,8 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
 
     private fun reportSuccess(result: MicrosmithGradleWorkerSuccess) {
         result.warnings.forEach(logger::warn)
-        val generatedOutputRoot = outputDirectory.get().asFile.toPath().toAbsolutePath().normalize().resolve("proto")
+        val generatedOutputRoot =
+            describeGeneratedOutputRoots(outputDirectory.get().asFile.toPath(), result.generatedRoots)
         logger.lifecycle(
             "Generated Microsmith outputs into '$generatedOutputRoot'. " +
                 "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)",
@@ -87,4 +89,19 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
         appendLine("Microsmith generation failed (${result.type.lowercase()}).")
         result.diagnostics.forEach(::appendLine)
     }.trimEnd()
+
+    private fun describeGeneratedOutputRoots(outputDirectory: Path, roots: List<Path>): String {
+        val normalizedOutputDirectory = outputDirectory.toAbsolutePath().normalize()
+        val normalizedRoots = roots.map { root -> root.toAbsolutePath().normalize() }.distinct().sorted()
+        return when (normalizedRoots.size) {
+            0 -> normalizedOutputDirectory.toString()
+            1 -> normalizedRoots.single().toString()
+            else -> buildString {
+                append(normalizedOutputDirectory)
+                append(" (roots: ")
+                append(normalizedRoots.joinToString())
+                append(')')
+            }
+        }
+    }
 }

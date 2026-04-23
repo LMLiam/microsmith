@@ -7,4 +7,5 @@ data class ProtoFileArtifact(
     val packageName: String?,
     val imports: List<String>,
     val declarations: List<ProtoDeclaration>,
+    val origins: Set<String> = emptySet(),
 ) : ProtobufArtifact

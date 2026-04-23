@@ -1,25 +1,25 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeadersBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestBindingArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspHeadersBinding
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspModelLocality
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRequestBinding
 
 internal fun validateEndpointGenerationInputs(artifact: DotnetAspServiceArtifact) {
     validateRequestBindings(artifact)
+    validateNoContentResponses(artifact)
     validateResponseHeaderNames(artifact)
     validateGeneratedContractTypeNames(artifact)
     validateGeneratedControllerTypeNames(artifact)
 }
 
 private fun validateRequestBindings(artifact: DotnetAspServiceArtifact) {
-    artifact.rest.endpoints.forEach { endpoint ->
+    artifact.endpoints.forEach { endpoint ->
         listOfNotNull(endpoint.bindings.path, endpoint.bindings.query).forEach { binding ->
             binding.fields.forEach { field ->
                 val referenceTarget = (field.type as? DotnetFieldType.Reference)?.target
                 require(referenceTarget == null) {
-                    "ASP.NET request binding '${binding.name}' in operation " +
+                    "ASP.NET request binding '${binding.typeName}' in operation " +
                         "'${endpoint.operationName}' cannot reference shared model " +
                         "'$referenceTarget'. " +
                         "Transport bindings must declare scalar fields."
@@ -30,7 +30,7 @@ private fun validateRequestBindings(artifact: DotnetAspServiceArtifact) {
 }
 
 private fun validateResponseHeaderNames(artifact: DotnetAspServiceArtifact) {
-    artifact.rest.endpoints.forEach { endpoint ->
+    artifact.endpoints.forEach { endpoint ->
         endpoint.responses.forEach { response ->
             val headerPropertyNames = response.headers.map { header ->
                 val generatedName = dotnetAspHeaderPropertyName(header.name)
@@ -57,6 +57,21 @@ private fun validateResponseHeaderNames(artifact: DotnetAspServiceArtifact) {
     }
 }
 
+private fun validateNoContentResponses(artifact: DotnetAspServiceArtifact) {
+    artifact.endpoints.forEach { endpoint ->
+        endpoint.responses
+            .filter { response -> response.statusCode == HTTP_NO_CONTENT_STATUS_CODE }
+            .forEach { response ->
+                require(response.model.model.fields.isEmpty()) {
+                    "ASP.NET response ${response.statusCode} in operation " +
+                        "'${endpoint.operationName}' cannot declare response body fields " +
+                        "for model '${response.model.typeName}'. " +
+                        "HTTP 204 responses are emitted without a response body."
+                }
+            }
+    }
+}
+
 private fun validateGeneratedControllerTypeNames(artifact: DotnetAspServiceArtifact) {
     require(controllerBaseTypeName(artifact) != MICROSMITH_CONTROLLER_BASE_TYPE_NAME) {
         "ASP.NET service '${artifact.serviceName}' project '${artifact.id.projectName}' " +
@@ -73,35 +88,24 @@ private fun validateGeneratedContractTypeNames(artifact: DotnetAspServiceArtifac
         contractOwners.getOrPut(typeName) { mutableListOf() }.add(owner)
     }
 
-    artifact.models.keys.forEach { register(it, "shared model '$it'") }
-    collectRequestBindings(artifact).forEach { register(it.name, "request binding '${it.name}'") }
-    collectHeaderBindings(artifact).forEach { register(it.name, "headers binding '${it.name}'") }
-    artifact.rest.endpoints.forEach { endpoint ->
+    artifact.contractModels
+        .distinctBy { it.typeName }
+        .forEach { model ->
+            register(model.typeName, "generated contract model '${model.typeName}'")
+        }
+    collectRequestBindings(artifact).forEach { register(it.typeName, "request binding '${it.typeName}'") }
+    collectHeaderBindings(artifact).forEach { register(it.typeName, "headers binding '${it.typeName}'") }
+    artifact.endpoints.forEach { endpoint ->
         register(
             resultBaseTypeName(endpoint),
             "result base for operation '${endpoint.operationName}'",
         )
-        endpoint.bindings.body
-            ?.takeIf { it.locality == ResolvedDotnetAspModelLocality.INLINE }
-            ?.let {
-                register(
-                    inlineBodyTypeName(endpoint),
-                    "inline body model for operation '${endpoint.operationName}'",
-                )
-            }
         endpoint.responses.forEach { response ->
             register(
                 resultVariantTypeName(endpoint, response),
                 "response result for operation '${endpoint.operationName}' " +
                     "status ${response.statusCode}",
             )
-            if (response.model.locality == ResolvedDotnetAspModelLocality.INLINE) {
-                register(
-                    inlineResponseTypeName(endpoint, response),
-                    "inline response model for operation '${endpoint.operationName}' " +
-                        "status ${response.statusCode}",
-                )
-            }
         }
     }
 
@@ -117,32 +121,30 @@ private fun validateGeneratedContractTypeNames(artifact: DotnetAspServiceArtifac
     }
 }
 
-internal fun collectRequestBindings(artifact: DotnetAspServiceArtifact): List<ResolvedDotnetAspRequestBinding> =
+internal fun collectRequestBindings(artifact: DotnetAspServiceArtifact): List<DotnetAspRequestBindingArtifact> =
     artifact
-        .rest
         .endpoints
         .flatMap { endpoint ->
             listOfNotNull(endpoint.bindings.path, endpoint.bindings.query)
-        }.groupBy(ResolvedDotnetAspRequestBinding::name)
-        .map { (name, bindings) ->
+        }.groupBy(DotnetAspRequestBindingArtifact::typeName)
+        .map { (typeName, bindings) ->
             val first = bindings.first()
             require(bindings.all { it == first }) {
                 "ASP.NET service '${artifact.serviceName}' declares conflicting " +
-                    "request binding shapes for '$name'."
+                    "request binding shapes for '$typeName'."
             }
             first
-        }.sortedBy(ResolvedDotnetAspRequestBinding::name)
+        }.sortedBy(DotnetAspRequestBindingArtifact::typeName)
 
-internal fun collectHeaderBindings(artifact: DotnetAspServiceArtifact): List<ResolvedDotnetAspHeadersBinding> = artifact
-    .rest
+internal fun collectHeaderBindings(artifact: DotnetAspServiceArtifact): List<DotnetAspHeadersBindingArtifact> = artifact
     .endpoints
     .mapNotNull { it.bindings.headers }
-    .groupBy(ResolvedDotnetAspHeadersBinding::name)
-    .map { (name, bindings) ->
+    .groupBy(DotnetAspHeadersBindingArtifact::typeName)
+    .map { (typeName, bindings) ->
         val first = bindings.first()
         require(bindings.all { it == first }) {
             "ASP.NET service '${artifact.serviceName}' declares conflicting " +
-                "headers binding shapes for '$name'."
+                "headers binding shapes for '$typeName'."
         }
         first
-    }.sortedBy(ResolvedDotnetAspHeadersBinding::name)
+    }.sortedBy(DotnetAspHeadersBindingArtifact::typeName)

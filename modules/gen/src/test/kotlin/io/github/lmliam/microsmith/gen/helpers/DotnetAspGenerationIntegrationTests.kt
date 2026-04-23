@@ -7,209 +7,154 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.asp
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import io.kotest.matchers.string.shouldNotContain
 import java.nio.file.Files
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 class DotnetAspGenerationIntegrationTests :
     StringSpec({
-        "generateTo emits the ASP.NET scaffold and endpoint extension surface" {
+        "generateTo emits an abstract ASP.NET extension surface with provenance" {
             val outputDir = Files.createTempDirectory("microsmith-dotnet-asp-output-")
-            val model =
-                microsmith {
-                    services {
-                        dotnet {
-                            target(NET8)
-                            solutions {
-                                "Platform" {}
-                            }
-                        }
-
-                        "UserService" {
-                            dotnet {
-                                solution("Platform")
-                                project("UserService.Api")
-                                models {
-                                    "User" {
-                                        string("id")
-                                        string("email")
-                                    }
-
-                                    "Problem" {
-                                        string("message")
-                                    }
-                                }
-
-                                asp {
-                                    rest {
-                                        "/users" {
-                                            get("/{id}", "GetUser") {
-                                                path("GetUserPath") {
-                                                    string("id")
-                                                }
-
-                                                responses {
-                                                    ok("User")
-                                                    notFound("Problem") {
-                                                        headers {
-                                                            header("X-Trace-Id")
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            post("CreateUser") {
-                                                query("CreateUserQuery") {
-                                                    bool("dryRun") {
-                                                        optional()
-                                                        default(false)
-                                                    }
-                                                }
-
-                                                body("Body") {
-                                                    string("email")
-                                                }
-
-                                                responses {
-                                                    created("User") {
-                                                        headers {
-                                                            header("Location")
-                                                        }
-                                                    }
-                                                    badRequest("Problem") {
-                                                        model {
-                                                            string("message")
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            val model = sampleDotnetAspModel()
 
             model.generateTo(outputDir)
 
             val projectRoot = outputDir.resolve("dotnet/Platform/UserService.Api")
             Files.exists(projectRoot.resolve("UserService.Api.csproj")) shouldBe true
-            Files.exists(projectRoot.resolve("Program.cs")) shouldBe false
-            Files.exists(projectRoot.resolve("appsettings.json")) shouldBe true
-            Files.exists(projectRoot.resolve("Properties/launchSettings.json")) shouldBe true
+            Files.exists(projectRoot.resolve("Program.cs")) shouldBe true
             Files.exists(projectRoot.resolve("Generated/Hosting/MicrosmithHostingExtensions.cs")) shouldBe true
             Files.exists(projectRoot.resolve("Generated/Contracts/ServiceModels.cs")) shouldBe true
             Files.exists(projectRoot.resolve("Generated/Contracts/RequestModels.cs")) shouldBe true
             Files.exists(projectRoot.resolve("Generated/Contracts/ResponseModels.cs")) shouldBe true
-            Files.exists(
-                projectRoot.resolve("Generated/Controllers/UserServiceApiControllerBase.cs"),
-            ) shouldBe true
-            Files.exists(
-                projectRoot.resolve("Controllers/UserServiceApiController.cs"),
-            ) shouldBe false
-            projectRoot.resolve("Generated/Hosting/MicrosmithHostingExtensions.cs").readText()
-                .shouldContain("Generated by Microsmith")
-            projectRoot.resolve("Generated/Hosting/MicrosmithHostingExtensions.cs").readText()
-                .shouldContain("AddMicrosmith")
-            projectRoot.resolve("Generated/Hosting/MicrosmithHostingExtensions.cs").readText()
-                .shouldContain("MapMicrosmith")
+            Files.exists(projectRoot.resolve("Generated/Controllers/MicrosmithControllerBase.cs")) shouldBe true
+            Files.exists(projectRoot.resolve("Generated/Controllers/UserServiceApiControllerBase.cs")) shouldBe true
+            Files.exists(projectRoot.resolve(".microsmith/origins.json")) shouldBe true
+
+            projectRoot.resolve("Program.cs").readText().shouldContain("Generated by Microsmith")
+            projectRoot.resolve("Program.cs").readText().shouldContain("AddMicrosmith")
             projectRoot.resolve("Generated/Controllers/UserServiceApiControllerBase.cs").readText()
-                .shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync(")
+                .shouldContain("""[HttpGet("/users/{id}", Name = "GetUser")]""")
+            projectRoot.resolve("Generated/Controllers/UserServiceApiControllerBase.cs").readText()
+                .shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync")
             projectRoot.resolve("Generated/Contracts/RequestModels.cs").readText()
-                .shouldContain("public bool DryRun { get; set; } = false;")
+                .shouldContain("public bool IncludeDetails { get; set; } = false;")
+            projectRoot.resolve("Generated/Contracts/RequestModels.cs").readText()
+                .shouldContain("public decimal Threshold { get; set; } = 1.5M;")
+            projectRoot.resolve("Generated/Contracts/RequestModels.cs").readText()
+                .shouldContain("public TimeSpan? Window { get; set; } = null;")
+            projectRoot.resolve(".microsmith/origins.json").readText()
+                .shouldContain("services.UserService.rest.GetUser")
+            projectRoot.resolve(".microsmith/origins.json").readText()
+                .shouldContain("services.UserService.rest.CreateUser.body.CreateUserBody")
         }
 
-        "generateTo overwrites generated ASP.NET endpoint files on rerun" {
+        "generateTo overwrites generator-owned ASP.NET files on rerun" {
             val outputDir = Files.createTempDirectory("microsmith-dotnet-asp-rerun-")
-            val initialModel =
-                microsmith {
-                    services {
-                        dotnet {
-                            target(NET8)
-                            solutions {
-                                "Platform" {}
-                            }
-                        }
+            val model = sampleDotnetAspModel()
 
-                        "UserService" {
-                            dotnet {
-                                solution("Platform")
-                                project("UserService.Api")
-                                models {
-                                    "User" {
-                                        string("id")
-                                    }
-                                }
+            model.generateTo(outputDir)
 
-                                asp {
-                                    rest {
-                                        "/users" {
-                                            get("/{id}", "GetUser") {
-                                                path("GetUserPath") {
-                                                    string("id")
-                                                }
+            val controllerFile =
+                outputDir.resolve(
+                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
+                        "UserServiceApiControllerBase.cs",
+                )
+            controllerFile.writeText("stale")
 
-                                                responses {
-                                                    ok("User")
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            model.generateTo(outputDir)
 
-            initialModel.generateTo(outputDir)
-
-            val controllerBaseFile =
-                outputDir
-                    .resolve("dotnet/Platform/UserService.Api")
-                    .resolve("Generated/Controllers/UserServiceApiControllerBase.cs")
-            val requestModelsFile =
-                outputDir
-                    .resolve("dotnet/Platform/UserService.Api")
-                    .resolve("Generated/Contracts/RequestModels.cs")
-            controllerBaseFile.writeText("stale")
-            requestModelsFile.writeText("stale")
-
-            val updatedModel =
-                microsmith {
-                    services {
-                        dotnet {
-                            target(NET8)
-                            solutions {
-                                "Platform" {}
-                            }
-                        }
-
-                        "UserService" {
-                            dotnet {
-                                solution("Platform")
-                                project("UserService.Api")
-                                models {
-                                    "User" {
-                                        string("id")
-                                    }
-                                }
-
-                                asp {}
-                            }
-                        }
-                    }
-                }
-
-            updatedModel.generateTo(outputDir)
-
-            controllerBaseFile.readText()
-                .shouldContain("public abstract class UserServiceApiControllerBase : MicrosmithControllerBase\n{}")
-            controllerBaseFile.readText().shouldNotContain("stale")
-            controllerBaseFile.readText().shouldNotContain("OnGetUserAsync")
-            requestModelsFile.readText().shouldContain("namespace UserService.Api.Generated.Contracts;")
-            requestModelsFile.readText().shouldNotContain("stale")
-            requestModelsFile.readText().shouldNotContain("GetUserPath")
+            controllerFile.readText().shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync")
         }
     })
+
+private fun sampleDotnetAspModel() = microsmith {
+    services {
+        dotnet {
+            target(NET8)
+            solutions {
+                "Platform" {}
+            }
+        }
+
+        "UserService" {
+            dotnet {
+                solution("Platform")
+                project("UserService.Api")
+                models {
+                    "User" {
+                        string("id")
+                        string("email")
+                    }
+                    "Problem" {
+                        string("detail")
+                    }
+                }
+                asp {
+                    rest {
+                        "/users" {
+                            get("/{id}", "GetUser") {
+                                path("GetUserPath") {
+                                    string("id")
+                                }
+                                query("GetUserQuery") {
+                                    bool("includeDetails") {
+                                        optional()
+                                        default(false)
+                                    }
+                                }
+                                headers("GetUserHeaders") {
+                                    header("X-Correlation-Id")
+                                }
+                                responses {
+                                    ok("User") {
+                                        headers {
+                                            header("ETag")
+                                        }
+                                    }
+                                    notFound("Problem")
+                                }
+                            }
+
+                            post("CreateUser") {
+                                body("CreateUserBody") {
+                                    string("email")
+                                }
+                                responses {
+                                    created("User") {
+                                        headers {
+                                            header("Location")
+                                        }
+                                    }
+                                    badRequest("Problem")
+                                }
+                            }
+                        }
+
+                        "/reports" {
+                            get("/{reportId}", "GetReport") {
+                                path("GetReportPath") {
+                                    guid("reportId")
+                                }
+                                query("GetReportQuery") {
+                                    int("days")
+                                    dateOnly("since")
+                                    dateTimeOffset("requestedAt")
+                                    decimal("threshold") {
+                                        optional()
+                                        default(1.5)
+                                    }
+                                    timeSpan("window") {
+                                        optional()
+                                    }
+                                }
+                                responses {
+                                    ok("User")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

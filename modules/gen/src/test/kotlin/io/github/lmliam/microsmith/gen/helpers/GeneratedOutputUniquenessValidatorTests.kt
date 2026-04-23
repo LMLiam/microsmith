@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.gen.helpers
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import java.nio.file.Files
 import kotlin.io.path.Path
 
 class GeneratedOutputUniquenessValidatorTests :
@@ -47,6 +48,38 @@ class GeneratedOutputUniquenessValidatorTests :
                         GeneratedFile(
                             relativePath = Path("./User.proto"),
                             contents = byteArrayOf(2),
+                            outputRoot = Path("proto"),
+                        ),
+                    ),
+                )
+            }
+        }
+
+        "requireUniqueOutputPaths rejects absolute generated file paths" {
+            val absolutePath = Files.createTempDirectory("microsmith-uniqueness-")
+                .resolve("User.proto")
+                .toAbsolutePath()
+
+            shouldThrow<IllegalArgumentException> {
+                GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(
+                    listOf(
+                        GeneratedFile(
+                            relativePath = absolutePath,
+                            contents = byteArrayOf(1),
+                            outputRoot = Path("proto"),
+                        ),
+                    ),
+                )
+            }
+        }
+
+        "requireUniqueOutputPaths rejects generated file paths that traverse outside the root" {
+            shouldThrow<IllegalArgumentException> {
+                GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(
+                    listOf(
+                        GeneratedFile(
+                            relativePath = Path("../outside.proto"),
+                            contents = byteArrayOf(1),
                             outputRoot = Path("proto"),
                         ),
                     ),

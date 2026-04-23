@@ -8,6 +8,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import java.nio.file.Files
+import java.nio.file.Path
 import java.util.Properties
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
@@ -51,6 +52,11 @@ class ProcessIsolationProtocolTests :
                         warnings = listOf("warning"),
                         cacheHit = true,
                         elapsedMillis = Int.MAX_VALUE.toLong() + 1,
+                        generatedRoots =
+                        listOf(
+                            Path.of("/tmp/generated"),
+                            Path.of("/tmp/generated/dotnet/Platform/UserService.Api"),
+                        ),
                     )
 
                 ProcessIsolationProtocol.writeResult(resultFile, success)

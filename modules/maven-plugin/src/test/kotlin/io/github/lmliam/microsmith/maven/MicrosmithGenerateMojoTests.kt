@@ -75,6 +75,61 @@ class MicrosmithGenerateMojoTests : StringSpec() {
             fixture.file("custom-generated/proto/MavenConfiguredUserCreated.proto").toFile().shouldExist()
         }
 
+        "execute supports ASP.NET service generation" {
+            val fixture = MicrosmithMavenTestProject.create("maven-plugin-dotnet-asp")
+            fixture.writeFile(
+                "build.microsmith.kts",
+                """
+                microsmith {
+                    services {
+                        dotnet {
+                            target(NET8)
+                            solutions {
+                                "Platform" {}
+                            }
+                        }
+
+                        "UserService" {
+                            dotnet {
+                                solution("Platform")
+                                project("UserService.Api")
+                                models {
+                                    "User" {
+                                        string("id")
+                                    }
+                                }
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            get("/{id}", "GetUser") {
+                                                path("GetUserPath") {
+                                                    string("id")
+                                                }
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+
+            fixture.createMojo().execute()
+
+            fixture.file("dotnet/Platform/UserService.Api/Program.cs").toFile().shouldExist()
+            fixture
+                .file(
+                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
+                        "UserServiceApiControllerBase.cs",
+                ).toFile()
+                .shouldExist()
+        }
+
         "script compilation failures surface as MojoFailureException" {
             val fixture = MicrosmithMavenTestProject.create("maven-plugin-compilation-failure")
             fixture.writeFile(

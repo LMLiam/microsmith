@@ -7,12 +7,17 @@ class MicrosmithScriptContext(
     val outDir: Path,
     val vars: Map<String, String>,
     val flags: Set<String>,
-    private val emitHandler: (MicrosmithModel) -> Unit,
+    private val emitHandler: (MicrosmithModel) -> List<Path>,
 ) {
     private var emitted: Boolean = false
+    private var generatedRoots: List<Path> = emptyList()
 
     fun emit(model: MicrosmithModel) {
-        emitHandler(model)
+        generatedRoots =
+            (generatedRoots + emitHandler(model))
+                .map { path -> path.toAbsolutePath().normalize() }
+                .distinct()
+                .sorted()
         emitted = true
     }
 
@@ -25,4 +30,6 @@ class MicrosmithScriptContext(
     fun requireVar(name: String): String = vars[name] ?: error("Missing required --var '$name'.")
 
     internal fun emittedAny(): Boolean = emitted
+
+    internal fun generatedRoots(): List<Path> = generatedRoots
 }

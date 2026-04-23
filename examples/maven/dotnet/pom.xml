@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>example.microsmith</groupId>
+    <artifactId>dotnet-maven-native-fixture</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>local-m2</id>
+            <url>file://${user.home}/.m2/repository</url>
+        </repository>
+        <repository>
+            <id>github-microsmith</id>
+            <url>https://maven.pkg.github.com/lmliam/microsmith</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>local-m2</id>
+            <url>file://${user.home}/.m2/repository</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>github-microsmith</id>
+            <url>https://maven.pkg.github.com/lmliam/microsmith</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.lmliam.microsmith</groupId>
+            <artifactId>runtime-scripting</artifactId>
+            <version>${microsmith.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.github.lmliam.microsmith</groupId>
+                <artifactId>maven-plugin</artifactId>
+                <version>${microsmith.version}</version>
+                <configuration>
+                    <outputDirectory>${project.basedir}/Generated</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

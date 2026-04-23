@@ -30,6 +30,13 @@ class ProtobufArtifactContributor : ArtifactContributor<ResolvedProtobufSchemaMo
                         contents = declarationHandler.render(resolvedSchema.schema.schema),
                     ),
                 ),
+                origins = setOf(
+                    buildString {
+                        append("schemas.protobuf")
+                        resolvedSchema.qualifiedName.packageName?.let { append('.').append(it) }
+                        append('.').append(resolvedSchema.qualifiedName.typeName)
+                    },
+                ),
             )
         }
 }

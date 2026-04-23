@@ -69,6 +69,62 @@ class MicrosmithSbtExecutionServiceTests : StringSpec() {
             fixture.file("target/generated/custom/proto/SbtConfiguredUserCreated.proto").toFile().shouldExist()
         }
 
+        "execute supports ASP.NET service generation" {
+            val fixture = MicrosmithSbtTestProject.create("microsmith-sbt-plugin-dotnet-asp")
+            fixture.writeFile(
+                "build.microsmith.kts",
+                """
+                microsmith {
+                    services {
+                        dotnet {
+                            target(NET8)
+                            solutions {
+                                "Platform" {}
+                            }
+                        }
+
+                        "UserService" {
+                            dotnet {
+                                solution("Platform")
+                                project("UserService.Api")
+                                models {
+                                    "User" {
+                                        string("id")
+                                    }
+                                }
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            get("/{id}", "GetUser") {
+                                                path("GetUserPath") {
+                                                    string("id")
+                                                }
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+
+            val result = MicrosmithSbtExecutionService().execute(fixture.executionConfiguration())
+
+            result.outputDirectory shouldBe fixture.file(".").normalize()
+            fixture.file("dotnet/Platform/UserService.Api/Program.cs").toFile().shouldExist()
+            fixture
+                .file(
+                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
+                        "UserServiceApiControllerBase.cs",
+                ).toFile()
+                .shouldExist()
+        }
+
         "script compilation failures surface as MicrosmithSbtScriptFailureException" {
             val fixture = MicrosmithSbtTestProject.create("microsmith-sbt-plugin-compilation-failure")
             fixture.writeFile(

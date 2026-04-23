@@ -24,6 +24,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                         check(generateTask.group == "$TASK_GROUP_NAME")
 
                         val ide = project.configurations.getByName("microsmithIde")
+                        val runtime = project.configurations.getByName("microsmithRuntime")
                         val plugins = project.configurations.getByName("microsmithPlugins")
                         val compileOnly = project.configurations.getByName("compileOnly")
                         val extension = project.extensions.getByName("$EXTENSION_NAME")
@@ -31,6 +32,10 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                         check(ide.extendsFrom.contains(plugins))
                         check(compileOnly.extendsFrom.contains(ide))
                         check(!ide.isCanBeResolved)
+                        check(
+                            runtime.attributes.getAttribute(Bundling.BUNDLING_ATTRIBUTE)?.name ==
+                                Bundling.SHADOWED,
+                        )
                         check(extension is io.github.lmliam.microsmith.gradle.MicrosmithGradleExtension)
                     }
                 }
@@ -115,6 +120,69 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
 
             result.task(":microsmithGenerate")?.outcome shouldBe TaskOutcome.SUCCESS
             project.file("custom-generated/proto/GradleConfiguredUserCreated.proto").toFile().shouldExist()
+        }
+
+        "microsmithGenerate supports ASP.NET service generation" {
+            val project = MicrosmithGradleFunctionalTestProject.create(
+                name = "microsmith-gradle-plugin-dotnet-asp",
+                buildScript = """
+                plugins {
+                    id("io.github.lmliam.microsmith")
+                }
+                """.trimIndent(),
+            )
+            project.writeFile(
+                "build.microsmith.kts",
+                """
+                microsmith {
+                    services {
+                        dotnet {
+                            target(NET8)
+                            solutions {
+                                "Platform" {}
+                            }
+                        }
+
+                        "UserService" {
+                            dotnet {
+                                solution("Platform")
+                                project("UserService.Api")
+                                models {
+                                    "User" {
+                                        string("id")
+                                    }
+                                }
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            get("/{id}", "GetUser") {
+                                                path("GetUserPath") {
+                                                    string("id")
+                                                }
+                                                responses {
+                                                    ok("User")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            )
+
+            val result = project.build("microsmithGenerate")
+
+            result.task(":microsmithGenerate")?.outcome shouldBe TaskOutcome.SUCCESS
+            project.file("dotnet/Platform/UserService.Api/Program.cs").toFile().shouldExist()
+            project
+                .file(
+                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
+                        "UserServiceApiControllerBase.cs",
+                ).toFile()
+                .shouldExist()
         }
 
         "microsmithGenerate fails with script diagnostics" {

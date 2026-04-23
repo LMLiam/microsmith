@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.build.runtime
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -64,7 +66,51 @@ class RuntimeScriptingPlugin : Plugin<Project> {
         }
         val ideFallbackReleaseAssetsDirectory =
             project.layout.buildDirectory.dir(RuntimeScriptingBuildNames.RELATIVE_RELEASE_ASSETS_DIRECTORY)
-        val ideFallbackShadowJarTask = project.tasks.named("shadowJar", Jar::class.java)
+        val runtimeScriptingShadowJarExpectedProviders = mapOf(
+            "META-INF/services/io.github.lmliam.microsmith.resolve.core.DomainResolver" to
+                listOf(
+                    "io.github.lmliam.microsmith.resolve.schemas.core.SchemasResolver",
+                    "io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufSchemasResolver",
+                    "io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcSchemasResolver",
+                    "io.github.lmliam.microsmith.resolve.services.core.ServicesResolver",
+                    "io.github.lmliam.microsmith.resolve.services.dotnet.DotnetWorkspaceDomainResolver",
+                    "io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspaceDomainResolver",
+                    "io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspaceDomainResolver",
+                ),
+            "META-INF/services/io.github.lmliam.microsmith.artifact.core.ArtifactContributor" to
+                listOf(
+                    "io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtobufArtifactContributor",
+                    "io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcArtifactContributor",
+                    "io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspArtifactContributor",
+                    "io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageArtifactContributor",
+                ),
+            "META-INF/services/io.github.lmliam.microsmith.artifact.core.ArtifactAssembler" to
+                listOf(
+                    "io.github.lmliam.microsmith.artifact.files.BinaryFileArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.files.TextFileArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifactAssembler",
+                ),
+            "META-INF/services/io.github.lmliam.microsmith.compile.core.ArtifactCompiler" to
+                listOf(
+                    "io.github.lmliam.microsmith.compile.schemas.protobuf.ProtoFileArtifactCompiler",
+                    "io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.ProtobufRpcServiceArtifactCompiler",
+                    "io.github.lmliam.microsmith.compile.services.dotnet.asp.DotnetAspServiceArtifactCompiler",
+                    "io.github.lmliam.microsmith.compile.services.dotnet.msbuild.MsBuildProjectArtifactCompiler",
+                    "io.github.lmliam.microsmith.compile.services.dotnet.packages.DotnetPackageReferencesArtifactCompiler",
+                    "io.github.lmliam.microsmith.compile.services.dotnet.packages.DotnetPackageVersionsArtifactCompiler",
+                ),
+            "META-INF/services/io.github.lmliam.microsmith.gen.core.ArtifactRenderer" to
+                listOf(
+                    "io.github.lmliam.microsmith.gen.files.render.BinaryFileArtifactRenderer",
+                    "io.github.lmliam.microsmith.gen.files.render.TextFileArtifactRenderer",
+                ),
+        )
+        val ideFallbackShadowJarTask = project.tasks.named("shadowJar", ShadowJar::class.java)
         val ideFallbackShadowJarArchive = ideFallbackShadowJarTask.flatMap { it.archiveFile }
         val ideFallbackExpectedEntries = listOf(
             RuntimeScriptingBuildNames.classEntryName(scriptTemplateFqcn),
@@ -77,6 +123,10 @@ class RuntimeScriptingPlugin : Plugin<Project> {
         ideFallbackShadowJarTask.configure { shadowJarTask ->
             shadowJarTask.archiveBaseName.set(RuntimeScriptingBuildNames.IDE_FALLBACK_SHADOW_JAR_BASE_NAME)
             shadowJarTask.archiveClassifier.set(RuntimeScriptingBuildNames.IDE_FALLBACK_SHADOW_JAR_CLASSIFIER)
+            shadowJarTask.filesMatching("META-INF/services/**") { fileCopyDetails ->
+                fileCopyDetails.duplicatesStrategy = DuplicatesStrategy.INCLUDE
+            }
+            shadowJarTask.mergeServiceFiles()
             shadowJarTask.manifest.attributes(
                 mapOf(
                     "Implementation-Version" to project.version.toString(),
@@ -152,9 +202,15 @@ class RuntimeScriptingPlugin : Plugin<Project> {
             verifyShadowTask.inputs.file(ideFallbackShadowJarArchive)
 
             verifyShadowTask.doLast {
+                val shadowJarFile = ideFallbackShadowJarArchive.get().asFile
                 verifyJarEntries(
-                    ideFallbackShadowJarArchive.get().asFile,
+                    shadowJarFile,
                     ideFallbackExpectedEntries,
+                    "IDE fallback shadow jar",
+                )
+                verifyMergedServiceProviders(
+                    shadowJarFile,
+                    runtimeScriptingShadowJarExpectedProviders,
                     "IDE fallback shadow jar",
                 )
             }
@@ -204,3 +260,34 @@ class RuntimeScriptingPlugin : Plugin<Project> {
 }
 
 private fun ByteArray.encodeHex(): String = joinToString(separator = "") { byte -> "%02x".format(byte) }
+
+private fun verifyMergedServiceProviders(
+    archiveFile: java.io.File,
+    expectedProvidersByDescriptor: Map<String, List<String>>,
+    artifactDescription: String,
+) {
+    JarFile(archiveFile).use { jarFile ->
+        expectedProvidersByDescriptor.forEach { (servicePath, expectedProviders) ->
+            val entry = jarFile.getJarEntry(servicePath)
+                ?: throw GradleException(
+                    "$artifactDescription '${archiveFile.name}' is missing service descriptor '$servicePath'.",
+                )
+            val providers =
+                jarFile.getInputStream(entry)
+                    .bufferedReader(StandardCharsets.UTF_8)
+                    .use { reader ->
+                        reader.lineSequence()
+                            .map(String::trim)
+                            .filter { line -> line.isNotEmpty() && !line.startsWith("#") }
+                            .toSet()
+                    }
+            expectedProviders.forEach { expectedProvider ->
+                if (expectedProvider !in providers) {
+                    throw GradleException(
+                        "$artifactDescription '${archiveFile.name}' is missing provider '$expectedProvider' in '$servicePath'.",
+                    )
+                }
+            }
+        }
+    }
+}

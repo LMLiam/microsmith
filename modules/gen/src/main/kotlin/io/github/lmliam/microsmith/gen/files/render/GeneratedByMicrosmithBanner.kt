@@ -45,22 +45,23 @@ internal object GeneratedByMicrosmithBanner {
 
     fun prepend(path: Path, contents: String): String {
         val comment = resolveComment(path) ?: return contents
-        if (contents.startsWith(comment)) {
+        if (contents.startsWith(commentText(comment, HEADER_TEXT))) {
             return contents
         }
+        val banner = commentText(comment, HEADER_TEXT)
         if (comment.startsWith("#") && contents.startsWith("#!")) {
             val shebangEnd = contents.indexOf('\n')
             if (shebangEnd == -1) {
-                return "$contents\n$comment\n"
+                return "$contents\n$banner\n"
             }
             val shebang = contents.substring(0, shebangEnd)
             val remainder = contents.substring(shebangEnd + 1)
-            return listOf(shebang, comment, remainder).joinToString(separator = "\n")
+            return listOf(shebang, banner, remainder).joinToString(separator = "\n")
         }
         return if (contents.isEmpty()) {
-            "$comment\n"
+            "$banner\n"
         } else {
-            "$comment\n$contents"
+            "$banner\n$contents"
         }
     }
 
@@ -68,10 +69,15 @@ internal object GeneratedByMicrosmithBanner {
         val fileName = path.fileName.toString()
         val extension = fileName.substringAfterLast('.', missingDelimiterValue = "")
         return when (extension) {
-            in xmlExtensions -> "<!-- $HEADER_TEXT -->"
-            in slashCommentExtensions -> "// $HEADER_TEXT"
-            in hashCommentExtensions -> "# $HEADER_TEXT"
+            in xmlExtensions -> "xml"
+            in slashCommentExtensions -> "//"
+            in hashCommentExtensions -> "#"
             else -> null
         }
+    }
+
+    private fun commentText(comment: String, text: String): String = when (comment) {
+        "xml" -> "<!-- $text -->"
+        else -> "$comment $text"
     }
 }

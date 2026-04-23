@@ -4,6 +4,16 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTy
 
 internal object DotnetAspCSharpTypes {
     object AspNetCore {
+        object Builder {
+            data object WebApplication : DotnetCSharpTypeName {
+                override val value = "WebApplication"
+            }
+
+            data object WebApplicationBuilder : DotnetCSharpTypeName {
+                override val value = "WebApplicationBuilder"
+            }
+        }
+
         object Mvc {
             data object ActionResult : DotnetCSharpTypeName {
                 override val value = "ActionResult"
@@ -15,16 +25,6 @@ internal object DotnetAspCSharpTypes {
 
             data object ObjectResult : DotnetCSharpTypeName {
                 override val value = "ObjectResult"
-            }
-        }
-
-        object Builder {
-            data object WebApplication : DotnetCSharpTypeName {
-                override val value = "WebApplication"
-            }
-
-            data object WebApplicationBuilder : DotnetCSharpTypeName {
-                override val value = "WebApplicationBuilder"
             }
         }
     }

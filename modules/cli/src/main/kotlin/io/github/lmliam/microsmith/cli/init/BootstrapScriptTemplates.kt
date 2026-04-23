@@ -13,6 +13,10 @@ internal object BootstrapScriptTemplates {
     }
 
     private fun renderDefaultBuildScript(profile: OnboardingProfile): String = buildString {
+        if (profile == DotnetOnboardingProfile) {
+            append(DotnetBootstrapScriptTemplateRenderer.render(profile))
+            return@buildString
+        }
         appendLine("// Bootstrapped Microsmith schema for this ${profile.bootstrapTargetDescription}.")
         appendLine("// Canonical first run:")
         appendLine("// microsmith run build.microsmith.kts")
@@ -21,79 +25,6 @@ internal object BootstrapScriptTemplates {
             appendLine("// Common repository-native output path:")
             appendLine("// microsmith run build.microsmith.kts --out $outputDirectory")
         }
-        appendLine(renderDefaultBuildScriptBody(profile))
-    }
-
-    private fun renderDefaultBuildScriptBody(profile: OnboardingProfile): String = when (profile) {
-        DotnetOnboardingProfile -> renderDotnetBuildScriptBody()
-        else -> renderSchemaOnlyBuildScriptBody(profile)
-    }
-
-    private fun renderSchemaOnlyBuildScriptBody(profile: OnboardingProfile): String {
-        return """
-            microsmith {
-                schemas {
-                    protobuf {
-                        message("${profile.sampleMessageName}") {
-                            int32("id") { index(1) }
-                            string("email") { index(2) }
-                        }
-                    }
-                }
-            }
-        """.trimIndent()
-    }
-
-    private fun renderDotnetBuildScriptBody(): String {
-        return """
-            microsmith {
-                schemas {
-                    protobuf {
-                        message("${DotnetOnboardingProfile.sampleMessageName}") {
-                            int32("id") { index(1) }
-                            string("email") { index(2) }
-                        }
-                    }
-                }
-
-                services {
-                    dotnet {
-                        target(NET8)
-                        solutions {
-                            "Platform" {}
-                        }
-                    }
-
-                    "UserService" {
-                        dotnet {
-                            solution("Platform")
-                            project("UserService.Api")
-                            models {
-                                "User" {
-                                    string("id")
-                                    string("email")
-                                }
-                            }
-
-                            asp {
-                                rest {
-                                    "/users" {
-                                        get("/{id}", "GetUser") {
-                                            path("GetUserPath") {
-                                                string("id")
-                                            }
-
-                                            responses {
-                                                ok("User")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        """.trimIndent()
+        appendLine(SchemaBootstrapScriptTemplateRenderer.render(profile))
     }
 }

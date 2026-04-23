@@ -6,6 +6,7 @@ import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
@@ -22,6 +23,7 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
                 outputRoot = artifact.outputRoot(),
             ),
             contents = MsBuildProjectXmlRenderer.render(artifact),
+            origins = artifact.origins.ifEmpty { setOf(artifact.id.originName()) },
         ),
     )
 
@@ -43,6 +45,12 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
         MsBuildProjectKind.DirectoryPackagesProps -> Path.of("Directory.Packages.props")
         MsBuildProjectKind.DirectoryBuildProps -> Path.of("Directory.Build.props")
         MsBuildProjectKind.Project -> Path.of("${requireNotNull(artifact.id.projectName)}.csproj")
+    }
+
+    private fun MsBuildProjectArtifactId.originName(): String = buildString {
+        append("dotnet.solutions.").append(solutionName)
+        projectName?.let { append(".projects.").append(it) }
+        append(".").append(kind.name)
     }
 
     private companion object {

@@ -223,7 +223,7 @@ This keeps the layering explicit:
 - `dsl-schemas-protobuf-rpc`: protobuf service and RPC DSL extensions on top of `dsl-schemas-protobuf`
 - `dsl-services`: generic service registry and service-oriented DSL surface
 - `dsl-services-dotnet`: .NET service defaults, identity, and model DSL support
-- `dsl-services-dotnet-asp`: ASP.NET scaffold opt-in DSL support on top of `dsl-services-dotnet`
+- `dsl-services-dotnet-asp`: ASP.NET service-generation DSL support on top of `dsl-services-dotnet`
 - `dsl-services-dotnet-packages`: .NET package ownership and package reference DSL support
 - `resolve`: base resolution contracts and resolved-model orchestration
 - `resolve-schemas`: schema-domain resolved model support
@@ -231,7 +231,7 @@ This keeps the layering explicit:
 - `resolve-schemas-protobuf-rpc`: protobuf RPC finalization and validation
 - `resolve-services`: service-domain resolved model support
 - `resolve-services-dotnet`: finalized .NET service workspace resolution
-- `resolve-services-dotnet-asp`: finalized ASP.NET scaffold workspace resolution
+- `resolve-services-dotnet-asp`: finalized ASP.NET service workspace resolution
 - `resolve-services-dotnet-packages`: finalized .NET package workspace resolution
 - `artifact`: shared artifact contracts, assembly, and contribution infrastructure
 - `artifact-schemas`: schema-domain artifact contracts
@@ -239,7 +239,7 @@ This keeps the layering explicit:
 - `artifact-schemas-protobuf-rpc`: protobuf RPC artifact types and contributions
 - `artifact-services`: service-domain artifact contracts
 - `artifact-services-dotnet`: .NET/MSBuild artifact types and assembly
-- `artifact-services-dotnet-asp`: ASP.NET scaffold artifact types and contributions
+- `artifact-services-dotnet-asp`: ASP.NET service artifact types and contributions
 - `artifact-services-dotnet-packages`: .NET package artifact types and contributions
 - `compile`: artifact compiler contracts and recursive artifact compilation
 - `compile-schemas`: schema-domain compiler contracts and shared schema compilation entrypoints
@@ -247,7 +247,7 @@ This keeps the layering explicit:
 - `compile-schemas-protobuf-rpc`: protobuf RPC artifact compilation into file artifacts
 - `compile-services`: service-domain compiler contracts and shared service compilation entrypoints
 - `compile-services-dotnet`: .NET/MSBuild artifact compilation into file artifacts
-- `compile-services-dotnet-asp`: ASP.NET scaffold compilation into project and source file artifacts
+- `compile-services-dotnet-asp`: ASP.NET project and source-file compilation from normalized REST models
 - `compile-services-dotnet-packages`: .NET package artifact compilation into file artifacts
 - `gen`: final file rendering, output routing, and generation orchestration
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution and built-in provider loading
@@ -439,7 +439,7 @@ microsmith {
 }
 ```
 
-### ASP.NET service scaffolding DSL
+### ASP.NET service generation DSL
 
 ```kotlin
 microsmith {
@@ -528,18 +528,17 @@ REST DSL contract notes:
 - route groups can be nested, verb helpers are lower-case, and every endpoint requires an explicit operation name
 - request bindings are modeled explicitly through `path(...)`, `query(...)`, `headers(...)`, and `body(...)`
 - inline body and response models stay endpoint-local in the normalized model; shared service models must be declared under `models { ... }`
-- route placeholders are validated against `path(...)` bindings, response/header declarations are normalized, and invalid REST declarations fail before Microsmith emits ASP.NET endpoint glue
+- route placeholders are validated against `path(...)` bindings, response/header declarations are normalized, and invalid REST declarations fail during resolution before any ASP.NET source files are emitted
 
-The ASP.NET scaffold currently emits this canonical layout under the run output root:
+The generated ASP.NET project currently emits this canonical layout under the run output root:
 
 ```text
 dotnet/
   Platform/
     UserService.Api/
       UserService.Api.csproj
+      Program.cs
       appsettings.json
-      Properties/
-        launchSettings.json
       Generated/
         Hosting/
           MicrosmithHostingExtensions.cs
@@ -550,56 +549,26 @@ dotnet/
         Controllers/
           MicrosmithControllerBase.cs
           UserServiceApiControllerBase.cs
+      Properties/
+        launchSettings.json
+      .microsmith/
+        origins.json
 ```
 
-Canonical scaffold policy:
+Canonical generation policy:
 
-- Microsmith does not generate `Program.cs`; the ASP.NET entrypoint is user-owned
-- `Generated/Hosting/MicrosmithHostingExtensions.cs` contains Microsmith-owned hosting extensions for `builder.AddMicrosmith()` and `app.MapMicrosmith()`
-- `Generated/Contracts/*.cs` contains Microsmith-owned service-local records, request bindings, inline response models, and typed per-operation result contracts
-- `Generated/Controllers/MicrosmithControllerBase.cs` contains Microsmith-owned shared controller helpers such as `Respond(...)` and `ReadHeader(...)`
-- `Generated/Controllers/*ControllerBase.cs` contains Microsmith-owned route attributes, request binding glue, and response mapping that forwards to abstract handler methods such as `OnGetUserAsync(...)`
-- everything under `Generated/` is owned by Microsmith and is overwritten in place on rerun
-- user-authored ASP.NET implementation code should live outside `Generated/`, for example under `Controllers/`, by deriving from the generated base controller and implementing the abstract handlers
-
-Typical user-owned `Program.cs` shape:
-
-```csharp
-var builder = WebApplication.CreateBuilder(args);
-builder.AddMicrosmith();
-
-var app = builder.Build();
-app.MapMicrosmith();
-
-app.Run();
-```
-
-Typical user-owned controller shape:
-
-```csharp
-using System.Threading;
-using System.Threading.Tasks;
-using UserService.Api.Generated.Controllers;
-using UserService.Api.Generated.Contracts;
-
-namespace UserService.Api.Controllers;
-
-public sealed class UserServiceApiController : UserServiceApiControllerBase
-{
-    protected override Task<GetUserResult> OnGetUserAsync(
-        GetUserPath path,
-        CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-}
-```
+- `Program.cs` uses top-level hosting and delegates ASP.NET registration through generated hosting extensions
+- generated files under `Generated/` provide the contract records, abstract controller base, and response/result mapping surface derived from the normalized REST model
+- handwritten service behavior belongs outside `Generated/`, typically in a user-authored controller that derives from the generated base type
+- generator-owned scaffold files such as `Program.cs`, `appsettings.json`, `Properties/launchSettings.json`, and everything under `Generated/` are overwritten in place on rerun
+- handwritten files outside those generator-owned paths are not overwritten by Microsmith
+- `.microsmith/origins.json` records the structural Microsmith origins associated with each generated file
 
 ### Script defaults
 
 Inside `.microsmith.kts` scripts:
 
-- default imports include `microsmith {}`, `schemas {}`, and `protobuf {}`
+- default imports include `microsmith {}`, `services {}`, `.NET`/ASP.NET entrypoints, package helpers, `schemas {}`, and `protobuf {}`
 - a script can return a `MicrosmithModel`
 - a script can also call `emit(model)` or `generate(model)`
 
@@ -780,7 +749,7 @@ Coexistence with the CLI, helper, and fallback paths:
 - `microsmith init` still works in Gradle repositories and is the fastest way to scaffold `build.microsmith.kts`
 - once native Gradle integration is adopted, use `./gradlew microsmithGenerate` as the primary generation path
 - the JetBrains IDE helper and fallback jar remain useful when you intentionally keep Microsmith outside the Gradle build, or when you are validating CLI-managed flows
-- representative native Gradle fixtures live in `examples/gradle/java`, `examples/gradle/kotlin`, and `examples/gradle/scala`
+- representative native Gradle fixtures live in `examples/gradle/java`, `examples/gradle/kotlin`, `examples/gradle/scala`, and `examples/gradle/dotnet`
 
 ## Native Maven integration
 
@@ -879,7 +848,7 @@ Coexistence with the CLI, helper, and fallback paths:
 - `microsmith init` still works in Maven repositories and is the fastest way to scaffold `build.microsmith.kts`
 - once native Maven integration is adopted, use `mvn microsmith:generate` as the primary generation path
 - the JetBrains IDE helper and fallback jar remain useful when you intentionally keep Microsmith outside Maven, or when a Maven-imported IDE project needs plugin-provided types that are not mirrored as project dependencies
-- representative native Maven fixtures live in `examples/maven/java`, `examples/maven/kotlin`, and `examples/maven/scala`
+- representative native Maven fixtures live in `examples/maven/java`, `examples/maven/kotlin`, `examples/maven/scala`, and `examples/maven/dotnet`
 
 ## Native sbt integration
 
@@ -980,7 +949,7 @@ Coexistence with the CLI, helper, and fallback paths:
 - `microsmith init` still works in sbt repositories and is the fastest way to scaffold `build.microsmith.kts`
 - once native sbt integration is adopted, use `sbt microsmithGenerate` as the primary generation path
 - the JetBrains IDE helper and fallback jar remain useful when you intentionally keep Microsmith outside sbt, or when sbt-imported IDE indexing still needs explicit script-definition support
-- the representative native sbt fixture lives in `examples/sbt/scala`
+- representative native sbt fixtures live in `examples/sbt/scala` and `examples/sbt/dotnet`
 
 ### Direct script execution
 
@@ -1610,10 +1579,13 @@ CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flow
 | Java (native Gradle)   | `examples/gradle/java`       | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/java/.github/workflows/microsmith.yml`       |
 | Kotlin (native Gradle) | `examples/gradle/kotlin`     | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/kotlin/.github/workflows/microsmith.yml`     |
 | Scala (native Gradle)  | `examples/gradle/scala`      | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/scala/.github/workflows/microsmith.yml`      |
+| .NET (native Gradle)   | `examples/gradle/dotnet`     | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/dotnet/.github/workflows/microsmith.yml`     |
 | Java (native Maven)    | `examples/maven/java`        | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/java/.github/workflows/microsmith.yml`        |
 | Kotlin (native Maven)  | `examples/maven/kotlin`      | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/kotlin/.github/workflows/microsmith.yml`      |
 | Scala (native Maven)   | `examples/maven/scala`       | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/scala/.github/workflows/microsmith.yml`       |
+| .NET (native Maven)    | `examples/maven/dotnet`      | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/dotnet/.github/workflows/microsmith.yml`      |
 | Scala (native sbt)     | `examples/sbt/scala`         | `sbt -Dmicrosmith.version=<version> microsmithGenerate`                        | `examples/sbt/scala/.github/workflows/microsmith.yml`         |
+| .NET (native sbt)      | `examples/sbt/dotnet`        | `sbt -Dmicrosmith.version=<version> microsmithGenerate`                        | `examples/sbt/dotnet/.github/workflows/microsmith.yml`        |
 | Java                   | `examples/jvm/java-maven`    | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/java-maven/.github/workflows/microsmith.yml`    |
 | Kotlin                 | `examples/jvm/kotlin-gradle` | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/kotlin-gradle/.github/workflows/microsmith.yml` |
 | Scala                  | `examples/jvm/scala-sbt`     | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/scala-sbt/.github/workflows/microsmith.yml`     |
@@ -1633,11 +1605,11 @@ CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flow
 | CLI help and README contract  | `build-and-qodana` on Ubuntu                   | `scripts/verify_readme_cli_usage.py` compares the README usage block to built `--help`.                                                           |
 | CLI distribution smoke        | `cli-smoke` on Ubuntu, macOS, and Windows      | Dist launcher, generation, process isolation, and `doctor --diagnostics json`.                                                                    |
 | Installer and bootstrap smoke | `cli-smoke` on Ubuntu, macOS, and Windows      | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.                                                                |
-| Native Gradle fixture smoke   | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `microsmithGenerate` for Java, Kotlin, and Scala Gradle fixtures.                          |
-| Native Maven fixture smoke    | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `mvn microsmith:generate` for Java, Kotlin, and Scala Maven fixtures.                      |
-| Native sbt fixture smoke      | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `sbt microsmithGenerate` for the Scala sbt fixture.                                        |
-| Consumer fixture onboarding   | `cli-smoke` on Ubuntu and Windows              | Ubuntu covers Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust fixtures; Windows covers the .NET fixture.                                    |
-| JetBrains helper lifecycle    | `cli-smoke` on Ubuntu and Windows              | Ubuntu runs `ide refresh` and `ide doctor` for Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust fixtures; Windows runs the .NET helper path. |
+| Native Gradle fixture smoke   | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `microsmithGenerate` for Java, Kotlin, Scala, and .NET Gradle fixtures.                   |
+| Native Maven fixture smoke    | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `mvn microsmith:generate` for Java, Kotlin, Scala, and .NET Maven fixtures.               |
+| Native sbt fixture smoke      | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `sbt microsmithGenerate` for Scala and .NET sbt fixtures.                                  |
+| Consumer fixture onboarding   | `cli-smoke` on Ubuntu, macOS, and Windows      | Ubuntu covers Java, Kotlin, Scala, Node, Go, Python, Ruby, Rust, and .NET; macOS and Windows cover the .NET fixture through dist or installer flows. |
+| JetBrains helper lifecycle    | `cli-smoke` on Ubuntu, macOS, and Windows      | Ubuntu covers Java, Kotlin, Scala, Node, Go, Python, Ruby, Rust, and .NET helper flows; macOS and Windows validate the .NET helper path.         |
 | Fallback artifact packaging   | `build-and-qodana` on Ubuntu                   | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`.                                                  |
 | Resolver, auth, lock, offline | `./gradlew build` and module regression suites | `:cli:jvmKotest` covers authenticated repositories, lockfiles, cache policy, and offline behavior.                                                |
 
