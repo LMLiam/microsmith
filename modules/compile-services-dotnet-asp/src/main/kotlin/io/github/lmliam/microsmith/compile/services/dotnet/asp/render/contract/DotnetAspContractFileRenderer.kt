@@ -1,9 +1,13 @@
-package io.github.lmliam.microsmith.compile.services.dotnet.asp
-
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelLocality
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
+package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.contract
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelLocality
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpNamespaces
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.using
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.contractsNamespace
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.validation.collectHeaderBindings
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.validation.collectRequestBindings
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpFileBuilder
 
