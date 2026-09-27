@@ -1,5 +1,5 @@
-package io.github.lmliam.microsmith.runtime.scripting.host
-
+package io.github.lmliam.microsmith.runtime.scripting
+import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
@@ -393,7 +393,18 @@ class MicrosmithScriptHostTests :
                     microsmith {
                         schemas {
                             protobuf {
-                                message("ProcessIsolated") {
+                                service("ProcessService") {
+                                    "Process" {
+                                        request(ProcessRequest)
+                                        response(ProcessResponse)
+                                    }
+                                }
+
+                                message("ProcessRequest") {
+                                    int32("id") { index(1) }
+                                }
+
+                                message("ProcessResponse") {
                                     int32("id") { index(1) }
                                 }
                             }
@@ -415,9 +426,121 @@ class MicrosmithScriptHostTests :
                     )
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
-                val generatedFile = output.resolve("proto/ProcessIsolated.proto")
+                val generatedFile = output.resolve("proto/ProcessService.proto")
                 Files.exists(generatedFile) shouldBe true
-                generatedFile.readText().shouldContain("message ProcessIsolated")
+                generatedFile
+                    .readText()
+                    .shouldContain(
+                        "rpc Process (ProcessRequest) returns (ProcessResponse);",
+                    )
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "supports forward protobuf message symbols in rpc declarations" {
+            val tempDir = createTempDirectory("microsmith-script-host-symbols")
+            try {
+                val script = tempDir.resolve("symbols.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val cache = tempDir.resolve("cache")
+
+                script.writeText(
+                    """
+            microsmith {
+                schemas {
+                    protobuf {
+                        service("Users") {
+                            "GetUsers" {
+                                request(GetUsersRequest)
+                                response(GetUsersResponse)
+                            }
+                        }
+
+                        message("GetUsersRequest") {
+                            int32("id") { index(1) }
+                        }
+
+                        message("GetUsersResponse") {
+                            int32("id") { index(1) }
+                        }
+                    }
+                }
+            }
+                    """.trimIndent(),
+                )
+
+                val host = MicrosmithScriptHost(cacheDirectory = cache)
+                val result =
+                    host.run(
+                        ScriptRunRequest(
+                            script = script,
+                            outputDir = output,
+                            variables = emptyMap(),
+                            flags = emptySet(),
+                        ),
+                    )
+
+                result.shouldBeTypeOf<ScriptRunSuccess>()
+
+                val generatedFile = output.resolve("proto/Users.proto")
+                generatedFile.exists() shouldBe true
+
+                generatedFile
+                    .readText()
+                    .shouldContain(
+                        "rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);",
+                    )
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "rejects enum symbols where rpc message symbols are required" {
+            val tempDir = createTempDirectory("microsmith-script-host-symbol-types")
+            try {
+                val script = tempDir.resolve("symbol-types.microsmith.kts")
+                val output = tempDir.resolve("generated")
+                val cache = tempDir.resolve("cache")
+
+                script.writeText(
+                    """
+            microsmith {
+                schemas {
+                    protobuf {
+                        enum("Role") {
+                            +"USER"
+                        }
+
+                        service("Users") {
+                            "GetUsers" {
+                                request(Role)
+                                response(Role)
+                            }
+                        }
+                    }
+                }
+            }
+                    """.trimIndent(),
+                )
+
+                val host = MicrosmithScriptHost(cacheDirectory = cache)
+                val result =
+                    host.run(
+                        ScriptRunRequest(
+                            script = script,
+                            outputDir = output,
+                            variables = emptyMap(),
+                            flags = emptySet(),
+                        ),
+                    )
+
+                val failure = result.shouldBeTypeOf<ScriptRunFailure>()
+
+                failure.type shouldBe ScriptFailureType.COMPILATION
+                failure.diagnostics
+                    .joinToString("\n")
+                    .shouldContain("MessageRef")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
