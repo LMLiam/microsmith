@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.gen.helpers
-
+package io.github.lmliam.microsmith.gen.output
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import java.nio.file.Path
 
