@@ -1,5 +1,7 @@
 package io.github.lmliam.microsmith.runtime.scripting.cache
 
+import io.github.lmliam.microsmith.runtime.scripting.symbols.microsmithScriptSymbols
+import io.github.lmliam.microsmith.runtime.scripting.symbols.model.CompiledScriptSymbol
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -79,6 +81,68 @@ class MicrosmithScriptCacheTests :
                         script = scriptSource,
                         scriptCompilationConfiguration = compilationConfiguration,
                         additionalFingerprints = listOf(RuntimeClasspathFingerprint.calculate(listOf(pluginJar))),
+                    )
+
+                secondFingerprint shouldNotBe firstFingerprint
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "compiled script fingerprint changes when automatic symbol metadata changes" {
+            val tempDir = createTempDirectory("microsmith-compiled-fingerprint-symbols")
+            try {
+                val scriptFile = tempDir.resolve("schema.microsmith.kts")
+                scriptFile.writeText("microsmith { }")
+
+                val firstConfiguration =
+                    ScriptCompilationConfiguration {
+                        ScriptCompilationConfiguration
+                            .microsmithScriptSymbols
+                            .put(
+                                listOf(
+                                    CompiledScriptSymbol(
+                                        propertyName = "User",
+                                        typeName =
+                                        "io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef",
+                                        contributorId = "microsmith.protobuf",
+                                        kind = "message",
+                                        valueKey = "one.User",
+                                    ),
+                                ),
+                            )
+                    }
+
+                val secondConfiguration =
+                    ScriptCompilationConfiguration {
+                        ScriptCompilationConfiguration
+                            .microsmithScriptSymbols
+                            .put(
+                                listOf(
+                                    CompiledScriptSymbol(
+                                        propertyName = "User",
+                                        typeName =
+                                        "io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef",
+                                        contributorId = "microsmith.protobuf",
+                                        kind = "message",
+                                        valueKey = "two.User",
+                                    ),
+                                ),
+                            )
+                    }
+
+                val source = FileScriptSource(scriptFile.toFile())
+
+                val firstFingerprint =
+                    CompiledScriptFingerprint.uniqueName(
+                        script = source,
+                        scriptCompilationConfiguration = firstConfiguration,
+                    )
+
+                val secondFingerprint =
+                    CompiledScriptFingerprint.uniqueName(
+                        script = source,
+                        scriptCompilationConfiguration = secondConfiguration,
                     )
 
                 secondFingerprint shouldNotBe firstFingerprint
