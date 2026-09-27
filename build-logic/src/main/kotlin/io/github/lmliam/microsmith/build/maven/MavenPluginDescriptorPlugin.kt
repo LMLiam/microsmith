@@ -11,7 +11,6 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.tasks.Jar
-
 import javax.xml.parsers.DocumentBuilderFactory
 
 class MavenPluginDescriptorPlugin : Plugin<Project> {
@@ -25,7 +24,7 @@ class MavenPluginDescriptorPlugin : Plugin<Project> {
         val runtimeClasspath = project.configurations.getByName("runtimeClasspath")
 
         project.dependencies.apply {
-            add("implementation", project.project(":runtime-scripting"))
+            add("implementation", project.dependencies.project(":runtime-scripting"))
             add("compileOnly", libs.findLibrary("maven-plugin-api").orElseThrow().get())
             add("testImplementation", libs.findLibrary("maven-plugin-api").orElseThrow().get())
         }
@@ -80,11 +79,13 @@ class MavenPluginDescriptorPlugin : Plugin<Project> {
                         throw GradleException("Maven plugin descriptor '${descriptorOutputFile.path}' was not created.")
                     }
 
-                    val descriptor = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(descriptorOutputFile)
+                    val descriptor = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+                        descriptorOutputFile,
+                    )
                     val goalPrefix = descriptor.getElementsByTagName("goalPrefix").item(0)?.textContent?.trim()
                     if (goalPrefix != pluginGoalPrefix) {
                         throw GradleException(
-                            "Expected Maven plugin goal prefix '${pluginGoalPrefix}', found '${goalPrefix}'.",
+                            "Expected Maven plugin goal prefix '$pluginGoalPrefix', found '$goalPrefix'.",
                         )
                     }
 
@@ -94,7 +95,9 @@ class MavenPluginDescriptorPlugin : Plugin<Project> {
                                 descriptor.getElementsByTagName("goal").item(index)?.textContent?.trim()
                             }
                     if (goals != listOf(MavenPluginBuildNames.GENERATE_GOAL)) {
-                        throw GradleException("Expected Maven plugin goals [${MavenPluginBuildNames.GENERATE_GOAL}], found ${goals}.")
+                        throw GradleException(
+                            "Expected Maven plugin goals [${MavenPluginBuildNames.GENERATE_GOAL}], found $goals.",
+                        )
                     }
                 }
             }
