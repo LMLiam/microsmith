@@ -1,10 +1,7 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
-
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.invariantViolation
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapType
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.ProtobufEmissionInvariantException
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ValueType
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
 
 internal object ProtobufValueTypeRenderer {
     private val primitiveKeywords =
@@ -26,13 +23,11 @@ internal object ProtobufValueTypeRenderer {
             PrimitiveType.BYTES to "bytes",
         )
 
-    fun render(type: PrimitiveType): String =
-        primitiveKeywords[type] ?: invariantViolation("Unsupported protobuf primitive type: $type")
+    fun render(type: PrimitiveType): String = primitiveKeywords[type]
+        ?: throw ProtobufEmissionInvariantException("Unsupported protobuf primitive type: $type")
 
-    fun render(type: ValueType): String = when (type) {
-        is PrimitiveType -> render(type)
-        is Reference -> type.name
+    fun render(type: ResolvedProtobufValueType): String = when (type) {
+        is ResolvedProtobufValueType.Primitive -> render(type.type)
+        is ResolvedProtobufValueType.Reference -> type.reference.target.fullyQualifiedName
     }
-
-    fun render(type: MapType): String = "map<${render(type.key)}, ${render(type.value)}>"
 }

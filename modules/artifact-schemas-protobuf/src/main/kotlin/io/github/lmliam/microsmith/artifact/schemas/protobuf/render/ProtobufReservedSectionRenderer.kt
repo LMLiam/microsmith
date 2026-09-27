@@ -1,16 +1,13 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
-
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.invariantViolation
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.ProtobufEmissionInvariantException
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Reserved
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.ReservedDeclarationOwner
 
 internal object ProtobufReservedSectionRenderer {
-    fun render(type: ReservedDeclarationOwner): String? {
-        val entries = type.reserved
+    fun render(entries: List<Reserved>): String? {
         if (entries.isEmpty()) {
             return null
         }
@@ -32,8 +29,13 @@ internal object ProtobufReservedSectionRenderer {
 
     private fun renderNumericReserved(reserved: Reserved): String = when (reserved) {
         is ReservedIndex -> reserved.index.toString()
+
         is ReservedRange -> "${reserved.indexRange.first} to ${reserved.indexRange.last}"
+
         is ReservedToMax -> "${reserved.from} to max"
-        is ReservedName -> invariantViolation("Reserved names are rendered by renderReservedNames().")
+
+        is ReservedName -> throw ProtobufEmissionInvariantException(
+            "Reserved names are rendered by renderReservedNames().",
+        )
     }
 }
