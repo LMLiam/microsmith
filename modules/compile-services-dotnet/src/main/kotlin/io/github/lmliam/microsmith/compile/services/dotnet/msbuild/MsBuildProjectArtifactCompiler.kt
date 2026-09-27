@@ -1,15 +1,15 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
 
 import com.github.eventhorizonlab.spi.ServiceProvider
-import io.github.lmliam.microsmith.artifact.core.Artifact
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.Artifact
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
-import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
-import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
+import io.github.lmliam.microsmith.compile.ArtifactCompiler
+import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
 import java.nio.file.Path
 
 @ServiceProvider(ArtifactCompiler::class)

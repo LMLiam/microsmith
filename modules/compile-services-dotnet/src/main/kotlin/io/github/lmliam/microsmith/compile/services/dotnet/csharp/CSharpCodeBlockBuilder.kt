@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
-
 @CSharp.Dsl
 class CSharpCodeBlockBuilder internal constructor() {
     private val statements = mutableListOf<CSharp.Statement>()

@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
-
 @CSharp.Dsl
 class CSharpFileBuilder internal constructor(private val namespace: String) {
     private val usings = linkedSetOf<String>()

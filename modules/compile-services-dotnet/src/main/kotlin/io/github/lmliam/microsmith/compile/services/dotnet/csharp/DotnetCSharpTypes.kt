@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
-
 object DotnetCSharpTypes {
     object System {
         data object InvalidOperationException : DotnetCSharpTypeName {

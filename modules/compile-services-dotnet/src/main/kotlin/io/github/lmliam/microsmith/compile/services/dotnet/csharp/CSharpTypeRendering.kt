@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
-
 internal fun renderTypeRef(type: CSharp.TypeRef): String = when (type) {
     is CSharp.ArrayType -> "${renderTypeRef(type.elementType)}[]"
 

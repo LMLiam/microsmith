@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
-
 @Suppress("TooManyFunctions")
 object CSharp {
     @DslMarker

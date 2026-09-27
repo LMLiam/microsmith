@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 import java.math.BigDecimal
 import java.math.BigInteger
 
