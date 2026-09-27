@@ -1,18 +1,15 @@
-package io.github.lmliam.microsmith.compile.services.dotnet.asp
-
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointBindingsArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelLocality
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestBindingArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestFieldArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseHeaderArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifactId
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
+package io.github.lmliam.microsmith.compile.services.dotnet.asp.validation
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointBindingsArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelLocality
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseHeaderArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactId
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetField
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.string.shouldContain
@@ -20,53 +17,6 @@ import java.nio.file.Path
 
 class DotnetAspEndpointValidationTests :
     StringSpec({
-        "validation rejects path and query bindings that reference models" {
-            val userModel = sharedModel("User")
-            val artifact =
-                validationArtifact(
-                    contractModels = listOf(userModel),
-                    endpoints = listOf(
-                        DotnetAspEndpointArtifact(
-                            method = "GET",
-                            route = "/users/{id}",
-                            operationName = "GetUser",
-                            bindings = DotnetAspEndpointBindingsArtifact(
-                                query = DotnetAspRequestBindingArtifact(
-                                    typeName = "GetUserQuery",
-                                    name = "GetUserQuery",
-                                    fields = listOf(
-                                        DotnetAspRequestFieldArtifact(
-                                            name = "user",
-                                            type = DotnetFieldType.Reference("User"),
-                                            optional = false,
-                                            defaultValue = null,
-                                        ),
-                                    ),
-                                    origins = setOf("services.UserService.rest.GetUser.query.GetUserQuery"),
-                                ),
-                            ),
-                            responses = listOf(
-                                DotnetAspResponseArtifact(
-                                    statusCode = 200,
-                                    model = userModel,
-                                    headers = emptyList(),
-                                    origins = setOf("services.UserService.rest.GetUser.responses.200"),
-                                ),
-                            ),
-                            origins = setOf("services.UserService.rest.GetUser"),
-                        ),
-                    ),
-                )
-
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    validateEndpointGenerationInputs(artifact)
-                }
-
-            error.message.shouldContain("Transport bindings must declare scalar fields")
-            error.message.shouldContain("cannot reference shared model 'User'")
-        }
-
         "validation rejects response headers that collide with the generated Body property" {
             val userModel = sharedModel("User")
             val artifact =

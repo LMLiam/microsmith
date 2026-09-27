@@ -1,6 +1,13 @@
-package io.github.lmliam.microsmith.compile.services.dotnet.asp
-
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
+package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.hosting
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpNamespaces
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.using
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllersNamespace
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.hostingNamespace
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controller.renderReadHeaderHelper
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controller.renderRespondHelper
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 

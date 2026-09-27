@@ -1,32 +1,20 @@
-package io.github.lmliam.microsmith.compile.services.dotnet.asp
-
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeadersBindingArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestBindingArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+package io.github.lmliam.microsmith.compile.services.dotnet.asp.validation
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeadersBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.HTTP_NO_CONTENT_STATUS_CODE
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.RESULT_BODY_PROPERTY_NAME
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllerBaseTypeName
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.dotnetAspHeaderPropertyName
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultBaseTypeName
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultVariantTypeName
 
 internal fun validateEndpointGenerationInputs(artifact: DotnetAspServiceArtifact) {
-    validateRequestBindings(artifact)
     validateNoContentResponses(artifact)
     validateResponseHeaderNames(artifact)
     validateGeneratedContractTypeNames(artifact)
     validateGeneratedControllerTypeNames(artifact)
-}
-
-private fun validateRequestBindings(artifact: DotnetAspServiceArtifact) {
-    artifact.endpoints.forEach { endpoint ->
-        listOfNotNull(endpoint.bindings.path, endpoint.bindings.query).forEach { binding ->
-            binding.fields.forEach { field ->
-                val referenceTarget = (field.type as? DotnetFieldType.Reference)?.target
-                require(referenceTarget == null) {
-                    "ASP.NET request binding '${binding.typeName}' in operation " +
-                        "'${endpoint.operationName}' cannot reference shared model " +
-                        "'$referenceTarget'. " +
-                        "Transport bindings must declare scalar fields."
-                }
-            }
-        }
-    }
 }
 
 private fun validateResponseHeaderNames(artifact: DotnetAspServiceArtifact) {

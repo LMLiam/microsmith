@@ -1,8 +1,7 @@
-package io.github.lmliam.microsmith.compile.services.dotnet.asp
-
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
+package io.github.lmliam.microsmith.compile.services.dotnet.asp.names
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import java.util.Locale
 
 internal const val MICROSMITH_CONTROLLER_BASE_TYPE_NAME = "MicrosmithControllerBase"

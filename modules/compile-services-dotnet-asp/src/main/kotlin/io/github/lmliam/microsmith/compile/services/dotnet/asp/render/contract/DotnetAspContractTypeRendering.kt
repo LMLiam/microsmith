@@ -1,16 +1,24 @@
-package io.github.lmliam.microsmith.compile.services.dotnet.asp
-
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeadersBindingArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestBindingArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestFieldArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseArtifact
+package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.contract
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeadersBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestFieldArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.renderDotnetAspModelPropertyType
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.HTTP_NO_CONTENT_STATUS_CODE
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.RESULT_BODY_PROPERTY_NAME
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.dotnetAspHeaderPropertyName
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.dotnetAspPascalIdentifier
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultBaseTypeName
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultVariantTypeName
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.defaults.renderDotnetAspBindingInitializer
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.defaults.renderDotnetAspInitializer
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpAutoProperty
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpNullableType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetField
 
 internal fun renderRecordType(typeName: String, fields: List<DotnetField>): CSharp.Type = CSharp.Type(
     kind = CSharp.TypeKind.RECORD,

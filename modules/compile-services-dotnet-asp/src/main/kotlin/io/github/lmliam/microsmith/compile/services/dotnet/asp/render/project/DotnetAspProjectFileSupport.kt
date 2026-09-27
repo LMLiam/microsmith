@@ -1,8 +1,7 @@
-package io.github.lmliam.microsmith.compile.services.dotnet.asp
-
+package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import java.nio.file.Path
@@ -66,15 +65,22 @@ private fun escapeDotnetAspJsonString(value: String): String {
     value.forEach { char ->
         when (char) {
             '\\' -> escaped.append("\\\\")
+
             '"' -> escaped.append("\\\"")
+
             '\b' -> escaped.append("\\b")
+
             '\u000C' -> escaped.append("\\f")
+
             '\n' -> escaped.append("\\n")
+
             '\r' -> escaped.append("\\r")
+
             '\t' -> escaped.append("\\t")
+
             else -> {
                 if (char.code < FIRST_NON_PRINTABLE_ASCII_CODE_POINT) {
-                    escaped.append("\\u%04x".format(char.code))
+                    escaped.append(char.toUnicodeEscape())
                 } else {
                     escaped.append(char)
                 }
@@ -83,3 +89,5 @@ private fun escapeDotnetAspJsonString(value: String): String {
     }
     return escaped.toString()
 }
+
+private fun Char.toUnicodeEscape(): String = "\\u${code.toString(radix = 16).padStart(length = 4, padChar = '0')}"

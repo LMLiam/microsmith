@@ -1,7 +1,12 @@
-package io.github.lmliam.microsmith.compile.services.dotnet.asp
-
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseArtifact
+package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controller
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.HTTP_NO_CONTENT_STATUS_CODE
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.RESULT_BODY_PROPERTY_NAME
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.dotnetAspHeaderPropertyName
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultBaseTypeName
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultVariantTypeName
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpGenericType
