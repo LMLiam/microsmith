@@ -1,8 +1,7 @@
-package io.github.lmliam.microsmith.artifact.services.dotnet.packages
-
+package io.github.lmliam.microsmith.artifact.services.dotnet.packages.references
 import com.github.eventhorizonlab.spi.ServiceProvider
-import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 
 @ServiceProvider(ArtifactAssembler::class)
 class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackageReferencesArtifact> {

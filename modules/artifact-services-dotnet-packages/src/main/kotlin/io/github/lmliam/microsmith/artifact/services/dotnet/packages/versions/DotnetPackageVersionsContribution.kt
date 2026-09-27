@@ -1,6 +1,5 @@
-package io.github.lmliam.microsmith.artifact.services.dotnet.packages
-
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+package io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
 
 data class DotnetPackageVersionsContribution(
     override val artifactId: DotnetPackageVersionsArtifactId,

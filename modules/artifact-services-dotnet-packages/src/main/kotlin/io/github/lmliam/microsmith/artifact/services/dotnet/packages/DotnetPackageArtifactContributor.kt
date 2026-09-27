@@ -1,9 +1,15 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.packages
 
 import com.github.eventhorizonlab.spi.ServiceProvider
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import io.github.lmliam.microsmith.artifact.core.ArtifactContributor
-import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspace
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReference
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifactId
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesContribution
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersion
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifactId
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsContribution
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspace
 
 @ServiceProvider(ArtifactContributor::class)
 class DotnetPackageArtifactContributor : ArtifactContributor<DotnetPackageWorkspace> {
