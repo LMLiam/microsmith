@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.defaults
+
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.defaults.DotnetDefaultsExtension
 

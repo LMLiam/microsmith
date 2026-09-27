@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen.output
+
 import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.github.lmliam.microsmith.gen.files.FileSpace
 import io.github.lmliam.microsmith.gen.files.GeneratedFile

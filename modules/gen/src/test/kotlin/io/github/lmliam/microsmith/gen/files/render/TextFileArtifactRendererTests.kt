@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen.files.render
+
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
 import io.kotest.core.spec.style.StringSpec

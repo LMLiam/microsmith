@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
+
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.render.renderDeclaration
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufDeclaration
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum

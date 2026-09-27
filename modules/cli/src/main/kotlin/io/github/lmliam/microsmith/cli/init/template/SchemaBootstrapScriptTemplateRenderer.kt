@@ -1,5 +1,7 @@
 package io.github.lmliam.microsmith.cli.init.template
+
 import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfile
+
 internal object SchemaBootstrapScriptTemplateRenderer {
     fun render(profile: OnboardingProfile): String = """
         microsmith {

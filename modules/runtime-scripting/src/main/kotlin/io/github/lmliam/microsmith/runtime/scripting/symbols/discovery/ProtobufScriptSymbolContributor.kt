@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.discovery
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.EnumRef
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptCallCallee

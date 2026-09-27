@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen.files.render
+
 import java.nio.file.Path
 
 internal object GeneratedByMicrosmithBanner {

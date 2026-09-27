@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.parsing
+
 import io.github.lmliam.microsmith.cli.command.CliCommand
 import io.github.lmliam.microsmith.cli.command.ErrorCommand
 import io.github.lmliam.microsmith.cli.command.RunCommand

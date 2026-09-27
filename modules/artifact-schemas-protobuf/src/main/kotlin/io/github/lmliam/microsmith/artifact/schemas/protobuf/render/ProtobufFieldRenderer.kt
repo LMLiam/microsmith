@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Cardinality
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField

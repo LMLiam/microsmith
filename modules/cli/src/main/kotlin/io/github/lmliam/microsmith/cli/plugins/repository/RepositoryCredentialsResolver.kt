@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.repository
+
 import kotlin.LazyThreadSafetyMode
 
 internal interface RepositoryCredentialsResolver {

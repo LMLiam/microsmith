@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly
+
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler

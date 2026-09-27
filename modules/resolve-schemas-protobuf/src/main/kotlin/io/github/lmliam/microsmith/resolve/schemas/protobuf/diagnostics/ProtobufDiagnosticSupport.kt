@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.diagnostics
+
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 

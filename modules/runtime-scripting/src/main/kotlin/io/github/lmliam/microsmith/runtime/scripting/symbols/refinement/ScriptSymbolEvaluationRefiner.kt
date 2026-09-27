@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.refinement
+
 import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolContributorRegistry
 import kotlin.script.experimental.api.ResultWithDiagnostics
 import kotlin.script.experimental.api.ScriptCompilationConfiguration

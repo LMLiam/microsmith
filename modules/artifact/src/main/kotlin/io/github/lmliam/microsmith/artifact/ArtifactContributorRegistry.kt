@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact
+
 import io.github.lmliam.microsmith.resolve.ResolvedModel
 import kotlin.reflect.KClass
 

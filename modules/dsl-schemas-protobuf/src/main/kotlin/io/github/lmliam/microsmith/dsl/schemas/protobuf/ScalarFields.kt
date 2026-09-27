@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Field
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.FieldScope
 

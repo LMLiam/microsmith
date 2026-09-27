@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.cache
+
 import java.nio.file.Path
 
 internal fun defaultPluginCacheDirectory(): Path {

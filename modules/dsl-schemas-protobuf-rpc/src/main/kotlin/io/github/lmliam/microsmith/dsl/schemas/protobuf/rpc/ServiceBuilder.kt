@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufDeclarationContext
 
 internal class ServiceBuilder(private val name: String, private val declarationContext: ProtobufDeclarationContext) :

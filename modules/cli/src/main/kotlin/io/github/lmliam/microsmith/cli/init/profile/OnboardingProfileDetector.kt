@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init.profile
+
 import java.nio.file.Path
 
 internal class OnboardingProfileDetector(

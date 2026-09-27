@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.sbt
+
 import io.github.lmliam.microsmith.runtime.scripting.model.GeneratedOutputRootsLocator
 import _root_.sbt._
 import _root_.sbt.Keys._

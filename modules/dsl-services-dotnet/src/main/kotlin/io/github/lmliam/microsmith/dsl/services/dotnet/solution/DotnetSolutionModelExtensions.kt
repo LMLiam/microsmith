@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.solution
+
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.solution.DotnetSolutionModel
 

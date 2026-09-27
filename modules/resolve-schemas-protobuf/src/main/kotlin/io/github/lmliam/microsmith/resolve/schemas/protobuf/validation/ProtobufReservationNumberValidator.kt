@@ -1,5 +1,7 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.validation
+
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
+
 internal fun validateReservationNumbers(
     schemaName: String,
     spans: List<IntRange>,

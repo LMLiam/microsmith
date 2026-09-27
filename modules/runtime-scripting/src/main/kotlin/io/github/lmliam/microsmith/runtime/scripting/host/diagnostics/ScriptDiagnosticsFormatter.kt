@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.diagnostics
+
 import kotlin.script.experimental.api.ScriptDiagnostic
 
 internal object ScriptDiagnosticsFormatter {

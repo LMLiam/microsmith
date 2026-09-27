@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution
+
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetPackageVersionsBuilder
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetPackageVersionsExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetPackageVersionsScope

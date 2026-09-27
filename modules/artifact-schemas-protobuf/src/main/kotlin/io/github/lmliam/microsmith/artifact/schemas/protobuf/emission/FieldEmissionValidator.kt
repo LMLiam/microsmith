@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
+
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation

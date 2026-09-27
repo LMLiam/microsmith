@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting
+
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure

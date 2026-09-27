@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen
+
 import com.github.eventhorizonlab.spi.ServiceContract
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.gen.files.GeneratedFile

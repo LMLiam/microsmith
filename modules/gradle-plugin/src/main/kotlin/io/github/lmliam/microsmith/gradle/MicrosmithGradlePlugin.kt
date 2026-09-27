@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gradle
+
 import io.github.lmliam.microsmith.gradle.configuration.MicrosmithGradleConfigurations
 import io.github.lmliam.microsmith.gradle.configuration.MicrosmithRuntimeDependencyNotation
 import io.github.lmliam.microsmith.gradle.task.MicrosmithGenerateTask

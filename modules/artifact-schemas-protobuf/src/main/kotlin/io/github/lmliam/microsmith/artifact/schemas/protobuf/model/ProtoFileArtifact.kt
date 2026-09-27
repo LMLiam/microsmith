@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.model
+
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtobufArtifact
 
 data class ProtoFileArtifact(

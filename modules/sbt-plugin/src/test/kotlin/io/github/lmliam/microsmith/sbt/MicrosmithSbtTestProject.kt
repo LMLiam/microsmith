@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.sbt
+
 import java.nio.file.Files
 import java.nio.file.Path
 

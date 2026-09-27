@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl
+
 import io.github.lmliam.microsmith.dsl.merge.mergeModelExtension
 import kotlin.reflect.KClass
 

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.packages.diagnostics
+
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
 
 sealed interface DotnetPackageWorkspaceResolutionIssue : DotnetResolutionIssue {

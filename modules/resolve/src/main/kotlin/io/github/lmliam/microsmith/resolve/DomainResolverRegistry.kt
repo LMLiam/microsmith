@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve
+
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import kotlin.reflect.KClass
 

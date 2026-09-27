@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gradle
+
 import java.nio.file.Path
 
 internal object MicrosmithGradleFunctionalTestRuntimeClasspath {

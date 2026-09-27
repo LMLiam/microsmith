@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.integrity
+
 import io.github.lmliam.microsmith.cli.plugins.LOCAL_KIND
 import io.github.lmliam.microsmith.cli.plugins.REMOTE_ARTIFACT_KIND
 import io.github.lmliam.microsmith.cli.plugins.REMOTE_KIND

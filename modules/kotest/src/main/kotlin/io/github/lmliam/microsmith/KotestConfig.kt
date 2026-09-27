@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith
+
 import io.kotest.core.config.AbstractProjectConfig
 import io.kotest.extensions.junitxml.JunitXmlReporter
 

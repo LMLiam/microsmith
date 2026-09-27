@@ -1,5 +1,7 @@
 package io.github.lmliam.microsmith.cli.init.template
+
 import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfile
+
 internal object DotnetBootstrapScriptTemplateRenderer {
     fun render(profile: OnboardingProfile): String = buildString {
         appendHeader(profile)

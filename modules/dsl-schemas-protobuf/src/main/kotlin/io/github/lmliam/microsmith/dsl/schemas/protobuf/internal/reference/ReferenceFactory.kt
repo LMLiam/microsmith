@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 
 internal fun textualReference(target: String): Reference {

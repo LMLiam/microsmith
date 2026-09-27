@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.sbt.execution
+
 import java.nio.file.Path
 
 data class MicrosmithSbtExecutionOutcome(

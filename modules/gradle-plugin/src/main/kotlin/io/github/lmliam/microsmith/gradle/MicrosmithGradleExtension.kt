@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gradle
+
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.model
+
 import java.io.Serializable
 
 internal data class CompiledScriptSymbol(

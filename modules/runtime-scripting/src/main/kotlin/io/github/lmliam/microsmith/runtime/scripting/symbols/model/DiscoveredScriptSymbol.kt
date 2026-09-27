@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.model
+
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDefinition
 

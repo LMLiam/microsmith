@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.types
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Cardinality
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference

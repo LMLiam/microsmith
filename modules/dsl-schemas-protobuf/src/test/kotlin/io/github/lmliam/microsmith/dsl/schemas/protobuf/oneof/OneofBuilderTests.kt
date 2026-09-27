@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.EnumRef

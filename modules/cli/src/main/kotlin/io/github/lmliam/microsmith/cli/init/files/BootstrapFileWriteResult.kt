@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init.files
+
 import java.nio.file.Path
 
 internal sealed interface BootstrapFileWriteResult {

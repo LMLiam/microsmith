@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init.files
+
 import io.github.lmliam.microsmith.cli.init.InitConflictException
 import java.io.IOException
 import java.nio.charset.StandardCharsets

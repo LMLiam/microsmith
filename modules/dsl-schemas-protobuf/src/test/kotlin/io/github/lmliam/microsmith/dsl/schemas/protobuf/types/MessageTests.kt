@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.types
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.cache
+
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript
 import java.nio.ByteBuffer
 import java.nio.file.Files

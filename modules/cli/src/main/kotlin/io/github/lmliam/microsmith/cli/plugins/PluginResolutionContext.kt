@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins
+
 import io.github.lmliam.microsmith.cli.plugins.integrity.PluginChecksumAllowlist
 import io.github.lmliam.microsmith.cli.plugins.lockfile.ParsedLockfile
 import io.github.lmliam.microsmith.cli.plugins.repository.RepositoryEndpoint

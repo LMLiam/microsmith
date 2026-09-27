@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.maven.execution
+
 import io.github.lmliam.microsmith.runtime.scripting.model.GeneratedOutputRootsLocator
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure

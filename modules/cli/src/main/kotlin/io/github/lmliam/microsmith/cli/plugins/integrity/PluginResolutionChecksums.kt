@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.integrity
+
 import java.nio.file.Path
 import io.github.lmliam.microsmith.cli.plugins.integrity.sha256 as fileSha256
 

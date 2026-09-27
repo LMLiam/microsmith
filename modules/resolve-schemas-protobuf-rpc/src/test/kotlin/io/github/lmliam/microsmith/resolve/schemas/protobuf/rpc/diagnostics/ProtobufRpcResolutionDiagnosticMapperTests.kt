@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.diagnostics
+
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly

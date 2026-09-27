@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.oneof
+
 import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ScalarFields
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofField

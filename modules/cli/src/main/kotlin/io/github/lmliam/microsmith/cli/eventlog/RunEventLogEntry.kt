@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.eventlog
+
 import io.github.lmliam.microsmith.cli.diagnostics.CliFailureCode
 import io.github.lmliam.microsmith.cli.execution.RunExecutionStatus
 import java.nio.file.Path

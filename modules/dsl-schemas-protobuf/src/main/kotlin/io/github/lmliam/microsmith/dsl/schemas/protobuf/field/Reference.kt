@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.ProtobufTypeRef
 
 sealed interface Reference : ValueType {

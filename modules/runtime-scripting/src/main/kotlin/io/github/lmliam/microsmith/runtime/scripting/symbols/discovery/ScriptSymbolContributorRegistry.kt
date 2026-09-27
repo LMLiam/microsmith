@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.discovery
+
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor
 import java.util.ServiceLoader
 

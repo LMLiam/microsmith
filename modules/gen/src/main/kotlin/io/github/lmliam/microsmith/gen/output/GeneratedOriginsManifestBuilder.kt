@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen.output
+
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path

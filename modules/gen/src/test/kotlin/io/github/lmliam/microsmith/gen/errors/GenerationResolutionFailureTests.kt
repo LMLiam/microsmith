@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen.errors
+
 import arrow.core.nonEmptyListOf
 import dev.zacsweers.metro.createGraphFactory
 import io.github.lmliam.microsmith.dsl.MicrosmithBuilder

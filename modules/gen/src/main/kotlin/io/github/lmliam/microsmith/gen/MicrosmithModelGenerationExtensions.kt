@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen
+
 import dev.zacsweers.metro.createGraphFactory
 import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import io.github.lmliam.microsmith.gen.composition.MicrosmithGenerationGraph

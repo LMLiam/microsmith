@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.resolution
+
 import io.github.lmliam.microsmith.dsl.microsmith
 import io.github.lmliam.microsmith.dsl.require
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension

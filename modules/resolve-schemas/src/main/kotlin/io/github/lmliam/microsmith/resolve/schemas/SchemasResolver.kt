@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas
+
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.resolve.DomainResolution

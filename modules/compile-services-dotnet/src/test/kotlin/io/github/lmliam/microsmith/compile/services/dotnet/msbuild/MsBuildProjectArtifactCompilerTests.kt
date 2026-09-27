@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
+
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames

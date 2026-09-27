@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.refinement
+
 import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolContributorRegistry
 import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolDiscovery
 import io.github.lmliam.microsmith.runtime.scripting.symbols.model.DiscoveredScriptSymbol

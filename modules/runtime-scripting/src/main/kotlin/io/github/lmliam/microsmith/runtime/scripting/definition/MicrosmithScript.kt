@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.definition
+
 import kotlin.script.experimental.annotations.KotlinScript
 
 @KotlinScript(

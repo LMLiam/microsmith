@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.parsing
+
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptCallCallee
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptCallSite
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDeclarationSite

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen.output
+
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import io.github.lmliam.microsmith.gen.MicrosmithGenerationScope

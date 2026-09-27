@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.resolution
+
 import io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget
 import io.github.lmliam.microsmith.dsl.services.dotnet.solution.DotnetSolution
 import io.github.lmliam.microsmith.resolve.ResolvedModel

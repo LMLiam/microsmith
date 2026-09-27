@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.names
+
 import kotlin.io.path.Path
 
 /**

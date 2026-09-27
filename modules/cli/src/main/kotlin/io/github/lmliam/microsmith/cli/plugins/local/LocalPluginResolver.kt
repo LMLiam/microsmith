@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.local
+
 import io.github.lmliam.microsmith.cli.plugins.LOCAL_KIND
 import io.github.lmliam.microsmith.cli.plugins.integrity.PluginChecksumAllowlist
 import io.github.lmliam.microsmith.cli.plugins.integrity.PluginResolutionIntegrityVerifier

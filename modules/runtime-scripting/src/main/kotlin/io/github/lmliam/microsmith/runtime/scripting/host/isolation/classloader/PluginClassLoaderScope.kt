@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.classloader
+
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript
 import java.net.URLClassLoader
 import java.nio.file.Path

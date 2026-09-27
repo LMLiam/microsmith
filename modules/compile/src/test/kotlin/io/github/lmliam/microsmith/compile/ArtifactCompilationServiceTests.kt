@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile
+
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactId

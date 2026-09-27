@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Max
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.merge
 

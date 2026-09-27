@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.lockfile
+
 import io.github.lmliam.microsmith.cli.plugins.LOCAL_KIND
 import io.github.lmliam.microsmith.cli.plugins.LOCKFILE_VERSION
 import io.github.lmliam.microsmith.cli.plugins.REMOTE_ARTIFACT_KIND

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas
+
 import io.github.lmliam.microsmith.dsl.schemas.Schema
 import io.github.lmliam.microsmith.resolve.ResolvedModel
 

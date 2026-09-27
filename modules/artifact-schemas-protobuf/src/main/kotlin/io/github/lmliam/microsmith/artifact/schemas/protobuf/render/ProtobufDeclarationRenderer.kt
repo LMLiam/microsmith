@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
+
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 

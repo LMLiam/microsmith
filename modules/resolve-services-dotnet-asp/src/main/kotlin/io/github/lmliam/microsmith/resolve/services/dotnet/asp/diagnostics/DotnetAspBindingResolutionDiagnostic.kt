@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics
+
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 
 internal fun DotnetAspBindingResolutionIssue.toDiagnostic(): ResolutionDiagnostic = when (this) {

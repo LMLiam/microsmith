@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen
+
 import io.github.lmliam.microsmith.dsl.microsmith
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

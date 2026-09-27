@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.paths
+
 import io.github.lmliam.microsmith.runtime.scripting.host.configuration.ScriptDirectivePolicy
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure

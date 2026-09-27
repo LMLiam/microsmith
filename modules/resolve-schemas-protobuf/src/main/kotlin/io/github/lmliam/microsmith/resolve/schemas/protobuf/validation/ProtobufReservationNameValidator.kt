@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.validation
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Reserved
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution
+
 import arrow.core.Either
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue

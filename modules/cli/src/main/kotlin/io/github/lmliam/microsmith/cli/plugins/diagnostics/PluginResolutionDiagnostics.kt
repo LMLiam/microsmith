@@ -1,5 +1,7 @@
 package io.github.lmliam.microsmith.cli.plugins.diagnostics
+
 import io.github.lmliam.microsmith.cli.plugins.repository.redactSensitiveValues
+
 internal class PluginResolutionDiagnostics {
     fun format(error: Throwable, sensitiveValues: Set<String>): String = when (error) {
         is PluginResolutionDiagnosticException ->

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.maven
+
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.kotest.assertions.throwables.shouldThrow

@@ -1,8 +1,10 @@
 package io.github.lmliam.microsmith.cli.init.template
+
 import io.github.lmliam.microsmith.cli.init.profile.DotnetOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfile
 import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileDetection
 import io.github.lmliam.microsmith.cli.init.profile.describeForComment
+
 internal object BootstrapScriptTemplates {
     fun filesFor(repositoryDetection: OnboardingProfileDetection): Map<String, String> = linkedMapOf(
         "settings.microsmith.kts" to renderDefaultSettingsScript(repositoryDetection),

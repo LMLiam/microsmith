@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.integrity
+
 import io.github.lmliam.microsmith.cli.plugins.LOCKFILE_VERSION
 import io.github.lmliam.microsmith.cli.plugins.PluginResolverErrorCategory
 import io.github.lmliam.microsmith.cli.plugins.diagnostics.PluginResolutionDiagnosticException

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gradle.worker
+
 import io.github.lmliam.microsmith.gradle.configuration.missingProperty
 import io.github.lmliam.microsmith.gradle.configuration.readValues
 import io.github.lmliam.microsmith.gradle.configuration.requiredBoolean

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.doctor
+
 import io.github.lmliam.microsmith.cli.ide.IDE_HELPER_DIRECTORY
 import io.github.lmliam.microsmith.cli.ide.IdeHelperManagedSurface
 import java.nio.file.Files

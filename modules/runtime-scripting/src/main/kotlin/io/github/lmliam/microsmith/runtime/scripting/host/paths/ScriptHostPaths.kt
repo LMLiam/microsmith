@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.paths
+
 import java.nio.file.Path
 
 internal object ScriptHostPaths {

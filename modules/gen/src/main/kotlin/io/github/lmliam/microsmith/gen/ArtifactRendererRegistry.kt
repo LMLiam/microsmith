@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen
+
 import io.github.lmliam.microsmith.artifact.Artifact
 import kotlin.reflect.KClass
 

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
+
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.ProtobufEmissionInvariantException
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Reserved
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex

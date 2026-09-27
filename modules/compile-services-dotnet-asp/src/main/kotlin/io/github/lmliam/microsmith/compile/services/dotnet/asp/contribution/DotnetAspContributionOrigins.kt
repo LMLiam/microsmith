@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp.contribution
+
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelLocality
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact

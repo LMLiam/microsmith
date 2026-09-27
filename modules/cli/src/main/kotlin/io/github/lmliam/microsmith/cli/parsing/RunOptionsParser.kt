@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.parsing
+
 import java.nio.file.Path
 
 internal fun parseRunOptions(args: List<String>, startIndex: Int): ParsedRunOptions {
