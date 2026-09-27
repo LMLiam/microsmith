@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.artifact.services.dotnet.asp
-
+package io.github.lmliam.microsmith.artifact.services.dotnet.asp.request
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 
 data class DotnetAspRequestFieldArtifact(

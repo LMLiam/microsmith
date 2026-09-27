@@ -1,5 +1,8 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp
 
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.ports.dotnetAspHttpPortFor
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactId
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceContribution
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspPorts
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRest
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspService
