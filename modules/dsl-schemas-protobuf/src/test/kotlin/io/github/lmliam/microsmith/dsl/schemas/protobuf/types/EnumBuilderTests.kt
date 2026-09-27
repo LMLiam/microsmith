@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.types
-
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange

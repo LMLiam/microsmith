@@ -1,14 +1,14 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.types
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.EnumScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.EnumValueScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.ReservedScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation.IndexAllocator
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names.NameRegistry
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Max
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.buildReservedDeclarations
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.NameRegistry
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.enum.EnumScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.enum.EnumValueScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.reserved.ReservedScope
 
 internal class EnumBuilder(private val name: String) : EnumScope {
     private val allocator = IndexAllocator(0)

@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.getReferencePath
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference.getReferencePath
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.enum.EnumScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.message.MessageScope
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.EnumBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.MessageBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
@@ -16,7 +18,7 @@ internal class ProtobufBuilder(private val segments: List<String> = emptyList())
     }
 
     override fun message(name: String, block: MessageScope.() -> Unit) {
-        registerDeclaration(name, MessageBuilder(name, segments).apply(block).build())
+        registerDeclaration(name, MessageBuilder(name).apply(block).build())
     }
 
     override fun enum(name: String, block: EnumScope.() -> Unit) {
