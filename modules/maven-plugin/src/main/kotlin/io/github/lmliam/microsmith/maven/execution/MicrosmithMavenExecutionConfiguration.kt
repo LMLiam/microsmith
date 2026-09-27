@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.maven
-
+package io.github.lmliam.microsmith.maven.execution
 import java.nio.file.Path
 import java.util.Properties
 

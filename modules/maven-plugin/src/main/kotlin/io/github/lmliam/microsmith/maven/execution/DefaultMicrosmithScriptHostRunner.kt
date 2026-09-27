@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.maven
+package io.github.lmliam.microsmith.maven.execution
 
 import io.github.lmliam.microsmith.runtime.scripting.MicrosmithScriptHost
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest

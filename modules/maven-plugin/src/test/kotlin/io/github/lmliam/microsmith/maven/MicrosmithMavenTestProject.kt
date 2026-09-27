@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.maven
-
 import java.nio.file.Files
 import java.nio.file.Path
 
