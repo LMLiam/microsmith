@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.ide
-
 import io.github.lmliam.microsmith.cli.command.IdeRefreshCommand
 import java.io.File
 import java.nio.file.Files

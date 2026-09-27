@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.ide
-
 import java.nio.file.Path
 
 internal fun Path.toKotlinPathLiteral(): String = toAbsolutePath()
