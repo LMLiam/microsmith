@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.runtime.scripting.model
-
 import java.nio.file.Path
 
 data class ScriptRunSuccess(
@@ -7,5 +6,4 @@ data class ScriptRunSuccess(
     val cacheHit: Boolean,
     val elapsedMillis: Long,
     val generatedRoots: List<Path> = emptyList(),
-) :
-    ScriptRunResult
+) : ScriptRunResult

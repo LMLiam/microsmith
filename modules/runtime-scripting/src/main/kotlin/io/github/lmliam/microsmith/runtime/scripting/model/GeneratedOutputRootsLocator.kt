@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.runtime.scripting.model
-
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
