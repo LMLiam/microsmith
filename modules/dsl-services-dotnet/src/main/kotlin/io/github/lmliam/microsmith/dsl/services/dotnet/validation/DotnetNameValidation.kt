@@ -1,0 +1,63 @@
+package io.github.lmliam.microsmith.dsl.services.dotnet.validation
+fun validateDotnetIdentifier(value: String, label: String): String {
+    val normalized = value.trim()
+    require(normalized.isNotBlank()) { "$label cannot be blank." }
+    require(isDotnetIdentifier(normalized)) {
+        "$label is not a valid .NET identifier: '$value'"
+    }
+
+    return normalized
+}
+
+fun validateDotnetQualifiedIdentifier(value: String, label: String): String {
+    val normalized = value.trim()
+    require(normalized.isNotBlank()) { "$label cannot be blank." }
+    require(isDotnetQualifiedIdentifier(normalized)) {
+        "$label is not a valid .NET qualified identifier: '$value'"
+    }
+
+    return normalized
+}
+
+private fun isDotnetQualifiedIdentifier(value: String): Boolean = value.split('.').all(::isDotnetIdentifier)
+
+fun isDotnetIdentifier(value: String): Boolean {
+    val candidate = value.removePrefix("@")
+    if (candidate.isEmpty()) {
+        return false
+    }
+
+    val firstCodePoint = candidate.firstCodePoint()
+    if (!firstCodePoint.isDotnetIdentifierStart()) {
+        return false
+    }
+
+    return candidate.asCodePoints().drop(1).all(Int::isDotnetIdentifierPart)
+}
+
+private fun String.firstCodePoint(): Int = codePointAt(0)
+
+private fun String.asCodePoints(): Sequence<Int> = sequence {
+    var index = 0
+    while (index < length) {
+        val codePoint = codePointAt(index)
+        yield(codePoint)
+        index += Character.charCount(codePoint)
+    }
+}
+
+private fun Int.isDotnetIdentifierStart(): Boolean = this == '_'.code ||
+    Character.isLetter(this) ||
+    Character.getType(this) == Character.LETTER_NUMBER.toInt()
+
+private fun Int.isDotnetIdentifierPart(): Boolean = isDotnetIdentifierStart() ||
+    when (Character.getType(this)) {
+        Character.NON_SPACING_MARK.toInt(),
+        Character.COMBINING_SPACING_MARK.toInt(),
+        Character.DECIMAL_DIGIT_NUMBER.toInt(),
+        Character.CONNECTOR_PUNCTUATION.toInt(),
+        Character.FORMAT.toInt(),
+        -> true
+
+        else -> false
+    }
