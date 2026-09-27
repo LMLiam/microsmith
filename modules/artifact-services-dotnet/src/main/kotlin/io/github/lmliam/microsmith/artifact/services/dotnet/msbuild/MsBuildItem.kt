@@ -8,10 +8,8 @@ class MsBuildItem(val itemName: String, val include: String, attributes: Map<Str
         this.attributes.keys.forEach(MsBuildNames::requireAttributeName)
     }
 
-    override fun equals(other: Any?): Boolean = other is MsBuildItem &&
-        itemName == other.itemName &&
-        include == other.include &&
-        attributes == other.attributes
+    override fun equals(other: Any?): Boolean =
+        other is MsBuildItem && itemName == other.itemName && include == other.include && attributes == other.attributes
 
     override fun hashCode(): Int {
         var result = itemName.hashCode()

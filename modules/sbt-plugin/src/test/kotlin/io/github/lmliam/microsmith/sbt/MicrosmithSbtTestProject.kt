@@ -18,14 +18,15 @@ class MicrosmithSbtTestProject private constructor(private val rootDirectory: Pa
         cacheDirectory: Path = file("target/tmp/microsmith/cache"),
         variables: Map<String, String> = emptyMap(),
         flags: Set<String> = emptySet(),
-    ): MicrosmithSbtExecutionConfiguration = MicrosmithSbtExecutionConfiguration(
-        baseDirectory = rootDirectory,
-        scriptFile = scriptFile,
-        outputDirectory = outputDirectory,
-        cacheDirectory = cacheDirectory,
-        variables = variables,
-        flags = flags,
-    )
+    ): MicrosmithSbtExecutionConfiguration =
+        MicrosmithSbtExecutionConfiguration(
+            baseDirectory = rootDirectory,
+            scriptFile = scriptFile,
+            outputDirectory = outputDirectory,
+            cacheDirectory = cacheDirectory,
+            variables = variables,
+            flags = flags,
+        )
 
     companion object {
         fun create(prefix: String): MicrosmithSbtTestProject =

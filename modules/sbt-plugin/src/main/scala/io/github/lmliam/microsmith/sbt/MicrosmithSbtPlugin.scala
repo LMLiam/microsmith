@@ -42,6 +42,10 @@ object MicrosmithSbtPlugin extends AutoPlugin {
   }
 
   import autoImport._
+import io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtExecutionConfiguration
+import io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtExecutionService
+import io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtHostFailureException
+import io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtScriptFailureException
 
   private val executionService = new MicrosmithSbtExecutionService()
 

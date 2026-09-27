@@ -5,37 +5,36 @@ internal fun renderAttribute(attribute: CSharp.Attribute): String =
         "[${attribute.name}(${arguments.joinToString(", ", transform = ::renderAttributeArgument)})]"
     } ?: "[${attribute.name}]"
 
-private fun renderAttributeArgument(argument: CSharp.AttributeArgument): String = when (argument) {
-    is CSharp.NamedAttributeArgument ->
-        "${argument.name} = ${renderAttributeExpression(argument.expression)}"
+private fun renderAttributeArgument(argument: CSharp.AttributeArgument): String =
+    when (argument) {
+        is CSharp.NamedAttributeArgument -> "${argument.name} = ${renderAttributeExpression(argument.expression)}"
 
-    is CSharp.PositionalAttributeArgument ->
-        renderAttributeExpression(argument.expression)
-}
+        is CSharp.PositionalAttributeArgument -> renderAttributeExpression(argument.expression)
+    }
 
-private fun renderAttributeExpression(expression: CSharp.Expression): String = when (expression) {
-    is CSharp.IntLiteral -> expression.value.toString()
+private fun renderAttributeExpression(expression: CSharp.Expression): String =
+    when (expression) {
+        is CSharp.IntLiteral -> expression.value.toString()
 
-    CSharp.NullLiteral -> "null"
+        CSharp.NullLiteral -> "null"
 
-    is CSharp.RawExpression -> expression.text
+        is CSharp.RawExpression -> expression.text
 
-    is CSharp.StringLiteral -> renderStringLiteral(expression.value)
+        is CSharp.StringLiteral -> renderStringLiteral(expression.value)
 
-    is CSharp.Assignment,
-    is CSharp.Await,
-    is CSharp.BinaryOperation,
-    is CSharp.Call,
-    is CSharp.Conditional,
-    is CSharp.Identifier,
-    is CSharp.IndexAccess,
-    is CSharp.MemberAccess,
-    is CSharp.ObjectCreation,
-    is CSharp.SwitchExpression,
-    is CSharp.Throw,
-    is CSharp.TupleLiteral,
-    -> error("C# attribute arguments must render from literal-safe expressions.")
-}
+        is CSharp.Assignment,
+        is CSharp.Await,
+        is CSharp.BinaryOperation,
+        is CSharp.Call,
+        is CSharp.Conditional,
+        is CSharp.Identifier,
+        is CSharp.IndexAccess,
+        is CSharp.MemberAccess,
+        is CSharp.ObjectCreation,
+        is CSharp.SwitchExpression,
+        is CSharp.Throw,
+        is CSharp.TupleLiteral -> error("C# attribute arguments must render from literal-safe expressions.")
+    }
 
 internal fun indent(text: String, spaces: Int = 4): String {
     val padding = " ".repeat(spaces)

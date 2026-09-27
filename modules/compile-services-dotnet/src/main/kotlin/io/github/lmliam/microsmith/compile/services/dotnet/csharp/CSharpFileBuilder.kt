@@ -20,13 +20,16 @@ class CSharpFileBuilder internal constructor(private val namespace: String) {
         attributes: List<CSharp.Attribute> = emptyList(),
         build: CSharpTypeBuilder.() -> Unit = {},
     ) {
-        types += CSharpTypeBuilder(
-            kind = CSharp.TypeKind.CLASS,
-            name = name,
-            modifiers = modifiers,
-            baseTypes = baseTypes,
-            attributes = attributes,
-        ).apply(build).build()
+        types +=
+            CSharpTypeBuilder(
+                    kind = CSharp.TypeKind.CLASS,
+                    name = name,
+                    modifiers = modifiers,
+                    baseTypes = baseTypes,
+                    attributes = attributes,
+                )
+                .apply(build)
+                .build()
     }
 
     fun recordType(
@@ -37,19 +40,23 @@ class CSharpFileBuilder internal constructor(private val namespace: String) {
         attributes: List<CSharp.Attribute> = emptyList(),
         build: CSharpTypeBuilder.() -> Unit = {},
     ) {
-        types += CSharpTypeBuilder(
-            kind = CSharp.TypeKind.RECORD,
-            name = name,
-            modifiers = modifiers,
-            baseTypes = baseTypes,
-            attributes = attributes,
-            primaryConstructorParameters = primaryConstructorParameters,
-        ).apply(build).build()
+        types +=
+            CSharpTypeBuilder(
+                    kind = CSharp.TypeKind.RECORD,
+                    name = name,
+                    modifiers = modifiers,
+                    baseTypes = baseTypes,
+                    attributes = attributes,
+                    primaryConstructorParameters = primaryConstructorParameters,
+                )
+                .apply(build)
+                .build()
     }
 
-    internal fun build(): CSharp.File = CSharp.File(
-        namespace = namespace,
-        usings = usings,
-        types = types,
-    )
+    internal fun build(): CSharp.File =
+        CSharp.File(
+            namespace = namespace,
+            usings = usings,
+            types = types,
+        )
 }

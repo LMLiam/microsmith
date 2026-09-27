@@ -187,7 +187,7 @@ class MicrosmithCliTests :
                     providerValidator = { emptyList() },
                     pluginResolver = {
                         PluginResolutionResult.Failure(
-                            diagnostics = listOf("Failed to resolve plugin from repository mirror."),
+                            diagnostics = listOf("Failed to resolve plugin from repository mirror.")
                         )
                     },
                 )
@@ -201,7 +201,7 @@ class MicrosmithCliTests :
                         "build/generated",
                         "--plugin",
                         "com.acme:test-emitter:1.0.0",
-                    ),
+                    )
                 )
 
             exitCode shouldBe 11
@@ -218,9 +218,7 @@ class MicrosmithCliTests :
                     stdout = out::add,
                     stderr = err::add,
                     providerValidator = { emptyList() },
-                    pluginResolver = {
-                        throw IllegalStateException("simulated resolver crash")
-                    },
+                    pluginResolver = { throw IllegalStateException("simulated resolver crash") },
                 )
 
             val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
@@ -241,7 +239,7 @@ class MicrosmithCliTests :
                     providerValidator = { emptyList() },
                     pluginResolver = {
                         PluginResolutionResult.Failure(
-                            diagnostics = listOf("Plugin repository policy blocked endpoint."),
+                            diagnostics = listOf("Plugin repository policy blocked endpoint.")
                         )
                     },
                 )
@@ -255,7 +253,7 @@ class MicrosmithCliTests :
                         "build/generated",
                         "--diagnostics",
                         "json",
-                    ),
+                    )
                 )
 
             exitCode shouldBe 11
@@ -292,7 +290,7 @@ class MicrosmithCliTests :
                             outputDir.toString(),
                             "--event-log",
                             eventLogPath.toString(),
-                        ),
+                        )
                     )
 
                 exitCode shouldBe 0
@@ -316,13 +314,13 @@ class MicrosmithCliTests :
                     doctorRunner = {
                         DoctorResult(
                             checks =
-                            listOf(
-                                DoctorCheckResult(
-                                    id = "provider-discovery",
-                                    status = DoctorCheckStatus.PASS,
-                                    message = "Required providers available.",
-                                ),
-                            ),
+                                listOf(
+                                    DoctorCheckResult(
+                                        id = "provider-discovery",
+                                        status = DoctorCheckStatus.PASS,
+                                        message = "Required providers available.",
+                                    )
+                                )
                         )
                     },
                 )
@@ -344,13 +342,13 @@ class MicrosmithCliTests :
                     doctorRunner = {
                         DoctorResult(
                             checks =
-                            listOf(
-                                DoctorCheckResult(
-                                    id = "provider-discovery",
-                                    status = DoctorCheckStatus.FAIL,
-                                    message = "Provider loading failed.",
-                                ),
-                            ),
+                                listOf(
+                                    DoctorCheckResult(
+                                        id = "provider-discovery",
+                                        status = DoctorCheckStatus.FAIL,
+                                        message = "Provider loading failed.",
+                                    )
+                                )
                         )
                     },
                 )
@@ -401,9 +399,7 @@ class MicrosmithCliTests :
                 MicrosmithCli(
                     stdout = out::add,
                     stderr = err::add,
-                    ideRefreshRunner = {
-                        error("simulated helper generation failure")
-                    },
+                    ideRefreshRunner = { error("simulated helper generation failure") },
                 )
 
             val exitCode = cli.run(arrayOf("ide", "refresh"))
@@ -429,13 +425,13 @@ class MicrosmithCliTests :
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 helperRoot = helperRoot,
                                 checks =
-                                listOf(
-                                    IdeDoctorCheckResult(
-                                        id = "helper-directory",
-                                        passed = true,
-                                        message = "IDE helper directory exists.",
+                                    listOf(
+                                        IdeDoctorCheckResult(
+                                            id = "helper-directory",
+                                            passed = true,
+                                            message = "IDE helper directory exists.",
+                                        )
                                     ),
-                                ),
                             )
                         },
                     )
@@ -465,13 +461,13 @@ class MicrosmithCliTests :
                                 projectRoot = projectRoot,
                                 helperRoot = helperRoot,
                                 checks =
-                                listOf(
-                                    IdeDoctorCheckResult(
-                                        id = "classpath-sync",
-                                        passed = false,
-                                        message = "IDE helper build file is stale.",
+                                    listOf(
+                                        IdeDoctorCheckResult(
+                                            id = "classpath-sync",
+                                            passed = false,
+                                            message = "IDE helper build file is stale.",
+                                        )
                                     ),
-                                ),
                             )
                         },
                     )
@@ -502,13 +498,13 @@ class MicrosmithCliTests :
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 helperRoot = tempDir.resolve(".microsmith/ide"),
                                 checks =
-                                listOf(
-                                    IdeDoctorCheckResult(
-                                        id = "classpath-sync",
-                                        passed = false,
-                                        message = "IDE helper build file is stale.",
+                                    listOf(
+                                        IdeDoctorCheckResult(
+                                            id = "classpath-sync",
+                                            passed = false,
+                                            message = "IDE helper build file is stale.",
+                                        )
                                     ),
-                                ),
                             )
                         },
                     )
@@ -522,7 +518,7 @@ class MicrosmithCliTests :
                             tempDir.toString(),
                             "--diagnostics",
                             "json",
-                        ),
+                        )
                     )
 
                 exitCode shouldBe 41

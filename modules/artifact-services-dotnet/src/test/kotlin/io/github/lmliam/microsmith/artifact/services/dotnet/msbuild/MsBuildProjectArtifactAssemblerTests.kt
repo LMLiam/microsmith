@@ -9,10 +9,11 @@ import io.kotest.matchers.shouldBe
 class MsBuildProjectArtifactAssemblerTests :
     StringSpec({
         val assembler = MsBuildProjectArtifactAssembler()
-        val artifactId = MsBuildProjectArtifactId(
-            solutionName = "Platform",
-            kind = MsBuildProjectKind.DirectoryPackagesProps,
-        )
+        val artifactId =
+            MsBuildProjectArtifactId(
+                solutionName = "Platform",
+                kind = MsBuildProjectKind.DirectoryPackagesProps,
+            )
 
         "merge combines compatible properties and items" {
             val initial =
@@ -21,14 +22,14 @@ class MsBuildProjectArtifactAssemblerTests :
                         artifactId = artifactId,
                         properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
                         items =
-                        listOf(
-                            MsBuildItem(
-                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                                include = "Serilog.AspNetCore",
-                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
+                            listOf(
+                                MsBuildItem(
+                                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                                    include = "Serilog.AspNetCore",
+                                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
+                                )
                             ),
-                        ),
-                    ),
+                    )
                 )
 
             val merged =
@@ -38,30 +39,31 @@ class MsBuildProjectArtifactAssemblerTests :
                         artifactId = artifactId,
                         properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
                         items =
-                        listOf(
-                            MsBuildItem(
-                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                                include = "FluentValidation.AspNetCore",
-                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "12.0.0"),
+                            listOf(
+                                MsBuildItem(
+                                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                                    include = "FluentValidation.AspNetCore",
+                                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "12.0.0"),
+                                )
                             ),
-                        ),
                     ),
                 )
 
             merged.properties shouldContainExactly
                 mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true")
-            merged.items shouldContainExactly listOf(
-                MsBuildItem(
-                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                    include = "Serilog.AspNetCore",
-                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
-                ),
-                MsBuildItem(
-                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                    include = "FluentValidation.AspNetCore",
-                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "12.0.0"),
-                ),
-            )
+            merged.items shouldContainExactly
+                listOf(
+                    MsBuildItem(
+                        itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                        include = "Serilog.AspNetCore",
+                        attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
+                    ),
+                    MsBuildItem(
+                        itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                        include = "FluentValidation.AspNetCore",
+                        attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "12.0.0"),
+                    ),
+                )
         }
 
         "merge rejects conflicting properties and item metadata" {
@@ -71,14 +73,14 @@ class MsBuildProjectArtifactAssemblerTests :
                         artifactId = artifactId,
                         properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
                         items =
-                        listOf(
-                            MsBuildItem(
-                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                                include = "Serilog.AspNetCore",
-                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
+                            listOf(
+                                MsBuildItem(
+                                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                                    include = "Serilog.AspNetCore",
+                                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
+                                )
                             ),
-                        ),
-                    ),
+                    )
                 )
 
             shouldThrow<IllegalArgumentException> {
@@ -97,13 +99,13 @@ class MsBuildProjectArtifactAssemblerTests :
                     MsBuildProjectContribution(
                         artifactId = artifactId,
                         items =
-                        listOf(
-                            MsBuildItem(
-                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                                include = "Serilog.AspNetCore",
-                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.1"),
+                            listOf(
+                                MsBuildItem(
+                                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                                    include = "Serilog.AspNetCore",
+                                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.1"),
+                                )
                             ),
-                        ),
                     ),
                 )
             }

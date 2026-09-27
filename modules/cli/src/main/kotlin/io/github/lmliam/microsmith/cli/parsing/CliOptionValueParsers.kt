@@ -6,23 +6,17 @@ import java.nio.file.Path
 
 private const val PLUGIN_COORDINATE_PART_COUNT = 3
 
-internal fun parseVariableValue(value: String?): ParsedVariable = when {
-    value == null || value.startsWith("--") -> ParsedVariable(error = "Missing value for --var option.")
-    else -> parseVariableAssignment(value)
-}
+internal fun parseVariableValue(value: String?): ParsedVariable =
+    when {
+        value == null || value.startsWith("--") -> ParsedVariable(error = "Missing value for --var option.")
+        else -> parseVariableAssignment(value)
+    }
 
-internal fun parseFlagValue(value: String?): String? = value
-    ?.takeUnless { it.startsWith("--") }
-    ?.trim()
-    ?.takeIf { it.isNotBlank() }
+internal fun parseFlagValue(value: String?): String? =
+    value?.takeUnless { it.startsWith("--") }?.trim()?.takeIf { it.isNotBlank() }
 
 internal fun parsePluginCoordinate(value: String?): String? {
-    val coordinate =
-        value
-            ?.takeUnless { it.startsWith("--") }
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
-            ?: return null
+    val coordinate = value?.takeUnless { it.startsWith("--") }?.trim()?.takeIf { it.isNotBlank() } ?: return null
 
     val parts = coordinate.split(':')
     val isValid =
@@ -34,24 +28,14 @@ internal fun parsePluginCoordinate(value: String?): String? {
 }
 
 internal fun parseIsolationMode(value: String?): ScriptIsolationMode? {
-    val normalized =
-        value
-            ?.takeUnless { it.startsWith("--") }
-            ?.trim()
-            ?.takeIf { it.isNotEmpty() }
-            ?: return null
+    val normalized = value?.takeUnless { it.startsWith("--") }?.trim()?.takeIf { it.isNotEmpty() } ?: return null
 
     return ScriptIsolationMode.fromCliValue(normalized)
 }
 
 internal fun parseDiagnosticFormat(value: String?): DiagnosticFormat? {
     val normalized =
-        value
-            ?.takeUnless { it.startsWith("--") }
-            ?.trim()
-            ?.takeIf { it.isNotEmpty() }
-            ?.lowercase()
-            ?: return null
+        value?.takeUnless { it.startsWith("--") }?.trim()?.takeIf { it.isNotEmpty() }?.lowercase() ?: return null
     return DiagnosticFormat.parse(normalized)
 }
 

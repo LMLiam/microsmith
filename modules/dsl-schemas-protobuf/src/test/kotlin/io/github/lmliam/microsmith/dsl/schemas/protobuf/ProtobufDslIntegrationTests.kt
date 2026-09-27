@@ -1,9 +1,10 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf
 
-import io.github.lmliam.microsmith.dsl.schemas.core.SchemasBuilder
+import io.github.lmliam.microsmith.dsl.schemas.SchemasBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Cardinality
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
@@ -65,40 +66,42 @@ class ProtobufDslIntegrationTests :
                     "attrs" to 5,
                     "color" to 8,
                 )
+            person.schema.fields.first { it.name == "age" }.let { it as ScalarField }.cardinality shouldBe
+                Cardinality.OPTIONAL
+            person.schema.fields.first { it.name == "tags" }.let { it as ScalarField }.cardinality shouldBe
+                Cardinality.REPEATED
             person.schema.fields
-                .first { it.name == "age" }
-                .let { it as ScalarField }
-                .cardinality shouldBe Cardinality.OPTIONAL
+                .first { it.name == "attrs" }
+                .let { it as MapField }
+                .type
+                .also {
+                    it.key shouldBe PrimitiveType.STRING
+                    it.value shouldBe PrimitiveType.STRING
+                }
             person.schema.fields
-                .first { it.name == "tags" }
-                .let { it as ScalarField }
-                .cardinality shouldBe Cardinality.REPEATED
-            person.schema.fields.first { it.name == "attrs" }.let { it as MapField }.type.also {
-                it.key shouldBe PrimitiveType.STRING
-                it.value shouldBe PrimitiveType.STRING
-            }
-            person.schema.fields.first { it.name == "color" }.let { it as ReferenceField }.also {
-                it.cardinality shouldBe Cardinality.REQUIRED
-                it.reference.name shouldBe "Color"
-                it.reference.type shouldBe color.schema
-            }
-            person.schema.oneofs.first { it.name == "choice" }.fields.also { fields ->
-                fields.associate { it.name to it.index } shouldContainExactly
-                    mapOf(
-                        "active" to 6,
-                        "score" to 7,
-                    )
-                fields.first { it.name == "active" }.fieldType shouldBe PrimitiveType.BOOL
-                fields.first { it.name == "score" }.fieldType shouldBe PrimitiveType.INT32
-            }
+                .first { it.name == "color" }
+                .let { it as ReferenceField }
+                .also {
+                    it.cardinality shouldBe Cardinality.SINGULAR
+                    it.reference shouldBe Reference.Local(target = "Color")
+                }
+            person.schema.oneofs
+                .first { it.name == "choice" }
+                .fields
+                .also { fields ->
+                    fields.associate { it.name to it.index } shouldContainExactly
+                        mapOf(
+                            "active" to 6,
+                            "score" to 7,
+                        )
+                    fields.first { it.name == "active" }.fieldType shouldBe PrimitiveType.BOOL
+                    fields.first { it.name == "score" }.fieldType shouldBe PrimitiveType.INT32
+                }
             person.schema.reserved.filterIsInstance<ReservedRange>().also {
                 it.size shouldBe 1
                 it.first().indexRange shouldBe 9..12
             }
-            person.schema.reserved
-                .filterIsInstance<ReservedName>()
-                .first()
-                .name shouldBe "LEGACY"
+            person.schema.reserved.filterIsInstance<ReservedName>().first().name shouldBe "LEGACY"
 
             color.name shouldBe "Color"
             color.schema.name shouldBe "Color"
@@ -108,28 +111,16 @@ class ProtobufDslIntegrationTests :
                     "RED" to 1,
                     "GREEN" to 2,
                 )
-            color.schema.reserved
-                .filterIsInstance<ReservedIndex>()
-                .first()
-                .index shouldBe 99
-            color.schema.reserved
-                .filterIsInstance<ReservedName>()
-                .first()
-                .name shouldBe "OBSOLETE"
+            color.schema.reserved.filterIsInstance<ReservedIndex>().first().index shouldBe 99
+            color.schema.reserved.filterIsInstance<ReservedName>().first().name shouldBe "OBSOLETE"
         }
 
         "nested namespaces and versioning produce qualified names" {
             val schemasBuilder = SchemasBuilder()
             schemasBuilder.protobuf {
                 "pkg.sub" {
-                    message("Foo") {
-                        int32("id")
-                    }
-                    2 {
-                        enum("Status") {
-                            +"OK"
-                        }
-                    }
+                    message("Foo") { int32("id") }
+                    2 { enum("Status") { +"OK" } }
                 }
             }
             val schemas = schemasBuilder.toExtension()

@@ -29,11 +29,12 @@ class CSharpCodeBlockBuilder internal constructor() {
     }
 
     fun local(keyword: String = "var", name: String, initializer: CSharp.Expression) {
-        statements += CSharp.LocalDeclaration(
-            keyword = keyword,
-            name = name,
-            initializer = initializer,
-        )
+        statements +=
+            CSharp.LocalDeclaration(
+                keyword = keyword,
+                name = name,
+                initializer = initializer,
+            )
     }
 
     fun local(keyword: String = "var", name: String, initializer: String) {
@@ -41,10 +42,11 @@ class CSharpCodeBlockBuilder internal constructor() {
     }
 
     fun ifStatement(condition: CSharp.Expression, build: CSharpCodeBlockBuilder.() -> Unit) {
-        statements += CSharp.IfStatement(
-            condition = condition,
-            body = CSharpCodeBlockBuilder().apply(build).build(),
-        )
+        statements +=
+            CSharp.IfStatement(
+                condition = condition,
+                body = CSharpCodeBlockBuilder().apply(build).build(),
+            )
     }
 
     fun ifStatement(condition: String, build: CSharpCodeBlockBuilder.() -> Unit) {
@@ -52,18 +54,20 @@ class CSharpCodeBlockBuilder internal constructor() {
     }
 
     fun foreach(signature: String, build: CSharpCodeBlockBuilder.() -> Unit) {
-        statements += CSharp.RawForeachStatement(
-            signature = signature,
-            body = CSharpCodeBlockBuilder().apply(build).build(),
-        )
+        statements +=
+            CSharp.RawForeachStatement(
+                signature = signature,
+                body = CSharpCodeBlockBuilder().apply(build).build(),
+            )
     }
 
     fun foreach(name: String, source: CSharp.Expression, build: CSharpCodeBlockBuilder.() -> Unit) {
-        statements += CSharp.StructuredForeachStatement(
-            target = CSharp.ForeachIdentifier(name),
-            source = source,
-            body = CSharpCodeBlockBuilder().apply(build).build(),
-        )
+        statements +=
+            CSharp.StructuredForeachStatement(
+                target = CSharp.ForeachIdentifier(name),
+                source = source,
+                body = CSharpCodeBlockBuilder().apply(build).build(),
+            )
     }
 
     fun foreachDeconstruction(
@@ -71,11 +75,12 @@ class CSharpCodeBlockBuilder internal constructor() {
         source: CSharp.Expression,
         build: CSharpCodeBlockBuilder.() -> Unit,
     ) {
-        statements += CSharp.StructuredForeachStatement(
-            target = CSharp.ForeachDeconstruction(names.toList()),
-            source = source,
-            body = CSharpCodeBlockBuilder().apply(build).build(),
-        )
+        statements +=
+            CSharp.StructuredForeachStatement(
+                target = CSharp.ForeachDeconstruction(names.toList()),
+                source = source,
+                body = CSharpCodeBlockBuilder().apply(build).build(),
+            )
     }
 
     fun blankLine() {

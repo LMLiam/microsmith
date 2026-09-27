@@ -16,13 +16,9 @@ import kotlin.io.path.Path
 
 class CliParserTests :
     StringSpec({
-        "returns help command for empty args" {
-            parseCliArgs(emptyList()) shouldBe HelpCommand
-        }
+        "returns help command for empty args" { parseCliArgs(emptyList()) shouldBe HelpCommand }
 
-        "parses --version command" {
-            parseCliArgs(listOf("--version")) shouldBe VersionCommand
-        }
+        "parses --version command" { parseCliArgs(listOf("--version")) shouldBe VersionCommand }
 
         "returns error for version alias command" {
             parseCliArgs(listOf("version")) shouldBe ErrorCommand("Unknown command 'version'.")
@@ -33,9 +29,7 @@ class CliParserTests :
                 ErrorCommand("The --version command does not accept additional arguments.")
         }
 
-        "parses doctor command with defaults" {
-            parseCliArgs(listOf("doctor")) shouldBe DoctorCommand()
-        }
+        "parses doctor command with defaults" { parseCliArgs(listOf("doctor")) shouldBe DoctorCommand() }
 
         "parses doctor command options" {
             parseCliArgs(listOf("doctor", "--diagnostics", "json", "--verbose")) shouldBe
@@ -45,9 +39,7 @@ class CliParserTests :
                 )
         }
 
-        "parses init command with defaults" {
-            parseCliArgs(listOf("init")) shouldBe InitCommand()
-        }
+        "parses init command with defaults" { parseCliArgs(listOf("init")) shouldBe InitCommand() }
 
         "parses init command options" {
             parseCliArgs(
@@ -60,7 +52,7 @@ class CliParserTests :
                     "--diagnostics",
                     "json",
                     "--verbose",
-                ),
+                )
             ) shouldBe
                 InitCommand(
                     projectRoot = Path("examples/go-service"),
@@ -85,7 +77,7 @@ class CliParserTests :
                     "--diagnostics",
                     "json",
                     "--verbose",
-                ),
+                )
             ) shouldBe
                 IdeRefreshCommand(
                     projectRoot = Path("examples/go-service"),
@@ -104,7 +96,7 @@ class CliParserTests :
                     "--diagnostics",
                     "json",
                     "--verbose",
-                ),
+                )
             ) shouldBe
                 IdeDoctorCommand(
                     projectRoot = Path("examples/dotnet-service"),
@@ -138,7 +130,7 @@ class CliParserTests :
                     "dry-run",
                     "--flag",
                     "verbose",
-                ),
+                )
             ) shouldBe
                 RunCommand(
                     script = Path("schema.microsmith.kts"),
@@ -164,7 +156,7 @@ class CliParserTests :
                     "https://maven.acme.internal/repository/mirror",
                     "--isolation",
                     "process",
-                ),
+                )
             ) shouldBe
                 RunCommand(
                     script = Path("schema.microsmith.kts"),
@@ -189,7 +181,7 @@ class CliParserTests :
                     "--verbose",
                     "--event-log",
                     "build/event-log.jsonl",
-                ),
+                )
             ) shouldBe
                 RunCommand(
                     script = Path("schema.microsmith.kts"),
@@ -211,9 +203,7 @@ class CliParserTests :
         }
 
         "returns error for invalid --var value" {
-            parseCliArgs(
-                listOf("run", "schema.microsmith.kts", "--out", "build/generated", "--var", "broken"),
-            ) shouldBe
+            parseCliArgs(listOf("run", "schema.microsmith.kts", "--out", "build/generated", "--var", "broken")) shouldBe
                 ErrorCommand("Invalid --var value 'broken'. Expected key=value.")
         }
 
@@ -226,11 +216,9 @@ class CliParserTests :
                     "build/generated",
                     "--plugin",
                     "com.acme:missing-version",
-                ),
-            ) shouldBe
-                ErrorCommand(
-                    "Invalid --plugin value 'com.acme:missing-version'. Expected group:artifact:version.",
                 )
+            ) shouldBe
+                ErrorCommand("Invalid --plugin value 'com.acme:missing-version'. Expected group:artifact:version.")
         }
 
         "returns error for invalid isolation mode" {
@@ -242,9 +230,8 @@ class CliParserTests :
                     "build/generated",
                     "--isolation",
                     "container",
-                ),
-            ) shouldBe
-                ErrorCommand("Invalid --isolation value 'container'. Expected 'classloader' or 'process'.")
+                )
+            ) shouldBe ErrorCommand("Invalid --isolation value 'container'. Expected 'classloader' or 'process'.")
         }
 
         "returns error for invalid diagnostics mode" {
@@ -256,9 +243,8 @@ class CliParserTests :
                     "build/generated",
                     "--diagnostics",
                     "yaml",
-                ),
-            ) shouldBe
-                ErrorCommand("Invalid --diagnostics value 'yaml'. Expected 'text' or 'json'.")
+                )
+            ) shouldBe ErrorCommand("Invalid --diagnostics value 'yaml'. Expected 'text' or 'json'.")
         }
 
         "returns error when ide subcommand is missing" {
@@ -289,7 +275,7 @@ class CliParserTests :
                     "repo-one",
                     "--repo-root",
                     "repo-two",
-                ),
+                )
             ) shouldBe ErrorCommand("--repo-root may only be specified once.")
         }
 
@@ -319,14 +305,12 @@ class CliParserTests :
         }
 
         "returns error when init repo-root value is missing" {
-            parseCliArgs(listOf("init", "--repo-root")) shouldBe
-                ErrorCommand("Missing value for --repo-root option.")
+            parseCliArgs(listOf("init", "--repo-root")) shouldBe ErrorCommand("Missing value for --repo-root option.")
         }
 
         "returns error when init repo-root is specified multiple times" {
-            parseCliArgs(
-                listOf("init", "--repo-root", "one", "--repo-root", "two"),
-            ) shouldBe ErrorCommand("--repo-root may only be specified once.")
+            parseCliArgs(listOf("init", "--repo-root", "one", "--repo-root", "two")) shouldBe
+                ErrorCommand("--repo-root may only be specified once.")
         }
 
         "returns error for removed init non-interactive option" {
@@ -335,8 +319,7 @@ class CliParserTests :
         }
 
         "returns error for removed init yes option" {
-            parseCliArgs(listOf("init", "--yes")) shouldBe
-                ErrorCommand("Unknown option '--yes'.")
+            parseCliArgs(listOf("init", "--yes")) shouldBe ErrorCommand("Unknown option '--yes'.")
         }
 
         "returns error when init force is specified multiple times" {

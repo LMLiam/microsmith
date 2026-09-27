@@ -1,14 +1,10 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.MapFieldScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.getReferencePath
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference.textualReference
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.MapFieldScope
 
-internal class MapFieldBuilder(
-    private val segments: List<String>,
-    var index: Int? = null,
-    var key: MapKeyType? = null,
-    var value: ValueType? = null,
-) : MapFieldScope {
+internal class MapFieldBuilder(var index: Int? = null, var key: MapKeyType? = null, var value: ValueType? = null) :
+    MapFieldScope {
     override fun index(index: Int) {
         this.index = index
     }
@@ -28,8 +24,5 @@ internal class MapFieldBuilder(
         value(kvpValue.second)
     }
 
-    override fun ref(target: String): Reference {
-        val fqName = getReferencePath(segments, target).joinToString(".")
-        return Reference(fqName)
-    }
+    override fun ref(target: String): Reference = textualReference(target)
 }

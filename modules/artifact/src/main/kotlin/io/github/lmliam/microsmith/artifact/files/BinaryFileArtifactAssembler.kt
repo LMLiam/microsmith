@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.artifact.files
 
 import com.github.eventhorizonlab.spi.ServiceProvider
-import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 
 @ServiceProvider(ArtifactAssembler::class)
 class BinaryFileArtifactAssembler : ArtifactAssembler<BinaryFileArtifact> {
@@ -29,7 +29,7 @@ class BinaryFileArtifactAssembler : ArtifactAssembler<BinaryFileArtifact> {
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<BinaryFileArtifact>,
+        contribution: ArtifactContribution<BinaryFileArtifact>
     ): BinaryFileArtifactContribution {
         require(contribution is BinaryFileArtifactContribution) {
             "Unsupported binary artifact contribution type: ${contribution::class}"

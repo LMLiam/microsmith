@@ -19,17 +19,20 @@ class JavaOnboardingProfileTests :
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-java")
             repoRoot.resolve("pom.xml").writeText("<project />\n")
             repoRoot.resolve("src/main/java/example").createDirectories()
-            repoRoot.resolve("src/main/java/example/App.java").writeText(
-                """
-                package example;
+            repoRoot
+                .resolve("src/main/java/example/App.java")
+                .writeText(
+                    """
+                    package example;
 
-                public final class App {
-                    public String message() {
-                        return "Microsmith Java fixture";
+                    public final class App {
+                        public String message() {
+                            return "Microsmith Java fixture";
+                        }
                     }
-                }
-                """.trimIndent() + "\n",
-            )
+                    """
+                        .trimIndent() + "\n"
+                )
             try {
                 val helperRoot = repoRoot.resolve(".microsmith/ide")
                 val result =

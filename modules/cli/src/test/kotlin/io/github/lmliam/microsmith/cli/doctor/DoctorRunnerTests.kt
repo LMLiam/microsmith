@@ -94,7 +94,8 @@ class DoctorRunnerTests :
             repoRoot.resolve("build.microsmith.kts").writeText("microsmith { }")
             repoRoot.resolve("settings.microsmith.kts").writeText("// settings")
             repoRoot.resolve(".microsmith/ide").createDirectories()
-            repoRoot.resolve(".microsmith/ide/settings.gradle.kts")
+            repoRoot
+                .resolve(".microsmith/ide/settings.gradle.kts")
                 .writeText("rootProject.name = \"microsmith-ide-helper\"")
             try {
                 val result =
@@ -173,35 +174,36 @@ class DoctorRunnerTests :
             }
         }
 
-        "bootstrap-state treats symlinked bootstrap files as invalid".config(enabled = !runningOnWindows()) {
-            val repoRoot = createTempDirectory("microsmith-doctor-bootstrap-symlink")
-            val targetRoot = createTempDirectory("microsmith-doctor-bootstrap-symlink-target")
-            val scriptCache = createTempDirectory("microsmith-doctor-script-cache")
-            val pluginCache = createTempDirectory("microsmith-doctor-plugin-cache")
-            val externalBuildScript = targetRoot.resolve("build.microsmith.kts")
-            externalBuildScript.writeText("microsmith { }")
-            Files.createSymbolicLink(repoRoot.resolve("build.microsmith.kts"), externalBuildScript)
-            repoRoot.resolve("settings.microsmith.kts").writeText("// settings")
-            try {
-                val result =
-                    runDoctorChecks(
-                        providerValidator = { emptyList() },
-                        scriptCacheDirectory = scriptCache,
-                        pluginCacheDirectory = pluginCache,
-                        projectRoot = repoRoot,
-                    )
+        "bootstrap-state treats symlinked bootstrap files as invalid"
+            .config(enabled = !runningOnWindows()) {
+                val repoRoot = createTempDirectory("microsmith-doctor-bootstrap-symlink")
+                val targetRoot = createTempDirectory("microsmith-doctor-bootstrap-symlink-target")
+                val scriptCache = createTempDirectory("microsmith-doctor-script-cache")
+                val pluginCache = createTempDirectory("microsmith-doctor-plugin-cache")
+                val externalBuildScript = targetRoot.resolve("build.microsmith.kts")
+                externalBuildScript.writeText("microsmith { }")
+                Files.createSymbolicLink(repoRoot.resolve("build.microsmith.kts"), externalBuildScript)
+                repoRoot.resolve("settings.microsmith.kts").writeText("// settings")
+                try {
+                    val result =
+                        runDoctorChecks(
+                            providerValidator = { emptyList() },
+                            scriptCacheDirectory = scriptCache,
+                            pluginCacheDirectory = pluginCache,
+                            projectRoot = repoRoot,
+                        )
 
-                val bootstrapCheck = result.checks.single { it.id == "bootstrap-state" }
-                bootstrapCheck.status shouldBe DoctorCheckStatus.FAIL
-                bootstrapCheck.message.shouldContain("Run 'microsmith init'")
-                bootstrapCheck.details["invalidBootstrapFiles"] shouldBe "build.microsmith.kts"
-            } finally {
-                runCatching { repoRoot.deleteRecursively() }
-                runCatching { targetRoot.deleteRecursively() }
-                runCatching { scriptCache.deleteRecursively() }
-                runCatching { pluginCache.deleteRecursively() }
+                    val bootstrapCheck = result.checks.single { it.id == "bootstrap-state" }
+                    bootstrapCheck.status shouldBe DoctorCheckStatus.FAIL
+                    bootstrapCheck.message.shouldContain("Run 'microsmith init'")
+                    bootstrapCheck.details["invalidBootstrapFiles"] shouldBe "build.microsmith.kts"
+                } finally {
+                    runCatching { repoRoot.deleteRecursively() }
+                    runCatching { targetRoot.deleteRecursively() }
+                    runCatching { scriptCache.deleteRecursively() }
+                    runCatching { pluginCache.deleteRecursively() }
+                }
             }
-        }
     })
 
 private fun runningOnWindows(): Boolean = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)

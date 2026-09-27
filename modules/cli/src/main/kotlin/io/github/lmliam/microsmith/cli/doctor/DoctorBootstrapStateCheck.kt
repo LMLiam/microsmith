@@ -13,11 +13,14 @@ internal object DoctorBootstrapStateCheck {
         val helperRoot = projectRoot.resolve(IDE_HELPER_DIRECTORY)
 
         validateBootstrapSurface(
-            projectRoot = projectRoot,
-            buildScript = buildScript,
-            settingsScript = settingsScript,
-            helperRoot = helperRoot,
-        )?.let { return it }
+                projectRoot = projectRoot,
+                buildScript = buildScript,
+                settingsScript = settingsScript,
+                helperRoot = helperRoot,
+            )
+            ?.let {
+                return it
+            }
 
         val invalidHelperFiles = invalidIdeHelperFiles(projectRoot = projectRoot, helperRoot = helperRoot)
         val missingHelperFiles = missingIdeHelperFiles(projectRoot = projectRoot, helperRoot = helperRoot)
@@ -26,8 +29,8 @@ internal object DoctorBootstrapStateCheck {
             invalidHelperFiles.isNotEmpty() ->
                 failure(
                     message =
-                    "JetBrains IDE helper contains conflicting managed paths. " +
-                        "Remove them and run 'microsmith ide refresh' to repair it.",
+                        "JetBrains IDE helper contains conflicting managed paths. " +
+                            "Remove them and run 'microsmith ide refresh' to repair it.",
                     details = mapOf("invalidIdeHelperFiles" to invalidHelperFiles.joinToString(separator = ",")),
                 )
 
@@ -46,8 +49,8 @@ internal object DoctorBootstrapStateCheck {
             else ->
                 failure(
                     message =
-                    "Bootstrap files are present, but the JetBrains IDE helper is missing. " +
-                        "Run 'microsmith ide refresh' to restore the default onboarding surface.",
+                        "Bootstrap files are present, but the JetBrains IDE helper is missing. " +
+                            "Run 'microsmith ide refresh' to restore the default onboarding surface.",
                     details = mapOf("projectRoot" to projectRoot.toString()),
                 )
         }
@@ -78,28 +81,22 @@ internal object DoctorBootstrapStateCheck {
             invalidBootstrapFiles.isNotEmpty() ->
                 failure(
                     message =
-                    "Bootstrap paths are invalid. Remove the conflicting paths. " +
-                        "Run 'microsmith init' to repair them.",
-                    details =
-                    mapOf(
-                        "invalidBootstrapFiles" to invalidBootstrapFiles.joinToString(separator = ","),
-                    ),
+                        "Bootstrap paths are invalid. Remove the conflicting paths. " +
+                            "Run 'microsmith init' to repair them.",
+                    details = mapOf("invalidBootstrapFiles" to invalidBootstrapFiles.joinToString(separator = ",")),
                 )
 
             missingBootstrapFiles.isNotEmpty() ->
                 failure(
                     message = "Bootstrap state is incomplete. Run 'microsmith init' to repair it.",
-                    details =
-                    mapOf(
-                        "missingBootstrapFiles" to missingBootstrapFiles.joinToString(separator = ","),
-                    ),
+                    details = mapOf("missingBootstrapFiles" to missingBootstrapFiles.joinToString(separator = ",")),
                 )
 
             managedPathExists(helperRoot) && !Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) ->
                 failure(
                     message =
-                    "JetBrains IDE helper path is invalid. " +
-                        "Run 'microsmith ide refresh' after removing the conflicting path.",
+                        "JetBrains IDE helper path is invalid. " +
+                            "Run 'microsmith ide refresh' after removing the conflicting path.",
                     details = mapOf("helperRoot" to helperRoot.toString()),
                 )
 
@@ -110,27 +107,21 @@ internal object DoctorBootstrapStateCheck {
     private fun invalidIdeHelperFiles(projectRoot: Path, helperRoot: Path): List<String> =
         IdeHelperManagedSurface.requiredFiles(helperRoot)
             .takeIf { Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) }
-            ?.let { managedFiles ->
-                invalidManagedFiles(projectRoot = projectRoot, managedFiles = managedFiles)
-            }
+            ?.let { managedFiles -> invalidManagedFiles(projectRoot = projectRoot, managedFiles = managedFiles) }
             .orEmpty()
 
     private fun missingIdeHelperFiles(projectRoot: Path, helperRoot: Path): List<String> =
         IdeHelperManagedSurface.requiredFiles(helperRoot)
             .takeIf { Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) }
-            ?.let { managedFiles ->
-                missingManagedFiles(projectRoot = projectRoot, managedFiles = managedFiles)
-            }
+            ?.let { managedFiles -> missingManagedFiles(projectRoot = projectRoot, managedFiles = managedFiles) }
             .orEmpty()
 
-    private fun missingManagedFiles(projectRoot: Path, managedFiles: List<Path>): List<String> = managedFiles
-        .filterNot(::managedPathExists)
-        .map(projectRoot::relativize)
-        .map(Path::toString)
-        .sorted()
+    private fun missingManagedFiles(projectRoot: Path, managedFiles: List<Path>): List<String> =
+        managedFiles.filterNot(::managedPathExists).map(projectRoot::relativize).map(Path::toString).sorted()
 
     private fun invalidManagedFiles(projectRoot: Path, managedFiles: List<Path>): List<String> =
-        managedFiles.asSequence()
+        managedFiles
+            .asSequence()
             .filter(::managedPathExists)
             .filterNot(::isManagedRegularFile)
             .map(projectRoot::relativize)
@@ -142,12 +133,13 @@ internal object DoctorBootstrapStateCheck {
 
     private fun isManagedRegularFile(path: Path): Boolean = Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)
 
-    private fun pass(message: String, details: Map<String, String> = emptyMap()): DoctorCheckResult = DoctorCheckResult(
-        id = CHECK_ID,
-        status = DoctorCheckStatus.PASS,
-        message = message,
-        details = details,
-    )
+    private fun pass(message: String, details: Map<String, String> = emptyMap()): DoctorCheckResult =
+        DoctorCheckResult(
+            id = CHECK_ID,
+            status = DoctorCheckStatus.PASS,
+            message = message,
+            details = details,
+        )
 
     private fun failure(message: String, details: Map<String, String> = emptyMap()): DoctorCheckResult =
         DoctorCheckResult(

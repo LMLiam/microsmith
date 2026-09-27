@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import java.nio.file.Path
 
 data class ResolvedDotnetAspService(

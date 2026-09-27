@@ -9,19 +9,18 @@ import kotlin.script.experimental.jvmhost.CompiledScriptJarsCache
 internal class MicrosmithScriptCache(
     private val cacheDirectory: Path,
     private val additionalFingerprints: () -> List<String> = { emptyList() },
-) : CompiledScriptJarsCache(
-    { script, scriptCompilationConfiguration ->
+) :
+    CompiledScriptJarsCache({ script, scriptCompilationConfiguration ->
         cacheDirectory
             .resolve(
                 CompiledScriptFingerprint.uniqueName(
                     script = script,
                     scriptCompilationConfiguration = scriptCompilationConfiguration,
                     additionalFingerprints = additionalFingerprints(),
-                ) + ".jar",
+                ) + ".jar"
             )
             .toFile()
-    },
-) {
+    }) {
     var storedScripts: Int = 0
         private set
 

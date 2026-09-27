@@ -9,7 +9,7 @@ class ReferenceFieldBuilderTests :
         "default state has null index and REQUIRED cardinality" {
             val builder = ReferenceFieldBuilder()
             builder.index shouldBe null
-            builder.cardinality shouldBe Cardinality.REQUIRED
+            builder.cardinality shouldBe Cardinality.SINGULAR
         }
 
         "index is set correctly" {
@@ -40,32 +40,24 @@ class ReferenceFieldBuilderTests :
         "calling optional twice throws" {
             val builder = ReferenceFieldBuilder()
             builder.optional()
-            shouldThrow<IllegalArgumentException> {
-                builder.optional()
-            }
+            shouldThrow<IllegalArgumentException> { builder.optional() }
         }
 
         "calling repeated twice throws" {
             val builder = ReferenceFieldBuilder()
             builder.repeated()
-            shouldThrow<IllegalArgumentException> {
-                builder.repeated()
-            }
+            shouldThrow<IllegalArgumentException> { builder.repeated() }
         }
 
         "calling optional then repeated throws" {
             val builder = ReferenceFieldBuilder()
             builder.optional()
-            shouldThrow<IllegalArgumentException> {
-                builder.repeated()
-            }
+            shouldThrow<IllegalArgumentException> { builder.repeated() }
         }
 
         "calling repeated then optional throws" {
             val builder = ReferenceFieldBuilder()
             builder.repeated()
-            shouldThrow<IllegalArgumentException> {
-                builder.optional()
-            }
+            shouldThrow<IllegalArgumentException> { builder.optional() }
         }
     })

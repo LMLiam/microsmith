@@ -29,15 +29,15 @@ class PluginResolverGuardrailTests :
                     PluginResolverSettings(
                         cacheDirectory = tempDir.resolve("cache"),
                         repositoryCredentialsResolver =
-                        object : RepositoryCredentialsResolver {
-                            override fun resolve(repositoryUri: String): RepositoryCredentials {
-                                error("resolve() should not be called when no plugins are requested.")
-                            }
+                            object : RepositoryCredentialsResolver {
+                                override fun resolve(repositoryUri: String): RepositoryCredentials {
+                                    error("resolve() should not be called when no plugins are requested.")
+                                }
 
-                            override fun sensitiveValues(): Set<String> {
-                                error("sensitiveValues() should not be called when no plugins are requested.")
-                            }
-                        },
+                                override fun sensitiveValues(): Set<String> {
+                                    error("sensitiveValues() should not be called when no plugins are requested.")
+                                }
+                            },
                     )
 
                 val result = resolvePlugins(command = command, settings = settings)
@@ -69,15 +69,15 @@ class PluginResolverGuardrailTests :
                     PluginResolverSettings(
                         cacheDirectory = tempDir.resolve("cache"),
                         repositoryCredentialsResolver =
-                        object : RepositoryCredentialsResolver {
-                            override fun resolve(repositoryUri: String): RepositoryCredentials {
-                                error("resolve() should not be called for local plugin-jar-only runs.")
-                            }
+                            object : RepositoryCredentialsResolver {
+                                override fun resolve(repositoryUri: String): RepositoryCredentials {
+                                    error("resolve() should not be called for local plugin-jar-only runs.")
+                                }
 
-                            override fun sensitiveValues(): Set<String> {
-                                error("sensitiveValues() should not be called for local plugin-jar-only runs.")
-                            }
-                        },
+                                override fun sensitiveValues(): Set<String> {
+                                    error("sensitiveValues() should not be called for local plugin-jar-only runs.")
+                                }
+                            },
                     )
 
                 val result = resolvePlugins(command = command, settings = settings)
@@ -101,21 +101,21 @@ class PluginResolverGuardrailTests :
                     PluginResolverSettings(
                         cacheDirectory = tempDir.resolve("cache"),
                         repositoryCredentialsResolver =
-                        object : RepositoryCredentialsResolver {
-                            override fun resolve(repositoryUri: String): RepositoryCredentials? {
-                                error("resolve() should not be called when sensitive value initialization fails.")
-                            }
+                            object : RepositoryCredentialsResolver {
+                                override fun resolve(repositoryUri: String): RepositoryCredentials? {
+                                    error("resolve() should not be called when sensitive value initialization fails.")
+                                }
 
-                            override fun sensitiveValues(): Set<String> =
-                                throw IllegalArgumentException("Repository credentials file is invalid.")
-                        },
+                                override fun sensitiveValues(): Set<String> =
+                                    throw IllegalArgumentException("Repository credentials file is invalid.")
+                            },
                     )
 
                 val result = resolvePlugins(command = command, settings = settings)
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
-                failure.diagnostics.joinToString("\n").shouldBe(
-                    "[authentication] Repository credentials file is invalid.",
-                )
+                failure.diagnostics
+                    .joinToString("\n")
+                    .shouldBe("[authentication] Repository credentials file is invalid.")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -134,15 +134,16 @@ class PluginResolverGuardrailTests :
                     PluginResolverSettings(
                         cacheDirectory = tempDir.resolve("cache"),
                         repositoryCredentialsResolver =
-                        object : RepositoryCredentialsResolver {
-                            override fun resolve(repositoryUri: String): RepositoryCredentials? {
-                                error("resolve() should not be called when sensitive value initialization fails.")
-                            }
+                            object : RepositoryCredentialsResolver {
+                                override fun resolve(repositoryUri: String): RepositoryCredentials? {
+                                    error("resolve() should not be called when sensitive value initialization fails.")
+                                }
 
-                            override fun sensitiveValues(): Set<String> = throw UncheckedIOException(
-                                IOException("Repository credentials file could not be read."),
-                            )
-                        },
+                                override fun sensitiveValues(): Set<String> =
+                                    throw UncheckedIOException(
+                                        IOException("Repository credentials file could not be read.")
+                                    )
+                            },
                     )
 
                 val result = resolvePlugins(command = command, settings = settings)

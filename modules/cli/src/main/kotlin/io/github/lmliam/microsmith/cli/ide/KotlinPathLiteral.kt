@@ -2,11 +2,8 @@ package io.github.lmliam.microsmith.cli.ide
 
 import java.nio.file.Path
 
-internal fun Path.toKotlinPathLiteral(): String = toAbsolutePath()
-    .normalize()
-    .toString()
-    .replace('\\', '/')
-    .toKotlinStringLiteralContent()
+internal fun Path.toKotlinPathLiteral(): String =
+    toAbsolutePath().normalize().toString().replace('\\', '/').toKotlinStringLiteralContent()
 
 private fun String.toKotlinStringLiteralContent(): String {
     val builder = StringBuilder(length + KOTLIN_ESCAPE_BUFFER_PADDING)

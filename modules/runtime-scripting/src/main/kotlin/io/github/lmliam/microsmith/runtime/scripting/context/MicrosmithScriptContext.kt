@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.context
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithModel
+import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import java.nio.file.Path
 
 class MicrosmithScriptContext(
@@ -14,10 +14,7 @@ class MicrosmithScriptContext(
 
     fun emit(model: MicrosmithModel) {
         generatedRoots =
-            (generatedRoots + emitHandler(model))
-                .map { path -> path.toAbsolutePath().normalize() }
-                .distinct()
-                .sorted()
+            (generatedRoots + emitHandler(model)).map { path -> path.toAbsolutePath().normalize() }.distinct().sorted()
         emitted = true
     }
 

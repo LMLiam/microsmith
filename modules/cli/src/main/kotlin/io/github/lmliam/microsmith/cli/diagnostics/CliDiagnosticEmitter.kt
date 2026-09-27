@@ -26,12 +26,12 @@ internal class CliDiagnosticEmitter(
         emit(
             sink = stderr,
             event =
-            DiagnosticEvent(
-                level = DiagnosticLevel.ERROR,
-                code = code.id,
-                message = message,
-                details = details,
-            ),
+                DiagnosticEvent(
+                    level = DiagnosticLevel.ERROR,
+                    code = code.id,
+                    message = message,
+                    details = details,
+                ),
         )
     }
 
@@ -47,24 +47,23 @@ internal class CliDiagnosticEmitter(
         val code = event.code?.let { "[$it] " }.orEmpty()
         sink("$prefix $code${event.message}")
         if (verbose) {
-            event.details.toSortedMap().forEach { (key, value) ->
-                sink("  $key=$value")
-            }
+            event.details.toSortedMap().forEach { (key, value) -> sink("  $key=$value") }
         }
     }
 
     private fun emitJson(sink: (String) -> Unit, event: DiagnosticEvent) {
         val payload =
             linkedMapOf<String, Any?>(
-                "timestamp" to Instant.now().toString(),
-                "level" to event.level.name.lowercase(),
-                "message" to event.message,
-            ).apply {
-                event.code?.let { put("code", it) }
-                if (verbose && event.details.isNotEmpty()) {
-                    put("details", event.details.toSortedMap())
+                    "timestamp" to Instant.now().toString(),
+                    "level" to event.level.name.lowercase(),
+                    "message" to event.message,
+                )
+                .apply {
+                    event.code?.let { put("code", it) }
+                    if (verbose && event.details.isNotEmpty()) {
+                        put("details", event.details.toSortedMap())
+                    }
                 }
-            }
         sink(toJsonValue(payload))
     }
 }

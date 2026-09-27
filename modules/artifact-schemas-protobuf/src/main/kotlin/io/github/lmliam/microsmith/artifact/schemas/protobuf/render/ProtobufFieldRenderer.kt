@@ -1,47 +1,71 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.invalidTopLevelOneofField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Cardinality
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.CardinalityField
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Field
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofField
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.EnumValue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
 
 internal object ProtobufFieldRenderer {
-    fun render(field: Field): String = buildString {
-        val prefix = (field as? CardinalityField)?.cardinality?.let(::renderPrefix).orEmpty()
-        append(prefix)
+    fun render(field: ResolvedProtobufField): String =
         when (field) {
-            is ScalarField -> append(
-                "${ProtobufValueTypeRenderer.render(field.primitive)} ${field.name} = ${field.index};",
-            )
+            is ResolvedProtobufField.Scalar ->
+                renderCardinalityField(
+                    field.cardinality,
+                    ProtobufValueTypeRenderer.render(field.type),
+                    field.name,
+                    field.number,
+                )
 
-            is ReferenceField -> append("${field.reference.name} ${field.name} = ${field.index};")
+            is ResolvedProtobufField.Reference ->
+                renderCardinalityField(
+                    field.cardinality,
+                    field.reference.target.fullyQualifiedName,
+                    field.name,
+                    field.number,
+                )
 
-            is MapField -> append("${ProtobufValueTypeRenderer.render(field.type)} ${field.name} = ${field.index};")
-
-            is OneofField -> invalidTopLevelOneofField(field.name)
+            is ResolvedProtobufField.Map ->
+                buildString {
+                    append("map<")
+                    append(ProtobufValueTypeRenderer.render(field.key))
+                    append(", ")
+                    append(ProtobufValueTypeRenderer.render(field.value))
+                    append("> ")
+                    append(field.name)
+                    append(" = ")
+                    append(field.number)
+                    append(";")
+                }
         }
-    }
 
-    fun render(oneof: Oneof): String = buildString {
+    fun render(oneof: ResolvedProtobufOneof): String = buildString {
         appendLine("oneof ${oneof.name} {")
+
         oneof.fields.forEach { appendLine(render(it).prependIndent("  ")) }
+
         append("}")
     }
 
-    fun render(field: OneofField): String =
-        "${ProtobufValueTypeRenderer.render(field.fieldType)} ${field.name} = ${field.index};"
+    fun render(field: ResolvedProtobufOneof.Field): String =
+        "${ProtobufValueTypeRenderer.render(field.type)} ${field.name} = ${field.number};"
 
-    fun render(value: EnumValue): String = "${value.name} = ${value.index};"
+    fun render(value: ResolvedProtobufEnumValue): String = "${value.name} = ${value.number};"
 
-    private fun renderPrefix(cardinality: Cardinality): String = when (cardinality) {
-        Cardinality.REQUIRED -> ""
-        Cardinality.OPTIONAL -> "optional "
-        Cardinality.REPEATED -> "repeated "
-    }
+    private fun renderCardinalityField(cardinality: Cardinality, type: String, name: String, number: Int): String =
+        buildString {
+            append(
+                when (cardinality) {
+                    Cardinality.SINGULAR -> ""
+                    Cardinality.OPTIONAL -> "optional "
+                    Cardinality.REPEATED -> "repeated "
+                }
+            )
+
+            append(type)
+            append(' ')
+            append(name)
+            append(" = ")
+            append(number)
+            append(";")
+        }
 }

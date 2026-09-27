@@ -1,15 +1,15 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
-import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
-import io.github.lmliam.microsmith.dsl.services.core.services
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.packages
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.packages
+import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
+import io.github.lmliam.microsmith.dsl.services.ServicesExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.dotnet
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferenceDeclaration
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferencesExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.packages
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetPackageVersionDeclaration
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetPackageVersionsExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.packages
+import io.github.lmliam.microsmith.dsl.services.services
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -31,9 +31,7 @@ class DotnetPackageDslTests :
                                 "Serilog" {
                                     version("9.0.0")
                                     +"AspNetCore"
-                                    "Settings.Configuration" {
-                                        version("9.0.1")
-                                    }
+                                    "Settings.Configuration" { version("9.0.1") }
                                 }
                             }
                         }
@@ -43,16 +41,18 @@ class DotnetPackageDslTests :
 
             val solution =
                 requireNotNull(
-                    builder
-                        .requireServicesExtension()
-                        .get<io.github.lmliam.microsmith.dsl.services.dotnet.core.defaults.DotnetDefaultsExtension>(),
-                ).requireSolution("Platform")
+                        builder
+                            .requireServicesExtension()
+                            .get<io.github.lmliam.microsmith.dsl.services.dotnet.defaults.DotnetDefaultsExtension>()
+                    )
+                    .requireSolution("Platform")
             val packages = requireNotNull(solution.get<DotnetPackageVersionsExtension>()).packages
 
-            packages shouldBe listOf(
-                DotnetPackageVersionDeclaration(name = "Serilog.AspNetCore", version = "9.0.0"),
-                DotnetPackageVersionDeclaration(name = "Serilog.Settings.Configuration", version = "9.0.1"),
-            )
+            packages shouldBe
+                listOf(
+                    DotnetPackageVersionDeclaration(name = "Serilog.AspNetCore", version = "9.0.0"),
+                    DotnetPackageVersionDeclaration(name = "Serilog.Settings.Configuration", version = "9.0.1"),
+                )
         }
 
         "dotnet service packages support string-invoke and unary-plus forms" {
@@ -67,9 +67,7 @@ class DotnetPackageDslTests :
                                 "Serilog" {
                                     version("9.0.0")
                                     +"AspNetCore"
-                                    "Settings.Configuration" {
-                                        version("9.0.1")
-                                    }
+                                    "Settings.Configuration" { version("9.0.1") }
                                 }
                             }
                         }
@@ -97,14 +95,15 @@ class DotnetPackageDslTests :
                     .requireServicesExtension()
                     .require("UserService")
                     .model
-                    .get<io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension>()
+                    .get<io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExtension>()
             val packages = requireNotNull(requireNotNull(service).get<DotnetPackageReferencesExtension>()).packages
 
-            packages shouldBe listOf(
-                DotnetPackageReferenceDeclaration(name = "Serilog.AspNetCore", version = null),
-                DotnetPackageReferenceDeclaration(name = "Serilog.Settings.Configuration", version = null),
-                DotnetPackageReferenceDeclaration(name = "FluentValidation.AspNetCore", version = null),
-            )
+            packages shouldBe
+                listOf(
+                    DotnetPackageReferenceDeclaration(name = "Serilog.AspNetCore", version = null),
+                    DotnetPackageReferenceDeclaration(name = "Serilog.Settings.Configuration", version = null),
+                    DotnetPackageReferenceDeclaration(name = "FluentValidation.AspNetCore", version = null),
+                )
         }
 
         "dotnet service packages support grouped version inheritance and leaf overrides" {
@@ -119,14 +118,10 @@ class DotnetPackageDslTests :
                             "Serilog" {
                                 version("9.0.0")
                                 +"AspNetCore"
-                                "Settings.Configuration" {
-                                    version("9.0.1")
-                                }
+                                "Settings.Configuration" { version("9.0.1") }
                             }
 
-                            "FluentValidation.AspNetCore" {
-                                version("12.0.0")
-                            }
+                            "FluentValidation.AspNetCore" { version("12.0.0") }
                         }
                     }
                 }
@@ -137,14 +132,15 @@ class DotnetPackageDslTests :
                     .requireServicesExtension()
                     .require("UserService")
                     .model
-                    .get<io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension>()
+                    .get<io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExtension>()
             val packages = requireNotNull(requireNotNull(service).get<DotnetPackageReferencesExtension>()).packages
 
-            packages shouldBe listOf(
-                DotnetPackageReferenceDeclaration(name = "Serilog.AspNetCore", version = "9.0.0"),
-                DotnetPackageReferenceDeclaration(name = "Serilog.Settings.Configuration", version = "9.0.1"),
-                DotnetPackageReferenceDeclaration(name = "FluentValidation.AspNetCore", version = "12.0.0"),
-            )
+            packages shouldBe
+                listOf(
+                    DotnetPackageReferenceDeclaration(name = "Serilog.AspNetCore", version = "9.0.0"),
+                    DotnetPackageReferenceDeclaration(name = "Serilog.Settings.Configuration", version = "9.0.1"),
+                    DotnetPackageReferenceDeclaration(name = "FluentValidation.AspNetCore", version = "12.0.0"),
+                )
         }
 
         "dotnet package ownership rejects duplicate resolved package identifiers" {
@@ -161,9 +157,7 @@ class DotnetPackageDslTests :
                                         +"AspNetCore"
                                     }
 
-                                    "Serilog.AspNetCore" {
-                                        version("9.0.1")
-                                    }
+                                    "Serilog.AspNetCore" { version("9.0.1") }
                                 }
                             }
                         }
@@ -177,34 +171,12 @@ class DotnetPackageDslTests :
 
             shouldThrow<IllegalArgumentException> {
                 builder.services {
-                    dotnet {
-                        solutions {
-                            "Platform" {
-                                packages {
-                                    "Bad Name" {
-                                        version("9.0.0")
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    dotnet { solutions { "Platform" { packages { "Bad Name" { version("9.0.0") } } } } }
                 }
             }
 
             shouldThrow<IllegalArgumentException> {
-                builder.services {
-                    dotnet {
-                        solutions {
-                            "Platform" {
-                                packages {
-                                    "Serilog" {
-                                        version(" ")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                builder.services { dotnet { solutions { "Platform" { packages { "Serilog" { version(" ") } } } } } }
             }
         }
 
@@ -212,17 +184,7 @@ class DotnetPackageDslTests :
             val builder = MicrosmithBuilder()
 
             shouldThrow<IllegalStateException> {
-                builder.services {
-                    dotnet {
-                        solutions {
-                            "Platform" {
-                                packages {
-                                    +"Serilog.AspNetCore"
-                                }
-                            }
-                        }
-                    }
-                }
+                builder.services { dotnet { solutions { "Platform" { packages { +"Serilog.AspNetCore" } } } } }
             }
         }
 
@@ -236,9 +198,7 @@ class DotnetPackageDslTests :
                             solution("Platform")
                             project("UserService.Api")
                             packages {
-                                "Serilog" {
-                                    +"AspNetCore"
-                                }
+                                "Serilog" { +"AspNetCore" }
 
                                 +"Serilog.AspNetCore"
                             }

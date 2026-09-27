@@ -22,10 +22,10 @@ internal class RunPreparationService(
             return PreparedRun.Failure(CliFailureCode.PROVIDER_VALIDATION_FAILED)
         }
 
-        val resolvedPlugins =
-            runCatching {
-                pluginResolver(command)
-            }.getOrElse { error ->
+        val resolvedPlugins = runCatching {
+            pluginResolver(command)
+        }
+            .getOrElse { error ->
                 context.resolverStatus = RunExecutionStatus.FAILURE
                 emitter.error(
                     CliFailureCode.PLUGIN_RESOLUTION_FAILED,
@@ -52,10 +52,11 @@ internal class RunPreparationService(
         }
     }
 
-    private fun collectProviderErrors(): List<String> = try {
-        providerValidator()
-    } catch (error: ServiceConfigurationError) {
-        val message = error.message ?: error::class.simpleName ?: "ServiceConfigurationError"
-        listOf("Failed to load runtime service providers: $message")
-    }
+    private fun collectProviderErrors(): List<String> =
+        try {
+            providerValidator()
+        } catch (error: ServiceConfigurationError) {
+            val message = error.message ?: error::class.simpleName ?: "ServiceConfigurationError"
+            listOf("Failed to load runtime service providers: $message")
+        }
 }

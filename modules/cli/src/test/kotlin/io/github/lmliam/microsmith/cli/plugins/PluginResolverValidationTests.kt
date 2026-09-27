@@ -71,27 +71,26 @@ class PluginResolverValidationTests :
                         cacheDirectory = tempDir.resolve("cache"),
                         defaultRepositories = emptyList(),
                         repositoryPolicy =
-                        RepositoryAllowlistPolicy(
-                            allowedRepositories = setOf(
-                                normalizeRepositoryUri("https://packages.acme.internal/maven"),
+                            RepositoryAllowlistPolicy(
+                                allowedRepositories =
+                                    setOf(normalizeRepositoryUri("https://packages.acme.internal/maven"))
                             ),
-                        ),
                         repositoryCredentialsResolver =
-                        object : RepositoryCredentialsResolver {
-                            override fun resolve(repositoryUri: String): RepositoryCredentials =
-                                throw IllegalArgumentException("Repository credentials are invalid.")
-                        },
+                            object : RepositoryCredentialsResolver {
+                                override fun resolve(repositoryUri: String): RepositoryCredentials =
+                                    throw IllegalArgumentException("Repository credentials are invalid.")
+                            },
                         remotePluginResolver =
-                        object : RemotePluginResolver {
-                            override fun resolve(
-                                coordinate: Coordinate,
-                                repositories: List<RepositoryEndpoint>,
-                                cacheDirectory: Path,
-                                offline: Boolean,
-                            ): ResolvedRemotePlugin {
-                                error("Remote resolution should not start when credential lookup fails.")
-                            }
-                        },
+                            object : RemotePluginResolver {
+                                override fun resolve(
+                                    coordinate: Coordinate,
+                                    repositories: List<RepositoryEndpoint>,
+                                    cacheDirectory: Path,
+                                    offline: Boolean,
+                                ): ResolvedRemotePlugin {
+                                    error("Remote resolution should not start when credential lookup fails.")
+                                }
+                            },
                     )
 
                 val result = resolvePlugins(command = command, settings = settings)
@@ -286,10 +285,10 @@ class PluginResolverValidationTests :
                     resolvePlugins(
                         command = command,
                         settings =
-                        PluginResolverSettings(
-                            cacheDirectory = tempDir.resolve("cache"),
-                            checksumAllowlist = PluginChecksumAllowlist(entries = emptyMap()),
-                        ),
+                            PluginResolverSettings(
+                                cacheDirectory = tempDir.resolve("cache"),
+                                checksumAllowlist = PluginChecksumAllowlist(entries = emptyMap()),
+                            ),
                     )
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
                 failure.diagnostics.joinToString("\n").shouldContain("missing required entries")
@@ -321,20 +320,17 @@ class PluginResolverValidationTests :
 
                 val allowlist =
                     PluginChecksumAllowlist(
-                        entries =
-                        mapOf(
-                            LockKey(kind = LOCAL_KIND, key = lockKey) to invalidChecksum,
-                        ),
+                        entries = mapOf(LockKey(kind = LOCAL_KIND, key = lockKey) to invalidChecksum)
                     )
 
                 val result =
                     resolvePlugins(
                         command = command,
                         settings =
-                        PluginResolverSettings(
-                            cacheDirectory = tempDir.resolve("cache"),
-                            checksumAllowlist = allowlist,
-                        ),
+                            PluginResolverSettings(
+                                cacheDirectory = tempDir.resolve("cache"),
+                                checksumAllowlist = allowlist,
+                            ),
                     )
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
                 failure.diagnostics.joinToString("\n").shouldContain("Allowlist checksum mismatch")

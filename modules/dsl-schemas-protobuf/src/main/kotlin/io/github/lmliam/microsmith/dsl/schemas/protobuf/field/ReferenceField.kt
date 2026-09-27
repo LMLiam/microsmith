@@ -4,5 +4,5 @@ data class ReferenceField(
     override val name: String,
     override val index: Int,
     val reference: Reference,
-    override val cardinality: Cardinality = Cardinality.REQUIRED,
+    override val cardinality: Cardinality = Cardinality.SINGULAR,
 ) : CardinalityField

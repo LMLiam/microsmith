@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.normalizeDotnetPackagePath
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.validateDotnetPackageVersion
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.validation.normalizeDotnetPackagePath
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.validation.validateDotnetPackageVersion
 
 internal class DotnetPackageVersionsBuilder(private val pathSegments: List<String> = emptyList()) :
     DotnetPackageVersionScope {
@@ -15,9 +15,7 @@ internal class DotnetPackageVersionsBuilder(private val pathSegments: List<Strin
     override fun String.invoke(block: DotnetPackageVersionScope.() -> Unit) {
         val normalizedPathSegments = normalizeDotnetPackagePath(this, "Package name")
         val childKey = normalizedPathSegments.joinToString(".")
-        require(childKey !in children) {
-            "Duplicate .NET package declaration for '$childKey'."
-        }
+        require(childKey !in children) { "Duplicate .NET package declaration for '$childKey'." }
 
         val child = DotnetPackageVersionsBuilder(pathSegments + normalizedPathSegments)
         child.block()
@@ -42,13 +40,9 @@ internal class DotnetPackageVersionsBuilder(private val pathSegments: List<Strin
 
         if (pathSegments.isNotEmpty() && children.isEmpty()) {
             val packageName = pathSegments.joinToString(".")
-            val resolvedVersion =
-                currentVersion
-                    ?: error("Dotnet package '$packageName' must declare a version.")
+            val resolvedVersion = currentVersion ?: error("Dotnet package '$packageName' must declare a version.")
 
-            require(packageName !in packages) {
-                "Duplicate .NET package ownership declaration for '$packageName'."
-            }
+            require(packageName !in packages) { "Duplicate .NET package ownership declaration for '$packageName'." }
 
             packages[packageName] = DotnetPackageVersionDeclaration(name = packageName, version = resolvedVersion)
             return

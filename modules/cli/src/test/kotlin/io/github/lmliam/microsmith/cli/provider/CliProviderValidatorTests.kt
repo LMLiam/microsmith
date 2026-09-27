@@ -1,29 +1,31 @@
 package io.github.lmliam.microsmith.cli.provider
 
-import io.github.lmliam.microsmith.artifact.core.Artifact
-import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import io.github.lmliam.microsmith.artifact.core.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.Artifact
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifact
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileContribution
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution.ProtoFileContribution
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
-import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
-import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
-import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
-import io.github.lmliam.microsmith.gen.core.ArtifactRenderer
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifact
+import io.github.lmliam.microsmith.compile.ArtifactCompiler
+import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
+import io.github.lmliam.microsmith.dsl.services.ServicesExtension
+import io.github.lmliam.microsmith.gen.ArtifactRenderer
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
-import io.github.lmliam.microsmith.resolve.core.DomainResolver
-import io.github.lmliam.microsmith.resolve.core.ResolvedModel
+import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
+import io.github.lmliam.microsmith.resolve.DomainResolution
+import io.github.lmliam.microsmith.resolve.DomainResolver
+import io.github.lmliam.microsmith.resolve.ResolvedModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
-import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspace
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
@@ -33,123 +35,120 @@ import kotlin.reflect.KClass
 class CliProviderValidatorTests :
     StringSpec({
         "reports missing built-in providers when none are present" {
-            val errors =
-                verifyBuiltinProviders(
-                    domainResolvers = emptyList(),
-                    artifactContributors = emptyList(),
-                    artifactAssemblers = emptyList(),
-                    artifactCompilers = emptyList(),
-                    artifactRenderers = emptyList(),
-                )
+            val errors = verifyBuiltinProviders(MicrosmithPluginCatalog())
 
             errors.shouldHaveSize(22)
             errors.shouldContain(
                 "Missing built-in DomainResolver for SchemasExtension -> " +
-                    "ResolvedProtobufSchemaModel. Check CLI runtime packaging.",
+                    "ResolvedProtobufSchemaModel. Check CLI runtime packaging."
             )
             errors.shouldContain(
                 "Missing built-in DomainResolver for SchemasExtension -> " +
-                    "ResolvedProtobufRpcSchemaModel. Check CLI runtime packaging.",
+                    "ResolvedProtobufRpcSchemaModel. Check CLI runtime packaging."
             )
             errors.shouldContain(
                 "Missing built-in DomainResolver for ServicesExtension -> " +
-                    "DotnetAspWorkspace. Check CLI runtime packaging.",
+                    "DotnetAspWorkspace. Check CLI runtime packaging."
             )
             errors.shouldContain(
                 "Missing built-in DomainResolver for ServicesExtension -> " +
-                    "DotnetPackageWorkspace. Check CLI runtime packaging.",
+                    "DotnetPackageWorkspace. Check CLI runtime packaging."
             )
             errors.shouldContain(
                 "Missing built-in ArtifactContributor for ResolvedProtobufSchemaModel. " +
-                    "Check CLI runtime packaging.",
+                    "Check CLI runtime packaging."
             )
             errors.shouldContain(
                 "Missing built-in ArtifactContributor for ResolvedProtobufRpcSchemaModel. " +
-                    "Check CLI runtime packaging.",
+                    "Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactContributor for DotnetAspWorkspace. Check CLI runtime packaging.",
+                "Missing built-in ArtifactContributor for DotnetAspWorkspace. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactContributor for DotnetPackageWorkspace. Check CLI runtime packaging.",
+                "Missing built-in ArtifactContributor for DotnetPackageWorkspace. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactAssembler for ProtoFileArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactAssembler for ProtoFileArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactAssembler for ProtobufRpcServiceArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactAssembler for ProtobufRpcServiceArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactAssembler for DotnetAspServiceArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactAssembler for DotnetAspServiceArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactAssembler for DotnetPackageVersionsArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactAssembler for DotnetPackageVersionsArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactAssembler for DotnetPackageReferencesArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactAssembler for DotnetPackageReferencesArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactAssembler for MsBuildProjectArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactAssembler for MsBuildProjectArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactAssembler for TextFileArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactAssembler for TextFileArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactCompiler for ProtoFileArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactCompiler for ProtoFileArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactCompiler for ProtobufRpcServiceArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactCompiler for ProtobufRpcServiceArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactCompiler for DotnetAspServiceArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactCompiler for DotnetAspServiceArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactCompiler for DotnetPackageVersionsArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactCompiler for DotnetPackageVersionsArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactCompiler for DotnetPackageReferencesArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactCompiler for DotnetPackageReferencesArtifact. Check CLI runtime packaging."
             )
             errors.shouldContain(
-                "Missing built-in ArtifactCompiler for MsBuildProjectArtifact. Check CLI runtime packaging.",
+                "Missing built-in ArtifactCompiler for MsBuildProjectArtifact. Check CLI runtime packaging."
             )
-            errors.shouldContain(
-                "Missing built-in ArtifactRenderer for TextFileArtifact. Check CLI runtime packaging.",
-            )
+            errors.shouldContain("Missing built-in ArtifactRenderer for TextFileArtifact. Check CLI runtime packaging.")
         }
 
         "returns no errors when required providers are present" {
             val errors =
                 verifyBuiltinProviders(
-                    domainResolvers = listOf(
-                        ProtobufResolverStub(),
-                        ProtobufRpcResolverStub(),
-                        DotnetAspResolverStub(),
-                        DotnetPackageResolverStub(),
-                    ),
-                    artifactContributors = listOf(
-                        ProtobufContributorStub(),
-                        ProtobufRpcContributorStub(),
-                        ContributorStub(DotnetAspWorkspace::class),
-                        ContributorStub(DotnetPackageWorkspace::class),
-                    ),
-                    artifactAssemblers = listOf(
-                        ProtoFileAssemblerStub(),
-                        ProtobufRpcAssemblerStub(),
-                        AssemblerStub(DotnetAspServiceArtifact::class),
-                        AssemblerStub(DotnetPackageVersionsArtifact::class),
-                        AssemblerStub(DotnetPackageReferencesArtifact::class),
-                        AssemblerStub(MsBuildProjectArtifact::class),
-                        TextFileAssemblerStub(),
-                    ),
-                    artifactCompilers = listOf(
-                        CompilerStub(ProtoFileArtifact::class),
-                        CompilerStub(ProtobufRpcServiceArtifact::class),
-                        CompilerStub(DotnetAspServiceArtifact::class),
-                        CompilerStub(DotnetPackageVersionsArtifact::class),
-                        CompilerStub(DotnetPackageReferencesArtifact::class),
-                        CompilerStub(MsBuildProjectArtifact::class),
-                    ),
-                    artifactRenderers = listOf(TextFileRendererStub()),
+                    MicrosmithPluginCatalog(
+                        domainResolvers =
+                            listOf(
+                                ProtobufResolverStub(),
+                                ProtobufRpcResolverStub(),
+                                DotnetAspResolverStub(),
+                                DotnetPackageResolverStub(),
+                            ),
+                        artifactContributors =
+                            listOf(
+                                ProtobufContributorStub(),
+                                ProtobufRpcContributorStub(),
+                                ContributorStub(DotnetAspWorkspace::class),
+                                ContributorStub(DotnetPackageWorkspace::class),
+                            ),
+                        artifactAssemblers =
+                            listOf(
+                                ProtoFileAssemblerStub(),
+                                ProtobufRpcAssemblerStub(),
+                                AssemblerStub(DotnetAspServiceArtifact::class),
+                                AssemblerStub(DotnetPackageVersionsArtifact::class),
+                                AssemblerStub(DotnetPackageReferencesArtifact::class),
+                                AssemblerStub(MsBuildProjectArtifact::class),
+                                TextFileAssemblerStub(),
+                            ),
+                        artifactCompilers =
+                            listOf(
+                                CompilerStub(ProtoFileArtifact::class),
+                                CompilerStub(ProtobufRpcServiceArtifact::class),
+                                CompilerStub(DotnetAspServiceArtifact::class),
+                                CompilerStub(DotnetPackageVersionsArtifact::class),
+                                CompilerStub(DotnetPackageReferencesArtifact::class),
+                                CompilerStub(MsBuildProjectArtifact::class),
+                            ),
+                        artifactRenderers = listOf(TextFileRendererStub()),
+                    )
                 )
 
             errors shouldBe emptyList()
@@ -160,16 +159,16 @@ private class ProtobufResolverStub : DomainResolver<SchemasExtension, ResolvedPr
     override val authoringType = SchemasExtension::class
     override val resolvedType = ResolvedProtobufSchemaModel::class
 
-    override fun resolve(authoring: SchemasExtension): ResolvedProtobufSchemaModel =
-        ResolvedProtobufSchemaModel(emptyList())
+    override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufSchemaModel> =
+        DomainResolution.Success(ResolvedProtobufSchemaModel(emptyList()))
 }
 
 private class ProtobufRpcResolverStub : DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
     override val authoringType = SchemasExtension::class
     override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 
-    override fun resolve(authoring: SchemasExtension): ResolvedProtobufRpcSchemaModel =
-        ResolvedProtobufRpcSchemaModel(emptyList())
+    override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufRpcSchemaModel> =
+        DomainResolution.Success(ResolvedProtobufRpcSchemaModel(emptyList()))
 }
 
 private class ProtobufContributorStub : ArtifactContributor<ResolvedProtobufSchemaModel> {
@@ -188,15 +187,21 @@ private class DotnetAspResolverStub : DomainResolver<ServicesExtension, DotnetAs
     override val authoringType = ServicesExtension::class
     override val resolvedType = DotnetAspWorkspace::class
 
-    override fun resolve(authoring: ServicesExtension): DotnetAspWorkspace = DotnetAspWorkspace(emptyMap())
+    override fun resolve(authoring: ServicesExtension): DomainResolution<DotnetAspWorkspace> =
+        DomainResolution.Success(DotnetAspWorkspace(emptyMap()))
 }
 
 private class DotnetPackageResolverStub : DomainResolver<ServicesExtension, DotnetPackageWorkspace> {
     override val authoringType = ServicesExtension::class
     override val resolvedType = DotnetPackageWorkspace::class
 
-    override fun resolve(authoring: ServicesExtension): DotnetPackageWorkspace =
-        DotnetPackageWorkspace(emptyMap(), emptyMap())
+    override fun resolve(authoring: ServicesExtension): DomainResolution<DotnetPackageWorkspace> =
+        DomainResolution.Success(
+            DotnetPackageWorkspace(
+                solutionsByName = emptyMap(),
+                servicesByName = emptyMap(),
+            )
+        )
 }
 
 private class ContributorStub<T : ResolvedModel>(override val resolvedType: KClass<T>) : ArtifactContributor<T> {
@@ -267,9 +272,10 @@ private class CompilerStub<T : Artifact>(override val artifactType: KClass<T>) :
 private class TextFileRendererStub : ArtifactRenderer<TextFileArtifact> {
     override val artifactType = TextFileArtifact::class
 
-    override fun render(artifact: TextFileArtifact): GeneratedFile = GeneratedFile(
-        relativePath = artifact.id.relativePath,
-        contents = artifact.contents.toByteArray(),
-        outputRoot = artifact.id.outputRoot,
-    )
+    override fun render(artifact: TextFileArtifact): GeneratedFile =
+        GeneratedFile(
+            relativePath = artifact.id.relativePath,
+            contents = artifact.contents.toByteArray(),
+            outputRoot = artifact.id.outputRoot,
+        )
 }

@@ -18,19 +18,20 @@ class MsBuildProjectArtifactCompilerTests :
         "compile emits deterministic xml with escaped values" {
             val artifact =
                 MsBuildProjectArtifact(
-                    id = MsBuildProjectArtifactId(
-                        solutionName = "Platform",
-                        kind = MsBuildProjectKind.DirectoryPackagesProps,
-                    ),
+                    id =
+                        MsBuildProjectArtifactId(
+                            solutionName = "Platform",
+                            kind = MsBuildProjectKind.DirectoryPackagesProps,
+                        ),
                     properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
                     items =
-                    listOf(
-                        MsBuildItem(
-                            itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                            include = "Serilog.AspNetCore",
-                            attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0 & preview"),
+                        listOf(
+                            MsBuildItem(
+                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                                include = "Serilog.AspNetCore",
+                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0 & preview"),
+                            )
                         ),
-                    ),
                 )
 
             val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
@@ -47,20 +48,21 @@ class MsBuildProjectArtifactCompilerTests :
         "compile writes project package references into auto-imported Directory.Build.props" {
             val artifact =
                 MsBuildProjectArtifact(
-                    id = MsBuildProjectArtifactId(
-                        solutionName = "Platform",
-                        projectName = "UserService.Api",
-                        kind = MsBuildProjectKind.DirectoryBuildProps,
-                    ),
+                    id =
+                        MsBuildProjectArtifactId(
+                            solutionName = "Platform",
+                            projectName = "UserService.Api",
+                            kind = MsBuildProjectKind.DirectoryBuildProps,
+                        ),
                     properties = emptyMap(),
                     items =
-                    listOf(
-                        MsBuildItem(
-                            itemName = MsBuildNames.PACKAGE_REFERENCE_ITEM,
-                            include = "Serilog.AspNetCore",
-                            attributes = emptyMap(),
+                        listOf(
+                            MsBuildItem(
+                                itemName = MsBuildNames.PACKAGE_REFERENCE_ITEM,
+                                include = "Serilog.AspNetCore",
+                                attributes = emptyMap(),
+                            )
                         ),
-                    ),
                 )
 
             val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
@@ -77,11 +79,12 @@ class MsBuildProjectArtifactCompilerTests :
         "compile writes sdk-style project files into the project root" {
             val artifact =
                 MsBuildProjectArtifact(
-                    id = MsBuildProjectArtifactId(
-                        solutionName = "Platform",
-                        projectName = "UserService.Api",
-                        kind = MsBuildProjectKind.Project,
-                    ),
+                    id =
+                        MsBuildProjectArtifactId(
+                            solutionName = "Platform",
+                            projectName = "UserService.Api",
+                            kind = MsBuildProjectKind.Project,
+                        ),
                     projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
                     properties = mapOf(MsBuildNames.TARGET_FRAMEWORK_PROPERTY to "net8.0"),
                     items = emptyList(),
@@ -101,19 +104,20 @@ class MsBuildProjectArtifactCompilerTests :
         "compile emits well-formed xml for escaped property and attribute values" {
             val artifact =
                 MsBuildProjectArtifact(
-                    id = MsBuildProjectArtifactId(
-                        solutionName = "Platform",
-                        kind = MsBuildProjectKind.DirectoryPackagesProps,
-                    ),
+                    id =
+                        MsBuildProjectArtifactId(
+                            solutionName = "Platform",
+                            kind = MsBuildProjectKind.DirectoryPackagesProps,
+                        ),
                     properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "A&B<true>"),
                     items =
-                    listOf(
-                        MsBuildItem(
-                            itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                            include = "Serilog.\"AspNetCore\"",
-                            attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0 & preview"),
+                        listOf(
+                            MsBuildItem(
+                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                                include = "Serilog.\"AspNetCore\"",
+                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0 & preview"),
+                            )
                         ),
-                    ),
                 )
 
             val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
@@ -121,10 +125,10 @@ class MsBuildProjectArtifactCompilerTests :
             val contents = textContribution.contents
 
             contents.shouldContain(
-                "<ManagePackageVersionsCentrally>A&amp;B&lt;true&gt;</ManagePackageVersionsCentrally>",
+                "<ManagePackageVersionsCentrally>A&amp;B&lt;true&gt;</ManagePackageVersionsCentrally>"
             )
             contents.shouldContain(
-                """<PackageVersion Include="Serilog.&quot;AspNetCore&quot;" Version="9.0.0 &amp; preview"/>""",
+                """<PackageVersion Include="Serilog.&quot;AspNetCore&quot;" Version="9.0.0 &amp; preview"/>"""
             )
             parseXml(contents) shouldBe "Project"
         }

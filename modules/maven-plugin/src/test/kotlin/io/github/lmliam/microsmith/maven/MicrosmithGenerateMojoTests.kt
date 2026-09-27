@@ -7,9 +7,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import java.util.Properties
 import org.apache.maven.plugin.MojoExecutionException
 import org.apache.maven.plugin.MojoFailureException
-import java.util.Properties
 
 class MicrosmithGenerateMojoTests : StringSpec() {
     init {
@@ -27,7 +27,8 @@ class MicrosmithGenerateMojoTests : StringSpec() {
                         }
                     }
                 }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
             val mojo = fixture.createMojo()
@@ -58,17 +59,17 @@ class MicrosmithGenerateMojoTests : StringSpec() {
                         }
                     },
                 )
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
-            val properties = Properties().apply {
-                setProperty("entityName", "MavenConfiguredUserCreated")
-            }
+            val properties = Properties().apply { setProperty("entityName", "MavenConfiguredUserCreated") }
 
-            val mojo = fixture.createMojo().apply {
-                outputDirectory = fixture.file("custom-generated").toFile()
-                variables = properties
-                flags = listOf(" emit ", "")
-            }
+            val mojo =
+                fixture.createMojo().apply {
+                    outputDirectory = fixture.file("custom-generated").toFile()
+                    variables = properties
+                    flags = listOf(" emit ", "")
+                }
 
             mojo.execute()
 
@@ -116,17 +117,16 @@ class MicrosmithGenerateMojoTests : StringSpec() {
                         }
                     }
                 }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
             fixture.createMojo().execute()
 
             fixture.file("dotnet/Platform/UserService.Api/Program.cs").toFile().shouldExist()
             fixture
-                .file(
-                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
-                        "UserServiceApiControllerBase.cs",
-                ).toFile()
+                .file("dotnet/Platform/UserService.Api/Generated/Controllers/" + "UserServiceApiControllerBase.cs")
+                .toFile()
                 .shouldExist()
         }
 
@@ -142,14 +142,13 @@ class MicrosmithGenerateMojoTests : StringSpec() {
                         }
                     }
                 }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
             val mojo = fixture.createMojo()
 
-            val error = shouldThrow<MojoFailureException> {
-                mojo.execute()
-            }
+            val error = shouldThrow<MojoFailureException> { mojo.execute() }
 
             error.message shouldContain "Microsmith generation failed"
             error.message shouldContain "Unresolved reference 'unknownCall'"
@@ -158,15 +157,14 @@ class MicrosmithGenerateMojoTests : StringSpec() {
         "host failures surface as MojoExecutionException" {
             val fixture = MicrosmithMavenTestProject.create("maven-plugin-host-failure")
             fixture.writeFile("build.microsmith.kts", "emit(microsmith { })")
-            val mojo = fixture.createMojo().apply {
-                scriptHostRunner = MicrosmithScriptHostRunner { _, _ ->
-                    ScriptRunFailure(listOf("Host failure"), ScriptFailureType.HOST)
+            val mojo =
+                fixture.createMojo().apply {
+                    scriptHostRunner = MicrosmithScriptHostRunner { _, _ ->
+                        ScriptRunFailure(listOf("Host failure"), ScriptFailureType.HOST)
+                    }
                 }
-            }
 
-            val error = shouldThrow<MojoExecutionException> {
-                mojo.execute()
-            }
+            val error = shouldThrow<MojoExecutionException> { mojo.execute() }
 
             error.message shouldContain "Microsmith generation failed"
             error.message shouldContain "Host failure"
@@ -176,13 +174,10 @@ class MicrosmithGenerateMojoTests : StringSpec() {
             val fixture = MicrosmithMavenTestProject.create("maven-plugin-unexpected-failure")
             fixture.writeFile("build.microsmith.kts", "emit(microsmith { })")
             val failure = IllegalStateException("Unexpected host failure")
-            val mojo = fixture.createMojo().apply {
-                scriptHostRunner = MicrosmithScriptHostRunner { _, _ -> throw failure }
-            }
+            val mojo =
+                fixture.createMojo().apply { scriptHostRunner = MicrosmithScriptHostRunner { _, _ -> throw failure } }
 
-            val error = shouldThrow<MojoExecutionException> {
-                mojo.execute()
-            }
+            val error = shouldThrow<MojoExecutionException> { mojo.execute() }
 
             error.message shouldContain "Microsmith Maven plugin failed before generation completed."
             error.cause shouldBe failure
@@ -192,13 +187,10 @@ class MicrosmithGenerateMojoTests : StringSpec() {
             val fixture = MicrosmithMavenTestProject.create("maven-plugin-runtime-failure")
             fixture.writeFile("build.microsmith.kts", "emit(microsmith { })")
             val failure = RuntimeException("Unexpected runtime failure")
-            val mojo = fixture.createMojo().apply {
-                scriptHostRunner = MicrosmithScriptHostRunner { _, _ -> throw failure }
-            }
+            val mojo =
+                fixture.createMojo().apply { scriptHostRunner = MicrosmithScriptHostRunner { _, _ -> throw failure } }
 
-            val error = shouldThrow<MojoExecutionException> {
-                mojo.execute()
-            }
+            val error = shouldThrow<MojoExecutionException> { mojo.execute() }
 
             error.message shouldContain "Microsmith Maven plugin failed before generation completed."
             error.cause shouldBe failure

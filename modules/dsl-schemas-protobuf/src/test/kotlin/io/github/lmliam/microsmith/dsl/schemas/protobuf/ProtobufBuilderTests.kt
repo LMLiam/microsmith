@@ -54,9 +54,7 @@ class ProtobufBuilderTests :
 
         "version appends vN segment to namespace" {
             val builder = ProtobufBuilder(segments = listOf("me", "liam"))
-            builder.version(2) {
-                message("Thing") { int32("id") { index(1) } }
-            }
+            builder.version(2) { message("Thing") { int32("id") { index(1) } } }
             val schemas = builder.build()
             schemas.map { it.name } shouldContainExactlyInAnyOrder listOf("me.liam.v2.Thing")
         }
@@ -64,11 +62,7 @@ class ProtobufBuilderTests :
         "nested and top-level schemas coexist" {
             val builder = ProtobufBuilder()
             builder.message("Top") { int32("id") { index(1) } }
-            with(builder) {
-                "pkg" {
-                    enum("E") { value("X") { index(1) } }
-                }
-            }
+            with(builder) { "pkg" { enum("E") { value("X") { index(1) } } } }
             val schemas = builder.build()
             schemas.map { it.name } shouldContainExactlyInAnyOrder listOf("Top", "pkg.E")
         }
@@ -77,20 +71,14 @@ class ProtobufBuilderTests :
             val builder = ProtobufBuilder()
             builder.message("User") { int32("id") { index(1) } }
 
-            shouldThrow<IllegalArgumentException> {
-                builder.message("User") { int32("id") { index(2) } }
-            }
+            shouldThrow<IllegalArgumentException> { builder.message("User") { int32("id") { index(2) } } }
         }
 
         "throws on namespace with empty segment" {
             val builder = ProtobufBuilder()
 
             shouldThrow<IllegalArgumentException> {
-                builder.apply {
-                    "pkg..sub" {
-                        message("User") { int32("id") { index(1) } }
-                    }
-                }
+                builder.apply { "pkg..sub" { message("User") { int32("id") { index(1) } } } }
             }
         }
 
@@ -98,9 +86,7 @@ class ProtobufBuilderTests :
             val builder = ProtobufBuilder()
 
             shouldThrow<IllegalArgumentException> {
-                builder.version(0) {
-                    message("User") { int32("id") { index(1) } }
-                }
+                builder.version(0) { message("User") { int32("id") { index(1) } } }
             }
         }
     })

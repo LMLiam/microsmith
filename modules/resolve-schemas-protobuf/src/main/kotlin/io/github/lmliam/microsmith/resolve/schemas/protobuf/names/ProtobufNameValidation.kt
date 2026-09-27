@@ -10,20 +10,17 @@ object ProtobufNameValidation {
 
         val segments = normalized.split('.')
         require(segments.none(String::isBlank)) { "$label contains an empty segment: '$value'" }
-        segments.forEachIndexed { index, segment ->
-            requireIdentifier(segment, "$label segment[$index]")
-        }
+        segments.forEachIndexed { index, segment -> requireIdentifier(segment, "$label segment[$index]") }
 
         return segments.joinToString(".")
     }
 
     fun requireIdentifier(value: String, label: String) {
-        val normalized = value.trim()
-        require(normalized.isNotBlank()) { "$label cannot be blank." }
-        require(normalized == value && PROTO_IDENTIFIER.matches(normalized)) {
-            "$label is not a valid protobuf identifier: '$value'"
-        }
+        require(isIdentifier(value)) { "$label is not a valid protobuf identifier: '$value'" }
     }
+
+    fun isIdentifier(value: String): Boolean =
+        value.isNotBlank() && value == value.trim() && PROTO_IDENTIFIER.matches(value)
 
     private val PROTO_IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*")
 }

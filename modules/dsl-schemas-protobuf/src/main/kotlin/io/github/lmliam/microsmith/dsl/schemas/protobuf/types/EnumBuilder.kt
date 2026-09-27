@@ -1,14 +1,14 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.types
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.EnumScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.EnumValueScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.ReservedScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation.IndexAllocator
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names.NameRegistry
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Max
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.buildReservedDeclarations
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.NameRegistry
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.enum.EnumScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.enum.EnumValueScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.reserved.ReservedScope
 
 internal class EnumBuilder(private val name: String) : EnumScope {
     private val allocator = IndexAllocator(0)
@@ -17,9 +17,7 @@ internal class EnumBuilder(private val name: String) : EnumScope {
     private val values = mutableSetOf<EnumValue>()
 
     init {
-        value(Enum.UNSPECIFIED) {
-            index(0)
-        }
+        value(Enum.UNSPECIFIED) { index(0) }
     }
 
     override fun value(name: String, block: EnumValueScope.() -> Unit) {
@@ -44,9 +42,10 @@ internal class EnumBuilder(private val name: String) : EnumScope {
         ReservedBuilder(allocator, nameRegistry).apply(block)
     }
 
-    fun build() = Enum(
-        name = name,
-        values = values.sortedBy { it.index },
-        reserved = buildReservedDeclarations(allocator, nameRegistry),
-    )
+    fun build() =
+        Enum(
+            name = name,
+            values = values.sortedBy { it.index },
+            reserved = buildReservedDeclarations(allocator, nameRegistry),
+        )
 }

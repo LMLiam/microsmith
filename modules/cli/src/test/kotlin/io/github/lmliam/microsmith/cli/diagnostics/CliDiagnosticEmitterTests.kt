@@ -22,10 +22,11 @@ class CliDiagnosticEmitterTests :
             emitter.error(CliFailureCode.USAGE_ERROR, "error message")
 
             stdout shouldBe listOf("[info] info message")
-            stderr shouldBe listOf(
-                "[warn] warn message",
-                "[error] [MS-CLI-0001] error message",
-            )
+            stderr shouldBe
+                listOf(
+                    "[warn] warn message",
+                    "[error] [MS-CLI-0001] error message",
+                )
         }
 
         "verbose text diagnostics sort details by key" {
@@ -43,11 +44,12 @@ class CliDiagnosticEmitterTests :
                 details = mapOf("zeta" to "last", "alpha" to "first"),
             )
 
-            stdout shouldBe listOf(
-                "[info] info message",
-                "  alpha=first",
-                "  zeta=last",
-            )
+            stdout shouldBe
+                listOf(
+                    "[info] info message",
+                    "  alpha=first",
+                    "  zeta=last",
+                )
         }
 
         "json diagnostics only include details when verbose" {

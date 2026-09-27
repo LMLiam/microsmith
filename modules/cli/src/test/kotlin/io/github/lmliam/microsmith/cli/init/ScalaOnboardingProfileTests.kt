@@ -21,15 +21,18 @@ class ScalaOnboardingProfileTests :
             repoRoot.resolve("build.sbt").writeText("""scalaVersion := "3.7.1""" + "\n")
             repoRoot.resolve("project/build.properties").writeText("sbt.version=1.11.7\n")
             repoRoot.resolve("src/main/scala/example").createDirectories()
-            repoRoot.resolve("src/main/scala/example/App.scala").writeText(
-                """
-                package example
+            repoRoot
+                .resolve("src/main/scala/example/App.scala")
+                .writeText(
+                    """
+                    package example
 
-                object App {
-                  def message: String = "Microsmith Scala fixture"
-                }
-                """.trimIndent() + "\n",
-            )
+                    object App {
+                      def message: String = "Microsmith Scala fixture"
+                    }
+                    """
+                        .trimIndent() + "\n"
+                )
             try {
                 val helperRoot = repoRoot.resolve(".microsmith/ide")
                 val result =

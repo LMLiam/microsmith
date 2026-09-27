@@ -1,0 +1,18 @@
+package io.github.lmliam.microsmith.runtime.scripting.host.execution
+
+import io.github.lmliam.microsmith.gen.generateTo
+import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
+import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
+import java.nio.file.Path
+import kotlinx.coroutines.runBlocking
+
+internal object ScriptContextFactory {
+    fun create(outputPath: Path, request: ScriptRunRequest): MicrosmithScriptContext =
+        MicrosmithScriptContext(
+            outDir = outputPath,
+            vars = request.variables,
+            flags = request.flags,
+        ) { model ->
+            runBlocking { model.generateTo(outputPath) }
+        }
+}

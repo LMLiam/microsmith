@@ -7,7 +7,9 @@ import java.nio.file.Path
 
 internal fun parseInitCommand(args: List<String>): CliCommand {
     val parsed = parseInitOptions(args = args, startIndex = 1)
-    parsed.error?.let { return ErrorCommand(it) }
+    parsed.error?.let {
+        return ErrorCommand(it)
+    }
     return InitCommand(
         projectRoot = parsed.projectRoot,
         diagnosticsFormat = parsed.diagnosticsFormat,
@@ -29,14 +31,10 @@ private fun parseInitOptions(args: List<String>, startIndex: Int): ParsedInitOpt
     while (index < args.size && error == null && diagnosticOptions.error == null) {
         val parsedToken =
             when (val token = args[index]) {
-                DIAGNOSTICS_OPTION -> ParsedToken(
-                    index + diagnosticOptions.consumeDiagnostics(args = args, index = index),
-                )
+                DIAGNOSTICS_OPTION ->
+                    ParsedToken(index + diagnosticOptions.consumeDiagnostics(args = args, index = index))
 
-                VERBOSE_OPTION ->
-                    ParsedToken(
-                        index + diagnosticOptions.consumeVerbose(),
-                    )
+                VERBOSE_OPTION -> ParsedToken(index + diagnosticOptions.consumeVerbose())
 
                 REPO_ROOT_OPTION ->
                     parseRepoRootOption(
