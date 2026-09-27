@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolution
+import io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
+import io.github.lmliam.microsmith.dsl.services.dotnet.solution.DotnetSolution
 
 /**
  * Resolved per-service .NET generation state.
