@@ -1,7 +1,7 @@
-package io.github.lmliam.microsmith.sbt
-
+package io.github.lmliam.microsmith.sbt.execution
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
+import io.github.lmliam.microsmith.sbt.MicrosmithSbtTestProject
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.file.shouldExist
