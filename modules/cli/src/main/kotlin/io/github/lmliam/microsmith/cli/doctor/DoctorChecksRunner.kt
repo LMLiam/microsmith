@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.cli.doctor
 
-import io.github.lmliam.microsmith.cli.plugins.defaultPluginCacheDirectory
+import io.github.lmliam.microsmith.cli.plugins.cache.defaultPluginCacheDirectory
 import java.nio.file.Path
 
 internal class DoctorChecksRunner(

@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.cli.doctor
 
-import io.github.lmliam.microsmith.cli.plugins.defaultRepositoryAllowlistPolicy
+import io.github.lmliam.microsmith.cli.plugins.repository.defaultRepositoryAllowlistPolicy
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.ServiceConfigurationError
