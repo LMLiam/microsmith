@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
-
 internal fun shouldInsertSpacerLine(previous: CSharp.Statement, current: CSharp.Statement): Boolean =
     current !is CSharp.BlankLine &&
         previous.isBlockStatement &&
