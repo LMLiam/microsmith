@@ -1,6 +1,5 @@
-package io.github.lmliam.microsmith.resolve.services.core
-
-import io.github.lmliam.microsmith.dsl.services.core.Service
+package io.github.lmliam.microsmith.resolve.services
+import io.github.lmliam.microsmith.dsl.services.Service
 import io.github.lmliam.microsmith.resolve.ResolvedModel
 
 /**
