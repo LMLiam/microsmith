@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.gen.helpers
-
+package io.github.lmliam.microsmith.gen.output
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -57,15 +56,22 @@ internal object GeneratedOriginsManifestBuilder {
         value.forEach { char ->
             when (char) {
                 '\\' -> append("\\\\")
+
                 '"' -> append("\\\"")
+
                 '\b' -> append("\\b")
+
                 '\u000C' -> append("\\f")
+
                 '\n' -> append("\\n")
+
                 '\r' -> append("\\r")
+
                 '\t' -> append("\\t")
+
                 else -> {
                     if (char.code < FIRST_PRINTABLE_CHARACTER_CODE) {
-                        append("\\u%04x".format(char.code))
+                        append(char.toUnicodeEscape())
                     } else {
                         append(char)
                     }
@@ -76,3 +82,5 @@ internal object GeneratedOriginsManifestBuilder {
 
     private data class TracedFile(val relativePath: String, val origins: List<String>)
 }
+
+private fun Char.toUnicodeEscape(): String = "\\u${code.toString(radix = 16).padStart(length = 4, padChar = '0')}"

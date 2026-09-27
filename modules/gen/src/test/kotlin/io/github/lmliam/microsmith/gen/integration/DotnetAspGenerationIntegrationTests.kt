@@ -1,9 +1,9 @@
-package io.github.lmliam.microsmith.gen.helpers
-
-import io.github.lmliam.microsmith.dsl.core.microsmith
-import io.github.lmliam.microsmith.dsl.services.core.services
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.asp
+package io.github.lmliam.microsmith.gen.integration
+import io.github.lmliam.microsmith.dsl.microsmith
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.service.asp
+import io.github.lmliam.microsmith.dsl.services.dotnet.dotnet
+import io.github.lmliam.microsmith.dsl.services.services
+import io.github.lmliam.microsmith.gen.generateTo
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain

@@ -1,6 +1,5 @@
-package io.github.lmliam.microsmith.gen.helpers
-
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+package io.github.lmliam.microsmith.gen.execution
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.gen.files.FileSpace
 
 internal object GenerationProgressReporter {
