@@ -1,15 +1,15 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
-import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
-import io.github.lmliam.microsmith.dsl.services.core.services
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.service.packages
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.packages
+import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
+import io.github.lmliam.microsmith.dsl.services.ServicesExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.dotnet
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferenceDeclaration
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferencesExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.packages
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetPackageVersionDeclaration
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetPackageVersionsExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.packages
+import io.github.lmliam.microsmith.dsl.services.services
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -45,7 +45,7 @@ class DotnetPackageDslTests :
                 requireNotNull(
                     builder
                         .requireServicesExtension()
-                        .get<io.github.lmliam.microsmith.dsl.services.dotnet.core.defaults.DotnetDefaultsExtension>(),
+                        .get<io.github.lmliam.microsmith.dsl.services.dotnet.defaults.DotnetDefaultsExtension>(),
                 ).requireSolution("Platform")
             val packages = requireNotNull(solution.get<DotnetPackageVersionsExtension>()).packages
 
@@ -97,7 +97,7 @@ class DotnetPackageDslTests :
                     .requireServicesExtension()
                     .require("UserService")
                     .model
-                    .get<io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension>()
+                    .get<io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExtension>()
             val packages = requireNotNull(requireNotNull(service).get<DotnetPackageReferencesExtension>()).packages
 
             packages shouldBe listOf(
@@ -137,7 +137,7 @@ class DotnetPackageDslTests :
                     .requireServicesExtension()
                     .require("UserService")
                     .model
-                    .get<io.github.lmliam.microsmith.dsl.services.dotnet.core.service.DotnetServiceExtension>()
+                    .get<io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExtension>()
             val packages = requireNotNull(requireNotNull(service).get<DotnetPackageReferencesExtension>()).packages
 
             packages shouldBe listOf(

@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution
 
-import io.github.lmliam.microsmith.dsl.core.MergeableExtension
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+import io.github.lmliam.microsmith.dsl.MergeableExtension
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 
 /**
  * Central package versions declared under `solutions { "Name" { packages { ... } } }`.

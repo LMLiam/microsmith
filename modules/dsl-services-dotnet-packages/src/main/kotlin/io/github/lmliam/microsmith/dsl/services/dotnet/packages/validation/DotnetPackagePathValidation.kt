@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.packages.support
-
+package io.github.lmliam.microsmith.dsl.services.dotnet.packages.validation
 internal fun normalizeDotnetPackagePath(value: String, label: String): List<String> {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }

@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages.service
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.normalizeDotnetPackagePath
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.validateDotnetPackageVersion
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.validation.normalizeDotnetPackagePath
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.validation.validateDotnetPackageVersion
 
 internal class DotnetPackageReferencesBuilder(private val pathSegments: List<String> = emptyList()) :
     DotnetPackageReferencesScope {

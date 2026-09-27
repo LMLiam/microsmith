@@ -1,8 +1,9 @@
-package io.github.lmliam.microsmith.dsl.services.dotnet.core.service
-
+package io.github.lmliam.microsmith.dsl.services.dotnet.packages.service
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferencesBuilder
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferencesExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferencesScope
+import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceContext
+import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceScope
 
 /**
  * Start a per-project package references block inside a named .NET service.
