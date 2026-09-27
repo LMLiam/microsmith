@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli
-
 internal const val HELP_TEXT = """
 Microsmith CLI
 

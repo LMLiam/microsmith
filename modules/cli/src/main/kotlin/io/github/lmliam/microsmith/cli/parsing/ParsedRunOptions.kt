@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.parsing
-
 import io.github.lmliam.microsmith.cli.diagnostics.DiagnosticFormat
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import java.nio.file.Path
