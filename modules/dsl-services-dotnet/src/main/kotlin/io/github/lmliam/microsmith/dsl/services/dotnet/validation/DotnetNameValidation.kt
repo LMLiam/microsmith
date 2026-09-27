@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.validation
+
 fun validateDotnetIdentifier(value: String, label: String): String {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }

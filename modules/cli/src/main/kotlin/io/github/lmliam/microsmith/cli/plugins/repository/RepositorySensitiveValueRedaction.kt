@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.repository
+
 private const val REDACTED_SECRET = "<redacted>"
 
 internal fun String.redactSensitiveValues(sensitiveValues: Set<String>): String = sensitiveValues

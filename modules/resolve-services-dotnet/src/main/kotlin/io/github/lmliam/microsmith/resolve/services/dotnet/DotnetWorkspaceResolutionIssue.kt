@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet
+
 sealed interface DotnetWorkspaceResolutionIssue : DotnetResolutionIssue {
     data class TargetNotConfigured(val serviceName: String) : DotnetWorkspaceResolutionIssue
 

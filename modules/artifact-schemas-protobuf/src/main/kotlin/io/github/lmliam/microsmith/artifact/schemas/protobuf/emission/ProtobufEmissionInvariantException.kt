@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
+
 /**
  * Signals an invalid in-memory protobuf model shape while rendering or validating.
  *

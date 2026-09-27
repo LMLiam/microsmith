@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas
+
 /**
  * The type of schema.
  *

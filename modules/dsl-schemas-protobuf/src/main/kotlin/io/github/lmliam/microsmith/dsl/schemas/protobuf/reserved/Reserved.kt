@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved
+
 sealed interface Reserved {
     companion object {
         fun fromRange(range: IntRange): Reserved = when {

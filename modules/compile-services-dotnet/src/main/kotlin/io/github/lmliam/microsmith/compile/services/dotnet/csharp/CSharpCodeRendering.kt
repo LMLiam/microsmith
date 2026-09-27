@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
+
 internal fun renderCodeBlock(block: CSharp.CodeBlock): String = indent(
     buildString {
         block.statements.forEachIndexed { index, statement ->

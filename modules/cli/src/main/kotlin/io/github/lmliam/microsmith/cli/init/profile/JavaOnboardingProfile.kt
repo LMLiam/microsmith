@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init.profile
+
 internal data object JavaOnboardingProfile : OnboardingProfile {
     override val id = "java"
     override val displayName = "Java"

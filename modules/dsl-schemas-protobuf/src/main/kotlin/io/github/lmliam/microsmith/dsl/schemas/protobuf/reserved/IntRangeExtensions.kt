@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved
+
 internal fun MutableSet<IntRange>.merge(newRange: IntRange) {
     val disjoint = mutableListOf<IntRange>()
 

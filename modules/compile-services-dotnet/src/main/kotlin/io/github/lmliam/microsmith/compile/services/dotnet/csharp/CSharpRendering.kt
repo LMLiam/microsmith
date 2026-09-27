@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
+
 internal fun renderCSharp(file: CSharp.File): String = buildString {
     file.usings
         .sorted()

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
+
 object DotnetCSharpNamespaces {
     object System {
         data object Root : DotnetCSharpNamespace {

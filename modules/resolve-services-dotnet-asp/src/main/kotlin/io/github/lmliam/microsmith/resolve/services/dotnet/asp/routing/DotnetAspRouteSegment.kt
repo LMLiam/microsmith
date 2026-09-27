@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing
+
 internal sealed interface DotnetAspRouteSegment {
     val text: String
 

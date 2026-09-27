@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
+
 object MsBuildNames {
     const val SDK_ATTRIBUTE = "Sdk"
     const val IMPLICIT_USINGS_PROPERTY = "ImplicitUsings"

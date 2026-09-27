@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init.profile
+
 internal data object RustOnboardingProfile : OnboardingProfile {
     override val id = "rust"
     override val displayName = "Rust"

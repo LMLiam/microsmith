@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
+
 fun csharpAttribute(name: String, vararg arguments: CSharp.AttributeArgument): CSharp.Attribute =
     CSharp.attribute(name, *arguments)
 

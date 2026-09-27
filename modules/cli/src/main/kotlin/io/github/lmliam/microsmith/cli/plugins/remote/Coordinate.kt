@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.remote
+
 private const val COORDINATE_PART_COUNT = 3
 
 internal data class Coordinate(val group: String, val artifact: String, val version: String) {

@@ -60,6 +60,13 @@ gradlePlugin {
             description = "Registers repository structural Kotlin quality guardrails."
         }
 
+        register("kotlinSourceFormatting") {
+            id = "io.github.lmliam.microsmith.kotlin-source-formatting"
+            implementationClass = "io.github.lmliam.microsmith.build.formatting.KotlinSourceFormattingPlugin"
+            displayName = "Microsmith Kotlin Source Formatting"
+            description = "Formats package and import spacing after KtLint formatting."
+        }
+
         register("runtimeScripting") {
             id = "io.github.lmliam.microsmith.runtime-scripting"
             implementationClass = "io.github.lmliam.microsmith.build.runtime.RuntimeScriptingPlugin"

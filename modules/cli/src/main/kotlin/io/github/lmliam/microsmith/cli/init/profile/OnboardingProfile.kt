@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init.profile
+
 internal interface OnboardingProfile {
     val id: OnboardingProfileId
     val displayName: String

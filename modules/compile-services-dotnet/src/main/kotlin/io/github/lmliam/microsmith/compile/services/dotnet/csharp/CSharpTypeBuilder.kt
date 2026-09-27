@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
+
 @CSharp.Dsl
 class CSharpTypeBuilder internal constructor(
     private val kind: CSharp.TypeKind,

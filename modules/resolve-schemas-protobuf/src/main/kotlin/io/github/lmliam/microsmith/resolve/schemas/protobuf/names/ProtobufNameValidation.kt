@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.names
+
 object ProtobufNameValidation {
     fun normalizeQualifiedName(value: String, label: String): String {
         val normalized = value.trim()

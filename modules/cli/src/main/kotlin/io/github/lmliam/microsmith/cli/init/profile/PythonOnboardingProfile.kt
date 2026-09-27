@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init.profile
+
 internal data object PythonOnboardingProfile : OnboardingProfile {
     override val id = "python"
     override val displayName = "Python"

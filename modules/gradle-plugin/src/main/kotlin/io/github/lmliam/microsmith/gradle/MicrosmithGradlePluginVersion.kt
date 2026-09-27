@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gradle
+
 internal object MicrosmithGradlePluginVersion {
     val current: String =
         checkNotNull(MicrosmithGradlePluginVersion::class.java.getResourceAsStream(VERSION_RESOURCE_PATH)) {

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.diagnostics
+
 internal fun toJsonValue(value: Any?): String = when (value) {
     null -> "null"
 

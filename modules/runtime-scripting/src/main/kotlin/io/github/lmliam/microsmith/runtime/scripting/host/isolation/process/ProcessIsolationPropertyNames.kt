@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
+
 internal object ProcessIsolationPropertyNames {
     const val REQUEST_SCRIPT = "request.script"
     const val REQUEST_OUTPUT_DIR = "request.outputDir"

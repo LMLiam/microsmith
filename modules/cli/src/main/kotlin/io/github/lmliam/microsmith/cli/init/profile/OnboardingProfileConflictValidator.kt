@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init.profile
+
 internal object OnboardingProfileConflictValidator {
     fun requireConsistentDefinitions(matchers: List<OnboardingProfileMatcher>, fallbackProfile: OnboardingProfile) {
         val conflictingIds = conflictingProfileIds(matchers, fallbackProfile)
