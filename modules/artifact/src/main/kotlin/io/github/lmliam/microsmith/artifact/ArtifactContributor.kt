@@ -1,7 +1,6 @@
-package io.github.lmliam.microsmith.artifact.core
-
+package io.github.lmliam.microsmith.artifact
 import com.github.eventhorizonlab.spi.ServiceContract
-import io.github.lmliam.microsmith.resolve.core.ResolvedModel
+import io.github.lmliam.microsmith.resolve.ResolvedModel
 import kotlin.reflect.KClass
 
 @ServiceContract

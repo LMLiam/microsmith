@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.artifact.files
 
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
 
 class BinaryFileArtifactContribution(override val artifactId: BinaryFileArtifactId, contents: ByteArray) :
     ArtifactContribution<BinaryFileArtifact> {
