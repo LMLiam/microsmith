@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.schemas.core
-
+package io.github.lmliam.microsmith.dsl.schemas
 /**
  * Marker for all schema definitions.
  * Dialects implement this (protobuf, json, avro, etc.).

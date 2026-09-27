@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.schemas.core
-
+package io.github.lmliam.microsmith.dsl.schemas
 import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec

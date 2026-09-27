@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.schemas.core
-
+package io.github.lmliam.microsmith.dsl.schemas
 /**
  * Internal builder used within the `schemas { ... }` DSL block.
  *
