@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.cli.plugins
-
 import io.github.lmliam.microsmith.cli.command.RunCommand
+import io.github.lmliam.microsmith.cli.plugins.diagnostics.PluginResolutionDiagnostics
+import io.github.lmliam.microsmith.cli.plugins.diagnostics.resolveWithDiagnostics
+import io.github.lmliam.microsmith.cli.plugins.diagnostics.sensitiveValuesWithDiagnostics
 
 internal fun resolvePlugins(command: RunCommand): PluginResolutionResult {
     if (!command.requiresPluginResolution()) {

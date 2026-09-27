@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.plugins
-
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeBytes
