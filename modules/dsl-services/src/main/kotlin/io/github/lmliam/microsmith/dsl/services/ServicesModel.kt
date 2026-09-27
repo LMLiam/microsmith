@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.services.core
-
+package io.github.lmliam.microsmith.dsl.services
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.merge.mergeModelExtension
 import kotlin.reflect.KClass
