@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.artifact.services.dotnet.packages
-
+package io.github.lmliam.microsmith.artifact.services.dotnet.packages.references
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 
 data class DotnetPackageReferencesContribution(
