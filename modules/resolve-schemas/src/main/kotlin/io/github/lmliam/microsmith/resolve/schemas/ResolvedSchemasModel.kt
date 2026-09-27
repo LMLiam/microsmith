@@ -1,6 +1,5 @@
-package io.github.lmliam.microsmith.resolve.schemas.core
-
-import io.github.lmliam.microsmith.dsl.schemas.core.Schema
+package io.github.lmliam.microsmith.resolve.schemas
+import io.github.lmliam.microsmith.dsl.schemas.Schema
 import io.github.lmliam.microsmith.resolve.ResolvedModel
 
 /**
