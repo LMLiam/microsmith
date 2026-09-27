@@ -14,7 +14,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
-import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
+import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.gen.ArtifactRenderer
 import io.github.lmliam.microsmith.gen.files.GeneratedFile

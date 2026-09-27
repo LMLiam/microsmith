@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.compile.schemas.core
 
-import io.github.lmliam.microsmith.artifact.schemas.core.SchemasArtifact
+import io.github.lmliam.microsmith.artifact.schemas.SchemasArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 
 /**
