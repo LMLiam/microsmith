@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.sbt
-
+package io.github.lmliam.microsmith.sbt.execution
 class MicrosmithSbtExecutionService(
     private val requestFactory: MicrosmithSbtExecutionRequestFactory = MicrosmithSbtExecutionRequestFactory(),
     private val scriptHostRunner: MicrosmithSbtScriptHostRunner = DefaultMicrosmithSbtScriptHostRunner,
