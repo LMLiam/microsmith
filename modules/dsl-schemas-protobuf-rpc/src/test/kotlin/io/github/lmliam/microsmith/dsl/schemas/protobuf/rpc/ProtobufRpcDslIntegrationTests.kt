@@ -1,9 +1,9 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc
 
-import io.github.lmliam.microsmith.dsl.schemas.core.SchemasBuilder
+import io.github.lmliam.microsmith.dsl.schemas.SchemasBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -54,8 +54,8 @@ class ProtobufRpcDslIntegrationTests :
                 "DownloadUser",
                 "UploadUser",
             )
-            service.rpcs[0].request.reference.type shouldBe Message("GetUserRequest")
-            service.rpcs[0].response.reference.type shouldBe Message("GetUserResponse")
+            service.rpcs[0].request.reference shouldBe Reference.Local("GetUserRequest")
+            service.rpcs[0].response.reference shouldBe Reference.Local("GetUserResponse")
             service.rpcs[1].response.streaming shouldBe true
             service.rpcs[2].request.streaming shouldBe true
             service.rpcs[2].response.streaming shouldBe true

@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc
-
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufDeclarationContext
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufScope
 
