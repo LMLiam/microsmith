@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
-
 class MsBuildItem(val itemName: String, val include: String, attributes: Map<String, String> = emptyMap()) {
     val attributes: Map<String, String> = attributes.toMap()
 
