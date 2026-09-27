@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.gradle
+package io.github.lmliam.microsmith.gradle.worker
 
 import io.github.lmliam.microsmith.runtime.scripting.MicrosmithScriptHost
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure

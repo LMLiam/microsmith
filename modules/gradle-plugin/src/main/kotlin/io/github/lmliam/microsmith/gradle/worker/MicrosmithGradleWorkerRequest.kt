@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.gradle
-
+package io.github.lmliam.microsmith.gradle.worker
 import java.nio.file.Path
 
 internal data class MicrosmithGradleWorkerRequest(

@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.gradle
-
+package io.github.lmliam.microsmith.gradle.configuration
 import java.nio.file.Path
 import java.util.Properties
 

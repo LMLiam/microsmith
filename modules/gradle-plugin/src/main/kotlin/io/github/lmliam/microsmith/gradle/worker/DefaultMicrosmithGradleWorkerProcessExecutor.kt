@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.gradle
-
+package io.github.lmliam.microsmith.gradle.worker
 internal class DefaultMicrosmithGradleWorkerProcessExecutor : MicrosmithGradleWorkerProcessExecutor {
     override fun execute(command: List<String>): MicrosmithGradleWorkerProcessOutcome {
         val process =

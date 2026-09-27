@@ -1,5 +1,8 @@
-package io.github.lmliam.microsmith.gradle
-
+package io.github.lmliam.microsmith.gradle.task
+import io.github.lmliam.microsmith.gradle.worker.MicrosmithGradleWorkerFailure
+import io.github.lmliam.microsmith.gradle.worker.MicrosmithGradleWorkerLauncher
+import io.github.lmliam.microsmith.gradle.worker.MicrosmithGradleWorkerRequest
+import io.github.lmliam.microsmith.gradle.worker.MicrosmithGradleWorkerSuccess
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
