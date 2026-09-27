@@ -1,9 +1,13 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp
 
 import com.github.eventhorizonlab.spi.ServiceProvider
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import io.github.lmliam.microsmith.artifact.core.ArtifactContributor
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.ports.allocateDotnetAspPorts
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.ports.validateUniqueDotnetAspPorts
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactFactory
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactId
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
 
 @ServiceProvider(ArtifactContributor::class)
 class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {

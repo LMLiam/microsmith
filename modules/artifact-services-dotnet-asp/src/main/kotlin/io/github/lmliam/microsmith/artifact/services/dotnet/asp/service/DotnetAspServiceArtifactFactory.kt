@@ -1,7 +1,17 @@
-package io.github.lmliam.microsmith.artifact.services.dotnet.asp
-
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspDefaultValue
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
+package io.github.lmliam.microsmith.artifact.services.dotnet.asp.service
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointBindingsArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelLocality
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.ports.DotnetAspAllocatedPorts
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeaderFieldArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeadersBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestFieldArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseHeaderArtifact
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.request.DotnetAspDefaultValue
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspHeadersBinding
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspModel

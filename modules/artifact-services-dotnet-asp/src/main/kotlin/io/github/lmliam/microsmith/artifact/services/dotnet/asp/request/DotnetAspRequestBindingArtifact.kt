@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.artifact.services.dotnet.asp
-
+package io.github.lmliam.microsmith.artifact.services.dotnet.asp.request
 data class DotnetAspRequestBindingArtifact(
     val typeName: String,
     val name: String,
