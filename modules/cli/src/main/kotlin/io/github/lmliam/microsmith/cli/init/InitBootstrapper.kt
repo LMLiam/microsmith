@@ -1,10 +1,13 @@
 package io.github.lmliam.microsmith.cli.init
-
 import io.github.lmliam.microsmith.cli.command.IdeRefreshCommand
 import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.ide.IdeHelperConflictException
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
 import io.github.lmliam.microsmith.cli.ide.refreshIdeHelperProject
+import io.github.lmliam.microsmith.cli.init.files.BootstrapFileWriteResult
+import io.github.lmliam.microsmith.cli.init.files.BootstrapFileWriter
+import io.github.lmliam.microsmith.cli.init.profile.detectOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.template.BootstrapScriptTemplates
 import java.nio.file.Files
 import java.nio.file.Path
 

@@ -5,7 +5,7 @@ import io.github.lmliam.microsmith.cli.diagnostics.CliFailureCode
 import io.github.lmliam.microsmith.cli.init.InitBootstrapResult
 import io.github.lmliam.microsmith.cli.init.InitConflictException
 import io.github.lmliam.microsmith.cli.init.InitValidationException
-import io.github.lmliam.microsmith.cli.init.describeForSummary
+import io.github.lmliam.microsmith.cli.init.profile.describeForSummary
 
 internal class InitCommandHandler(
     private val emitterFactory: CliDiagnosticEmitterFactory,
@@ -33,7 +33,7 @@ internal class InitCommandHandler(
             details =
             mapOf(
                 "projectRoot" to projectRoot.toString(),
-                "repositoryProfile" to result.repositoryDetection.profile.id.toString(),
+                "repositoryProfile" to result.repositoryDetection.profile.id,
                 "repositoryProfileDisplayName" to result.repositoryDetection.profile.displayName,
                 "matchedMarkers" to result.repositoryDetection.matchedMarkers.joinToString(separator = ","),
                 "createdFiles" to result.createdFiles.size.toString(),
