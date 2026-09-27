@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc
 
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
 
 data class ProtobufRpcServiceContribution(
     override val artifactId: ProtobufRpcServiceArtifactId,

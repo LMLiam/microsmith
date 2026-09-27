@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc
 
 import com.github.eventhorizonlab.spi.ServiceProvider
-import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 
 @ServiceProvider(ArtifactAssembler::class)
 class ProtobufRpcServiceArtifactAssembler : ArtifactAssembler<ProtobufRpcServiceArtifact> {
