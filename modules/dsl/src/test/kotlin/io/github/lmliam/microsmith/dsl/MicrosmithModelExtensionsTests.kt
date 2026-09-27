@@ -1,7 +1,6 @@
-package io.github.lmliam.microsmith.dsl.helpers
-
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
-import io.github.lmliam.microsmith.dsl.core.MicrosmithModel
+package io.github.lmliam.microsmith.dsl
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
+import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeFalse

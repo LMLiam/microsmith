@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.core
-
+package io.github.lmliam.microsmith.dsl
 /**
  * Marker interface for extensions declared at the root `microsmith { ... }` scope.
  */

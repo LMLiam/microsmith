@@ -1,7 +1,6 @@
-package io.github.lmliam.microsmith.dsl.helpers
-
-import io.github.lmliam.microsmith.dsl.core.MergeableExtension
-import io.github.lmliam.microsmith.dsl.core.ModelExtension
+package io.github.lmliam.microsmith.dsl.merge
+import io.github.lmliam.microsmith.dsl.MergeableExtension
+import io.github.lmliam.microsmith.dsl.ModelExtension
 
 /**
  * Merge [incoming] into [existing] when the extension type opts into mergeable
