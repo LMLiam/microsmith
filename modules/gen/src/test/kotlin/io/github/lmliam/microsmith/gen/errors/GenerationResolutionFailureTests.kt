@@ -30,51 +30,49 @@ private class FailingTestResolver : DomainResolver<TestExtension, TestResolvedMo
     override val authoringType = TestExtension::class
     override val resolvedType = TestResolvedModel::class
 
-    override fun resolve(authoring: TestExtension): DomainResolution<TestResolvedModel> = DomainResolution.Failure(
-        nonEmptyListOf(TestIssue),
-    )
+    override fun resolve(authoring: TestExtension): DomainResolution<TestResolvedModel> =
+        DomainResolution.Failure(nonEmptyListOf(TestIssue))
 }
 
 private class TestIssueDiagnosticMapper : ResolutionIssueDiagnosticMapper<TestIssue> {
     override val issueType = TestIssue::class
 
-    override fun map(issue: TestIssue): ResolutionDiagnostic = ResolutionDiagnostic(
-        code = "test.resolution-failure",
-        message = "Test resolution failed.",
-    )
+    override fun map(issue: TestIssue): ResolutionDiagnostic =
+        ResolutionDiagnostic(
+            code = "test.resolution-failure",
+            message = "Test resolution failed.",
+        )
 }
 
 class GenerationResolutionFailureTests :
     StringSpec({
         "generation maps semantic issues before exposing resolution failure" {
-            val pluginCatalog = MicrosmithPluginCatalog(
-                domainResolvers = listOf(FailingTestResolver()),
-                resolutionIssueDiagnosticMappers = listOf(TestIssueDiagnosticMapper()),
-            )
+            val pluginCatalog =
+                MicrosmithPluginCatalog(
+                    domainResolvers = listOf(FailingTestResolver()),
+                    resolutionIssueDiagnosticMappers = listOf(TestIssueDiagnosticMapper()),
+                )
 
-            val graph = createGraphFactory<MicrosmithGenerationGraph.Factory>()
-                .create(pluginCatalog)
+            val graph = createGraphFactory<MicrosmithGenerationGraph.Factory>().create(pluginCatalog)
 
-            val model = MicrosmithBuilder().apply {
-                put(TestExtension::class, TestExtension)
-            }.model
+            val model = MicrosmithBuilder().apply { put(TestExtension::class, TestExtension) }.model
 
             val output = DirectorySpace.from(Files.createTempDirectory("microsmith-resolution-failure"))
 
-            val failure = shouldThrow<GenerationResolutionFailedException> {
-                graph.runner.generate(model, output)
-            }
+            val failure = shouldThrow<GenerationResolutionFailedException> { graph.runner.generate(model, output) }
 
             failure.issues.toList() shouldContainExactly listOf(TestIssue)
 
-            failure.diagnostics.toList() shouldContainExactly listOf(
-                ResolutionDiagnostic(
-                    code = "test.resolution-failure",
-                    message = "Test resolution failed.",
-                ),
-            )
+            failure.diagnostics.toList() shouldContainExactly
+                listOf(
+                    ResolutionDiagnostic(
+                        code = "test.resolution-failure",
+                        message = "Test resolution failed.",
+                    )
+                )
 
-            failure.message shouldBe "Microsmith model resolution failed with 1 semantic issue(s): " +
-                "[test.resolution-failure] Test resolution failed."
+            failure.message shouldBe
+                "Microsmith model resolution failed with 1 semantic issue(s): " +
+                    "[test.resolution-failure] Test resolution failed."
         }
     })

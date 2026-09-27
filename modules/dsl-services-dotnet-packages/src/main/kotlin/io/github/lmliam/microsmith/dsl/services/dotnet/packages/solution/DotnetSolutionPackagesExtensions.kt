@@ -6,13 +6,10 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetP
 import io.github.lmliam.microsmith.dsl.services.dotnet.solution.DotnetSolutionContext
 import io.github.lmliam.microsmith.dsl.services.dotnet.solution.DotnetSolutionScope
 
-/**
- * Start a central package ownership block inside a named .NET solution.
- */
+/** Start a central package ownership block inside a named .NET solution. */
 fun DotnetSolutionScope.packages(block: DotnetPackageVersionsScope.() -> Unit) {
     val builder =
-        this as? DotnetSolutionContext
-            ?: error("packages { ... } can only be invoked within a .NET solution block.")
+        this as? DotnetSolutionContext ?: error("packages { ... } can only be invoked within a .NET solution block.")
 
     builder.put(DotnetPackageVersionsExtension::class, DotnetPackageVersionsBuilder().apply(block).build())
 }

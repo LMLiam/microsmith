@@ -50,12 +50,12 @@ internal class PluginResolutionService(
             lockfilePath = context.lockfilePath,
         )
 
-        val lockEntries =
-            buildList {
-                addAll(remoteResolution.rootLockEntries)
-                addAll(remoteResolution.remoteArtifactChecksums.toRemoteArtifactLockEntries())
-                addAll(localResolution.lockEntries)
-            }.sortedWith(compareBy(LockEntry::kind, LockEntry::key))
+        val lockEntries = buildList {
+            addAll(remoteResolution.rootLockEntries)
+            addAll(remoteResolution.remoteArtifactChecksums.toRemoteArtifactLockEntries())
+            addAll(localResolution.lockEntries)
+        }
+            .sortedWith(compareBy(LockEntry::kind, LockEntry::key))
 
         integrityVerifier.assertAllowlistCoverage(context.checksumAllowlist, lockEntries)
         integrityVerifier.writeGeneratedLockfile(

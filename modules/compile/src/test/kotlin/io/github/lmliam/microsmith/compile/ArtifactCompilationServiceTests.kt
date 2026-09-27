@@ -17,17 +17,19 @@ import java.nio.file.Path
 class ArtifactCompilationServiceTests :
     StringSpec({
         "compile recursively compiles artifacts until only terminal artifacts remain" {
-            val assemblyService = ArtifactAssemblyService(
-                listOf(
-                    StageOneArtifactAssembler(),
-                    StageTwoArtifactAssembler(),
-                    TextFileArtifactAssembler(),
-                ),
-            )
-            val compilationService = ArtifactCompilationService(
-                compilers = listOf(StageOneCompiler(), StageTwoCompiler()),
-                assemblyService = assemblyService,
-            )
+            val assemblyService =
+                ArtifactAssemblyService(
+                    listOf(
+                        StageOneArtifactAssembler(),
+                        StageTwoArtifactAssembler(),
+                        TextFileArtifactAssembler(),
+                    )
+                )
+            val compilationService =
+                ArtifactCompilationService(
+                    compilers = listOf(StageOneCompiler(), StageTwoCompiler()),
+                    assemblyService = assemblyService,
+                )
             val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
 
             val compiled = compilationService.compile(initial)
@@ -37,33 +39,32 @@ class ArtifactCompilationServiceTests :
 
         "compile rejects immediate self-cycles from compilers" {
             val assemblyService = ArtifactAssemblyService(listOf(StageOneArtifactAssembler()))
-            val compilationService = ArtifactCompilationService(
-                compilers = listOf(SelfCyclingCompiler()),
-                assemblyService = assemblyService,
-            )
+            val compilationService =
+                ArtifactCompilationService(
+                    compilers = listOf(SelfCyclingCompiler()),
+                    assemblyService = assemblyService,
+                )
             val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
 
-            shouldThrow<IllegalArgumentException> {
-                compilationService.compile(initial)
-            }
+            shouldThrow<IllegalArgumentException> { compilationService.compile(initial) }
         }
 
         "compile rejects indirect cycles across compiler stages" {
-            val assemblyService = ArtifactAssemblyService(
-                listOf(
-                    StageOneArtifactAssembler(),
-                    StageTwoArtifactAssembler(),
-                ),
-            )
-            val compilationService = ArtifactCompilationService(
-                compilers = listOf(StageOneToStageTwoCompiler(), StageTwoToStageOneCompiler()),
-                assemblyService = assemblyService,
-            )
+            val assemblyService =
+                ArtifactAssemblyService(
+                    listOf(
+                        StageOneArtifactAssembler(),
+                        StageTwoArtifactAssembler(),
+                    )
+                )
+            val compilationService =
+                ArtifactCompilationService(
+                    compilers = listOf(StageOneToStageTwoCompiler(), StageTwoToStageOneCompiler()),
+                    assemblyService = assemblyService,
+                )
             val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
 
-            shouldThrow<IllegalArgumentException> {
-                compilationService.compile(initial)
-            }
+            shouldThrow<IllegalArgumentException> { compilationService.compile(initial) }
         }
     })
 

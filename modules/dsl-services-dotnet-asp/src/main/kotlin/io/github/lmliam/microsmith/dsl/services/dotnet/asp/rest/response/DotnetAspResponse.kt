@@ -8,15 +8,9 @@ data class DotnetAspResponse(
     val headers: List<DotnetAspResponseHeader> = emptyList(),
 ) {
     init {
-        val duplicateHeaders =
-            headers
-                .groupBy { it.name.lowercase() }
-                .filterValues { it.size > 1 }
-                .keys
-                .sorted()
+        val duplicateHeaders = headers.groupBy { it.name.lowercase() }.filterValues { it.size > 1 }.keys.sorted()
         require(duplicateHeaders.isEmpty()) {
-            "ASP.NET response $statusCode declares duplicate headers: " +
-                duplicateHeaders.joinToString(", ") + "."
+            "ASP.NET response $statusCode declares duplicate headers: " + duplicateHeaders.joinToString(", ") + "."
         }
     }
 }

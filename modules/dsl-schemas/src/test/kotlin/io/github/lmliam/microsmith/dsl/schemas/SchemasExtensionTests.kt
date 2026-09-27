@@ -38,17 +38,13 @@ class SchemasExtensionTests :
             val s1 = ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")
             val ext = SchemasExtension(setOf(s1))
 
-            shouldThrow<IllegalStateException> {
-                ext.require(TestSchemaTypes.JSON, "User")
-            }
+            shouldThrow<IllegalStateException> { ext.require(TestSchemaTypes.JSON, "User") }
         }
 
         "find throws when schema name is blank" {
             val ext = SchemasExtension(emptySet())
 
-            shouldThrow<IllegalArgumentException> {
-                ext.find(TestSchemaTypes.PROTOBUF, " ")
-            }
+            shouldThrow<IllegalArgumentException> { ext.find(TestSchemaTypes.PROTOBUF, " ") }
         }
 
         "allOf returns all schemas of given type" {
@@ -65,8 +61,6 @@ class SchemasExtensionTests :
             val left = SchemasExtension(setOf(ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")))
             val right = SchemasExtension(setOf(ExtFakeSchema(TestSchemaTypes.PROTOBUF, "User")))
 
-            shouldThrow<IllegalArgumentException> {
-                left.merge(right)
-            }
+            shouldThrow<IllegalArgumentException> { left.merge(right) }
         }
     })

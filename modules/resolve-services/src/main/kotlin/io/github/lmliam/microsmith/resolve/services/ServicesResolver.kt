@@ -11,7 +11,5 @@ class ServicesResolver : DomainResolver<ServicesExtension, ResolvedServicesModel
     override val resolvedType = ResolvedServicesModel::class
 
     override fun resolve(authoring: ServicesExtension): DomainResolution<ResolvedServicesModel> =
-        DomainResolution.Success(
-            ResolvedServicesModel(authoring.services),
-        )
+        DomainResolution.Success(ResolvedServicesModel(authoring.services))
 }

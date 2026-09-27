@@ -25,9 +25,7 @@ class SchemasBuilderTests :
             val builder = SchemasBuilder()
             val schema = FakeSchema(name = "")
 
-            shouldThrow<IllegalArgumentException> {
-                builder.register(schema)
-            }
+            shouldThrow<IllegalArgumentException> { builder.register(schema) }
         }
 
         "register throws for duplicate schema type and name" {
@@ -36,9 +34,7 @@ class SchemasBuilderTests :
 
             builder.register(schema)
 
-            shouldThrow<IllegalArgumentException> {
-                builder.register(FakeSchema(name = "User"))
-            }
+            shouldThrow<IllegalArgumentException> { builder.register(FakeSchema(name = "User")) }
         }
 
         "build produces SchemasExtension with all schemas" {

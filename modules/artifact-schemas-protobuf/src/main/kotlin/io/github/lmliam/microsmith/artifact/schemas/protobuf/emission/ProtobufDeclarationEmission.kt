@@ -12,7 +12,8 @@ internal fun validateProtobufDeclaration(declaration: ResolvedProtobufDeclaratio
     }
 }
 
-internal fun renderProtobufDeclaration(declaration: ResolvedProtobufDeclaration): String = when (declaration) {
-    is ResolvedProtobufMessage -> renderDeclaration(declaration)
-    is ResolvedProtobufEnum -> renderDeclaration(declaration)
-}
+internal fun renderProtobufDeclaration(declaration: ResolvedProtobufDeclaration): String =
+    when (declaration) {
+        is ResolvedProtobufMessage -> renderDeclaration(declaration)
+        is ResolvedProtobufEnum -> renderDeclaration(declaration)
+    }

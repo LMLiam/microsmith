@@ -5,8 +5,7 @@ import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 /**
  * Marker interface for the `schemas { ... }` DSL block.
  *
- * This scope is intentionally empty: dialect modules contribute
- * extension functions on [SchemasScope], such as `protobuf { ... }`.
+ * This scope is intentionally empty: dialect modules contribute extension functions on [SchemasScope], such as
+ * `protobuf { ... }`.
  */
-@MicrosmithDsl
-interface SchemasScope
+@MicrosmithDsl interface SchemasScope

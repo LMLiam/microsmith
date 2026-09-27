@@ -84,12 +84,13 @@ internal open class DotnetAspRequestFieldSetBuilder(private val fieldContainerLa
         name: String,
         type: DotnetFieldType,
         options: DotnetAspRequestFieldOptions,
-    ): DotnetAspRequestField = DotnetAspRequestField(
-        name = name,
-        type = type,
-        optional = options.optional,
-        defaultValue = requireCompatibleDotnetAspDefaultValue(type, options.defaultValue),
-    )
+    ): DotnetAspRequestField =
+        DotnetAspRequestField(
+            name = name,
+            type = type,
+            optional = options.optional,
+            defaultValue = requireCompatibleDotnetAspDefaultValue(type, options.defaultValue),
+        )
 
     protected open fun createReference(name: String, target: String): DotnetAspRequestField =
         DotnetAspRequestField(name = name, type = DotnetFieldType.Reference(target))
@@ -104,10 +105,11 @@ internal open class DotnetAspRequestFieldSetBuilder(private val fieldContainerLa
         return register(createField(fieldName, type, options))
     }
 
-    private fun registerReference(name: String, target: String): DotnetAspRequestField = throw IllegalArgumentException(
-        "ASP.NET request bindings cannot declare reference field '$name' to '$target'. " +
-            "Declare scalar transport fields instead.",
-    )
+    private fun registerReference(name: String, target: String): DotnetAspRequestField =
+        throw IllegalArgumentException(
+            "ASP.NET request bindings cannot declare reference field '$name' to '$target'. " +
+                "Declare scalar transport fields instead."
+        )
 
     private fun register(field: DotnetAspRequestField): DotnetAspRequestField {
         require(field.name !in fieldsByName) {

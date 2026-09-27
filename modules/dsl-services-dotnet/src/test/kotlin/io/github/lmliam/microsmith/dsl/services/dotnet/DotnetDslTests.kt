@@ -20,15 +20,13 @@ private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
 
 private data class TestSolutionExtension(val values: List<String>) :
-    MicrosmithExtension,
-    MergeableExtension<TestSolutionExtension> {
+    MicrosmithExtension, MergeableExtension<TestSolutionExtension> {
     override fun merge(other: TestSolutionExtension) = TestSolutionExtension(values + other.values)
 }
 
 private fun DotnetSolutionScope.marker(value: String) {
     val context =
-        this as? DotnetSolutionContext
-            ?: error("marker { ... } can only be invoked within a .NET solution block.")
+        this as? DotnetSolutionContext ?: error("marker { ... } can only be invoked within a .NET solution block.")
     context.put(TestSolutionExtension::class, TestSolutionExtension(listOf(value)))
 }
 
@@ -37,19 +35,9 @@ class DotnetDslTests :
         "services-level dotnet blocks merge into defaults extension" {
             val builder = MicrosmithBuilder()
 
-            builder.services {
-                dotnet {
-                    target(NET8)
-                }
-            }
+            builder.services { dotnet { target(NET8) } }
 
-            builder.services {
-                dotnet {
-                    solutions {
-                        "Platform" {}
-                    }
-                }
-            }
+            builder.services { dotnet { solutions { "Platform" {} } } }
 
             val extension = builder.requireServicesExtension()
             val defaults = requireNotNull(extension.get<DotnetDefaultsExtension>())
@@ -78,25 +66,9 @@ class DotnetDslTests :
         "services-level dotnet blocks merge matching solution declarations by name" {
             val builder = MicrosmithBuilder()
 
-            builder.services {
-                dotnet {
-                    solutions {
-                        "Platform" {
-                            marker("left")
-                        }
-                    }
-                }
-            }
+            builder.services { dotnet { solutions { "Platform" { marker("left") } } } }
 
-            builder.services {
-                dotnet {
-                    solutions {
-                        "Platform" {
-                            marker("right")
-                        }
-                    }
-                }
-            }
+            builder.services { dotnet { solutions { "Platform" { marker("right") } } } }
 
             val extension = builder.requireServicesExtension()
             val solution = requireNotNull(extension.get<DotnetDefaultsExtension>()).requireSolution("Platform")
@@ -109,9 +81,7 @@ class DotnetDslTests :
 
             builder.services {
                 "UserService" {
-                    dotnet {
-                        target(NET9)
-                    }
+                    dotnet { target(NET9) }
 
                     dotnet {
                         solution("Platform")
@@ -138,10 +108,11 @@ class DotnetDslTests :
             dotnet.models.keys.toList() shouldContainExactly listOf("User")
             val userModel = requireNotNull(dotnet.models["User"])
             userModel.fields.map(DotnetField::name) shouldContainExactly listOf("id", "age", "manager", "owner")
-            userModel.fields.drop(2).map(DotnetField::type) shouldContainExactly listOf(
-                DotnetFieldType.Reference("User"),
-                DotnetFieldType.Reference("User"),
-            )
+            userModel.fields.drop(2).map(DotnetField::type) shouldContainExactly
+                listOf(
+                    DotnetFieldType.Reference("User"),
+                    DotnetFieldType.Reference("User"),
+                )
         }
 
         "dotnet models support both string-invoke and model helpers" {
@@ -152,13 +123,9 @@ class DotnetDslTests :
                     dotnet {
                         project("UserService.Api")
                         models {
-                            "User" {
-                                string("id")
-                            }
+                            "User" { string("id") }
 
-                            model("Address") {
-                                string("line1")
-                            }
+                            model("Address") { string("line1") }
                         }
                     }
                 }
@@ -222,65 +189,56 @@ class DotnetDslTests :
                     .let { requireNotNull(it.get<DotnetServiceExtension>()) }
                     .requireModel("Example")
 
-            exampleModel.fields.map(DotnetField::type) shouldContainExactly listOf(
-                DotnetFieldType.String,
-                DotnetFieldType.Char,
-                DotnetFieldType.Byte,
-                DotnetFieldType.SignedByte,
-                DotnetFieldType.Short,
-                DotnetFieldType.UnsignedShort,
-                DotnetFieldType.Int,
-                DotnetFieldType.UnsignedInt,
-                DotnetFieldType.Long,
-                DotnetFieldType.UnsignedLong,
-                DotnetFieldType.NativeInt,
-                DotnetFieldType.UnsignedNativeInt,
-                DotnetFieldType.Float,
-                DotnetFieldType.Double,
-                DotnetFieldType.Decimal,
-                DotnetFieldType.Bool,
-                DotnetFieldType.Guid,
-                DotnetFieldType.DateOnly,
-                DotnetFieldType.TimeOnly,
-                DotnetFieldType.DateTime,
-                DotnetFieldType.DateTimeOffset,
-                DotnetFieldType.TimeSpan,
-            )
+            exampleModel.fields.map(DotnetField::type) shouldContainExactly
+                listOf(
+                    DotnetFieldType.String,
+                    DotnetFieldType.Char,
+                    DotnetFieldType.Byte,
+                    DotnetFieldType.SignedByte,
+                    DotnetFieldType.Short,
+                    DotnetFieldType.UnsignedShort,
+                    DotnetFieldType.Int,
+                    DotnetFieldType.UnsignedInt,
+                    DotnetFieldType.Long,
+                    DotnetFieldType.UnsignedLong,
+                    DotnetFieldType.NativeInt,
+                    DotnetFieldType.UnsignedNativeInt,
+                    DotnetFieldType.Float,
+                    DotnetFieldType.Double,
+                    DotnetFieldType.Decimal,
+                    DotnetFieldType.Bool,
+                    DotnetFieldType.Guid,
+                    DotnetFieldType.DateOnly,
+                    DotnetFieldType.TimeOnly,
+                    DotnetFieldType.DateTime,
+                    DotnetFieldType.DateTimeOffset,
+                    DotnetFieldType.TimeSpan,
+                )
         }
 
         "dotnet validators accept unicode and verbatim identifiers" {
             val builder = MicrosmithBuilder()
 
             builder.services {
-                dotnet {
-                    solutions {
-                        "Acme.Δelta" {}
-                    }
-                }
+                dotnet { solutions { "Acme.Δelta" {} } }
 
                 "UserService" {
                     dotnet {
                         solution("Acme.Δelta")
                         project("Acme.@class")
                         models {
-                            "@class" {
-                                string("Δelta")
-                            }
+                            "@class" { string("Δelta") }
 
-                            "Owner" {
-                                "Δelta" ref "@class"
-                            }
+                            "Owner" { "Δelta" ref "@class" }
                         }
                     }
                 }
             }
 
             val dotnet =
-                builder
-                    .requireServicesExtension()
-                    .require("UserService")
-                    .model
-                    .let { requireNotNull(it.get<DotnetServiceExtension>()) }
+                builder.requireServicesExtension().require("UserService").model.let {
+                    requireNotNull(it.get<DotnetServiceExtension>())
+                }
 
             dotnet.solution shouldBe "Acme.Δelta"
             dotnet.project shouldBe "Acme.@class"
@@ -296,20 +254,10 @@ class DotnetDslTests :
                     "UserService" {
                         dotnet {
                             project("UserService.Api")
-                            models {
-                                "User" {
-                                    string("id")
-                                }
-                            }
+                            models { "User" { string("id") } }
                         }
 
-                        dotnet {
-                            models {
-                                "User" {
-                                    string("name")
-                                }
-                            }
-                        }
+                        dotnet { models { "User" { string("name") } } }
                     }
                 }
             }
@@ -319,12 +267,8 @@ class DotnetDslTests :
             DotnetTarget.of("net10.0") shouldBe DotnetTarget.NET10
             DotnetTarget.of("net5.0") shouldBe DotnetTarget.NET5
 
-            shouldThrow<IllegalArgumentException> {
-                DotnetTarget.of("netstandard2.1")
-            }
+            shouldThrow<IllegalArgumentException> { DotnetTarget.of("netstandard2.1") }
 
-            shouldThrow<IllegalArgumentException> {
-                DotnetTarget.of("netcoreapp3.1")
-            }
+            shouldThrow<IllegalArgumentException> { DotnetTarget.of("netcoreapp3.1") }
         }
     })

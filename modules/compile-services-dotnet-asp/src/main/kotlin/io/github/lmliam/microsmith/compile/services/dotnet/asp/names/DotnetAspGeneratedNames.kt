@@ -41,59 +41,54 @@ internal fun resultBaseTypeName(endpoint: DotnetAspEndpointArtifact): String = "
 internal fun resultVariantTypeName(endpoint: DotnetAspEndpointArtifact, response: DotnetAspResponseArtifact): String =
     endpoint.operationName + dotnetAspStatusName(response.statusCode)
 
-internal fun dotnetAspPascalIdentifier(identifier: String): String = when {
-    identifier.startsWith("@") && identifier.length > 1 ->
-        "@${identifier.substring(1).replaceFirstChar { firstChar ->
+internal fun dotnetAspPascalIdentifier(identifier: String): String =
+    when {
+        identifier.startsWith("@") && identifier.length > 1 ->
+            "@${identifier.substring(1).replaceFirstChar { firstChar ->
             firstChar.titlecase(Locale.ROOT)
         }}"
 
-    else ->
-        identifier.replaceFirstChar { firstChar ->
-            firstChar.titlecase(Locale.ROOT)
-        }
-}
-
-internal fun dotnetAspTypeName(raw: String): String = raw
-    .split('.', '-', '_', ' ')
-    .filter(String::isNotBlank)
-    .joinToString("") { segment ->
-        segment
-            .removePrefix("@")
-            .replaceFirstChar { firstChar -> firstChar.titlecase(Locale.ROOT) }
-    }.ifBlank {
-        error("Unable to derive a generated ASP.NET type name from '$raw'.")
+        else -> identifier.replaceFirstChar { firstChar -> firstChar.titlecase(Locale.ROOT) }
     }
 
-internal fun dotnetAspHeaderPropertyName(headerName: String): String = headerName
-    .trim()
-    .split(HEADER_PROPERTY_DELIMITER_PATTERN)
-    .filter(String::isNotBlank)
-    .joinToString("") { segment ->
-        segment.lowercase(Locale.ROOT).replaceFirstChar { firstChar ->
-            firstChar.titlecase(Locale.ROOT)
+internal fun dotnetAspTypeName(raw: String): String =
+    raw.split('.', '-', '_', ' ')
+        .filter(String::isNotBlank)
+        .joinToString("") { segment ->
+            segment.removePrefix("@").replaceFirstChar { firstChar -> firstChar.titlecase(Locale.ROOT) }
         }
-    }.let { identifier ->
-        if (identifier.firstOrNull()?.isDigit() == true) {
-            "Header$identifier"
-        } else {
-            identifier
+        .ifBlank { error("Unable to derive a generated ASP.NET type name from '$raw'.") }
+
+internal fun dotnetAspHeaderPropertyName(headerName: String): String =
+    headerName
+        .trim()
+        .split(HEADER_PROPERTY_DELIMITER_PATTERN)
+        .filter(String::isNotBlank)
+        .joinToString("") { segment ->
+            segment.lowercase(Locale.ROOT).replaceFirstChar { firstChar -> firstChar.titlecase(Locale.ROOT) }
         }
-    }.ifBlank {
-        error("Unable to derive an ASP.NET response header property name from '$headerName'.")
-    }
+        .let { identifier ->
+            if (identifier.firstOrNull()?.isDigit() == true) {
+                "Header$identifier"
+            } else {
+                identifier
+            }
+        }
+        .ifBlank { error("Unable to derive an ASP.NET response header property name from '$headerName'.") }
 
 internal fun dotnetAspStatusName(statusCode: Int): String = COMMON_STATUS_NAMES[statusCode] ?: "Status$statusCode"
 
 private val HEADER_PROPERTY_DELIMITER_PATTERN = Regex("[^A-Za-z0-9]+")
-private val COMMON_STATUS_NAMES = mapOf(
-    HTTP_OK_STATUS_CODE to "Ok",
-    HTTP_CREATED_STATUS_CODE to "Created",
-    HTTP_ACCEPTED_STATUS_CODE to "Accepted",
-    HTTP_NO_CONTENT_STATUS_CODE to "NoContent",
-    HTTP_BAD_REQUEST_STATUS_CODE to "BadRequest",
-    HTTP_UNAUTHORIZED_STATUS_CODE to "Unauthorized",
-    HTTP_FORBIDDEN_STATUS_CODE to "Forbidden",
-    HTTP_NOT_FOUND_STATUS_CODE to "NotFound",
-    HTTP_CONFLICT_STATUS_CODE to "Conflict",
-    HTTP_INTERNAL_SERVER_ERROR_STATUS_CODE to "InternalServerError",
-)
+private val COMMON_STATUS_NAMES =
+    mapOf(
+        HTTP_OK_STATUS_CODE to "Ok",
+        HTTP_CREATED_STATUS_CODE to "Created",
+        HTTP_ACCEPTED_STATUS_CODE to "Accepted",
+        HTTP_NO_CONTENT_STATUS_CODE to "NoContent",
+        HTTP_BAD_REQUEST_STATUS_CODE to "BadRequest",
+        HTTP_UNAUTHORIZED_STATUS_CODE to "Unauthorized",
+        HTTP_FORBIDDEN_STATUS_CODE to "Forbidden",
+        HTTP_NOT_FOUND_STATUS_CODE to "NotFound",
+        HTTP_CONFLICT_STATUS_CODE to "Conflict",
+        HTTP_INTERNAL_SERVER_ERROR_STATUS_CODE to "InternalServerError",
+    )

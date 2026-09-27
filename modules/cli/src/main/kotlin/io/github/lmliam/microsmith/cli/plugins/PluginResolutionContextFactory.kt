@@ -49,11 +49,11 @@ internal class PluginResolutionContextFactory(
             checksumAllowlist = checksumAllowlist,
             cacheDirectory = cacheDirectory,
             repositories =
-            repositoryResolver.resolve(
-                command = command,
-                settings = settings,
-                requiresRemoteRepositories = coordinates.isNotEmpty(),
-            ),
+                repositoryResolver.resolve(
+                    command = command,
+                    settings = settings,
+                    requiresRemoteRepositories = coordinates.isNotEmpty(),
+                ),
         )
     }
 

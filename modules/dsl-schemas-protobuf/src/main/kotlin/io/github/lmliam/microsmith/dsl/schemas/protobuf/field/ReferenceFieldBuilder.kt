@@ -9,16 +9,12 @@ internal class ReferenceFieldBuilder(var index: Int? = null, var cardinality: Ca
     }
 
     override fun optional() {
-        require(cardinality == Cardinality.SINGULAR) {
-            "Cardinality is already set to $cardinality"
-        }
+        require(cardinality == Cardinality.SINGULAR) { "Cardinality is already set to $cardinality" }
         this.cardinality = Cardinality.OPTIONAL
     }
 
     override fun repeated() {
-        require(cardinality == Cardinality.SINGULAR) {
-            "Cardinality is already set to $cardinality"
-        }
+        require(cardinality == Cardinality.SINGULAR) { "Cardinality is already set to $cardinality" }
         this.cardinality = Cardinality.REPEATED
     }
 }

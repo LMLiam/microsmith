@@ -20,11 +20,12 @@ internal class DotnetAspEndpointResolver {
         models: Map<String, DotnetModel>,
     ): EitherNel<DotnetAspResolutionIssue, ResolvedDotnetAspEndpoint> {
         val context = DotnetAspOperationContext(serviceName, endpoint.operationName)
-        return routeResolver.parseDeclaredRoute(
-            route = endpoint.path,
-            kind = DotnetAspResolutionIssue.RouteDeclarationKind.ENDPOINT,
-            allowEmpty = true,
-        )
+        return routeResolver
+            .parseDeclaredRoute(
+                route = endpoint.path,
+                kind = DotnetAspResolutionIssue.RouteDeclarationKind.ENDPOINT,
+                allowEmpty = true,
+            )
             .flatMap { endpointRoute -> routeResolver.resolve(context, fragment = parentRoute + endpointRoute) }
             .flatMap { route -> contentResolver.resolve(context, endpoint, route, models) }
     }

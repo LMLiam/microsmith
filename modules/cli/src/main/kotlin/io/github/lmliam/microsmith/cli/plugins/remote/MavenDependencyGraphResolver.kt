@@ -13,7 +13,7 @@ import org.eclipse.aether.util.artifact.JavaScopes
 import org.eclipse.aether.util.filter.DependencyFilterUtils
 
 internal class MavenDependencyGraphResolver(
-    private val diagnostics: PluginDependencyResolutionDiagnostics = PluginDependencyResolutionDiagnostics(),
+    private val diagnostics: PluginDependencyResolutionDiagnostics = PluginDependencyResolutionDiagnostics()
 ) {
     fun resolve(
         repositorySystem: RepositorySystem,

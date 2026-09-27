@@ -5,11 +5,11 @@ import io.github.lmliam.microsmith.maven.execution.MicrosmithMavenExecutionConfi
 import io.github.lmliam.microsmith.maven.execution.MicrosmithMavenExecutionRequestFactory
 import io.github.lmliam.microsmith.maven.execution.MicrosmithMavenResultHandler
 import io.github.lmliam.microsmith.maven.execution.MicrosmithScriptHostRunner
+import java.io.File
+import java.util.Properties
 import org.apache.maven.plugin.AbstractMojo
 import org.apache.maven.plugin.MojoExecutionException
 import org.apache.maven.plugin.MojoFailureException
-import java.io.File
-import java.util.Properties
 
 class MicrosmithGenerateMojo : AbstractMojo() {
     var projectBaseDirectory: File = File(".")
@@ -34,7 +34,7 @@ class MicrosmithGenerateMojo : AbstractMojo() {
                         cacheDirectory = cacheDirectory.toPath(),
                         variables = variables,
                         flags = flags,
-                    ),
+                    )
                 )
             val result = scriptHostRunner.run(request.cacheDirectory, request.scriptRunRequest)
             resultHandler.handle(log, request.outputDirectory, result)
@@ -51,12 +51,13 @@ class MicrosmithGenerateMojo : AbstractMojo() {
         }
     }
 
-    private fun Exception.toMojoException(): Exception = when (this) {
-        is MojoFailureException -> this
-        is MojoExecutionException -> this
-        is RuntimeException -> unexpectedExecutionFailure(this)
-        else -> this
-    }
+    private fun Exception.toMojoException(): Exception =
+        when (this) {
+            is MojoFailureException -> this
+            is MojoExecutionException -> this
+            is RuntimeException -> unexpectedExecutionFailure(this)
+            else -> this
+        }
 
     private fun unexpectedExecutionFailure(error: RuntimeException): MojoExecutionException =
         MojoExecutionException("Microsmith Maven plugin failed before generation completed.", error)

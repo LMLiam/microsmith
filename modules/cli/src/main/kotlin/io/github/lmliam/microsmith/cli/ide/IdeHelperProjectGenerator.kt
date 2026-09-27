@@ -12,12 +12,8 @@ internal class IdeHelperProjectGenerator(
 ) {
     fun run(): IdeHelperRefreshResult {
         val projectRoot = command.projectRoot.toAbsolutePath().normalize()
-        require(Files.exists(projectRoot)) {
-            "Repository root '$projectRoot' does not exist."
-        }
-        require(Files.isDirectory(projectRoot)) {
-            "Repository root '$projectRoot' is not a directory."
-        }
+        require(Files.exists(projectRoot)) { "Repository root '$projectRoot' does not exist." }
+        require(Files.isDirectory(projectRoot)) { "Repository root '$projectRoot' is not a directory." }
 
         val helperRoot = projectRoot.resolve(IDE_HELPER_DIRECTORY).toAbsolutePath().normalize()
         val classpathEntries =
@@ -34,14 +30,14 @@ internal class IdeHelperProjectGenerator(
         fileWriter.ensureManagedDirectory(projectRoot.resolve(".microsmith").toAbsolutePath().normalize())
         fileWriter.ensureManagedDirectory(helperRoot)
 
-        val updatedFiles =
-            buildList {
-                IdeHelperManagedSurface.renderedFiles(helperRoot, classpathEntries).forEach { (path, content) ->
-                    if (fileWriter.writeFileIfChanged(path, content)) {
-                        add(path)
-                    }
+        val updatedFiles = buildList {
+            IdeHelperManagedSurface.renderedFiles(helperRoot, classpathEntries).forEach { (path, content) ->
+                if (fileWriter.writeFileIfChanged(path, content)) {
+                    add(path)
                 }
-            }.sortedBy(Path::toString)
+            }
+        }
+            .sortedBy(Path::toString)
 
         return IdeHelperRefreshResult(
             projectRoot = projectRoot,
@@ -58,15 +54,11 @@ internal fun refreshIdeHelperProject(
 ): IdeHelperRefreshResult = IdeHelperProjectGenerator(command = command, classpathResolver = classpathResolver).run()
 
 internal fun resolveIdeHelperClasspathEntries(
-    javaClasspath: String = System.getProperty("java.class.path").orEmpty(),
+    javaClasspath: String = System.getProperty("java.class.path").orEmpty()
 ): List<Path> {
     if (javaClasspath.isBlank()) {
         return emptyList()
     }
 
-    return javaClasspath
-        .split(File.pathSeparator)
-        .map(String::trim)
-        .filter(String::isNotEmpty)
-        .map(Path::of)
+    return javaClasspath.split(File.pathSeparator).map(String::trim).filter(String::isNotEmpty).map(Path::of)
 }

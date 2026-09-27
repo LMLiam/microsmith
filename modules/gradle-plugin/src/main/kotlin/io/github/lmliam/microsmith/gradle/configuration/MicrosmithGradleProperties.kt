@@ -14,9 +14,7 @@ internal fun Properties.readPairs(countKey: String, keyPrefix: String, valuePref
     }
 
 internal fun Properties.readValues(countKey: String, valuePrefix: String): List<String> =
-    List(requiredInt(countKey)) { index ->
-        getProperty("$valuePrefix$index") ?: missingProperty("$valuePrefix$index")
-    }
+    List(requiredInt(countKey)) { index -> getProperty("$valuePrefix$index") ?: missingProperty("$valuePrefix$index") }
 
 internal fun Properties.requiredBoolean(key: String): Boolean {
     val value = getProperty(key) ?: missingProperty(key)

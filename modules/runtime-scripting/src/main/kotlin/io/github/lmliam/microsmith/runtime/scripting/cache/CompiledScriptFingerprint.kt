@@ -34,6 +34,4 @@ private fun MessageDigest.addChunk(chunk: String) {
     update(chunkBytes)
 }
 
-private fun Int.toByteArray() = ByteBuffer.allocate(Int.SIZE_BYTES)
-    .also { it.putInt(this) }
-    .array()
+private fun Int.toByteArray() = ByteBuffer.allocate(Int.SIZE_BYTES).also { it.putInt(this) }.array()

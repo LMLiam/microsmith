@@ -10,69 +10,58 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 sealed interface DotnetAspDefaultValue {
-    @JvmInline
-    value class StringValue(val value: String) : DotnetAspDefaultValue
+    @JvmInline value class StringValue(val value: String) : DotnetAspDefaultValue
 
-    @JvmInline
-    value class CharValue(val value: Char) : DotnetAspDefaultValue
+    @JvmInline value class CharValue(val value: Char) : DotnetAspDefaultValue
 
-    @JvmInline
-    value class NumericValue(val value: Number) : DotnetAspDefaultValue
+    @JvmInline value class NumericValue(val value: Number) : DotnetAspDefaultValue
 
-    @JvmInline
-    value class BooleanValue(val value: Boolean) : DotnetAspDefaultValue
+    @JvmInline value class BooleanValue(val value: Boolean) : DotnetAspDefaultValue
 
-    @JvmInline
-    value class UuidValue(val value: UUID) : DotnetAspDefaultValue
+    @JvmInline value class UuidValue(val value: UUID) : DotnetAspDefaultValue
 
-    @JvmInline
-    value class LocalDateValue(val value: LocalDate) : DotnetAspDefaultValue
+    @JvmInline value class LocalDateValue(val value: LocalDate) : DotnetAspDefaultValue
 
-    @JvmInline
-    value class LocalTimeValue(val value: LocalTime) : DotnetAspDefaultValue
+    @JvmInline value class LocalTimeValue(val value: LocalTime) : DotnetAspDefaultValue
 
-    @JvmInline
-    value class LocalDateTimeValue(val value: LocalDateTime) : DotnetAspDefaultValue
+    @JvmInline value class LocalDateTimeValue(val value: LocalDateTime) : DotnetAspDefaultValue
 
-    @JvmInline
-    value class InstantValue(val value: Instant) : DotnetAspDefaultValue
+    @JvmInline value class InstantValue(val value: Instant) : DotnetAspDefaultValue
 
-    @JvmInline
-    value class OffsetDateTimeValue(val value: OffsetDateTime) : DotnetAspDefaultValue
+    @JvmInline value class OffsetDateTimeValue(val value: OffsetDateTime) : DotnetAspDefaultValue
 
-    @JvmInline
-    value class DurationValue(val value: Duration) : DotnetAspDefaultValue
+    @JvmInline value class DurationValue(val value: Duration) : DotnetAspDefaultValue
 }
 
-internal fun dotnetAspDefaultValue(value: Any): DotnetAspDefaultValue = when (value) {
-    is String -> DotnetAspDefaultValue.StringValue(value)
+internal fun dotnetAspDefaultValue(value: Any): DotnetAspDefaultValue =
+    when (value) {
+        is String -> DotnetAspDefaultValue.StringValue(value)
 
-    is Char -> DotnetAspDefaultValue.CharValue(value)
+        is Char -> DotnetAspDefaultValue.CharValue(value)
 
-    is Number -> DotnetAspDefaultValue.NumericValue(value)
+        is Number -> DotnetAspDefaultValue.NumericValue(value)
 
-    is Boolean -> DotnetAspDefaultValue.BooleanValue(value)
+        is Boolean -> DotnetAspDefaultValue.BooleanValue(value)
 
-    is UUID -> DotnetAspDefaultValue.UuidValue(value)
+        is UUID -> DotnetAspDefaultValue.UuidValue(value)
 
-    is LocalDate -> DotnetAspDefaultValue.LocalDateValue(value)
+        is LocalDate -> DotnetAspDefaultValue.LocalDateValue(value)
 
-    is LocalTime -> DotnetAspDefaultValue.LocalTimeValue(value)
+        is LocalTime -> DotnetAspDefaultValue.LocalTimeValue(value)
 
-    is LocalDateTime -> DotnetAspDefaultValue.LocalDateTimeValue(value)
+        is LocalDateTime -> DotnetAspDefaultValue.LocalDateTimeValue(value)
 
-    is Instant -> DotnetAspDefaultValue.InstantValue(value)
+        is Instant -> DotnetAspDefaultValue.InstantValue(value)
 
-    is OffsetDateTime -> DotnetAspDefaultValue.OffsetDateTimeValue(value)
+        is OffsetDateTime -> DotnetAspDefaultValue.OffsetDateTimeValue(value)
 
-    is Duration -> DotnetAspDefaultValue.DurationValue(value)
+        is Duration -> DotnetAspDefaultValue.DurationValue(value)
 
-    else ->
-        error(
-            "Unsupported ASP.NET request default value type " +
-                "'${value::class.qualifiedName ?: value::class}'.",
-        )
-}
+        else ->
+            error(
+                "Unsupported ASP.NET request default value type " + "'${value::class.qualifiedName ?: value::class}'."
+            )
+    }
 
 internal fun requireCompatibleDotnetAspDefaultValue(
     type: DotnetFieldType,
@@ -107,34 +96,33 @@ internal fun requireCompatibleDotnetAspDefaultValue(
     return defaultValue
 }
 
-private fun DotnetFieldType.isNumeric(): Boolean = when (this) {
-    DotnetFieldType.Byte,
-    DotnetFieldType.SignedByte,
-    DotnetFieldType.Short,
-    DotnetFieldType.UnsignedShort,
-    DotnetFieldType.Int,
-    DotnetFieldType.UnsignedInt,
-    DotnetFieldType.Long,
-    DotnetFieldType.UnsignedLong,
-    DotnetFieldType.NativeInt,
-    DotnetFieldType.UnsignedNativeInt,
-    DotnetFieldType.Float,
-    DotnetFieldType.Double,
-    DotnetFieldType.Decimal,
-    -> true
+private fun DotnetFieldType.isNumeric(): Boolean =
+    when (this) {
+        DotnetFieldType.Byte,
+        DotnetFieldType.SignedByte,
+        DotnetFieldType.Short,
+        DotnetFieldType.UnsignedShort,
+        DotnetFieldType.Int,
+        DotnetFieldType.UnsignedInt,
+        DotnetFieldType.Long,
+        DotnetFieldType.UnsignedLong,
+        DotnetFieldType.NativeInt,
+        DotnetFieldType.UnsignedNativeInt,
+        DotnetFieldType.Float,
+        DotnetFieldType.Double,
+        DotnetFieldType.Decimal -> true
 
-    DotnetFieldType.String,
-    DotnetFieldType.Char,
-    DotnetFieldType.Bool,
-    DotnetFieldType.Guid,
-    DotnetFieldType.DateOnly,
-    DotnetFieldType.TimeOnly,
-    DotnetFieldType.DateTime,
-    DotnetFieldType.DateTimeOffset,
-    DotnetFieldType.TimeSpan,
-    is DotnetFieldType.Reference,
-    -> false
-}
+        DotnetFieldType.String,
+        DotnetFieldType.Char,
+        DotnetFieldType.Bool,
+        DotnetFieldType.Guid,
+        DotnetFieldType.DateOnly,
+        DotnetFieldType.TimeOnly,
+        DotnetFieldType.DateTime,
+        DotnetFieldType.DateTimeOffset,
+        DotnetFieldType.TimeSpan,
+        is DotnetFieldType.Reference -> false
+    }
 
 private fun DotnetAspDefaultValue.isGuidCompatible(): Boolean =
     this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.UuidValue
@@ -145,13 +133,15 @@ private fun DotnetAspDefaultValue.isDateOnlyCompatible(): Boolean =
 private fun DotnetAspDefaultValue.isTimeOnlyCompatible(): Boolean =
     this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.LocalTimeValue
 
-private fun DotnetAspDefaultValue.isDateTimeCompatible(): Boolean = this is DotnetAspDefaultValue.StringValue ||
-    this is DotnetAspDefaultValue.LocalDateTimeValue ||
-    this is DotnetAspDefaultValue.InstantValue
+private fun DotnetAspDefaultValue.isDateTimeCompatible(): Boolean =
+    this is DotnetAspDefaultValue.StringValue ||
+        this is DotnetAspDefaultValue.LocalDateTimeValue ||
+        this is DotnetAspDefaultValue.InstantValue
 
-private fun DotnetAspDefaultValue.isDateTimeOffsetCompatible(): Boolean = this is DotnetAspDefaultValue.StringValue ||
-    this is DotnetAspDefaultValue.OffsetDateTimeValue ||
-    this is DotnetAspDefaultValue.InstantValue
+private fun DotnetAspDefaultValue.isDateTimeOffsetCompatible(): Boolean =
+    this is DotnetAspDefaultValue.StringValue ||
+        this is DotnetAspDefaultValue.OffsetDateTimeValue ||
+        this is DotnetAspDefaultValue.InstantValue
 
 private fun DotnetAspDefaultValue.isTimeSpanCompatible(): Boolean =
     this is DotnetAspDefaultValue.StringValue || this is DotnetAspDefaultValue.DurationValue

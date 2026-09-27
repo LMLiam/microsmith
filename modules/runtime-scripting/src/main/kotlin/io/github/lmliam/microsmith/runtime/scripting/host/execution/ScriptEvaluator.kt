@@ -27,17 +27,11 @@ internal object ScriptEvaluator {
         val compilationConfiguration =
             ScriptCompilationConfiguration(MicrosmithScriptCompilationConfiguration) {
                 hostConfiguration.update { runtimeHostConfiguration }
-                jvm {
-                    updateClasspath(pluginClasspath.map(Path::toFile))
-                }
+                jvm { updateClasspath(pluginClasspath.map(Path::toFile)) }
             }
         val evaluationConfiguration =
-            ScriptEvaluationConfiguration(
-                MicrosmithScriptEvaluationConfiguration,
-            ) {
-                hostConfiguration.update {
-                    runtimeHostConfiguration
-                }
+            ScriptEvaluationConfiguration(MicrosmithScriptEvaluationConfiguration) {
+                hostConfiguration.update { runtimeHostConfiguration }
 
                 implicitReceivers(scriptContext)
             }

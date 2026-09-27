@@ -82,26 +82,18 @@ internal class OneofBuilder(
         reference: Reference,
         block: OneofReferenceFieldScope.() -> Unit,
     ): OneofField {
-        require(name !in fields) {
-            "Duplicate field in oneof: $name"
-        }
+        require(name !in fields) { "Duplicate field in oneof: $name" }
 
         useName(name)
 
-        val index =
-            allocateIndex(
-                ReferenceFieldBuilder()
-                    .apply(block)
-                    .index,
-            )
+        val index = allocateIndex(ReferenceFieldBuilder().apply(block).index)
 
         return OneofField(
-            name,
-            index,
-            reference,
-        ).also { field ->
-            fields[name] = field
-        }
+                name,
+                index,
+                reference,
+            )
+            .also { field -> fields[name] = field }
     }
 
     private fun addField(name: String, type: PrimitiveType, block: OneofFieldScope.() -> Unit): OneofField {

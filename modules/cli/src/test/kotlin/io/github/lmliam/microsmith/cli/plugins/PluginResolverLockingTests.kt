@@ -31,16 +31,16 @@ class PluginResolverLockingTests :
                 val result =
                     resolvePlugins(
                         command =
-                        RunCommand(
-                            script = script,
-                            outputDir = output,
-                            pluginJars = setOf(relativizeFromWorkingDirectory(localJar)),
-                        ),
+                            RunCommand(
+                                script = script,
+                                outputDir = output,
+                                pluginJars = setOf(relativizeFromWorkingDirectory(localJar)),
+                            ),
                         settings =
-                        PluginResolverSettings(
-                            cacheDirectory = cache,
-                            lockfilePathOverride = lockfilePath,
-                        ),
+                            PluginResolverSettings(
+                                cacheDirectory = cache,
+                                lockfilePathOverride = lockfilePath,
+                            ),
                     )
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
@@ -68,23 +68,24 @@ class PluginResolverLockingTests :
                     """
                     version=1
                     remote|$coordinate|${sha256(rootJar)}
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val result =
                     resolvePlugins(
                         command =
-                        RunCommand(
-                            script = script,
-                            outputDir = tempDir.resolve("generated"),
-                            plugins = setOf(coordinate),
-                            repositoryOverride = repositoryRoot.toUri().toString(),
-                        ),
+                            RunCommand(
+                                script = script,
+                                outputDir = tempDir.resolve("generated"),
+                                plugins = setOf(coordinate),
+                                repositoryOverride = repositoryRoot.toUri().toString(),
+                            ),
                         settings =
-                        PluginResolverSettings(
-                            cacheDirectory = cache,
-                            repositoryPolicy = fileRepositoryAllowedPolicy(),
-                        ),
+                            PluginResolverSettings(
+                                cacheDirectory = cache,
+                                repositoryPolicy = fileRepositoryAllowedPolicy(),
+                            ),
                     )
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
@@ -210,8 +211,7 @@ class PluginResolverLockingTests :
                         repositoryPolicy = fileRepositoryAllowedPolicy(),
                     )
 
-                resolvePlugins(command = command, settings = settings)
-                    .shouldBeTypeOf<PluginResolutionResult.Success>()
+                resolvePlugins(command = command, settings = settings).shouldBeTypeOf<PluginResolutionResult.Success>()
 
                 val cachedTransitive =
                     cachePathFor(pluginArtifactCacheRoot(cache), parseCoordinate(transitiveCoordinate))
@@ -243,27 +243,24 @@ class PluginResolverLockingTests :
                 val rootJar = repositoryRoot.resolve(parseCoordinate(rootCoordinate).relativeJarPath)
                 val allowlist =
                     PluginChecksumAllowlist(
-                        entries =
-                        mapOf(
-                            LockKey(kind = REMOTE_KIND, key = rootCoordinate) to sha256(rootJar),
-                        ),
+                        entries = mapOf(LockKey(kind = REMOTE_KIND, key = rootCoordinate) to sha256(rootJar))
                     )
 
                 val result =
                     resolvePlugins(
                         command =
-                        RunCommand(
-                            script = script,
-                            outputDir = tempDir.resolve("generated"),
-                            plugins = setOf(rootCoordinate),
-                            repositoryOverride = repositoryRoot.toUri().toString(),
-                        ),
+                            RunCommand(
+                                script = script,
+                                outputDir = tempDir.resolve("generated"),
+                                plugins = setOf(rootCoordinate),
+                                repositoryOverride = repositoryRoot.toUri().toString(),
+                            ),
                         settings =
-                        PluginResolverSettings(
-                            cacheDirectory = cache,
-                            repositoryPolicy = fileRepositoryAllowedPolicy(),
-                            checksumAllowlist = allowlist,
-                        ),
+                            PluginResolverSettings(
+                                cacheDirectory = cache,
+                                repositoryPolicy = fileRepositoryAllowedPolicy(),
+                                checksumAllowlist = allowlist,
+                            ),
                     )
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()

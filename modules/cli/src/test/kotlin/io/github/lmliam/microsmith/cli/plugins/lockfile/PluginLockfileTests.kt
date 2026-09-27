@@ -23,56 +23,64 @@ class PluginLockfileTests :
 
                 writeLockfile(
                     lockfilePath = lockfilePath,
-                    lockfile = ParsedLockfile(
-                        version = LOCKFILE_VERSION,
-                        entries = listOf(
-                            LockEntry(
-                                kind = REMOTE_ARTIFACT_KIND,
-                                key = "b/path.jar",
-                                checksum = artifactChecksum,
-                            ),
-                            LockEntry(
-                                kind = LOCAL_KIND,
-                                key = "plugins/local.jar",
-                                checksum = localChecksum,
-                            ),
-                            LockEntry(
-                                kind = REMOTE_KIND,
-                                key = "com.acme:plugin:1.0.0",
-                                checksum = remoteChecksum,
-                            ),
+                    lockfile =
+                        ParsedLockfile(
+                            version = LOCKFILE_VERSION,
+                            entries =
+                                listOf(
+                                    LockEntry(
+                                        kind = REMOTE_ARTIFACT_KIND,
+                                        key = "b/path.jar",
+                                        checksum = artifactChecksum,
+                                    ),
+                                    LockEntry(
+                                        kind = LOCAL_KIND,
+                                        key = "plugins/local.jar",
+                                        checksum = localChecksum,
+                                    ),
+                                    LockEntry(
+                                        kind = REMOTE_KIND,
+                                        key = "com.acme:plugin:1.0.0",
+                                        checksum = remoteChecksum,
+                                    ),
+                                ),
                         ),
-                    ),
                 )
 
-                lockfilePath.readLines().shouldContainExactly(
-                    "version=2",
-                    "local|plugins/local.jar|$localChecksum",
-                    "remote|com.acme:plugin:1.0.0|$remoteChecksum",
-                    "remote-artifact|b/path.jar|$artifactChecksum",
-                )
-                readLockfile(lockfilePath)?.entries.shouldContainExactly(
-                    LockEntry(kind = LOCAL_KIND, key = "plugins/local.jar", checksum = localChecksum),
-                    LockEntry(kind = REMOTE_KIND, key = "com.acme:plugin:1.0.0", checksum = remoteChecksum),
-                    LockEntry(
-                        kind = REMOTE_ARTIFACT_KIND,
-                        key = "b/path.jar",
-                        checksum = artifactChecksum,
-                    ),
-                )
+                lockfilePath
+                    .readLines()
+                    .shouldContainExactly(
+                        "version=2",
+                        "local|plugins/local.jar|$localChecksum",
+                        "remote|com.acme:plugin:1.0.0|$remoteChecksum",
+                        "remote-artifact|b/path.jar|$artifactChecksum",
+                    )
+                readLockfile(lockfilePath)
+                    ?.entries
+                    .shouldContainExactly(
+                        LockEntry(kind = LOCAL_KIND, key = "plugins/local.jar", checksum = localChecksum),
+                        LockEntry(kind = REMOTE_KIND, key = "com.acme:plugin:1.0.0", checksum = remoteChecksum),
+                        LockEntry(
+                            kind = REMOTE_ARTIFACT_KIND,
+                            key = "b/path.jar",
+                            checksum = artifactChecksum,
+                        ),
+                    )
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
         }
 
         "assertSameRemoteArtifactSet reports both missing and extra graph entries" {
-            val lockfile = ParsedLockfile(
-                version = LOCKFILE_VERSION,
-                entries = listOf(
-                    LockEntry(kind = REMOTE_ARTIFACT_KIND, key = "a/path.jar", checksum = "a".repeat(64)),
-                    LockEntry(kind = REMOTE_ARTIFACT_KIND, key = "b/path.jar", checksum = "b".repeat(64)),
-                ),
-            )
+            val lockfile =
+                ParsedLockfile(
+                    version = LOCKFILE_VERSION,
+                    entries =
+                        listOf(
+                            LockEntry(kind = REMOTE_ARTIFACT_KIND, key = "a/path.jar", checksum = "a".repeat(64)),
+                            LockEntry(kind = REMOTE_ARTIFACT_KIND, key = "b/path.jar", checksum = "b".repeat(64)),
+                        ),
+                )
 
             val error =
                 shouldThrow<IllegalArgumentException> {

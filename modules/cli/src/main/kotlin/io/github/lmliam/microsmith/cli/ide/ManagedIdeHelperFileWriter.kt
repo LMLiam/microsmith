@@ -33,17 +33,18 @@ internal class ManagedIdeHelperFileWriter {
 
     private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
 
-    private fun managedFileContentMatches(path: Path, normalizedContent: String): Boolean = try {
-        if (!isManagedRegularFile(path)) {
+    private fun managedFileContentMatches(path: Path, normalizedContent: String): Boolean =
+        try {
+            if (!isManagedRegularFile(path)) {
+                false
+            } else {
+                Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n") == normalizedContent
+            }
+        } catch (_: IOException) {
             false
-        } else {
-            Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n") == normalizedContent
+        } catch (_: SecurityException) {
+            false
         }
-    } catch (_: IOException) {
-        false
-    } catch (_: SecurityException) {
-        false
-    }
 
     private fun isManagedDirectory(path: Path): Boolean = Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)
 

@@ -5,7 +5,5 @@ import io.kotest.matchers.shouldBe
 
 class CliProviderDiscoveryIntegrationTests :
     StringSpec({
-        "discovers built-in providers through ServiceLoader" {
-            verifyBuiltinProviders() shouldBe emptyList()
-        }
+        "discovers built-in providers through ServiceLoader" { verifyBuiltinProviders() shouldBe emptyList() }
     })

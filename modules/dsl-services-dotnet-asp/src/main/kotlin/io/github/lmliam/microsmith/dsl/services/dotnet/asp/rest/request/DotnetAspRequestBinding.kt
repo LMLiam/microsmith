@@ -4,9 +4,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnet
 
 data class DotnetAspRequestBinding(val name: String, val fields: List<DotnetAspRequestField>) {
     init {
-        require(fields.isNotEmpty()) {
-            "ASP.NET request binding '$name' must declare at least one field."
-        }
+        require(fields.isNotEmpty()) { "ASP.NET request binding '$name' must declare at least one field." }
         validateDotnetIdentifier(name, "ASP.NET request binding name")
     }
 }

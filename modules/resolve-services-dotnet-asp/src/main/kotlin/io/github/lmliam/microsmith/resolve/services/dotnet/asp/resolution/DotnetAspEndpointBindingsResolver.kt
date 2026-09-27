@@ -30,28 +30,33 @@ internal class DotnetAspEndpointBindingsResolver {
         var query: ResolvedDotnetAspRequestBinding? = null
         var body: ResolvedDotnetAspModel? = null
 
-        resolvePathBinding(context, route, endpoint.bindings.path).fold(
-            ifLeft = issues::addAll,
-            ifRight = { path = it },
-        )
+        resolvePathBinding(context, route, endpoint.bindings.path)
+            .fold(
+                ifLeft = issues::addAll,
+                ifRight = { path = it },
+            )
 
         endpoint.bindings.query?.let { binding ->
-            bindingResolver.resolveRequestBinding(context, binding).fold(
-                ifLeft = issues::addAll,
-                ifRight = { query = it },
-            )
+            bindingResolver
+                .resolveRequestBinding(context, binding)
+                .fold(
+                    ifLeft = issues::addAll,
+                    ifRight = { query = it },
+                )
         }
 
         endpoint.bindings.body?.let { reference ->
-            modelResolver.resolve(
-                context,
-                models,
-                reference,
-                DotnetAspBindingResolutionIssue.ModelReferenceSource.RequestBody,
-            ).fold(
-                ifLeft = issues::addAll,
-                ifRight = { body = it },
-            )
+            modelResolver
+                .resolve(
+                    context,
+                    models,
+                    reference,
+                    DotnetAspBindingResolutionIssue.ModelReferenceSource.RequestBody,
+                )
+                .fold(
+                    ifLeft = issues::addAll,
+                    ifRight = { body = it },
+                )
         }
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
@@ -64,7 +69,7 @@ internal class DotnetAspEndpointBindingsResolver {
                 query,
                 headers = endpoint.bindings.headers?.let(bindingResolver::resolveHeadersBinding),
                 body,
-            ),
+            )
         )
     }
 
@@ -84,8 +89,8 @@ internal class DotnetAspEndpointBindingsResolver {
                             context.operationName,
                             route.path,
                             route.placeholders,
-                        ),
-                    ),
+                        )
+                    )
                 )
             }
         }
@@ -98,8 +103,8 @@ internal class DotnetAspEndpointBindingsResolver {
                         context.operationName,
                         binding.name,
                         route.path,
-                    ),
-                ),
+                    )
+                )
             )
         }
 

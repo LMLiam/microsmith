@@ -9,13 +9,14 @@ fun csharpParameter(
     modifiers: List<CSharp.Modifier> = emptyList(),
     attributes: List<CSharp.Attribute> = emptyList(),
     defaultValue: String? = null,
-): CSharp.Parameter = CSharp.Parameter(
-    type = type,
-    name = name,
-    modifiers = modifiers,
-    attributes = attributes,
-    defaultValue = defaultValue,
-)
+): CSharp.Parameter =
+    CSharp.Parameter(
+        type = type,
+        name = name,
+        modifiers = modifiers,
+        attributes = attributes,
+        defaultValue = defaultValue,
+    )
 
 fun csharpParameter(
     type: DotnetCSharpTypeName,
@@ -23,13 +24,14 @@ fun csharpParameter(
     modifiers: List<CSharp.Modifier> = emptyList(),
     attributes: List<CSharp.Attribute> = emptyList(),
     defaultValue: String? = null,
-): CSharp.Parameter = csharpParameter(
-    type = csharpType(type),
-    name = name,
-    modifiers = modifiers,
-    attributes = attributes,
-    defaultValue = defaultValue,
-)
+): CSharp.Parameter =
+    csharpParameter(
+        type = csharpType(type),
+        name = name,
+        modifiers = modifiers,
+        attributes = attributes,
+        defaultValue = defaultValue,
+    )
 
 fun csharpParameter(
     type: String,
@@ -37,13 +39,14 @@ fun csharpParameter(
     modifiers: List<CSharp.Modifier> = emptyList(),
     attributes: List<CSharp.Attribute> = emptyList(),
     defaultValue: String? = null,
-): CSharp.Parameter = csharpParameter(
-    type = csharpType(type),
-    name = name,
-    modifiers = modifiers,
-    attributes = attributes,
-    defaultValue = defaultValue,
-)
+): CSharp.Parameter =
+    csharpParameter(
+        type = csharpType(type),
+        name = name,
+        modifiers = modifiers,
+        attributes = attributes,
+        defaultValue = defaultValue,
+    )
 
 fun csharpAutoProperty(
     type: CSharp.TypeRef,
@@ -52,14 +55,15 @@ fun csharpAutoProperty(
     attributes: List<CSharp.Attribute> = emptyList(),
     accessors: CSharp.PropertyAccessors = CSharp.PropertyAccessors.READ_WRITE,
     initializer: String? = null,
-): CSharp.Property = CSharp.Property(
-    type = type,
-    name = name,
-    modifiers = modifiers,
-    attributes = attributes,
-    accessors = accessors,
-    initializer = initializer,
-)
+): CSharp.Property =
+    CSharp.Property(
+        type = type,
+        name = name,
+        modifiers = modifiers,
+        attributes = attributes,
+        accessors = accessors,
+        initializer = initializer,
+    )
 
 fun csharpType(name: DotnetCSharpTypeName): CSharp.TypeRef = csharpType(name.value)
 
@@ -89,8 +93,9 @@ fun CSharpFileBuilder.using(namespace: DotnetCSharpNamespace) {
 fun extensionParameter(type: DotnetCSharpTypeName, name: String): CSharp.Parameter =
     extensionParameter(type.value, name)
 
-fun extensionParameter(type: String, name: String): CSharp.Parameter = csharpParameter(
-    type = type,
-    name = name,
-    modifiers = listOf(CSharp.Modifier.THIS),
-)
+fun extensionParameter(type: String, name: String): CSharp.Parameter =
+    csharpParameter(
+        type = type,
+        name = name,
+        modifiers = listOf(CSharp.Modifier.THIS),
+    )

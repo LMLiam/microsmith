@@ -7,17 +7,14 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnetIdentifier
 import kotlin.reflect.KClass
 
-/**
- * Per-service .NET configuration declared under `"ServiceName" { dotnet { ... } }`.
- */
+/** Per-service .NET configuration declared under `"ServiceName" { dotnet { ... } }`. */
 data class DotnetServiceExtension(
     val target: DotnetTarget? = null,
     val solution: String? = null,
     val project: String? = null,
     val models: Map<String, DotnetModel> = emptyMap(),
     val model: DotnetServiceModel = DotnetServiceModel.empty(),
-) : ServiceExtension,
-    MergeableExtension<DotnetServiceExtension> {
+) : ServiceExtension, MergeableExtension<DotnetServiceExtension> {
     fun findModel(name: String) = models[name]
 
     fun requireModel(name: String): DotnetModel {
@@ -27,14 +24,11 @@ data class DotnetServiceExtension(
 
     fun models() = models.values
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T : ServiceExtension> get(type: KClass<T>) = model.get(type) as? T?
+    @Suppress("UNCHECKED_CAST") fun <T : ServiceExtension> get(type: KClass<T>) = model.get(type) as? T?
 
     inline fun <reified T : ServiceExtension> get(): T? = get(T::class)
 
-    internal fun <T : ServiceExtension> with(type: KClass<T>, ext: T) = copy(
-        model = model.with(type, ext),
-    )
+    internal fun <T : ServiceExtension> with(type: KClass<T>, ext: T) = copy(model = model.with(type, ext))
 
     override fun merge(other: DotnetServiceExtension): DotnetServiceExtension {
         val collisions = other.models.keys.filter { it in models }.sorted()

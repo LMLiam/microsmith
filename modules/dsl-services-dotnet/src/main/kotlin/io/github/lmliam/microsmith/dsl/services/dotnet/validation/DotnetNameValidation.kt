@@ -3,9 +3,7 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.validation
 fun validateDotnetIdentifier(value: String, label: String): String {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }
-    require(isDotnetIdentifier(normalized)) {
-        "$label is not a valid .NET identifier: '$value'"
-    }
+    require(isDotnetIdentifier(normalized)) { "$label is not a valid .NET identifier: '$value'" }
 
     return normalized
 }
@@ -13,9 +11,7 @@ fun validateDotnetIdentifier(value: String, label: String): String {
 fun validateDotnetQualifiedIdentifier(value: String, label: String): String {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }
-    require(isDotnetQualifiedIdentifier(normalized)) {
-        "$label is not a valid .NET qualified identifier: '$value'"
-    }
+    require(isDotnetQualifiedIdentifier(normalized)) { "$label is not a valid .NET qualified identifier: '$value'" }
 
     return normalized
 }
@@ -47,18 +43,17 @@ private fun String.asCodePoints(): Sequence<Int> = sequence {
     }
 }
 
-private fun Int.isDotnetIdentifierStart(): Boolean = this == '_'.code ||
-    Character.isLetter(this) ||
-    Character.getType(this) == Character.LETTER_NUMBER.toInt()
+private fun Int.isDotnetIdentifierStart(): Boolean =
+    this == '_'.code || Character.isLetter(this) || Character.getType(this) == Character.LETTER_NUMBER.toInt()
 
-private fun Int.isDotnetIdentifierPart(): Boolean = isDotnetIdentifierStart() ||
-    when (Character.getType(this)) {
-        Character.NON_SPACING_MARK.toInt(),
-        Character.COMBINING_SPACING_MARK.toInt(),
-        Character.DECIMAL_DIGIT_NUMBER.toInt(),
-        Character.CONNECTOR_PUNCTUATION.toInt(),
-        Character.FORMAT.toInt(),
-        -> true
+private fun Int.isDotnetIdentifierPart(): Boolean =
+    isDotnetIdentifierStart() ||
+        when (Character.getType(this)) {
+            Character.NON_SPACING_MARK.toInt(),
+            Character.COMBINING_SPACING_MARK.toInt(),
+            Character.DECIMAL_DIGIT_NUMBER.toInt(),
+            Character.CONNECTOR_PUNCTUATION.toInt(),
+            Character.FORMAT.toInt() -> true
 
-        else -> false
-    }
+            else -> false
+        }

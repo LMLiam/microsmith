@@ -10,17 +10,18 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
             val mapper = ProtobufRpcResolutionDiagnosticMapper()
 
             listOf(
-                ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch(
-                    schemaName = "acme.user.v1.OtherService",
-                    declarationName = "UserService",
-                ),
-                ProtobufRpcResolutionIssue.EndpointMustTargetMessage(
-                    serviceName = "UserService",
-                    rpcName = "GetUser",
-                    position = ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
-                    targetName = "Status",
-                ),
-            ).map(mapper::map) shouldContainExactly
+                    ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch(
+                        schemaName = "acme.user.v1.OtherService",
+                        declarationName = "UserService",
+                    ),
+                    ProtobufRpcResolutionIssue.EndpointMustTargetMessage(
+                        serviceName = "UserService",
+                        rpcName = "GetUser",
+                        position = ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
+                        targetName = "Status",
+                    ),
+                )
+                .map(mapper::map) shouldContainExactly
                 listOf(
                     ResolutionDiagnostic(
                         code = "protobuf.rpc.schema-declaration-name-mismatch",

@@ -10,24 +10,19 @@ internal class DotnetAspResponseBuilder(private val modelName: String) : DotnetA
     private var headers: List<DotnetAspResponseHeader> = emptyList()
 
     override fun model(block: DotnetModelScope.() -> Unit) {
-        require(inlineModel == null) {
-            "ASP.NET response '$modelName' already declares an inline model."
-        }
+        require(inlineModel == null) { "ASP.NET response '$modelName' already declares an inline model." }
         inlineModel = InlineDotnetModelBuilder(modelName).apply(block).build()
     }
 
     override fun headers(block: DotnetAspResponseHeadersScope.() -> Unit) {
-        require(headers.isEmpty()) {
-            "ASP.NET response '$modelName' already declares headers metadata."
-        }
+        require(headers.isEmpty()) { "ASP.NET response '$modelName' already declares headers metadata." }
         headers = DotnetAspResponseHeadersBuilder().apply(block).build()
     }
 
-    fun build(statusCode: Int) = DotnetAspResponse(
-        statusCode = statusCode,
-        model =
-        inlineModel?.let(DotnetAspModelReference::Inline)
-            ?: DotnetAspModelReference.Shared(modelName),
-        headers = headers,
-    )
+    fun build(statusCode: Int) =
+        DotnetAspResponse(
+            statusCode = statusCode,
+            model = inlineModel?.let(DotnetAspModelReference::Inline) ?: DotnetAspModelReference.Shared(modelName),
+            headers = headers,
+        )
 }

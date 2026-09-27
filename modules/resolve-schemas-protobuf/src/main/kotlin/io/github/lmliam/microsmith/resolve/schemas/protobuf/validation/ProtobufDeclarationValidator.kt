@@ -19,7 +19,7 @@ internal class ProtobufDeclarationValidator {
                     validateMessageDeclaration(
                         schemaName,
                         declaration,
-                    ),
+                    )
                 )
 
             is Enum ->
@@ -27,7 +27,7 @@ internal class ProtobufDeclarationValidator {
                     validateEnumDeclaration(
                         schemaName,
                         declaration,
-                    ),
+                    )
                 )
         }
     }

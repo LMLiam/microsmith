@@ -10,7 +10,7 @@ class MicrosmithModelGenerationExtensionsTests :
         "generateTo creates output directory when it does not exist" {
             val workspaceRoot = Files.createTempDirectory("microsmith-generate-to-root-")
             val outputDir = workspaceRoot.resolve("generated/proto")
-            val model = microsmith { }
+            val model = microsmith {}
 
             model.generateTo(outputDir)
 

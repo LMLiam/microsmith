@@ -14,18 +14,7 @@ import kotlin.io.use
 class ProtobufGenerationIntegrationTests :
     StringSpec({
         "generateTo emits protobuf messages through the resolved artifact pipeline" {
-            val model =
-                microsmith {
-                    schemas {
-                        protobuf {
-                            "acme.user.v1" {
-                                message("User") {
-                                    string("id")
-                                }
-                            }
-                        }
-                    }
-                }
+            val model = microsmith { schemas { protobuf { "acme.user.v1" { message("User") { string("id") } } } } }
 
             TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
                 model.generateTo(outputSpace.root)

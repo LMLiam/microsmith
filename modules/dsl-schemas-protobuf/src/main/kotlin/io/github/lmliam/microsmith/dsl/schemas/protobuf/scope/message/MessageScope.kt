@@ -18,9 +18,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.oneof.OneofScope
 
 @Suppress("INAPPLICABLE_JVM_NAME")
 @MicrosmithDsl
-interface MessageScope :
-    ScalarFields<ScalarFieldScope, ScalarField>,
-    Reservable {
+interface MessageScope : ScalarFields<ScalarFieldScope, ScalarField>, Reservable {
     fun optional(field: CardinalityField)
 
     fun optional(block: MessageScope.() -> CardinalityField)
@@ -37,7 +35,8 @@ interface MessageScope :
 
     fun ref(name: String, target: ProtobufTypeRef, block: ReferenceFieldScope.() -> Unit = {}): ReferenceField
 
-    val max get() = Max
+    val max
+        get() = Max
 
     operator fun Int.rangeTo(max: Max) = MaxRange(this)
 }

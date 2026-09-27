@@ -13,8 +13,7 @@ internal class ScriptEvaluationModelEmitter {
             is ResultValue.Value -> emitReturnedModelIfNeeded(returnValue.value, scriptContext)
 
             is ResultValue.Unit,
-            ResultValue.NotEvaluated,
-            -> requireGenerated(scriptContext)
+            ResultValue.NotEvaluated -> requireGenerated(scriptContext)
         }
     }
 

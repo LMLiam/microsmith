@@ -1,27 +1,24 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet
 
-/**
- * Validated .NET target framework monikers for the DSL.
- */
+/** Validated .NET target framework monikers for the DSL. */
 @JvmInline
 value class DotnetTarget(val moniker: String) {
     init {
-        require(moniker in supportedMonikers) {
-            "Unsupported .NET target framework moniker: '$moniker'."
-        }
+        require(moniker in supportedMonikers) { "Unsupported .NET target framework moniker: '$moniker'." }
     }
 
     override fun toString(): String = moniker
 
     companion object {
-        private val supportedMonikers = setOf(
-            "net5.0",
-            "net6.0",
-            "net7.0",
-            "net8.0",
-            "net9.0",
-            "net10.0",
-        )
+        private val supportedMonikers =
+            setOf(
+                "net5.0",
+                "net6.0",
+                "net7.0",
+                "net8.0",
+                "net9.0",
+                "net10.0",
+            )
 
         val NET5 = DotnetTarget("net5.0")
         val NET6 = DotnetTarget("net6.0")

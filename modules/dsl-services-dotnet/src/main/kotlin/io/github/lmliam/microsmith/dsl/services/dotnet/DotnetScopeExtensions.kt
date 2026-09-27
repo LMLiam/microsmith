@@ -11,24 +11,17 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceBuil
 import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceScope
 
-/**
- * Start a shared .NET defaults block inside `services { ... }`.
- */
+/** Start a shared .NET defaults block inside `services { ... }`. */
 fun ServicesScope.dotnet(block: DotnetDefaultsScope.() -> Unit) {
     val builder =
-        this as? ServicesBuilder
-            ?: error("dotnet { ... } can only be invoked within a services { ... } block.")
+        this as? ServicesBuilder ?: error("dotnet { ... } can only be invoked within a services { ... } block.")
 
     builder.put(DotnetDefaultsExtension::class, DotnetDefaultsBuilder().apply(block).build())
 }
 
-/**
- * Start a per-service .NET configuration block inside a named service.
- */
+/** Start a per-service .NET configuration block inside a named service. */
 fun ServiceScope.dotnet(block: DotnetServiceScope.() -> Unit) {
-    val builder =
-        this as? ServiceBuilder
-            ?: error("dotnet { ... } can only be invoked within a service block.")
+    val builder = this as? ServiceBuilder ?: error("dotnet { ... } can only be invoked within a service block.")
 
     builder.put(DotnetServiceExtension::class, DotnetServiceBuilder().apply(block).build())
 }

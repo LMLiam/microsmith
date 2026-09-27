@@ -44,9 +44,7 @@ class GeneratedOutputPathResolverTests :
             val space = DirectorySpace.from(root)
             val absolutePath = root.resolve("outside.proto").toAbsolutePath()
 
-            shouldThrow<IllegalArgumentException> {
-                GeneratedOutputPathResolver.resolve(space, absolutePath)
-            }
+            shouldThrow<IllegalArgumentException> { GeneratedOutputPathResolver.resolve(space, absolutePath) }
         }
 
         "resolve rejects absolute routed output roots" {
@@ -59,9 +57,7 @@ class GeneratedOutputPathResolverTests :
                     outputRoot = root.resolve("services").toAbsolutePath(),
                 )
 
-            shouldThrow<IllegalArgumentException> {
-                GeneratedOutputPathResolver.resolve(space, output)
-            }
+            shouldThrow<IllegalArgumentException> { GeneratedOutputPathResolver.resolve(space, output) }
         }
 
         "resolve rejects root traversal output paths" {
@@ -87,9 +83,7 @@ class GeneratedOutputPathResolverTests :
                     outputRoot = Path("../services/UserService"),
                 )
 
-            shouldThrow<IllegalArgumentException> {
-                GeneratedOutputPathResolver.resolve(space, output)
-            }
+            shouldThrow<IllegalArgumentException> { GeneratedOutputPathResolver.resolve(space, output) }
         }
 
         "resolve rejects symlink traversal output paths" {

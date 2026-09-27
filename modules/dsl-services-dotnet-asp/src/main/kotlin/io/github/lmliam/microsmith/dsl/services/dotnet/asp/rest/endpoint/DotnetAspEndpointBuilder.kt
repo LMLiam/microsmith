@@ -30,59 +30,47 @@ internal class DotnetAspEndpointBuilder(
     private var responses: List<DotnetAspResponse> = emptyList()
 
     override fun path(name: String, block: DotnetAspRequestBindingScope.() -> Unit) {
-        require(pathBinding == null) {
-            "ASP.NET endpoint '$operationName' already declares a path binding."
-        }
+        require(pathBinding == null) { "ASP.NET endpoint '$operationName' already declares a path binding." }
         pathBinding = DotnetAspRequestBindingBuilder(name).apply(block).build()
     }
 
     override fun query(name: String, block: DotnetAspRequestBindingScope.() -> Unit) {
-        require(queryBinding == null) {
-            "ASP.NET endpoint '$operationName' already declares a query binding."
-        }
+        require(queryBinding == null) { "ASP.NET endpoint '$operationName' already declares a query binding." }
         queryBinding = DotnetAspRequestBindingBuilder(name).apply(block).build()
     }
 
     override fun headers(name: String, block: DotnetAspHeadersBindingScope.() -> Unit) {
-        require(headersBinding == null) {
-            "ASP.NET endpoint '$operationName' already declares a headers binding."
-        }
+        require(headersBinding == null) { "ASP.NET endpoint '$operationName' already declares a headers binding." }
         headersBinding = DotnetAspHeadersBindingBuilder(name).apply(block).build()
     }
 
     override fun body(modelName: String) {
-        require(bodyBinding == null) {
-            "ASP.NET endpoint '$operationName' already declares a body binding."
-        }
+        require(bodyBinding == null) { "ASP.NET endpoint '$operationName' already declares a body binding." }
         bodyBinding = DotnetAspModelReference.Shared(modelName)
     }
 
     override fun body(name: String, block: DotnetModelScope.() -> Unit) {
-        require(bodyBinding == null) {
-            "ASP.NET endpoint '$operationName' already declares a body binding."
-        }
-        bodyBinding = DotnetAspModelReference.Inline(
-            InlineDotnetModelBuilder(name).apply(block).build(),
-        )
+        require(bodyBinding == null) { "ASP.NET endpoint '$operationName' already declares a body binding." }
+        bodyBinding = DotnetAspModelReference.Inline(InlineDotnetModelBuilder(name).apply(block).build())
     }
 
     override fun responses(block: DotnetAspResponsesScope.() -> Unit) {
-        require(responses.isEmpty()) {
-            "ASP.NET endpoint '$operationName' already declares responses."
-        }
+        require(responses.isEmpty()) { "ASP.NET endpoint '$operationName' already declares responses." }
         responses = DotnetAspResponsesBuilder().apply(block).build()
     }
 
-    fun build() = DotnetAspEndpoint(
-        method = method,
-        path = path.orEmpty(),
-        operationName = operationName,
-        bindings = DotnetAspEndpointBindings(
-            path = pathBinding,
-            query = queryBinding,
-            headers = headersBinding,
-            body = bodyBinding,
-        ),
-        responses = responses,
-    )
+    fun build() =
+        DotnetAspEndpoint(
+            method = method,
+            path = path.orEmpty(),
+            operationName = operationName,
+            bindings =
+                DotnetAspEndpointBindings(
+                    path = pathBinding,
+                    query = queryBinding,
+                    headers = headersBinding,
+                    body = bodyBinding,
+                ),
+            responses = responses,
+        )
 }

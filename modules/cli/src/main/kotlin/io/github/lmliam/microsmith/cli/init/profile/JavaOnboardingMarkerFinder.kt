@@ -10,7 +10,8 @@ internal object JavaOnboardingMarkerFinder {
         JAVA_SOURCE_ROOT_MARKERS.any(relativeDirectory::endsWith)
 }
 
-private val JAVA_SOURCE_ROOT_MARKERS = listOf(
-    Path.of("src/main/java"),
-    Path.of("src/test/java"),
-)
+private val JAVA_SOURCE_ROOT_MARKERS =
+    listOf(
+        Path.of("src/main/java"),
+        Path.of("src/test/java"),
+    )

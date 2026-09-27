@@ -10,13 +10,11 @@ data class DotnetPackageWorkspace(
 ) : ResolvedModel {
     fun findSolution(name: String): ResolvedDotnetPackageSolution? = solutionsByName[name]
 
-    fun requireSolution(name: String): ResolvedDotnetPackageSolution = requireNotNull(findSolution(name)) {
-        "Resolved .NET package solution not found: $name"
-    }
+    fun requireSolution(name: String): ResolvedDotnetPackageSolution =
+        requireNotNull(findSolution(name)) { "Resolved .NET package solution not found: $name" }
 
     fun findService(name: String): ResolvedDotnetPackageService? = servicesByName[name]
 
-    fun requireService(name: String): ResolvedDotnetPackageService = requireNotNull(findService(name)) {
-        "Resolved .NET package service not found: $name"
-    }
+    fun requireService(name: String): ResolvedDotnetPackageService =
+        requireNotNull(findService(name)) { "Resolved .NET package service not found: $name" }
 }

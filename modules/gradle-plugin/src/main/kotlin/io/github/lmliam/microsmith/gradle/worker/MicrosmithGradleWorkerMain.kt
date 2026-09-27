@@ -42,7 +42,7 @@ internal object MicrosmithGradleWorkerMain {
                         variables = request.variables,
                         flags = request.flags,
                         pluginClasspath = request.pluginClasspath,
-                    ),
+                    )
                 )
         ) {
             is ScriptRunSuccess ->
@@ -59,13 +59,14 @@ internal object MicrosmithGradleWorkerMain {
                     type = result.type.name,
                 )
         }
-    }.getOrElse { error ->
-        val message = error.message ?: error::class.simpleName ?: "unknown worker error"
-        MicrosmithGradleWorkerFailure(
-            diagnostics = listOf("Microsmith Gradle worker failure: $message"),
-            type = "HOST",
-        )
     }
+        .getOrElse { error ->
+            val message = error.message ?: error::class.simpleName ?: "unknown worker error"
+            MicrosmithGradleWorkerFailure(
+                diagnostics = listOf("Microsmith Gradle worker failure: $message"),
+                type = "HOST",
+            )
+        }
 }
 
 private const val EXPECTED_ARGS = 2

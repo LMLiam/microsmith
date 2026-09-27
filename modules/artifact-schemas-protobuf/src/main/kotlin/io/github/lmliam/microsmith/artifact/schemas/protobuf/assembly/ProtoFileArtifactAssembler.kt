@@ -35,8 +35,7 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
         next.declarations.forEach { declaration ->
             val existing = mergedDeclarations[declaration.name]
             require(existing == null || existing == declaration) {
-                "Conflicting protobuf declaration '${declaration.name}' for " +
-                    "'${current.id.fullyQualifiedName}'."
+                "Conflicting protobuf declaration '${declaration.name}' for " + "'${current.id.fullyQualifiedName}'."
             }
             mergedDeclarations.putIfAbsent(declaration.name, declaration)
         }
@@ -50,8 +49,7 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
 
     private fun requireContribution(contribution: ArtifactContribution<ProtoFileArtifact>): ProtoFileContribution {
         require(contribution is ProtoFileContribution) {
-            "Unsupported protobuf artifact contribution type: " +
-                "${contribution::class}"
+            "Unsupported protobuf artifact contribution type: " + "${contribution::class}"
         }
         return contribution
     }

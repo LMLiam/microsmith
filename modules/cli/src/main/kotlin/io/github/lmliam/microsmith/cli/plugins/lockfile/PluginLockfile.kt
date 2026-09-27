@@ -16,24 +16,16 @@ internal fun readLockfile(lockfilePath: Path): ParsedLockfile? {
     }
 
     val nonBlankLines = Files.readAllLines(lockfilePath).map(String::trim).filter(String::isNotEmpty)
-    require(nonBlankLines.isNotEmpty()) {
-        "Plugin lockfile '$lockfilePath' is empty."
-    }
+    require(nonBlankLines.isNotEmpty()) { "Plugin lockfile '$lockfilePath' is empty." }
 
     val versionLine = nonBlankLines.first()
-    require(versionLine.startsWith("version=")) {
-        "Plugin lockfile '$lockfilePath' is invalid. Missing version line."
-    }
+    require(versionLine.startsWith("version=")) { "Plugin lockfile '$lockfilePath' is invalid. Missing version line." }
     val version = versionLine.substringAfter("version=").toIntOrNull()
     require(version == LOCKFILE_VERSION) {
         "Plugin lockfile '$lockfilePath' has unsupported version '$version'. Expected '$LOCKFILE_VERSION'."
     }
 
-    val entries =
-        nonBlankLines
-            .drop(1)
-            .map(::parseLockEntry)
-            .distinctBy { it.kind to it.key }
+    val entries = nonBlankLines.drop(1).map(::parseLockEntry).distinctBy { it.kind to it.key }
 
     return ParsedLockfile(version = version, entries = entries)
 }
@@ -64,11 +56,7 @@ internal fun ParsedLockfile.assertSamePluginSet(requestedKeys: Set<LockKey>, loc
 
 internal fun ParsedLockfile.assertSameRemoteArtifactSet(resolvedKeys: Set<String>, lockfilePath: Path) {
     val lockedKeys =
-        entries
-            .asSequence()
-            .filter { entry -> entry.kind == REMOTE_ARTIFACT_KIND }
-            .map(LockEntry::key)
-            .toSet()
+        entries.asSequence().filter { entry -> entry.kind == REMOTE_ARTIFACT_KIND }.map(LockEntry::key).toSet()
     val missingFromLock = resolvedKeys - lockedKeys
     val extraInLock = lockedKeys - resolvedKeys
 
@@ -87,11 +75,7 @@ internal fun ParsedLockfile.assertSameRemoteArtifactSet(resolvedKeys: Set<String
 }
 
 internal fun ParsedLockfile.verifyChecksum(kind: String, key: String, actualChecksum: String) {
-    val expected =
-        entries
-            .firstOrNull { it.kind == kind && it.key == key }
-            ?.checksum
-            ?: return
+    val expected = entries.firstOrNull { it.kind == kind && it.key == key }?.checksum ?: return
 
     require(expected == actualChecksum) {
         "Checksum mismatch for $kind plugin '$key'. Expected '$expected' but found '$actualChecksum'."
@@ -101,11 +85,9 @@ internal fun ParsedLockfile.verifyChecksum(kind: String, key: String, actualChec
 internal fun writeLockfile(lockfilePath: Path, lockfile: ParsedLockfile) {
     val lines = buildList {
         add("version=${lockfile.version}")
-        lockfile.entries
-            .sortedWith(compareBy(LockEntry::kind, LockEntry::key))
-            .forEach { entry ->
-                add("${entry.kind}|${entry.key}|${entry.checksum}")
-            }
+        lockfile.entries.sortedWith(compareBy(LockEntry::kind, LockEntry::key)).forEach { entry ->
+            add("${entry.kind}|${entry.key}|${entry.checksum}")
+        }
     }
 
     lockfilePath.parent?.let(Files::createDirectories)
@@ -122,13 +104,9 @@ private fun parseLockEntry(line: String): LockEntry {
     val key = parts[1]
     val checksum = parts[2]
     val allowedKinds = setOf(REMOTE_KIND, REMOTE_ARTIFACT_KIND, LOCAL_KIND)
-    require(kind in allowedKinds) {
-        "Invalid plugin lockfile entry kind '$kind'."
-    }
+    require(kind in allowedKinds) { "Invalid plugin lockfile entry kind '$kind'." }
     require(key.isNotBlank()) { "Plugin lockfile entry key must not be blank." }
-    require(isSha256(checksum)) {
-        "Plugin lockfile checksum for '$key' is invalid."
-    }
+    require(isSha256(checksum)) { "Plugin lockfile checksum for '$key' is invalid." }
 
     return LockEntry(kind = kind, key = key, checksum = checksum)
 }

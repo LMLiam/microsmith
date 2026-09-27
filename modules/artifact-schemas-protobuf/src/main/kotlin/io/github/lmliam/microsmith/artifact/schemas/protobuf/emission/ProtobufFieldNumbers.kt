@@ -8,7 +8,5 @@ internal fun requireValidFieldNumber(number: Int, label: String) {
     require(number in MIN_FIELD_NUMBER..MAX_FIELD_NUMBER) {
         "$label must be in $MIN_FIELD_NUMBER..$MAX_FIELD_NUMBER, but was $number."
     }
-    require(number !in FORBIDDEN_RANGE) {
-        "$label must not be in reserved range $FORBIDDEN_RANGE, but was $number."
-    }
+    require(number !in FORBIDDEN_RANGE) { "$label must not be in reserved range $FORBIDDEN_RANGE, but was $number." }
 }

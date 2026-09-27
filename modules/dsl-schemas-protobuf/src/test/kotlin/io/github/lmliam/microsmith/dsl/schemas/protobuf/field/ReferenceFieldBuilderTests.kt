@@ -40,32 +40,24 @@ class ReferenceFieldBuilderTests :
         "calling optional twice throws" {
             val builder = ReferenceFieldBuilder()
             builder.optional()
-            shouldThrow<IllegalArgumentException> {
-                builder.optional()
-            }
+            shouldThrow<IllegalArgumentException> { builder.optional() }
         }
 
         "calling repeated twice throws" {
             val builder = ReferenceFieldBuilder()
             builder.repeated()
-            shouldThrow<IllegalArgumentException> {
-                builder.repeated()
-            }
+            shouldThrow<IllegalArgumentException> { builder.repeated() }
         }
 
         "calling optional then repeated throws" {
             val builder = ReferenceFieldBuilder()
             builder.optional()
-            shouldThrow<IllegalArgumentException> {
-                builder.repeated()
-            }
+            shouldThrow<IllegalArgumentException> { builder.repeated() }
         }
 
         "calling repeated then optional throws" {
             val builder = ReferenceFieldBuilder()
             builder.repeated()
-            shouldThrow<IllegalArgumentException> {
-                builder.optional()
-            }
+            shouldThrow<IllegalArgumentException> { builder.optional() }
         }
     })

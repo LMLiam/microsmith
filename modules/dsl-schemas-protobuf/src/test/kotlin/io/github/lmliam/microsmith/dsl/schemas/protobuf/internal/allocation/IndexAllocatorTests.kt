@@ -41,9 +41,7 @@ class IndexAllocatorTests :
         "allocate with explicit request throws if index already used" {
             val allocator = IndexAllocator(min = 1)
             allocator.allocate(5)
-            shouldThrow<IllegalArgumentException> {
-                allocator.allocate(5)
-            }
+            shouldThrow<IllegalArgumentException> { allocator.allocate(5) }
         }
 
         "reserve single index adds to reserved set" {
@@ -67,55 +65,41 @@ class IndexAllocatorTests :
 
         "validate throws for index below min" {
             val allocator = IndexAllocator(min = 5)
-            shouldThrow<IllegalArgumentException> {
-                allocator.validate(4)
-            }
+            shouldThrow<IllegalArgumentException> { allocator.validate(4) }
         }
 
         "validate throws for index above Max.VALUE" {
             val allocator = IndexAllocator(min = 5)
-            shouldThrow<IllegalArgumentException> {
-                allocator.validate(Max.VALUE + 1)
-            }
+            shouldThrow<IllegalArgumentException> { allocator.validate(Max.VALUE + 1) }
         }
 
         "validate throws for index in protoReserved range" {
             val allocator = IndexAllocator(min = 5, protoReserved = 1..10)
-            shouldThrow<IllegalArgumentException> {
-                allocator.validate(6)
-            }
+            shouldThrow<IllegalArgumentException> { allocator.validate(6) }
         }
 
         "validate throws for index already reserved" {
             val allocator = IndexAllocator(min = 1)
             allocator.reserve(1..10)
-            shouldThrow<IllegalArgumentException> {
-                allocator.validate(6)
-            }
+            shouldThrow<IllegalArgumentException> { allocator.validate(6) }
         }
 
         "validate throws for index already used" {
             val allocator = IndexAllocator(min = 5)
             allocator.allocate(6)
-            shouldThrow<IllegalArgumentException> {
-                allocator.validate(6)
-            }
+            shouldThrow<IllegalArgumentException> { allocator.validate(6) }
         }
 
         "validate throws for range overlapping used indexes" {
             val allocator = IndexAllocator(min = 5)
             allocator.allocate(8)
-            shouldThrow<IllegalArgumentException> {
-                allocator.validate(6..10)
-            }
+            shouldThrow<IllegalArgumentException> { allocator.validate(6..10) }
         }
 
         "validate throws for range overlapping reserved ranges" {
             val allocator = IndexAllocator(min = 5)
             allocator.reserve(10..15)
-            shouldThrow<IllegalArgumentException> {
-                allocator.validate(12..20)
-            }
+            shouldThrow<IllegalArgumentException> { allocator.validate(12..20) }
         }
 
         "multiple allocations and reservations coexist correctly" {

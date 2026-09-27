@@ -15,13 +15,14 @@ import java.nio.file.Path
 class ProtoFileArtifactCompiler : SchemasArtifactCompiler<ProtoFileArtifact> {
     override val artifactType = ProtoFileArtifact::class
 
-    override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> = listOf(
-        TextFileArtifactContribution(
-            artifactId = TextFileArtifactId(relativePath = artifact.relativePath()),
-            contents = ProtobufFileRenderer.render(artifact),
-            origins = artifact.origins,
-        ),
-    )
+    override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> =
+        listOf(
+            TextFileArtifactContribution(
+                artifactId = TextFileArtifactId(relativePath = artifact.relativePath()),
+                contents = ProtobufFileRenderer.render(artifact),
+                origins = artifact.origins,
+            )
+        )
 
     private fun ProtoFileArtifact.relativePath(): Path {
         val packagePath = id.packageName?.replace('.', '/')

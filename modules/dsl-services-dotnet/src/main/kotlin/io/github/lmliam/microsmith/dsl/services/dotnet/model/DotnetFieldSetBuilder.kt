@@ -62,9 +62,7 @@ open class DotnetFieldSetBuilder(
 
     protected fun addField(name: String, type: DotnetFieldType): DotnetField {
         val fieldName = validateDotnetIdentifier(name, fieldNameLabel)
-        require(fieldName !in fieldsByName) {
-            duplicateFieldMessage(fieldName)
-        }
+        require(fieldName !in fieldsByName) { duplicateFieldMessage(fieldName) }
 
         val field = DotnetField(name = fieldName, type = type)
         fieldsByName[fieldName] = field

@@ -33,24 +33,26 @@ class ScriptEvaluationSuccessFinalizerTests :
             val evaluationResult =
                 EvaluationResult(
                     returnValue =
-                    ResultValue.Value(
-                        "result",
-                        MicrosmithModel.empty(),
-                        "MicrosmithModel",
-                        null,
-                        null,
-                    ),
+                        ResultValue.Value(
+                            "result",
+                            MicrosmithModel.empty(),
+                            "MicrosmithModel",
+                            null,
+                            null,
+                        ),
                     configuration = ScriptEvaluationConfiguration {},
                 )
 
             val result =
-                ScriptEvaluationSuccessFinalizer().complete(
-                    evaluationResult = evaluationResult,
-                    scriptContext = scriptContext,
-                    warnings = listOf("warning"),
-                    cacheHit = true,
-                    elapsedMillis = 42,
-                ).shouldBeTypeOf<ScriptRunSuccess>()
+                ScriptEvaluationSuccessFinalizer()
+                    .complete(
+                        evaluationResult = evaluationResult,
+                        scriptContext = scriptContext,
+                        warnings = listOf("warning"),
+                        cacheHit = true,
+                        elapsedMillis = 42,
+                    )
+                    .shouldBeTypeOf<ScriptRunSuccess>()
 
             emittedModels.size shouldBe 1
             result.warnings shouldBe listOf("warning")
@@ -79,13 +81,15 @@ class ScriptEvaluationSuccessFinalizerTests :
                 )
 
             val result =
-                ScriptEvaluationSuccessFinalizer().complete(
-                    evaluationResult = evaluationResult,
-                    scriptContext = scriptContext,
-                    warnings = emptyList(),
-                    cacheHit = false,
-                    elapsedMillis = 9,
-                ).shouldBeTypeOf<ScriptRunSuccess>()
+                ScriptEvaluationSuccessFinalizer()
+                    .complete(
+                        evaluationResult = evaluationResult,
+                        scriptContext = scriptContext,
+                        warnings = emptyList(),
+                        cacheHit = false,
+                        elapsedMillis = 9,
+                    )
+                    .shouldBeTypeOf<ScriptRunSuccess>()
 
             result.generatedRoots.shouldContainExactly(listOf(generatedRootOne, generatedRootTwo).sorted())
         }
@@ -105,19 +109,21 @@ class ScriptEvaluationSuccessFinalizerTests :
                 )
 
             val result =
-                ScriptEvaluationSuccessFinalizer().complete(
-                    evaluationResult = evaluationResult,
-                    scriptContext = scriptContext,
-                    warnings = listOf("warning"),
-                    cacheHit = false,
-                    elapsedMillis = 7,
-                ).shouldBeTypeOf<ScriptRunFailure>()
+                ScriptEvaluationSuccessFinalizer()
+                    .complete(
+                        evaluationResult = evaluationResult,
+                        scriptContext = scriptContext,
+                        warnings = listOf("warning"),
+                        cacheHit = false,
+                        elapsedMillis = 7,
+                    )
+                    .shouldBeTypeOf<ScriptRunFailure>()
 
             result.type shouldBe ScriptFailureType.EVALUATION
             result.diagnostics.shouldContain("warning")
             result.diagnostics.shouldContain(
                 "Script evaluation failed: Script must either return MicrosmithModel or call " +
-                    "emit(model)/generate(model).",
+                    "emit(model)/generate(model)."
             )
         }
     })

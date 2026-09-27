@@ -8,14 +8,9 @@ internal fun allocateDotnetAspPorts(
     configuredPorts: ResolvedDotnetAspPorts?,
 ): DotnetAspAllocatedPorts {
     val defaultHttp = dotnetAspHttpPortFor(artifactId)
-    val http =
-        configuredPorts?.http
-            ?: configuredPorts?.https?.minus(HTTPS_PORT_OFFSET)
-            ?: defaultHttp
+    val http = configuredPorts?.http ?: configuredPorts?.https?.minus(HTTPS_PORT_OFFSET) ?: defaultHttp
     val https =
-        configuredPorts?.https
-            ?: configuredPorts?.http?.plus(HTTPS_PORT_OFFSET)
-            ?: (defaultHttp + HTTPS_PORT_OFFSET)
+        configuredPorts?.https ?: configuredPorts?.http?.plus(HTTPS_PORT_OFFSET) ?: (defaultHttp + HTTPS_PORT_OFFSET)
 
     require(http in MIN_DOTNET_ASP_PORT..MAX_DOTNET_ASP_PORT) {
         "ASP.NET HTTP port for '${artifactId.stablePortIdentity()}' must be between " +
@@ -36,14 +31,13 @@ internal fun dotnetAspHttpPortFor(artifactId: DotnetAspServiceArtifactId): Int {
     val slot =
         artifactId
             .stablePortIdentity()
-            .fold(0L) { hash, character ->
-                ((hash * PORT_HASH_MULTIPLIER) + character.code) % PORT_SLOT_COUNT
-            }.toInt()
+            .fold(0L) { hash, character -> ((hash * PORT_HASH_MULTIPLIER) + character.code) % PORT_SLOT_COUNT }
+            .toInt()
     return BASE_HTTP_PORT + (slot * PORT_STRIDE)
 }
 
 internal fun validateUniqueDotnetAspPorts(
-    servicePorts: List<Pair<DotnetAspServiceArtifactId, DotnetAspAllocatedPorts>>,
+    servicePorts: List<Pair<DotnetAspServiceArtifactId, DotnetAspAllocatedPorts>>
 ) {
     val portOwners = mutableMapOf<Int, MutableList<DotnetAspServiceArtifactId>>()
     servicePorts.forEach { (artifactId, ports) ->
@@ -51,21 +45,18 @@ internal fun validateUniqueDotnetAspPorts(
         portOwners.getOrPut(ports.https, ::mutableListOf) += artifactId
     }
 
-    val collisions =
-        portOwners
-            .filterValues { it.size > 1 }
-            .toSortedMap()
+    val collisions = portOwners.filterValues { it.size > 1 }.toSortedMap()
 
     require(collisions.isEmpty()) {
         "ASP.NET services produce colliding launch ports: " +
             collisions.entries.joinToString("; ") { (port, artifactIds) ->
                 val owners =
-                    artifactIds
-                        .distinct()
-                        .sortedBy(DotnetAspServiceArtifactId::stablePortIdentity)
-                        .joinToString(", ") { it.stablePortIdentity() }
+                    artifactIds.distinct().sortedBy(DotnetAspServiceArtifactId::stablePortIdentity).joinToString(", ") {
+                        it.stablePortIdentity()
+                    }
                 "$owners share localhost:$port"
-            } + "."
+            } +
+            "."
     }
 }
 

@@ -17,23 +17,18 @@ private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
 
 private fun DotnetPackageWorkspaceResolver.resolveSuccessfully(extension: ServicesExtension): DotnetPackageWorkspace =
-    resolve(extension).fold(
-        ifLeft = { issues ->
-            error(
-                "Expected package resolution success, but got: " +
-                    issues.joinToString(),
-            )
-        },
-        ifRight = { it },
-    )
+    resolve(extension)
+        .fold(
+            ifLeft = { issues -> error("Expected package resolution success, but got: " + issues.joinToString()) },
+            ifRight = { it },
+        )
 
 private fun DotnetPackageWorkspaceResolver.resolveIssues(extension: ServicesExtension): List<DotnetResolutionIssue> =
-    resolve(extension).fold(
-        ifLeft = { it.toList() },
-        ifRight = {
-            error("Expected package resolution failure")
-        },
-    )
+    resolve(extension)
+        .fold(
+            ifLeft = { it.toList() },
+            ifRight = { error("Expected package resolution failure") },
+        )
 
 class DotnetPackageWorkspaceResolverTests :
     StringSpec({
@@ -49,9 +44,7 @@ class DotnetPackageWorkspaceResolverTests :
                                 "Serilog" {
                                     version("9.0.0")
                                     +"AspNetCore"
-                                    "Settings.Configuration" {
-                                        version("9.0.1")
-                                    }
+                                    "Settings.Configuration" { version("9.0.1") }
                                 }
                             }
                         }
@@ -72,19 +65,18 @@ class DotnetPackageWorkspaceResolverTests :
                 }
             }
 
-            val workspace = DotnetPackageWorkspaceResolver()
-                .resolveSuccessfully(
-                    builder.requireServicesExtension(),
-                )
+            val workspace = DotnetPackageWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
 
-            workspace.requireSolution("Platform").packages shouldContainExactly listOf(
-                ResolvedDotnetPackageVersion(name = "Serilog.AspNetCore", version = "9.0.0"),
-                ResolvedDotnetPackageVersion(name = "Serilog.Settings.Configuration", version = "9.0.1"),
-            )
-            workspace.requireService("UserService").packages shouldContainExactly listOf(
-                ResolvedDotnetPackageReference(name = "Serilog.AspNetCore", version = null),
-                ResolvedDotnetPackageReference(name = "Serilog.Settings.Configuration", version = null),
-            )
+            workspace.requireSolution("Platform").packages shouldContainExactly
+                listOf(
+                    ResolvedDotnetPackageVersion(name = "Serilog.AspNetCore", version = "9.0.0"),
+                    ResolvedDotnetPackageVersion(name = "Serilog.Settings.Configuration", version = "9.0.1"),
+                )
+            workspace.requireService("UserService").packages shouldContainExactly
+                listOf(
+                    ResolvedDotnetPackageReference(name = "Serilog.AspNetCore", version = null),
+                    ResolvedDotnetPackageReference(name = "Serilog.Settings.Configuration", version = null),
+                )
         }
 
         "resolve rejects service packages that are not centrally owned by the selected solution" {
@@ -109,28 +101,20 @@ class DotnetPackageWorkspaceResolverTests :
                     dotnet {
                         solution("Platform")
                         project("UserService.Api")
-                        packages {
-                            +"FluentValidation.AspNetCore"
-                        }
+                        packages { +"FluentValidation.AspNetCore" }
                     }
                 }
             }
 
-            val issues =
-                DotnetPackageWorkspaceResolver()
-                    .resolveIssues(
-                        builder.requireServicesExtension(),
-                    )
+            val issues = DotnetPackageWorkspaceResolver().resolveIssues(builder.requireServicesExtension())
 
             issues shouldContainExactly
                 listOf(
-                    DotnetPackageWorkspaceResolutionIssue
-                        .PackageNotCentrallyOwned(
-                            serviceName = "UserService",
-                            solutionName = "Platform",
-                            packageName =
-                            "FluentValidation.AspNetCore",
-                        ),
+                    DotnetPackageWorkspaceResolutionIssue.PackageNotCentrallyOwned(
+                        serviceName = "UserService",
+                        solutionName = "Platform",
+                        packageName = "FluentValidation.AspNetCore",
+                    )
                 )
         }
 
@@ -140,9 +124,7 @@ class DotnetPackageWorkspaceResolverTests :
             builder.services {
                 dotnet {
                     target(NET8)
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
@@ -153,24 +135,20 @@ class DotnetPackageWorkspaceResolverTests :
                             "Serilog" {
                                 version("9.0.0")
                                 +"AspNetCore"
-                                "Settings.Configuration" {
-                                    version("9.0.1")
-                                }
+                                "Settings.Configuration" { version("9.0.1") }
                             }
                         }
                     }
                 }
             }
 
-            val workspace = DotnetPackageWorkspaceResolver()
-                .resolveSuccessfully(
-                    builder.requireServicesExtension(),
-                )
+            val workspace = DotnetPackageWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
 
-            workspace.requireService("UserService").packages shouldContainExactly listOf(
-                ResolvedDotnetPackageReference(name = "Serilog.AspNetCore", version = "9.0.0"),
-                ResolvedDotnetPackageReference(name = "Serilog.Settings.Configuration", version = "9.0.1"),
-            )
+            workspace.requireService("UserService").packages shouldContainExactly
+                listOf(
+                    ResolvedDotnetPackageReference(name = "Serilog.AspNetCore", version = "9.0.0"),
+                    ResolvedDotnetPackageReference(name = "Serilog.Settings.Configuration", version = "9.0.1"),
+                )
         }
 
         "resolve rejects versionless service package references without central ownership" {
@@ -180,35 +158,26 @@ class DotnetPackageWorkspaceResolverTests :
                 dotnet {
                     target(NET8)
 
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
                     dotnet {
                         solution("Platform")
                         project("UserService.Api")
-                        packages {
-                            +"Serilog.AspNetCore"
-                        }
+                        packages { +"Serilog.AspNetCore" }
                     }
                 }
             }
 
-            val issues =
-                DotnetPackageWorkspaceResolver()
-                    .resolveIssues(
-                        builder.requireServicesExtension(),
-                    )
+            val issues = DotnetPackageWorkspaceResolver().resolveIssues(builder.requireServicesExtension())
 
             issues shouldContainExactly
                 listOf(
-                    DotnetPackageWorkspaceResolutionIssue
-                        .PackageVersionRequired(
-                            serviceName = "UserService",
-                            packageName = "Serilog.AspNetCore",
-                        ),
+                    DotnetPackageWorkspaceResolutionIssue.PackageVersionRequired(
+                        serviceName = "UserService",
+                        packageName = "Serilog.AspNetCore",
+                    )
                 )
         }
 
@@ -218,45 +187,27 @@ class DotnetPackageWorkspaceResolverTests :
             builder.services {
                 dotnet {
                     target(NET8)
-                    solutions {
-                        "Platform" {
-                            packages {
-                                "Serilog.AspNetCore" {
-                                    version("9.0.0")
-                                }
-                            }
-                        }
-                    }
+                    solutions { "Platform" { packages { "Serilog.AspNetCore" { version("9.0.0") } } } }
                 }
 
                 "UserService" {
                     dotnet {
                         solution("Platform")
                         project("UserService.Api")
-                        packages {
-                            "FluentValidation.AspNetCore" {
-                                version("12.0.0")
-                            }
-                        }
+                        packages { "FluentValidation.AspNetCore" { version("12.0.0") } }
                     }
                 }
             }
 
-            val issues =
-                DotnetPackageWorkspaceResolver()
-                    .resolveIssues(
-                        builder.requireServicesExtension(),
-                    )
+            val issues = DotnetPackageWorkspaceResolver().resolveIssues(builder.requireServicesExtension())
 
             issues shouldContainExactly
                 listOf(
-                    DotnetPackageWorkspaceResolutionIssue
-                        .MixedPackageVersionManagement(
-                            serviceName = "UserService",
-                            solutionName = "Platform",
-                            packageName =
-                            "FluentValidation.AspNetCore",
-                        ),
+                    DotnetPackageWorkspaceResolutionIssue.MixedPackageVersionManagement(
+                        serviceName = "UserService",
+                        solutionName = "Platform",
+                        packageName = "FluentValidation.AspNetCore",
+                    )
                 )
         }
 
@@ -267,15 +218,7 @@ class DotnetPackageWorkspaceResolverTests :
                 dotnet {
                     target(NET8)
 
-                    solutions {
-                        "Platform" {
-                            packages {
-                                "Serilog.AspNetCore" {
-                                    version("9.0.0")
-                                }
-                            }
-                        }
-                    }
+                    solutions { "Platform" { packages { "Serilog.AspNetCore" { version("9.0.0") } } } }
                 }
 
                 "UserService" {
@@ -286,35 +229,26 @@ class DotnetPackageWorkspaceResolverTests :
                         packages {
                             +"FluentValidation.AspNetCore"
 
-                            "Dapper" {
-                                version("2.1.66")
-                            }
+                            "Dapper" { version("2.1.66") }
                         }
                     }
                 }
             }
 
-            val issues =
-                DotnetPackageWorkspaceResolver()
-                    .resolveIssues(
-                        builder.requireServicesExtension(),
-                    )
+            val issues = DotnetPackageWorkspaceResolver().resolveIssues(builder.requireServicesExtension())
 
             issues shouldContainExactly
                 listOf(
-                    DotnetPackageWorkspaceResolutionIssue
-                        .PackageNotCentrallyOwned(
-                            serviceName = "UserService",
-                            solutionName = "Platform",
-                            packageName =
-                            "FluentValidation.AspNetCore",
-                        ),
-                    DotnetPackageWorkspaceResolutionIssue
-                        .MixedPackageVersionManagement(
-                            serviceName = "UserService",
-                            solutionName = "Platform",
-                            packageName = "Dapper",
-                        ),
+                    DotnetPackageWorkspaceResolutionIssue.PackageNotCentrallyOwned(
+                        serviceName = "UserService",
+                        solutionName = "Platform",
+                        packageName = "FluentValidation.AspNetCore",
+                    ),
+                    DotnetPackageWorkspaceResolutionIssue.MixedPackageVersionManagement(
+                        serviceName = "UserService",
+                        solutionName = "Platform",
+                        packageName = "Dapper",
+                    ),
                 )
         }
 
@@ -326,30 +260,14 @@ class DotnetPackageWorkspaceResolverTests :
                     target(NET8)
 
                     solutions {
-                        "Platform" {
-                            packages {
-                                "Serilog.AspNetCore" {
-                                    version("9.0.0")
-                                }
-                            }
-                        }
+                        "Platform" { packages { "Serilog.AspNetCore" { version("9.0.0") } } }
 
-                        "Payments" {
-                            packages {
-                                "FluentValidation" {
-                                    version("12.0.0")
-                                }
-                            }
-                        }
+                        "Payments" { packages { "FluentValidation" { version("12.0.0") } } }
                     }
                 }
             }
 
-            val workspace =
-                DotnetPackageWorkspaceResolver()
-                    .resolveSuccessfully(
-                        builder.requireServicesExtension(),
-                    )
+            val workspace = DotnetPackageWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
 
             workspace.solutionsByName.keys.sorted() shouldContainExactly
                 listOf(

@@ -25,7 +25,8 @@ class MicrosmithSbtExecutionServiceTests : StringSpec() {
                         }
                     }
                 }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
             val result = MicrosmithSbtExecutionService().execute(fixture.executionConfiguration())
@@ -55,16 +56,19 @@ class MicrosmithSbtExecutionServiceTests : StringSpec() {
                         }
                     },
                 )
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
-            val result = MicrosmithSbtExecutionService().execute(
-                fixture.executionConfiguration(
-                    outputDirectory = fixture.file("target/generated/custom"),
-                    variables = mapOf("entityName" to "SbtConfiguredUserCreated"),
-                    flags = setOf("emit"),
-                ),
-            )
+            val result =
+                MicrosmithSbtExecutionService()
+                    .execute(
+                        fixture.executionConfiguration(
+                            outputDirectory = fixture.file("target/generated/custom"),
+                            variables = mapOf("entityName" to "SbtConfiguredUserCreated"),
+                            flags = setOf("emit"),
+                        )
+                    )
 
             result.outputDirectory shouldBe fixture.file("target/generated/custom")
             fixture.file("target/generated/custom/proto/SbtConfiguredUserCreated.proto").toFile().shouldExist()
@@ -111,7 +115,8 @@ class MicrosmithSbtExecutionServiceTests : StringSpec() {
                         }
                     }
                 }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
             val result = MicrosmithSbtExecutionService().execute(fixture.executionConfiguration())
@@ -119,10 +124,8 @@ class MicrosmithSbtExecutionServiceTests : StringSpec() {
             result.outputDirectory shouldBe fixture.file(".").normalize()
             fixture.file("dotnet/Platform/UserService.Api/Program.cs").toFile().shouldExist()
             fixture
-                .file(
-                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
-                        "UserServiceApiControllerBase.cs",
-                ).toFile()
+                .file("dotnet/Platform/UserService.Api/Generated/Controllers/" + "UserServiceApiControllerBase.cs")
+                .toFile()
                 .shouldExist()
         }
 
@@ -138,12 +141,14 @@ class MicrosmithSbtExecutionServiceTests : StringSpec() {
                         }
                     }
                 }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
-            val error = shouldThrow<MicrosmithSbtScriptFailureException> {
-                MicrosmithSbtExecutionService().execute(fixture.executionConfiguration())
-            }
+            val error =
+                shouldThrow<MicrosmithSbtScriptFailureException> {
+                    MicrosmithSbtExecutionService().execute(fixture.executionConfiguration())
+                }
 
             error.message shouldContain "Microsmith generation failed"
             error.message shouldContain "Unresolved reference 'unknownCall'"
@@ -152,15 +157,16 @@ class MicrosmithSbtExecutionServiceTests : StringSpec() {
         "host failures surface as MicrosmithSbtHostFailureException" {
             val fixture = MicrosmithSbtTestProject.create("microsmith-sbt-plugin-host-failure")
             fixture.writeFile("build.microsmith.kts", "emit(microsmith { })")
-            val service = MicrosmithSbtExecutionService(
-                scriptHostRunner = MicrosmithSbtScriptHostRunner { _, _ ->
-                    ScriptRunFailure(listOf("Host failure"), ScriptFailureType.HOST)
-                },
-            )
+            val service =
+                MicrosmithSbtExecutionService(
+                    scriptHostRunner =
+                        MicrosmithSbtScriptHostRunner { _, _ ->
+                            ScriptRunFailure(listOf("Host failure"), ScriptFailureType.HOST)
+                        }
+                )
 
-            val error = shouldThrow<MicrosmithSbtHostFailureException> {
-                service.execute(fixture.executionConfiguration())
-            }
+            val error =
+                shouldThrow<MicrosmithSbtHostFailureException> { service.execute(fixture.executionConfiguration()) }
 
             error.message shouldContain "Microsmith generation failed"
             error.message shouldContain "Host failure"
@@ -170,13 +176,13 @@ class MicrosmithSbtExecutionServiceTests : StringSpec() {
             val fixture = MicrosmithSbtTestProject.create("microsmith-sbt-plugin-runtime-failure")
             fixture.writeFile("build.microsmith.kts", "emit(microsmith { })")
             val failure = RuntimeException("Unexpected runtime failure")
-            val service = MicrosmithSbtExecutionService(
-                scriptHostRunner = MicrosmithSbtScriptHostRunner { _, _ -> throw failure },
-            )
+            val service =
+                MicrosmithSbtExecutionService(
+                    scriptHostRunner = MicrosmithSbtScriptHostRunner { _, _ -> throw failure }
+                )
 
-            val error = shouldThrow<MicrosmithSbtHostFailureException> {
-                service.execute(fixture.executionConfiguration())
-            }
+            val error =
+                shouldThrow<MicrosmithSbtHostFailureException> { service.execute(fixture.executionConfiguration()) }
 
             error.message shouldContain "Microsmith sbt plugin failed before generation completed."
             error.cause shouldBe failure

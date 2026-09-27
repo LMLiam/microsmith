@@ -4,9 +4,10 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.route.DotnetAspR
 
 internal class DotnetAspRouteGroupBuilder(private val path: String) : DotnetAspRouteTreeBuilder() {
 
-    fun build() = DotnetAspRouteGroup(
-        path = path,
-        groups = groups.toList(),
-        endpoints = endpoints.toList(),
-    )
+    fun build() =
+        DotnetAspRouteGroup(
+            path = path,
+            groups = groups.toList(),
+            endpoints = endpoints.toList(),
+        )
 }

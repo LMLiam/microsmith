@@ -3,9 +3,7 @@ package io.github.lmliam.microsmith.dsl
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.MicrosmithModel
 
-/**
- * Returns true if the model contains an extension of type [T].
- */
+/** Returns true if the model contains an extension of type [T]. */
 inline fun <reified T : MicrosmithExtension> MicrosmithModel.has() = get<T>() != null
 
 /**
@@ -16,12 +14,8 @@ inline fun <reified T : MicrosmithExtension> MicrosmithModel.has() = get<T>() !=
 inline fun <reified T : MicrosmithExtension> MicrosmithModel.require() =
     get<T>() ?: error("Required extension ${T::class.simpleName} not found")
 
-/**
- * Returns all extensions currently attached to the model.
- */
+/** Returns all extensions currently attached to the model. */
 fun MicrosmithModel.extensions() = this.keys().mapNotNull { get(it) }
 
-/**
- * Returns the set of extension types present in the model.
- */
+/** Returns the set of extension types present in the model. */
 fun MicrosmithModel.extensionTypes() = this.keys().map { it.java }.toSet()

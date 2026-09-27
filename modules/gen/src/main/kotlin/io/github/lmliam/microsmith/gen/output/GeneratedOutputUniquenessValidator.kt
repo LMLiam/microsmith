@@ -5,10 +5,7 @@ import java.nio.file.Path
 
 internal object GeneratedOutputUniquenessValidator {
     fun requireUniqueOutputPaths(outputs: List<GeneratedFile>) {
-        val duplicates =
-            outputs
-                .groupBy { outputPathKey(it) }
-                .filterValues { it.size > 1 }
+        val duplicates = outputs.groupBy { outputPathKey(it) }.filterValues { it.size > 1 }
 
         require(duplicates.isEmpty()) {
             val details = duplicates.keys.sorted().joinToString(", ")
@@ -20,16 +17,11 @@ internal object GeneratedOutputUniquenessValidator {
         requireValidOutputRoot(output.outputRoot)
         val normalizedRelativePath = requireValidRelativePath(output.relativePath)
 
-        return output.outputRoot.normalize()
-            .resolve(normalizedRelativePath)
-            .normalize()
-            .toString()
+        return output.outputRoot.normalize().resolve(normalizedRelativePath).normalize().toString()
     }
 
     private fun requireValidOutputRoot(outputRoot: Path) {
-        require(!outputRoot.isAbsolute) {
-            "Generated output root must be relative, but was '$outputRoot'."
-        }
+        require(!outputRoot.isAbsolute) { "Generated output root must be relative, but was '$outputRoot'." }
 
         val normalizedOutputRoot = outputRoot.normalize()
         require(!normalizedOutputRoot.startsWith(Path.of(".."))) {
@@ -38,9 +30,7 @@ internal object GeneratedOutputUniquenessValidator {
     }
 
     private fun requireValidRelativePath(relativePath: Path): Path {
-        require(!relativePath.isAbsolute) {
-            "Generated output path must be relative, but was '$relativePath'."
-        }
+        require(!relativePath.isAbsolute) { "Generated output path must be relative, but was '$relativePath'." }
 
         val normalizedRelativePath = relativePath.normalize()
         require(!normalizedRelativePath.startsWith(Path.of(".."))) {

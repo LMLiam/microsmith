@@ -13,23 +13,18 @@ private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
 
 private fun DotnetWorkspaceResolver.resolveSuccessfully(extension: ServicesExtension): DotnetWorkspace =
-    resolve(extension).fold(
-        ifLeft = { issues ->
-            error(
-                "Expected .NET resolution success, but got: " +
-                    issues.joinToString(),
-            )
-        },
-        ifRight = { it },
-    )
+    resolve(extension)
+        .fold(
+            ifLeft = { issues -> error("Expected .NET resolution success, but got: " + issues.joinToString()) },
+            ifRight = { it },
+        )
 
 private fun DotnetWorkspaceResolver.resolveIssues(extension: ServicesExtension): List<DotnetWorkspaceResolutionIssue> =
-    resolve(extension).fold(
-        ifLeft = { it.toList() },
-        ifRight = {
-            error("Expected .NET resolution failure")
-        },
-    )
+    resolve(extension)
+        .fold(
+            ifLeft = { it.toList() },
+            ifRight = { error("Expected .NET resolution failure") },
+        )
 
 class DotnetWorkspaceResolverTests :
     StringSpec({
@@ -39,9 +34,7 @@ class DotnetWorkspaceResolverTests :
             builder.services {
                 dotnet {
                     target(NET8)
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
@@ -73,9 +66,7 @@ class DotnetWorkspaceResolverTests :
             val builder = MicrosmithBuilder()
 
             builder.services {
-                dotnet {
-                    target(NET8)
-                }
+                dotnet { target(NET8) }
 
                 "UserService" {
                     dotnet {
@@ -85,14 +76,12 @@ class DotnetWorkspaceResolverTests :
                 }
             }
 
-            DotnetWorkspaceResolver()
-                .resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+            DotnetWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                 listOf(
-                    DotnetWorkspaceResolutionIssue
-                        .SolutionNotDeclared(
-                            serviceName = "UserService",
-                            solutionName = "Platform",
-                        ),
+                    DotnetWorkspaceResolutionIssue.SolutionNotDeclared(
+                        serviceName = "UserService",
+                        solutionName = "Platform",
+                    )
                 )
         }
 
@@ -102,33 +91,25 @@ class DotnetWorkspaceResolverTests :
             builder.services {
                 dotnet {
                     target(NET8)
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
                     dotnet {
                         solution("Platform")
                         project("UserService.Api")
-                        models {
-                            model("User") {
-                                "manager" ref "MissingUser"
-                            }
-                        }
+                        models { model("User") { "manager" ref "MissingUser" } }
                     }
                 }
             }
 
-            DotnetWorkspaceResolver()
-                .resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+            DotnetWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                 listOf(
-                    DotnetWorkspaceResolutionIssue
-                        .UnknownModelReference(
-                            serviceName = "UserService",
-                            modelName = "User",
-                            targetName = "MissingUser",
-                        ),
+                    DotnetWorkspaceResolutionIssue.UnknownModelReference(
+                        serviceName = "UserService",
+                        modelName = "User",
+                        targetName = "MissingUser",
+                    )
                 )
         }
     })

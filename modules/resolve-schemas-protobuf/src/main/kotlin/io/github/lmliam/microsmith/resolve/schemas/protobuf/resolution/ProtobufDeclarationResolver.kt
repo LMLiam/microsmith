@@ -37,19 +37,19 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
             issues += ProtobufResolutionIssue.SchemaDeclarationNameMismatch(identity.fullyQualifiedName, source.name)
         }
 
-        val declaration = when (source) {
-            is Message -> resolveMessage(identity, source, issues, dependencies)
+        val declaration =
+            when (source) {
+                is Message -> resolveMessage(identity, source, issues, dependencies)
 
-            is Enum -> ResolvedProtobufEnum(
-                source.name,
-                values = source.values.map {
-                    ResolvedProtobufEnumValue(it.name, it.index)
-                },
-                source.reserved,
-            )
+                is Enum ->
+                    ResolvedProtobufEnum(
+                        source.name,
+                        values = source.values.map { ResolvedProtobufEnumValue(it.name, it.index) },
+                        source.reserved,
+                    )
 
-            else -> error("Unsupported protobuf declaration: ${source::class.qualifiedName}")
-        }
+                else -> error("Unsupported protobuf declaration: ${source::class.qualifiedName}")
+            }
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 
@@ -60,10 +60,8 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                 ResolvedProtobufSchema(
                     identity,
                     declaration,
-                    dependencies = dependencies
-                        .filter { it != identity }
-                        .sortedBy { it.fullyQualifiedName },
-                ),
+                    dependencies = dependencies.filter { it != identity }.sortedBy { it.fullyQualifiedName },
+                )
             )
         }
     }
@@ -74,53 +72,58 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
         issues: MutableList<ProtobufResolutionIssue>,
         dependencies: MutableSet<QualifiedSchemaName>,
     ): ResolvedProtobufMessage {
-        val fields = message.fields.mapNotNull { field ->
-            when (field) {
-                is ScalarField -> ResolvedProtobufField.Scalar(
-                    field.name,
-                    field.index,
-                    field.primitive,
-                    field.cardinality,
-                )
+        val fields =
+            message.fields.mapNotNull { field ->
+                when (field) {
+                    is ScalarField ->
+                        ResolvedProtobufField.Scalar(
+                            field.name,
+                            field.index,
+                            field.primitive,
+                            field.cardinality,
+                        )
 
-                is ReferenceField -> resolveReference(
-                    identity,
-                    field.reference,
-                    ProtobufResolutionIssue.ReferenceLocation.Field(field.name),
-                    issues,
-                    dependencies,
-                )?.let { reference ->
-                    ResolvedProtobufField.Reference(field.name, field.index, reference, field.cardinality)
-                }
+                    is ReferenceField ->
+                        resolveReference(
+                                identity,
+                                field.reference,
+                                ProtobufResolutionIssue.ReferenceLocation.Field(field.name),
+                                issues,
+                                dependencies,
+                            )
+                            ?.let { reference ->
+                                ResolvedProtobufField.Reference(field.name, field.index, reference, field.cardinality)
+                            }
 
-                is MapField -> resolveValueType(
-                    identity,
-                    field.type.value,
-                    ProtobufResolutionIssue.ReferenceLocation.MapValue(field.name),
-                    issues,
-                    dependencies,
-                )?.let { value ->
-                    ResolvedProtobufField.Map(field.name, field.index, field.type.key, value)
+                    is MapField ->
+                        resolveValueType(
+                                identity,
+                                field.type.value,
+                                ProtobufResolutionIssue.ReferenceLocation.MapValue(field.name),
+                                issues,
+                                dependencies,
+                            )
+                            ?.let { value -> ResolvedProtobufField.Map(field.name, field.index, field.type.key, value) }
                 }
             }
-        }
 
-        val oneofs = message.oneofs.map { oneof ->
-            ResolvedProtobufOneof(
-                oneof.name,
-                fields = oneof.fields.mapNotNull { field ->
-                    resolveValueType(
-                        identity,
-                        field.fieldType,
-                        ProtobufResolutionIssue.ReferenceLocation.OneofField(oneof.name, field.name),
-                        issues,
-                        dependencies,
-                    )?.let { value ->
-                        ResolvedProtobufOneof.Field(field.name, field.index, value)
-                    }
-                },
-            )
-        }
+        val oneofs =
+            message.oneofs.map { oneof ->
+                ResolvedProtobufOneof(
+                    oneof.name,
+                    fields =
+                        oneof.fields.mapNotNull { field ->
+                            resolveValueType(
+                                    identity,
+                                    field.fieldType,
+                                    ProtobufResolutionIssue.ReferenceLocation.OneofField(oneof.name, field.name),
+                                    issues,
+                                    dependencies,
+                                )
+                                ?.let { value -> ResolvedProtobufOneof.Field(field.name, field.index, value) }
+                        },
+                )
+            }
 
         return ResolvedProtobufMessage(message.name, fields, oneofs, message.reserved)
     }
@@ -131,13 +134,15 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
         location: ProtobufResolutionIssue.ReferenceLocation,
         issues: MutableList<ProtobufResolutionIssue>,
         dependencies: MutableSet<QualifiedSchemaName>,
-    ): ResolvedProtobufValueType? = when (value) {
-        is PrimitiveType -> ResolvedProtobufValueType.Primitive(value)
+    ): ResolvedProtobufValueType? =
+        when (value) {
+            is PrimitiveType -> ResolvedProtobufValueType.Primitive(value)
 
-        is Reference -> resolveReference(identity, value, location, issues, dependencies)?.let {
-            ResolvedProtobufValueType.Reference(it)
+            is Reference ->
+                resolveReference(identity, value, location, issues, dependencies)?.let {
+                    ResolvedProtobufValueType.Reference(it)
+                }
         }
-    }
 
     private fun resolveReference(
         identity: QualifiedSchemaName,
@@ -145,14 +150,17 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
         location: ProtobufResolutionIssue.ReferenceLocation,
         issues: MutableList<ProtobufResolutionIssue>,
         dependencies: MutableSet<QualifiedSchemaName>,
-    ): ResolvedProtobufReference? = referenceResolver.resolve(identity, reference, location).fold(
-        ifLeft = { issue ->
-            issues += issue
-            null
-        },
-        ifRight = { resolved ->
-            dependencies += resolved.target
-            resolved
-        },
-    )
+    ): ResolvedProtobufReference? =
+        referenceResolver
+            .resolve(identity, reference, location)
+            .fold(
+                ifLeft = { issue ->
+                    issues += issue
+                    null
+                },
+                ifRight = { resolved ->
+                    dependencies += resolved.target
+                    resolved
+                },
+            )
 }

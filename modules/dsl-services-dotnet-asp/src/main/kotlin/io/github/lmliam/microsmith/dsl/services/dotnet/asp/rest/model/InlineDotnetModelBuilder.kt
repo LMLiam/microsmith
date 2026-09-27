@@ -13,8 +13,9 @@ internal class InlineDotnetModelBuilder(private val modelName: String) :
         },
     ),
     DotnetModelScope {
-    fun build() = DotnetModel(
-        name = validateDotnetIdentifier(modelName, "ASP.NET inline model name"),
-        fields = buildFields(),
-    )
+    fun build() =
+        DotnetModel(
+            name = validateDotnetIdentifier(modelName, "ASP.NET inline model name"),
+            fields = buildFields(),
+        )
 }

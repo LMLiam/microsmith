@@ -16,28 +16,30 @@ import io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.render.ProtobufS
 class ProtobufRpcServiceArtifactCompiler : SchemasArtifactCompiler<ProtobufRpcServiceArtifact> {
     override val artifactType = ProtobufRpcServiceArtifact::class
 
-    override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> = listOf(
-        ProtoFileContribution(
-            artifactId = ProtoFileArtifactId(
+    override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> =
+        listOf(
+            ProtoFileContribution(
+                artifactId =
+                    ProtoFileArtifactId(
+                        packageName = artifact.id.packageName,
+                        typeName = artifact.id.serviceName,
+                    ),
                 packageName = artifact.id.packageName,
-                typeName = artifact.id.serviceName,
-            ),
-            packageName = artifact.id.packageName,
-            imports = artifact.imports,
-            declarations = listOf(
-                ProtoDeclaration(
-                    name = artifact.id.serviceName,
-                    contents = ProtobufServiceRenderer.render(artifact),
-                ),
-            ),
-            origins = buildSet {
-                add(artifact.id.qualifiedName("service"))
-                artifact.operations.forEach { operation ->
-                    add(artifact.id.qualifiedName(operation.name))
-                }
-            },
-        ),
-    )
+                imports = artifact.imports,
+                declarations =
+                    listOf(
+                        ProtoDeclaration(
+                            name = artifact.id.serviceName,
+                            contents = ProtobufServiceRenderer.render(artifact),
+                        )
+                    ),
+                origins =
+                    buildSet {
+                        add(artifact.id.qualifiedName("service"))
+                        artifact.operations.forEach { operation -> add(artifact.id.qualifiedName(operation.name)) }
+                    },
+            )
+        )
 
     private fun ProtobufRpcServiceArtifactId.qualifiedName(suffix: String): String = buildString {
         append("schemas.protobuf")

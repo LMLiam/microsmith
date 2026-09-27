@@ -16,8 +16,8 @@ class GeneratedOutputUniquenessValidatorTests :
                             relativePath = Path("User.proto"),
                             contents = byteArrayOf(1),
                             outputRoot = Path("/tmp/proto"),
-                        ),
-                    ),
+                        )
+                    )
                 )
             }
         }
@@ -30,8 +30,8 @@ class GeneratedOutputUniquenessValidatorTests :
                             relativePath = Path("User.proto"),
                             contents = byteArrayOf(1),
                             outputRoot = Path("../proto"),
-                        ),
-                    ),
+                        )
+                    )
                 )
             }
         }
@@ -50,15 +50,14 @@ class GeneratedOutputUniquenessValidatorTests :
                             contents = byteArrayOf(2),
                             outputRoot = Path("proto"),
                         ),
-                    ),
+                    )
                 )
             }
         }
 
         "requireUniqueOutputPaths rejects absolute generated file paths" {
-            val absolutePath = Files.createTempDirectory("microsmith-uniqueness-")
-                .resolve("User.proto")
-                .toAbsolutePath()
+            val absolutePath =
+                Files.createTempDirectory("microsmith-uniqueness-").resolve("User.proto").toAbsolutePath()
 
             shouldThrow<IllegalArgumentException> {
                 GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(
@@ -67,8 +66,8 @@ class GeneratedOutputUniquenessValidatorTests :
                             relativePath = absolutePath,
                             contents = byteArrayOf(1),
                             outputRoot = Path("proto"),
-                        ),
-                    ),
+                        )
+                    )
                 )
             }
         }
@@ -81,8 +80,8 @@ class GeneratedOutputUniquenessValidatorTests :
                             relativePath = Path("../outside.proto"),
                             contents = byteArrayOf(1),
                             outputRoot = Path("proto"),
-                        ),
-                    ),
+                        )
+                    )
                 )
             }
         }
@@ -100,7 +99,7 @@ class GeneratedOutputUniquenessValidatorTests :
                         contents = byteArrayOf(2),
                         outputRoot = Path("services/UserService"),
                     ),
-                ),
+                )
             )
         }
     })

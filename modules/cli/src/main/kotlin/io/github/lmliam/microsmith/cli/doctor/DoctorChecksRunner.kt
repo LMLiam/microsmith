@@ -28,9 +28,11 @@ internal fun runDoctorChecks(
     scriptCacheDirectory: Path = defaultScriptCacheDirectory(),
     pluginCacheDirectory: Path = defaultPluginCacheDirectory(),
     projectRoot: Path = Path.of(".").toAbsolutePath().normalize(),
-): DoctorResult = DoctorChecksRunner(
-    providerValidator = providerValidator,
-    scriptCacheDirectory = scriptCacheDirectory,
-    pluginCacheDirectory = pluginCacheDirectory,
-    projectRoot = projectRoot,
-).run()
+): DoctorResult =
+    DoctorChecksRunner(
+            providerValidator = providerValidator,
+            scriptCacheDirectory = scriptCacheDirectory,
+            pluginCacheDirectory = pluginCacheDirectory,
+            projectRoot = projectRoot,
+        )
+        .run()

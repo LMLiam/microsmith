@@ -14,16 +14,17 @@ internal class RunCommandHandler(
     providerValidator: () -> List<String>,
     pluginResolver: (RunCommand) -> PluginResolutionResult,
     scriptRunner: (RunCommand, List<Path>) -> ScriptRunResult = { command, pluginClasspath ->
-        MicrosmithScriptHost().run(
-            ScriptRunRequest(
-                script = command.script,
-                outputDir = command.outputDir,
-                variables = command.variables,
-                flags = command.flags,
-                pluginClasspath = pluginClasspath,
-                isolationMode = command.isolationMode,
-            ),
-        )
+        MicrosmithScriptHost()
+            .run(
+                ScriptRunRequest(
+                    script = command.script,
+                    outputDir = command.outputDir,
+                    variables = command.variables,
+                    flags = command.flags,
+                    pluginClasspath = pluginClasspath,
+                    isolationMode = command.isolationMode,
+                )
+            )
     },
     eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,
 ) {

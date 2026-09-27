@@ -4,27 +4,20 @@ import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnetQualifiedIdentifier
 import kotlin.reflect.KClass
 
-/**
- * A named .NET solution declared in the services-level dotnet defaults scope.
- */
+/** A named .NET solution declared in the services-level dotnet defaults scope. */
 data class DotnetSolution(val name: String, val model: DotnetSolutionModel = DotnetSolutionModel.empty()) {
     init {
         validateDotnetQualifiedIdentifier(name, "Solution name")
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T : MicrosmithExtension> get(type: KClass<T>) = model.get(type) as? T?
+    @Suppress("UNCHECKED_CAST") fun <T : MicrosmithExtension> get(type: KClass<T>) = model.get(type) as? T?
 
     inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
 
-    internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = copy(
-        model = model.with(type, value),
-    )
+    internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = copy(model = model.with(type, value))
 
     internal fun merge(other: DotnetSolution): DotnetSolution {
-        require(name == other.name) {
-            "Cannot merge .NET solutions with different names: '$name' and '${other.name}'."
-        }
+        require(name == other.name) { "Cannot merge .NET solutions with different names: '$name' and '${other.name}'." }
 
         return copy(model = model.merge(other.model))
     }

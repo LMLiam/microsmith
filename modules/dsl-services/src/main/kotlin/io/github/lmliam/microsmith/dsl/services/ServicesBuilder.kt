@@ -3,9 +3,7 @@ package io.github.lmliam.microsmith.dsl.services
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import kotlin.reflect.KClass
 
-/**
- * Internal builder used within the `services { ... }` DSL block.
- */
+/** Internal builder used within the `services { ... }` DSL block. */
 class ServicesBuilder : ServicesScope {
     private var model = ServicesModel.empty()
     private val servicesByKey = linkedMapOf<String, Service>()
@@ -18,9 +16,7 @@ class ServicesBuilder : ServicesScope {
 
     fun register(service: Service) {
         val serviceKey = service.serviceKey()
-        require(serviceKey !in servicesByKey) {
-            "Duplicate service registration for '$serviceKey'."
-        }
+        require(serviceKey !in servicesByKey) { "Duplicate service registration for '$serviceKey'." }
 
         servicesByKey[serviceKey] = service
     }

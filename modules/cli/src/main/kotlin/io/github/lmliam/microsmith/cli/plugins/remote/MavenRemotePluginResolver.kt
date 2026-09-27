@@ -5,10 +5,10 @@ import io.github.lmliam.microsmith.cli.plugins.cache.cachePathFor
 import io.github.lmliam.microsmith.cli.plugins.cache.pluginArtifactCacheRoot
 import io.github.lmliam.microsmith.cli.plugins.diagnostics.PluginResolutionDiagnosticException
 import io.github.lmliam.microsmith.cli.plugins.repository.RepositoryEndpoint
-import org.eclipse.aether.RepositorySystem
-import org.eclipse.aether.supplier.RepositorySystemSupplier
 import java.nio.file.Files
 import java.nio.file.Path
+import org.eclipse.aether.RepositorySystem
+import org.eclipse.aether.supplier.RepositorySystemSupplier
 
 internal class MavenRemotePluginResolver(
     private val repositorySystem: RepositorySystem = RepositorySystemSupplier().get(),
@@ -23,10 +23,7 @@ internal class MavenRemotePluginResolver(
         cacheDirectory: Path,
         offline: Boolean,
     ): ResolvedRemotePlugin {
-        val localRepositoryRoot =
-            pluginArtifactCacheRoot(cacheDirectory).also { root ->
-                Files.createDirectories(root)
-            }
+        val localRepositoryRoot = pluginArtifactCacheRoot(cacheDirectory).also { root -> Files.createDirectories(root) }
         val expectedRootArtifactPath = cachePathFor(localRepositoryRoot, coordinate)
         ensureOfflineRootAvailability(
             coordinate = coordinate,
@@ -41,12 +38,12 @@ internal class MavenRemotePluginResolver(
                 repositorySystem = repositorySystem,
                 session = session,
                 request =
-                MavenDependencyGraphRequest(
-                    coordinate = coordinate,
-                    repositories = remoteRepositories,
-                    localRepositoryRoot = localRepositoryRoot,
-                    offline = offline,
-                ),
+                    MavenDependencyGraphRequest(
+                        coordinate = coordinate,
+                        repositories = remoteRepositories,
+                        localRepositoryRoot = localRepositoryRoot,
+                        offline = offline,
+                    ),
             )
         return resolvedRemotePluginFactory.create(
             coordinate = coordinate,
@@ -68,8 +65,8 @@ internal class MavenRemotePluginResolver(
         throw PluginResolutionDiagnosticException(
             category = PluginResolverErrorCategory.OFFLINE_CACHE_MISS,
             message =
-            "Offline mode is enabled and plugin '${coordinate.value}' is not in cache at " +
-                "'$expectedRootArtifactPath'. Run once without --offline to populate the cache.",
+                "Offline mode is enabled and plugin '${coordinate.value}' is not in cache at " +
+                    "'$expectedRootArtifactPath'. Run once without --offline to populate the cache.",
         )
     }
 }

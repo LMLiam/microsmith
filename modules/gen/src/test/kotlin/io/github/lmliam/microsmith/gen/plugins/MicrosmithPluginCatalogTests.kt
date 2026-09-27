@@ -8,9 +8,7 @@ class MicrosmithPluginCatalogTests :
         "plugin discovery loads resolution diagnostic mappers" {
             val catalog = discoverMicrosmithPlugins()
 
-            catalog
-                .resolutionIssueDiagnosticMappers
-                .mapNotNull { it::class.qualifiedName } shouldContain
+            catalog.resolutionIssueDiagnosticMappers.mapNotNull { it::class.qualifiedName } shouldContain
                 "io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionDiagnosticMapper"
         }
     })

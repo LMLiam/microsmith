@@ -31,39 +31,39 @@ internal class MicrosmithGenerationRunner(
     private val outputWriter: GeneratedOutputWriter,
 ) {
     suspend fun generate(model: MicrosmithModel, finalDir: FileSpace): List<Path> {
-        val outputs = TemporaryDirectory.create().use { tempSpace ->
-            val resolvedModels = when (val resolution = domainResolutionService.resolve(model)) {
-                is ResolutionOutcome.Success -> resolution.models
+        val outputs =
+            TemporaryDirectory.create().use { tempSpace ->
+                val resolvedModels =
+                    when (val resolution = domainResolutionService.resolve(model)) {
+                        is ResolutionOutcome.Success -> resolution.models
 
-                is ResolutionOutcome.Failure -> {
-                    val diagnostics = resolutionDiagnosticService.describe(resolution.issues)
-                    throw GenerationResolutionFailedException(issues = resolution.issues, diagnostics = diagnostics)
-                }
+                        is ResolutionOutcome.Failure -> {
+                            val diagnostics = resolutionDiagnosticService.describe(resolution.issues)
+                            throw GenerationResolutionFailedException(
+                                issues = resolution.issues,
+                                diagnostics = diagnostics,
+                            )
+                        }
+                    }
+
+                val contributions = artifactContributionService.contribute(resolvedModels)
+                val assembly = artifactAssemblyService.assemble(contributions)
+                val compiledAssembly = artifactCompilationService.compile(assembly)
+                val generatedWithOriginsManifest =
+                    GeneratedOriginsManifestBuilder.appendTo(artifactRenderingService.render(compiledAssembly))
+
+                GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(generatedWithOriginsManifest)
+                outputWriter.write(generatedWithOriginsManifest, tempSpace)
+
+                generatedWithOriginsManifest
             }
-
-            val contributions = artifactContributionService.contribute(resolvedModels)
-            val assembly = artifactAssemblyService.assemble(contributions)
-            val compiledAssembly = artifactCompilationService.compile(assembly)
-            val generatedWithOriginsManifest = GeneratedOriginsManifestBuilder.appendTo(
-                artifactRenderingService.render(compiledAssembly),
-            )
-
-            GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(generatedWithOriginsManifest)
-            outputWriter.write(generatedWithOriginsManifest, tempSpace)
-
-            generatedWithOriginsManifest
-        }
 
         outputWriter.write(outputs, finalDir)
 
         GenerationProgressReporter.reportModelGenerationComplete(finalDir)
 
         return outputs
-            .map { generatedFile ->
-                finalDir.root
-                    .resolve(generatedFile.outputRoot)
-                    .normalize()
-            }
+            .map { generatedFile -> finalDir.root.resolve(generatedFile.outputRoot).normalize() }
             .distinct()
             .sorted()
     }

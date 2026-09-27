@@ -4,9 +4,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.github.lmliam.microsmith.dsl.services.dotnet.solution.DotnetSolution
 
-/**
- * Resolved per-service .NET generation state.
- */
+/** Resolved per-service .NET generation state. */
 data class ResolvedDotnetService(
     val name: String,
     val target: DotnetTarget,

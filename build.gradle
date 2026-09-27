@@ -10,13 +10,12 @@ import org.gradle.api.file.DuplicatesStrategy
 plugins {
     id 'base'
     id 'io.github.lmliam.microsmith.repository-quality'
-    id 'io.github.lmliam.microsmith.kotlin-source-formatting'
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.metro) apply false
     alias(libs.plugins.mappie) apply false
     alias(libs.plugins.detekt) apply false
-    alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.ktfmt) apply false
     alias(libs.plugins.axion.release)
     id 'maven-publish'
     alias(libs.plugins.kotest) apply false
@@ -51,7 +50,16 @@ subprojects {
     apply plugin: 'io.kotest'
     apply plugin: 'com.gradleup.shadow'
     apply plugin: 'dev.detekt'
-    apply plugin: 'org.jlleitschuh.gradle.ktlint'
+    apply plugin: 'com.ncorti.ktfmt.gradle'
+
+    ktfmt {
+        kotlinLangStyle()
+        maxWidth.set(120)
+        blockIndent.set(4)
+        continuationIndent.set(4)
+        removeUnusedImports.set(false)
+        trailingCommaManagementStrategy.set(com.ncorti.ktfmt.gradle.TrailingCommaManagementStrategy.COMPLETE)
+    }
 
     java {
         withSourcesJar()
@@ -145,23 +153,6 @@ subprojects {
         }
     }
 
-    plugins.withId('org.jlleitschuh.gradle.ktlint') {
-        ktlint {
-            android = false
-            ignoreFailures = false
-            outputToConsole = true
-            verbose = true
-            filter {
-                exclude("**/generated/**")
-                exclude("**/build/**")
-            }
-        }
-
-        tasks.matching { it.name == "ktlintGenerateBaseline" }.configureEach {
-            enabled = false
-        }
-    }
-
     plugins.withId('tech.mappie.plugin') {
         mappie {
             useDefaultArguments.set(false)
@@ -187,7 +178,7 @@ subprojects {
     tasks.named("check") {
         dependsOn(tasks.named("detektMain"))
         dependsOn(tasks.named("detektTest"))
-        dependsOn(tasks.named("ktlintCheck"))
+        dependsOn(tasks.named("ktfmtCheck"))
     }
 
     tasks.withType(AbstractArchiveTask).configureEach {

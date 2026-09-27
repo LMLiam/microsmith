@@ -4,22 +4,22 @@ data class DotnetAspPorts(val http: Int? = null, val https: Int? = null) {
     init {
         validatePort(http, "HTTP")
         validatePort(https, "HTTPS")
-        require(http == null || https == null || http != https) {
-            "ASP.NET HTTP and HTTPS ports must be distinct."
-        }
+        require(http == null || https == null || http != https) { "ASP.NET HTTP and HTTPS ports must be distinct." }
     }
 }
 
-internal fun mergeDotnetAspPorts(left: DotnetAspPorts, right: DotnetAspPorts): DotnetAspPorts = DotnetAspPorts(
-    http = mergeDotnetAspPortValue("HTTP", left.http, right.http),
-    https = mergeDotnetAspPortValue("HTTPS", left.https, right.https),
-)
+internal fun mergeDotnetAspPorts(left: DotnetAspPorts, right: DotnetAspPorts): DotnetAspPorts =
+    DotnetAspPorts(
+        http = mergeDotnetAspPortValue("HTTP", left.http, right.http),
+        https = mergeDotnetAspPortValue("HTTPS", left.https, right.https),
+    )
 
-private fun mergeDotnetAspPortValue(label: String, left: Int?, right: Int?): Int? = when {
-    left == null -> right
-    right == null -> left
-    else -> error("ASP.NET service already declares an explicit $label port.")
-}
+private fun mergeDotnetAspPortValue(label: String, left: Int?, right: Int?): Int? =
+    when {
+        left == null -> right
+        right == null -> left
+        else -> error("ASP.NET service already declares an explicit $label port.")
+    }
 
 private fun validatePort(port: Int?, label: String) {
     require(port == null || port in MIN_DOTNET_ASP_PORT..MAX_DOTNET_ASP_PORT) {

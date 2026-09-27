@@ -21,10 +21,10 @@ class OnboardingProfileDetectorTests :
             val detector =
                 OnboardingProfileDetector(
                     matchers =
-                    listOf(
-                        OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("package.json") },
-                        OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("pnpm-workspace.yaml") },
-                    ),
+                        listOf(
+                            OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("package.json") },
+                            OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("pnpm-workspace.yaml") },
+                        )
                 )
 
             detector.detect(UNUSED_PROJECT_ROOT) shouldBe
@@ -39,10 +39,10 @@ class OnboardingProfileDetectorTests :
             val detector =
                 OnboardingProfileDetector(
                     matchers =
-                    listOf(
-                        OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("package.json") },
-                        OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("package.json") },
-                    ),
+                        listOf(
+                            OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("package.json") },
+                            OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("package.json") },
+                        )
                 )
 
             detector.detect(UNUSED_PROJECT_ROOT) shouldBe
@@ -57,10 +57,10 @@ class OnboardingProfileDetectorTests :
             val detector =
                 OnboardingProfileDetector(
                     matchers =
-                    listOf(
-                        OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("package.json") },
-                        OnboardingProfileMatcher(GoOnboardingProfile) { listOf("go.mod") },
-                    ),
+                        listOf(
+                            OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("package.json") },
+                            OnboardingProfileMatcher(GoOnboardingProfile) { listOf("go.mod") },
+                        )
                 )
 
             detector.detect(UNUSED_PROJECT_ROOT) shouldBe
@@ -100,10 +100,10 @@ class OnboardingProfileDetectorTests :
             val detector =
                 OnboardingProfileDetector(
                     matchers =
-                    listOf(
-                        OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("package.json") },
-                        OnboardingProfileMatcher(GoOnboardingProfile) { listOf("go.mod") },
-                    ),
+                        listOf(
+                            OnboardingProfileMatcher(NodeOnboardingProfile) { listOf("package.json") },
+                            OnboardingProfileMatcher(GoOnboardingProfile) { listOf("go.mod") },
+                        ),
                     fallbackProfile = customFallback,
                 )
 
@@ -139,10 +139,10 @@ class OnboardingProfileDetectorTests :
                 io.kotest.assertions.throwables.shouldThrow<IllegalArgumentException> {
                     OnboardingProfileDetector(
                         matchers =
-                        listOf(
-                            OnboardingProfileMatcher(primaryProfile) { listOf("pyproject.toml") },
-                            OnboardingProfileMatcher(conflictingProfile) { listOf("requirements.txt") },
-                        ),
+                            listOf(
+                                OnboardingProfileMatcher(primaryProfile) { listOf("pyproject.toml") },
+                                OnboardingProfileMatcher(conflictingProfile) { listOf("requirements.txt") },
+                            )
                     )
                 }
 
@@ -202,9 +202,8 @@ class OnboardingProfileDetectorTests :
 
                 detectOnboardingProfile(
                     projectRoot = nodeRoot,
-                    detector = detectorWithDotnetMarkerFinder {
-                        throw UncheckedIOException(IOException("permission denied"))
-                    },
+                    detector =
+                        detectorWithDotnetMarkerFinder { throw UncheckedIOException(IOException("permission denied")) },
                 ) shouldBe
                     OnboardingProfileDetection(
                         profile = NodeOnboardingProfile,
@@ -216,32 +215,31 @@ class OnboardingProfileDetectorTests :
             }
         }
 
-        ".NET detection skips unreadable directories".config(enabled = supportsPosixPermissions()) {
-            val dotnetRoot = createTempDirectory("microsmith-init-detect-dotnet-unreadable-directory")
-            val unreadableDirectory = dotnetRoot.resolve("restricted")
-            val readableProject = dotnetRoot.resolve("src/apps/service/Fixture.csproj")
-            val unreadableProject = unreadableDirectory.resolve("Ignored.csproj")
-            readableProject.parent.createDirectories()
-            unreadableDirectory.createDirectories()
-            readableProject.writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
-            unreadableProject.writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
+        ".NET detection skips unreadable directories"
+            .config(enabled = supportsPosixPermissions()) {
+                val dotnetRoot = createTempDirectory("microsmith-init-detect-dotnet-unreadable-directory")
+                val unreadableDirectory = dotnetRoot.resolve("restricted")
+                val readableProject = dotnetRoot.resolve("src/apps/service/Fixture.csproj")
+                val unreadableProject = unreadableDirectory.resolve("Ignored.csproj")
+                readableProject.parent.createDirectories()
+                unreadableDirectory.createDirectories()
+                readableProject.writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
+                unreadableProject.writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
 
-            val originalPermissions = Files.getPosixFilePermissions(unreadableDirectory)
-            Files.setPosixFilePermissions(unreadableDirectory, emptySet())
-            try {
-                detectOnboardingProfile(dotnetRoot) shouldBe
-                    OnboardingProfileDetection(
-                        profile = DotnetOnboardingProfile,
-                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                        matchedMarkers = listOf("src/apps/service/Fixture.csproj"),
-                    )
-            } finally {
-                runCatching {
-                    Files.setPosixFilePermissions(unreadableDirectory, originalPermissions)
+                val originalPermissions = Files.getPosixFilePermissions(unreadableDirectory)
+                Files.setPosixFilePermissions(unreadableDirectory, emptySet())
+                try {
+                    detectOnboardingProfile(dotnetRoot) shouldBe
+                        OnboardingProfileDetection(
+                            profile = DotnetOnboardingProfile,
+                            selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                            matchedMarkers = listOf("src/apps/service/Fixture.csproj"),
+                        )
+                } finally {
+                    runCatching { Files.setPosixFilePermissions(unreadableDirectory, originalPermissions) }
+                    runCatching { dotnetRoot.deleteRecursively() }
                 }
-                runCatching { dotnetRoot.deleteRecursively() }
             }
-        }
 
         listOf("pyproject.toml", "requirements.txt", "setup.py", "setup.cfg").forEach { markerFileName ->
             "detects Python repositories from $markerFileName" {
@@ -270,23 +268,19 @@ class OnboardingProfileDetectorTests :
             try {
                 mavenRoot.resolve("pom.xml").writeText("<project />\n")
                 mavenRoot.resolve("src/main/kotlin/example").createDirectories()
-                gradleKotlinDslRoot.resolve(
-                    "build.gradle.kts",
-                ).writeText("plugins { kotlin(\"jvm\") version \"2.4.20\" }\n")
-                gradleKotlinDslRoot.resolve(
-                    "settings.gradle.kts",
-                ).writeText("rootProject.name = \"fixture-kotlin\"\n")
+                gradleKotlinDslRoot
+                    .resolve("build.gradle.kts")
+                    .writeText("plugins { kotlin(\"jvm\") version \"2.4.20\" }\n")
+                gradleKotlinDslRoot.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture-kotlin\"\n")
                 gradleKotlinDslRoot.resolve("src/test/kotlin/example").createDirectories()
-                gradleGroovyRoot.resolve(
-                    "build.gradle",
-                ).writeText("plugins { id 'org.jetbrains.kotlin.jvm' version '2.4.20' }\n")
-                gradleGroovyRoot.resolve(
-                    "settings.gradle",
-                ).writeText("rootProject.name = 'fixture-kotlin'\n")
+                gradleGroovyRoot
+                    .resolve("build.gradle")
+                    .writeText("plugins { id 'org.jetbrains.kotlin.jvm' version '2.4.20' }\n")
+                gradleGroovyRoot.resolve("settings.gradle").writeText("rootProject.name = 'fixture-kotlin'\n")
                 gradleGroovyRoot.resolve("src/main/kotlin/example").createDirectories()
-                multiplatformRoot.resolve(
-                    "build.gradle.kts",
-                ).writeText("plugins { kotlin(\"multiplatform\") version \"2.4.20\" }\n")
+                multiplatformRoot
+                    .resolve("build.gradle.kts")
+                    .writeText("plugins { kotlin(\"multiplatform\") version \"2.4.20\" }\n")
                 multiplatformRoot.resolve("src/commonMain/kotlin/example").createDirectories()
                 lightweightRoot.resolve("src/main/kotlin/example").createDirectories()
 
@@ -393,14 +387,15 @@ class OnboardingProfileDetectorTests :
             val kotlinInfrastructureRoot = createTempDirectory("microsmith-init-detect-kotlin-build-infra")
             val scalaExamplesRoot = createTempDirectory("microsmith-init-detect-scala-examples")
             try {
-                scalaInfrastructureRoot.resolve("settings.gradle.kts")
+                scalaInfrastructureRoot
+                    .resolve("settings.gradle.kts")
                     .writeText("rootProject.name = \"fixture-build-infra\"\n")
                 scalaInfrastructureRoot.resolve("build-logic/src/main/scala/example").createDirectories()
-                kotlinInfrastructureRoot.resolve("settings.gradle.kts")
+                kotlinInfrastructureRoot
+                    .resolve("settings.gradle.kts")
                     .writeText("rootProject.name = \"fixture-build-infra\"\n")
                 kotlinInfrastructureRoot.resolve("buildSrc/src/main/kotlin/example").createDirectories()
-                scalaExamplesRoot.resolve("settings.gradle.kts")
-                    .writeText("rootProject.name = \"fixture-examples\"\n")
+                scalaExamplesRoot.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture-examples\"\n")
                 scalaExamplesRoot.resolve("examples/scala/src/main/scala/example").createDirectories()
 
                 detectOnboardingProfile(scalaInfrastructureRoot) shouldBe
@@ -449,21 +444,27 @@ class OnboardingProfileDetectorTests :
             val packageRoot = createTempDirectory("microsmith-init-detect-rust-package")
             val workspaceRoot = createTempDirectory("microsmith-init-detect-rust-workspace")
             try {
-                packageRoot.resolve("Cargo.toml").writeText(
-                    """
-                    [package]
-                    name = "fixture-rust"
-                    version = "0.1.0"
-                    edition = "2024"
-                    """.trimIndent() + "\n",
-                )
+                packageRoot
+                    .resolve("Cargo.toml")
+                    .writeText(
+                        """
+                        [package]
+                        name = "fixture-rust"
+                        version = "0.1.0"
+                        edition = "2024"
+                        """
+                            .trimIndent() + "\n"
+                    )
                 workspaceRoot.resolve("crates/app").createDirectories()
-                workspaceRoot.resolve("Cargo.toml").writeText(
-                    """
-                    [workspace]
-                    members = ["crates/app"]
-                    """.trimIndent() + "\n",
-                )
+                workspaceRoot
+                    .resolve("Cargo.toml")
+                    .writeText(
+                        """
+                        [workspace]
+                        members = ["crates/app"]
+                        """
+                            .trimIndent() + "\n"
+                    )
 
                 detectOnboardingProfile(packageRoot) shouldBe
                     OnboardingProfileDetection(
@@ -487,14 +488,17 @@ class OnboardingProfileDetectorTests :
             val repoRoot = createTempDirectory("microsmith-init-detect-rust-nested-only")
             try {
                 repoRoot.resolve("crates/app").createDirectories()
-                repoRoot.resolve("crates/app/Cargo.toml").writeText(
-                    """
-                    [package]
-                    name = "fixture-rust-app"
-                    version = "0.1.0"
-                    edition = "2024"
-                    """.trimIndent() + "\n",
-                )
+                repoRoot
+                    .resolve("crates/app/Cargo.toml")
+                    .writeText(
+                        """
+                        [package]
+                        name = "fixture-rust-app"
+                        version = "0.1.0"
+                        edition = "2024"
+                        """
+                            .trimIndent() + "\n"
+                    )
 
                 detectOnboardingProfile(repoRoot) shouldBe
                     OnboardingProfileDetection(
@@ -507,33 +511,35 @@ class OnboardingProfileDetectorTests :
             }
         }
 
-        "Ruby root gemspec detection skips unreadable repository roots".config(enabled = supportsPosixPermissions()) {
-            val rubyRoot = createTempDirectory("microsmith-init-detect-ruby-unreadable-root")
-            rubyRoot.resolve("microsmith-ruby-fixture.gemspec").writeText(
-                """
-                Gem::Specification.new do |spec|
-                  spec.name = "microsmith-ruby-fixture"
-                  spec.version = "0.1.0"
-                end
-                """.trimIndent() + "\n",
-            )
-
-            val originalPermissions = Files.getPosixFilePermissions(rubyRoot)
-            Files.setPosixFilePermissions(rubyRoot, emptySet())
-            try {
-                detectOnboardingProfile(rubyRoot) shouldBe
-                    OnboardingProfileDetection(
-                        profile = GenericOnboardingProfile,
-                        selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
-                        matchedMarkers = emptyList(),
+        "Ruby root gemspec detection skips unreadable repository roots"
+            .config(enabled = supportsPosixPermissions()) {
+                val rubyRoot = createTempDirectory("microsmith-init-detect-ruby-unreadable-root")
+                rubyRoot
+                    .resolve("microsmith-ruby-fixture.gemspec")
+                    .writeText(
+                        """
+                        Gem::Specification.new do |spec|
+                          spec.name = "microsmith-ruby-fixture"
+                          spec.version = "0.1.0"
+                        end
+                        """
+                            .trimIndent() + "\n"
                     )
-            } finally {
-                runCatching {
-                    Files.setPosixFilePermissions(rubyRoot, originalPermissions)
+
+                val originalPermissions = Files.getPosixFilePermissions(rubyRoot)
+                Files.setPosixFilePermissions(rubyRoot, emptySet())
+                try {
+                    detectOnboardingProfile(rubyRoot) shouldBe
+                        OnboardingProfileDetection(
+                            profile = GenericOnboardingProfile,
+                            selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
+                            matchedMarkers = emptyList(),
+                        )
+                } finally {
+                    runCatching { Files.setPosixFilePermissions(rubyRoot, originalPermissions) }
+                    runCatching { rubyRoot.deleteRecursively() }
                 }
-                runCatching { rubyRoot.deleteRecursively() }
             }
-        }
 
         "detects built-in repository profiles and falls back to the generic profile for ambiguous markers" {
             val javaRoot = createTempDirectory("microsmith-init-detect-java")
@@ -559,7 +565,8 @@ class OnboardingProfileDetectorTests :
                 scalaRoot.resolve("build.sbt").writeText("""scalaVersion := "3.7.1""" + "\n")
                 scalaRoot.resolve("src/main/scala/example").createDirectories()
                 dotnetRoot.resolve("src/apps/service").createDirectories()
-                dotnetRoot.resolve("src/apps/service/Fixture.csproj")
+                dotnetRoot
+                    .resolve("src/apps/service/Fixture.csproj")
                     .writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
                 mixedRoot.resolve("gems.rb").writeText("source \"https://rubygems.org\"\n")
                 mixedRoot.resolve("Cargo.toml").writeText("[package]\nname = \"fixture-rust\"\nversion = \"0.1.0\"\n")
@@ -645,8 +652,6 @@ private fun supportsPosixPermissions(): Boolean =
     !runningOnWindows() && FileSystems.getDefault().supportedFileAttributeViews().contains("posix")
 
 private fun detectorWithDotnetMarkerFinder(dotnetMarkerFinder: (Path) -> String?): OnboardingProfileDetector =
-    OnboardingProfileDetector(
-        matchers = BuiltInOnboardingProfileMatchers.all(dotnetMarkerFinder),
-    )
+    OnboardingProfileDetector(matchers = BuiltInOnboardingProfileMatchers.all(dotnetMarkerFinder))
 
 private fun runningOnWindows(): Boolean = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)

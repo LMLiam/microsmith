@@ -22,8 +22,9 @@ internal class DotnetAspRestResolver {
     ): EitherNel<DotnetResolutionIssue, ResolvedDotnetAspRest> {
         if (rest == null) return Either.Right(ResolvedDotnetAspRest.empty())
 
-        return treeResolver.resolve(serviceName, models, rest)
-            .flatMap { endpoints -> resolveEndpointSet(serviceName, endpoints) }
+        return treeResolver.resolve(serviceName, models, rest).flatMap { endpoints ->
+            resolveEndpointSet(serviceName, endpoints)
+        }
     }
 
     private fun resolveEndpointSet(
@@ -42,9 +43,9 @@ internal class DotnetAspRestResolver {
                     compareBy(
                         ResolvedDotnetAspEndpoint::route,
                         ResolvedDotnetAspEndpoint::operationName,
-                    ),
-                ),
-            ),
+                    )
+                )
+            )
         )
     }
 
@@ -69,7 +70,7 @@ internal class DotnetAspRestResolver {
                 compareBy(
                     { it.first.name },
                     { it.second },
-                ),
+                )
             )
             .forEach { (method, route) ->
                 add(DotnetAspResolutionIssue.DuplicateRestEndpoint(serviceName, method, route))

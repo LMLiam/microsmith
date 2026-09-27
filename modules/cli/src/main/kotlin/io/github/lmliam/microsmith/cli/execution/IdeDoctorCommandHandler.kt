@@ -10,10 +10,10 @@ internal class IdeDoctorCommandHandler(
 ) {
     fun execute(command: IdeDoctorCommand): Int {
         val emitter = emitterFactory.create(command.diagnosticsFormat, command.verbose)
-        val result =
-            runCatching {
-                ideDoctorRunner(command)
-            }.getOrElse { error ->
+        val result = runCatching {
+            ideDoctorRunner(command)
+        }
+            .getOrElse { error ->
                 emitter.error(
                     CliFailureCode.IDE_DOCTOR_FAILED,
                     error.message ?: "JetBrains IDE helper doctor failed unexpectedly.",

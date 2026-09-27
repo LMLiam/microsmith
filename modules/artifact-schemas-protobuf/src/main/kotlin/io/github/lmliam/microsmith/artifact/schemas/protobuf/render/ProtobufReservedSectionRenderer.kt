@@ -16,27 +16,29 @@ internal object ProtobufReservedSectionRenderer {
         return listOfNotNull(renderReservedNames(entries), renderNumericReservedEntries(entries)).joinToString("\n")
     }
 
-    private fun renderReservedNames(entries: List<Reserved>): String? = entries
-        .filterIsInstance<ReservedName>()
-        .takeIf { it.isNotEmpty() }
-        ?.joinToString(", ") { "\"${it.name}\"" }
-        ?.let { "reserved $it;" }
+    private fun renderReservedNames(entries: List<Reserved>): String? =
+        entries
+            .filterIsInstance<ReservedName>()
+            .takeIf { it.isNotEmpty() }
+            ?.joinToString(", ") { "\"${it.name}\"" }
+            ?.let { "reserved $it;" }
 
-    private fun renderNumericReservedEntries(entries: List<Reserved>): String? = entries
-        .filterNot { it is ReservedName }
-        .takeIf { it.isNotEmpty() }
-        ?.joinToString(", ", transform = ::renderNumericReserved)
-        ?.let { "reserved $it;" }
+    private fun renderNumericReservedEntries(entries: List<Reserved>): String? =
+        entries
+            .filterNot { it is ReservedName }
+            .takeIf { it.isNotEmpty() }
+            ?.joinToString(", ", transform = ::renderNumericReserved)
+            ?.let { "reserved $it;" }
 
-    private fun renderNumericReserved(reserved: Reserved): String = when (reserved) {
-        is ReservedIndex -> reserved.index.toString()
+    private fun renderNumericReserved(reserved: Reserved): String =
+        when (reserved) {
+            is ReservedIndex -> reserved.index.toString()
 
-        is ReservedRange -> "${reserved.indexRange.first} to ${reserved.indexRange.last}"
+            is ReservedRange -> "${reserved.indexRange.first} to ${reserved.indexRange.last}"
 
-        is ReservedToMax -> "${reserved.from} to max"
+            is ReservedToMax -> "${reserved.from} to max"
 
-        is ReservedName -> throw ProtobufEmissionInvariantException(
-            "Reserved names are rendered by renderReservedNames().",
-        )
-    }
+            is ReservedName ->
+                throw ProtobufEmissionInvariantException("Reserved names are rendered by renderReservedNames().")
+        }
 }

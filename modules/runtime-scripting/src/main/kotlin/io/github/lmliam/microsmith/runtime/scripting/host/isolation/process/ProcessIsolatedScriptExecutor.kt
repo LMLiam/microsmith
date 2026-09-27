@@ -21,15 +21,15 @@ internal class ProcessIsolatedScriptExecutor(
             requestCodec.write(
                 path = createdWorkspace.requestFile,
                 request =
-                ProcessIsolationRequest(
-                    request = request,
-                    scriptPath = scriptPath,
-                    outputPath = outputPath,
-                    cacheDirectory = cacheDirectory,
-                ),
+                    ProcessIsolationRequest(
+                        request = request,
+                        scriptPath = scriptPath,
+                        outputPath = outputPath,
+                        cacheDirectory = cacheDirectory,
+                    ),
             )
             failureFactory.fromOutcome(
-                workerLauncher.execute(createdWorkspace.requestFile, createdWorkspace.resultFile),
+                workerLauncher.execute(createdWorkspace.requestFile, createdWorkspace.resultFile)
             )
         } catch (error: IOException) {
             failureFactory.fromException(error)
@@ -43,9 +43,7 @@ internal class ProcessIsolatedScriptExecutor(
         } catch (error: SecurityException) {
             failureFactory.fromException(error)
         } finally {
-            workspace?.let { existingWorkspace ->
-                runCatching { workspaceFactory.delete(existingWorkspace) }
-            }
+            workspace?.let { existingWorkspace -> runCatching { workspaceFactory.delete(existingWorkspace) } }
         }
     }
 }

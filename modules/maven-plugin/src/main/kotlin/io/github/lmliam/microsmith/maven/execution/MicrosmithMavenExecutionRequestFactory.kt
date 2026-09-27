@@ -11,12 +11,12 @@ internal class MicrosmithMavenExecutionRequestFactory {
         val cachePath = resolveAgainstBaseDirectory(baseDirectory, configuration.cacheDirectory)
         return MicrosmithMavenExecutionRequest(
             scriptRunRequest =
-            ScriptRunRequest(
-                script = scriptPath,
-                outputDir = outputPath,
-                variables = configuration.variables.toSortedStringMap(),
-                flags = configuration.flags.toNormalizedFlagSet(),
-            ),
+                ScriptRunRequest(
+                    script = scriptPath,
+                    outputDir = outputPath,
+                    variables = configuration.variables.toSortedStringMap(),
+                    flags = configuration.flags.toNormalizedFlagSet(),
+                ),
             outputDirectory = outputPath,
             cacheDirectory = cachePath,
         )
@@ -26,13 +26,8 @@ internal class MicrosmithMavenExecutionRequestFactory {
         path.takeIf(Path::isAbsolute)?.normalize() ?: baseDirectory.resolve(path).normalize()
 }
 
-private fun java.util.Properties?.toSortedStringMap(): Map<String, String> = this?.stringPropertyNames()
-    ?.sorted()
-    ?.associateWith { propertyName -> getProperty(propertyName) }
-    .orEmpty()
+private fun java.util.Properties?.toSortedStringMap(): Map<String, String> =
+    this?.stringPropertyNames()?.sorted()?.associateWith { propertyName -> getProperty(propertyName) }.orEmpty()
 
-private fun List<String>?.toNormalizedFlagSet(): Set<String> = this.orEmpty()
-    .asSequence()
-    .map(String::trim)
-    .filter(String::isNotEmpty)
-    .toSortedSet()
+private fun List<String>?.toNormalizedFlagSet(): Set<String> =
+    this.orEmpty().asSequence().map(String::trim).filter(String::isNotEmpty).toSortedSet()

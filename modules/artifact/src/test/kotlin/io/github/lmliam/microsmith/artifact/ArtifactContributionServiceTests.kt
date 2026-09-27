@@ -17,28 +17,29 @@ private data class BetaResolved(val name: String) : ResolvedModel
 private class AlphaContributor : ArtifactContributor<AlphaResolved> {
     override val resolvedType = AlphaResolved::class
 
-    override fun contribute(model: AlphaResolved): List<ArtifactContribution<out Artifact>> = listOf(
-        TextFileArtifactContribution(
-            artifactId = TextFileArtifactId(relativePath = Path.of("alpha.txt")),
-            contents = model.name,
-        ),
-    )
+    override fun contribute(model: AlphaResolved): List<ArtifactContribution<out Artifact>> =
+        listOf(
+            TextFileArtifactContribution(
+                artifactId = TextFileArtifactId(relativePath = Path.of("alpha.txt")),
+                contents = model.name,
+            )
+        )
 }
 
 private class BetaContributor : ArtifactContributor<BetaResolved> {
     override val resolvedType = BetaResolved::class
 
-    override fun contribute(model: BetaResolved): List<ArtifactContribution<out Artifact>> = listOf(
-        TextFileArtifactContribution(
-            artifactId = TextFileArtifactId(relativePath = Path.of("beta.txt")),
-            contents = model.name,
-        ),
-    )
+    override fun contribute(model: BetaResolved): List<ArtifactContribution<out Artifact>> =
+        listOf(
+            TextFileArtifactContribution(
+                artifactId = TextFileArtifactId(relativePath = Path.of("beta.txt")),
+                contents = model.name,
+            )
+        )
 }
 
 private class MisdeclaredContributor : ArtifactContributor<AlphaResolved> {
-    @Suppress("UNCHECKED_CAST")
-    override val resolvedType = BetaResolved::class as KClass<AlphaResolved>
+    @Suppress("UNCHECKED_CAST") override val resolvedType = BetaResolved::class as KClass<AlphaResolved>
 
     override fun contribute(model: AlphaResolved): List<ArtifactContribution<out Artifact>> = emptyList()
 }
@@ -51,34 +52,32 @@ class ArtifactContributionServiceTests :
                     listOf(
                         BetaContributor(),
                         AlphaContributor(),
-                    ),
+                    )
                 )
 
-            val contributions = service.contribute(
-                listOf(BetaResolved("second"), AlphaResolved("first")),
-            )
+            val contributions = service.contribute(listOf(BetaResolved("second"), AlphaResolved("first")))
 
-            contributions shouldContainExactly listOf(
-                TextFileArtifactContribution(
-                    artifactId = TextFileArtifactId(relativePath = Path.of("alpha.txt")),
-                    contents = "first",
-                ),
-                TextFileArtifactContribution(
-                    artifactId = TextFileArtifactId(relativePath = Path.of("beta.txt")),
-                    contents = "second",
-                ),
-            )
+            contributions shouldContainExactly
+                listOf(
+                    TextFileArtifactContribution(
+                        artifactId = TextFileArtifactId(relativePath = Path.of("alpha.txt")),
+                        contents = "first",
+                    ),
+                    TextFileArtifactContribution(
+                        artifactId = TextFileArtifactId(relativePath = Path.of("beta.txt")),
+                        contents = "second",
+                    ),
+                )
         }
 
         "contributor registry rejects registrations whose declared resolvedType does not match the generic contract" {
-            val error = shouldThrow<IllegalArgumentException> {
-                ArtifactContributorRegistry(listOf(MisdeclaredContributor()))
-            }
+            val error =
+                shouldThrow<IllegalArgumentException> { ArtifactContributorRegistry(listOf(MisdeclaredContributor())) }
 
             error.message shouldBe
                 "io.github.lmliam.microsmith.artifact.MisdeclaredContributor declares " +
-                "resolvedType io.github.lmliam.microsmith.artifact.BetaResolved, but implements " +
-                "ArtifactContributor<io.github.lmliam.microsmith.artifact.AlphaResolved>. " +
-                "Ensure resolvedType matches the ArtifactContributor<R> generic type."
+                    "resolvedType io.github.lmliam.microsmith.artifact.BetaResolved, but implements " +
+                    "ArtifactContributor<io.github.lmliam.microsmith.artifact.AlphaResolved>. " +
+                    "Ensure resolvedType matches the ArtifactContributor<R> generic type."
         }
     })

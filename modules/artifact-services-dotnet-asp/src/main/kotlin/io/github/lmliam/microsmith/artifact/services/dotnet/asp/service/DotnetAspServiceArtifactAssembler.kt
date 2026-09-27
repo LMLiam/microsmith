@@ -35,7 +35,7 @@ class DotnetAspServiceArtifactAssembler : ArtifactAssembler<DotnetAspServiceArti
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<DotnetAspServiceArtifact>,
+        contribution: ArtifactContribution<DotnetAspServiceArtifact>
     ): DotnetAspServiceContribution {
         require(contribution is DotnetAspServiceContribution) {
             "Unsupported ASP.NET service contribution type: ${contribution::class}"

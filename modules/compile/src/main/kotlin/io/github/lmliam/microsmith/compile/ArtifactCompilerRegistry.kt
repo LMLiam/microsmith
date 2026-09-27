@@ -10,15 +10,10 @@ internal class ArtifactCompilerRegistry(compilers: List<ArtifactCompiler<*>>) {
         compilersByType[artifact.id.artifactType]?.cast()
 
     private fun indexCompilers(compilers: List<ArtifactCompiler<*>>): Map<KClass<out Artifact>, ArtifactCompiler<*>> {
-        val duplicates = compilers
-            .groupBy(ArtifactCompiler<*>::artifactType)
-            .filterValues { it.size > 1 }
+        val duplicates = compilers.groupBy(ArtifactCompiler<*>::artifactType).filterValues { it.size > 1 }
 
         require(duplicates.isEmpty()) {
-            val types = duplicates.keys
-                .map(::formatType)
-                .sorted()
-                .joinToString(", ")
+            val types = duplicates.keys.map(::formatType).sorted().joinToString(", ")
 
             "Duplicate artifact compilers registered for artifact types: $types"
         }

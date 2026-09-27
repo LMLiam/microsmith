@@ -1,6 +1,4 @@
 package io.github.lmliam.microsmith.dsl
 
-/**
- * Marker interface for typed extension payloads stored on a [MicrosmithModel].
- */
+/** Marker interface for typed extension payloads stored on a [MicrosmithModel]. */
 interface ModelExtension

@@ -23,29 +23,28 @@ class DotnetAspEndpointValidationTests :
             val artifact =
                 validationArtifact(
                     contractModels = listOf(userModel),
-                    endpoints = listOf(
-                        DotnetAspEndpointArtifact(
-                            method = "GET",
-                            route = "/users/{id}",
-                            operationName = "GetUser",
-                            bindings = DotnetAspEndpointBindingsArtifact(),
-                            responses = listOf(
-                                DotnetAspResponseArtifact(
-                                    statusCode = 200,
-                                    model = userModel,
-                                    headers = listOf(DotnetAspResponseHeaderArtifact("body")),
-                                    origins = setOf("services.UserService.rest.GetUser.responses.200"),
-                                ),
-                            ),
-                            origins = setOf("services.UserService.rest.GetUser"),
+                    endpoints =
+                        listOf(
+                            DotnetAspEndpointArtifact(
+                                method = "GET",
+                                route = "/users/{id}",
+                                operationName = "GetUser",
+                                bindings = DotnetAspEndpointBindingsArtifact(),
+                                responses =
+                                    listOf(
+                                        DotnetAspResponseArtifact(
+                                            statusCode = 200,
+                                            model = userModel,
+                                            headers = listOf(DotnetAspResponseHeaderArtifact("body")),
+                                            origins = setOf("services.UserService.rest.GetUser.responses.200"),
+                                        )
+                                    ),
+                                origins = setOf("services.UserService.rest.GetUser"),
+                            )
                         ),
-                    ),
                 )
 
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    validateEndpointGenerationInputs(artifact)
-                }
+            val error = shouldThrow<IllegalArgumentException> { validateEndpointGenerationInputs(artifact) }
 
             error.message.shouldContain("collides with the generated result body property 'Body'")
             error.message.shouldContain("header 'body'")
@@ -54,10 +53,7 @@ class DotnetAspEndpointValidationTests :
         "validation rejects project names that collide with the shared controller base type" {
             val artifact = validationArtifact(projectName = "Microsmith")
 
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    validateEndpointGenerationInputs(artifact)
-                }
+            val error = shouldThrow<IllegalArgumentException> { validateEndpointGenerationInputs(artifact) }
 
             error.message.shouldContain("collides with shared generated controller base type")
             error.message.shouldContain("project 'Microsmith'")
@@ -68,29 +64,28 @@ class DotnetAspEndpointValidationTests :
             val artifact =
                 validationArtifact(
                     contractModels = listOf(sharedResultModel, sharedModel("User")),
-                    endpoints = listOf(
-                        DotnetAspEndpointArtifact(
-                            method = "GET",
-                            route = "/users/{id}",
-                            operationName = "GetUser",
-                            bindings = DotnetAspEndpointBindingsArtifact(),
-                            responses = listOf(
-                                DotnetAspResponseArtifact(
-                                    statusCode = 200,
-                                    model = sharedModel("User"),
-                                    headers = emptyList(),
-                                    origins = setOf("services.UserService.rest.GetUser.responses.200"),
-                                ),
-                            ),
-                            origins = setOf("services.UserService.rest.GetUser"),
+                    endpoints =
+                        listOf(
+                            DotnetAspEndpointArtifact(
+                                method = "GET",
+                                route = "/users/{id}",
+                                operationName = "GetUser",
+                                bindings = DotnetAspEndpointBindingsArtifact(),
+                                responses =
+                                    listOf(
+                                        DotnetAspResponseArtifact(
+                                            statusCode = 200,
+                                            model = sharedModel("User"),
+                                            headers = emptyList(),
+                                            origins = setOf("services.UserService.rest.GetUser.responses.200"),
+                                        )
+                                    ),
+                                origins = setOf("services.UserService.rest.GetUser"),
+                            )
                         ),
-                    ),
                 )
 
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    validateEndpointGenerationInputs(artifact)
-                }
+            val error = shouldThrow<IllegalArgumentException> { validateEndpointGenerationInputs(artifact) }
 
             error.message.shouldContain("colliding generated contract types")
             error.message.shouldContain("GetUserResult")
@@ -102,20 +97,22 @@ private fun validationArtifact(
     contractModels: List<DotnetAspModelArtifact> = emptyList(),
     endpoints: List<DotnetAspEndpointArtifact> = emptyList(),
     projectName: String = "UserService.Api",
-): DotnetAspServiceArtifact = DotnetAspServiceArtifact(
-    id = DotnetAspServiceArtifactId("Platform", projectName),
-    serviceName = "UserService",
-    targetFrameworkMoniker = "net8.0",
-    outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),
-    httpPort = 5000,
-    httpsPort = 5001,
-    contractModels = contractModels,
-    endpoints = endpoints,
-)
+): DotnetAspServiceArtifact =
+    DotnetAspServiceArtifact(
+        id = DotnetAspServiceArtifactId("Platform", projectName),
+        serviceName = "UserService",
+        targetFrameworkMoniker = "net8.0",
+        outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),
+        httpPort = 5000,
+        httpsPort = 5001,
+        contractModels = contractModels,
+        endpoints = endpoints,
+    )
 
-private fun sharedModel(name: String): DotnetAspModelArtifact = DotnetAspModelArtifact(
-    typeName = name,
-    locality = DotnetAspModelLocality.SHARED,
-    model = DotnetModel(name = name, fields = listOf(DotnetField("id", DotnetFieldType.String))),
-    origins = setOf("services.UserService.models.$name"),
-)
+private fun sharedModel(name: String): DotnetAspModelArtifact =
+    DotnetAspModelArtifact(
+        typeName = name,
+        locality = DotnetAspModelLocality.SHARED,
+        model = DotnetModel(name = name, fields = listOf(DotnetField("id", DotnetFieldType.String))),
+        origins = setOf("services.UserService.models.$name"),
+    )

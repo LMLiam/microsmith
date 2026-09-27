@@ -20,10 +20,9 @@ internal class IndexAllocator(private val min: Int, private val protoReserved: I
 
         return generateSequence(next) { it + 1 }
             .first { candidate ->
-                candidate !in used &&
-                    reserved.none { candidate in it } &&
-                    protoReserved?.contains(candidate) != true
-            }.also { candidate ->
+                candidate !in used && reserved.none { candidate in it } && protoReserved?.contains(candidate) != true
+            }
+            .also { candidate ->
                 validate(candidate)
                 used += candidate
                 next = candidate + 1
@@ -42,9 +41,7 @@ internal class IndexAllocator(private val min: Int, private val protoReserved: I
 
     fun validate(index: Int) {
         require(index in min..Max.VALUE) { "Invalid index: $index" }
-        protoReserved?.let {
-            require(index !in it) { "Index $index is in proto reserved range" }
-        }
+        protoReserved?.let { require(index !in it) { "Index $index is in proto reserved range" } }
         require(index !in used) { "Index $index already used" }
         require(reserved.none { index in it }) { "Index $index is in reserved range" }
     }
@@ -53,10 +50,8 @@ internal class IndexAllocator(private val min: Int, private val protoReserved: I
         validate(range.first)
         validate(range.last)
         require(used.none { it in range }) { "Range $range overlaps with used indexes" }
-        require(
-            reserved.none { existing ->
-                existing.first <= range.last && range.first <= existing.last
-            },
-        ) { "Range $range overlaps with already reserved ranges" }
+        require(reserved.none { existing -> existing.first <= range.last && range.first <= existing.last }) {
+            "Range $range overlaps with already reserved ranges"
+        }
     }
 }

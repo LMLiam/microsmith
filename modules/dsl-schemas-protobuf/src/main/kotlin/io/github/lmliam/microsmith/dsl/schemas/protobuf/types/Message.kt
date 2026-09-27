@@ -9,5 +9,4 @@ data class Message(
     val fields: List<MessageField> = emptyList(),
     val oneofs: List<Oneof> = emptyList(),
     override val reserved: List<Reserved> = emptyList(),
-) : Type,
-    ReservedDeclarationOwner
+) : Type, ReservedDeclarationOwner

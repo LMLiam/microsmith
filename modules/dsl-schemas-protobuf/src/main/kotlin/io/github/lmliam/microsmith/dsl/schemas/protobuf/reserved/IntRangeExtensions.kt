@@ -3,8 +3,10 @@ package io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved
 internal fun MutableSet<IntRange>.merge(newRange: IntRange) {
     val disjoint = mutableListOf<IntRange>()
 
-    val merged =
-        sortedBy { it.first }.fold(newRange) { current, range ->
+    val merged = sortedBy {
+        it.first
+    }
+        .fold(newRange) { current, range ->
             if (range.last + 1 < current.first || current.last + 1 < range.first) {
                 // disjoint, remember it
                 disjoint += range

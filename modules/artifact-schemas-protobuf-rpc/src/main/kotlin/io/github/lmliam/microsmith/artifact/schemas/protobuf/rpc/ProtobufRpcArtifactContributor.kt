@@ -12,24 +12,28 @@ class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSc
     override fun contribute(model: ResolvedProtobufRpcSchemaModel): List<ArtifactContribution<*>> =
         model.schemas.map { schema ->
             ProtobufRpcServiceContribution(
-                artifactId = ProtobufRpcServiceArtifactId(
-                    packageName = schema.qualifiedName.packageName,
-                    serviceName = schema.qualifiedName.typeName,
-                ),
+                artifactId =
+                    ProtobufRpcServiceArtifactId(
+                        packageName = schema.qualifiedName.packageName,
+                        serviceName = schema.qualifiedName.typeName,
+                    ),
                 imports = schema.imports,
-                operations = schema.rpcs.map { rpc ->
-                    ProtobufRpcOperation(
-                        name = rpc.name,
-                        request = ProtobufRpcEndpoint(
-                            typeName = rpc.request.qualifiedTypeName,
-                            streaming = rpc.request.streaming,
-                        ),
-                        response = ProtobufRpcEndpoint(
-                            typeName = rpc.response.qualifiedTypeName,
-                            streaming = rpc.response.streaming,
-                        ),
-                    )
-                },
+                operations =
+                    schema.rpcs.map { rpc ->
+                        ProtobufRpcOperation(
+                            name = rpc.name,
+                            request =
+                                ProtobufRpcEndpoint(
+                                    typeName = rpc.request.qualifiedTypeName,
+                                    streaming = rpc.request.streaming,
+                                ),
+                            response =
+                                ProtobufRpcEndpoint(
+                                    typeName = rpc.response.qualifiedTypeName,
+                                    streaming = rpc.response.streaming,
+                                ),
+                        )
+                    },
             )
         }
 }

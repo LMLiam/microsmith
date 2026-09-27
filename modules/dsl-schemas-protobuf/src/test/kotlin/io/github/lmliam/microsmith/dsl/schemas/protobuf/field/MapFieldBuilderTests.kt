@@ -18,9 +18,7 @@ class MapFieldBuilderTests :
             builder.key(PrimitiveType.STRING)
             builder.key shouldBe PrimitiveType.STRING
 
-            shouldThrow<IllegalArgumentException> {
-                builder.key(PrimitiveType.INT32)
-            }
+            shouldThrow<IllegalArgumentException> { builder.key(PrimitiveType.INT32) }
         }
 
         "sets value once and throws on second set" {
@@ -28,9 +26,7 @@ class MapFieldBuilderTests :
             builder.value(PrimitiveType.STRING)
             builder.value shouldBe PrimitiveType.STRING
 
-            shouldThrow<IllegalArgumentException> {
-                builder.value(PrimitiveType.INT32)
-            }
+            shouldThrow<IllegalArgumentException> { builder.value(PrimitiveType.INT32) }
         }
 
         "types sets both key and value" {

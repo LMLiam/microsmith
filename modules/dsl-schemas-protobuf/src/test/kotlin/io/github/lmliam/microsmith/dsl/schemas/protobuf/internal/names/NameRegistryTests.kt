@@ -29,48 +29,36 @@ class NameRegistryTests :
 
         "cannot use a blank name" {
             val registry = NameRegistry()
-            shouldThrow<IllegalArgumentException> {
-                registry.use(" ")
-            }
+            shouldThrow<IllegalArgumentException> { registry.use(" ") }
         }
 
         "cannot reserve a blank name" {
             val registry = NameRegistry()
-            shouldThrow<IllegalArgumentException> {
-                registry.reserve(" ")
-            }
+            shouldThrow<IllegalArgumentException> { registry.reserve(" ") }
         }
 
         "cannot use a name already reserved" {
             val registry = NameRegistry()
             registry.reserve("hello")
-            shouldThrow<IllegalArgumentException> {
-                registry.use("hello")
-            }
+            shouldThrow<IllegalArgumentException> { registry.use("hello") }
         }
 
         "cannot reserve a name already used" {
             val registry = NameRegistry()
             registry.use("hello")
-            shouldThrow<IllegalArgumentException> {
-                registry.reserve("hello")
-            }
+            shouldThrow<IllegalArgumentException> { registry.reserve("hello") }
         }
 
         "cannot use a name already used" {
             val registry = NameRegistry()
             registry.use("hello")
-            shouldThrow<IllegalArgumentException> {
-                registry.use("hello")
-            }
+            shouldThrow<IllegalArgumentException> { registry.use("hello") }
         }
 
         "cannot reserve a name already reserved" {
             val registry = NameRegistry()
             registry.reserve("hello")
-            shouldThrow<IllegalArgumentException> {
-                registry.reserve("hello")
-            }
+            shouldThrow<IllegalArgumentException> { registry.reserve("hello") }
         }
 
         "used and reserved sets are immutable snapshots" {

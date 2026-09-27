@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.request
 internal class DotnetAspRequestFieldOptions : DotnetAspRequestFieldScope {
     var optional = false
         private set
+
     var defaultValue: DotnetAspDefaultValue? = null
         private set
 

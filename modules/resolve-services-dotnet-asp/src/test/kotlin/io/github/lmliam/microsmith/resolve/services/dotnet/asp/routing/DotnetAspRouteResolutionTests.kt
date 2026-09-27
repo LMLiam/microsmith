@@ -15,12 +15,11 @@ private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
 
 private fun DotnetAspWorkspaceResolver.resolveRouteIssues(extension: ServicesExtension): List<DotnetResolutionIssue> =
-    resolve(extension).fold(
-        ifLeft = { it.toList() },
-        ifRight = {
-            error("Expected ASP.NET route resolution failure")
-        },
-    )
+    resolve(extension)
+        .fold(
+            ifLeft = { it.toList() },
+            ifRight = { error("Expected ASP.NET route resolution failure") },
+        )
 
 class DotnetAspRouteResolutionTests :
     StringSpec({
@@ -31,9 +30,7 @@ class DotnetAspRouteResolutionTests :
                 dotnet {
                     target(NET8)
 
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
@@ -41,64 +38,31 @@ class DotnetAspRouteResolutionTests :
                         solution("Platform")
                         project("UserService.Api")
 
-                        models {
-                            "User" {
-                                string("id")
-                            }
-                        }
+                        models { "User" { string("id") } }
 
                         asp {
                             rest {
-                                "/users/user-{id}" {
-                                    get("GetUser") {
-                                        responses {
-                                            ok("User")
-                                        }
-                                    }
-                                }
+                                "/users/user-{id}" { get("GetUser") { responses { ok("User") } } }
 
-                                "admins" {
-                                    get("GetAdmin") {
-                                        responses {
-                                            ok("User")
-                                        }
-                                    }
-                                }
+                                "admins" { get("GetAdmin") { responses { ok("User") } } }
                             }
                         }
                     }
                 }
             }
 
-            DotnetAspWorkspaceResolver()
-                .resolveRouteIssues(
-                    builder.requireServicesExtension(),
-                ) shouldContainExactly
+            DotnetAspWorkspaceResolver().resolveRouteIssues(builder.requireServicesExtension()) shouldContainExactly
                 listOf(
-                    DotnetAspResolutionIssue
-                        .InvalidRouteDeclaration(
-                            kind =
-                            DotnetAspResolutionIssue
-                                .RouteDeclarationKind.GROUP,
-                            route = "/users/user-{id}",
-                            problem =
-                            DotnetAspResolutionIssue
-                                .RouteProblem
-                                .InvalidSegment(
-                                    "user-{id}",
-                                ),
-                        ),
-                    DotnetAspResolutionIssue
-                        .InvalidRouteDeclaration(
-                            kind =
-                            DotnetAspResolutionIssue
-                                .RouteDeclarationKind.GROUP,
-                            route = "admins",
-                            problem =
-                            DotnetAspResolutionIssue
-                                .RouteProblem
-                                .MissingLeadingSlash,
-                        ),
+                    DotnetAspResolutionIssue.InvalidRouteDeclaration(
+                        kind = DotnetAspResolutionIssue.RouteDeclarationKind.GROUP,
+                        route = "/users/user-{id}",
+                        problem = DotnetAspResolutionIssue.RouteProblem.InvalidSegment("user-{id}"),
+                    ),
+                    DotnetAspResolutionIssue.InvalidRouteDeclaration(
+                        kind = DotnetAspResolutionIssue.RouteDeclarationKind.GROUP,
+                        route = "admins",
+                        problem = DotnetAspResolutionIssue.RouteProblem.MissingLeadingSlash,
+                    ),
                 )
         }
     })

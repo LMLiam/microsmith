@@ -29,18 +29,12 @@ class ProtobufRpcSchemasResolver : DomainResolver<SchemasExtension, ResolvedProt
         }
 
         return rpcSchemas
-            .mapOrAccumulate { (schema, service) ->
-                schemaResolver.resolve(schema, service, schemasByName).bindNel()
-            }
+            .mapOrAccumulate { (schema, service) -> schemaResolver.resolve(schema, service, schemasByName).bindNel() }
             .fold(
                 ifLeft = { DomainResolution.Failure(it) },
                 ifRight = { resolvedSchemas ->
                     DomainResolution.Success(
-                        ResolvedProtobufRpcSchemaModel(
-                            resolvedSchemas.sortedBy {
-                                it.qualifiedName.fullyQualifiedName
-                            },
-                        ),
+                        ResolvedProtobufRpcSchemaModel(resolvedSchemas.sortedBy { it.qualifiedName.fullyQualifiedName })
                     )
                 },
             )

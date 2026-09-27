@@ -20,16 +20,19 @@ internal fun DotnetAspServiceArtifact.textContribution(
     relativePath: String,
     contents: String,
     origins: Set<String>,
-): TextFileArtifactContribution = TextFileArtifactContribution(
-    artifactId = TextFileArtifactId(
-        relativePath = Path.of(relativePath),
-        outputRoot = outputRoot,
-    ),
-    contents = contents,
-    origins = origins,
-)
+): TextFileArtifactContribution =
+    TextFileArtifactContribution(
+        artifactId =
+            TextFileArtifactId(
+                relativePath = Path.of(relativePath),
+                outputRoot = outputRoot,
+            ),
+        contents = contents,
+        origins = origins,
+    )
 
-internal fun renderDotnetAspAppSettingsFile(artifact: DotnetAspServiceArtifact): String = """
+internal fun renderDotnetAspAppSettingsFile(artifact: DotnetAspServiceArtifact): String =
+    """
     {
       "Microsmith": {
         "ServiceName": "${escapeDotnetAspJsonString(artifact.serviceName)}"
@@ -42,9 +45,11 @@ internal fun renderDotnetAspAppSettingsFile(artifact: DotnetAspServiceArtifact):
       },
       "AllowedHosts": "*"
     }
-""".trimIndent()
+"""
+        .trimIndent()
 
-internal fun renderDotnetAspLaunchSettingsFile(artifact: DotnetAspServiceArtifact): String = """
+internal fun renderDotnetAspLaunchSettingsFile(artifact: DotnetAspServiceArtifact): String =
+    """
     {
       "${'$'}schema": "http://json.schemastore.org/launchsettings.json",
       "profiles": {
@@ -59,7 +64,8 @@ internal fun renderDotnetAspLaunchSettingsFile(artifact: DotnetAspServiceArtifac
         }
       }
     }
-""".trimIndent()
+"""
+        .trimIndent()
 
 private fun escapeDotnetAspJsonString(value: String): String {
     val escaped = StringBuilder(value.length)

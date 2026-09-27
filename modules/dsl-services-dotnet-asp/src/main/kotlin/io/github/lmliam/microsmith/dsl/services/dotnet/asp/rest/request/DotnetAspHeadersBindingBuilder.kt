@@ -13,9 +13,7 @@ internal class DotnetAspHeadersBindingBuilder(private val name: String) : Dotnet
 
     private fun headerFieldName(headerName: String): String {
         val normalized = headerName.trim()
-        require(normalized.isNotBlank()) {
-            "ASP.NET header name cannot be blank."
-        }
+        require(normalized.isNotBlank()) { "ASP.NET header name cannot be blank." }
 
         val candidate =
             normalized
@@ -28,10 +26,9 @@ internal class DotnetAspHeadersBindingBuilder(private val name: String) : Dotnet
                     } else {
                         lower.replaceFirstChar(Char::uppercaseChar)
                     }
-                }.joinToString("")
+                }
+                .joinToString("")
 
-        return candidate.ifBlank {
-            error("Unable to derive an ASP.NET header field name from '$headerName'.")
-        }
+        return candidate.ifBlank { error("Unable to derive an ASP.NET header field name from '$headerName'.") }
     }
 }

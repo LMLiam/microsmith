@@ -20,15 +20,11 @@ private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
 
 private fun DotnetAspWorkspaceResolver.resolveSuccessfully(extension: ServicesExtension): DotnetAspWorkspace =
-    resolve(extension).fold(
-        ifLeft = { issues ->
-            error(
-                "Expected ASP.NET resolution success, but got: " +
-                    issues.joinToString(),
-            )
-        },
-        ifRight = { it },
-    )
+    resolve(extension)
+        .fold(
+            ifLeft = { issues -> error("Expected ASP.NET resolution success, but got: " + issues.joinToString()) },
+            ifRight = { it },
+        )
 
 class DotnetAspWorkspaceResolverTests :
     StringSpec({
@@ -38,9 +34,7 @@ class DotnetAspWorkspaceResolverTests :
             builder.services {
                 dotnet {
                     target(NET8)
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
@@ -48,36 +42,24 @@ class DotnetAspWorkspaceResolverTests :
                         solution("Platform")
                         project("UserService.Api")
                         models {
-                            "User" {
-                                string("id")
-                            }
-                            "Problem" {
-                                string("detail")
-                            }
+                            "User" { string("id") }
+                            "Problem" { string("detail") }
                         }
                         asp {
                             rest {
                                 "/users" {
                                     "/{id}" {
                                         get("GetUser") {
-                                            path("GetUserPath") {
-                                                string("id")
-                                            }
+                                            path("GetUserPath") { string("id") }
                                             query("GetUserQuery") {
                                                 bool("includeDetails") {
                                                     optional()
                                                     default(false)
                                                 }
                                             }
-                                            headers("GetUserHeaders") {
-                                                header("X-Correlation-Id")
-                                            }
+                                            headers("GetUserHeaders") { header("X-Correlation-Id") }
                                             responses {
-                                                ok("User") {
-                                                    headers {
-                                                        header("ETag")
-                                                    }
-                                                }
+                                                ok("User") { headers { header("ETag") } }
                                                 notFound("Problem")
                                             }
                                         }
@@ -88,9 +70,7 @@ class DotnetAspWorkspaceResolverTests :
                                             string("email")
                                             "manager" ref "User"
                                         }
-                                        responses {
-                                            created("User")
-                                        }
+                                        responses { created("User") }
                                     }
                                 }
                             }
@@ -123,10 +103,8 @@ class DotnetAspWorkspaceResolverTests :
 
             createUser.route shouldBe "/users"
             requireNotNull(createUser.bindings.body).locality shouldBe ResolvedDotnetAspModelLocality.INLINE
-            requireNotNull(createUser.bindings.body)
-                .model
-                .fields
-                .map { it.name } shouldContainExactly listOf("email", "manager")
+            requireNotNull(createUser.bindings.body).model.fields.map { it.name } shouldContainExactly
+                listOf("email", "manager")
             createUser.responses.single().model.locality shouldBe ResolvedDotnetAspModelLocality.SHARED
         }
 
@@ -136,9 +114,7 @@ class DotnetAspWorkspaceResolverTests :
             builder.services {
                 dotnet {
                     target(NET8)
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
@@ -150,21 +126,9 @@ class DotnetAspWorkspaceResolverTests :
                                 http(7000)
                                 https(7443)
                             }
-                            rest {
-                                "/health" {
-                                    get("GetHealth") {
-                                        responses {
-                                            ok("Status")
-                                        }
-                                    }
-                                }
-                            }
+                            rest { "/health" { get("GetHealth") { responses { ok("Status") } } } }
                         }
-                        models {
-                            "Status" {
-                                string("value")
-                            }
-                        }
+                        models { "Status" { string("value") } }
                     }
                 }
             }
@@ -181,35 +145,23 @@ class DotnetAspWorkspaceResolverTests :
             builder.services {
                 dotnet {
                     target(NET8)
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
                     dotnet {
                         solution("Platform")
                         project("UserService.Api")
-                        models {
-                            "Problem" {
-                                string("detail")
-                            }
-                        }
+                        models { "Problem" { string("detail") } }
                         asp {
                             rest {
                                 "/users" {
                                     post("CreateUser") {
-                                        body("CreateUserBody") {
-                                            string("email")
-                                        }
+                                        body("CreateUserBody") { string("email") }
                                         responses {
                                             created("CreateUserResponse") {
-                                                model {
-                                                    string("id")
-                                                }
-                                                headers {
-                                                    header("Location")
-                                                }
+                                                model { string("id") }
+                                                headers { header("Location") }
                                             }
                                             badRequest("Problem")
                                         }

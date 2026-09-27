@@ -21,9 +21,7 @@ internal class ProcessIsolationWorkspaceFactory {
         }
 
         Files.walk(workspace.workingDirectory).use { stream ->
-            stream.sorted(Comparator.reverseOrder()).forEach { entry ->
-                Files.deleteIfExists(entry)
-            }
+            stream.sorted(Comparator.reverseOrder()).forEach { entry -> Files.deleteIfExists(entry) }
         }
     }
 }

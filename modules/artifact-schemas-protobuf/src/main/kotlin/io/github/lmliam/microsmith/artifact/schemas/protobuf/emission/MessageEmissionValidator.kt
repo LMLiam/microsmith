@@ -24,9 +24,7 @@ private fun requireUniqueFieldNumbers(message: ResolvedProtobufMessage) {
 }
 
 private fun requireUniqueOneofNames(message: ResolvedProtobufMessage) {
-    val duplicates = message.oneofs
-        .groupBy { it.name }
-        .filterValues { it.size > 1 }
+    val duplicates = message.oneofs.groupBy { it.name }.filterValues { it.size > 1 }
 
     require(duplicates.isEmpty()) {
         val names = duplicates.keys.sorted().joinToString(", ")
@@ -49,13 +47,16 @@ private fun collectFieldNumberUsages(message: ResolvedProtobufMessage): List<Fie
 }
 
 private fun <K : Comparable<K>> requireUniqueUsages(messageName: String, label: String, usages: List<FieldUsage<K>>) {
-    val duplicates = usages.groupBy(keySelector = FieldUsage<K>::key, valueTransform = FieldUsage<K>::location)
-        .filterValues { it.size > 1 }
+    val duplicates =
+        usages.groupBy(keySelector = FieldUsage<K>::key, valueTransform = FieldUsage<K>::location).filterValues {
+            it.size > 1
+        }
 
     require(duplicates.isEmpty()) {
-        val details = duplicates.toSortedMap()
-            .entries
-            .joinToString("; ") { (duplicateKey, locations) -> "$duplicateKey (${locations.joinToString()})" }
+        val details =
+            duplicates.toSortedMap().entries.joinToString("; ") { (duplicateKey, locations) ->
+                "$duplicateKey (${locations.joinToString()})"
+            }
         "Duplicate $label in message '$messageName': $details"
     }
 }

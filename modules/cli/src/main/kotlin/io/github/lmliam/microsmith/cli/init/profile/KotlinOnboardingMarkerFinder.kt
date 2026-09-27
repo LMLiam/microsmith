@@ -21,8 +21,7 @@ internal object KotlinOnboardingMarkerFinder {
             return false
         }
 
-        val sourceSetName =
-            relativeDirectory.getName(relativeDirectory.nameCount - SOURCE_SET_NAME_OFFSET).toString()
+        val sourceSetName = relativeDirectory.getName(relativeDirectory.nameCount - SOURCE_SET_NAME_OFFSET).toString()
         return sourceSetName == MAIN_SOURCE_SET_NAME ||
             sourceSetName == TEST_SOURCE_SET_NAME ||
             sourceSetName.endsWith(MAIN_SOURCE_SET_SUFFIX) ||

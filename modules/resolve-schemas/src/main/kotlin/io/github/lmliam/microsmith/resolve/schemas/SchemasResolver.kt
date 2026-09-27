@@ -11,7 +11,5 @@ class SchemasResolver : DomainResolver<SchemasExtension, ResolvedSchemasModel> {
     override val resolvedType = ResolvedSchemasModel::class
 
     override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedSchemasModel> =
-        DomainResolution.Success(
-            ResolvedSchemasModel(authoring.schemas),
-        )
+        DomainResolution.Success(ResolvedSchemasModel(authoring.schemas))
 }

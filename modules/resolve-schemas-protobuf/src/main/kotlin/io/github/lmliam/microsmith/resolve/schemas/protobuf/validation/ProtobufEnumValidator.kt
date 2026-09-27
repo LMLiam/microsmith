@@ -14,7 +14,7 @@ internal fun validateEnumDeclaration(schemaName: String, enum: Enum): List<Proto
                 schemaName,
                 first.name,
                 first.index,
-            ),
+            )
         )
     }
 
@@ -31,7 +31,7 @@ internal fun validateEnumDeclaration(schemaName: String, enum: Enum): List<Proto
             ProtobufResolutionIssue.DuplicateEnumValueNames(
                 schemaName,
                 it,
-            ),
+            )
         )
     }
 
@@ -40,7 +40,7 @@ internal fun validateEnumDeclaration(schemaName: String, enum: Enum): List<Proto
             ProtobufResolutionIssue.DuplicateEnumValueNumbers(
                 schemaName,
                 it,
-            ),
+            )
         )
     }
 
@@ -50,6 +50,6 @@ internal fun validateEnumDeclaration(schemaName: String, enum: Enum): List<Proto
             enum.reserved,
             usedNames = enum.values.map { it.name },
             usedNumbers = enum.values.map { it.index },
-        ),
+        )
     )
 }

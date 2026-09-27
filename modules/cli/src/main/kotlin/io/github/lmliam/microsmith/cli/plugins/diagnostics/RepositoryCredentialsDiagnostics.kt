@@ -16,17 +16,18 @@ internal fun RepositoryCredentialsResolver.sensitiveValuesWithDiagnostics(): Set
         sensitiveValues()
     }
 
-private inline fun <T> runWithCredentialDiagnostics(block: () -> T): T = try {
-    block()
-} catch (error: IllegalArgumentException) {
-    throw error.toAuthenticationDiagnostic()
-} catch (error: IOException) {
-    throw error.toAuthenticationDiagnostic()
-} catch (error: UncheckedIOException) {
-    throw error.toAuthenticationDiagnostic()
-} catch (error: SecurityException) {
-    throw error.toAuthenticationDiagnostic()
-}
+private inline fun <T> runWithCredentialDiagnostics(block: () -> T): T =
+    try {
+        block()
+    } catch (error: IllegalArgumentException) {
+        throw error.toAuthenticationDiagnostic()
+    } catch (error: IOException) {
+        throw error.toAuthenticationDiagnostic()
+    } catch (error: UncheckedIOException) {
+        throw error.toAuthenticationDiagnostic()
+    } catch (error: SecurityException) {
+        throw error.toAuthenticationDiagnostic()
+    }
 
 private fun Throwable.toAuthenticationDiagnostic(): PluginResolutionDiagnosticException =
     PluginResolutionDiagnosticException(

@@ -30,11 +30,13 @@ private fun validateEnumReserved(reserved: Reserved) {
     when (reserved) {
         is ReservedName -> ProtobufNameValidation.requireIdentifier(reserved.name, "Reserved name")
 
-        is ReservedRange -> require(reserved.indexRange.first <= reserved.indexRange.last) {
-            "Reserved range must be ascending, but was ${reserved.indexRange}"
-        }
+        is ReservedRange ->
+            require(reserved.indexRange.first <= reserved.indexRange.last) {
+                "Reserved range must be ascending, but was ${reserved.indexRange}"
+            }
 
-        is ReservedIndex, is ReservedToMax -> Unit
+        is ReservedIndex,
+        is ReservedToMax -> Unit
     }
 }
 

@@ -18,15 +18,16 @@ internal object ProcessIsolatedScriptMain {
         val requestFile = Path.of(args[0])
         val resultFile = Path.of(args[1])
 
-        val result =
-            runCatching {
-                val request = ProcessIsolationProtocol.readRequest(requestFile)
-                ScriptRunExecutor(request.cacheDirectory).execute(
+        val result = runCatching {
+            val request = ProcessIsolationProtocol.readRequest(requestFile)
+            ScriptRunExecutor(request.cacheDirectory)
+                .execute(
                     request = request.request.copy(isolationMode = ScriptIsolationMode.CLASSLOADER),
                     scriptPath = request.scriptPath,
                     outputPath = request.outputPath,
                 )
-            }.getOrElse { error ->
+        }
+            .getOrElse { error ->
                 val message = error.message ?: error::class.simpleName ?: "unknown process worker error"
                 ScriptRunFailure(
                     diagnostics = listOf("Process-isolated worker failure: $message"),
@@ -36,11 +37,12 @@ internal object ProcessIsolatedScriptMain {
 
         runCatching {
             ProcessIsolationProtocol.writeResult(resultFile, result)
-        }.onFailure { error ->
-            val message = error.message ?: error::class.simpleName ?: "unknown result-write error"
-            System.err.println("Failed to write process isolation result: $message")
-            exitProcess(2)
         }
+            .onFailure { error ->
+                val message = error.message ?: error::class.simpleName ?: "unknown result-write error"
+                System.err.println("Failed to write process isolation result: $message")
+                exitProcess(2)
+            }
 
         exitProcess(0)
     }

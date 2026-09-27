@@ -7,13 +7,15 @@ internal data class DiscoveredScriptSymbol(
     val contributor: ScriptSymbolContributor,
     val definition: ScriptSymbolDefinition,
 ) {
-    fun compiled(): CompiledScriptSymbol = CompiledScriptSymbol(
-        propertyName = definition.propertyName,
-        typeName = requireNotNull(definition.valueType.qualifiedName) {
-            "Script symbol '${definition.propertyName}' uses a local or anonymous value type"
-        },
-        contributorId = contributor.id,
-        kind = definition.kind,
-        valueKey = definition.valueKey,
-    )
+    fun compiled(): CompiledScriptSymbol =
+        CompiledScriptSymbol(
+            propertyName = definition.propertyName,
+            typeName =
+                requireNotNull(definition.valueType.qualifiedName) {
+                    "Script symbol '${definition.propertyName}' uses a local or anonymous value type"
+                },
+            contributorId = contributor.id,
+            kind = definition.kind,
+            valueKey = definition.valueKey,
+        )
 }

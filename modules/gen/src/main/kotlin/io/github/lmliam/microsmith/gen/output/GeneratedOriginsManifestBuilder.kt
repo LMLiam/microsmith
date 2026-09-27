@@ -9,27 +9,30 @@ internal object GeneratedOriginsManifestBuilder {
     private val manifestRelativePath = Path.of(".microsmith", "origins.json")
 
     fun appendTo(outputs: List<GeneratedFile>): List<GeneratedFile> {
-        val manifests = outputs
-            .groupBy { generatedFile -> generatedFile.outputRoot.normalize() }
-            .mapNotNull { (outputRoot, files) ->
-                val tracedFiles = files
-                    .filter { it.relativePath != manifestRelativePath }
-                    .map { file ->
-                        TracedFile(
-                            relativePath = file.relativePath.toString().replace('\\', '/'),
-                            origins = file.origins.toList().sorted(),
-                        )
-                    }.sortedBy(TracedFile::relativePath)
-                if (tracedFiles.isEmpty()) {
-                    return@mapNotNull null
+        val manifests =
+            outputs
+                .groupBy { generatedFile -> generatedFile.outputRoot.normalize() }
+                .mapNotNull { (outputRoot, files) ->
+                    val tracedFiles =
+                        files
+                            .filter { it.relativePath != manifestRelativePath }
+                            .map { file ->
+                                TracedFile(
+                                    relativePath = file.relativePath.toString().replace('\\', '/'),
+                                    origins = file.origins.toList().sorted(),
+                                )
+                            }
+                            .sortedBy(TracedFile::relativePath)
+                    if (tracedFiles.isEmpty()) {
+                        return@mapNotNull null
+                    }
+                    GeneratedFile(
+                        relativePath = manifestRelativePath,
+                        contents = renderManifest(tracedFiles).toByteArray(StandardCharsets.UTF_8),
+                        outputRoot = outputRoot,
+                        origins = tracedFiles.flatMapTo(sortedSetOf()) { it.origins },
+                    )
                 }
-                GeneratedFile(
-                    relativePath = manifestRelativePath,
-                    contents = renderManifest(tracedFiles).toByteArray(StandardCharsets.UTF_8),
-                    outputRoot = outputRoot,
-                    origins = tracedFiles.flatMapTo(sortedSetOf()) { it.origins },
-                )
-            }
         return outputs + manifests
     }
 
@@ -53,33 +56,34 @@ internal object GeneratedOriginsManifestBuilder {
         append('}')
     }
 
-    private fun escapeJson(value: String): String = buildString(value.length) {
-        value.forEach { char ->
-            when (char) {
-                '\\' -> append("\\\\")
+    private fun escapeJson(value: String): String =
+        buildString(value.length) {
+            value.forEach { char ->
+                when (char) {
+                    '\\' -> append("\\\\")
 
-                '"' -> append("\\\"")
+                    '"' -> append("\\\"")
 
-                '\b' -> append("\\b")
+                    '\b' -> append("\\b")
 
-                '\u000C' -> append("\\f")
+                    '\u000C' -> append("\\f")
 
-                '\n' -> append("\\n")
+                    '\n' -> append("\\n")
 
-                '\r' -> append("\\r")
+                    '\r' -> append("\\r")
 
-                '\t' -> append("\\t")
+                    '\t' -> append("\\t")
 
-                else -> {
-                    if (char.code < FIRST_PRINTABLE_CHARACTER_CODE) {
-                        append(char.toUnicodeEscape())
-                    } else {
-                        append(char)
+                    else -> {
+                        if (char.code < FIRST_PRINTABLE_CHARACTER_CODE) {
+                            append(char.toUnicodeEscape())
+                        } else {
+                            append(char)
+                        }
                     }
                 }
             }
         }
-    }
 
     private data class TracedFile(val relativePath: String, val origins: List<String>)
 }

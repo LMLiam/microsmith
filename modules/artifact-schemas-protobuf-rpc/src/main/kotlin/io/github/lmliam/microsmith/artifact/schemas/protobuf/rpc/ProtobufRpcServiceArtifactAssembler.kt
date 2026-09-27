@@ -37,7 +37,7 @@ class ProtobufRpcServiceArtifactAssembler : ArtifactAssembler<ProtobufRpcService
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<ProtobufRpcServiceArtifact>,
+        contribution: ArtifactContribution<ProtobufRpcServiceArtifact>
     ): ProtobufRpcServiceContribution {
         require(contribution is ProtobufRpcServiceContribution) {
             "Unsupported protobuf RPC contribution type: ${contribution::class}"

@@ -21,22 +21,24 @@ internal fun validateEndpointGenerationInputs(artifact: DotnetAspServiceArtifact
 private fun validateResponseHeaderNames(artifact: DotnetAspServiceArtifact) {
     artifact.endpoints.forEach { endpoint ->
         endpoint.responses.forEach { response ->
-            val headerPropertyNames = response.headers.map { header ->
-                val generatedName = dotnetAspHeaderPropertyName(header.name)
-                require(generatedName != RESULT_BODY_PROPERTY_NAME) {
-                    "ASP.NET response ${response.statusCode} in operation " +
-                        "'${endpoint.operationName}' declares header '${header.name}', " +
-                        "which collides with the generated result body property " +
-                        "'$RESULT_BODY_PROPERTY_NAME'."
+            val headerPropertyNames =
+                response.headers.map { header ->
+                    val generatedName = dotnetAspHeaderPropertyName(header.name)
+                    require(generatedName != RESULT_BODY_PROPERTY_NAME) {
+                        "ASP.NET response ${response.statusCode} in operation " +
+                            "'${endpoint.operationName}' declares header '${header.name}', " +
+                            "which collides with the generated result body property " +
+                            "'$RESULT_BODY_PROPERTY_NAME'."
+                    }
+                    generatedName
                 }
-                generatedName
-            }
-            val collisions = response.headers
-                .zip(headerPropertyNames)
-                .groupBy({ (_, generatedName) -> generatedName }, { (header, _) -> header })
-                .filterValues { it.size > 1 }
-                .keys
-                .sorted()
+            val collisions =
+                response.headers
+                    .zip(headerPropertyNames)
+                    .groupBy({ (_, generatedName) -> generatedName }, { (header, _) -> header })
+                    .filterValues { it.size > 1 }
+                    .keys
+                    .sorted()
             require(collisions.isEmpty()) {
                 "ASP.NET response ${response.statusCode} in operation " +
                     "'${endpoint.operationName}' declares headers with colliding " +
@@ -79,9 +81,7 @@ private fun validateGeneratedContractTypeNames(artifact: DotnetAspServiceArtifac
 
     artifact.contractModels
         .distinctBy { it.typeName }
-        .forEach { model ->
-            register(model.typeName, "generated contract model '${model.typeName}'")
-        }
+        .forEach { model -> register(model.typeName, "generated contract model '${model.typeName}'") }
     collectRequestBindings(artifact).forEach { register(it.typeName, "request binding '${it.typeName}'") }
     collectHeaderBindings(artifact).forEach { register(it.typeName, "headers binding '${it.typeName}'") }
     artifact.endpoints.forEach { endpoint ->
@@ -92,30 +92,25 @@ private fun validateGeneratedContractTypeNames(artifact: DotnetAspServiceArtifac
         endpoint.responses.forEach { response ->
             register(
                 resultVariantTypeName(endpoint, response),
-                "response result for operation '${endpoint.operationName}' " +
-                    "status ${response.statusCode}",
+                "response result for operation '${endpoint.operationName}' " + "status ${response.statusCode}",
             )
         }
     }
 
-    val collisions = contractOwners
-        .filterValues { it.size > 1 }
-        .entries
-        .sortedBy { it.key }
+    val collisions = contractOwners.filterValues { it.size > 1 }.entries.sortedBy { it.key }
     require(collisions.isEmpty()) {
         "ASP.NET service '${artifact.serviceName}' produces colliding generated contract types: " +
             collisions.joinToString("; ") { (typeName, owners) ->
                 "$typeName from ${owners.sorted().joinToString(", ")}"
-            } + "."
+            } +
+            "."
     }
 }
 
 internal fun collectRequestBindings(artifact: DotnetAspServiceArtifact): List<DotnetAspRequestBindingArtifact> =
-    artifact
-        .endpoints
-        .flatMap { endpoint ->
-            listOfNotNull(endpoint.bindings.path, endpoint.bindings.query)
-        }.groupBy(DotnetAspRequestBindingArtifact::typeName)
+    artifact.endpoints
+        .flatMap { endpoint -> listOfNotNull(endpoint.bindings.path, endpoint.bindings.query) }
+        .groupBy(DotnetAspRequestBindingArtifact::typeName)
         .map { (typeName, bindings) ->
             val first = bindings.first()
             require(bindings.all { it == first }) {
@@ -123,17 +118,19 @@ internal fun collectRequestBindings(artifact: DotnetAspServiceArtifact): List<Do
                     "request binding shapes for '$typeName'."
             }
             first
-        }.sortedBy(DotnetAspRequestBindingArtifact::typeName)
-
-internal fun collectHeaderBindings(artifact: DotnetAspServiceArtifact): List<DotnetAspHeadersBindingArtifact> = artifact
-    .endpoints
-    .mapNotNull { it.bindings.headers }
-    .groupBy(DotnetAspHeadersBindingArtifact::typeName)
-    .map { (typeName, bindings) ->
-        val first = bindings.first()
-        require(bindings.all { it == first }) {
-            "ASP.NET service '${artifact.serviceName}' declares conflicting " +
-                "headers binding shapes for '$typeName'."
         }
-        first
-    }.sortedBy(DotnetAspHeadersBindingArtifact::typeName)
+        .sortedBy(DotnetAspRequestBindingArtifact::typeName)
+
+internal fun collectHeaderBindings(artifact: DotnetAspServiceArtifact): List<DotnetAspHeadersBindingArtifact> =
+    artifact.endpoints
+        .mapNotNull { it.bindings.headers }
+        .groupBy(DotnetAspHeadersBindingArtifact::typeName)
+        .map { (typeName, bindings) ->
+            val first = bindings.first()
+            require(bindings.all { it == first }) {
+                "ASP.NET service '${artifact.serviceName}' declares conflicting " +
+                    "headers binding shapes for '$typeName'."
+            }
+            first
+        }
+        .sortedBy(DotnetAspHeadersBindingArtifact::typeName)

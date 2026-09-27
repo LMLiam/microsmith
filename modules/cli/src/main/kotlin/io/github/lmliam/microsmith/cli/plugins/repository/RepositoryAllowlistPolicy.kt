@@ -14,12 +14,14 @@ internal data class RepositoryAllowlistPolicy(
         val normalized = normalizeRepositoryUri(repositoryUri)
         val parsed = URI.create(normalized)
         when (parsed.scheme) {
-            "file" -> require(allowFileRepositories) {
-                "Repository '$repositoryUri' is blocked by policy: file:// repositories are not allowed. " +
-                    "Set $ALLOW_FILE_REPOSITORIES_ENV=true to explicitly enable file repositories."
-            }
+            "file" ->
+                require(allowFileRepositories) {
+                    "Repository '$repositoryUri' is blocked by policy: file:// repositories are not allowed. " +
+                        "Set $ALLOW_FILE_REPOSITORIES_ENV=true to explicitly enable file repositories."
+                }
 
-            "http", "https" ->
+            "http",
+            "https" ->
                 require(allowedRepositories.contains(normalized)) {
                     "Repository '$repositoryUri' is not in the allowed repository allowlist. " +
                         "Configure $REPOSITORY_ALLOWLIST_ENV to permit additional endpoints."
@@ -34,17 +36,9 @@ internal fun defaultRepositoryAllowlistPolicy(
     repositoryAllowlistEnv: String? = System.getenv(REPOSITORY_ALLOWLIST_ENV),
     allowFileRepositoriesEnv: String? = System.getenv(ALLOW_FILE_REPOSITORIES_ENV),
 ): RepositoryAllowlistPolicy {
-    val envAllowlist =
-        repositoryAllowlistEnv
-            ?.split(',')
-            ?.map(String::trim)
-            ?.filter(String::isNotEmpty)
-            .orEmpty()
+    val envAllowlist = repositoryAllowlistEnv?.split(',')?.map(String::trim)?.filter(String::isNotEmpty).orEmpty()
     val allowFileRepositories = parseBooleanEnv(allowFileRepositoriesEnv)
-    val allowedRepositories =
-        (listOf(MAVEN_CENTRAL_REPOSITORY) + envAllowlist)
-            .map(::normalizeRepositoryUri)
-            .toSet()
+    val allowedRepositories = (listOf(MAVEN_CENTRAL_REPOSITORY) + envAllowlist).map(::normalizeRepositoryUri).toSet()
 
     return RepositoryAllowlistPolicy(
         allowedRepositories = allowedRepositories,
@@ -71,14 +65,11 @@ internal fun normalizeRepositoryUri(uri: String): String {
             URI("file", null, path, null).toString().trimEnd('/')
         }
 
-        "http", "https" -> {
-            require(parsed.userInfo == null) {
-                "Repository URI '$uri' must not include userinfo credentials."
-            }
+        "http",
+        "https" -> {
+            require(parsed.userInfo == null) { "Repository URI '$uri' must not include userinfo credentials." }
             val host = parsed.host?.lowercase()
-            require(!host.isNullOrBlank()) {
-                "Repository URI '$uri' must include a valid host."
-            }
+            require(!host.isNullOrBlank()) { "Repository URI '$uri' must include a valid host." }
             val path = parsed.path?.ifEmpty { "" }.orEmpty()
             URI(scheme, parsed.userInfo, host, parsed.port, path, null, null).toString().trimEnd('/')
         }
@@ -87,8 +78,5 @@ internal fun normalizeRepositoryUri(uri: String): String {
     }
 }
 
-private fun parseBooleanEnv(value: String?): Boolean = value
-    ?.trim()
-    ?.takeIf { it.isNotEmpty() }
-    ?.equals("true", ignoreCase = true)
-    ?: false
+private fun parseBooleanEnv(value: String?): Boolean =
+    value?.trim()?.takeIf { it.isNotEmpty() }?.equals("true", ignoreCase = true) ?: false

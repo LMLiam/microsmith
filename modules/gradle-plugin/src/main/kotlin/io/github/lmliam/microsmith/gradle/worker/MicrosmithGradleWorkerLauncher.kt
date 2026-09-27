@@ -1,14 +1,13 @@
 package io.github.lmliam.microsmith.gradle.worker
 
-import org.gradle.api.GradleException
 import java.nio.file.Files
 import java.nio.file.Path
+import org.gradle.api.GradleException
 
 internal class MicrosmithGradleWorkerLauncher(
     private val requestCodec: MicrosmithGradleWorkerRequestCodec = MicrosmithGradleWorkerRequestCodec(),
     private val resultCodec: MicrosmithGradleWorkerResultCodec = MicrosmithGradleWorkerResultCodec(),
-    private val processExecutor: MicrosmithGradleWorkerProcessExecutor =
-        DefaultMicrosmithGradleWorkerProcessExecutor(),
+    private val processExecutor: MicrosmithGradleWorkerProcessExecutor = DefaultMicrosmithGradleWorkerProcessExecutor(),
 ) {
     fun execute(
         request: MicrosmithGradleWorkerRequest,
@@ -33,13 +32,9 @@ internal class MicrosmithGradleWorkerLauncher(
         requestFile: Path,
         resultFile: Path,
     ): MicrosmithGradleWorkerExecutionOutcome {
-        val processOutcome =
-            processExecutor.execute(
-                buildCommand(runtimeClasspath, requestFile, resultFile),
-            )
-        val parsedResult = resultFile.takeIf(Files::isRegularFile)?.let { file ->
-            runCatching { resultCodec.read(file) }.getOrNull()
-        }
+        val processOutcome = processExecutor.execute(buildCommand(runtimeClasspath, requestFile, resultFile))
+        val parsedResult =
+            resultFile.takeIf(Files::isRegularFile)?.let { file -> runCatching { resultCodec.read(file) }.getOrNull() }
         return MicrosmithGradleWorkerExecutionOutcome(
             exitCode = processOutcome.exitCode,
             processOutput = processOutcome.processOutput,
@@ -47,14 +42,15 @@ internal class MicrosmithGradleWorkerLauncher(
         )
     }
 
-    private fun buildCommand(runtimeClasspath: List<Path>, requestFile: Path, resultFile: Path): List<String> = listOf(
-        resolveJavaCommand().toString(),
-        "-cp",
-        runtimeClasspath.joinToString(FilePathSeparator.value),
-        MicrosmithGradleWorkerMain::class.java.name,
-        requestFile.toString(),
-        resultFile.toString(),
-    )
+    private fun buildCommand(runtimeClasspath: List<Path>, requestFile: Path, resultFile: Path): List<String> =
+        listOf(
+            resolveJavaCommand().toString(),
+            "-cp",
+            runtimeClasspath.joinToString(FilePathSeparator.value),
+            MicrosmithGradleWorkerMain::class.java.name,
+            requestFile.toString(),
+            resultFile.toString(),
+        )
 
     private fun resolveJavaCommand(): Path {
         val javaHome = Path.of(System.getProperty("java.home"))
@@ -74,7 +70,8 @@ internal class MicrosmithGradleWorkerLauncher(
             appendLine("Worker output:")
             appendLine(outcome.processOutput)
         }
-    }.trimEnd()
+    }
+        .trimEnd()
 
     private fun isWindows(): Boolean = System.getProperty("os.name").orEmpty().lowercase().contains("windows")
 }

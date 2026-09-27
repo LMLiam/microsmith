@@ -32,22 +32,14 @@ internal fun parseCoordinate(raw: String): Coordinate {
 
 private fun validateCoordinateGroup(group: String) {
     val segments = group.split('.')
-    require(segments.none(String::isBlank)) {
-        "Plugin coordinate group '$group' contains an empty package segment."
-    }
-    segments.forEach { segment ->
-        validateCoordinateSegment("group", segment)
-    }
+    require(segments.none(String::isBlank)) { "Plugin coordinate group '$group' contains an empty package segment." }
+    segments.forEach { segment -> validateCoordinateSegment("group", segment) }
 }
 
 private fun validateCoordinateSegment(label: String, value: String) {
     require(!value.contains('/') && !value.contains('\\')) {
         "Plugin coordinate $label '$value' contains a path separator."
     }
-    require(value != "." && value != "..") {
-        "Plugin coordinate $label '$value' contains an invalid path segment."
-    }
-    require(!value.contains('|')) {
-        "Plugin coordinate $label '$value' contains a reserved lockfile delimiter."
-    }
+    require(value != "." && value != "..") { "Plugin coordinate $label '$value' contains an invalid path segment." }
+    require(!value.contains('|')) { "Plugin coordinate $label '$value' contains a reserved lockfile delimiter." }
 }

@@ -7,17 +7,15 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
 private data class TestServiceExtension(val value: String) : ServiceExtension
+
 private data class MergeableTestServiceExtension(val values: List<String>) :
-    ServiceExtension,
-    MergeableExtension<MergeableTestServiceExtension> {
+    ServiceExtension, MergeableExtension<MergeableTestServiceExtension> {
     override fun merge(other: MergeableTestServiceExtension) = MergeableTestServiceExtension(values + other.values)
 }
 
 class ServiceModelTests :
     StringSpec({
-        "empty models compare equal by value" {
-            ServiceModel.empty() shouldBe ServiceModel.empty()
-        }
+        "empty models compare equal by value" { ServiceModel.empty() shouldBe ServiceModel.empty() }
 
         "get returns extension when present" {
             val extension = TestServiceExtension("hello")
@@ -42,19 +40,19 @@ class ServiceModelTests :
 
         "merge combines mergeable service extensions by type" {
             val left =
-                ServiceModel.empty().with(
-                    MergeableTestServiceExtension::class,
-                    MergeableTestServiceExtension(listOf("left")),
-                )
+                ServiceModel.empty()
+                    .with(
+                        MergeableTestServiceExtension::class,
+                        MergeableTestServiceExtension(listOf("left")),
+                    )
             val right =
-                ServiceModel.empty().with(
-                    MergeableTestServiceExtension::class,
-                    MergeableTestServiceExtension(listOf("right")),
-                )
+                ServiceModel.empty()
+                    .with(
+                        MergeableTestServiceExtension::class,
+                        MergeableTestServiceExtension(listOf("right")),
+                    )
 
-            left
-                .merge(right)
-                .require<MergeableTestServiceExtension>()
-                .values shouldContainExactly listOf("left", "right")
+            left.merge(right).require<MergeableTestServiceExtension>().values shouldContainExactly
+                listOf("left", "right")
         }
     })

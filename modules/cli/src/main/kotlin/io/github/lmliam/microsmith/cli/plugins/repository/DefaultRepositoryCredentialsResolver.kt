@@ -32,7 +32,9 @@ internal class DefaultRepositoryCredentialsResolver(
         fileCredentialsByRepository.values.mapTo(this) { credentials -> credentials.password }
         githubPackagesCredentials?.password?.let(this::add)
         defaultCredentials?.password?.let(this::add)
-    }.filter(String::isNotBlank).toSet()
+    }
+        .filter(String::isNotBlank)
+        .toSet()
 
     private fun githubPackagesCredentialsFor(repositoryUri: String): RepositoryCredentials? {
         val host = URI.create(repositoryUri).host?.lowercase()
@@ -57,24 +59,17 @@ internal fun defaultRepositoryCredentialsResolver(
     require(repositoryUsername.isNotEmpty() == repositoryPassword.isNotEmpty()) {
         "Set both $REPOSITORY_USERNAME_ENV and $REPOSITORY_PASSWORD_ENV, or leave both unset."
     }
-    val defaultCredentials = repositoryUsername.takeIf(String::isNotEmpty)?.let { username ->
-        RepositoryCredentials(username = username, password = repositoryPassword)
-    }
+    val defaultCredentials =
+        repositoryUsername.takeIf(String::isNotEmpty)?.let { username ->
+            RepositoryCredentials(username = username, password = repositoryPassword)
+        }
 
     val githubPackagesToken =
-        githubPackagesTokenEnv
-            ?.trim()
-            ?.takeIf(String::isNotEmpty)
-            ?: githubTokenEnv
-                ?.trim()
-                ?.takeIf(String::isNotEmpty)
+        githubPackagesTokenEnv?.trim()?.takeIf(String::isNotEmpty) ?: githubTokenEnv?.trim()?.takeIf(String::isNotEmpty)
     val githubPackagesCredentials = githubPackagesToken?.let { token ->
         val githubPackagesUsername = githubPackagesUsernameEnv?.trim()?.takeIf(String::isNotEmpty)
         val githubActorUsername = githubActorEnv?.trim()?.takeIf(String::isNotEmpty)
-        val username =
-            githubPackagesUsername
-                ?: githubActorUsername
-                ?: DEFAULT_GITHUB_PACKAGES_USERNAME
+        val username = githubPackagesUsername ?: githubActorUsername ?: DEFAULT_GITHUB_PACKAGES_USERNAME
         RepositoryCredentials(username = username, password = token)
     }
 

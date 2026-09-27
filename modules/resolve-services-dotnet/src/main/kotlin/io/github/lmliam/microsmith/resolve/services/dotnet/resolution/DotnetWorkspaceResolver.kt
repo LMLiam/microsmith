@@ -13,27 +13,23 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExte
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetWorkspaceResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.ResolvedDotnetService
 
-/**
- * Normalises the shared and per-service .NET DSL into a resolved workspace model.
- */
+/** Normalises the shared and per-service .NET DSL into a resolved workspace model. */
 class DotnetWorkspaceResolver {
     fun resolve(extension: ServicesExtension): EitherNel<DotnetWorkspaceResolutionIssue, DotnetWorkspace> {
         val defaults = extension.get<DotnetDefaultsExtension>() ?: DotnetDefaultsExtension()
-        val services = extension.services
-            .mapNotNull { service ->
-                service.model
-                    .get<DotnetServiceExtension>()
-                    ?.let { service to it }
-            }
-            .sortedBy { (service) -> service.name }
+        val services =
+            extension.services
+                .mapNotNull { service -> service.model.get<DotnetServiceExtension>()?.let { service to it } }
+                .sortedBy { (service) -> service.name }
 
         return services
             .mapOrAccumulate { (service, dotnet) ->
                 resolveService(
-                    service = service,
-                    dotnet = dotnet,
-                    defaults = defaults,
-                ).bindNel()
+                        service = service,
+                        dotnet = dotnet,
+                        defaults = defaults,
+                    )
+                    .bindNel()
             }
             .map { resolvedServices ->
                 DotnetWorkspace(
@@ -67,7 +63,7 @@ class DotnetWorkspaceResolver {
                 modelReferenceIssues(
                     service = service,
                     models = dotnet.models.values.toList(),
-                ),
+                )
             )
         }
         val accumulatedIssues = issues.toNonEmptyListOrNull()
@@ -80,7 +76,7 @@ class DotnetWorkspaceResolver {
                 solution = checkNotNull(solution),
                 project = checkNotNull(project),
                 models = dotnet.models,
-            ),
+            )
         )
     }
 
@@ -101,7 +97,7 @@ class DotnetWorkspaceResolver {
                                 serviceName = service.name,
                                 modelName = model.name,
                                 targetName = reference.target,
-                            ),
+                            )
                         )
                     }
             }

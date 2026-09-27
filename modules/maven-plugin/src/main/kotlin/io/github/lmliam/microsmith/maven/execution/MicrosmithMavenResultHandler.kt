@@ -5,11 +5,11 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
+import java.nio.file.Path
+import java.util.Locale
 import org.apache.maven.plugin.MojoExecutionException
 import org.apache.maven.plugin.MojoFailureException
 import org.apache.maven.plugin.logging.Log
-import java.nio.file.Path
-import java.util.Locale
 
 internal class MicrosmithMavenResultHandler {
     fun handle(log: Log, outputDirectory: Path, result: ScriptRunResult) {
@@ -24,7 +24,7 @@ internal class MicrosmithMavenResultHandler {
         val generatedOutputRoot = GeneratedOutputRootsLocator.describe(outputDirectory, result.generatedRoots)
         log.info(
             "Generated Microsmith outputs into '$generatedOutputRoot'. " +
-                "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)",
+                "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)"
         )
     }
 
@@ -33,8 +33,7 @@ internal class MicrosmithMavenResultHandler {
         return when (result.type) {
             ScriptFailureType.VALIDATION,
             ScriptFailureType.COMPILATION,
-            ScriptFailureType.EVALUATION,
-            -> MojoFailureException(message)
+            ScriptFailureType.EVALUATION -> MojoFailureException(message)
 
             ScriptFailureType.HOST -> MojoExecutionException(message)
         }
@@ -43,5 +42,6 @@ internal class MicrosmithMavenResultHandler {
     private fun buildFailureMessage(result: ScriptRunFailure): String = buildString {
         appendLine("Microsmith generation failed (${result.type.name.lowercase(Locale.ROOT)}).")
         result.diagnostics.forEach(::appendLine)
-    }.trimEnd()
+    }
+        .trimEnd()
 }

@@ -35,21 +35,13 @@ class DotnetAspDslTests :
                             rest {
                                 "/users" {
                                     get("/{id}", "GetUser") {
-                                        path("GetUserPath") {
-                                            string("id")
-                                        }
-                                        responses {
-                                            ok("User")
-                                        }
+                                        path("GetUserPath") { string("id") }
+                                        responses { ok("User") }
                                     }
 
                                     post("CreateUser") {
-                                        body("CreateUserRequest") {
-                                            string("email")
-                                        }
-                                        responses {
-                                            created("User")
-                                        }
+                                        body("CreateUserRequest") { string("email") }
+                                        responses { created("User") }
                                     }
                                 }
                             }
@@ -69,17 +61,19 @@ class DotnetAspDslTests :
             usersGroup.path shouldBe "/users"
             getUser.path shouldBe "/{id}"
             requireNotNull(getUser.bindings.path).fields.map { it.name } shouldContainExactly listOf("id")
-            createUser.bindings.body shouldBe DotnetAspModelReference.Inline(
-                DotnetModel(
-                    name = "CreateUserRequest",
-                    fields = listOf(
-                        DotnetField(
-                            name = "email",
-                            type = DotnetFieldType.String,
-                        ),
-                    ),
-                ),
-            )
+            createUser.bindings.body shouldBe
+                DotnetAspModelReference.Inline(
+                    DotnetModel(
+                        name = "CreateUserRequest",
+                        fields =
+                            listOf(
+                                DotnetField(
+                                    name = "email",
+                                    type = DotnetFieldType.String,
+                                )
+                            ),
+                    )
+                )
         }
 
         "multiple asp blocks merge declared rest groups" {
@@ -88,29 +82,9 @@ class DotnetAspDslTests :
             builder.services {
                 "UserService" {
                     dotnet {
-                        asp {
-                            rest {
-                                "/users" {
-                                    get("ListUsers") {
-                                        responses {
-                                            ok("User")
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        asp { rest { "/users" { get("ListUsers") { responses { ok("User") } } } } }
 
-                        asp {
-                            rest {
-                                "/health" {
-                                    get("GetHealth") {
-                                        responses {
-                                            ok("Problem")
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        asp { rest { "/health" { get("GetHealth") { responses { ok("Problem") } } } } }
                     }
                 }
             }
@@ -127,19 +101,7 @@ class DotnetAspDslTests :
 
             builder.services {
                 "UserService" {
-                    dotnet {
-                        aspNet {
-                            rest {
-                                "/health" {
-                                    get("GetHealth") {
-                                        responses {
-                                            ok("Status")
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    dotnet { aspNet { rest { "/health" { get("GetHealth") { responses { ok("Status") } } } } } }
                 }
             }
 
@@ -189,9 +151,7 @@ class DotnetAspDslTests :
                                                     header("X-Trace-Id")
                                                     header("X_Trace_Id")
                                                 }
-                                                responses {
-                                                    ok("User")
-                                                }
+                                                responses { ok("User") }
                                             }
                                         }
                                     }
@@ -246,15 +206,9 @@ class DotnetAspDslTests :
                                     rest {
                                         "/users/{id}" {
                                             get("GetUser") {
-                                                path("GetUserPath") {
-                                                    string("id")
-                                                }
-                                                path("DuplicatePath") {
-                                                    string("id")
-                                                }
-                                                responses {
-                                                    ok("User")
-                                                }
+                                                path("GetUserPath") { string("id") }
+                                                path("DuplicatePath") { string("id") }
+                                                responses { ok("User") }
                                             }
                                         }
                                     }
@@ -279,15 +233,9 @@ class DotnetAspDslTests :
                                     rest {
                                         "/users" {
                                             get("ListUsers") {
-                                                query("ListUsersQuery") {
-                                                    string("search")
-                                                }
-                                                query("DuplicateQuery") {
-                                                    string("page")
-                                                }
-                                                responses {
-                                                    ok("User")
-                                                }
+                                                query("ListUsersQuery") { string("search") }
+                                                query("DuplicateQuery") { string("page") }
+                                                responses { ok("User") }
                                             }
                                         }
                                     }
@@ -313,12 +261,8 @@ class DotnetAspDslTests :
                                         "/users" {
                                             post("CreateUser") {
                                                 body("CreateUserBody")
-                                                body("InlineBody") {
-                                                    string("email")
-                                                }
-                                                responses {
-                                                    created("User")
-                                                }
+                                                body("InlineBody") { string("email") }
+                                                responses { created("User") }
                                             }
                                         }
                                     }
@@ -343,12 +287,8 @@ class DotnetAspDslTests :
                                     rest {
                                         "/health" {
                                             get("GetHealth") {
-                                                responses {
-                                                    ok("Status")
-                                                }
-                                                responses {
-                                                    accepted("AcceptedStatus")
-                                                }
+                                                responses { ok("Status") }
+                                                responses { accepted("AcceptedStatus") }
                                             }
                                         }
                                     }
@@ -373,12 +313,8 @@ class DotnetAspDslTests :
                                     rest {
                                         "/users/{id}" {
                                             get("GetUser") {
-                                                query("GetUserQuery") {
-                                                    "user" ref "User"
-                                                }
-                                                responses {
-                                                    ok("User")
-                                                }
+                                                query("GetUserQuery") { "user" ref "User" }
+                                                responses { ok("User") }
                                             }
                                         }
                                     }

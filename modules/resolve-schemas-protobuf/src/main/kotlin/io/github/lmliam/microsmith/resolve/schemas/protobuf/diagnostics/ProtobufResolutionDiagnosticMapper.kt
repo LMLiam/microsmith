@@ -7,20 +7,16 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIs
 
 @ServiceProvider(ResolutionIssueDiagnosticMapper::class)
 class ProtobufResolutionDiagnosticMapper : ResolutionIssueDiagnosticMapper<ProtobufResolutionIssue> {
-    override val issueType =
-        ProtobufResolutionIssue::class
+    override val issueType = ProtobufResolutionIssue::class
 
-    override fun map(issue: ProtobufResolutionIssue): ResolutionDiagnostic = when (issue) {
-        is ProtobufResolutionIssue.ReferenceIssue ->
-            issue.toDiagnostic()
+    override fun map(issue: ProtobufResolutionIssue): ResolutionDiagnostic =
+        when (issue) {
+            is ProtobufResolutionIssue.ReferenceIssue -> issue.toDiagnostic()
 
-        is ProtobufResolutionIssue.DeclarationIssue ->
-            issue.toDiagnostic()
+            is ProtobufResolutionIssue.DeclarationIssue -> issue.toDiagnostic()
 
-        is ProtobufResolutionIssue.EnumIssue ->
-            issue.toDiagnostic()
+            is ProtobufResolutionIssue.EnumIssue -> issue.toDiagnostic()
 
-        is ProtobufResolutionIssue.ReservationIssue ->
-            issue.toDiagnostic()
-    }
+            is ProtobufResolutionIssue.ReservationIssue -> issue.toDiagnostic()
+        }
 }

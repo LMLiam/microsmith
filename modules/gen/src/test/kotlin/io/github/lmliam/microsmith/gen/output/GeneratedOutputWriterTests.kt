@@ -18,16 +18,18 @@ class GeneratedOutputWriterTests :
             Files.createDirectories(existingProtoFile.parent)
             existingProtoFile.writeText("stale")
 
-            GeneratedOutputWriter().write(
-                outputs = listOf(
-                    GeneratedFile(
-                        relativePath = Path("UserCreated.proto"),
-                        contents = "fresh".toByteArray(),
-                        outputRoot = Path("services/UserService"),
-                    ),
-                ),
-                space = DirectorySpace.from(outputRoot),
-            )
+            GeneratedOutputWriter()
+                .write(
+                    outputs =
+                        listOf(
+                            GeneratedFile(
+                                relativePath = Path("UserCreated.proto"),
+                                contents = "fresh".toByteArray(),
+                                outputRoot = Path("services/UserService"),
+                            )
+                        ),
+                    space = DirectorySpace.from(outputRoot),
+                )
 
             existingProtoFile.readText() shouldBe "fresh"
         }

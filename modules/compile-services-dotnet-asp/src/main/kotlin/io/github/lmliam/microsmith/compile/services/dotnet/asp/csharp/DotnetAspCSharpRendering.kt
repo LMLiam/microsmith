@@ -41,16 +41,17 @@ internal fun escapeDotnetAspCsharpStringLiteral(value: String): String = buildSt
     append('"')
 }
 
-internal fun escapeDotnetAspCsharpCharLiteral(value: Char): String = when (value) {
-    '\\' -> "'\\\\'"
-    '\'' -> "'\\''"
-    '\n' -> "'\\n'"
-    '\r' -> "'\\r'"
-    '\t' -> "'\\t'"
-    '\b' -> "'\\b'"
-    '\u000C' -> "'\\f'"
-    else -> renderDotnetAspPrintableCharLiteral(value)
-}
+internal fun escapeDotnetAspCsharpCharLiteral(value: Char): String =
+    when (value) {
+        '\\' -> "'\\\\'"
+        '\'' -> "'\\''"
+        '\n' -> "'\\n'"
+        '\r' -> "'\\r'"
+        '\t' -> "'\\t'"
+        '\b' -> "'\\b'"
+        '\u000C' -> "'\\f'"
+        else -> renderDotnetAspPrintableCharLiteral(value)
+    }
 
 private fun renderDotnetAspPrintableCharLiteral(value: Char): String =
     if (value.code < FIRST_NON_PRINTABLE_ASCII_CODE_POINT) {

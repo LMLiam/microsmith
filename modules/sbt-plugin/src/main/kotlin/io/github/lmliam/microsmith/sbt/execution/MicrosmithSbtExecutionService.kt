@@ -14,7 +14,7 @@ class MicrosmithSbtExecutionService(
 
     @Suppress("TooGenericExceptionCaught")
     private inline fun runWithHostFailureMapping(
-        action: () -> MicrosmithSbtExecutionOutcome,
+        action: () -> MicrosmithSbtExecutionOutcome
     ): MicrosmithSbtExecutionOutcome {
         try {
             return action()
@@ -23,14 +23,16 @@ class MicrosmithSbtExecutionService(
         }
     }
 
-    private fun RuntimeException.toHostFailure(): RuntimeException = when (this) {
-        is MicrosmithSbtScriptFailureException -> this
+    private fun RuntimeException.toHostFailure(): RuntimeException =
+        when (this) {
+            is MicrosmithSbtScriptFailureException -> this
 
-        is MicrosmithSbtHostFailureException -> this
+            is MicrosmithSbtHostFailureException -> this
 
-        else -> MicrosmithSbtHostFailureException(
-            "Microsmith sbt plugin failed before generation completed.",
-            this,
-        )
-    }
+            else ->
+                MicrosmithSbtHostFailureException(
+                    "Microsmith sbt plugin failed before generation completed.",
+                    this,
+                )
+        }
 }

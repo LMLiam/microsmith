@@ -14,24 +14,23 @@ internal fun validateMessageReservations(
             schemaName,
             reservations,
             usedNames,
-        ),
+        )
     )
 
-    val spans =
-        reservations.mapNotNull { reservation ->
-            validateMessageReservationSpan(
-                schemaName,
-                reservation,
-                this,
-            )
-        }
+    val spans = reservations.mapNotNull { reservation ->
+        validateMessageReservationSpan(
+            schemaName,
+            reservation,
+            this,
+        )
+    }
 
     addAll(
         validateReservationNumbers(
             schemaName,
             spans,
             usedNumbers,
-        ),
+        )
     )
 }
 
@@ -46,23 +45,22 @@ internal fun validateEnumReservations(
             schemaName,
             reservations,
             usedNames,
-        ),
+        )
     )
 
-    val spans =
-        reservations.mapNotNull { reservation ->
-            validateEnumReservationSpan(
-                schemaName,
-                reservation,
-                this,
-            )
-        }
+    val spans = reservations.mapNotNull { reservation ->
+        validateEnumReservationSpan(
+            schemaName,
+            reservation,
+            this,
+        )
+    }
 
     addAll(
         validateReservationNumbers(
             schemaName,
             spans,
             usedNumbers,
-        ),
+        )
     )
 }

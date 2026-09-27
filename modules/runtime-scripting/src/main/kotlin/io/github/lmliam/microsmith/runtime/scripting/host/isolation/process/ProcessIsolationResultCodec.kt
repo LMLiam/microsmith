@@ -17,26 +17,21 @@ internal class ProcessIsolationResultCodec {
         }
 
         path.parent?.let(Files::createDirectories)
-        Files.newOutputStream(path).use { output ->
-            properties.store(output, "Microsmith process isolation result")
-        }
+        Files.newOutputStream(path).use { output -> properties.store(output, "Microsmith process isolation result") }
     }
 
     fun read(path: Path): ScriptRunResult {
-        val properties = Properties().also { loaded ->
-            Files.newInputStream(path).use { input ->
-                loaded.load(input)
-            }
-        }
+        val properties = Properties().also { loaded -> Files.newInputStream(path).use { input -> loaded.load(input) } }
 
         return when (properties.getProperty(ProcessIsolationPropertyNames.RESULT_STATUS)?.trim()) {
             ProcessIsolationPropertyNames.RESULT_STATUS_SUCCESS -> readSuccess(properties)
 
             ProcessIsolationPropertyNames.RESULT_STATUS_FAILURE -> readFailure(properties)
 
-            else -> error(
-                "Missing or invalid '${ProcessIsolationPropertyNames.RESULT_STATUS}' in process isolation result.",
-            )
+            else ->
+                error(
+                    "Missing or invalid '${ProcessIsolationPropertyNames.RESULT_STATUS}' in process isolation result."
+                )
         }
     }
 
@@ -63,31 +58,37 @@ internal class ProcessIsolationResultCodec {
         }
     }
 
-    private fun readSuccess(properties: Properties): ScriptRunSuccess = ScriptRunSuccess(
-        warnings =
-        properties.readIndexedList(
-            countKey = ProcessIsolationPropertyNames.RESULT_WARNING_COUNT,
-            keyPrefix = ProcessIsolationPropertyNames.RESULT_WARNING_PREFIX,
-        ),
-        cacheHit = properties.requiredBoolean(ProcessIsolationPropertyNames.RESULT_CACHE_HIT),
-        elapsedMillis = properties.requiredLong(ProcessIsolationPropertyNames.RESULT_ELAPSED_MILLIS),
-        generatedRoots =
-        properties.readIndexedList(
-            countKey = ProcessIsolationPropertyNames.RESULT_GENERATED_ROOT_COUNT,
-            keyPrefix = ProcessIsolationPropertyNames.RESULT_GENERATED_ROOT_PREFIX,
-        ).map(Path::of),
-    )
+    private fun readSuccess(properties: Properties): ScriptRunSuccess =
+        ScriptRunSuccess(
+            warnings =
+                properties.readIndexedList(
+                    countKey = ProcessIsolationPropertyNames.RESULT_WARNING_COUNT,
+                    keyPrefix = ProcessIsolationPropertyNames.RESULT_WARNING_PREFIX,
+                ),
+            cacheHit = properties.requiredBoolean(ProcessIsolationPropertyNames.RESULT_CACHE_HIT),
+            elapsedMillis = properties.requiredLong(ProcessIsolationPropertyNames.RESULT_ELAPSED_MILLIS),
+            generatedRoots =
+                properties
+                    .readIndexedList(
+                        countKey = ProcessIsolationPropertyNames.RESULT_GENERATED_ROOT_COUNT,
+                        keyPrefix = ProcessIsolationPropertyNames.RESULT_GENERATED_ROOT_PREFIX,
+                    )
+                    .map(Path::of),
+        )
 
-    private fun readFailure(properties: Properties): ScriptRunFailure = ScriptRunFailure(
-        diagnostics =
-        properties.readIndexedList(
-            countKey = ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_COUNT,
-            keyPrefix = ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_PREFIX,
-        ),
-        type = parseFailureType(properties.getProperty(ProcessIsolationPropertyNames.RESULT_FAILURE_TYPE)),
-    )
+    private fun readFailure(properties: Properties): ScriptRunFailure =
+        ScriptRunFailure(
+            diagnostics =
+                properties.readIndexedList(
+                    countKey = ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_COUNT,
+                    keyPrefix = ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_PREFIX,
+                ),
+            type = parseFailureType(properties.getProperty(ProcessIsolationPropertyNames.RESULT_FAILURE_TYPE)),
+        )
 
-    private fun parseFailureType(raw: String?): ScriptFailureType = runCatching {
-        raw?.trim()?.takeIf(String::isNotEmpty)?.let(ScriptFailureType::valueOf)
-    }.getOrNull() ?: ScriptFailureType.HOST
+    private fun parseFailureType(raw: String?): ScriptFailureType =
+        runCatching {
+            raw?.trim()?.takeIf(String::isNotEmpty)?.let(ScriptFailureType::valueOf)
+        }
+            .getOrNull() ?: ScriptFailureType.HOST
 }

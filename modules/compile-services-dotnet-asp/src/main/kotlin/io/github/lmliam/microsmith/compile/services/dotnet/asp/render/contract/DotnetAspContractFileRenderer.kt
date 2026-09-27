@@ -22,42 +22,44 @@ internal object DotnetAspContractFileRenderer {
                 .forEach { addType(renderRecordType(it.typeName, it.model.fields)) }
         }
 
-    fun renderRequestModelsFile(artifact: DotnetAspServiceArtifact): String = renderContractsFile(
-        artifact,
-        usings = setOf(
-            DotnetAspCSharpNamespaces.System,
-            DotnetAspCSharpNamespaces.Microsoft.AspNetCore.ModelBinding,
-        ),
-    ) {
-        buildList {
-            collectRequestBindings(artifact).forEach { add(renderRequestBindingType(it)) }
-            collectHeaderBindings(artifact).forEach { add(renderHeadersBindingType(it)) }
-            artifact.endpoints.forEach { endpoint ->
-                endpoint.bindings.body
-                    ?.takeIf { it.locality == DotnetAspModelLocality.INLINE }
-                    ?.let { add(renderRecordType(it.typeName, it.model.fields)) }
-            }
-        }.distinctBy(CSharp.Type::name)
-            .forEach(::addType)
-    }
+    fun renderRequestModelsFile(artifact: DotnetAspServiceArtifact): String =
+        renderContractsFile(
+            artifact,
+            usings =
+                setOf(
+                    DotnetAspCSharpNamespaces.System,
+                    DotnetAspCSharpNamespaces.Microsoft.AspNetCore.ModelBinding,
+                ),
+        ) {
+            buildList {
+                    collectRequestBindings(artifact).forEach { add(renderRequestBindingType(it)) }
+                    collectHeaderBindings(artifact).forEach { add(renderHeadersBindingType(it)) }
+                    artifact.endpoints.forEach { endpoint ->
+                        endpoint.bindings.body
+                            ?.takeIf { it.locality == DotnetAspModelLocality.INLINE }
+                            ?.let { add(renderRecordType(it.typeName, it.model.fields)) }
+                    }
+                }
+                .distinctBy(CSharp.Type::name)
+                .forEach(::addType)
+        }
 
     fun renderResponseModelsFile(artifact: DotnetAspServiceArtifact): String =
         renderContractsFile(artifact, usings = setOf(DotnetAspCSharpNamespaces.System)) {
             buildList {
-                artifact.endpoints.forEach { endpoint ->
-                    endpoint.responses
-                        .map(DotnetAspResponseArtifact::model)
-                        .filter { it.locality == DotnetAspModelLocality.INLINE }
-                        .distinctBy(DotnetAspModelArtifact::typeName)
-                        .forEach { model -> add(renderRecordType(model.typeName, model.model.fields)) }
-                }
-                artifact.endpoints.forEach { endpoint ->
-                    add(renderResultBaseType(endpoint))
-                    endpoint.responses.forEach { response ->
-                        add(renderResultVariantType(endpoint, response))
+                    artifact.endpoints.forEach { endpoint ->
+                        endpoint.responses
+                            .map(DotnetAspResponseArtifact::model)
+                            .filter { it.locality == DotnetAspModelLocality.INLINE }
+                            .distinctBy(DotnetAspModelArtifact::typeName)
+                            .forEach { model -> add(renderRecordType(model.typeName, model.model.fields)) }
+                    }
+                    artifact.endpoints.forEach { endpoint ->
+                        add(renderResultBaseType(endpoint))
+                        endpoint.responses.forEach { response -> add(renderResultVariantType(endpoint, response)) }
                     }
                 }
-            }.distinctBy(CSharp.Type::name)
+                .distinctBy(CSharp.Type::name)
                 .forEach(::addType)
         }
 
@@ -65,10 +67,11 @@ internal object DotnetAspContractFileRenderer {
         artifact: DotnetAspServiceArtifact,
         usings: Set<io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpNamespace>,
         build: CSharpFileBuilder.() -> Unit,
-    ): String = CSharp.render(
-        CSharp.file(contractsNamespace(artifact)) {
-            usings.forEach(::using)
-            build()
-        },
-    )
+    ): String =
+        CSharp.render(
+            CSharp.file(contractsNamespace(artifact)) {
+                usings.forEach(::using)
+                build()
+            }
+        )
 }

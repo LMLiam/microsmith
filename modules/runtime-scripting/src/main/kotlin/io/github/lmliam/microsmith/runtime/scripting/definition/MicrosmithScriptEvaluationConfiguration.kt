@@ -4,6 +4,5 @@ import io.github.lmliam.microsmith.runtime.scripting.symbols.refinement.refineMi
 import kotlin.script.experimental.api.ScriptEvaluationConfiguration
 import kotlin.script.experimental.api.refineConfigurationBeforeEvaluate
 
-internal object MicrosmithScriptEvaluationConfiguration : ScriptEvaluationConfiguration({
-    refineConfigurationBeforeEvaluate(::refineMicrosmithScriptSymbolValues)
-})
+internal object MicrosmithScriptEvaluationConfiguration :
+    ScriptEvaluationConfiguration({ refineConfigurationBeforeEvaluate(::refineMicrosmithScriptSymbolValues) })

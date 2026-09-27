@@ -32,26 +32,22 @@ internal class ProcessIsolationRequestCodec {
         }
 
         path.parent?.let(Files::createDirectories)
-        Files.newOutputStream(path).use { output ->
-            properties.store(output, "Microsmith process isolation request")
-        }
+        Files.newOutputStream(path).use { output -> properties.store(output, "Microsmith process isolation request") }
     }
 
     fun read(path: Path): ProcessIsolationRequest {
-        val properties = Properties().also { loaded ->
-            Files.newInputStream(path).use { input ->
-                loaded.load(input)
-            }
-        }
+        val properties = Properties().also { loaded -> Files.newInputStream(path).use { input -> loaded.load(input) } }
 
         val scriptPath = properties.requiredPath(ProcessIsolationPropertyNames.REQUEST_SCRIPT)
         val outputPath = properties.requiredPath(ProcessIsolationPropertyNames.REQUEST_OUTPUT_DIR)
         val cacheDirectory = properties.requiredPath(ProcessIsolationPropertyNames.REQUEST_CACHE_DIR)
         val pluginClasspath =
-            properties.readIndexedList(
-                countKey = ProcessIsolationPropertyNames.REQUEST_PLUGIN_CLASSPATH_COUNT,
-                keyPrefix = ProcessIsolationPropertyNames.REQUEST_PLUGIN_CLASSPATH_PREFIX,
-            ).map(Path::of)
+            properties
+                .readIndexedList(
+                    countKey = ProcessIsolationPropertyNames.REQUEST_PLUGIN_CLASSPATH_COUNT,
+                    keyPrefix = ProcessIsolationPropertyNames.REQUEST_PLUGIN_CLASSPATH_PREFIX,
+                )
+                .map(Path::of)
         val variables =
             properties.readIndexedMap(
                 countKey = ProcessIsolationPropertyNames.REQUEST_VARIABLE_COUNT,
@@ -59,20 +55,22 @@ internal class ProcessIsolationRequestCodec {
                 valuePrefix = ProcessIsolationPropertyNames.REQUEST_VARIABLE_VALUE_PREFIX,
             )
         val flags =
-            properties.readIndexedList(
-                countKey = ProcessIsolationPropertyNames.REQUEST_FLAG_COUNT,
-                keyPrefix = ProcessIsolationPropertyNames.REQUEST_FLAG_PREFIX,
-            ).toSet()
+            properties
+                .readIndexedList(
+                    countKey = ProcessIsolationPropertyNames.REQUEST_FLAG_COUNT,
+                    keyPrefix = ProcessIsolationPropertyNames.REQUEST_FLAG_PREFIX,
+                )
+                .toSet()
 
         return ProcessIsolationRequest(
             request =
-            ScriptRunRequest(
-                script = scriptPath,
-                outputDir = outputPath,
-                variables = variables,
-                flags = flags,
-                pluginClasspath = pluginClasspath,
-            ),
+                ScriptRunRequest(
+                    script = scriptPath,
+                    outputDir = outputPath,
+                    variables = variables,
+                    flags = flags,
+                    pluginClasspath = pluginClasspath,
+                ),
             scriptPath = scriptPath,
             outputPath = outputPath,
             cacheDirectory = cacheDirectory,

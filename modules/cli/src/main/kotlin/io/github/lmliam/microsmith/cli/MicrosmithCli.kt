@@ -40,20 +40,19 @@ internal class MicrosmithCli(
     providerValidator: () -> List<String> = ::verifyBuiltinProviders,
     pluginResolver: (RunCommand) -> PluginResolutionResult = ::resolvePlugins,
     scriptRunner: (RunCommand, List<Path>) -> ScriptRunResult = { command, pluginClasspath ->
-        MicrosmithScriptHost().run(
-            ScriptRunRequest(
-                script = command.script,
-                outputDir = command.outputDir,
-                variables = command.variables,
-                flags = command.flags,
-                pluginClasspath = pluginClasspath,
-                isolationMode = command.isolationMode,
-            ),
-        )
+        MicrosmithScriptHost()
+            .run(
+                ScriptRunRequest(
+                    script = command.script,
+                    outputDir = command.outputDir,
+                    variables = command.variables,
+                    flags = command.flags,
+                    pluginClasspath = pluginClasspath,
+                    isolationMode = command.isolationMode,
+                )
+            )
     },
-    doctorRunner: () -> DoctorResult = {
-        runDoctorChecks(providerValidator = providerValidator)
-    },
+    doctorRunner: () -> DoctorResult = { runDoctorChecks(providerValidator = providerValidator) },
     private val versionProvider: () -> String = ::resolveCliVersion,
     initRunner: (InitCommand) -> InitBootstrapResult = ::runInitBootstrap,
     ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult = ::refreshIdeHelperProject,
@@ -91,27 +90,28 @@ internal class MicrosmithCli(
             ideDoctorRunner = ideDoctorRunner,
         )
 
-    fun run(args: Array<String>): Int = when (val parsed = parseCliArgs(args.toList())) {
-        is HelpCommand -> {
-            stdout(HELP_TEXT.trimIndent())
-            0
+    fun run(args: Array<String>): Int =
+        when (val parsed = parseCliArgs(args.toList())) {
+            is HelpCommand -> {
+                stdout(HELP_TEXT.trimIndent())
+                0
+            }
+
+            is ErrorCommand -> usageErrorHandler.execute(parsed)
+
+            is RunCommand -> runCommandHandler.execute(parsed)
+
+            is DoctorCommand -> doctorCommandHandler.execute(parsed)
+
+            is VersionCommand -> {
+                stdout("microsmith ${versionProvider()}")
+                0
+            }
+
+            is InitCommand -> initCommandHandler.execute(parsed)
+
+            is IdeRefreshCommand -> ideRefreshCommandHandler.execute(parsed)
+
+            is IdeDoctorCommand -> ideDoctorCommandHandler.execute(parsed)
         }
-
-        is ErrorCommand -> usageErrorHandler.execute(parsed)
-
-        is RunCommand -> runCommandHandler.execute(parsed)
-
-        is DoctorCommand -> doctorCommandHandler.execute(parsed)
-
-        is VersionCommand -> {
-            stdout("microsmith ${versionProvider()}")
-            0
-        }
-
-        is InitCommand -> initCommandHandler.execute(parsed)
-
-        is IdeRefreshCommand -> ideRefreshCommandHandler.execute(parsed)
-
-        is IdeDoctorCommand -> ideDoctorCommandHandler.execute(parsed)
-    }
 }

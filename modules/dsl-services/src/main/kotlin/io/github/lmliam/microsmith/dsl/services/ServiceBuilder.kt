@@ -2,9 +2,7 @@ package io.github.lmliam.microsmith.dsl.services
 
 import kotlin.reflect.KClass
 
-/**
- * Internal builder used to construct a [Service] from DSL blocks.
- */
+/** Internal builder used to construct a [Service] from DSL blocks. */
 class ServiceBuilder(private val name: String) : ServiceScope {
     private var model = ServiceModel.empty()
 

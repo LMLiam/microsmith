@@ -12,18 +12,20 @@ internal fun validateReservedUsage(message: ResolvedProtobufMessage) {
     validateNames(
         owner = ReservedUsageOwner.message(message.name),
         reservedNames = message.reservations.filterIsInstance<ReservedName>().map(ReservedName::name),
-        usedNames = buildList {
-            message.fields.forEach { add(it.name) }
-            message.oneofs.forEach { oneof -> oneof.fields.forEach { add(it.name) } }
-        },
+        usedNames =
+            buildList {
+                message.fields.forEach { add(it.name) }
+                message.oneofs.forEach { oneof -> oneof.fields.forEach { add(it.name) } }
+            },
     )
     validateNumbers(
         owner = ReservedUsageOwner.message(message.name),
         reserved = message.reservations,
-        usedNumbers = buildList {
-            message.fields.forEach { add(it.number) }
-            message.oneofs.forEach { oneof -> oneof.fields.forEach { add(it.number) } }
-        },
+        usedNumbers =
+            buildList {
+                message.fields.forEach { add(it.number) }
+                message.oneofs.forEach { oneof -> oneof.fields.forEach { add(it.number) } }
+            },
         maxNumber = MAX_FIELD_NUMBER,
     )
 }
@@ -62,9 +64,7 @@ private fun validateNumbers(
     usedNumbers: List<Int>,
     maxNumber: Int,
 ) {
-    val reservedRanges = reserved
-        .filterNot { it is ReservedName }
-        .map { toReservedSpan(it, maxNumber) }
+    val reservedRanges = reserved.filterNot { it is ReservedName }.map { toReservedSpan(it, maxNumber) }
 
     requireNoReservedRangeOverlaps(owner, reservedRanges)
 
@@ -75,32 +75,37 @@ private fun validateNumbers(
 }
 
 private fun requireNoReservedRangeOverlaps(owner: ReservedUsageOwner, reservedRanges: List<ReservedSpan>) {
-    val overlaps = reservedRanges
-        .sortedBy { it.range.first }
-        .zipWithNext()
-        .filter { (left, right) -> left.range.last >= right.range.first }
-        .map { (left, right) -> "${left.description} overlaps ${right.description}" }
+    val overlaps =
+        reservedRanges
+            .sortedBy { it.range.first }
+            .zipWithNext()
+            .filter { (left, right) -> left.range.last >= right.range.first }
+            .map { (left, right) -> "${left.description} overlaps ${right.description}" }
 
     require(overlaps.isEmpty()) {
         "${owner.displayName} '${owner.name}' has overlapping reserved ranges: ${overlaps.joinToString("; ")}"
     }
 }
 
-private fun toReservedSpan(reserved: Reserved, maxNumber: Int): ReservedSpan = when (reserved) {
-    is ReservedIndex -> ReservedSpan(
-        description = reserved.index.toString(),
-        range = reserved.index..reserved.index,
-    )
+private fun toReservedSpan(reserved: Reserved, maxNumber: Int): ReservedSpan =
+    when (reserved) {
+        is ReservedIndex ->
+            ReservedSpan(
+                description = reserved.index.toString(),
+                range = reserved.index..reserved.index,
+            )
 
-    is ReservedRange -> ReservedSpan(
-        description = "${reserved.indexRange.first} to ${reserved.indexRange.last}",
-        range = reserved.indexRange,
-    )
+        is ReservedRange ->
+            ReservedSpan(
+                description = "${reserved.indexRange.first} to ${reserved.indexRange.last}",
+                range = reserved.indexRange,
+            )
 
-    is ReservedToMax -> ReservedSpan(
-        description = "${reserved.from} to max",
-        range = reserved.from..maxNumber,
-    )
+        is ReservedToMax ->
+            ReservedSpan(
+                description = "${reserved.from} to max",
+                range = reserved.from..maxNumber,
+            )
 
-    is ReservedName -> error("Reserved names do not produce numeric spans")
-}
+        is ReservedName -> error("Reserved names do not produce numeric spans")
+    }

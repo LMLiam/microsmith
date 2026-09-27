@@ -9,9 +9,11 @@ import org.gradle.testkit.runner.TaskOutcome
 class MicrosmithGradlePluginFunctionalTests : StringSpec() {
     init {
         "plugin registers task and IDE configurations for Java projects" {
-            val project = MicrosmithGradleFunctionalTestProject.create(
-                name = "microsmith-gradle-plugin-java-wiring",
-                buildScript = """
+            val project =
+                MicrosmithGradleFunctionalTestProject.create(
+                    name = "microsmith-gradle-plugin-java-wiring",
+                    buildScript =
+                        """
                 plugins {
                     java
                     id("io.github.lmliam.microsmith")
@@ -39,8 +41,9 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                         check(extension is io.github.lmliam.microsmith.gradle.MicrosmithGradleExtension)
                     }
                 }
-                """.trimIndent(),
-            )
+                """
+                            .trimIndent(),
+                )
 
             val result = project.build("verifyMicrosmithWiring")
 
@@ -48,14 +51,17 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
         }
 
         "microsmithGenerate uses the default script and output layout" {
-            val project = MicrosmithGradleFunctionalTestProject.create(
-                name = "microsmith-gradle-plugin-default-generate",
-                buildScript = """
-                plugins {
-                    id("io.github.lmliam.microsmith")
-                }
-                """.trimIndent(),
-            )
+            val project =
+                MicrosmithGradleFunctionalTestProject.create(
+                    name = "microsmith-gradle-plugin-default-generate",
+                    buildScript =
+                        """
+                        plugins {
+                            id("io.github.lmliam.microsmith")
+                        }
+                        """
+                            .trimIndent(),
+                )
             project.writeFile(
                 "build.microsmith.kts",
                 """
@@ -68,7 +74,8 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                         }
                     }
                 }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
             val result = project.build("microsmithGenerate")
@@ -79,21 +86,24 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
         }
 
         "microsmithGenerate honors custom script, output, vars, and flags" {
-            val project = MicrosmithGradleFunctionalTestProject.create(
-                name = "microsmith-gradle-plugin-custom-generate",
-                buildScript = """
-                plugins {
-                    id("io.github.lmliam.microsmith")
-                }
+            val project =
+                MicrosmithGradleFunctionalTestProject.create(
+                    name = "microsmith-gradle-plugin-custom-generate",
+                    buildScript =
+                        """
+                        plugins {
+                            id("io.github.lmliam.microsmith")
+                        }
 
-                microsmith {
-                    scriptFile.set(layout.projectDirectory.file("schema.microsmith.kts"))
-                    outputDirectory.set(layout.projectDirectory.dir("custom-generated"))
-                    variables.put("entityName", "GradleConfiguredUserCreated")
-                    flags.add("emit")
-                }
-                """.trimIndent(),
-            )
+                        microsmith {
+                            scriptFile.set(layout.projectDirectory.file("schema.microsmith.kts"))
+                            outputDirectory.set(layout.projectDirectory.dir("custom-generated"))
+                            variables.put("entityName", "GradleConfiguredUserCreated")
+                            flags.add("emit")
+                        }
+                        """
+                            .trimIndent(),
+                )
             project.writeFile(
                 "schema.microsmith.kts",
                 """
@@ -113,7 +123,8 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                         }
                     },
                 )
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
             val result = project.build("microsmithGenerate")
@@ -123,14 +134,17 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
         }
 
         "microsmithGenerate supports ASP.NET service generation" {
-            val project = MicrosmithGradleFunctionalTestProject.create(
-                name = "microsmith-gradle-plugin-dotnet-asp",
-                buildScript = """
-                plugins {
-                    id("io.github.lmliam.microsmith")
-                }
-                """.trimIndent(),
-            )
+            val project =
+                MicrosmithGradleFunctionalTestProject.create(
+                    name = "microsmith-gradle-plugin-dotnet-asp",
+                    buildScript =
+                        """
+                        plugins {
+                            id("io.github.lmliam.microsmith")
+                        }
+                        """
+                            .trimIndent(),
+                )
             project.writeFile(
                 "build.microsmith.kts",
                 """
@@ -170,7 +184,8 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                         }
                     }
                 }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
             val result = project.build("microsmithGenerate")
@@ -178,22 +193,23 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
             result.task(":microsmithGenerate")?.outcome shouldBe TaskOutcome.SUCCESS
             project.file("dotnet/Platform/UserService.Api/Program.cs").toFile().shouldExist()
             project
-                .file(
-                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
-                        "UserServiceApiControllerBase.cs",
-                ).toFile()
+                .file("dotnet/Platform/UserService.Api/Generated/Controllers/" + "UserServiceApiControllerBase.cs")
+                .toFile()
                 .shouldExist()
         }
 
         "microsmithGenerate fails with script diagnostics" {
-            val project = MicrosmithGradleFunctionalTestProject.create(
-                name = "microsmith-gradle-plugin-failure",
-                buildScript = """
-                plugins {
-                    id("io.github.lmliam.microsmith")
-                }
-                """.trimIndent(),
-            )
+            val project =
+                MicrosmithGradleFunctionalTestProject.create(
+                    name = "microsmith-gradle-plugin-failure",
+                    buildScript =
+                        """
+                        plugins {
+                            id("io.github.lmliam.microsmith")
+                        }
+                        """
+                            .trimIndent(),
+                )
             project.writeFile(
                 "build.microsmith.kts",
                 """
@@ -204,7 +220,8 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                         }
                     }
                 }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
 
             val result = project.buildAndFail("microsmithGenerate")

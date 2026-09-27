@@ -18,12 +18,16 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
 
     override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufSchemaModel> {
         val protobufSchemas = authoring.schemas.filterIsInstance<ProtobufSchema>()
-        val schemas = protobufSchemas.filter { schema ->
-            when (schema.schema) {
-                is Message, is Enum -> true
-                else -> false
-            }
-        }.sortedBy(ProtobufSchema::name)
+        val schemas =
+            protobufSchemas
+                .filter { schema ->
+                    when (schema.schema) {
+                        is Message,
+                        is Enum -> true
+                        else -> false
+                    }
+                }
+                .sortedBy(ProtobufSchema::name)
 
         if (schemas.isEmpty()) {
             return DomainResolution.NotApplicable
@@ -33,13 +37,15 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
         val resolver = ProtobufDeclarationResolver(ProtobufReferenceResolver(symbolTable))
         val issues = mutableListOf<ProtobufResolutionIssue>()
         val resolved = schemas.mapNotNull { schema ->
-            resolver.resolve(schema).fold(
-                ifLeft = { failures ->
-                    issues.addAll(failures)
-                    null
-                },
-                ifRight = { it },
-            )
+            resolver
+                .resolve(schema)
+                .fold(
+                    ifLeft = { failures ->
+                        issues.addAll(failures)
+                        null
+                    },
+                    ifRight = { it },
+                )
         }
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()

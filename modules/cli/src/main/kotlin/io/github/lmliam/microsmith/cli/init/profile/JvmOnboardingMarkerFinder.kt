@@ -10,39 +10,39 @@ import java.nio.file.attribute.BasicFileAttributes
 import kotlin.io.path.isRegularFile
 
 internal object JvmOnboardingMarkerFinder {
-    fun find(projectRoot: Path, buildMarkers: List<Path>, sourceRootMatcher: (Path) -> Boolean): List<String> = try {
-        val matchedBuildMarkers =
-            buildMarkers
-                .filter { markerPath ->
-                    projectRoot.resolve(markerPath).isRegularFile()
-                }.map(Path::toString)
-        val rootSourceMarkers = findRootSourceMarkers(projectRoot, sourceRootMatcher)
+    fun find(projectRoot: Path, buildMarkers: List<Path>, sourceRootMatcher: (Path) -> Boolean): List<String> =
+        try {
+            val matchedBuildMarkers =
+                buildMarkers
+                    .filter { markerPath -> projectRoot.resolve(markerPath).isRegularFile() }
+                    .map(Path::toString)
+            val rootSourceMarkers = findRootSourceMarkers(projectRoot, sourceRootMatcher)
 
-        when {
-            rootSourceMarkers.isNotEmpty() -> {
-                (matchedBuildMarkers + rootSourceMarkers).sorted()
-            }
+            when {
+                rootSourceMarkers.isNotEmpty() -> {
+                    (matchedBuildMarkers + rootSourceMarkers).sorted()
+                }
 
-            matchedBuildMarkers.isEmpty() -> {
-                emptyList()
-            }
-
-            else -> {
-                val matchedModuleSourceMarkers = findModuleSourceMarkers(projectRoot, sourceRootMatcher)
-                if (matchedModuleSourceMarkers.isEmpty()) {
+                matchedBuildMarkers.isEmpty() -> {
                     emptyList()
-                } else {
-                    (matchedBuildMarkers + matchedModuleSourceMarkers).sorted()
+                }
+
+                else -> {
+                    val matchedModuleSourceMarkers = findModuleSourceMarkers(projectRoot, sourceRootMatcher)
+                    if (matchedModuleSourceMarkers.isEmpty()) {
+                        emptyList()
+                    } else {
+                        (matchedBuildMarkers + matchedModuleSourceMarkers).sorted()
+                    }
                 }
             }
+        } catch (_: IOException) {
+            emptyList()
+        } catch (_: UncheckedIOException) {
+            emptyList()
+        } catch (_: SecurityException) {
+            emptyList()
         }
-    } catch (_: IOException) {
-        emptyList()
-    } catch (_: UncheckedIOException) {
-        emptyList()
-    } catch (_: SecurityException) {
-        emptyList()
-    }
 
     private fun findRootSourceMarkers(projectRoot: Path, sourceRootMatcher: (Path) -> Boolean): List<String> {
         val srcDirectory = projectRoot.resolve(SOURCE_ROOT_DIRECTORY_NAME)
@@ -124,17 +124,18 @@ private const val INFRASTRUCTURE_DIRECTORY_DEPTH = 1
 
 private const val SOURCE_ROOT_DIRECTORY_NAME = "src"
 
-private val IGNORED_NESTED_SCAN_ROOT_DIRECTORIES = setOf(
-    ".gradle",
-    ".microsmith",
-    "build",
-    "build-logic",
-    "buildSrc",
-    "doc",
-    "docs",
-    "example",
-    "examples",
-    "gradle",
-    "sample",
-    "samples",
-)
+private val IGNORED_NESTED_SCAN_ROOT_DIRECTORIES =
+    setOf(
+        ".gradle",
+        ".microsmith",
+        "build",
+        "build-logic",
+        "buildSrc",
+        "doc",
+        "docs",
+        "example",
+        "examples",
+        "gradle",
+        "sample",
+        "samples",
+    )

@@ -6,33 +6,37 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufFiel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
 
 internal object ProtobufFieldRenderer {
-    fun render(field: ResolvedProtobufField): String = when (field) {
-        is ResolvedProtobufField.Scalar -> renderCardinalityField(
-            field.cardinality,
-            ProtobufValueTypeRenderer.render(field.type),
-            field.name,
-            field.number,
-        )
+    fun render(field: ResolvedProtobufField): String =
+        when (field) {
+            is ResolvedProtobufField.Scalar ->
+                renderCardinalityField(
+                    field.cardinality,
+                    ProtobufValueTypeRenderer.render(field.type),
+                    field.name,
+                    field.number,
+                )
 
-        is ResolvedProtobufField.Reference -> renderCardinalityField(
-            field.cardinality,
-            field.reference.target.fullyQualifiedName,
-            field.name,
-            field.number,
-        )
+            is ResolvedProtobufField.Reference ->
+                renderCardinalityField(
+                    field.cardinality,
+                    field.reference.target.fullyQualifiedName,
+                    field.name,
+                    field.number,
+                )
 
-        is ResolvedProtobufField.Map -> buildString {
-            append("map<")
-            append(ProtobufValueTypeRenderer.render(field.key))
-            append(", ")
-            append(ProtobufValueTypeRenderer.render(field.value))
-            append("> ")
-            append(field.name)
-            append(" = ")
-            append(field.number)
-            append(";")
+            is ResolvedProtobufField.Map ->
+                buildString {
+                    append("map<")
+                    append(ProtobufValueTypeRenderer.render(field.key))
+                    append(", ")
+                    append(ProtobufValueTypeRenderer.render(field.value))
+                    append("> ")
+                    append(field.name)
+                    append(" = ")
+                    append(field.number)
+                    append(";")
+                }
         }
-    }
 
     fun render(oneof: ResolvedProtobufOneof): String = buildString {
         appendLine("oneof ${oneof.name} {")
@@ -54,7 +58,7 @@ internal object ProtobufFieldRenderer {
                     Cardinality.SINGULAR -> ""
                     Cardinality.OPTIONAL -> "optional "
                     Cardinality.REPEATED -> "repeated "
-                },
+                }
             )
 
             append(type)

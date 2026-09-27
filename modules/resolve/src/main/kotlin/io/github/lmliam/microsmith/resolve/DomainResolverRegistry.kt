@@ -8,22 +8,21 @@ internal class DomainResolverRegistry(resolvers: List<DomainResolver<*, *>>) {
         indexResolvers(resolvers)
 
     fun resolve(extension: MicrosmithExtension): List<DomainResolver<MicrosmithExtension, ResolvedModel>> =
-        resolversByAuthoringType[extension::class]
-            ?.map { it.cast() }
-            .orEmpty()
+        resolversByAuthoringType[extension::class]?.map { it.cast() }.orEmpty()
 
     private fun indexResolvers(
-        resolvers: List<DomainResolver<*, *>>,
+        resolvers: List<DomainResolver<*, *>>
     ): Map<KClass<out MicrosmithExtension>, List<DomainResolver<*, *>>> {
         val byAuthoringType = resolvers.groupBy(DomainResolver<*, *>::authoringType)
 
         byAuthoringType.forEach { (type, registrations) ->
-            val duplicateImplementations = registrations
-                .groupBy { it::class }
-                .filterValues { it.size > 1 }
-                .keys
-                .map { it.qualifiedName ?: it.toString() }
-                .sorted()
+            val duplicateImplementations =
+                registrations
+                    .groupBy { it::class }
+                    .filterValues { it.size > 1 }
+                    .keys
+                    .map { it.qualifiedName ?: it.toString() }
+                    .sorted()
 
             require(duplicateImplementations.isEmpty()) {
                 "Duplicate domain resolvers registered for authoring type ${formatType(type)}: " +
@@ -36,7 +35,7 @@ internal class DomainResolverRegistry(resolvers: List<DomainResolver<*, *>>) {
                 compareBy(
                     { it.resolvedType.qualifiedName ?: it.resolvedType.toString() },
                     { it::class.qualifiedName ?: it::class.toString() },
-                ),
+                )
             )
         }
     }

@@ -40,7 +40,8 @@ class MicrosmithScriptHostTests :
                             }
                         }
                     }
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -52,7 +53,7 @@ class MicrosmithScriptHostTests :
                             outputDir = output,
                             variables = emptyMap(),
                             flags = emptySet(),
-                        ),
+                        )
                     )
                 val firstSuccess = firstRun.shouldBeTypeOf<ScriptRunSuccess>()
                 firstSuccess.cacheHit shouldBe false
@@ -68,7 +69,7 @@ class MicrosmithScriptHostTests :
                             outputDir = output,
                             variables = emptyMap(),
                             flags = emptySet(),
-                        ),
+                        )
                     )
                 val secondSuccess = secondRun.shouldBeTypeOf<ScriptRunSuccess>()
                 secondSuccess.cacheHit shouldBe true
@@ -124,7 +125,8 @@ class MicrosmithScriptHostTests :
                             }
                         }
                     }
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -135,15 +137,16 @@ class MicrosmithScriptHostTests :
                             outputDir = output,
                             variables = emptyMap(),
                             flags = emptySet(),
-                        ),
+                        )
                     )
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
                 output.resolve("dotnet/Platform/UserService.Api/Program.cs").exists() shouldBe true
-                output.resolve(
-                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
-                        "UserServiceApiControllerBase.cs",
-                ).exists() shouldBe true
+                output
+                    .resolve(
+                        "dotnet/Platform/UserService.Api/Generated/Controllers/" + "UserServiceApiControllerBase.cs"
+                    )
+                    .exists() shouldBe true
                 output.resolve("dotnet/Platform/UserService.Api/.microsmith/origins.json").exists() shouldBe true
             } finally {
                 runCatching { tempDir.deleteRecursively() }
@@ -175,7 +178,8 @@ class MicrosmithScriptHostTests :
                             }
                         }
                     emit(model)
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -186,7 +190,7 @@ class MicrosmithScriptHostTests :
                             outputDir = output,
                             variables = mapOf("schema" to "EventRecord"),
                             flags = setOf("emit"),
-                        ),
+                        )
                     )
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
@@ -248,7 +252,8 @@ class MicrosmithScriptHostTests :
                             }
                         }
                     }
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -259,17 +264,19 @@ class MicrosmithScriptHostTests :
                             outputDir = output,
                             variables = emptyMap(),
                             flags = emptySet(),
-                        ),
+                        )
                     )
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
                 output.resolve("dotnet/Platform/UserService.Api/Program.cs").exists() shouldBe true
-                output.resolve(
-                    "dotnet/Platform/UserService.Api/Generated/Controllers/" +
-                        "UserServiceApiControllerBase.cs",
-                ).exists() shouldBe true
+                output
+                    .resolve(
+                        "dotnet/Platform/UserService.Api/Generated/Controllers/" + "UserServiceApiControllerBase.cs"
+                    )
+                    .exists() shouldBe true
                 output.resolve("dotnet/Platform/UserService.Api/.microsmith/origins.json").exists() shouldBe true
-                output.resolve("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs")
+                output
+                    .resolve("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs")
                     .readText()
                     .shouldContain("""[HttpGet("/users/{id}", Name = "GetUser")]""")
             } finally {
@@ -289,7 +296,8 @@ class MicrosmithScriptHostTests :
                     microsmith {
                         unknownDsl()
                     }
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -300,7 +308,7 @@ class MicrosmithScriptHostTests :
                             outputDir = output,
                             variables = emptyMap(),
                             flags = emptySet(),
-                        ),
+                        )
                     )
 
                 val failure = result.shouldBeTypeOf<ScriptRunFailure>()
@@ -323,7 +331,8 @@ class MicrosmithScriptHostTests :
                     @file:DependsOn("com.acme:dangerous:1.0.0")
 
                     microsmith { }
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -334,7 +343,7 @@ class MicrosmithScriptHostTests :
                             outputDir = output,
                             variables = emptyMap(),
                             flags = emptySet(),
-                        ),
+                        )
                     )
 
                 val failure = result.shouldBeTypeOf<ScriptRunFailure>()
@@ -360,7 +369,8 @@ class MicrosmithScriptHostTests :
                     ]
 
                     microsmith { }
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -371,7 +381,7 @@ class MicrosmithScriptHostTests :
                             outputDir = output,
                             variables = emptyMap(),
                             flags = emptySet(),
-                        ),
+                        )
                     )
 
                 val failure = result.shouldBeTypeOf<ScriptRunFailure>()
@@ -411,7 +421,8 @@ class MicrosmithScriptHostTests :
                             }
                         }
                     }
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -423,17 +434,13 @@ class MicrosmithScriptHostTests :
                             variables = emptyMap(),
                             flags = emptySet(),
                             isolationMode = ScriptIsolationMode.PROCESS,
-                        ),
+                        )
                     )
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
                 val generatedFile = output.resolve("proto/ProcessService.proto")
                 Files.exists(generatedFile) shouldBe true
-                generatedFile
-                    .readText()
-                    .shouldContain(
-                        "rpc Process (ProcessRequest) returns (ProcessResponse);",
-                    )
+                generatedFile.readText().shouldContain("rpc Process (ProcessRequest) returns (ProcessResponse);")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -448,27 +455,28 @@ class MicrosmithScriptHostTests :
 
                 script.writeText(
                     """
-            microsmith {
-                schemas {
-                    protobuf {
-                        service("Users") {
-                            "GetUsers" {
-                                request(GetUsersRequest)
-                                response(GetUsersResponse)
+                    microsmith {
+                        schemas {
+                            protobuf {
+                                service("Users") {
+                                    "GetUsers" {
+                                        request(GetUsersRequest)
+                                        response(GetUsersResponse)
+                                    }
+                                }
+
+                                message("GetUsersRequest") {
+                                    int32("id") { index(1) }
+                                }
+
+                                message("GetUsersResponse") {
+                                    int32("id") { index(1) }
+                                }
                             }
                         }
-
-                        message("GetUsersRequest") {
-                            int32("id") { index(1) }
-                        }
-
-                        message("GetUsersResponse") {
-                            int32("id") { index(1) }
-                        }
                     }
-                }
-            }
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -479,7 +487,7 @@ class MicrosmithScriptHostTests :
                             outputDir = output,
                             variables = emptyMap(),
                             flags = emptySet(),
-                        ),
+                        )
                     )
 
                 result.shouldBeTypeOf<ScriptRunSuccess>()
@@ -487,11 +495,7 @@ class MicrosmithScriptHostTests :
                 val generatedFile = output.resolve("proto/Users.proto")
                 generatedFile.exists() shouldBe true
 
-                generatedFile
-                    .readText()
-                    .shouldContain(
-                        "rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);",
-                    )
+                generatedFile.readText().shouldContain("rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -506,23 +510,24 @@ class MicrosmithScriptHostTests :
 
                 script.writeText(
                     """
-            microsmith {
-                schemas {
-                    protobuf {
-                        enum("Role") {
-                            +"USER"
-                        }
+                    microsmith {
+                        schemas {
+                            protobuf {
+                                enum("Role") {
+                                    +"USER"
+                                }
 
-                        service("Users") {
-                            "GetUsers" {
-                                request(Role)
-                                response(Role)
+                                service("Users") {
+                                    "GetUsers" {
+                                        request(Role)
+                                        response(Role)
+                                    }
+                                }
                             }
                         }
                     }
-                }
-            }
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val host = MicrosmithScriptHost(cacheDirectory = cache)
@@ -533,15 +538,13 @@ class MicrosmithScriptHostTests :
                             outputDir = output,
                             variables = emptyMap(),
                             flags = emptySet(),
-                        ),
+                        )
                     )
 
                 val failure = result.shouldBeTypeOf<ScriptRunFailure>()
 
                 failure.type shouldBe ScriptFailureType.COMPILATION
-                failure.diagnostics
-                    .joinToString("\n")
-                    .shouldContain("MessageRef")
+                failure.diagnostics.joinToString("\n").shouldContain("MessageRef")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }

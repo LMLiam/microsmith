@@ -13,22 +13,23 @@ internal object KotlinScriptLiteralParser {
                 val parsedString = parseStringLiteral(tokens, index) ?: return null
 
                 ParsedCallee(
-                    callee = parsedString.value?.let(ScriptCallCallee::StringLiteral)
-                        ?: ScriptCallCallee.Other,
+                    callee = parsedString.value?.let(ScriptCallCallee::StringLiteral) ?: ScriptCallCallee.Other,
                     nextIndex = parsedString.nextIndex,
                 )
             }
 
-            token.type == KtTokens.INTEGER_LITERAL -> ParsedCallee(
-                callee = token.text.toKotlinIntOrNull()?.let(ScriptCallCallee::IntLiteral)
-                    ?: ScriptCallCallee.Other,
-                nextIndex = index + 1,
-            )
+            token.type == KtTokens.INTEGER_LITERAL ->
+                ParsedCallee(
+                    callee =
+                        token.text.toKotlinIntOrNull()?.let(ScriptCallCallee::IntLiteral) ?: ScriptCallCallee.Other,
+                    nextIndex = index + 1,
+                )
 
-            token.text.isIdentifierLike() -> ParsedCallee(
-                callee = ScriptCallCallee.Named(token.text.removeSurrounding("`")),
-                nextIndex = index + 1,
-            )
+            token.text.isIdentifierLike() ->
+                ParsedCallee(
+                    callee = ScriptCallCallee.Named(token.text.removeSurrounding("`")),
+                    nextIndex = index + 1,
+                )
 
             else -> null
         }
@@ -48,10 +49,7 @@ internal object KotlinScriptLiteralParser {
         if (endExclusive != start + 1) return null
 
         return when (first.type) {
-            KtTokens.INTEGER_LITERAL ->
-                first.text
-                    .toKotlinIntOrNull()
-                    ?.let(ScriptLiteral::IntValue)
+            KtTokens.INTEGER_LITERAL -> first.text.toKotlinIntOrNull()?.let(ScriptLiteral::IntValue)
 
             KtTokens.TRUE_KEYWORD -> ScriptLiteral.BooleanValue(true)
 
@@ -70,16 +68,19 @@ internal object KotlinScriptLiteralParser {
             val token = tokens[index]
 
             when (token.type) {
-                KtTokens.CLOSING_QUOTE -> return ParsedString(
-                    value = value.toString().takeUnless { dynamic },
-                    nextIndex = index + 1,
-                )
+                KtTokens.CLOSING_QUOTE ->
+                    return ParsedString(
+                        value = value.toString().takeUnless { dynamic },
+                        nextIndex = index + 1,
+                    )
 
-                KtTokens.REGULAR_STRING_PART, KtTokens.DANGLING_NEWLINE -> value.append(token.text)
+                KtTokens.REGULAR_STRING_PART,
+                KtTokens.DANGLING_NEWLINE -> value.append(token.text)
 
                 KtTokens.ESCAPE_SEQUENCE -> value.append(token.text.decodeKotlinEscape())
 
-                KtTokens.SHORT_TEMPLATE_ENTRY_START, KtTokens.LONG_TEMPLATE_ENTRY_START -> dynamic = true
+                KtTokens.SHORT_TEMPLATE_ENTRY_START,
+                KtTokens.LONG_TEMPLATE_ENTRY_START -> dynamic = true
             }
 
             index++
@@ -95,50 +96,41 @@ internal object KotlinScriptLiteralParser {
 
         return when {
             normalized.startsWith(HEX_PREFIX, ignoreCase = true) ->
-                normalized
-                    .drop(RADIX_PREFIX_LENGTH)
-                    .toIntOrNull(HEX_RADIX)
+                normalized.drop(RADIX_PREFIX_LENGTH).toIntOrNull(HEX_RADIX)
 
             normalized.startsWith(BINARY_PREFIX, ignoreCase = true) ->
-                normalized
-                    .drop(RADIX_PREFIX_LENGTH)
-                    .toIntOrNull(BINARY_RADIX)
+                normalized.drop(RADIX_PREFIX_LENGTH).toIntOrNull(BINARY_RADIX)
 
             else -> normalized.toIntOrNull()
         }
     }
 
-    private fun String.decodeKotlinEscape(): String = when (this) {
-        "\\t" -> "\t"
+    private fun String.decodeKotlinEscape(): String =
+        when (this) {
+            "\\t" -> "\t"
 
-        "\\b" -> "\b"
+            "\\b" -> "\b"
 
-        "\\n" -> "\n"
+            "\\n" -> "\n"
 
-        "\\r" -> "\r"
+            "\\r" -> "\r"
 
-        "\\'" -> "'"
+            "\\'" -> "'"
 
-        "\\\"" -> "\""
+            "\\\"" -> "\""
 
-        "\\\\" -> "\\"
+            "\\\\" -> "\\"
 
-        "\\$" -> "$"
+            "\\$" -> "$"
 
-        else ->
-            if (
-                startsWith(UNICODE_ESCAPE_PREFIX) &&
-                length == UNICODE_ESCAPE_LENGTH
-            ) {
-                substring(UNICODE_ESCAPE_PREFIX.length)
-                    .toIntOrNull(HEX_RADIX)
-                    ?.toChar()
-                    ?.toString()
-                    ?: removePrefix("\\")
-            } else {
-                removePrefix("\\")
-            }
-    }
+            else ->
+                if (startsWith(UNICODE_ESCAPE_PREFIX) && length == UNICODE_ESCAPE_LENGTH) {
+                    substring(UNICODE_ESCAPE_PREFIX.length).toIntOrNull(HEX_RADIX)?.toChar()?.toString()
+                        ?: removePrefix("\\")
+                } else {
+                    removePrefix("\\")
+                }
+        }
 
     data class ParsedCallee(val callee: ScriptCallCallee, val nextIndex: Int)
 
@@ -153,6 +145,5 @@ internal object KotlinScriptLiteralParser {
     private const val UNICODE_ESCAPE_PREFIX = "\\u"
     private const val UNICODE_ESCAPE_LENGTH = 6
 
-    private val IDENTIFIER_PATTERN =
-        Regex("[A-Za-z_][A-Za-z0-9_]*")
+    private val IDENTIFIER_PATTERN = Regex("[A-Za-z_][A-Za-z0-9_]*")
 }

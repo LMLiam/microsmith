@@ -44,10 +44,10 @@ class PluginResolverRemoteResolutionTests :
                     resolvePlugins(
                         command = command,
                         settings =
-                        PluginResolverSettings(
-                            cacheDirectory = cache,
-                            repositoryPolicy = fileRepositoryAllowedPolicy(),
-                        ),
+                            PluginResolverSettings(
+                                cacheDirectory = cache,
+                                repositoryPolicy = fileRepositoryAllowedPolicy(),
+                            ),
                     )
 
                 val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
@@ -88,10 +88,10 @@ class PluginResolverRemoteResolutionTests :
                     resolvePlugins(
                         command = command,
                         settings =
-                        PluginResolverSettings(
-                            cacheDirectory = cache,
-                            repositoryPolicy = fileRepositoryAllowedPolicy(),
-                        ),
+                            PluginResolverSettings(
+                                cacheDirectory = cache,
+                                repositoryPolicy = fileRepositoryAllowedPolicy(),
+                            ),
                     )
 
                 val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
@@ -127,10 +127,10 @@ class PluginResolverRemoteResolutionTests :
                     coordinate = rootCoordinate,
                     dependencies = listOf(runtimeCoordinate, testCoordinate, providedCoordinate),
                     dependencyScopes =
-                    mapOf(
-                        testCoordinate to "test",
-                        providedCoordinate to "provided",
-                    ),
+                        mapOf(
+                            testCoordinate to "test",
+                            providedCoordinate to "provided",
+                        ),
                 )
                 script.writeText("// test script")
 
@@ -146,10 +146,10 @@ class PluginResolverRemoteResolutionTests :
                     resolvePlugins(
                         command = command,
                         settings =
-                        PluginResolverSettings(
-                            cacheDirectory = cache,
-                            repositoryPolicy = fileRepositoryAllowedPolicy(),
-                        ),
+                            PluginResolverSettings(
+                                cacheDirectory = cache,
+                                repositoryPolicy = fileRepositoryAllowedPolicy(),
+                            ),
                     )
 
                 val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
@@ -265,10 +265,10 @@ class PluginResolverRemoteResolutionTests :
                     resolvePlugins(
                         command = command,
                         settings =
-                        PluginResolverSettings(
-                            cacheDirectory = cache,
-                            repositoryPolicy = fileRepositoryAllowedPolicy(),
-                        ),
+                            PluginResolverSettings(
+                                cacheDirectory = cache,
+                                repositoryPolicy = fileRepositoryAllowedPolicy(),
+                            ),
                     )
 
                 val failure = result.shouldBeTypeOf<PluginResolutionResult.Failure>()
@@ -300,29 +300,30 @@ class PluginResolverRemoteResolutionTests :
                     PluginResolverSettings(
                         cacheDirectory = tempDir.resolve("cache"),
                         repositoryCredentialsResolver =
-                        object : RepositoryCredentialsResolver {
-                            override fun resolve(repositoryUri: String): RepositoryCredentials = RepositoryCredentials(
-                                username = "ci-user",
-                                password = secretToken,
-                            )
+                            object : RepositoryCredentialsResolver {
+                                override fun resolve(repositoryUri: String): RepositoryCredentials =
+                                    RepositoryCredentials(
+                                        username = "ci-user",
+                                        password = secretToken,
+                                    )
 
-                            override fun sensitiveValues(): Set<String> = setOf(secretToken)
-                        },
+                                override fun sensitiveValues(): Set<String> = setOf(secretToken)
+                            },
                         remotePluginResolver =
-                        object : RemotePluginResolver {
-                            override fun resolve(
-                                coordinate: Coordinate,
-                                repositories: List<RepositoryEndpoint>,
-                                cacheDirectory: Path,
-                                offline: Boolean,
-                            ): ResolvedRemotePlugin {
-                                repositories.first().credentials?.password shouldBe secretToken
-                                throw PluginResolutionDiagnosticException(
-                                    category = PluginResolverErrorCategory.AUTHENTICATION,
-                                    message = "Unauthorized while using token '$secretToken'.",
-                                )
-                            }
-                        },
+                            object : RemotePluginResolver {
+                                override fun resolve(
+                                    coordinate: Coordinate,
+                                    repositories: List<RepositoryEndpoint>,
+                                    cacheDirectory: Path,
+                                    offline: Boolean,
+                                ): ResolvedRemotePlugin {
+                                    repositories.first().credentials?.password shouldBe secretToken
+                                    throw PluginResolutionDiagnosticException(
+                                        category = PluginResolverErrorCategory.AUTHENTICATION,
+                                        message = "Unauthorized while using token '$secretToken'.",
+                                    )
+                                }
+                            },
                     )
 
                 val result = resolvePlugins(command = command, settings = settings)
@@ -358,10 +359,10 @@ class PluginResolverRemoteResolutionTests :
                 resolvePlugins(
                     command = command,
                     settings =
-                    PluginResolverSettings(
-                        cacheDirectory = cache,
-                        repositoryPolicy = fileRepositoryAllowedPolicy(),
-                    ),
+                        PluginResolverSettings(
+                            cacheDirectory = cache,
+                            repositoryPolicy = fileRepositoryAllowedPolicy(),
+                        ),
                 )
 
                 val cachedArtifact = cachePathFor(pluginArtifactCacheRoot(cache), parseCoordinate(coordinate))
@@ -369,13 +370,14 @@ class PluginResolverRemoteResolutionTests :
 
                 val mismatch =
                     resolvePlugins(
-                        command = command,
-                        settings =
-                        PluginResolverSettings(
-                            cacheDirectory = cache,
-                            repositoryPolicy = fileRepositoryAllowedPolicy(),
-                        ),
-                    ).shouldBeTypeOf<PluginResolutionResult.Failure>()
+                            command = command,
+                            settings =
+                                PluginResolverSettings(
+                                    cacheDirectory = cache,
+                                    repositoryPolicy = fileRepositoryAllowedPolicy(),
+                                ),
+                        )
+                        .shouldBeTypeOf<PluginResolutionResult.Failure>()
 
                 mismatch.diagnostics.joinToString("\n").shouldContain("Checksum mismatch")
             } finally {
@@ -405,18 +407,15 @@ class PluginResolverRemoteResolutionTests :
                     resolvePlugins(
                         command = command,
                         settings =
-                        PluginResolverSettings(
-                            cacheDirectory = cache,
-                            defaultRepositories =
-                            listOf(
-                                "http://127.0.0.1:1/repository",
-                                repositoryRoot.toUri().toString(),
+                            PluginResolverSettings(
+                                cacheDirectory = cache,
+                                defaultRepositories =
+                                    listOf(
+                                        "http://127.0.0.1:1/repository",
+                                        repositoryRoot.toUri().toString(),
+                                    ),
+                                repositoryPolicy = fileRepositoryAllowedPolicy("http://127.0.0.1:1/repository"),
                             ),
-                            repositoryPolicy =
-                            fileRepositoryAllowedPolicy(
-                                "http://127.0.0.1:1/repository",
-                            ),
-                        ),
                     )
 
                 val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()

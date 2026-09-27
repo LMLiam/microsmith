@@ -19,49 +19,50 @@ internal class DotnetAspBindingResolver {
         placeholders: List<String>,
         binding: DotnetAspRequestBinding,
     ): EitherNel<DotnetAspResolutionIssue, ResolvedDotnetAspRequestBinding> {
-        val issues = buildList<DotnetAspResolutionIssue> {
-            addAll(requestBindingIssues(context, binding))
+        val issues =
+            buildList<DotnetAspResolutionIssue> {
+                addAll(requestBindingIssues(context, binding))
 
-            binding.fields
-                .filter { it.optional }
-                .forEach { field ->
+                binding.fields
+                    .filter { it.optional }
+                    .forEach { field ->
+                        add(
+                            DotnetAspBindingResolutionIssue.OptionalPathBindingField(
+                                context.serviceName,
+                                context.operationName,
+                                binding.name,
+                                field.name,
+                            )
+                        )
+                    }
+
+                binding.fields
+                    .filter { it.defaultValue != null }
+                    .forEach { field ->
+                        add(
+                            DotnetAspBindingResolutionIssue.DefaultedPathBindingField(
+                                context.serviceName,
+                                context.operationName,
+                                binding.name,
+                                field.name,
+                            )
+                        )
+                    }
+
+                val fields = binding.fields.map { it.name }
+
+                if (fields.toSet() != placeholders.toSet()) {
                     add(
-                        DotnetAspBindingResolutionIssue.OptionalPathBindingField(
+                        DotnetAspBindingResolutionIssue.PathBindingFieldMismatch(
                             context.serviceName,
                             context.operationName,
                             binding.name,
-                            field.name,
-                        ),
+                            placeholders,
+                            fields,
+                        )
                     )
                 }
-
-            binding.fields
-                .filter { it.defaultValue != null }
-                .forEach { field ->
-                    add(
-                        DotnetAspBindingResolutionIssue.DefaultedPathBindingField(
-                            context.serviceName,
-                            context.operationName,
-                            binding.name,
-                            field.name,
-                        ),
-                    )
-                }
-
-            val fields = binding.fields.map { it.name }
-
-            if (fields.toSet() != placeholders.toSet()) {
-                add(
-                    DotnetAspBindingResolutionIssue.PathBindingFieldMismatch(
-                        context.serviceName,
-                        context.operationName,
-                        binding.name,
-                        placeholders,
-                        fields,
-                    ),
-                )
             }
-        }
 
         return resolveOrIssues(binding, issues)
     }
@@ -75,25 +76,24 @@ internal class DotnetAspBindingResolver {
     fun resolveHeadersBinding(binding: DotnetAspHeadersBinding): ResolvedDotnetAspHeadersBinding =
         ResolvedDotnetAspHeadersBinding(
             binding.name,
-            headers = binding.headers.map { field ->
-                ResolvedDotnetAspHeaderField(field.name, field.headerName)
-            },
+            headers = binding.headers.map { field -> ResolvedDotnetAspHeaderField(field.name, field.headerName) },
         )
 
     private fun requestBindingIssues(
         context: DotnetAspOperationContext,
         binding: DotnetAspRequestBinding,
-    ): List<DotnetAspBindingResolutionIssue> = binding.fields.mapNotNull { field ->
-        val reference = field.type as? DotnetFieldType.Reference ?: return@mapNotNull null
+    ): List<DotnetAspBindingResolutionIssue> =
+        binding.fields.mapNotNull { field ->
+            val reference = field.type as? DotnetFieldType.Reference ?: return@mapNotNull null
 
-        DotnetAspBindingResolutionIssue.RequestBindingReferenceField(
-            context.serviceName,
-            context.operationName,
-            binding.name,
-            field.name,
-            reference.target,
-        )
-    }
+            DotnetAspBindingResolutionIssue.RequestBindingReferenceField(
+                context.serviceName,
+                context.operationName,
+                binding.name,
+                field.name,
+                reference.target,
+            )
+        }
 
     private fun resolveOrIssues(
         binding: DotnetAspRequestBinding,
@@ -108,15 +108,16 @@ internal class DotnetAspBindingResolver {
         return Either.Right(
             ResolvedDotnetAspRequestBinding(
                 binding.name,
-                fields = binding.fields.map { field ->
-                    ResolvedDotnetAspRequestField(
-                        field.name,
-                        field.type,
-                        optional = field.optional || field.defaultValue != null,
-                        field.defaultValue,
-                    )
-                },
-            ),
+                fields =
+                    binding.fields.map { field ->
+                        ResolvedDotnetAspRequestField(
+                            field.name,
+                            field.type,
+                            optional = field.optional || field.defaultValue != null,
+                            field.defaultValue,
+                        )
+                    },
+            )
         )
     }
 }

@@ -18,20 +18,14 @@ import java.nio.file.Path
 
 /** Centralizes checksum, allowlist, and lockfile enforcement so orchestration stays behavior-focused. */
 internal class PluginResolutionIntegrityVerifier {
-    fun loadLockfile(lockfilePath: Path): ParsedLockfile? = withLockfileDiagnostics {
-        readLockfile(lockfilePath)
-    }
+    fun loadLockfile(lockfilePath: Path): ParsedLockfile? = withLockfileDiagnostics { readLockfile(lockfilePath) }
 
     fun assertSamePluginSet(lockfile: ParsedLockfile?, requestedKeys: Set<LockKey>, lockfilePath: Path) {
-        withLockfileDiagnostics {
-            lockfile?.assertSamePluginSet(requestedKeys, lockfilePath)
-        }
+        withLockfileDiagnostics { lockfile?.assertSamePluginSet(requestedKeys, lockfilePath) }
     }
 
     fun assertSameRemoteArtifactSet(lockfile: ParsedLockfile?, resolvedKeys: Set<String>, lockfilePath: Path) {
-        withLockfileDiagnostics {
-            lockfile?.assertSameRemoteArtifactSet(resolvedKeys, lockfilePath)
-        }
+        withLockfileDiagnostics { lockfile?.assertSameRemoteArtifactSet(resolvedKeys, lockfilePath) }
     }
 
     fun verifyChecksum(
@@ -41,9 +35,7 @@ internal class PluginResolutionIntegrityVerifier {
         lockfile: ParsedLockfile?,
         checksumAllowlist: PluginChecksumAllowlist?,
     ) {
-        withLockfileDiagnostics {
-            lockfile?.verifyChecksum(kind, key, actualChecksum)
-        }
+        withLockfileDiagnostics { lockfile?.verifyChecksum(kind, key, actualChecksum) }
         checksumAllowlist?.verifyChecksum(kind, key, actualChecksum)
     }
 
@@ -66,17 +58,18 @@ internal class PluginResolutionIntegrityVerifier {
         )
     }
 
-    private inline fun <T> withLockfileDiagnostics(block: () -> T): T = try {
-        block()
-    } catch (error: IllegalArgumentException) {
-        throw error.toLockfileDiagnostic()
-    } catch (error: IOException) {
-        throw error.toLockfileDiagnostic()
-    } catch (error: UncheckedIOException) {
-        throw error.toLockfileDiagnostic()
-    } catch (error: SecurityException) {
-        throw error.toLockfileDiagnostic()
-    }
+    private inline fun <T> withLockfileDiagnostics(block: () -> T): T =
+        try {
+            block()
+        } catch (error: IllegalArgumentException) {
+            throw error.toLockfileDiagnostic()
+        } catch (error: IOException) {
+            throw error.toLockfileDiagnostic()
+        } catch (error: UncheckedIOException) {
+            throw error.toLockfileDiagnostic()
+        } catch (error: SecurityException) {
+            throw error.toLockfileDiagnostic()
+        }
 
     private fun Throwable.toLockfileDiagnostic(): PluginResolutionDiagnosticException =
         PluginResolutionDiagnosticException(

@@ -4,6 +4,7 @@ import io.github.lmliam.microsmith.gradle.worker.MicrosmithGradleWorkerFailure
 import io.github.lmliam.microsmith.gradle.worker.MicrosmithGradleWorkerLauncher
 import io.github.lmliam.microsmith.gradle.worker.MicrosmithGradleWorkerRequest
 import io.github.lmliam.microsmith.gradle.worker.MicrosmithGradleWorkerSuccess
+import java.nio.file.Path
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
@@ -20,33 +21,24 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
-import java.nio.file.Path
 
 @DisableCachingByDefault(
-    because = "Microsmith maintains its own compilation cache and task-level caching needs deeper normalization.",
+    because = "Microsmith maintains its own compilation cache and task-level caching needs deeper normalization."
 )
 abstract class MicrosmithGenerateTask : DefaultTask() {
-    @get:InputFile
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val scriptFile: RegularFileProperty
+    @get:InputFile @get:PathSensitive(PathSensitivity.RELATIVE) abstract val scriptFile: RegularFileProperty
 
-    @get:OutputDirectory
-    abstract val outputDirectory: DirectoryProperty
+    @get:OutputDirectory abstract val outputDirectory: DirectoryProperty
 
-    @get:Input
-    abstract val variables: MapProperty<String, String>
+    @get:Input abstract val variables: MapProperty<String, String>
 
-    @get:Input
-    abstract val flags: SetProperty<String>
+    @get:Input abstract val flags: SetProperty<String>
 
-    @get:Classpath
-    abstract val pluginClasspath: ConfigurableFileCollection
+    @get:Classpath abstract val pluginClasspath: ConfigurableFileCollection
 
-    @get:Classpath
-    abstract val runtimeClasspath: ConfigurableFileCollection
+    @get:Classpath abstract val runtimeClasspath: ConfigurableFileCollection
 
-    @get:Internal
-    abstract val cacheDirectory: DirectoryProperty
+    @get:Internal abstract val cacheDirectory: DirectoryProperty
 
     @TaskAction
     fun generate() {
@@ -58,9 +50,7 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
                 variables = variables.get().toSortedMap(),
                 flags = flags.get().toSortedSet(),
                 pluginClasspath =
-                pluginClasspath.files
-                    .map { file -> file.toPath().toAbsolutePath().normalize() }
-                    .sorted(),
+                    pluginClasspath.files.map { file -> file.toPath().toAbsolutePath().normalize() }.sorted(),
             )
         val launcher = MicrosmithGradleWorkerLauncher()
         val result =
@@ -68,9 +58,7 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
                 request = request,
                 workDirectory = temporaryDir.toPath(),
                 runtimeClasspath =
-                runtimeClasspath.files
-                    .map { file -> file.toPath().toAbsolutePath().normalize() }
-                    .sorted(),
+                    runtimeClasspath.files.map { file -> file.toPath().toAbsolutePath().normalize() }.sorted(),
             )
 
         when (result) {
@@ -85,14 +73,15 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
             describeGeneratedOutputRoots(outputDirectory.get().asFile.toPath(), result.generatedRoots)
         logger.lifecycle(
             "Generated Microsmith outputs into '$generatedOutputRoot'. " +
-                "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)",
+                "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)"
         )
     }
 
     private fun formatFailure(result: MicrosmithGradleWorkerFailure): String = buildString {
         appendLine("Microsmith generation failed (${result.type.lowercase()}).")
         result.diagnostics.forEach(::appendLine)
-    }.trimEnd()
+    }
+        .trimEnd()
 
     private fun describeGeneratedOutputRoots(outputDirectory: Path, roots: List<Path>): String {
         val normalizedOutputDirectory = outputDirectory.toAbsolutePath().normalize()
@@ -100,12 +89,13 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
         return when (normalizedRoots.size) {
             0 -> normalizedOutputDirectory.toString()
             1 -> normalizedRoots.single().toString()
-            else -> buildString {
-                append(normalizedOutputDirectory)
-                append(" (roots: ")
-                append(normalizedRoots.joinToString())
-                append(')')
-            }
+            else ->
+                buildString {
+                    append(normalizedOutputDirectory)
+                    append(" (roots: ")
+                    append(normalizedRoots.joinToString())
+                    append(')')
+                }
         }
     }
 }

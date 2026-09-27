@@ -22,7 +22,8 @@ class PluginChecksumAllowlistTests :
 
                     remote|com.acme:plugin:1.0.0|${"a".repeat(64)}
                     local|plugins/custom.jar|${"b".repeat(64)}
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val allowlist = loadPluginChecksumAllowlistFromPath(allowlistPath)
@@ -37,9 +38,10 @@ class PluginChecksumAllowlistTests :
         }
 
         "assertCovers reports sorted missing keys" {
-            val allowlist = PluginChecksumAllowlist(
-                entries = mapOf(LockKey(kind = REMOTE_KIND, key = "com.acme:plugin:1.0.0") to "a".repeat(64)),
-            )
+            val allowlist =
+                PluginChecksumAllowlist(
+                    entries = mapOf(LockKey(kind = REMOTE_KIND, key = "com.acme:plugin:1.0.0") to "a".repeat(64))
+                )
 
             val error =
                 shouldThrow<IllegalArgumentException> {
@@ -48,7 +50,7 @@ class PluginChecksumAllowlistTests :
                             LockKey(kind = REMOTE_KIND, key = "com.acme:plugin:1.0.0"),
                             LockKey(kind = LOCAL_KIND, key = "plugins/custom.jar"),
                             LockKey(kind = REMOTE_ARTIFACT_KIND, key = "deps/shared.jar"),
-                        ),
+                        )
                     )
                 }
 

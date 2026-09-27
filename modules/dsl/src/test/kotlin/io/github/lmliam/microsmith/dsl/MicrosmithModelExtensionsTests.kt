@@ -32,9 +32,7 @@ class MicrosmithModelExtensionsTests :
 
         "require() throws if extension is missing" {
             val model = MicrosmithModel.empty()
-            shouldThrow<IllegalStateException> {
-                model.require<FooExt>()
-            }
+            shouldThrow<IllegalStateException> { model.require<FooExt>() }
         }
 
         "extensions() returns all attached extensions" {

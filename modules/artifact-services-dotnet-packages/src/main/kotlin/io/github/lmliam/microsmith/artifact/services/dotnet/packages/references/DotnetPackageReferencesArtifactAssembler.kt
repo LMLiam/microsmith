@@ -29,13 +29,11 @@ class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackage
         require(current.projectName == next.projectName) {
             "Conflicting dotnet project for package references owned by service '${current.id.serviceName}'."
         }
-        return current.copy(
-            packages = mergePackages(current.packages, next.packages, current.id.serviceName),
-        )
+        return current.copy(packages = mergePackages(current.packages, next.packages, current.id.serviceName))
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<DotnetPackageReferencesArtifact>,
+        contribution: ArtifactContribution<DotnetPackageReferencesArtifact>
     ): DotnetPackageReferencesContribution {
         require(contribution is DotnetPackageReferencesContribution) {
             "Unsupported dotnet package references contribution type: ${contribution::class}"

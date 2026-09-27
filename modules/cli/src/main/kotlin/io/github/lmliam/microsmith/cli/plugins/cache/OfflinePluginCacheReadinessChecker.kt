@@ -15,15 +15,16 @@ internal class OfflinePluginCacheReadinessChecker {
         throw failure
     }
 
-    private fun findMissingArtifacts(entries: List<LockEntry>, cacheRoot: Path): List<String> = entries
-        .map { entry -> entry.key to cacheRoot.resolve(entry.key).normalize() }
-        .mapNotNull { (key, path) ->
-            when {
-                !path.startsWith(cacheRoot) -> key
-                !Files.exists(path) || !Files.isRegularFile(path) -> key
-                else -> null
+    private fun findMissingArtifacts(entries: List<LockEntry>, cacheRoot: Path): List<String> =
+        entries
+            .map { entry -> entry.key to cacheRoot.resolve(entry.key).normalize() }
+            .mapNotNull { (key, path) ->
+                when {
+                    !path.startsWith(cacheRoot) -> key
+                    !Files.exists(path) || !Files.isRegularFile(path) -> key
+                    else -> null
+                }
             }
-        }
 
     private fun offlineCacheFailure(
         lockfile: ParsedLockfile?,
@@ -33,7 +34,7 @@ internal class OfflinePluginCacheReadinessChecker {
         if (lockfile == null) {
             return offlineCacheMiss(
                 "Offline mode requires a plugin lockfile. " +
-                    "Generate '$lockfilePath' by running once without --offline.",
+                    "Generate '$lockfilePath' by running once without --offline."
             )
         }
 
@@ -41,7 +42,7 @@ internal class OfflinePluginCacheReadinessChecker {
         if (remoteArtifactEntries.isEmpty()) {
             return offlineCacheMiss(
                 "Offline mode requires locked remote dependency graph entries in '$lockfilePath'. " +
-                    "Regenerate the lockfile by running once without --offline.",
+                    "Regenerate the lockfile by running once without --offline."
             )
         }
 
@@ -53,7 +54,7 @@ internal class OfflinePluginCacheReadinessChecker {
         return offlineCacheMiss(
             "Offline mode is enabled but plugin cache is missing locked dependency graph artifacts: " +
                 missingArtifacts.sorted().joinToString(", ") +
-                ". Run once without --offline to restore the cache.",
+                ". Run once without --offline to restore the cache."
         )
     }
 

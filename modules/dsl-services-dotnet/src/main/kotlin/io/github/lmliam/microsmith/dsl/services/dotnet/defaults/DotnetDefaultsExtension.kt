@@ -7,15 +7,12 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.solution.DotnetSolution
 import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnetQualifiedIdentifier
 import kotlin.reflect.KClass
 
-/**
- * Shared .NET defaults declared under `services { dotnet { ... } }`.
- */
+/** Shared .NET defaults declared under `services { dotnet { ... } }`. */
 data class DotnetDefaultsExtension(
     val target: DotnetTarget? = null,
     val solutions: Map<String, DotnetSolution> = emptyMap(),
     val model: DotnetDefaultsModel = DotnetDefaultsModel.empty(),
-) : MicrosmithExtension,
-    MergeableExtension<DotnetDefaultsExtension> {
+) : MicrosmithExtension, MergeableExtension<DotnetDefaultsExtension> {
     fun findSolution(name: String) = solutions[name]
 
     fun requireSolution(name: String): DotnetSolution {
@@ -25,21 +22,16 @@ data class DotnetDefaultsExtension(
 
     fun allSolutions() = solutions.values
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T : MicrosmithExtension> get(type: KClass<T>) = model.get(type) as? T?
+    @Suppress("UNCHECKED_CAST") fun <T : MicrosmithExtension> get(type: KClass<T>) = model.get(type) as? T?
 
     inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
 
-    internal fun <T : MicrosmithExtension> with(type: KClass<T>, ext: T) = copy(
-        model = model.with(type, ext),
-    )
+    internal fun <T : MicrosmithExtension> with(type: KClass<T>, ext: T) = copy(model = model.with(type, ext))
 
     override fun merge(other: DotnetDefaultsExtension): DotnetDefaultsExtension {
         val mergedSolutions = linkedMapOf<String, DotnetSolution>()
 
-        solutions.values.forEach { solution ->
-            mergedSolutions[solution.name] = solution
-        }
+        solutions.values.forEach { solution -> mergedSolutions[solution.name] = solution }
 
         other.solutions.values.forEach { solution ->
             mergedSolutions[solution.name] = mergedSolutions[solution.name]?.merge(solution) ?: solution

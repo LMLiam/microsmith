@@ -10,11 +10,12 @@ private const val REMOTE_REPOSITORY_TYPE_DEFAULT = "default"
 
 internal class AetherRemoteRepositoryFactory {
     fun create(index: Int, repository: RepositoryEndpoint): RemoteRepository {
-        val builder = RemoteRepository.Builder(
-            "$REMOTE_REPOSITORY_ID_PREFIX-$index",
-            REMOTE_REPOSITORY_TYPE_DEFAULT,
-            repository.uri,
-        )
+        val builder =
+            RemoteRepository.Builder(
+                "$REMOTE_REPOSITORY_ID_PREFIX-$index",
+                REMOTE_REPOSITORY_TYPE_DEFAULT,
+                repository.uri,
+            )
         repository.credentials?.let(builder::applyAuthentication)
         return builder.build()
     }
@@ -26,9 +27,6 @@ private fun RemoteRepository.Builder.applyAuthentication(credentials: Repository
      * the builder setter remains the only accessible API from this module.
      */
     setAuthentication(
-        AuthenticationBuilder()
-            .addUsername(credentials.username)
-            .addPassword(credentials.password)
-            .build(),
+        AuthenticationBuilder().addUsername(credentials.username).addPassword(credentials.password).build()
     )
 }

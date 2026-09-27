@@ -3,12 +3,8 @@ package io.github.lmliam.microsmith.dsl.schemas
 import io.github.lmliam.microsmith.dsl.MergeableExtension
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 
-/**
- * Root extension that holds all declared schemas.
- */
-data class SchemasExtension(val schemas: Set<Schema>) :
-    MicrosmithExtension,
-    MergeableExtension<SchemasExtension> {
+/** Root extension that holds all declared schemas. */
+data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension, MergeableExtension<SchemasExtension> {
     init {
         val duplicateKeys =
             schemas
@@ -36,26 +32,25 @@ data class SchemasExtension(val schemas: Set<Schema>) :
     /**
      * Require a schema by [type] and [name].
      *
-     * @throws IllegalStateException if no schema with the given
-     * type and name exists.
+     * @throws IllegalStateException if no schema with the given type and name exists.
      */
     fun require(type: SchemaType, name: String) =
         find(type, name) ?: error("Schema not found: ${schemaDisplayKey(type, name)}")
 
-    /**
-     * Convenience: return all schemas of a given [type].
-     */
+    /** Convenience: return all schemas of a given [type]. */
     fun allOf(type: SchemaType) = schemas.filter { it.type == type }.toSet()
 
     override fun merge(other: SchemasExtension): SchemasExtension {
         val existingKeys = schemas.mapTo(mutableSetOf(), Schema::schemaKey)
-        val collisions = other.schemas.asSequence()
-            .map(Schema::schemaKey)
-            .filter { it in existingKeys }
-            .map { (type, name) -> schemaDisplayKey(type, name) }
-            .distinct()
-            .sorted()
-            .toList()
+        val collisions =
+            other.schemas
+                .asSequence()
+                .map(Schema::schemaKey)
+                .filter { it in existingKeys }
+                .map { (type, name) -> schemaDisplayKey(type, name) }
+                .distinct()
+                .sorted()
+                .toList()
 
         require(collisions.isEmpty()) {
             "Duplicate schema keys while merging SchemasExtension: ${collisions.joinToString(", ")}"

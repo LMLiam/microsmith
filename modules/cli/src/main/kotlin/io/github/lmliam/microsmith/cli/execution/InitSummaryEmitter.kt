@@ -12,8 +12,7 @@ private const val MICROSMITH_GROUP = "io.github.lmliam.microsmith"
 private const val MICROSMITH_MAVEN_PLUGIN_ARTIFACT = "maven-plugin"
 private const val MICROSMITH_SBT_PLUGIN_ARTIFACT = "sbt-plugin"
 private const val MICROSMITH_RUNTIME_SCRIPTING_COORDINATE = "$MICROSMITH_GROUP:runtime-scripting"
-private const val MICROSMITH_MAVEN_PLUGIN_COORDINATE =
-    "$MICROSMITH_GROUP:$MICROSMITH_MAVEN_PLUGIN_ARTIFACT"
+private const val MICROSMITH_MAVEN_PLUGIN_COORDINATE = "$MICROSMITH_GROUP:$MICROSMITH_MAVEN_PLUGIN_ARTIFACT"
 
 internal object InitSummaryEmitter {
     fun emit(emitter: CliDiagnosticEmitter, command: InitCommand, result: InitBootstrapResult) {
@@ -24,7 +23,7 @@ internal object InitSummaryEmitter {
         emitNativeJvmGuidance(emitter, result)
         result.repositoryDetection.profile.recommendedOutputDirectory?.let { outputDirectory ->
             emitter.info(
-                "Optional repository-native output path: microsmith run build.microsmith.kts --out $outputDirectory",
+                "Optional repository-native output path: microsmith run build.microsmith.kts --out $outputDirectory"
             )
         }
     }
@@ -50,15 +49,11 @@ internal object InitSummaryEmitter {
             emitter.info("$message: ${result.preservedFiles.formatForDisplay(result.projectRoot)}")
             if (!command.force) {
                 emitter.info(
-                    "Re-run with --force to replace existing regular bootstrap files with the managed templates.",
+                    "Re-run with --force to replace existing regular bootstrap files with the managed templates."
                 )
             }
         }
-        if (
-            result.createdFiles.isEmpty() &&
-            result.overwrittenFiles.isEmpty() &&
-            result.preservedFiles.isEmpty()
-        ) {
+        if (result.createdFiles.isEmpty() && result.overwrittenFiles.isEmpty() && result.preservedFiles.isEmpty()) {
             emitter.info("Bootstrap completed with no managed file changes.")
         }
     }
@@ -67,7 +62,7 @@ internal object InitSummaryEmitter {
         val ideHelperResult = result.ideHelperResult
         if (ideHelperResult == null) {
             emitter.info(
-                "JetBrains IDE helper generation was skipped. Run 'microsmith ide refresh' when you want IDE indexing.",
+                "JetBrains IDE helper generation was skipped. Run 'microsmith ide refresh' when you want IDE indexing."
             )
             return
         }
@@ -81,23 +76,27 @@ internal object InitSummaryEmitter {
     private fun emitNativeJvmGuidance(emitter: CliDiagnosticEmitter, result: InitBootstrapResult) {
         val nativeBuildSystem = result.nativeJvmBuildSystem() ?: return
         when (nativeBuildSystem) {
-            JvmNativeBuildSystem.GRADLE -> emitter.info(
-                "Gradle repository detected. Prefer the native Gradle plugin path when you want imported-project " +
-                    "IDE support: apply plugin id '$GRADLE_PLUGIN_ID', configure 'microsmith { ... }', " +
-                    "and run './gradlew microsmithGenerate'.",
-            )
+            JvmNativeBuildSystem.GRADLE ->
+                emitter.info(
+                    "Gradle repository detected. Prefer the native Gradle plugin path when you want imported-project " +
+                        "IDE support: apply plugin id '$GRADLE_PLUGIN_ID', configure 'microsmith { ... }', " +
+                        "and run './gradlew microsmithGenerate'."
+                )
 
-            JvmNativeBuildSystem.MAVEN -> emitter.info(
-                "Maven repository detected. Prefer the native Maven plugin path when you want imported-project " +
-                    "IDE support: add '$MICROSMITH_RUNTIME_SCRIPTING_COORDINATE' as a provided dependency, " +
-                    "configure '$MICROSMITH_MAVEN_PLUGIN_COORDINATE', and run 'mvn microsmith:generate'.",
-            )
+            JvmNativeBuildSystem.MAVEN ->
+                emitter.info(
+                    "Maven repository detected. Prefer the native Maven plugin path when you want imported-project " +
+                        "IDE support: add '$MICROSMITH_RUNTIME_SCRIPTING_COORDINATE' as a provided dependency, " +
+                        "configure '$MICROSMITH_MAVEN_PLUGIN_COORDINATE', and run 'mvn microsmith:generate'."
+                )
 
-            JvmNativeBuildSystem.SBT -> emitter.info(
-                "sbt repository detected. Prefer the native sbt plugin path when you want build-aligned " +
-                    "generation: add '$MICROSMITH_GROUP' % '$MICROSMITH_SBT_PLUGIN_ARTIFACT' in project/plugins.sbt, " +
-                    "enable 'MicrosmithSbtPlugin', and run 'sbt microsmithGenerate'.",
-            )
+            JvmNativeBuildSystem.SBT ->
+                emitter.info(
+                    "sbt repository detected. Prefer the native sbt plugin path when you want build-aligned " +
+                        "generation: add '$MICROSMITH_GROUP' % '$MICROSMITH_SBT_PLUGIN_ARTIFACT' in " +
+                        "project/plugins.sbt, " +
+                        "enable 'MicrosmithSbtPlugin', and run 'sbt microsmithGenerate'."
+                )
         }
     }
 }
@@ -118,19 +117,23 @@ private fun InitBootstrapResult.nativeJvmBuildSystem(): JvmNativeBuildSystem? {
     }
 }
 
-private fun isGradleMarker(marker: String): Boolean = marker in setOf(
-    "build.gradle",
-    "build.gradle.kts",
-    "settings.gradle",
-    "settings.gradle.kts",
-)
+private fun isGradleMarker(marker: String): Boolean =
+    marker in
+        setOf(
+            "build.gradle",
+            "build.gradle.kts",
+            "settings.gradle",
+            "settings.gradle.kts",
+        )
 
 private fun isMavenMarker(marker: String): Boolean = marker == "pom.xml"
 
-private fun isSbtMarker(marker: String): Boolean = marker in setOf(
-    "build.sbt",
-    "project/build.properties",
-)
+private fun isSbtMarker(marker: String): Boolean =
+    marker in
+        setOf(
+            "build.sbt",
+            "project/build.properties",
+        )
 
 private enum class JvmNativeBuildSystem {
     GRADLE,

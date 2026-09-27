@@ -25,9 +25,8 @@ private class AlphaFirstResolver : DomainResolver<AlphaExtension, AlphaResolvedM
     override val authoringType = AlphaExtension::class
     override val resolvedType = AlphaResolvedModel::class
 
-    override fun resolve(authoring: AlphaExtension): DomainResolution<AlphaResolvedModel> = DomainResolution.Success(
-        AlphaResolvedModel("alpha"),
-    )
+    override fun resolve(authoring: AlphaExtension): DomainResolution<AlphaResolvedModel> =
+        DomainResolution.Success(AlphaResolvedModel("alpha"))
 }
 
 private class AlphaNotApplicableResolver : DomainResolver<AlphaExtension, BetaResolvedModel> {
@@ -42,27 +41,24 @@ private class BetaResolver : DomainResolver<BetaExtension, BetaResolvedModel> {
     override val authoringType = BetaExtension::class
     override val resolvedType = BetaResolvedModel::class
 
-    override fun resolve(authoring: BetaExtension): DomainResolution<BetaResolvedModel> = DomainResolution.Success(
-        BetaResolvedModel("beta"),
-    )
+    override fun resolve(authoring: BetaExtension): DomainResolution<BetaResolvedModel> =
+        DomainResolution.Success(BetaResolvedModel("beta"))
 }
 
 private class AlphaFailureResolver : DomainResolver<AlphaExtension, AlphaResolvedModel> {
     override val authoringType = AlphaExtension::class
     override val resolvedType = AlphaResolvedModel::class
 
-    override fun resolve(authoring: AlphaExtension): DomainResolution<AlphaResolvedModel> = DomainResolution.Failure(
-        nonEmptyListOf(AlphaIssue),
-    )
+    override fun resolve(authoring: AlphaExtension): DomainResolution<AlphaResolvedModel> =
+        DomainResolution.Failure(nonEmptyListOf(AlphaIssue))
 }
 
 private class BetaFailureResolver : DomainResolver<BetaExtension, BetaResolvedModel> {
     override val authoringType = BetaExtension::class
     override val resolvedType = BetaResolvedModel::class
 
-    override fun resolve(authoring: BetaExtension): DomainResolution<BetaResolvedModel> = DomainResolution.Failure(
-        nonEmptyListOf(BetaIssue),
-    )
+    override fun resolve(authoring: BetaExtension): DomainResolution<BetaResolvedModel> =
+        DomainResolution.Failure(nonEmptyListOf(BetaIssue))
 }
 
 private class ThrowingResolver : DomainResolver<AlphaExtension, AlphaResolvedModel> {
@@ -88,12 +84,10 @@ class DomainResolutionServiceTests :
                         BetaResolver(),
                         AlphaNotApplicableResolver(),
                         AlphaFirstResolver(),
-                    ),
+                    )
                 )
 
-            val result =
-                service.resolve(builder.model)
-                    .shouldBeTypeOf<ResolutionOutcome.Success>()
+            val result = service.resolve(builder.model).shouldBeTypeOf<ResolutionOutcome.Success>()
 
             result.models shouldContainExactly
                 listOf(
@@ -114,12 +108,10 @@ class DomainResolutionServiceTests :
                     listOf(
                         BetaFailureResolver(),
                         AlphaFailureResolver(),
-                    ),
+                    )
                 )
 
-            val result =
-                service.resolve(builder.model)
-                    .shouldBeTypeOf<ResolutionOutcome.Failure>()
+            val result = service.resolve(builder.model).shouldBeTypeOf<ResolutionOutcome.Failure>()
 
             result.issues.toList() shouldContainExactly
                 listOf(
@@ -129,19 +121,12 @@ class DomainResolutionServiceTests :
         }
 
         "resolve does not convert unexpected exceptions into semantic issues" {
-            val builder =
-                MicrosmithBuilder().apply {
-                    put(AlphaExtension::class, AlphaExtension)
-                }
+            val builder = MicrosmithBuilder().apply { put(AlphaExtension::class, AlphaExtension) }
 
-            val service =
-                DomainResolutionService(
-                    listOf(ThrowingResolver()),
-                )
+            val service = DomainResolutionService(listOf(ThrowingResolver()))
 
-            shouldThrow<IllegalStateException> {
-                service.resolve(builder.model)
-            }.message shouldBe "infrastructure exploded"
+            shouldThrow<IllegalStateException> { service.resolve(builder.model) }.message shouldBe
+                "infrastructure exploded"
         }
 
         "registry sorts resolvers for an authoring type deterministically by resolved type then implementation" {
@@ -151,7 +136,7 @@ class DomainResolutionServiceTests :
                         BetaResolver(),
                         AlphaFirstResolver(),
                         AlphaNotApplicableResolver(),
-                    ),
+                    )
                 )
 
             val resolvers = registry.resolve(AlphaExtension)
@@ -162,7 +147,6 @@ class DomainResolutionServiceTests :
                     BetaResolvedModel::class,
                 )
 
-            resolvers.first().authoringType shouldBe
-                AlphaExtension::class
+            resolvers.first().authoringType shouldBe AlphaExtension::class
         }
     })

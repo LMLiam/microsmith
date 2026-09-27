@@ -31,25 +31,19 @@ class ServicesExtensionTests :
             val s1 = Service(name = "UserService", model = ServiceModel.empty())
             val ext = ServicesExtension(setOf(s1))
 
-            shouldThrow<IllegalStateException> {
-                ext.require("OrderService")
-            }
+            shouldThrow<IllegalStateException> { ext.require("OrderService") }
         }
 
         "find throws when service name is blank" {
             val ext = ServicesExtension(emptySet())
 
-            shouldThrow<IllegalArgumentException> {
-                ext.find(" ")
-            }
+            shouldThrow<IllegalArgumentException> { ext.find(" ") }
         }
 
         "merge throws when duplicate service key exists across extensions" {
             val left = ServicesExtension(setOf(Service(name = "UserService", model = ServiceModel.empty())))
             val right = ServicesExtension(setOf(Service(name = "UserService", model = ServiceModel.empty())))
 
-            shouldThrow<IllegalArgumentException> {
-                left.merge(right)
-            }
+            shouldThrow<IllegalArgumentException> { left.merge(right) }
         }
     })

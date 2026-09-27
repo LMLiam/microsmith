@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.cli.plugins.remote
 
-import org.eclipse.aether.repository.RemoteRepository
 import java.nio.file.Path
+import org.eclipse.aether.repository.RemoteRepository
 
 internal data class MavenDependencyGraphRequest(
     val coordinate: Coordinate,

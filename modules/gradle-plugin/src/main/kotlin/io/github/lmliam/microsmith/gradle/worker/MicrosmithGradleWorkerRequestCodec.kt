@@ -18,14 +18,14 @@ internal class MicrosmithGradleWorkerRequestCodec {
             properties["$PLUGIN_CLASSPATH_PREFIX$index"] = pluginPath.toString()
         }
         properties[VARIABLE_COUNT] = request.variables.size.toString()
-        request.variables.entries.sortedBy { (key, _) -> key }.forEachIndexed { index, (key, value) ->
-            properties["$VARIABLE_KEY_PREFIX$index"] = key
-            properties["$VARIABLE_VALUE_PREFIX$index"] = value
-        }
+        request.variables.entries
+            .sortedBy { (key, _) -> key }
+            .forEachIndexed { index, (key, value) ->
+                properties["$VARIABLE_KEY_PREFIX$index"] = key
+                properties["$VARIABLE_VALUE_PREFIX$index"] = value
+            }
         properties[FLAG_COUNT] = request.flags.size.toString()
-        request.flags.sorted().forEachIndexed { index, flag ->
-            properties["$FLAG_PREFIX$index"] = flag
-        }
+        request.flags.sorted().forEachIndexed { index, flag -> properties["$FLAG_PREFIX$index"] = flag }
         path.parent?.let(Files::createDirectories)
         Files.newOutputStream(path).use { output -> properties.store(output, null) }
     }
@@ -38,21 +38,25 @@ internal class MicrosmithGradleWorkerRequestCodec {
             outputPath = properties.requiredPath(OUTPUT_PATH),
             cacheDirectory = properties.requiredPath(CACHE_DIRECTORY),
             variables =
-            properties.readPairs(
-                countKey = VARIABLE_COUNT,
-                keyPrefix = VARIABLE_KEY_PREFIX,
-                valuePrefix = VARIABLE_VALUE_PREFIX,
-            ),
+                properties.readPairs(
+                    countKey = VARIABLE_COUNT,
+                    keyPrefix = VARIABLE_KEY_PREFIX,
+                    valuePrefix = VARIABLE_VALUE_PREFIX,
+                ),
             flags =
-            properties.readValues(
-                countKey = FLAG_COUNT,
-                valuePrefix = FLAG_PREFIX,
-            ).toSortedSet(),
+                properties
+                    .readValues(
+                        countKey = FLAG_COUNT,
+                        valuePrefix = FLAG_PREFIX,
+                    )
+                    .toSortedSet(),
             pluginClasspath =
-            properties.readValues(
-                countKey = PLUGIN_CLASSPATH_COUNT,
-                valuePrefix = PLUGIN_CLASSPATH_PREFIX,
-            ).map(Path::of),
+                properties
+                    .readValues(
+                        countKey = PLUGIN_CLASSPATH_COUNT,
+                        valuePrefix = PLUGIN_CLASSPATH_PREFIX,
+                    )
+                    .map(Path::of),
         )
     }
 }

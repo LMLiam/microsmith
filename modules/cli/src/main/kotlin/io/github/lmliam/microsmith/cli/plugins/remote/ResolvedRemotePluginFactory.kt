@@ -2,11 +2,11 @@ package io.github.lmliam.microsmith.cli.plugins.remote
 
 import io.github.lmliam.microsmith.cli.plugins.PluginResolverErrorCategory
 import io.github.lmliam.microsmith.cli.plugins.diagnostics.PluginResolutionDiagnosticException
+import java.nio.file.Files
+import java.nio.file.Path
 import org.eclipse.aether.artifact.Artifact
 import org.eclipse.aether.resolution.ArtifactResult
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator
-import java.nio.file.Files
-import java.nio.file.Path
 
 /** Normalizes Aether results into cache-relative lock keys and a deterministic runtime classpath. */
 internal class ResolvedRemotePluginFactory {
@@ -56,21 +56,22 @@ internal class ResolvedRemotePluginFactory {
         coordinate: Coordinate,
         expectedRootArtifactPath: Path,
         artifactResults: List<ArtifactResult>,
-    ): Path = expectedRootArtifactPath.takeIf(Files::exists)
-        ?: artifactResults
-            .asSequence()
-            .mapNotNull { result -> result.artifact }
-            .firstOrNull { artifact -> artifact.matchesCoordinate(coordinate) }
-            ?.file
-            ?.toPath()
-            ?.toAbsolutePath()
-            ?.normalize()
-        ?: throw PluginResolutionDiagnosticException(
-            category = PluginResolverErrorCategory.ROOT_ARTIFACT_MISSING,
-            message =
-            "Plugin '${coordinate.value}' resolved but no root jar was produced in cache at " +
-                "'$expectedRootArtifactPath'.",
-        )
+    ): Path =
+        expectedRootArtifactPath.takeIf(Files::exists)
+            ?: artifactResults
+                .asSequence()
+                .mapNotNull { result -> result.artifact }
+                .firstOrNull { artifact -> artifact.matchesCoordinate(coordinate) }
+                ?.file
+                ?.toPath()
+                ?.toAbsolutePath()
+                ?.normalize()
+            ?: throw PluginResolutionDiagnosticException(
+                category = PluginResolverErrorCategory.ROOT_ARTIFACT_MISSING,
+                message =
+                    "Plugin '${coordinate.value}' resolved but no root jar was produced in cache at " +
+                        "'$expectedRootArtifactPath'.",
+            )
 
     private fun resolveArtifacts(
         coordinate: Coordinate,
@@ -95,30 +96,27 @@ internal class ResolvedRemotePluginFactory {
                         localRepositoryRoot = localRepositoryRoot,
                         artifact = artifact,
                     )
-                }.toList()
+                }
+                .toList()
 
         return (resolvedRuntimeArtifacts + listOf(rootArtifactPath) + resolvedDescriptorArtifacts)
             .distinct()
             .map { artifactPath ->
                 ResolvedRemoteArtifact(
                     lockKey =
-                    toRemoteArtifactLockKey(
-                        coordinate = coordinate,
-                        localRepositoryRoot = localRepositoryRoot,
-                        artifactPath = artifactPath,
-                    ),
+                        toRemoteArtifactLockKey(
+                            coordinate = coordinate,
+                            localRepositoryRoot = localRepositoryRoot,
+                            artifactPath = artifactPath,
+                        ),
                     artifactPath = artifactPath,
                 )
-            }.sortedBy(ResolvedRemoteArtifact::lockKey)
+            }
+            .sortedBy(ResolvedRemoteArtifact::lockKey)
     }
 
     private fun resolveDescriptorPath(coordinate: Coordinate, localRepositoryRoot: Path, artifact: Artifact): Path {
-        val fromArtifactFile =
-            artifact.file
-                ?.toPath()
-                ?.toAbsolutePath()
-                ?.normalize()
-                ?.let(::toPomSiblingPath)
+        val fromArtifactFile = artifact.file?.toPath()?.toAbsolutePath()?.normalize()?.let(::toPomSiblingPath)
         val fromArtifactCoordinates =
             localRepositoryRoot
                 .resolve(artifact.groupId.replace('.', '/'))

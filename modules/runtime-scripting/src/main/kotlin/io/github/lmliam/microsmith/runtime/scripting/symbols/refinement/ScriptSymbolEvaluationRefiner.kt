@@ -11,7 +11,7 @@ import kotlin.script.experimental.api.makeFailureResult
 import kotlin.script.experimental.api.providedProperties
 
 internal fun refineMicrosmithScriptSymbolValues(
-    context: ScriptEvaluationConfigurationRefinementContext,
+    context: ScriptEvaluationConfigurationRefinementContext
 ): ResultWithDiagnostics<ScriptEvaluationConfiguration> {
     val compilationConfiguration =
         context.evaluationConfiguration[ScriptEvaluationConfiguration.compilationConfiguration]
@@ -24,23 +24,20 @@ internal fun refineMicrosmithScriptSymbolValues(
     }
 
     return runCatching {
-        val registry = ScriptSymbolContributorRegistry.discover()
+            val registry = ScriptSymbolContributorRegistry.discover()
 
-        val values = symbols.associate { symbol ->
-            val contributor = registry.contributor(symbol.contributorId)
+            val values = symbols.associate { symbol ->
+                val contributor = registry.contributor(symbol.contributorId)
 
-            symbol.propertyName to contributor.createValue(symbol.kind, symbol.valueKey)
+                symbol.propertyName to contributor.createValue(symbol.kind, symbol.valueKey)
+            }
+
+            ScriptEvaluationConfiguration(context.evaluationConfiguration) { providedProperties.append(values) }
         }
-
-        ScriptEvaluationConfiguration(context.evaluationConfiguration) {
-            providedProperties.append(values)
-        }
-    }.fold(
-        onSuccess = { it.asSuccess() },
-        onFailure = {
-            makeFailureResult(
-                it.message ?: "Failed to create automatic Microsmith script symbol values",
-            )
-        },
-    )
+        .fold(
+            onSuccess = { it.asSuccess() },
+            onFailure = {
+                makeFailureResult(it.message ?: "Failed to create automatic Microsmith script symbol values")
+            },
+        )
 }

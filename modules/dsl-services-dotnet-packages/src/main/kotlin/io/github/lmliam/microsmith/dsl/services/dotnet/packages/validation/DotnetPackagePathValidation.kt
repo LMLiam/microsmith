@@ -8,9 +8,7 @@ internal fun normalizeDotnetPackagePath(value: String, label: String): List<Stri
 
     val segments = normalized.split('.')
     require(segments.all { it.isNotBlank() }) { "$label cannot contain empty path segments: '$value'." }
-    require(segments.all(::isValidDotnetPackageSegment)) {
-        "$label is not a valid .NET package identifier: '$value'"
-    }
+    require(segments.all(::isValidDotnetPackageSegment)) { "$label is not a valid .NET package identifier: '$value'" }
 
     return segments
 }
@@ -22,7 +20,7 @@ internal fun validateDotnetPackageVersion(value: String, label: String): String 
     require(
         normalized.all { character ->
             character.isLetterOrDigit() || character == '.' || character == '-' || character == '+' || character == '_'
-        },
+        }
     ) {
         "$label is not a valid .NET package version: '$value'"
     }
@@ -35,7 +33,5 @@ private fun isValidDotnetPackageSegment(value: String): Boolean {
         return false
     }
 
-    return value.all { character ->
-        character.isLetterOrDigit() || character == '-' || character == '_'
-    }
+    return value.all { character -> character.isLetterOrDigit() || character == '-' || character == '_' }
 }

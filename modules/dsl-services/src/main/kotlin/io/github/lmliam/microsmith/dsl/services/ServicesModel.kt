@@ -4,28 +4,24 @@ import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.merge.mergeModelExtension
 import kotlin.reflect.KClass
 
-/**
- * Immutable snapshot of the shared service-scoped extension payloads attached to `services { ... }`.
- */
-class ServicesModel internal constructor(
-    private val extensions: Map<KClass<out MicrosmithExtension>, MicrosmithExtension>,
-) {
-    @Suppress("UNCHECKED_CAST")
-    fun <T : MicrosmithExtension> get(type: KClass<T>) = extensions[type] as? T?
+/** Immutable snapshot of the shared service-scoped extension payloads attached to `services { ... }`. */
+class ServicesModel
+internal constructor(private val extensions: Map<KClass<out MicrosmithExtension>, MicrosmithExtension>) {
+    @Suppress("UNCHECKED_CAST") fun <T : MicrosmithExtension> get(type: KClass<T>) = extensions[type] as? T?
 
     inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
 
     @Suppress("UNCHECKED_CAST")
-    internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = ServicesModel(
-        extensions + (mapOf(type to mergeModelExtension(extensions[type] as T?, value))),
-    )
+    internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) =
+        ServicesModel(extensions + (mapOf(type to mergeModelExtension(extensions[type] as T?, value))))
 
-    internal fun merge(other: ServicesModel): ServicesModel = ServicesModel(
-        extensions +
-            other.extensions.mapValues { (type, value) ->
-                mergeModelExtension(extensions[type] as MicrosmithExtension?, value)
-            },
-    )
+    internal fun merge(other: ServicesModel): ServicesModel =
+        ServicesModel(
+            extensions +
+                other.extensions.mapValues { (type, value) ->
+                    mergeModelExtension(extensions[type] as MicrosmithExtension?, value)
+                }
+        )
 
     fun keys() = extensions.keys
 

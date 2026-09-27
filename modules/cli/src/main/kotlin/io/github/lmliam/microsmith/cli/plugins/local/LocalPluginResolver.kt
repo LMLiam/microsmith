@@ -19,7 +19,8 @@ internal class LocalPluginResolver(private val checksumCalculator: (Path) -> Str
                         artifactPath = requestedPath.toAbsolutePath().normalize(),
                         lockKey = requestedPath.toLocalPluginLockKey(),
                     )
-                }.sortedBy(LocalPluginJar::lockKey)
+                }
+                .sortedBy(LocalPluginJar::lockKey)
         localPluginJars.forEach { localJar ->
             require(Files.exists(localJar.artifactPath) && Files.isRegularFile(localJar.artifactPath)) {
                 "Plugin jar '${localJar.artifactPath}' does not exist or is not a file."

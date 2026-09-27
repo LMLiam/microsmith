@@ -13,25 +13,23 @@ internal class ProtobufReferenceResolver(private val symbols: ProtobufSymbolTabl
         location: ProtobufResolutionIssue.ReferenceLocation,
     ): Either<ProtobufResolutionIssue, ResolvedProtobufReference> {
         val target = resolveIdentity(schema, reference)
-        val symbol = symbols.find(target)
-            ?: return Either.Left(
-                ProtobufResolutionIssue.UnresolvedReference(
-                    schema.fullyQualifiedName,
-                    location,
-                    target.fullyQualifiedName,
-                ),
-            )
+        val symbol =
+            symbols.find(target)
+                ?: return Either.Left(
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        schema.fullyQualifiedName,
+                        location,
+                        target.fullyQualifiedName,
+                    )
+                )
 
         return Either.Right(ResolvedProtobufReference(symbol.identity, symbol.kind))
     }
 
     private fun resolveIdentity(current: QualifiedSchemaName, reference: Reference): QualifiedSchemaName =
         when (reference) {
-            is Reference.Local -> QualifiedSchemaName.parse(
-                current.packageName?.let {
-                    "$it.${reference.target}"
-                } ?: reference.target,
-            )
+            is Reference.Local ->
+                QualifiedSchemaName.parse(current.packageName?.let { "$it.${reference.target}" } ?: reference.target)
 
             is Reference.Relative -> resolveRelative(current, reference.expression)
 

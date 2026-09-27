@@ -3,10 +3,7 @@ package io.github.lmliam.microsmith.cli.plugins.cache
 import java.nio.file.Path
 
 internal fun defaultPluginCacheDirectory(): Path {
-    val envPath =
-        System.getenv("MICROSMITH_PLUGIN_CACHE_DIR")
-            ?.trim()
-            ?.takeIf { it.isNotEmpty() }
+    val envPath = System.getenv("MICROSMITH_PLUGIN_CACHE_DIR")?.trim()?.takeIf { it.isNotEmpty() }
     if (envPath != null) {
         return Path.of(envPath)
     }

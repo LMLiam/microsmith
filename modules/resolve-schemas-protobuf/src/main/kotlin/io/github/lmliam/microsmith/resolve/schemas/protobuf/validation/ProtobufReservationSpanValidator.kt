@@ -11,63 +11,57 @@ internal fun validateMessageReservationSpan(
     schemaName: String,
     reservation: Reserved,
     issues: MutableList<ProtobufResolutionIssue>,
-): IntRange? = when (reservation) {
-    is ReservedName ->
-        null
+): IntRange? =
+    when (reservation) {
+        is ReservedName -> null
 
-    is ReservedIndex -> {
-        issues.validateFieldNumber(
-            schemaName,
-            ProtobufResolutionIssue.FieldLocation.Reservation(
-                reservation.index.toString(),
-            ),
-            reservation.index,
-        )
+        is ReservedIndex -> {
+            issues.validateFieldNumber(
+                schemaName,
+                ProtobufResolutionIssue.FieldLocation.Reservation(reservation.index.toString()),
+                reservation.index,
+            )
 
-        reservation.index..reservation.index
+            reservation.index..reservation.index
+        }
+
+        is ReservedRange ->
+            validateMessageReservationRange(
+                schemaName,
+                reservation.indexRange,
+                issues,
+            )
+
+        is ReservedToMax -> {
+            issues.validateFieldNumber(
+                schemaName,
+                ProtobufResolutionIssue.FieldLocation.Reservation("${reservation.from} to max"),
+                reservation.from,
+            )
+
+            reservation.from..MAX_PROTOBUF_FIELD_NUMBER
+        }
     }
-
-    is ReservedRange ->
-        validateMessageReservationRange(
-            schemaName,
-            reservation.indexRange,
-            issues,
-        )
-
-    is ReservedToMax -> {
-        issues.validateFieldNumber(
-            schemaName,
-            ProtobufResolutionIssue.FieldLocation.Reservation(
-                "${reservation.from} to max",
-            ),
-            reservation.from,
-        )
-
-        reservation.from..MAX_PROTOBUF_FIELD_NUMBER
-    }
-}
 
 internal fun validateEnumReservationSpan(
     schemaName: String,
     reservation: Reserved,
     issues: MutableList<ProtobufResolutionIssue>,
-): IntRange? = when (reservation) {
-    is ReservedName ->
-        null
+): IntRange? =
+    when (reservation) {
+        is ReservedName -> null
 
-    is ReservedIndex ->
-        reservation.index..reservation.index
+        is ReservedIndex -> reservation.index..reservation.index
 
-    is ReservedRange ->
-        validateEnumReservationRange(
-            schemaName,
-            reservation.indexRange,
-            issues,
-        )
+        is ReservedRange ->
+            validateEnumReservationRange(
+                schemaName,
+                reservation.indexRange,
+                issues,
+            )
 
-    is ReservedToMax ->
-        reservation.from..Int.MAX_VALUE
-}
+        is ReservedToMax -> reservation.from..Int.MAX_VALUE
+    }
 
 private fun validateMessageReservationRange(
     schemaName: String,
@@ -78,10 +72,7 @@ private fun validateMessageReservationRange(
         return null
     }
 
-    val location =
-        ProtobufResolutionIssue.FieldLocation.Reservation(
-            range.toString(),
-        )
+    val location = ProtobufResolutionIssue.FieldLocation.Reservation(range.toString())
 
     issues.validateFieldNumber(
         schemaName,

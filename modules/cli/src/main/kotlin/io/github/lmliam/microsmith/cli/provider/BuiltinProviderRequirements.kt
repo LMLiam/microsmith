@@ -51,11 +51,12 @@ private data class BuiltinProviderRequirement(
     val description: String,
     val isPresent: (MicrosmithPluginCatalog) -> Boolean,
 ) {
-    fun missingMessage(pluginCatalog: MicrosmithPluginCatalog): String? = if (isPresent(pluginCatalog)) {
-        null
-    } else {
-        "Missing built-in $description. Check CLI runtime packaging."
-    }
+    fun missingMessage(pluginCatalog: MicrosmithPluginCatalog): String? =
+        if (isPresent(pluginCatalog)) {
+            null
+        } else {
+            "Missing built-in $description. Check CLI runtime packaging."
+        }
 }
 
 private fun domainResolverRequirement(authoringType: KClass<*>, resolvedType: KClass<*>): BuiltinProviderRequirement =
@@ -63,8 +64,7 @@ private fun domainResolverRequirement(authoringType: KClass<*>, resolvedType: KC
         description = "DomainResolver for ${authoringType.displayName()} -> ${resolvedType.displayName()}",
         isPresent = { pluginCatalog ->
             pluginCatalog.domainResolvers.any { resolver ->
-                resolver.authoringType == authoringType &&
-                    resolver.resolvedType == resolvedType
+                resolver.authoringType == authoringType && resolver.resolvedType == resolvedType
             }
         },
     )
@@ -73,9 +73,7 @@ private fun artifactContributorRequirement(resolvedType: KClass<*>): BuiltinProv
     BuiltinProviderRequirement(
         description = "ArtifactContributor for ${resolvedType.displayName()}",
         isPresent = { pluginCatalog ->
-            pluginCatalog.artifactContributors.any { contributor ->
-                contributor.resolvedType == resolvedType
-            }
+            pluginCatalog.artifactContributors.any { contributor -> contributor.resolvedType == resolvedType }
         },
     )
 
@@ -83,9 +81,7 @@ private fun artifactAssemblerRequirement(artifactType: KClass<*>): BuiltinProvid
     BuiltinProviderRequirement(
         description = "ArtifactAssembler for ${artifactType.displayName()}",
         isPresent = { pluginCatalog ->
-            pluginCatalog.artifactAssemblers.any { assembler ->
-                assembler.artifactType == artifactType
-            }
+            pluginCatalog.artifactAssemblers.any { assembler -> assembler.artifactType == artifactType }
         },
     )
 
@@ -93,9 +89,7 @@ private fun artifactCompilerRequirement(artifactType: KClass<*>): BuiltinProvide
     BuiltinProviderRequirement(
         description = "ArtifactCompiler for ${artifactType.displayName()}",
         isPresent = { pluginCatalog ->
-            pluginCatalog.artifactCompilers.any { compiler ->
-                compiler.artifactType == artifactType
-            }
+            pluginCatalog.artifactCompilers.any { compiler -> compiler.artifactType == artifactType }
         },
     )
 
@@ -103,9 +97,7 @@ private fun artifactRendererRequirement(artifactType: KClass<*>): BuiltinProvide
     BuiltinProviderRequirement(
         description = "ArtifactRenderer for ${artifactType.displayName()}",
         isPresent = { pluginCatalog ->
-            pluginCatalog.artifactRenderers.any { renderer ->
-                renderer.artifactType == artifactType
-            }
+            pluginCatalog.artifactRenderers.any { renderer -> renderer.artifactType == artifactType }
         },
     )
 

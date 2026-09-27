@@ -21,13 +21,11 @@ class DotnetPackageVersionsArtifactAssembler : ArtifactAssembler<DotnetPackageVe
         contribution: ArtifactContribution<DotnetPackageVersionsArtifact>,
     ): DotnetPackageVersionsArtifact {
         val next = requireContribution(contribution)
-        return current.copy(
-            packages = mergePackages(current.packages, next.packages, current.id.solutionName),
-        )
+        return current.copy(packages = mergePackages(current.packages, next.packages, current.id.solutionName))
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<DotnetPackageVersionsArtifact>,
+        contribution: ArtifactContribution<DotnetPackageVersionsArtifact>
     ): DotnetPackageVersionsContribution {
         require(contribution is DotnetPackageVersionsContribution) {
             "Unsupported dotnet package versions contribution type: ${contribution::class}"

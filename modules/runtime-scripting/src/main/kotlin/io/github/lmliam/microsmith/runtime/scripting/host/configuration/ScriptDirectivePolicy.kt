@@ -6,15 +6,11 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 private val DIRECT_FILE_DIRECTIVE =
-    Regex(
-        pattern = """^\s*@file:\s*(?:kotlin\.script\.experimental\.dependencies\.)?(DependsOn|Repository)\b""",
-    )
+    Regex(pattern = """^\s*@file:\s*(?:kotlin\.script\.experimental\.dependencies\.)?(DependsOn|Repository)\b""")
 private val GROUP_FILE_DIRECTIVE_START = Regex(pattern = """^\s*@file:\s*\[""")
 private val GROUP_FILE_DIRECTIVE_END = Regex(pattern = """]""")
 private val GROUP_FORBIDDEN_DIRECTIVE =
-    Regex(
-        pattern = """(?:kotlin\.script\.experimental\.dependencies\.)?(DependsOn|Repository)\b""",
-    )
+    Regex(pattern = """(?:kotlin\.script\.experimental\.dependencies\.)?(DependsOn|Repository)\b""")
 
 internal object ScriptDirectivePolicy {
     fun validate(scriptPath: Path): ScriptRunFailure? {
@@ -24,9 +20,7 @@ internal object ScriptDirectivePolicy {
         }
         return ScriptRunFailure(
             diagnostics =
-            listOf(
-                "Script dependency directives are blocked by default for security hardening.",
-            ) + violations,
+                listOf("Script dependency directives are blocked by default for security hardening.") + violations,
             type = ScriptFailureType.VALIDATION,
         )
     }
@@ -90,7 +84,8 @@ internal object ScriptDirectivePolicy {
                 val lineNumber = startLine + newlineCountBeforeMatch
                 val directive = match.groupValues[1]
                 violationMessage(lineNumber, directive)
-            }.distinct()
+            }
+            .distinct()
             .toList()
     }
 

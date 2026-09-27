@@ -7,8 +7,7 @@ import org.jetbrains.kotlin.lexer.KtTokens
 
 internal object KotlinScriptCallSiteParser {
     fun declarations(
-        @Suppress("UNUSED_PARAMETER")
-        sourceName: String,
+        @Suppress("UNUSED_PARAMETER") sourceName: String,
         sourceText: String,
         declarationCallNames: Set<String>,
     ): List<ScriptSymbolDeclarationSite> {
@@ -19,8 +18,7 @@ internal object KotlinScriptCallSiteParser {
 
         tokens.indices.forEach { index ->
             when (tokens[index].type) {
-                KtTokens.LBRACE ->
-                    enclosingBlocks += callsByOpeningBrace[index]
+                KtTokens.LBRACE -> enclosingBlocks += callsByOpeningBrace[index]
 
                 KtTokens.RBRACE ->
                     if (enclosingBlocks.isNotEmpty()) {
@@ -28,16 +26,13 @@ internal object KotlinScriptCallSiteParser {
                     }
 
                 else -> {
-                    val parsedCall =
-                        KotlinScriptCallParser.parse(tokens, index)
-                            ?: return@forEach
+                    val parsedCall = KotlinScriptCallParser.parse(tokens, index) ?: return@forEach
 
                     parsedCall.openingBraceIndex?.let { braceIndex ->
                         callsByOpeningBrace[braceIndex] = parsedCall.call
                     }
 
-                    val callName =
-                        (parsedCall.call.callee as? ScriptCallCallee.Named)?.name
+                    val callName = (parsedCall.call.callee as? ScriptCallCallee.Named)?.name
 
                     if (callName in declarationCallNames) {
                         declarations +=

@@ -10,26 +10,27 @@ import kotlin.io.path.Path
 class GeneratedOriginsManifestBuilderTests :
     StringSpec({
         "appendTo adds one origins manifest per output root" {
-            val outputs = listOf(
-                GeneratedFile(
-                    relativePath = Path("proto/User.proto"),
-                    contents = byteArrayOf(1),
-                    outputRoot = Path("repo-a"),
-                    origins = setOf("schemas.protobuf.pkg.User"),
-                ),
-                GeneratedFile(
-                    relativePath = Path("Generated/Controllers/UserServiceApiControllerBase.cs"),
-                    contents = byteArrayOf(2),
-                    outputRoot = Path("repo-a"),
-                    origins = setOf("services.UserService.rest.GetUser"),
-                ),
-                GeneratedFile(
-                    relativePath = Path("Program.cs"),
-                    contents = byteArrayOf(3),
-                    outputRoot = Path("repo-b"),
-                    origins = setOf("services.AdminService"),
-                ),
-            )
+            val outputs =
+                listOf(
+                    GeneratedFile(
+                        relativePath = Path("proto/User.proto"),
+                        contents = byteArrayOf(1),
+                        outputRoot = Path("repo-a"),
+                        origins = setOf("schemas.protobuf.pkg.User"),
+                    ),
+                    GeneratedFile(
+                        relativePath = Path("Generated/Controllers/UserServiceApiControllerBase.cs"),
+                        contents = byteArrayOf(2),
+                        outputRoot = Path("repo-a"),
+                        origins = setOf("services.UserService.rest.GetUser"),
+                    ),
+                    GeneratedFile(
+                        relativePath = Path("Program.cs"),
+                        contents = byteArrayOf(3),
+                        outputRoot = Path("repo-b"),
+                        origins = setOf("services.AdminService"),
+                    ),
+                )
 
             val withManifest = GeneratedOriginsManifestBuilder.appendTo(outputs)
             val manifests = withManifest.filter { it.relativePath == Path(".microsmith/origins.json") }
@@ -44,23 +45,26 @@ class GeneratedOriginsManifestBuilderTests :
         }
 
         "appendTo normalizes equivalent output roots before creating manifests" {
-            val outputs = listOf(
-                GeneratedFile(
-                    relativePath = Path("Program.cs"),
-                    contents = byteArrayOf(1),
-                    outputRoot = Path("dotnet/Platform/UserService.Api"),
-                    origins = setOf("services.UserService"),
-                ),
-                GeneratedFile(
-                    relativePath = Path("Generated/Contracts/RequestModels.cs"),
-                    contents = byteArrayOf(2),
-                    outputRoot = Path("dotnet/Platform/./UserService.Api"),
-                    origins = setOf("services.UserService.rest.GetUser.query.GetUserQuery"),
-                ),
-            )
+            val outputs =
+                listOf(
+                    GeneratedFile(
+                        relativePath = Path("Program.cs"),
+                        contents = byteArrayOf(1),
+                        outputRoot = Path("dotnet/Platform/UserService.Api"),
+                        origins = setOf("services.UserService"),
+                    ),
+                    GeneratedFile(
+                        relativePath = Path("Generated/Contracts/RequestModels.cs"),
+                        contents = byteArrayOf(2),
+                        outputRoot = Path("dotnet/Platform/./UserService.Api"),
+                        origins = setOf("services.UserService.rest.GetUser.query.GetUserQuery"),
+                    ),
+                )
 
-            val manifests = GeneratedOriginsManifestBuilder.appendTo(outputs)
-                .filter { it.relativePath == Path(".microsmith/origins.json") }
+            val manifests =
+                GeneratedOriginsManifestBuilder.appendTo(outputs).filter {
+                    it.relativePath == Path(".microsmith/origins.json")
+                }
 
             manifests.size shouldBe 1
             manifests.single().outputRoot shouldBe Path("dotnet/Platform/UserService.Api")

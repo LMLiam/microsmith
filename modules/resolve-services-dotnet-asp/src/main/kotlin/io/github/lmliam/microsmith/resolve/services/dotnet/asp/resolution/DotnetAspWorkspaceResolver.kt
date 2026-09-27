@@ -17,93 +17,92 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWork
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceResolver
 import java.nio.file.Path
 
-/**
- * Finalises the ASP.NET subset of the .NET workspace into a scaffold-ready model.
- */
+/** Finalises the ASP.NET subset of the .NET workspace into a scaffold-ready model. */
 class DotnetAspWorkspaceResolver(
-    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver(),
+    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver()
 ) {
     private val restResolver = DotnetAspRestResolver()
 
     fun resolve(extension: ServicesExtension): EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> {
-        val aspServiceNames = extension.services
-            .filter { service ->
-                service.model
-                    .get<DotnetServiceExtension>()
-                    ?.get<DotnetAspServiceExtension>() != null
-            }
-            .map { it.name }
-            .toSet()
+        val aspServiceNames =
+            extension.services
+                .filter { service ->
+                    service.model.get<DotnetServiceExtension>()?.get<DotnetAspServiceExtension>() != null
+                }
+                .map { it.name }
+                .toSet()
 
         if (aspServiceNames.isEmpty()) return Either.Right(DotnetAspWorkspace(emptyMap()))
 
-        val dotnetResolution: EitherNel<DotnetResolutionIssue, DotnetWorkspace> = dotnetWorkspaceResolver.resolve(
-            extension,
-        )
+        val dotnetResolution: EitherNel<DotnetResolutionIssue, DotnetWorkspace> =
+            dotnetWorkspaceResolver.resolve(extension)
 
-        return dotnetResolution
-            .flatMap { dotnetWorkspace ->
-                dotnetWorkspace.services
-                    .filterKeys(aspServiceNames::contains)
-                    .values
-                    .sortedBy { it.name }
-                    .mapOrAccumulate { resolvedService ->
-                        val aspExtension = checkNotNull(
-                            extension.require(resolvedService.name)
+        return dotnetResolution.flatMap { dotnetWorkspace ->
+            dotnetWorkspace.services
+                .filterKeys(aspServiceNames::contains)
+                .values
+                .sortedBy { it.name }
+                .mapOrAccumulate { resolvedService ->
+                    val aspExtension =
+                        checkNotNull(
+                            extension
+                                .require(resolvedService.name)
                                 .model
                                 .get<DotnetServiceExtension>()
-                                ?.get<DotnetAspServiceExtension>(),
+                                ?.get<DotnetAspServiceExtension>()
                         )
 
-                        val rest = restResolver.resolve(
-                            serviceName = resolvedService.name,
-                            models = resolvedService.models,
-                            rest = aspExtension.rest,
-                        ).bindNel()
+                    val rest =
+                        restResolver
+                            .resolve(
+                                serviceName = resolvedService.name,
+                                models = resolvedService.models,
+                                rest = aspExtension.rest,
+                            )
+                            .bindNel()
 
-                        ResolvedDotnetAspService(
-                            name = resolvedService.name,
-                            solutionName = resolvedService.solution.name,
-                            projectName = resolvedService.project,
-                            targetFrameworkMoniker = resolvedService.target.moniker,
-                            outputRoot = Path.of("dotnet", resolvedService.solution.name, resolvedService.project),
-                            ports = aspExtension.ports?.let {
+                    ResolvedDotnetAspService(
+                        name = resolvedService.name,
+                        solutionName = resolvedService.solution.name,
+                        projectName = resolvedService.project,
+                        targetFrameworkMoniker = resolvedService.target.moniker,
+                        outputRoot = Path.of("dotnet", resolvedService.solution.name, resolvedService.project),
+                        ports =
+                            aspExtension.ports?.let {
                                 ResolvedDotnetAspPorts(
                                     http = it.http,
                                     https = it.https,
                                 )
                             },
-                            models = resolvedService.models,
-                            rest = rest,
-                        )
-                    }
-                    .flatMap(::createWorkspace)
-            }
+                        models = resolvedService.models,
+                        rest = rest,
+                    )
+                }
+                .flatMap(::createWorkspace)
+        }
     }
 
     private fun createWorkspace(
-        services: List<ResolvedDotnetAspService>,
+        services: List<ResolvedDotnetAspService>
     ): EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> {
-        val issues = services.groupBy { it.outputRoot.normalize() }
-            .filterValues { it.size > 1 }
-            .map { (outputRoot, collidingServices) ->
-                DotnetAspResolutionIssue.OutputRootCollision(
-                    outputRoot = outputRoot,
-                    serviceNames = collidingServices
-                        .map(ResolvedDotnetAspService::name)
-                        .sorted(),
-                )
-            }
-            .sortedBy { it.outputRoot.toString() }
+        val issues =
+            services
+                .groupBy { it.outputRoot.normalize() }
+                .filterValues { it.size > 1 }
+                .map { (outputRoot, collidingServices) ->
+                    DotnetAspResolutionIssue.OutputRootCollision(
+                        outputRoot = outputRoot,
+                        serviceNames = collidingServices.map(ResolvedDotnetAspService::name).sorted(),
+                    )
+                }
+                .sortedBy { it.outputRoot.toString() }
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 
         return if (accumulatedIssues != null) {
             Either.Left(accumulatedIssues)
         } else {
-            Either.Right(
-                DotnetAspWorkspace(services.associateBy(ResolvedDotnetAspService::name)),
-            )
+            Either.Right(DotnetAspWorkspace(services.associateBy(ResolvedDotnetAspService::name)))
         }
     }
 }

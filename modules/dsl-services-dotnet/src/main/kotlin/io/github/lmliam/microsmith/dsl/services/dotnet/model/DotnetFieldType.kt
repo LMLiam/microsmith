@@ -2,9 +2,7 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.model
 
 import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnetIdentifier
 
-/**
- * Supported field types for service-local .NET models.
- */
+/** Supported field types for service-local .NET models. */
 sealed class DotnetFieldType(val csharpType: kotlin.String) {
     data object String : DotnetFieldType("string")
 

@@ -37,12 +37,13 @@ internal class ClassloaderScriptRunner(private val cacheDirectory: Path) {
                     scriptContext = scriptContext,
                     cacheHit = cache.retrievedScripts > 0,
                 )
-            }.getOrElse { exception ->
-                val message = exception.message ?: exception::class.simpleName ?: "unknown error"
-                ScriptRunFailure(
-                    diagnostics = listOf("Unhandled script host failure: $message"),
-                    type = ScriptFailureType.HOST,
-                )
             }
+                .getOrElse { exception ->
+                    val message = exception.message ?: exception::class.simpleName ?: "unknown error"
+                    ScriptRunFailure(
+                        diagnostics = listOf("Unhandled script host failure: $message"),
+                        type = ScriptFailureType.HOST,
+                    )
+                }
         }
 }

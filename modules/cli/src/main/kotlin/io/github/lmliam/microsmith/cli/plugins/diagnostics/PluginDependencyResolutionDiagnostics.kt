@@ -23,8 +23,7 @@ internal class PluginDependencyResolutionDiagnostics {
         val authenticationFailure = isAuthenticationFailure(cause)
         val reason =
             when (cause) {
-                is ArtifactNotFoundException ->
-                    "Artifact '${cause.artifact}' was not found in configured repositories."
+                is ArtifactNotFoundException -> "Artifact '${cause.artifact}' was not found in configured repositories."
 
                 else -> cause?.message ?: error.message ?: "Unknown resolver failure."
             }
@@ -32,9 +31,9 @@ internal class PluginDependencyResolutionDiagnostics {
         return PluginResolutionDiagnosticException(
             category = errorCategory(authenticationFailure),
             message =
-            "Could not resolve plugin '${coordinate.value}' with transitive dependencies. " +
-                "Repositories: $repositoryList. $reason " +
-                remediation(authenticationFailure, offline, localRepositoryRoot),
+                "Could not resolve plugin '${coordinate.value}' with transitive dependencies. " +
+                    "Repositories: $repositoryList. $reason " +
+                    remediation(authenticationFailure, offline, localRepositoryRoot),
             cause = error,
         )
     }

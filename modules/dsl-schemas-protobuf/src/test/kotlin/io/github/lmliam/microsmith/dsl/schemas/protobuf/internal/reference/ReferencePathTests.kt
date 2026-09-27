@@ -44,8 +44,7 @@ class ReferencePathTests :
             getReferencePath(
                 listOf("pkg", "sub"),
                 "....Foo",
-            ) shouldBe
-                listOf("Foo")
+            ) shouldBe listOf("Foo")
         }
 
         "relative with nested path works correctly" {

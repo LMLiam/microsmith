@@ -11,31 +11,26 @@ internal class OnboardingProfileDetector(
     }
 
     fun detect(projectRoot: Path): OnboardingProfileDetection {
-        val matches =
-            matchers.mapNotNull { matcher ->
-                val matchedMarkers = matcher.detect(projectRoot).sorted()
-                matchedMarkers
-                    .takeIf(List<String>::isNotEmpty)
-                    ?.let {
-                        OnboardingProfileMatch(
-                            profile = matcher.profile,
-                            matchedMarkers = it,
-                        )
-                    }
+        val matches = matchers.mapNotNull { matcher ->
+            val matchedMarkers = matcher.detect(projectRoot).sorted()
+            matchedMarkers.takeIf(List<String>::isNotEmpty)?.let {
+                OnboardingProfileMatch(
+                    profile = matcher.profile,
+                    matchedMarkers = it,
+                )
             }
+        }
 
         val matchedProfiles = matches.map(OnboardingProfileMatch::profile).distinctBy(OnboardingProfile::id)
         val matchedMarkers = matches.flatMap(OnboardingProfileMatch::matchedMarkers).distinct().sorted()
         val (profile, selectionReason) =
             when {
-                matchedProfiles.isEmpty() ->
-                    fallbackProfile to OnboardingProfileSelectionReason.NO_MARKERS_MATCHED
+                matchedProfiles.isEmpty() -> fallbackProfile to OnboardingProfileSelectionReason.NO_MARKERS_MATCHED
 
                 matchedProfiles.size == 1 ->
                     matchedProfiles.single() to OnboardingProfileSelectionReason.MATCHED_PROFILE
 
-                else ->
-                    fallbackProfile to OnboardingProfileSelectionReason.AMBIGUOUS_MARKERS
+                else -> fallbackProfile to OnboardingProfileSelectionReason.AMBIGUOUS_MARKERS
             }
 
         return OnboardingProfileDetection(

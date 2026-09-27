@@ -49,9 +49,7 @@ class OneofBuilderTests :
         "duplicate field names throw" {
             val (builder, _) = newBuilder()
             builder.int32("dup")
-            shouldThrow<IllegalArgumentException> {
-                builder.string("dup")
-            }
+            shouldThrow<IllegalArgumentException> { builder.string("dup") }
         }
 
         "used names are tracked" {
@@ -64,10 +62,12 @@ class OneofBuilderTests :
         "index is allocated" {
             var captured: Int? = null
             val (builder, _) =
-                newBuilder(allocateIndex = { idx ->
-                    captured = idx
-                    idx ?: 99
-                })
+                newBuilder(
+                    allocateIndex = { idx ->
+                        captured = idx
+                        idx ?: 99
+                    }
+                )
             builder.int64("num") { index(123) }
             captured shouldBe 123
         }
@@ -75,10 +75,12 @@ class OneofBuilderTests :
         "allocated index is called with null if no index set" {
             var captured: Int? = null
             val (builder, _) =
-                newBuilder(allocateIndex = { idx ->
-                    captured = idx
-                    77
-                })
+                newBuilder(
+                    allocateIndex = { idx ->
+                        captured = idx
+                        77
+                    }
+                )
             val field = builder.bool("flag")
             captured shouldBe null
             field.index shouldBe 77

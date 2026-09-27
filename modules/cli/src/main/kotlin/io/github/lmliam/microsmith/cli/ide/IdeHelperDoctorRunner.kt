@@ -11,7 +11,9 @@ internal class IdeHelperDoctorRunner(
     fun run(): IdeDoctorResult {
         val projectRoot = command.projectRoot.toAbsolutePath().normalize()
         val helperRoot = projectRoot.resolve(IDE_HELPER_DIRECTORY).toAbsolutePath().normalize()
-        validateRepoRoot(projectRoot, helperRoot)?.let { return it }
+        validateRepoRoot(projectRoot, helperRoot)?.let {
+            return it
+        }
 
         val classpathEntries = resolveClasspathEntries()
         val runtimeClasspathCheck = IdeHelperDoctorChecks.runtimeClasspathCheck(classpathEntries)
@@ -32,13 +34,13 @@ internal class IdeHelperDoctorRunner(
                 projectRoot = projectRoot,
                 helperRoot = helperRoot,
                 checks =
-                listOf(
-                    IdeDoctorCheckResult(
-                        id = "repo-root",
-                        passed = false,
-                        message = "Repository root '$projectRoot' does not exist.",
+                    listOf(
+                        IdeDoctorCheckResult(
+                            id = "repo-root",
+                            passed = false,
+                            message = "Repository root '$projectRoot' does not exist.",
+                        )
                     ),
-                ),
             )
         }
 
@@ -47,24 +49,25 @@ internal class IdeHelperDoctorRunner(
                 projectRoot = projectRoot,
                 helperRoot = helperRoot,
                 checks =
-                listOf(
-                    IdeDoctorCheckResult(
-                        id = "repo-root",
-                        passed = false,
-                        message = "Repository root '$projectRoot' is not a directory.",
+                    listOf(
+                        IdeDoctorCheckResult(
+                            id = "repo-root",
+                            passed = false,
+                            message = "Repository root '$projectRoot' is not a directory.",
+                        )
                     ),
-                ),
             )
         }
 
         return null
     }
 
-    private fun resolveClasspathEntries(): List<Path> = classpathResolver()
-        .map { path -> path.toAbsolutePath().normalize() }
-        .filter(Files::exists)
-        .distinctBy(Path::toString)
-        .sortedBy(Path::toString)
+    private fun resolveClasspathEntries(): List<Path> =
+        classpathResolver()
+            .map { path -> path.toAbsolutePath().normalize() }
+            .filter(Files::exists)
+            .distinctBy(Path::toString)
+            .sortedBy(Path::toString)
 }
 
 internal fun runIdeHelperDoctor(

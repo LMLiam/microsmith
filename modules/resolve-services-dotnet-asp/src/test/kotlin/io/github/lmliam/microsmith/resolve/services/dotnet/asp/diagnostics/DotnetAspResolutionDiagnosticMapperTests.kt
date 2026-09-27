@@ -9,61 +9,51 @@ import java.nio.file.Path
 class DotnetAspResolutionDiagnosticMapperTests :
     StringSpec({
         "maps asp net issues to diagnostics" {
-            val mapper =
-                DotnetAspResolutionDiagnosticMapper()
+            val mapper = DotnetAspResolutionDiagnosticMapper()
 
             listOf(
-                DotnetAspResolutionIssue
-                    .DuplicateOperationName(
+                    DotnetAspResolutionIssue.DuplicateOperationName(
                         serviceName = "UserService",
                         operationName = "GetUser",
                     ),
-                DotnetAspResolutionIssue
-                    .DuplicateRestEndpoint(
+                    DotnetAspResolutionIssue.DuplicateRestEndpoint(
                         serviceName = "UserService",
                         method = DotnetAspHttpMethod.GET,
                         route = "/users",
                     ),
-                DotnetAspResolutionIssue
-                    .OutputRootCollision(
+                    DotnetAspResolutionIssue.OutputRootCollision(
                         outputRoot =
-                        Path.of(
-                            "dotnet",
-                            "Platform",
-                            "Shared.Api",
-                        ),
+                            Path.of(
+                                "dotnet",
+                                "Platform",
+                                "Shared.Api",
+                            ),
                         serviceNames =
-                        listOf(
-                            "AdminService",
-                            "UserService",
-                        ),
+                            listOf(
+                                "AdminService",
+                                "UserService",
+                            ),
                     ),
-            ).map(mapper::map) shouldContainExactly
+                )
+                .map(mapper::map) shouldContainExactly
                 listOf(
                     ResolutionDiagnostic(
-                        code =
-                        "dotnet.asp.duplicate-operation-name",
+                        code = "dotnet.asp.duplicate-operation-name",
                         message =
-                        "ASP.NET service 'UserService' " +
-                            "declares duplicate operation " +
-                            "name 'GetUser'.",
+                            "ASP.NET service 'UserService' " + "declares duplicate operation " + "name 'GetUser'.",
                     ),
                     ResolutionDiagnostic(
-                        code =
-                        "dotnet.asp.duplicate-rest-endpoint",
+                        code = "dotnet.asp.duplicate-rest-endpoint",
                         message =
-                        "ASP.NET service 'UserService' " +
-                            "declares duplicate REST endpoint: " +
-                            "GET /users.",
+                            "ASP.NET service 'UserService' " + "declares duplicate REST endpoint: " + "GET /users.",
                     ),
                     ResolutionDiagnostic(
-                        code =
-                        "dotnet.asp.output-root-collision",
+                        code = "dotnet.asp.output-root-collision",
                         message =
-                        "ASP.NET services AdminService, " +
-                            "UserService resolve to colliding " +
-                            "output root " +
-                            "'dotnet/Platform/Shared.Api'.",
+                            "ASP.NET services AdminService, " +
+                                "UserService resolve to colliding " +
+                                "output root " +
+                                "'dotnet/Platform/Shared.Api'.",
                     ),
                 )
         }

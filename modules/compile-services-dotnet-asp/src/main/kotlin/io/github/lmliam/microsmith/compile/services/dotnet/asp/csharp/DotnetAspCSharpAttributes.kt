@@ -19,11 +19,12 @@ internal object DotnetAspCSharpAttributes {
                         CSharp.namedArgument("Name", CSharp.stringLiteral(operationName)),
                     )
 
-                fun producesResponseType(typeName: String, statusCode: Int): CSharp.Attribute = CSharp.attribute(
-                    name = "ProducesResponseType",
-                    CSharp.positionalArgument(CSharp.rawExpression("typeof($typeName)")),
-                    CSharp.positionalArgument(CSharp.intLiteral(statusCode)),
-                )
+                fun producesResponseType(typeName: String, statusCode: Int): CSharp.Attribute =
+                    CSharp.attribute(
+                        name = "ProducesResponseType",
+                        CSharp.positionalArgument(CSharp.rawExpression("typeof($typeName)")),
+                        CSharp.positionalArgument(CSharp.intLiteral(statusCode)),
+                    )
             }
         }
     }
