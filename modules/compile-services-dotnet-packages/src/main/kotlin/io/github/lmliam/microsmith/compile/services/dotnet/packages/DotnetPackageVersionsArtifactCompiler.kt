@@ -11,7 +11,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersion
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
-import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
+import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
 
 @ServiceProvider(ArtifactCompiler::class)
 class DotnetPackageVersionsArtifactCompiler : ServicesArtifactCompiler<DotnetPackageVersionsArtifact> {
