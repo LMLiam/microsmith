@@ -1,6 +1,8 @@
-package io.github.lmliam.microsmith.artifact.schemas.protobuf
-
+package io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoDeclaration
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifactId
 
 data class ProtoFileContribution(
     override val artifactId: ProtoFileArtifactId,

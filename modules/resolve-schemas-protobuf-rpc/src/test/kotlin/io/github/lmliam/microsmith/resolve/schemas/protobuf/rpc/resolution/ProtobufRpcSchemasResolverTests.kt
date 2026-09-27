@@ -8,8 +8,8 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service
 import io.github.lmliam.microsmith.dsl.schemas.schemas
 import io.github.lmliam.microsmith.resolve.DomainResolution
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.EndpointMustTargetMessage
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.EndpointPosition
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.EndpointMustTargetMessage
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.EndpointPosition
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec

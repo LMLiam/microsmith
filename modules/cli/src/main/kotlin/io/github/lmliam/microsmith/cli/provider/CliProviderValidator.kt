@@ -3,7 +3,7 @@ package io.github.lmliam.microsmith.cli.provider
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifact
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
