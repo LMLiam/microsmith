@@ -18,6 +18,7 @@ import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.gen.ArtifactRenderer
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
+import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.ResolvedModel
@@ -36,11 +37,7 @@ class CliProviderValidatorTests :
         "reports missing built-in providers when none are present" {
             val errors =
                 verifyBuiltinProviders(
-                    domainResolvers = emptyList(),
-                    artifactContributors = emptyList(),
-                    artifactAssemblers = emptyList(),
-                    artifactCompilers = emptyList(),
-                    artifactRenderers = emptyList(),
+                    MicrosmithPluginCatalog(),
                 )
 
             errors.shouldHaveSize(22)
@@ -121,36 +118,38 @@ class CliProviderValidatorTests :
         "returns no errors when required providers are present" {
             val errors =
                 verifyBuiltinProviders(
-                    domainResolvers = listOf(
-                        ProtobufResolverStub(),
-                        ProtobufRpcResolverStub(),
-                        DotnetAspResolverStub(),
-                        DotnetPackageResolverStub(),
+                    MicrosmithPluginCatalog(
+                        domainResolvers = listOf(
+                            ProtobufResolverStub(),
+                            ProtobufRpcResolverStub(),
+                            DotnetAspResolverStub(),
+                            DotnetPackageResolverStub(),
+                        ),
+                        artifactContributors = listOf(
+                            ProtobufContributorStub(),
+                            ProtobufRpcContributorStub(),
+                            ContributorStub(DotnetAspWorkspace::class),
+                            ContributorStub(DotnetPackageWorkspace::class),
+                        ),
+                        artifactAssemblers = listOf(
+                            ProtoFileAssemblerStub(),
+                            ProtobufRpcAssemblerStub(),
+                            AssemblerStub(DotnetAspServiceArtifact::class),
+                            AssemblerStub(DotnetPackageVersionsArtifact::class),
+                            AssemblerStub(DotnetPackageReferencesArtifact::class),
+                            AssemblerStub(MsBuildProjectArtifact::class),
+                            TextFileAssemblerStub(),
+                        ),
+                        artifactCompilers = listOf(
+                            CompilerStub(ProtoFileArtifact::class),
+                            CompilerStub(ProtobufRpcServiceArtifact::class),
+                            CompilerStub(DotnetAspServiceArtifact::class),
+                            CompilerStub(DotnetPackageVersionsArtifact::class),
+                            CompilerStub(DotnetPackageReferencesArtifact::class),
+                            CompilerStub(MsBuildProjectArtifact::class),
+                        ),
+                        artifactRenderers = listOf(TextFileRendererStub()),
                     ),
-                    artifactContributors = listOf(
-                        ProtobufContributorStub(),
-                        ProtobufRpcContributorStub(),
-                        ContributorStub(DotnetAspWorkspace::class),
-                        ContributorStub(DotnetPackageWorkspace::class),
-                    ),
-                    artifactAssemblers = listOf(
-                        ProtoFileAssemblerStub(),
-                        ProtobufRpcAssemblerStub(),
-                        AssemblerStub(DotnetAspServiceArtifact::class),
-                        AssemblerStub(DotnetPackageVersionsArtifact::class),
-                        AssemblerStub(DotnetPackageReferencesArtifact::class),
-                        AssemblerStub(MsBuildProjectArtifact::class),
-                        TextFileAssemblerStub(),
-                    ),
-                    artifactCompilers = listOf(
-                        CompilerStub(ProtoFileArtifact::class),
-                        CompilerStub(ProtobufRpcServiceArtifact::class),
-                        CompilerStub(DotnetAspServiceArtifact::class),
-                        CompilerStub(DotnetPackageVersionsArtifact::class),
-                        CompilerStub(DotnetPackageReferencesArtifact::class),
-                        CompilerStub(MsBuildProjectArtifact::class),
-                    ),
-                    artifactRenderers = listOf(TextFileRendererStub()),
                 )
 
             errors shouldBe emptyList()
@@ -162,7 +161,9 @@ private class ProtobufResolverStub : DomainResolver<SchemasExtension, ResolvedPr
     override val resolvedType = ResolvedProtobufSchemaModel::class
 
     override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufSchemaModel> =
-        DomainResolution.Success(ResolvedProtobufSchemaModel(emptyList()))
+        DomainResolution.Success(
+            ResolvedProtobufSchemaModel(emptyList()),
+        )
 }
 
 private class ProtobufRpcResolverStub : DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
@@ -170,7 +171,9 @@ private class ProtobufRpcResolverStub : DomainResolver<SchemasExtension, Resolve
     override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 
     override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufRpcSchemaModel> =
-        DomainResolution.Success(ResolvedProtobufRpcSchemaModel(emptyList()))
+        DomainResolution.Success(
+            ResolvedProtobufRpcSchemaModel(emptyList()),
+        )
 }
 
 private class ProtobufContributorStub : ArtifactContributor<ResolvedProtobufSchemaModel> {
@@ -189,8 +192,9 @@ private class DotnetAspResolverStub : DomainResolver<ServicesExtension, DotnetAs
     override val authoringType = ServicesExtension::class
     override val resolvedType = DotnetAspWorkspace::class
 
-    override fun resolve(authoring: ServicesExtension): DomainResolution<DotnetAspWorkspace> =
-        DomainResolution.Success(DotnetAspWorkspace(emptyMap()))
+    override fun resolve(authoring: ServicesExtension): DomainResolution<DotnetAspWorkspace> = DomainResolution.Success(
+        DotnetAspWorkspace(emptyMap()),
+    )
 }
 
 private class DotnetPackageResolverStub : DomainResolver<ServicesExtension, DotnetPackageWorkspace> {
@@ -198,7 +202,12 @@ private class DotnetPackageResolverStub : DomainResolver<ServicesExtension, Dotn
     override val resolvedType = DotnetPackageWorkspace::class
 
     override fun resolve(authoring: ServicesExtension): DomainResolution<DotnetPackageWorkspace> =
-        DomainResolution.Success(DotnetPackageWorkspace(emptyMap(), emptyMap()))
+        DomainResolution.Success(
+            DotnetPackageWorkspace(
+                solutionsByName = emptyMap(),
+                servicesByName = emptyMap(),
+            ),
+        )
 }
 
 private class ContributorStub<T : ResolvedModel>(override val resolvedType: KClass<T>) : ArtifactContributor<T> {
