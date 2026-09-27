@@ -1,10 +1,8 @@
-package io.github.lmliam.microsmith.resolve.core
-
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
-import java.util.ServiceLoader
+package io.github.lmliam.microsmith.resolve
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import kotlin.reflect.KClass
 
-class DomainResolverRegistry(resolvers: List<DomainResolver<*, *>> = loadDomainResolvers()) {
+internal class DomainResolverRegistry(resolvers: List<DomainResolver<*, *>>) {
     private val resolversByAuthoringType: Map<KClass<out MicrosmithExtension>, List<DomainResolver<*, *>>> =
         indexResolvers(resolvers)
 
@@ -17,14 +15,15 @@ class DomainResolverRegistry(resolvers: List<DomainResolver<*, *>> = loadDomainR
         resolvers: List<DomainResolver<*, *>>,
     ): Map<KClass<out MicrosmithExtension>, List<DomainResolver<*, *>>> {
         val byAuthoringType = resolvers.groupBy(DomainResolver<*, *>::authoringType)
+
         byAuthoringType.forEach { (type, registrations) ->
-            val duplicateImplementations =
-                registrations
-                    .groupBy { it::class }
-                    .filterValues { it.size > 1 }
-                    .keys
-                    .map { it.qualifiedName ?: it.toString() }
-                    .sorted()
+            val duplicateImplementations = registrations
+                .groupBy { it::class }
+                .filterValues { it.size > 1 }
+                .keys
+                .map { it.qualifiedName ?: it.toString() }
+                .sorted()
+
             require(duplicateImplementations.isEmpty()) {
                 "Duplicate domain resolvers registered for authoring type ${formatType(type)}: " +
                     duplicateImplementations.joinToString(", ")
@@ -47,6 +46,3 @@ class DomainResolverRegistry(resolvers: List<DomainResolver<*, *>> = loadDomainR
 
     private fun formatType(type: KClass<out MicrosmithExtension>): String = type.qualifiedName ?: type.toString()
 }
-
-private fun loadDomainResolvers(): List<DomainResolver<*, *>> =
-    ServiceLoader.load(DomainResolver::class.java).iterator().asSequence().toList()
