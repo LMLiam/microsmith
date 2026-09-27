@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp
 
-import io.github.lmliam.microsmith.artifact.services.core.ServicesArtifact
+import io.github.lmliam.microsmith.artifact.services.ServicesArtifact
 import java.nio.file.Path
 
 data class DotnetAspServiceArtifact(

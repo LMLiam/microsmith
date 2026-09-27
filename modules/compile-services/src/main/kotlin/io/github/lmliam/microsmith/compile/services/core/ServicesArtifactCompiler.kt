@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.core
 
-import io.github.lmliam.microsmith.artifact.services.core.ServicesArtifact
+import io.github.lmliam.microsmith.artifact.services.ServicesArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 
 /**
