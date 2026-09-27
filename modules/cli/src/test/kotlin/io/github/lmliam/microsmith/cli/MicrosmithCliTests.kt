@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli
-
 import io.github.lmliam.microsmith.cli.command.IdeDoctorCommand
 import io.github.lmliam.microsmith.cli.command.IdeRefreshCommand
 import io.github.lmliam.microsmith.cli.doctor.DoctorCheckResult
