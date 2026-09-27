@@ -1,10 +1,10 @@
 package io.github.lmliam.microsmith.runtime.scripting.cache
-
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript
 import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
+import java.util.HexFormat
 import kotlin.script.experimental.jvm.util.classpathFromClassloader
 
 internal object RuntimeClasspathFingerprint {
@@ -90,4 +90,4 @@ private fun Int.toByteArray() = ByteBuffer.allocate(Int.SIZE_BYTES)
     .also { it.putInt(this) }
     .array()
 
-private fun ByteArray.toHexString() = joinToString(separator = "") { "%02x".format(it) }
+private fun ByteArray.toHexString(): String = HexFormat.of().formatHex(this)
