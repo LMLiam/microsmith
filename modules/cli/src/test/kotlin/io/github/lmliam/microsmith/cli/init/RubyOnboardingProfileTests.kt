@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.init
-
 import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
 import io.kotest.core.spec.style.StringSpec

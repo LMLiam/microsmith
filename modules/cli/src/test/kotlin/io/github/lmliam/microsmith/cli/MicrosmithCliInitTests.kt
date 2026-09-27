@@ -2,17 +2,17 @@ package io.github.lmliam.microsmith.cli
 
 import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
-import io.github.lmliam.microsmith.cli.init.GenericOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.GoOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.InitBootstrapResult
 import io.github.lmliam.microsmith.cli.init.InitConflictException
 import io.github.lmliam.microsmith.cli.init.InitValidationException
-import io.github.lmliam.microsmith.cli.init.NodeOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.OnboardingProfileDetection
-import io.github.lmliam.microsmith.cli.init.OnboardingProfileSelectionReason
-import io.github.lmliam.microsmith.cli.init.PythonOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.RubyOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.RustOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.GenericOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.GoOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.NodeOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileDetection
+import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileSelectionReason
+import io.github.lmliam.microsmith.cli.init.profile.PythonOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.RubyOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.RustOnboardingProfile
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
