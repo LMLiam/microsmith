@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
-
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -9,7 +8,7 @@ class ReferenceFieldBuilderTests :
         "default state has null index and REQUIRED cardinality" {
             val builder = ReferenceFieldBuilder()
             builder.index shouldBe null
-            builder.cardinality shouldBe Cardinality.REQUIRED
+            builder.cardinality shouldBe Cardinality.SINGULAR
         }
 
         "index is set correctly" {

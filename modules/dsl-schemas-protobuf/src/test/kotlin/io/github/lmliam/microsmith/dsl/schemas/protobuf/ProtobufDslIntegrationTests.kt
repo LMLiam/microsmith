@@ -1,9 +1,10 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf
 
-import io.github.lmliam.microsmith.dsl.schemas.core.SchemasBuilder
+import io.github.lmliam.microsmith.dsl.schemas.SchemasBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Cardinality
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
@@ -78,9 +79,8 @@ class ProtobufDslIntegrationTests :
                 it.value shouldBe PrimitiveType.STRING
             }
             person.schema.fields.first { it.name == "color" }.let { it as ReferenceField }.also {
-                it.cardinality shouldBe Cardinality.REQUIRED
-                it.reference.name shouldBe "Color"
-                it.reference.type shouldBe color.schema
+                it.cardinality shouldBe Cardinality.SINGULAR
+                it.reference shouldBe Reference.Local(target = "Color")
             }
             person.schema.oneofs.first { it.name == "choice" }.fields.also { fields ->
                 fields.associate { it.name to it.index } shouldContainExactly

@@ -1,9 +1,11 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.types
-
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Cardinality
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.EnumRef
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
@@ -14,7 +16,7 @@ import io.kotest.matchers.shouldBe
 
 class MessageBuilderTests :
     StringSpec({
-        fun builder(segments: List<String> = listOf("pkg", "sub")) = MessageBuilder(name = "Msg", segments = segments)
+        fun builder() = MessageBuilder(name = "Msg")
 
         "build returns deterministic sorted fields and oneofs, with reserved collected" {
             val b = builder()
@@ -85,31 +87,31 @@ class MessageBuilderTests :
         }
 
         "ref builds FQN via segments for unqualified target" {
-            val b = builder(segments = listOf("me", "liam"))
+            val b = builder()
             val f = b.ref("ref_field", "Person")
             f.name shouldBe "ref_field"
             f.index shouldBe 1
-            f.reference.name shouldBe "me.liam.Person"
+            f.reference shouldBe Reference.Local("Person")
         }
 
         "ref respects qualified target ignoring segments" {
-            val b = builder(segments = listOf("me", "liam"))
+            val b = builder()
             val f = b.ref("ref_field", "me.someone.else.Person")
             f.name shouldBe "ref_field"
             f.index shouldBe 1
-            f.reference.name shouldBe "me.someone.else.Person"
+            f.reference shouldBe Reference.Qualified("me.someone.else.Person")
         }
 
         "ref supports relative target with leading dots dropping segments" {
-            val b = builder(segments = listOf("a", "b", "c"))
+            val b = builder()
             val f1 = b.ref("r1", ".Root")
-            f1.reference.name shouldBe "a.b.Root"
+            f1.reference shouldBe Reference.Relative(expression = ".Root")
             val f2 = b.ref("r2", ".x.Sub")
-            f2.reference.name shouldBe "a.b.x.Sub"
+            f2.reference shouldBe Reference.Relative(expression = ".x.Sub")
             val f3 = b.ref("r3", "..Root")
-            f3.reference.name shouldBe "a.Root"
+            f3.reference shouldBe Reference.Relative(expression = "..Root")
             val f4 = b.ref("r4", "...Y.Sub")
-            f4.reference.name shouldBe "Y.Sub"
+            f4.reference shouldBe Reference.Relative(expression = "...Y.Sub")
         }
 
         "map requires key and value, allocates index, stores field" {
@@ -204,7 +206,7 @@ class MessageBuilderTests :
             val msg = b.build()
             val field = msg.fields.first { it.name == "age" } as ScalarField
             field.cardinality shouldBe Cardinality.OPTIONAL
-            s.cardinality shouldBe Cardinality.REQUIRED
+            s.cardinality shouldBe Cardinality.SINGULAR
         }
 
         "optional on reference field flips cardinality and stores updated copy" {
@@ -214,7 +216,7 @@ class MessageBuilderTests :
             val msg = b.build()
             val field = msg.fields.first { it.name == "ref_field" } as ReferenceField
             field.cardinality shouldBe Cardinality.OPTIONAL
-            s.cardinality shouldBe Cardinality.REQUIRED
+            s.cardinality shouldBe Cardinality.SINGULAR
         }
 
         "optional(block) builds, flips cardinality, and stores" {
@@ -233,7 +235,7 @@ class MessageBuilderTests :
             val field = msg.fields.first { it.name == "ref_field" } as ReferenceField
             field.cardinality shouldBe Cardinality.OPTIONAL
             field.index shouldBe 3
-            field.reference.name shouldBe "pkg.sub.Person"
+            field.reference shouldBe Reference.Local(target = "Person")
         }
 
         "repeated on scalar field flips cardinlaity and stores updated copy" {
@@ -243,7 +245,7 @@ class MessageBuilderTests :
             val msg = b.build()
             val field = msg.fields.first { it.name == "age" } as ScalarField
             field.cardinality shouldBe Cardinality.REPEATED
-            s.cardinality shouldBe Cardinality.REQUIRED
+            s.cardinality shouldBe Cardinality.SINGULAR
         }
 
         "repeated on reference field flips cardinality" {
@@ -253,7 +255,7 @@ class MessageBuilderTests :
             val msg = b.build()
             val field = msg.fields.first { it.name == "ref_field" } as ReferenceField
             field.cardinality shouldBe Cardinality.REPEATED
-            s.cardinality shouldBe Cardinality.REQUIRED
+            s.cardinality shouldBe Cardinality.SINGULAR
         }
 
         "repeated(block) builds scalar, flips cardinality" {
@@ -272,7 +274,7 @@ class MessageBuilderTests :
             val field = msg.fields.first { it.name == "ref_field" } as ReferenceField
             field.cardinality shouldBe Cardinality.REPEATED
             field.index shouldBe 3
-            field.reference.name shouldBe "pkg.sub.Person"
+            field.reference shouldBe Reference.Local(target = "Person")
         }
 
         "oneof builds and adds to message" {
@@ -351,5 +353,17 @@ class MessageBuilderTests :
             val msg = b.build()
             msg.fields.size shouldBe 15
             msg.fields.map { it.index } shouldContainExactly (1..15).toList()
+        }
+
+        "ref preserves symbolic protobuf reference category" {
+            val b = builder()
+
+            val message = MessageRef("pkg.sub.Person")
+            val enum = EnumRef("pkg.sub.Status")
+            val messageField = b.ref("person", message)
+            val enumField = b.ref("status", enum)
+
+            messageField.reference shouldBe Reference.Symbolic(message)
+            enumField.reference shouldBe Reference.Symbolic(enum)
         }
     })

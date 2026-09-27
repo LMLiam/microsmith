@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
-
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -9,7 +8,7 @@ class ScalarFieldBuilderTests :
         "default state has null index and REQUIRED cardinality" {
             val builder = ScalarFieldBuilder()
             builder.index shouldBe null
-            builder.cardinality shouldBe Cardinality.REQUIRED
+            builder.cardinality shouldBe Cardinality.SINGULAR
         }
 
         "sets index correctly" {

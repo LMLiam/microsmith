@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
-
 sealed interface PrimitiveType : ValueType {
     object INT32 : MapKeyType
 
