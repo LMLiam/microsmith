@@ -1,11 +1,13 @@
-package io.github.lmliam.microsmith.dsl.schemas.core
-
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+package io.github.lmliam.microsmith.dsl.schemas
+import io.github.lmliam.microsmith.dsl.MergeableExtension
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 
 /**
  * Root extension that holds all declared schemas.
  */
-data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
+data class SchemasExtension(val schemas: Set<Schema>) :
+    MicrosmithExtension,
+    MergeableExtension<SchemasExtension> {
     init {
         val duplicateKeys =
             schemas
@@ -44,7 +46,7 @@ data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension {
      */
     fun allOf(type: SchemaType) = schemas.filter { it.type == type }.toSet()
 
-    fun merge(other: SchemasExtension): SchemasExtension {
+    override fun merge(other: SchemasExtension): SchemasExtension {
         val existingKeys = schemas.mapTo(mutableSetOf(), Schema::schemaKey)
         val collisions = other.schemas.asSequence()
             .map(Schema::schemaKey)
