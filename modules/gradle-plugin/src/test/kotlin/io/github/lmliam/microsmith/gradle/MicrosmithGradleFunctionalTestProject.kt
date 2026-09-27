@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.gradle
-
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import java.nio.file.Files
