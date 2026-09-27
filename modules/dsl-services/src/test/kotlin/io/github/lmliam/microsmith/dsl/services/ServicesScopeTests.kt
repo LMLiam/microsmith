@@ -1,6 +1,5 @@
-package io.github.lmliam.microsmith.dsl.services.core
-
-import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
+package io.github.lmliam.microsmith.dsl.services
+import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

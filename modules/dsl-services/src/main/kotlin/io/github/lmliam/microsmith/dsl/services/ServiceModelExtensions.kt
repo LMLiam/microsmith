@@ -1,7 +1,6 @@
-package io.github.lmliam.microsmith.dsl.services.helpers
-
-import io.github.lmliam.microsmith.dsl.services.core.ServiceExtension
-import io.github.lmliam.microsmith.dsl.services.core.ServiceModel
+package io.github.lmliam.microsmith.dsl.services
+import io.github.lmliam.microsmith.dsl.services.ServiceExtension
+import io.github.lmliam.microsmith.dsl.services.ServiceModel
 
 /**
  * Returns true if the model contains an extension of type [T].

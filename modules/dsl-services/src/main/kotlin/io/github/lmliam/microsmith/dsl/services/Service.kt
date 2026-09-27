@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.services.core
-
+package io.github.lmliam.microsmith.dsl.services
 /**
  * Immutable service declaration produced by the core service DSL.
  */

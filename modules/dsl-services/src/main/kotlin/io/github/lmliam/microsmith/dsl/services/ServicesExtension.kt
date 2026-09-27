@@ -1,13 +1,14 @@
-package io.github.lmliam.microsmith.dsl.services.core
-
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+package io.github.lmliam.microsmith.dsl.services
+import io.github.lmliam.microsmith.dsl.MergeableExtension
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import kotlin.reflect.KClass
 
 /**
  * Root extension that holds all declared services and shared services-scoped extensions.
  */
 data class ServicesExtension(val services: Set<Service>, val model: ServicesModel = ServicesModel.empty()) :
-    MicrosmithExtension {
+    MicrosmithExtension,
+    MergeableExtension<ServicesExtension> {
     init {
         val duplicateKeys =
             services
@@ -41,7 +42,7 @@ data class ServicesExtension(val services: Set<Service>, val model: ServicesMode
         model = model.with(type, value),
     )
 
-    fun merge(other: ServicesExtension): ServicesExtension {
+    override fun merge(other: ServicesExtension): ServicesExtension {
         val existingKeys = services.mapTo(mutableSetOf(), Service::serviceKey)
         val collisions =
             other.services
