@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.core
-
+package io.github.lmliam.microsmith.dsl
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
@@ -9,6 +8,14 @@ import io.kotest.matchers.shouldNotBe
 data class FooExtension(val foo: String) : MicrosmithExtension
 
 data class BarExtension(val bar: Int) : MicrosmithExtension
+
+data class MergeableFooExtension(val values: List<String>) :
+    MicrosmithExtension,
+    MergeableExtension<MergeableFooExtension> {
+    override fun merge(other: MergeableFooExtension): MergeableFooExtension = copy(
+        values = values + other.values,
+    )
+}
 
 class MicrosmithModelTests :
     StringSpec({
@@ -52,5 +59,25 @@ class MicrosmithModelTests :
 
             model.get(FooExtension::class)?.foo shouldBe "first"
             model.get<FooExtension>()?.foo shouldBe "first"
+        }
+
+        "with merges mergeable root extensions of the same type" {
+            val model = MicrosmithModel.empty()
+                .with(
+                    MergeableFooExtension(
+                        listOf("first"),
+                    ),
+                )
+                .with(
+                    MergeableFooExtension(
+                        listOf("second"),
+                    ),
+                )
+
+            model.get<MergeableFooExtension>()?.values shouldContainExactly
+                listOf(
+                    "first",
+                    "second",
+                )
         }
     })

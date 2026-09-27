@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.core
-
+package io.github.lmliam.microsmith.dsl
 /**
  * DSL marker annotation to prevent accidental scope leakage between nested DSL blocks.
  *

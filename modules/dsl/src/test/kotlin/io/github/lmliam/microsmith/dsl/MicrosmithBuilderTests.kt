@@ -1,6 +1,5 @@
-package io.github.lmliam.microsmith.dsl.core
-
-import io.github.lmliam.microsmith.dsl.helpers.put
+package io.github.lmliam.microsmith.dsl
+import io.github.lmliam.microsmith.dsl.put
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe

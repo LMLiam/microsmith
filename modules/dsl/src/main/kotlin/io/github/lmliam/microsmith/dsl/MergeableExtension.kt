@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.core
-
+package io.github.lmliam.microsmith.dsl
 /**
  * Marker for DSL extensions that can merge with another instance of the same type.
  *

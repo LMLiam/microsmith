@@ -1,6 +1,5 @@
-package io.github.lmliam.microsmith.dsl.core
-
-import io.github.lmliam.microsmith.dsl.helpers.mergeModelExtension
+package io.github.lmliam.microsmith.dsl
+import io.github.lmliam.microsmith.dsl.merge.mergeModelExtension
 import kotlin.reflect.KClass
 
 /**
@@ -13,9 +12,9 @@ class MicrosmithModel internal constructor(
     private val extensions: Map<KClass<out MicrosmithExtension>, MicrosmithExtension>,
 ) {
     /**
-     * Retrieve an extension of the given type.
+     * Retrieve the extension registered for the given type.
      *
-     * Gets the first if multiple of the same type exist, or null if not present.
+     * @return the extension, or `null` when the type is not present.
      */
     @Suppress("UNCHECKED_CAST")
     fun <T : MicrosmithExtension> get(type: KClass<T>) = extensions[type] as? T?

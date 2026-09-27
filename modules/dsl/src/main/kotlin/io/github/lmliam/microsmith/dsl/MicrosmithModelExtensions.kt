@@ -1,7 +1,6 @@
-package io.github.lmliam.microsmith.dsl.helpers
-
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
-import io.github.lmliam.microsmith.dsl.core.MicrosmithModel
+package io.github.lmliam.microsmith.dsl
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
+import io.github.lmliam.microsmith.dsl.MicrosmithModel
 
 /**
  * Returns true if the model contains an extension of type [T].

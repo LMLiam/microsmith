@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.dsl.core
-
+package io.github.lmliam.microsmith.dsl
 /**
  * Root DSL scope visible to end-users.
  *
