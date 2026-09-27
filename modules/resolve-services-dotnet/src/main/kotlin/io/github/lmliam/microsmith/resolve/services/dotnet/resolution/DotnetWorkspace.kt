@@ -1,8 +1,8 @@
-package io.github.lmliam.microsmith.resolve.services.dotnet
-
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.DotnetSolution
+package io.github.lmliam.microsmith.resolve.services.dotnet.resolution
+import io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget
+import io.github.lmliam.microsmith.dsl.services.dotnet.solution.DotnetSolution
 import io.github.lmliam.microsmith.resolve.ResolvedModel
+import io.github.lmliam.microsmith.resolve.services.dotnet.ResolvedDotnetService
 
 /**
  * Resolved .NET workspace state after DSL normalisation.
