@@ -1,13 +1,13 @@
 package io.github.lmliam.microsmith.compile.schemas.protobuf
 
 import com.github.eventhorizonlab.spi.ServiceProvider
-import io.github.lmliam.microsmith.artifact.core.Artifact
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.Artifact
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifact
-import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
-import io.github.lmliam.microsmith.compile.schemas.core.SchemasArtifactCompiler
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
+import io.github.lmliam.microsmith.compile.ArtifactCompiler
+import io.github.lmliam.microsmith.compile.schemas.SchemasArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.protobuf.render.ProtobufFileRenderer
 import java.nio.file.Path
 
