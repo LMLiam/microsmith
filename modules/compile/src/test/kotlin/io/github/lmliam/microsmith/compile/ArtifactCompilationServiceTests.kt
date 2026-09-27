@@ -1,10 +1,9 @@
-package io.github.lmliam.microsmith.compile.core
-
-import io.github.lmliam.microsmith.artifact.core.Artifact
-import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
-import io.github.lmliam.microsmith.artifact.core.ArtifactAssemblyService
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import io.github.lmliam.microsmith.artifact.core.ArtifactId
+package io.github.lmliam.microsmith.compile
+import io.github.lmliam.microsmith.artifact.Artifact
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactId
+import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
+import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssemblyService
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactAssembler
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
