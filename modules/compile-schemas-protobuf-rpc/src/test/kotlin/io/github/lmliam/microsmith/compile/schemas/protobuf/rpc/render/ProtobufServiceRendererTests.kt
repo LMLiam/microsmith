@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.compile.schemas.protobuf.rpc
-
+package io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.render
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcEndpoint
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcOperation
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
