@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.diagnostics
-
 internal fun toJsonValue(value: Any?): String = when (value) {
     null -> "null"
 
@@ -43,7 +42,7 @@ private fun String.escapeJson(): String {
 
             else -> {
                 if (char.code <= MAX_JSON_CONTROL_CHAR_CODE) {
-                    builder.append("\\u%04x".format(char.code))
+                    builder.append(char.toUnicodeEscape())
                 } else {
                     builder.append(char)
                 }
@@ -52,6 +51,8 @@ private fun String.escapeJson(): String {
     }
     return builder.toString()
 }
+
+private fun Char.toUnicodeEscape(): String = "\\u${code.toString(radix = 16).padStart(length = 4, padChar = '0')}"
 
 private const val MAX_JSON_CONTROL_CHAR_CODE = 0x1F
 private const val JSON_ESCAPE_BUFFER_PADDING = 8

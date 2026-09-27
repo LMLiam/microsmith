@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.cli.eventlog
 
 import io.github.lmliam.microsmith.cli.diagnostics.toJsonValue
-import io.github.lmliam.microsmith.cli.support.sha256IfRegularFile
+import io.github.lmliam.microsmith.cli.plugins.integrity.sha256IfRegularFile
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption

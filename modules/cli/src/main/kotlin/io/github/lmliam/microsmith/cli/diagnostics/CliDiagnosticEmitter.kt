@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.diagnostics
-
 import java.time.Instant
 
 internal class CliDiagnosticEmitter(

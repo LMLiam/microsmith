@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.diagnostics
-
 internal enum class CliFailureCode(val id: String, val exitCode: Int) {
     USAGE_ERROR(id = "MS-CLI-0001", exitCode = 2),
     PROVIDER_VALIDATION_FAILED(id = "MS-CLI-1001", exitCode = 10),
