@@ -1,6 +1,10 @@
 package io.github.lmliam.microsmith.sbt
 
-import io.github.lmliam.microsmith.runtime.scripting.model.GeneratedOutputRootsLocator
+import _root_.io.github.lmliam.microsmith.runtime.scripting.model.GeneratedOutputRootsLocator
+import _root_.io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtExecutionConfiguration
+import _root_.io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtExecutionService
+import _root_.io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtHostFailureException
+import _root_.io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtScriptFailureException
 import _root_.sbt._
 import _root_.sbt.Keys._
 import _root_.sbt.internal.util.MessageOnlyException
@@ -42,10 +46,6 @@ object MicrosmithSbtPlugin extends AutoPlugin {
   }
 
   import autoImport._
-import io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtExecutionConfiguration
-import io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtExecutionService
-import io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtHostFailureException
-import io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtScriptFailureException
 
   private val executionService = new MicrosmithSbtExecutionService()
 
