@@ -1,5 +1,9 @@
 package io.github.lmliam.microsmith.cli.plugins.lockfile
 
+import io.github.lmliam.microsmith.cli.plugins.LOCAL_KIND
+import io.github.lmliam.microsmith.cli.plugins.LOCKFILE_VERSION
+import io.github.lmliam.microsmith.cli.plugins.REMOTE_ARTIFACT_KIND
+import io.github.lmliam.microsmith.cli.plugins.REMOTE_KIND
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly

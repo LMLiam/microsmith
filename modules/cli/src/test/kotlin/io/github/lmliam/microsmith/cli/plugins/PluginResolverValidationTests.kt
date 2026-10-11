@@ -1,6 +1,16 @@
 package io.github.lmliam.microsmith.cli.plugins
 
 import io.github.lmliam.microsmith.cli.command.RunCommand
+import io.github.lmliam.microsmith.cli.plugins.integrity.PluginChecksumAllowlist
+import io.github.lmliam.microsmith.cli.plugins.lockfile.LockKey
+import io.github.lmliam.microsmith.cli.plugins.remote.Coordinate
+import io.github.lmliam.microsmith.cli.plugins.remote.RemotePluginResolver
+import io.github.lmliam.microsmith.cli.plugins.remote.ResolvedRemotePlugin
+import io.github.lmliam.microsmith.cli.plugins.repository.RepositoryAllowlistPolicy
+import io.github.lmliam.microsmith.cli.plugins.repository.RepositoryCredentials
+import io.github.lmliam.microsmith.cli.plugins.repository.RepositoryCredentialsResolver
+import io.github.lmliam.microsmith.cli.plugins.repository.RepositoryEndpoint
+import io.github.lmliam.microsmith.cli.plugins.repository.normalizeRepositoryUri
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain

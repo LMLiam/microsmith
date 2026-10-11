@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.cli.plugins.diagnostics
 
+import io.github.lmliam.microsmith.cli.plugins.PluginResolverErrorCategory
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 

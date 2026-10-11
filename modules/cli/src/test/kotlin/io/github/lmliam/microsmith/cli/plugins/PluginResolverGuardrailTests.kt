@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.cli.plugins
 
 import io.github.lmliam.microsmith.cli.command.RunCommand
+import io.github.lmliam.microsmith.cli.plugins.repository.RepositoryCredentials
+import io.github.lmliam.microsmith.cli.plugins.repository.RepositoryCredentialsResolver
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe

@@ -2,6 +2,11 @@ package io.github.lmliam.microsmith.cli.init
 
 import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
+import io.github.lmliam.microsmith.cli.init.profile.GenericOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.JavaOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileDetection
+import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileSelectionReason
+import io.github.lmliam.microsmith.cli.init.profile.detectOnboardingProfile
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain

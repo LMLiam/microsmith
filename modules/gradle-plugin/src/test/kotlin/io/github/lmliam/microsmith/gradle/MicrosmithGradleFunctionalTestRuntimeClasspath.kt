@@ -1,5 +1,7 @@
 package io.github.lmliam.microsmith.gradle
 
+import io.github.lmliam.microsmith.gradle.configuration.MicrosmithGradleConfigurations
+import io.github.lmliam.microsmith.gradle.worker.FilePathSeparator
 import java.nio.file.Path
 
 internal object MicrosmithGradleFunctionalTestRuntimeClasspath {

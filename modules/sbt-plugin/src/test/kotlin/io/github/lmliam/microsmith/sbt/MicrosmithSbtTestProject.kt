@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.sbt
 
+import io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtExecutionConfiguration
 import java.nio.file.Files
 import java.nio.file.Path
 

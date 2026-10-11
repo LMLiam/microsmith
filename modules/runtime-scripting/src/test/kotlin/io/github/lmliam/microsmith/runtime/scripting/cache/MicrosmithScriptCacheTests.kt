@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.runtime.scripting.cache
 
-import io.github.lmliam.microsmith.runtime.scripting.symbols.microsmithScriptSymbols
 import io.github.lmliam.microsmith.runtime.scripting.symbols.model.CompiledScriptSymbol
+import io.github.lmliam.microsmith.runtime.scripting.symbols.refinement.microsmithScriptSymbols
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
