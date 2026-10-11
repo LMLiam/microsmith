@@ -15,7 +15,6 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolveProtobufReferenceName
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpc
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcEndpoint
@@ -113,11 +112,7 @@ internal class ProtobufRpcSchemaResolver {
         position: ProtobufRpcResolutionIssue.EndpointPosition,
         schemasByName: Map<String, ProtobufSchema>,
     ): Either<ProtobufRpcResolutionIssue, ResolvedProtobufRpcEndpoint> = either {
-        val targetName =
-            resolveProtobufReferenceName(
-                endpoint.reference.qualifiedName,
-                current,
-            )
+        val targetName = current.resolveReference(endpoint.reference).fullyQualifiedName
 
         val target =
             ensureNotNull(schemasByName[targetName]) {

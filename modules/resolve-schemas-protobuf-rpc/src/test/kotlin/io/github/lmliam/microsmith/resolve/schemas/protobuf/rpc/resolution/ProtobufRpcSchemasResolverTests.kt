@@ -4,14 +4,21 @@ import io.github.lmliam.microsmith.dsl.microsmith
 import io.github.lmliam.microsmith.dsl.require
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Rpc
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.RpcEndpoint
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.dsl.schemas.schemas
 import io.github.lmliam.microsmith.resolve.DomainResolution
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.EndpointMustTargetMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.EndpointPosition
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -59,6 +66,37 @@ class ProtobufRpcSchemasResolverTests :
 
                     rpc.response.qualifiedTypeName shouldBe "acme.user.v1.GetUserResponse"
                 }
+            }
+        }
+
+        "resolves each endpoint reference kind without qualifying absolute names twice" {
+            val cases =
+                listOf(
+                    Reference.Local("Request") to "acme.user.v1.Request",
+                    Reference.Relative(".v2.Request") to "acme.user.v2.Request",
+                    Reference.Qualified("acme.shared.Request") to "acme.shared.Request",
+                    Reference.Qualified("RootRequest") to "RootRequest",
+                    Reference.Symbolic(MessageRef("acme.shared.Request")) to "acme.shared.Request",
+                )
+
+            cases.forEach { (reference, targetName) ->
+                val target = ProtobufSchema(targetName, Message(targetName.substringAfterLast('.')))
+                val service =
+                    ProtobufSchema(
+                        "acme.user.v1.UserService",
+                        Service("UserService", listOf(Rpc("GetUser", RpcEndpoint(reference), RpcEndpoint(reference)))),
+                    )
+                val resolved =
+                    resolver
+                        .resolve(SchemasExtension(setOf(target, service)))
+                        .shouldBeTypeOf<DomainResolution.Success<ResolvedProtobufRpcSchemaModel>>()
+                        .model
+                        .schemas
+                        .single()
+
+                resolved.rpcs.single().request.qualifiedTypeName shouldBe targetName
+                resolved.rpcs.single().response.qualifiedTypeName shouldBe targetName
+                resolved.imports shouldContainExactly listOf(targetName.replace('.', '/') + ".proto")
             }
         }
 
