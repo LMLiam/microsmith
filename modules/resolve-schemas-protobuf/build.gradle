@@ -6,7 +6,7 @@ dependencies {
     implementation project(":dsl-schemas")
     implementation project(":resolve")
     implementation project(":resolve-schemas")
-    implementation project(":dsl-schemas-protobuf")
+    api project(":dsl-schemas-protobuf")
     api libs.spi.tooling.annotations
     kapt libs.spi.tooling.processor
 }
