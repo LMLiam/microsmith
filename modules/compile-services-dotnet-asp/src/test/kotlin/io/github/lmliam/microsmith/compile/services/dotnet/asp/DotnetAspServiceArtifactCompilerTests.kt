@@ -78,6 +78,10 @@ class DotnetAspServiceArtifactCompilerTests :
             controller.contents.shouldContain(
                 "CreateUserCreated response => Respond(" + "response.Body, 201, (\"Location\", response.Location))"
             )
+            controller.contents.shouldContain(
+                """_ => throw new InvalidOperationException($"Unsupported GetUser result type """ +
+                    """'{result.GetType().FullName}'.")"""
+            )
             controller.contents.shouldNotContain("X-Microsmith-Response-Status")
             controller.contents.shouldNotContain("sample-location")
             controller.origins shouldContain "services.UserService.rest.GetUser"

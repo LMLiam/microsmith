@@ -83,7 +83,7 @@ private fun renderUnsupportedResultArm(endpoint: DotnetAspEndpointArtifact): CSh
                         listOf(
                             CSharp.rawExpression(
                                 """$"Unsupported ${endpoint.operationName} result type """ +
-                                    "'{result.GetType().FullName}'."
+                                    "'{result.GetType().FullName}'.\""
                             )
                         ),
                 )
