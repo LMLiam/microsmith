@@ -4,6 +4,7 @@ import io.github.lmliam.microsmith.dsl.schemas.SchemasBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -54,13 +55,44 @@ class ProtobufRpcDslIntegrationTests :
                     "DownloadUser",
                     "UploadUser",
                 )
-            service.rpcs[0].request.reference shouldBe Reference.Local("GetUserRequest")
-            service.rpcs[0].response.reference shouldBe Reference.Local("GetUserResponse")
+            service.rpcs[0].request.reference shouldBe Reference.Qualified("GetUserRequest")
+            service.rpcs[0].response.reference shouldBe Reference.Qualified("GetUserResponse")
             service.rpcs[1].response.streaming shouldBe true
             service.rpcs[2].request.streaming shouldBe true
             service.rpcs[2].response.streaming shouldBe true
             service.rpcs[3].response.streaming shouldBe true
             service.rpcs[4].request.streaming shouldBe true
+        }
+
+        "protobuf RPC DSL qualifies forward, relative, and typed message references" {
+            val schemas =
+                SchemasBuilder()
+                    .apply {
+                        protobuf {
+                            "acme.user.v1" {
+                                service("UserService") {
+                                    "GetUser" {
+                                        request("GetUserRequest")
+                                        response(MessageRef("acme.shared.GetUserResponse"))
+                                    }
+                                    "WatchUsers" { stream("GetUserRequest") to stream(".v2.GetUserResponse") }
+                                }
+                                message("GetUserRequest")
+                            }
+                        }
+                    }
+                    .toExtension()
+                    .schemas
+                    .filterIsInstance<ProtobufSchema>()
+
+            val service = schemas.single { it.name == "acme.user.v1.UserService" }.schema as Service
+
+            service.rpcs[0].request.reference shouldBe Reference.Qualified("acme.user.v1.GetUserRequest")
+            service.rpcs[0].response.reference shouldBe Reference.Qualified("acme.shared.GetUserResponse")
+            service.rpcs[1].request.reference shouldBe Reference.Qualified("acme.user.v1.GetUserRequest")
+            service.rpcs[1].response.reference shouldBe Reference.Qualified("acme.user.v2.GetUserResponse")
+            service.rpcs[1].request.streaming shouldBe true
+            service.rpcs[1].response.streaming shouldBe true
         }
 
         "protobuf RPC DSL rejects mixed explicit and shorthand route declarations" {
