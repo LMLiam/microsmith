@@ -12,9 +12,7 @@ internal object MsBuildProjectXmlRenderer {
         val writer = XMLOutputFactory.newFactory().createXMLStreamWriter(output)
         try {
             writer.writeStartElement(PROJECT_ELEMENT_NAME)
-            artifact.projectAttributes.toSortedMap().forEach { (name, value) ->
-                writer.writeAttribute(name, value)
-            }
+            artifact.projectAttributes.toSortedMap().forEach { (name, value) -> writer.writeAttribute(name, value) }
             renderProperties(writer, artifact)
             renderItems(writer, artifact)
             writer.writeCharacters(NEW_LINE)
@@ -45,9 +43,7 @@ internal object MsBuildProjectXmlRenderer {
                 writer.writeIndent(level = 2)
                 writer.writeEmptyElement(item.itemName)
                 writer.writeAttribute(MsBuildNames.requireAttributeName(INCLUDE_ATTRIBUTE_NAME), item.include)
-                item.attributes.toSortedMap().forEach { (name, value) ->
-                    writer.writeAttribute(name, value)
-                }
+                item.attributes.toSortedMap().forEach { (name, value) -> writer.writeAttribute(name, value) }
             }
             writer.writeIndentedEndElement(level = 1)
         }
@@ -65,9 +61,7 @@ internal object MsBuildProjectXmlRenderer {
 
     private fun XMLStreamWriter.writeIndent(level: Int) {
         writeCharacters(NEW_LINE)
-        repeat(level) {
-            writeCharacters(INDENT)
-        }
+        repeat(level) { writeCharacters(INDENT) }
     }
 
     private const val PROJECT_ELEMENT_NAME = "Project"

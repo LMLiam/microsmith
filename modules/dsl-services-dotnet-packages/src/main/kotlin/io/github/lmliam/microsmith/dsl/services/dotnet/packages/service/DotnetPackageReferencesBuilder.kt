@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.packages.service
 
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.normalizeDotnetPackagePath
-import io.github.lmliam.microsmith.dsl.services.dotnet.packages.support.validateDotnetPackageVersion
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.validation.normalizeDotnetPackagePath
+import io.github.lmliam.microsmith.dsl.services.dotnet.packages.validation.validateDotnetPackageVersion
 
 internal class DotnetPackageReferencesBuilder(private val pathSegments: List<String> = emptyList()) :
     DotnetPackageReferencesScope {
@@ -15,9 +15,7 @@ internal class DotnetPackageReferencesBuilder(private val pathSegments: List<Str
     override fun String.invoke(block: DotnetPackageReferencesScope.() -> Unit) {
         val normalizedPathSegments = normalizeDotnetPackagePath(this, "Package name")
         val childKey = normalizedPathSegments.joinToString(".")
-        require(childKey !in children) {
-            "Duplicate .NET package declaration for '$childKey'."
-        }
+        require(childKey !in children) { "Duplicate .NET package declaration for '$childKey'." }
 
         val child = DotnetPackageReferencesBuilder(pathSegments + normalizedPathSegments)
         child.block()
@@ -43,9 +41,7 @@ internal class DotnetPackageReferencesBuilder(private val pathSegments: List<Str
         if (pathSegments.isNotEmpty() && children.isEmpty()) {
             val packageName = pathSegments.joinToString(".")
 
-            require(packageName !in packages) {
-                "Duplicate .NET package reference declaration for '$packageName'."
-            }
+            require(packageName !in packages) { "Duplicate .NET package reference declaration for '$packageName'." }
 
             packages[packageName] = DotnetPackageReferenceDeclaration(name = packageName, version = currentVersion)
             return

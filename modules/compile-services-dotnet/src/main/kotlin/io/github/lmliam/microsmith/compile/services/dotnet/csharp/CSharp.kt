@@ -2,8 +2,7 @@ package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 
 @Suppress("TooManyFunctions")
 object CSharp {
-    @DslMarker
-    annotation class Dsl
+    @DslMarker annotation class Dsl
 
     data class File(val namespace: String, val usings: Set<String>, val types: List<Type>)
 
@@ -123,7 +122,7 @@ object CSharp {
     data class BinaryOperation(val left: Expression, val operator: BinaryOperator, val right: Expression) : Expression
 
     enum class BinaryOperator(val keyword: String) {
-        IS_NOT("is not"),
+        IS_NOT("is not")
     }
 
     data class Conditional(val condition: Expression, val whenTrue: Expression, val whenFalse: Expression) : Expression
@@ -174,10 +173,11 @@ object CSharp {
 
     fun type(name: String): TypeRef = NamedType(name)
 
-    fun genericType(name: String, vararg arguments: TypeRef): TypeRef = GenericType(
-        name = name,
-        arguments = arguments.toList(),
-    )
+    fun genericType(name: String, vararg arguments: TypeRef): TypeRef =
+        GenericType(
+            name = name,
+            arguments = arguments.toList(),
+        )
 
     fun nullable(type: TypeRef): TypeRef = NullableType(type)
 
@@ -203,15 +203,17 @@ object CSharp {
 
     fun call(callee: Expression): Expression = Call(callee, emptyList())
 
-    fun call(callee: Expression, vararg arguments: Expression): Expression = call(
-        callee = callee,
-        arguments = arguments.map(::ValueCallArgument),
-    )
+    fun call(callee: Expression, vararg arguments: Expression): Expression =
+        call(
+            callee = callee,
+            arguments = arguments.map(::ValueCallArgument),
+        )
 
-    fun callValues(callee: Expression, arguments: List<Expression>): Expression = call(
-        callee = callee,
-        arguments = arguments.map(::ValueCallArgument),
-    )
+    fun callValues(callee: Expression, arguments: List<Expression>): Expression =
+        call(
+            callee = callee,
+            arguments = arguments.map(::ValueCallArgument),
+        )
 
     fun call(callee: Expression, vararg arguments: CallArgument): Expression = call(callee, arguments.toList())
 
@@ -221,16 +223,18 @@ object CSharp {
 
     fun assignment(target: Expression, value: Expression): Expression = Assignment(target, value)
 
-    fun index(target: Expression, vararg arguments: Expression): Expression = IndexAccess(
-        target = target,
-        arguments = arguments.toList(),
-    )
+    fun index(target: Expression, vararg arguments: Expression): Expression =
+        IndexAccess(
+            target = target,
+            arguments = arguments.toList(),
+        )
 
-    fun binary(left: Expression, operator: BinaryOperator, right: Expression): Expression = BinaryOperation(
-        left = left,
-        operator = operator,
-        right = right,
-    )
+    fun binary(left: Expression, operator: BinaryOperator, right: Expression): Expression =
+        BinaryOperation(
+            left = left,
+            operator = operator,
+            right = right,
+        )
 
     fun conditional(condition: Expression, whenTrue: Expression, whenFalse: Expression): Expression =
         Conditional(condition, whenTrue, whenFalse)
@@ -239,11 +243,12 @@ object CSharp {
         type: TypeRef,
         arguments: List<Expression> = emptyList(),
         initializers: List<MemberInitializer> = emptyList(),
-    ): Expression = ObjectCreation(
-        type = type,
-        arguments = arguments,
-        initializers = initializers,
-    )
+    ): Expression =
+        ObjectCreation(
+            type = type,
+            arguments = arguments,
+            initializers = initializers,
+        )
 
     fun init(memberName: String, value: Expression): MemberInitializer = MemberInitializer(memberName, value)
 
@@ -257,17 +262,19 @@ object CSharp {
 
     fun tupleLiteral(vararg elements: Expression): Expression = TupleLiteral(elements.toList())
 
-    fun attribute(name: String, vararg arguments: AttributeArgument): Attribute = Attribute(
-        name = name,
-        arguments = arguments.toList(),
-    )
+    fun attribute(name: String, vararg arguments: AttributeArgument): Attribute =
+        Attribute(
+            name = name,
+            arguments = arguments.toList(),
+        )
 
     fun positionalArgument(expression: Expression): AttributeArgument = PositionalAttributeArgument(expression)
 
-    fun namedArgument(name: String, expression: Expression): AttributeArgument = NamedAttributeArgument(
-        name = name,
-        expression = expression,
-    )
+    fun namedArgument(name: String, expression: Expression): AttributeArgument =
+        NamedAttributeArgument(
+            name = name,
+            expression = expression,
+        )
 
     fun argument(expression: Expression): CallArgument = ValueCallArgument(expression)
 

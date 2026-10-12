@@ -1,6 +1,12 @@
 package io.github.lmliam.microsmith.cli.plugins
 
 import io.github.lmliam.microsmith.cli.command.RunCommand
+import io.github.lmliam.microsmith.cli.plugins.integrity.PluginResolutionIntegrityVerifier
+import io.github.lmliam.microsmith.cli.plugins.local.LocalPluginResolver
+import io.github.lmliam.microsmith.cli.plugins.lockfile.LockEntry
+import io.github.lmliam.microsmith.cli.plugins.lockfile.assertSameRemoteArtifactSet
+import io.github.lmliam.microsmith.cli.plugins.remote.RemotePluginResolutionAccumulator
+import io.github.lmliam.microsmith.cli.plugins.remote.parseCoordinate
 import java.nio.file.Files
 
 internal class PluginResolutionService(
@@ -44,12 +50,12 @@ internal class PluginResolutionService(
             lockfilePath = context.lockfilePath,
         )
 
-        val lockEntries =
-            buildList {
-                addAll(remoteResolution.rootLockEntries)
-                addAll(remoteResolution.remoteArtifactChecksums.toRemoteArtifactLockEntries())
-                addAll(localResolution.lockEntries)
-            }.sortedWith(compareBy(LockEntry::kind, LockEntry::key))
+        val lockEntries = buildList {
+            addAll(remoteResolution.rootLockEntries)
+            addAll(remoteResolution.remoteArtifactChecksums.toRemoteArtifactLockEntries())
+            addAll(localResolution.lockEntries)
+        }
+            .sortedWith(compareBy(LockEntry::kind, LockEntry::key))
 
         integrityVerifier.assertAllowlistCoverage(context.checksumAllowlist, lockEntries)
         integrityVerifier.writeGeneratedLockfile(

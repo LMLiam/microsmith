@@ -6,16 +6,20 @@ import io.github.lmliam.microsmith.cli.command.IdeDoctorCommand
 import io.github.lmliam.microsmith.cli.command.IdeRefreshCommand
 import java.nio.file.Path
 
-internal fun parseIdeCommand(args: List<String>): CliCommand = when (val subcommand = args.getOrNull(1)) {
-    null, in HELP_COMMANDS -> ErrorCommand("Missing <refresh|doctor> subcommand for ide command.")
-    IDE_REFRESH_SUBCOMMAND -> parseIdeRefreshCommand(args = args, startIndex = 2)
-    IDE_DOCTOR_SUBCOMMAND -> parseIdeDoctorCommand(args = args, startIndex = 2)
-    else -> ErrorCommand("Unknown ide subcommand '$subcommand'. Expected 'refresh' or 'doctor'.")
-}
+internal fun parseIdeCommand(args: List<String>): CliCommand =
+    when (val subcommand = args.getOrNull(1)) {
+        null,
+        in HELP_COMMANDS -> ErrorCommand("Missing <refresh|doctor> subcommand for ide command.")
+        IDE_REFRESH_SUBCOMMAND -> parseIdeRefreshCommand(args = args, startIndex = 2)
+        IDE_DOCTOR_SUBCOMMAND -> parseIdeDoctorCommand(args = args, startIndex = 2)
+        else -> ErrorCommand("Unknown ide subcommand '$subcommand'. Expected 'refresh' or 'doctor'.")
+    }
 
 private fun parseIdeRefreshCommand(args: List<String>, startIndex: Int): CliCommand {
     val parsed = parseIdeOptions(args = args, startIndex = startIndex)
-    parsed.error?.let { return ErrorCommand(it) }
+    parsed.error?.let {
+        return ErrorCommand(it)
+    }
     return IdeRefreshCommand(
         projectRoot = parsed.projectRoot,
         diagnosticsFormat = parsed.diagnosticsFormat,
@@ -25,7 +29,9 @@ private fun parseIdeRefreshCommand(args: List<String>, startIndex: Int): CliComm
 
 private fun parseIdeDoctorCommand(args: List<String>, startIndex: Int): CliCommand {
     val parsed = parseIdeOptions(args = args, startIndex = startIndex)
-    parsed.error?.let { return ErrorCommand(it) }
+    parsed.error?.let {
+        return ErrorCommand(it)
+    }
     return IdeDoctorCommand(
         projectRoot = parsed.projectRoot,
         diagnosticsFormat = parsed.diagnosticsFormat,
@@ -43,14 +49,10 @@ private fun parseIdeOptions(args: List<String>, startIndex: Int): ParsedIdeOptio
     while (index < args.size && error == null && diagnosticOptions.error == null) {
         val parsedToken =
             when (val token = args[index]) {
-                DIAGNOSTICS_OPTION -> ParsedToken(
-                    index + diagnosticOptions.consumeDiagnostics(args = args, index = index),
-                )
+                DIAGNOSTICS_OPTION ->
+                    ParsedToken(index + diagnosticOptions.consumeDiagnostics(args = args, index = index))
 
-                VERBOSE_OPTION ->
-                    ParsedToken(
-                        index + diagnosticOptions.consumeVerbose(),
-                    )
+                VERBOSE_OPTION -> ParsedToken(index + diagnosticOptions.consumeVerbose())
 
                 REPO_ROOT_OPTION ->
                     parseRepoRootOption(

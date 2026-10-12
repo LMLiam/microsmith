@@ -2,7 +2,7 @@ package io.github.lmliam.microsmith.gen.files.render
 
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
-import io.github.lmliam.microsmith.gen.core.ArtifactRenderer
+import io.github.lmliam.microsmith.gen.ArtifactRenderer
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import java.nio.charset.StandardCharsets
 

@@ -76,8 +76,9 @@ internal object GeneratedByMicrosmithBanner {
         }
     }
 
-    private fun commentText(comment: String, text: String): String = when (comment) {
-        "xml" -> "<!-- $text -->"
-        else -> "$comment $text"
-    }
+    private fun commentText(comment: String, text: String): String =
+        when (comment) {
+            "xml" -> "<!-- $text -->"
+            else -> "$comment $text"
+        }
 }

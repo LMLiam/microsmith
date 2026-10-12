@@ -1,27 +1,29 @@
 package io.github.lmliam.microsmith.cli.diagnostics
 
-internal fun toJsonValue(value: Any?): String = when (value) {
-    null -> "null"
+internal fun toJsonValue(value: Any?): String =
+    when (value) {
+        null -> "null"
 
-    is String -> "\"${value.escapeJson()}\""
+        is String -> "\"${value.escapeJson()}\""
 
-    is Number -> value.toString()
+        is Number -> value.toString()
 
-    is Boolean -> value.toString()
+        is Boolean -> value.toString()
 
-    is Map<*, *> ->
-        value.entries.joinToString(
-            prefix = "{",
-            postfix = "}",
-            separator = ",",
-        ) { (key, mapValue) ->
-            "\"${key.toString().escapeJson()}\":${toJsonValue(mapValue)}"
-        }
+        is Map<*, *> ->
+            value.entries.joinToString(
+                prefix = "{",
+                postfix = "}",
+                separator = ",",
+            ) { (key, mapValue) ->
+                "\"${key.toString().escapeJson()}\":${toJsonValue(mapValue)}"
+            }
 
-    is Iterable<*> -> value.joinToString(prefix = "[", postfix = "]", separator = ",") { entry -> toJsonValue(entry) }
+        is Iterable<*> ->
+            value.joinToString(prefix = "[", postfix = "]", separator = ",") { entry -> toJsonValue(entry) }
 
-    else -> "\"${value.toString().escapeJson()}\""
-}
+        else -> "\"${value.toString().escapeJson()}\""
+    }
 
 private fun String.escapeJson(): String {
     val builder = StringBuilder(length + JSON_ESCAPE_BUFFER_PADDING)
@@ -43,7 +45,7 @@ private fun String.escapeJson(): String {
 
             else -> {
                 if (char.code <= MAX_JSON_CONTROL_CHAR_CODE) {
-                    builder.append("\\u%04x".format(char.code))
+                    builder.append(char.toUnicodeEscape())
                 } else {
                     builder.append(char)
                 }
@@ -52,6 +54,8 @@ private fun String.escapeJson(): String {
     }
     return builder.toString()
 }
+
+private fun Char.toUnicodeEscape(): String = "\\u${code.toString(radix = 16).padStart(length = 4, padChar = '0')}"
 
 private const val MAX_JSON_CONTROL_CHAR_CODE = 0x1F
 private const val JSON_ESCAPE_BUFFER_PADDING = 8

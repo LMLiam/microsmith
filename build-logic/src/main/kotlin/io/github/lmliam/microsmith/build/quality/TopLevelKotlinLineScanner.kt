@@ -1,12 +1,14 @@
 package io.github.lmliam.microsmith.build.quality
 
 internal object TopLevelKotlinLineScanner {
-    fun scan(lines: List<String>): List<String> {
+    fun scan(lines: List<String>): List<String> = scanWithIndexes(lines).map { line -> line.value }
+
+    fun scanWithIndexes(lines: List<String>): List<IndexedValue<String>> {
         var state = ScanState()
-        return lines.filter { line ->
+        return lines.mapIndexedNotNull { index, line ->
             val isTopLevelLine = state.isTopLevelLine
             state = state.consume(line)
-            isTopLevelLine
+            if (isTopLevelLine) IndexedValue(index, line) else null
         }
     }
 

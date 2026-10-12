@@ -2,22 +2,20 @@ package io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.EnumRef
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 
 class OneofBuilderTests :
     StringSpec({
         fun newBuilder(
-            segments: List<String> = listOf("me, liam"),
             allocateIndex: (Int?) -> Int = { it ?: 1 },
             usedNames: MutableList<String> = mutableListOf(),
         ): Pair<OneofBuilder, MutableList<String>> {
             val builder =
                 OneofBuilder(
                     name = "TestOneof",
-                    segments = segments,
                     allocateIndex = allocateIndex,
                     useName = { usedNames += it },
                 )
@@ -33,29 +31,25 @@ class OneofBuilderTests :
         }
 
         "creates reference field with fqName from segments" {
-            val (builder, _) = newBuilder(segments = listOf("pkg", "sub"))
+            val (builder, _) = newBuilder()
             val field = builder.ref("bar", "Target") { index(7) }
             field.name shouldBe "bar"
             field.index shouldBe 7
-            field.fieldType.shouldBeInstanceOf<Reference>()
-            field.fieldType.name shouldBe "pkg.sub.Target"
+            field.fieldType shouldBe Reference.Local(target = "Target")
         }
 
         "ref with fully qualified target ignores segments" {
-            val (builder, _) = newBuilder(segments = listOf("pkg", "sub"))
+            val (builder, _) = newBuilder()
             val field = builder.ref("target", "pkg.else.Target") { index(7) }
             field.name shouldBe "target"
             field.index shouldBe 7
-            field.fieldType.shouldBeInstanceOf<Reference>()
-            field.fieldType.name shouldBe "pkg.else.Target"
+            field.fieldType shouldBe Reference.Qualified("pkg.else.Target")
         }
 
         "duplicate field names throw" {
             val (builder, _) = newBuilder()
             builder.int32("dup")
-            shouldThrow<IllegalArgumentException> {
-                builder.string("dup")
-            }
+            shouldThrow<IllegalArgumentException> { builder.string("dup") }
         }
 
         "used names are tracked" {
@@ -68,10 +62,12 @@ class OneofBuilderTests :
         "index is allocated" {
             var captured: Int? = null
             val (builder, _) =
-                newBuilder(allocateIndex = { idx ->
-                    captured = idx
-                    idx ?: 99
-                })
+                newBuilder(
+                    allocateIndex = { idx ->
+                        captured = idx
+                        idx ?: 99
+                    }
+                )
             builder.int64("num") { index(123) }
             captured shouldBe 123
         }
@@ -79,10 +75,12 @@ class OneofBuilderTests :
         "allocated index is called with null if no index set" {
             var captured: Int? = null
             val (builder, _) =
-                newBuilder(allocateIndex = { idx ->
-                    captured = idx
-                    77
-                })
+                newBuilder(
+                    allocateIndex = { idx ->
+                        captured = idx
+                        77
+                    }
+                )
             val field = builder.bool("flag")
             captured shouldBe null
             field.index shouldBe 77
@@ -94,5 +92,12 @@ class OneofBuilderTests :
             builder.int32("y") { index(10) }
             val oneof = builder.build()
             oneof.fields.map { it.name } shouldBe listOf("y", "x")
+        }
+
+        "symbolic oneof references preserve their category" {
+            val (builder, _) = newBuilder()
+            val target = EnumRef("pkg.sub.Status")
+            val field = builder.ref("status", target)
+            field.fieldType shouldBe Reference.Symbolic(target)
         }
     })

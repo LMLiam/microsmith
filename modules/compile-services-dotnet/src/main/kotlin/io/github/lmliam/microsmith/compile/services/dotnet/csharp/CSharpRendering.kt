@@ -1,11 +1,7 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 
 internal fun renderCSharp(file: CSharp.File): String = buildString {
-    file.usings
-        .sorted()
-        .forEach { namespace ->
-            appendLine("using $namespace;")
-        }
+    file.usings.sorted().forEach { namespace -> appendLine("using $namespace;") }
     if (file.usings.isNotEmpty()) {
         appendLine()
     }
@@ -43,16 +39,20 @@ private fun renderType(type: CSharp.Type): String = buildString {
 }
 
 private fun renderPrimaryConstructor(parameters: List<CSharp.Parameter>): String =
-    parameters.takeIf(List<CSharp.Parameter>::isNotEmpty)?.joinToString(
-        prefix = "(",
-        postfix = ")",
-        transform = ::renderParameter,
-    ).orEmpty()
+    parameters
+        .takeIf(List<CSharp.Parameter>::isNotEmpty)
+        ?.joinToString(
+            prefix = "(",
+            postfix = ")",
+            transform = ::renderParameter,
+        )
+        .orEmpty()
 
-private fun renderMember(member: CSharp.Member): String = when (member) {
-    is CSharp.Method -> renderMethod(member)
-    is CSharp.Property -> renderProperty(member)
-}
+private fun renderMember(member: CSharp.Member): String =
+    when (member) {
+        is CSharp.Method -> renderMethod(member)
+        is CSharp.Property -> renderProperty(member)
+    }
 
 private fun renderProperty(property: CSharp.Property): String = buildString {
     renderAttributes(property.attributes).forEach(::appendLine)
@@ -71,11 +71,12 @@ private fun renderProperty(property: CSharp.Property): String = buildString {
     }
 }
 
-private fun renderPropertyAccessors(accessors: CSharp.PropertyAccessors): String = when (accessors) {
-    CSharp.PropertyAccessors.READ_ONLY -> "get;"
-    CSharp.PropertyAccessors.READ_WRITE -> "get; set;"
-    CSharp.PropertyAccessors.READ_INIT -> "get; init;"
-}
+private fun renderPropertyAccessors(accessors: CSharp.PropertyAccessors): String =
+    when (accessors) {
+        CSharp.PropertyAccessors.READ_ONLY -> "get;"
+        CSharp.PropertyAccessors.READ_WRITE -> "get; set;"
+        CSharp.PropertyAccessors.READ_INIT -> "get; init;"
+    }
 
 private fun renderMethod(method: CSharp.Method): String = buildString {
     renderAttributes(method.attributes).forEach(::appendLine)
@@ -97,27 +98,29 @@ private fun renderMethod(method: CSharp.Method): String = buildString {
     append("}")
 }
 
-private fun renderMethodParameters(parameters: List<CSharp.Parameter>): String = when {
-    parameters.isEmpty() -> "()"
+private fun renderMethodParameters(parameters: List<CSharp.Parameter>): String =
+    when {
+        parameters.isEmpty() -> "()"
 
-    else -> {
-        val singleLine = parameters.joinToString(
-            prefix = "(",
-            postfix = ")",
-            transform = ::renderParameter,
-        )
-        if (singleLine.length <= MAX_INLINE_METHOD_PARAMETER_LENGTH) {
-            singleLine
-        } else {
-            parameters.joinToString(
-                prefix = "(\n",
-                postfix = "\n)",
-                separator = ",\n",
-                transform = { parameter -> indent(renderParameter(parameter), spaces = 4) },
-            )
+        else -> {
+            val singleLine =
+                parameters.joinToString(
+                    prefix = "(",
+                    postfix = ")",
+                    transform = ::renderParameter,
+                )
+            if (singleLine.length <= MAX_INLINE_METHOD_PARAMETER_LENGTH) {
+                singleLine
+            } else {
+                parameters.joinToString(
+                    prefix = "(\n",
+                    postfix = "\n)",
+                    separator = ",\n",
+                    transform = { parameter -> indent(renderParameter(parameter), spaces = 4) },
+                )
+            }
         }
     }
-}
 
 private fun renderParameter(parameter: CSharp.Parameter): String = buildString {
     parameter.attributes.forEach { attribute ->

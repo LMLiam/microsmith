@@ -29,36 +29,35 @@ import io.github.lmliam.microsmith.cli.parsing.parseCliArgs
 import io.github.lmliam.microsmith.cli.plugins.PluginResolutionResult
 import io.github.lmliam.microsmith.cli.plugins.resolvePlugins
 import io.github.lmliam.microsmith.cli.provider.verifyBuiltinProviders
-import io.github.lmliam.microsmith.runtime.scripting.host.MicrosmithScriptHost
+import io.github.lmliam.microsmith.runtime.scripting.MicrosmithScriptHost
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.nio.file.Path
 
 internal class MicrosmithCli(
     private val stdout: (String) -> Unit = ::println,
-    private val stderr: (String) -> Unit = { System.err.println(it) },
-    private val providerValidator: () -> List<String> = ::verifyBuiltinProviders,
-    private val pluginResolver: (RunCommand) -> PluginResolutionResult = ::resolvePlugins,
-    private val scriptRunner: (RunCommand, List<Path>) -> ScriptRunResult = { command, pluginClasspath ->
-        MicrosmithScriptHost().run(
-            ScriptRunRequest(
-                script = command.script,
-                outputDir = command.outputDir,
-                variables = command.variables,
-                flags = command.flags,
-                pluginClasspath = pluginClasspath,
-                isolationMode = command.isolationMode,
-            ),
-        )
+    stderr: (String) -> Unit = { System.err.println(it) },
+    providerValidator: () -> List<String> = ::verifyBuiltinProviders,
+    pluginResolver: (RunCommand) -> PluginResolutionResult = ::resolvePlugins,
+    scriptRunner: (RunCommand, List<Path>) -> ScriptRunResult = { command, pluginClasspath ->
+        MicrosmithScriptHost()
+            .run(
+                ScriptRunRequest(
+                    script = command.script,
+                    outputDir = command.outputDir,
+                    variables = command.variables,
+                    flags = command.flags,
+                    pluginClasspath = pluginClasspath,
+                    isolationMode = command.isolationMode,
+                )
+            )
     },
-    private val doctorRunner: () -> DoctorResult = {
-        runDoctorChecks(providerValidator = providerValidator)
-    },
+    doctorRunner: () -> DoctorResult = { runDoctorChecks(providerValidator = providerValidator) },
     private val versionProvider: () -> String = ::resolveCliVersion,
-    private val initRunner: (InitCommand) -> InitBootstrapResult = ::runInitBootstrap,
-    private val ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult = ::refreshIdeHelperProject,
-    private val ideDoctorRunner: (IdeDoctorCommand) -> IdeDoctorResult = ::runIdeHelperDoctor,
-    private val eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,
+    initRunner: (InitCommand) -> InitBootstrapResult = ::runInitBootstrap,
+    ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult = ::refreshIdeHelperProject,
+    ideDoctorRunner: (IdeDoctorCommand) -> IdeDoctorResult = ::runIdeHelperDoctor,
+    eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,
 ) {
     private val emitterFactory = CliDiagnosticEmitterFactory(stdout = stdout, stderr = stderr)
     private val usageErrorHandler = UsageErrorCommandHandler(emitterFactory = emitterFactory, stderr = stderr)
@@ -91,27 +90,28 @@ internal class MicrosmithCli(
             ideDoctorRunner = ideDoctorRunner,
         )
 
-    fun run(args: Array<String>): Int = when (val parsed = parseCliArgs(args.toList())) {
-        is HelpCommand -> {
-            stdout(HELP_TEXT.trimIndent())
-            0
+    fun run(args: Array<String>): Int =
+        when (val parsed = parseCliArgs(args.toList())) {
+            is HelpCommand -> {
+                stdout(HELP_TEXT.trimIndent())
+                0
+            }
+
+            is ErrorCommand -> usageErrorHandler.execute(parsed)
+
+            is RunCommand -> runCommandHandler.execute(parsed)
+
+            is DoctorCommand -> doctorCommandHandler.execute(parsed)
+
+            is VersionCommand -> {
+                stdout("microsmith ${versionProvider()}")
+                0
+            }
+
+            is InitCommand -> initCommandHandler.execute(parsed)
+
+            is IdeRefreshCommand -> ideRefreshCommandHandler.execute(parsed)
+
+            is IdeDoctorCommand -> ideDoctorCommandHandler.execute(parsed)
         }
-
-        is ErrorCommand -> usageErrorHandler.execute(parsed)
-
-        is RunCommand -> runCommandHandler.execute(parsed)
-
-        is DoctorCommand -> doctorCommandHandler.execute(parsed)
-
-        is VersionCommand -> {
-            stdout("microsmith ${versionProvider()}")
-            0
-        }
-
-        is InitCommand -> initCommandHandler.execute(parsed)
-
-        is IdeRefreshCommand -> ideRefreshCommandHandler.execute(parsed)
-
-        is IdeDoctorCommand -> ideDoctorCommandHandler.execute(parsed)
-    }
 }

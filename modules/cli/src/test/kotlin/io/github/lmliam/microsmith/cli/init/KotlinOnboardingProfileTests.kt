@@ -2,6 +2,11 @@ package io.github.lmliam.microsmith.cli.init
 
 import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
+import io.github.lmliam.microsmith.cli.init.profile.GenericOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.KotlinOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileDetection
+import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileSelectionReason
+import io.github.lmliam.microsmith.cli.init.profile.detectOnboardingProfile
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -17,18 +22,21 @@ class KotlinOnboardingProfileTests :
     StringSpec({
         "creates repo-aware bootstrap files for Kotlin repositories without a repository-native output override" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-kotlin")
-            repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.2.21\" }\n")
+            repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.4.20\" }\n")
             repoRoot.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture-kotlin\"\n")
             repoRoot.resolve("src/main/kotlin/example").createDirectories()
-            repoRoot.resolve("src/main/kotlin/example/App.kt").writeText(
-                """
-                package example
+            repoRoot
+                .resolve("src/main/kotlin/example/App.kt")
+                .writeText(
+                    """
+                    package example
 
-                class App {
-                    fun message(): String = "Microsmith Kotlin fixture"
-                }
-                """.trimIndent() + "\n",
-            )
+                    class App {
+                        fun message(): String = "Microsmith Kotlin fixture"
+                    }
+                    """
+                        .trimIndent() + "\n"
+                )
             try {
                 val helperRoot = repoRoot.resolve(".microsmith/ide")
                 val result =
@@ -80,7 +88,7 @@ class KotlinOnboardingProfileTests :
         "detects Kotlin repositories from Gradle Kotlin DSL roots when a Kotlin source tree exists" {
             val repoRoot = createTempDirectory("microsmith-init-detect-kotlin-gradle-kts")
             try {
-                repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.2.21\" }\n")
+                repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.4.20\" }\n")
                 repoRoot.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture-kotlin\"\n")
                 repoRoot.resolve("src/test/kotlin/example").createDirectories()
 
@@ -98,12 +106,10 @@ class KotlinOnboardingProfileTests :
         "detects Kotlin repositories from Gradle Groovy roots when a Kotlin source tree exists" {
             val repoRoot = createTempDirectory("microsmith-init-detect-kotlin-gradle-groovy")
             try {
-                repoRoot.resolve(
-                    "build.gradle",
-                ).writeText("plugins { id 'org.jetbrains.kotlin.jvm' version '2.2.21' }\n")
-                repoRoot.resolve(
-                    "settings.gradle",
-                ).writeText("rootProject.name = 'fixture-kotlin'\n")
+                repoRoot
+                    .resolve("build.gradle")
+                    .writeText("plugins { id 'org.jetbrains.kotlin.jvm' version '2.4.20' }\n")
+                repoRoot.resolve("settings.gradle").writeText("rootProject.name = 'fixture-kotlin'\n")
                 repoRoot.resolve("src/main/kotlin/example").createDirectories()
 
                 detectOnboardingProfile(repoRoot) shouldBe
@@ -120,12 +126,10 @@ class KotlinOnboardingProfileTests :
         "detects Kotlin multiplatform repositories from source-set roots" {
             val repoRoot = createTempDirectory("microsmith-init-detect-kotlin-multiplatform")
             try {
-                repoRoot.resolve(
-                    "build.gradle.kts",
-                ).writeText("plugins { kotlin(\"multiplatform\") version \"2.2.21\" }\n")
-                repoRoot.resolve(
-                    "src/commonMain/kotlin/example",
-                ).createDirectories()
+                repoRoot
+                    .resolve("build.gradle.kts")
+                    .writeText("plugins { kotlin(\"multiplatform\") version \"2.4.20\" }\n")
+                repoRoot.resolve("src/commonMain/kotlin/example").createDirectories()
 
                 detectOnboardingProfile(repoRoot) shouldBe
                     OnboardingProfileDetection(
@@ -174,7 +178,7 @@ class KotlinOnboardingProfileTests :
         "falls back to the generic profile for Kotlin build files without a Kotlin source tree" {
             val repoRoot = createTempDirectory("microsmith-init-detect-kotlin-build-only")
             try {
-                repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.2.21\" }\n")
+                repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.4.20\" }\n")
                 repoRoot.resolve("pom.xml").writeText("<project />\n")
 
                 detectOnboardingProfile(repoRoot) shouldBe
@@ -191,7 +195,7 @@ class KotlinOnboardingProfileTests :
         "falls back to the generic profile when Kotlin and another ecosystem marker both match" {
             val repoRoot = createTempDirectory("microsmith-init-detect-kotlin-mixed")
             try {
-                repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.2.21\" }\n")
+                repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.4.20\" }\n")
                 repoRoot.resolve("src/main/kotlin/example").createDirectories()
                 repoRoot.resolve("pyproject.toml").writeText("[project]\nname = \"fixture-python\"\n")
 
@@ -209,7 +213,7 @@ class KotlinOnboardingProfileTests :
         "falls back to the generic profile when Java and Kotlin source roots both match" {
             val repoRoot = createTempDirectory("microsmith-init-detect-kotlin-java-mixed")
             try {
-                repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.2.21\" }\n")
+                repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.4.20\" }\n")
                 repoRoot.resolve("src/main/java/example").createDirectories()
                 repoRoot.resolve("src/main/kotlin/example").createDirectories()
 

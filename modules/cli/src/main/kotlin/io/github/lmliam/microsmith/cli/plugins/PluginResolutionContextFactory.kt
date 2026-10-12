@@ -1,6 +1,16 @@
 package io.github.lmliam.microsmith.cli.plugins
 
 import io.github.lmliam.microsmith.cli.command.RunCommand
+import io.github.lmliam.microsmith.cli.plugins.cache.OfflinePluginCacheReadinessChecker
+import io.github.lmliam.microsmith.cli.plugins.cache.defaultLockfilePath
+import io.github.lmliam.microsmith.cli.plugins.cache.pluginArtifactCacheRoot
+import io.github.lmliam.microsmith.cli.plugins.integrity.PluginResolutionIntegrityVerifier
+import io.github.lmliam.microsmith.cli.plugins.integrity.loadPluginChecksumAllowlistFromEnvironment
+import io.github.lmliam.microsmith.cli.plugins.local.LocalPluginJar
+import io.github.lmliam.microsmith.cli.plugins.lockfile.LockKey
+import io.github.lmliam.microsmith.cli.plugins.lockfile.assertSamePluginSet
+import io.github.lmliam.microsmith.cli.plugins.remote.Coordinate
+import io.github.lmliam.microsmith.cli.plugins.repository.PluginRepositoryResolver
 
 internal class PluginResolutionContextFactory(
     private val integrityVerifier: PluginResolutionIntegrityVerifier = PluginResolutionIntegrityVerifier(),
@@ -39,11 +49,11 @@ internal class PluginResolutionContextFactory(
             checksumAllowlist = checksumAllowlist,
             cacheDirectory = cacheDirectory,
             repositories =
-            repositoryResolver.resolve(
-                command = command,
-                settings = settings,
-                requiresRemoteRepositories = coordinates.isNotEmpty(),
-            ),
+                repositoryResolver.resolve(
+                    command = command,
+                    settings = settings,
+                    requiresRemoteRepositories = coordinates.isNotEmpty(),
+                ),
         )
     }
 

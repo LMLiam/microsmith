@@ -1,5 +1,8 @@
 package io.github.lmliam.microsmith.cli.plugins
 
+import io.github.lmliam.microsmith.cli.plugins.remote.parseCoordinate
+import io.github.lmliam.microsmith.cli.plugins.repository.RepositoryAllowlistPolicy
+import io.github.lmliam.microsmith.cli.plugins.repository.normalizeRepositoryUri
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeBytes
@@ -8,9 +11,7 @@ import kotlin.io.path.writeText
 internal fun fileRepositoryAllowedPolicy(vararg additionalAllowedRepositories: String): RepositoryAllowlistPolicy =
     RepositoryAllowlistPolicy(
         allowedRepositories =
-        (listOf(MAVEN_CENTRAL_REPOSITORY) + additionalAllowedRepositories)
-            .map(::normalizeRepositoryUri)
-            .toSet(),
+            (listOf(MAVEN_CENTRAL_REPOSITORY) + additionalAllowedRepositories).map(::normalizeRepositoryUri).toSet(),
         allowFileRepositories = true,
     )
 
@@ -22,11 +23,7 @@ internal fun publishMavenArtifact(
     jarContents: ByteArray = "plugin-jar-contents".toByteArray(),
 ) {
     val parsed = parseCoordinate(coordinate)
-    val base =
-        repositoryRoot
-            .resolve(parsed.group.replace('.', '/'))
-            .resolve(parsed.artifact)
-            .resolve(parsed.version)
+    val base = repositoryRoot.resolve(parsed.group.replace('.', '/')).resolve(parsed.artifact).resolve(parsed.version)
     base.createDirectories()
 
     val pomPath = base.resolve("${parsed.artifact}-${parsed.version}.pom")
@@ -53,7 +50,8 @@ internal fun publishMavenArtifact(
                   <version>${dep.version}</version>
                   $scopeXml
                 </dependency>
-                """.trimIndent()
+                """
+                    .trimIndent()
             }
         }
     val pomXml =
@@ -68,7 +66,8 @@ internal fun publishMavenArtifact(
           <packaging>jar</packaging>
           $dependenciesBlock
         </project>
-        """.trimIndent()
+        """
+            .trimIndent()
     pomPath.writeText(pomXml)
 
     val jarPath = base.resolve("${parsed.artifact}-${parsed.version}.jar")

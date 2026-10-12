@@ -41,11 +41,12 @@ private fun parseOutputOption(args: List<String>, index: Int, state: RunOptionsS
     return ParsedToken(nextIndex = index + 2)
 }
 
-private fun validateOutputValue(value: String?, outputDirAlreadySet: Boolean): String? = when {
-    value == null || value.startsWith("--") -> "Missing value for --out option."
-    outputDirAlreadySet -> "--out option may only be specified once."
-    else -> null
-}
+private fun validateOutputValue(value: String?, outputDirAlreadySet: Boolean): String? =
+    when {
+        value == null || value.startsWith("--") -> "Missing value for --out option."
+        outputDirAlreadySet -> "--out option may only be specified once."
+        else -> null
+    }
 
 private fun parseVariableOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
@@ -75,10 +76,12 @@ private fun parseFlagOption(args: List<String>, index: Int, state: RunOptionsSta
 
 private fun parsePluginOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
-    val pluginCoordinate = parsePluginCoordinate(value) ?: return ParsedToken(
-        nextIndex = index,
-        error = "Invalid --plugin value '$value'. Expected group:artifact:version.",
-    )
+    val pluginCoordinate =
+        parsePluginCoordinate(value)
+            ?: return ParsedToken(
+                nextIndex = index,
+                error = "Invalid --plugin value '$value'. Expected group:artifact:version.",
+            )
     if (state.plugins.contains(pluginCoordinate)) {
         return ParsedToken(
             nextIndex = index,
@@ -104,13 +107,14 @@ private fun parsePluginJarOption(args: List<String>, index: Int, state: RunOptio
     return ParsedToken(nextIndex = index + 2)
 }
 
-private fun parseOfflineOption(index: Int, state: RunOptionsState): ParsedToken = parseSingleOccurrenceFlag(
-    index = index,
-    alreadySpecified = state.offline,
-    optionName = "--offline",
-) {
-    state.offline = true
-}
+private fun parseOfflineOption(index: Int, state: RunOptionsState): ParsedToken =
+    parseSingleOccurrenceFlag(
+        index = index,
+        alreadySpecified = state.offline,
+        optionName = "--offline",
+    ) {
+        state.offline = true
+    }
 
 private fun parseRepositoryOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)
@@ -167,13 +171,14 @@ private fun parseDiagnosticsOption(args: List<String>, index: Int, state: RunOpt
     return ParsedToken(nextIndex = index + 2)
 }
 
-private fun parseVerboseOption(index: Int, state: RunOptionsState): ParsedToken = parseSingleOccurrenceFlag(
-    index = index,
-    alreadySpecified = state.verbose,
-    optionName = "--verbose",
-) {
-    state.verbose = true
-}
+private fun parseVerboseOption(index: Int, state: RunOptionsState): ParsedToken =
+    parseSingleOccurrenceFlag(
+        index = index,
+        alreadySpecified = state.verbose,
+        optionName = "--verbose",
+    ) {
+        state.verbose = true
+    }
 
 private fun parseEventLogOption(args: List<String>, index: Int, state: RunOptionsState): ParsedToken {
     val value = args.getOrNull(index + 1)

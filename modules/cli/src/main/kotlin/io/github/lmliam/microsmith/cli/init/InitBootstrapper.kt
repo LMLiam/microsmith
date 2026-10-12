@@ -5,6 +5,10 @@ import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.ide.IdeHelperConflictException
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
 import io.github.lmliam.microsmith.cli.ide.refreshIdeHelperProject
+import io.github.lmliam.microsmith.cli.init.files.BootstrapFileWriteResult
+import io.github.lmliam.microsmith.cli.init.files.BootstrapFileWriter
+import io.github.lmliam.microsmith.cli.init.profile.detectOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.template.BootstrapScriptTemplates
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -59,25 +63,22 @@ internal class InitBootstrapper(
                     projectRoot = projectRoot,
                     diagnosticsFormat = command.diagnosticsFormat,
                     verbose = command.verbose,
-                ),
+                )
             )
-        }.getOrElse { error ->
-            when (error) {
-                is IdeHelperConflictException ->
-                    throw InitConflictException(error.message ?: "IDE helper path is invalid.")
-
-                else -> throw error
-            }
         }
+            .getOrElse { error ->
+                when (error) {
+                    is IdeHelperConflictException ->
+                        throw InitConflictException(error.message ?: "IDE helper path is invalid.")
+
+                    else -> throw error
+                }
+            }
     }
 
     private fun validateProjectRoot(projectRoot: Path) {
-        requireInit(Files.exists(projectRoot)) {
-            "Repository root '$projectRoot' does not exist."
-        }
-        requireInit(Files.isDirectory(projectRoot)) {
-            "Repository root '$projectRoot' is not a directory."
-        }
+        requireInit(Files.exists(projectRoot)) { "Repository root '$projectRoot' does not exist." }
+        requireInit(Files.isDirectory(projectRoot)) { "Repository root '$projectRoot' is not a directory." }
     }
 }
 

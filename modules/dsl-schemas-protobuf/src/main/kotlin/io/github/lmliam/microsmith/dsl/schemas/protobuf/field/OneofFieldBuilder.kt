@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.OneofFieldScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.OneofFieldScope
 
 internal class OneofFieldBuilder(var index: Int? = null) : OneofFieldScope {
     override fun index(index: Int) {

@@ -1,21 +1,23 @@
 package io.github.lmliam.microsmith.cli.plugins
 
 import io.github.lmliam.microsmith.cli.command.RunCommand
+import io.github.lmliam.microsmith.cli.plugins.diagnostics.PluginResolutionDiagnostics
+import io.github.lmliam.microsmith.cli.plugins.diagnostics.resolveWithDiagnostics
+import io.github.lmliam.microsmith.cli.plugins.diagnostics.sensitiveValuesWithDiagnostics
 
 internal fun resolvePlugins(command: RunCommand): PluginResolutionResult {
     if (!command.requiresPluginResolution()) {
         return PluginResolutionResult.Success(classpath = emptyList(), lockfilePath = null)
     }
 
-    return runCatching {
-        PluginResolverSettings()
-    }.fold(
-        onSuccess = { settings -> resolvePlugins(command = command, settings = settings) },
-        onFailure = { error ->
-            val diagnostics = PluginResolutionDiagnostics()
-            PluginResolutionResult.Failure(listOf(diagnostics.format(error, sensitiveValues = emptySet())))
-        },
-    )
+    return runCatching { PluginResolverSettings() }
+        .fold(
+            onSuccess = { settings -> resolvePlugins(command = command, settings = settings) },
+            onFailure = { error ->
+                val diagnostics = PluginResolutionDiagnostics()
+                PluginResolutionResult.Failure(listOf(diagnostics.format(error, sensitiveValues = emptySet())))
+            },
+        )
 }
 
 internal fun resolvePlugins(command: RunCommand, settings: PluginResolverSettings): PluginResolutionResult {
@@ -28,10 +30,10 @@ internal fun resolvePlugins(command: RunCommand, settings: PluginResolverSetting
         return resolveWithDiagnostics(command, settings, diagnostics, sensitiveValues = emptySet())
     }
 
-    val sensitiveValues =
-        runCatching {
-            settings.repositoryCredentialsResolver.sensitiveValuesWithDiagnostics()
-        }.getOrElse { error ->
+    val sensitiveValues = runCatching {
+        settings.repositoryCredentialsResolver.sensitiveValuesWithDiagnostics()
+    }
+        .getOrElse { error ->
             return PluginResolutionResult.Failure(listOf(diagnostics.format(error, sensitiveValues = emptySet())))
         }
 
@@ -47,9 +49,8 @@ private fun resolveWithDiagnostics(
     sensitiveValues: Set<String>,
 ): PluginResolutionResult = runCatching {
     PluginResolutionService(settings = settings).resolve(command)
-}.fold(
-    onSuccess = { success -> success },
-    onFailure = { error ->
-        PluginResolutionResult.Failure(listOf(diagnostics.format(error, sensitiveValues)))
-    },
-)
+}
+    .fold(
+        onSuccess = { success -> success },
+        onFailure = { error -> PluginResolutionResult.Failure(listOf(diagnostics.format(error, sensitiveValues))) },
+    )

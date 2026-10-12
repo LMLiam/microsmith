@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
 
 import com.github.eventhorizonlab.spi.ServiceProvider
-import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 
 @ServiceProvider(ArtifactAssembler::class)
 class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact> {
@@ -45,9 +45,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
         }
 
         val mergedItems = linkedMapOf<MsBuildItemIdentity, MsBuildItem>()
-        current.items.forEach { item ->
-            mergedItems[MsBuildItemIdentity(item.itemName, item.include)] = item
-        }
+        current.items.forEach { item -> mergedItems[MsBuildItemIdentity(item.itemName, item.include)] = item }
         next.items.forEach { item ->
             val key = MsBuildItemIdentity(item.itemName, item.include)
             val existing = mergedItems[key]
@@ -69,7 +67,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<MsBuildProjectArtifact>,
+        contribution: ArtifactContribution<MsBuildProjectArtifact>
     ): MsBuildProjectContribution {
         require(contribution is MsBuildProjectContribution) {
             "Unsupported MSBuild project contribution type: ${contribution::class}"

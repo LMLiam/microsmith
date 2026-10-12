@@ -10,11 +10,12 @@ internal class MicrosmithMavenTestProject private constructor(private val rootDi
         Files.writeString(file, "$contents\n")
     }
 
-    fun createMojo(): MicrosmithGenerateMojo = MicrosmithGenerateMojo().apply {
-        projectBaseDirectory = rootDirectory.toFile()
-        outputDirectory = file(".").toFile()
-        cacheDirectory = file("target/tmp/microsmith/cache").toFile()
-    }
+    fun createMojo(): MicrosmithGenerateMojo =
+        MicrosmithGenerateMojo().apply {
+            projectBaseDirectory = rootDirectory.toFile()
+            outputDirectory = file(".").toFile()
+            cacheDirectory = file("target/tmp/microsmith/cache").toFile()
+        }
 
     fun file(relativePath: String): Path = rootDirectory.resolve(relativePath)
 

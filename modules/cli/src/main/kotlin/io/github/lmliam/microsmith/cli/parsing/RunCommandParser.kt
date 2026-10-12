@@ -14,19 +14,21 @@ internal fun parseRunCommand(args: List<String>): CliCommand {
     }
 }
 
-private fun parseScriptArg(scriptArg: String?): Pair<Path?, String?> = when {
-    scriptArg == null || scriptArg.startsWith("--") ->
-        null to "Missing <script.microsmith.kts> argument for run command."
+private fun parseScriptArg(scriptArg: String?): Pair<Path?, String?> =
+    when {
+        scriptArg == null || scriptArg.startsWith("--") ->
+            null to "Missing <script.microsmith.kts> argument for run command."
 
-    !scriptArg.endsWith(SCRIPT_EXTENSION) ->
-        null to "Script file must use the .microsmith.kts extension."
+        !scriptArg.endsWith(SCRIPT_EXTENSION) -> null to "Script file must use the .microsmith.kts extension."
 
-    else -> Path.of(scriptArg) to null
-}
+        else -> Path.of(scriptArg) to null
+    }
 
 private fun parseRunOptionsCommand(script: Path, args: List<String>, startIndex: Int): CliCommand {
     val parsedOptions = parseRunOptions(args, startIndex)
-    parsedOptions.error?.let { return ErrorCommand(it) }
+    parsedOptions.error?.let {
+        return ErrorCommand(it)
+    }
     return RunCommand(
         script = script,
         outputDir = parsedOptions.outputDir,

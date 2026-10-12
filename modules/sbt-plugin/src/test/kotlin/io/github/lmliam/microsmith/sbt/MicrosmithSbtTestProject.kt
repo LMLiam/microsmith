@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.sbt
 
+import io.github.lmliam.microsmith.sbt.execution.MicrosmithSbtExecutionConfiguration
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -18,14 +19,15 @@ class MicrosmithSbtTestProject private constructor(private val rootDirectory: Pa
         cacheDirectory: Path = file("target/tmp/microsmith/cache"),
         variables: Map<String, String> = emptyMap(),
         flags: Set<String> = emptySet(),
-    ): MicrosmithSbtExecutionConfiguration = MicrosmithSbtExecutionConfiguration(
-        baseDirectory = rootDirectory,
-        scriptFile = scriptFile,
-        outputDirectory = outputDirectory,
-        cacheDirectory = cacheDirectory,
-        variables = variables,
-        flags = flags,
-    )
+    ): MicrosmithSbtExecutionConfiguration =
+        MicrosmithSbtExecutionConfiguration(
+            baseDirectory = rootDirectory,
+            scriptFile = scriptFile,
+            outputDirectory = outputDirectory,
+            cacheDirectory = cacheDirectory,
+            variables = variables,
+            flags = flags,
+        )
 
     companion object {
         fun create(prefix: String): MicrosmithSbtTestProject =

@@ -1,9 +1,9 @@
 package io.github.lmliam.microsmith.gradle
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.GradleRunner
 import java.nio.file.Files
 import java.nio.file.Path
+import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.GradleRunner
 
 internal class MicrosmithGradleFunctionalTestProject private constructor(private val rootDirectory: Path) {
     fun writeFile(relativePath: String, contents: String) {
@@ -21,10 +21,11 @@ internal class MicrosmithGradleFunctionalTestProject private constructor(private
 
     fun file(relativePath: String): Path = rootDirectory.resolve(relativePath)
 
-    private fun gradleRunner(vararg arguments: String): GradleRunner = GradleRunner.create()
-        .withProjectDir(rootDirectory.toFile())
-        .withPluginClasspath()
-        .withArguments(*arguments, "--stacktrace")
+    private fun gradleRunner(vararg arguments: String): GradleRunner =
+        GradleRunner.create()
+            .withProjectDir(rootDirectory.toFile())
+            .withPluginClasspath()
+            .withArguments(*arguments, "--stacktrace")
 
     companion object {
         fun create(name: String, buildScript: String): MicrosmithGradleFunctionalTestProject {
@@ -34,9 +35,10 @@ internal class MicrosmithGradleFunctionalTestProject private constructor(private
             project.writeFile(
                 "build.gradle.kts",
                 listOf(
-                    buildScript,
-                    MicrosmithGradleFunctionalTestRuntimeClasspath.buildScriptDependencyBlock(),
-                ).joinToString(separator = "\n\n"),
+                        buildScript,
+                        MicrosmithGradleFunctionalTestRuntimeClasspath.buildScriptDependencyBlock(),
+                    )
+                    .joinToString(separator = "\n\n"),
             )
             return project
         }

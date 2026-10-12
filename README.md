@@ -349,7 +349,7 @@ This keeps the layering explicit:
   - one-top-level-production-type-per-file remains the default
   - orchestration and side effects are separated from pure logic
   - Kotlin features improve clarity rather than novelty
-  - `verifyRepositoryStandards`, `detekt`, `ktlintCheck`, and relevant tests remain green
+  - `verifyRepositoryStandards`, `detekt`, `ktfmtCheck`, and relevant tests remain green
 
 ## Build, test, and quality gates
 
@@ -365,10 +365,10 @@ Run tests:
 ./gradlew kotest
 ```
 
-Run static analysis:
+Run static analysis and check Kotlin formatting:
 
 ```bash
-./gradlew detekt ktlintCheck
+./gradlew detekt ktfmtCheck
 ```
 
 Run repository structural guardrails directly:
@@ -377,17 +377,17 @@ Run repository structural guardrails directly:
 ./gradlew verifyRepositoryStandards
 ```
 
-Auto-format Kotlin sources:
+Format Kotlin sources:
 
 ```bash
-./gradlew ktlintFormat
+./gradlew ktfmtFormat
 ```
 
 Useful notes:
 
 - the Gradle build is configured for Java 24
 - `./gradlew build` includes the root `check` lifecycle and therefore runs `verifyRepositoryStandards`
-- if `ktlintCheck` fails, run `./gradlew ktlintFormat` and rerun checks
+- if `ktfmtCheck` fails, run `./gradlew ktfmtFormat` and rerun checks
 - if `detekt` fails, inspect the generated report under `build/reports/detekt/`
 - if `verifyRepositoryStandards` fails:
   - split extra production types into their own files or make tightly coupled helpers private

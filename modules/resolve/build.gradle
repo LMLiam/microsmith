@@ -1,4 +1,5 @@
 dependencies {
     implementation project(":dsl")
+    api libs.arrow.core
     api libs.spi.tooling.annotations
 }

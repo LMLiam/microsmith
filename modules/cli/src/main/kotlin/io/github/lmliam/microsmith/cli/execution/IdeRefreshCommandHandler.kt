@@ -10,10 +10,10 @@ internal class IdeRefreshCommandHandler(
 ) {
     fun execute(command: IdeRefreshCommand): Int {
         val emitter = emitterFactory.create(command.diagnosticsFormat, command.verbose)
-        val result =
-            runCatching {
-                ideRefreshRunner(command)
-            }.getOrElse { error ->
+        val result = runCatching {
+            ideRefreshRunner(command)
+        }
+            .getOrElse { error ->
                 emitter.error(
                     CliFailureCode.IDE_HELPER_FAILED,
                     error.message ?: "JetBrains IDE helper generation failed.",
@@ -27,12 +27,12 @@ internal class IdeRefreshCommandHandler(
         emitter.info(
             "JetBrains IDE helper is $state at '$helperRoot'.",
             details =
-            mapOf(
-                "projectRoot" to result.projectRoot.toAbsolutePath().normalize().toString(),
-                "helperRoot" to helperRoot.toString(),
-                "updatedFiles" to refreshed.toString(),
-                "classpathEntries" to result.classpathEntries.size.toString(),
-            ),
+                mapOf(
+                    "projectRoot" to result.projectRoot.toAbsolutePath().normalize().toString(),
+                    "helperRoot" to helperRoot.toString(),
+                    "updatedFiles" to refreshed.toString(),
+                    "classpathEntries" to result.classpathEntries.size.toString(),
+                ),
         )
         emitter.info("Import '${helperRoot.resolve("build.gradle.kts")}' as a Gradle project in JetBrains IDEs.")
         return 0

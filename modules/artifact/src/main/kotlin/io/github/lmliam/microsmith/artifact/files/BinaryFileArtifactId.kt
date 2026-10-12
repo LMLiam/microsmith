@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.artifact.files
 
-import io.github.lmliam.microsmith.artifact.core.ArtifactId
+import io.github.lmliam.microsmith.artifact.ArtifactId
 import java.nio.file.Path
 
 private val defaultBinaryFileOutputRoot = Path.of(".")

@@ -2,17 +2,17 @@ package io.github.lmliam.microsmith.cli
 
 import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
-import io.github.lmliam.microsmith.cli.init.GenericOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.GoOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.InitBootstrapResult
 import io.github.lmliam.microsmith.cli.init.InitConflictException
 import io.github.lmliam.microsmith.cli.init.InitValidationException
-import io.github.lmliam.microsmith.cli.init.NodeOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.OnboardingProfileDetection
-import io.github.lmliam.microsmith.cli.init.OnboardingProfileSelectionReason
-import io.github.lmliam.microsmith.cli.init.PythonOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.RubyOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.RustOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.GenericOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.GoOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.NodeOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileDetection
+import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileSelectionReason
+import io.github.lmliam.microsmith.cli.init.profile.PythonOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.RubyOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.RustOnboardingProfile
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -38,25 +38,25 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingProfileDetection(
-                                    profile = GoOnboardingProfile,
-                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                                    matchedMarkers = listOf("go.mod"),
-                                ),
+                                    OnboardingProfileDetection(
+                                        profile = GoOnboardingProfile,
+                                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                                        matchedMarkers = listOf("go.mod"),
+                                    ),
                                 createdFiles =
-                                listOf(
-                                    tempDir.resolve("build.microsmith.kts"),
-                                    tempDir.resolve("settings.microsmith.kts"),
-                                ),
+                                    listOf(
+                                        tempDir.resolve("build.microsmith.kts"),
+                                        tempDir.resolve("settings.microsmith.kts"),
+                                    ),
                                 overwrittenFiles = emptyList(),
                                 preservedFiles = emptyList(),
                                 ideHelperResult =
-                                IdeHelperRefreshResult(
-                                    projectRoot = tempDir,
-                                    helperRoot = helperRoot,
-                                    updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
-                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
-                                ),
+                                    IdeHelperRefreshResult(
+                                        projectRoot = tempDir,
+                                        helperRoot = helperRoot,
+                                        updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
+                                        classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                    ),
                             )
                         },
                     )
@@ -83,9 +83,7 @@ class MicrosmithCliInitTests :
                 MicrosmithCli(
                     stdout = out::add,
                     stderr = err::add,
-                    initRunner = {
-                        throw InitConflictException("Bootstrap path is not a regular file.")
-                    },
+                    initRunner = { throw InitConflictException("Bootstrap path is not a regular file.") },
                 )
 
             val exitCode = cli.run(arrayOf("init"))
@@ -103,9 +101,7 @@ class MicrosmithCliInitTests :
                 MicrosmithCli(
                     stdout = out::add,
                     stderr = err::add,
-                    initRunner = {
-                        throw InitValidationException("Repository root does not exist.")
-                    },
+                    initRunner = { throw InitValidationException("Repository root does not exist.") },
                 )
 
             val exitCode = cli.run(arrayOf("init", "--repo-root", "/path/does/not/exist"))
@@ -123,9 +119,7 @@ class MicrosmithCliInitTests :
                 MicrosmithCli(
                     stdout = out::add,
                     stderr = err::add,
-                    initRunner = {
-                        throw IllegalArgumentException("IDE helper refresh failed.")
-                    },
+                    initRunner = { throw IllegalArgumentException("IDE helper refresh failed.") },
                 )
 
             val exitCode = cli.run(arrayOf("init"))
@@ -143,9 +137,7 @@ class MicrosmithCliInitTests :
                 MicrosmithCli(
                     stdout = out::add,
                     stderr = err::add,
-                    initRunner = {
-                        throw IllegalStateException("Unexpected init failure.")
-                    },
+                    initRunner = { throw IllegalStateException("Unexpected init failure.") },
                 )
 
             val exitCode = cli.run(arrayOf("init"))
@@ -170,21 +162,21 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingProfileDetection(
-                                    profile = NodeOnboardingProfile,
-                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                                    matchedMarkers = listOf("package.json"),
-                                ),
+                                    OnboardingProfileDetection(
+                                        profile = NodeOnboardingProfile,
+                                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                                        matchedMarkers = listOf("package.json"),
+                                    ),
                                 createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
                                 overwrittenFiles = emptyList(),
                                 preservedFiles = listOf(tempDir.resolve("settings.microsmith.kts")),
                                 ideHelperResult =
-                                IdeHelperRefreshResult(
-                                    projectRoot = tempDir,
-                                    helperRoot = helperRoot,
-                                    updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
-                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
-                                ),
+                                    IdeHelperRefreshResult(
+                                        projectRoot = tempDir,
+                                        helperRoot = helperRoot,
+                                        updatedFiles = listOf(helperRoot.resolve("build.gradle.kts")),
+                                        classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                    ),
                             )
                         },
                     )
@@ -198,7 +190,7 @@ class MicrosmithCliInitTests :
                             "--diagnostics",
                             "json",
                             "--verbose",
-                        ),
+                        )
                     )
 
                 exitCode shouldBe 0
@@ -228,11 +220,11 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingProfileDetection(
-                                    profile = GenericOnboardingProfile,
-                                    selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
-                                    matchedMarkers = emptyList(),
-                                ),
+                                    OnboardingProfileDetection(
+                                        profile = GenericOnboardingProfile,
+                                        selectionReason = OnboardingProfileSelectionReason.NO_MARKERS_MATCHED,
+                                        matchedMarkers = emptyList(),
+                                    ),
                                 createdFiles = emptyList(),
                                 overwrittenFiles = emptyList(),
                                 preservedFiles = listOf(tempDir.resolve("build.microsmith.kts")),
@@ -248,7 +240,7 @@ class MicrosmithCliInitTests :
                             "--skip-ide-helper",
                             "--repo-root",
                             tempDir.toString(),
-                        ),
+                        )
                     )
 
                 exitCode shouldBe 0
@@ -275,21 +267,21 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingProfileDetection(
-                                    profile = PythonOnboardingProfile,
-                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                                    matchedMarkers = listOf("pyproject.toml"),
-                                ),
+                                    OnboardingProfileDetection(
+                                        profile = PythonOnboardingProfile,
+                                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                                        matchedMarkers = listOf("pyproject.toml"),
+                                    ),
                                 createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
                                 overwrittenFiles = emptyList(),
                                 preservedFiles = emptyList(),
                                 ideHelperResult =
-                                IdeHelperRefreshResult(
-                                    projectRoot = tempDir,
-                                    helperRoot = helperRoot,
-                                    updatedFiles = emptyList(),
-                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
-                                ),
+                                    IdeHelperRefreshResult(
+                                        projectRoot = tempDir,
+                                        helperRoot = helperRoot,
+                                        updatedFiles = emptyList(),
+                                        classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                    ),
                             )
                         },
                     )
@@ -320,21 +312,21 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingProfileDetection(
-                                    profile = RubyOnboardingProfile,
-                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                                    matchedMarkers = listOf("Gemfile"),
-                                ),
+                                    OnboardingProfileDetection(
+                                        profile = RubyOnboardingProfile,
+                                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                                        matchedMarkers = listOf("Gemfile"),
+                                    ),
                                 createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
                                 overwrittenFiles = emptyList(),
                                 preservedFiles = emptyList(),
                                 ideHelperResult =
-                                IdeHelperRefreshResult(
-                                    projectRoot = tempDir,
-                                    helperRoot = helperRoot,
-                                    updatedFiles = emptyList(),
-                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
-                                ),
+                                    IdeHelperRefreshResult(
+                                        projectRoot = tempDir,
+                                        helperRoot = helperRoot,
+                                        updatedFiles = emptyList(),
+                                        classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                    ),
                             )
                         },
                     )
@@ -365,21 +357,21 @@ class MicrosmithCliInitTests :
                             InitBootstrapResult(
                                 projectRoot = command.projectRoot.toAbsolutePath().normalize(),
                                 repositoryDetection =
-                                OnboardingProfileDetection(
-                                    profile = RustOnboardingProfile,
-                                    selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-                                    matchedMarkers = listOf("Cargo.toml"),
-                                ),
+                                    OnboardingProfileDetection(
+                                        profile = RustOnboardingProfile,
+                                        selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                                        matchedMarkers = listOf("Cargo.toml"),
+                                    ),
                                 createdFiles = listOf(tempDir.resolve("build.microsmith.kts")),
                                 overwrittenFiles = emptyList(),
                                 preservedFiles = emptyList(),
                                 ideHelperResult =
-                                IdeHelperRefreshResult(
-                                    projectRoot = tempDir,
-                                    helperRoot = helperRoot,
-                                    updatedFiles = emptyList(),
-                                    classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
-                                ),
+                                    IdeHelperRefreshResult(
+                                        projectRoot = tempDir,
+                                        helperRoot = helperRoot,
+                                        updatedFiles = emptyList(),
+                                        classpathEntries = listOf(tempDir.resolve("microsmith-cli-all.jar")),
+                                    ),
                             )
                         },
                     )

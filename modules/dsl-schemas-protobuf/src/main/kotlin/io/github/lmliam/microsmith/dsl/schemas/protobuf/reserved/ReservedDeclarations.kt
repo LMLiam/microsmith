@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.NameRegistry
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation.IndexAllocator
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names.NameRegistry
 
 internal fun buildReservedDeclarations(allocator: IndexAllocator, nameRegistry: NameRegistry): List<Reserved> =
     buildList {

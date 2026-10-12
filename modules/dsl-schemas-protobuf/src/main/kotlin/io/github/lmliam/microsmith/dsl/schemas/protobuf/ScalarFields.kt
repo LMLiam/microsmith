@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Field
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.FieldScope
 
 interface ScalarFields<TFieldScope : FieldScope, TField : Field> {
     fun int32(name: String, block: TFieldScope.() -> Unit = {}): TField

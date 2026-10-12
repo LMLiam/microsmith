@@ -155,57 +155,59 @@ class IdeHelperGeneratorTests :
             }
         }
 
-        "fails when managed helper root exists as a symlink".config(enabled = !runningOnWindows()) {
-            val repoRoot = createTempDirectory("microsmith-ide-helper-root-symlink")
-            val externalRoot = createTempDirectory("microsmith-ide-helper-root-symlink-target")
-            val runtimeJar = repoRoot.resolve("runtime/microsmith-cli-all.jar")
-            runtimeJar.parent.createDirectories()
-            runtimeJar.writeText("jar-binary-placeholder")
-            Files.createSymbolicLink(repoRoot.resolve(".microsmith"), externalRoot)
+        "fails when managed helper root exists as a symlink"
+            .config(enabled = !runningOnWindows()) {
+                val repoRoot = createTempDirectory("microsmith-ide-helper-root-symlink")
+                val externalRoot = createTempDirectory("microsmith-ide-helper-root-symlink-target")
+                val runtimeJar = repoRoot.resolve("runtime/microsmith-cli-all.jar")
+                runtimeJar.parent.createDirectories()
+                runtimeJar.writeText("jar-binary-placeholder")
+                Files.createSymbolicLink(repoRoot.resolve(".microsmith"), externalRoot)
 
-            try {
-                val error =
-                    shouldThrow<IdeHelperConflictException> {
-                        refreshIdeHelperProject(
-                            command = IdeRefreshCommand(projectRoot = repoRoot),
-                            classpathResolver = { listOf(runtimeJar) },
-                        )
-                    }
+                try {
+                    val error =
+                        shouldThrow<IdeHelperConflictException> {
+                            refreshIdeHelperProject(
+                                command = IdeRefreshCommand(projectRoot = repoRoot),
+                                classpathResolver = { listOf(runtimeJar) },
+                            )
+                        }
 
-                error.message.shouldContain("exists but is not a directory")
-            } finally {
-                runCatching { repoRoot.deleteRecursively() }
-                runCatching { externalRoot.deleteRecursively() }
+                    error.message.shouldContain("exists but is not a directory")
+                } finally {
+                    runCatching { repoRoot.deleteRecursively() }
+                    runCatching { externalRoot.deleteRecursively() }
+                }
             }
-        }
 
-        "fails when managed helper file exists as a symlink".config(enabled = !runningOnWindows()) {
-            val repoRoot = createTempDirectory("microsmith-ide-helper-file-symlink")
-            val externalRoot = createTempDirectory("microsmith-ide-helper-file-symlink-target")
-            val runtimeJar = repoRoot.resolve("runtime/microsmith-cli-all.jar")
-            val helperRoot = repoRoot.resolve(".microsmith/ide")
-            val targetFile = externalRoot.resolve("external-build.gradle.kts")
-            runtimeJar.parent.createDirectories()
-            helperRoot.createDirectories()
-            runtimeJar.writeText("jar-binary-placeholder")
-            targetFile.writeText("// external build file")
-            Files.createSymbolicLink(helperRoot.resolve("build.gradle.kts"), targetFile)
+        "fails when managed helper file exists as a symlink"
+            .config(enabled = !runningOnWindows()) {
+                val repoRoot = createTempDirectory("microsmith-ide-helper-file-symlink")
+                val externalRoot = createTempDirectory("microsmith-ide-helper-file-symlink-target")
+                val runtimeJar = repoRoot.resolve("runtime/microsmith-cli-all.jar")
+                val helperRoot = repoRoot.resolve(".microsmith/ide")
+                val targetFile = externalRoot.resolve("external-build.gradle.kts")
+                runtimeJar.parent.createDirectories()
+                helperRoot.createDirectories()
+                runtimeJar.writeText("jar-binary-placeholder")
+                targetFile.writeText("// external build file")
+                Files.createSymbolicLink(helperRoot.resolve("build.gradle.kts"), targetFile)
 
-            try {
-                val error =
-                    shouldThrow<IdeHelperConflictException> {
-                        refreshIdeHelperProject(
-                            command = IdeRefreshCommand(projectRoot = repoRoot),
-                            classpathResolver = { listOf(runtimeJar) },
-                        )
-                    }
+                try {
+                    val error =
+                        shouldThrow<IdeHelperConflictException> {
+                            refreshIdeHelperProject(
+                                command = IdeRefreshCommand(projectRoot = repoRoot),
+                                classpathResolver = { listOf(runtimeJar) },
+                            )
+                        }
 
-                error.message.shouldContain("exists but is not a regular file")
-            } finally {
-                runCatching { repoRoot.deleteRecursively() }
-                runCatching { externalRoot.deleteRecursively() }
+                    error.message.shouldContain("exists but is not a regular file")
+                } finally {
+                    runCatching { repoRoot.deleteRecursively() }
+                    runCatching { externalRoot.deleteRecursively() }
+                }
             }
-        }
     })
 
 private fun runningOnWindows(): Boolean = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)

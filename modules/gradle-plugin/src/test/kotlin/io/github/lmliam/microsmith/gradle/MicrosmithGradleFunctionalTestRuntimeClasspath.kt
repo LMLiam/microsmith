@@ -1,28 +1,29 @@
 package io.github.lmliam.microsmith.gradle
 
+import io.github.lmliam.microsmith.gradle.configuration.MicrosmithGradleConfigurations
+import io.github.lmliam.microsmith.gradle.worker.FilePathSeparator
 import java.nio.file.Path
 
 internal object MicrosmithGradleFunctionalTestRuntimeClasspath {
     fun buildScriptDependencyBlock(): String {
         val files =
-            entries().joinToString(separator = ",\n        ") { path ->
-                "\"${path.toString().replace("\\", "\\\\")}\""
-            }
+            entries().joinToString(separator = ",\n        ") { path -> "\"${path.toString().replace("\\", "\\\\")}\"" }
         return """
             dependencies {
                 add("${MicrosmithGradleConfigurations.RUNTIME}", files(
                     $files
                 ))
             }
-        """.trimIndent()
+        """
+            .trimIndent()
     }
 
     private fun entries(): List<Path> {
         val classpath =
-            System.getProperty("java.class.path")
-                ?.takeIf(String::isNotBlank)
+            System.getProperty("java.class.path")?.takeIf(String::isNotBlank)
                 ?: error("Expected a non-empty java.class.path for Gradle functional tests.")
-        return classpath.split(FilePathSeparator.value)
+        return classpath
+            .split(FilePathSeparator.value)
             .asSequence()
             .filter(String::isNotBlank)
             .map(Path::of)

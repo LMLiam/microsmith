@@ -1,6 +1,7 @@
 apply plugin: 'org.jetbrains.kotlin.kapt'
 
 dependencies {
+    implementation libs.arrow.core
     implementation project(":dsl")
     implementation project(":dsl-schemas")
     implementation project(":dsl-schemas-protobuf")
