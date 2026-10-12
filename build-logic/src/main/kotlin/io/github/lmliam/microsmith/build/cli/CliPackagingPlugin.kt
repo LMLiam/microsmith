@@ -284,20 +284,20 @@ class CliPackagingPlugin : Plugin<Project> {
         val cliDistZipTask =
             project.tasks.register(CliTaskNames.CLI_DIST_ZIP, Zip::class.java) { task ->
                 task.dependsOn(prepareDistTask)
+                task.inputs.property("unixLauncherPermissions", CLI_EXECUTABLE_FILE_MODE)
                 task.archiveBaseName.set(CliPackagingBuildNames.SHADOW_JAR_BASE_NAME)
                 task.archiveVersion.set(cliVersion)
                 task.archiveClassifier.set("dist")
                 task.destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
                 task.from(
                     distDirectory,
-                    Action { copySpec ->
-                        copySpec.into(distRootName)
-                    },
+                    distributionCopySpec(distRootName),
                 )
             }
         val cliDistTarTask =
             project.tasks.register(CliTaskNames.CLI_DIST_TAR, Tar::class.java) { task ->
                 task.dependsOn(prepareDistTask)
+                task.inputs.property("unixLauncherPermissions", CLI_EXECUTABLE_FILE_MODE)
                 task.compression = Compression.GZIP
                 task.archiveBaseName.set(CliPackagingBuildNames.SHADOW_JAR_BASE_NAME)
                 task.archiveVersion.set(cliVersion)
@@ -306,9 +306,7 @@ class CliPackagingPlugin : Plugin<Project> {
                 task.destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
                 task.from(
                     distDirectory,
-                    Action { copySpec ->
-                        copySpec.into(distRootName)
-                    },
+                    distributionCopySpec(distRootName),
                 )
             }
 
@@ -393,6 +391,11 @@ class CliPackagingPlugin : Plugin<Project> {
                             )
                         }
                     }
+                    verifyCliArchiveLauncherPermissions(
+                        zipArchive = cliDistZipArchive.get().asFile,
+                        tarArchive = cliDistTarArchive.get().asFile,
+                        launcherEntry = "$distRootName/bin/microsmith",
+                    )
                 }
             }
 
@@ -471,11 +474,7 @@ private fun launcherCopySpec(shadowJarArchiveName: String): Action<CopySpec> = A
         mapOf("tokens" to mapOf("CLI_JAR" to shadowJarArchiveName)),
         ReplaceTokens::class.java,
     )
-    copySpec.filePermissions(
-        Action { permissions ->
-            permissions.unix("rwxr-xr-x")
-        },
-    )
+    copySpec.filePermissions(executableFilePermissions())
 }
 
 private fun windowsLauncherCopySpec(shadowJarArchiveName: String): Action<CopySpec> = Action { copySpec ->
@@ -488,11 +487,19 @@ private fun windowsLauncherCopySpec(shadowJarArchiveName: String): Action<CopySp
 
 private fun executableFileCopySpec(): Action<CopySpec> = Action { copySpec ->
     copySpec.into(".")
-    copySpec.filePermissions(
-        Action { permissions ->
-            permissions.unix("rwxr-xr-x")
-        },
-    )
+    copySpec.filePermissions(executableFilePermissions())
+}
+
+private fun distributionCopySpec(distRootName: String): Action<CopySpec> = Action { copySpec ->
+    copySpec.into(distRootName)
+    // Gradle archives use mode 0644 by default. Override the Unix launcher permission in each archive.
+    copySpec.filesMatching("**/bin/microsmith") { launcher ->
+        launcher.permissions(executableFilePermissions())
+    }
+}
+
+private fun executableFilePermissions(): Action<ConfigurableFilePermissions> = Action { permissions ->
+    permissions.unix(CLI_EXECUTABLE_FILE_MODE)
 }
 
 private fun ByteArray.encodeHex(): String = joinToString(separator = "") { byte -> "%02x".format(byte) }
