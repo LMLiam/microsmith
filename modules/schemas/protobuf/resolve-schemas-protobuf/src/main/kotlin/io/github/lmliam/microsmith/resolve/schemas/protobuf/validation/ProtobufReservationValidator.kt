@@ -8,59 +8,27 @@ internal fun validateMessageReservations(
     reservations: List<Reserved>,
     usedNames: List<String>,
     usedNumbers: List<Int>,
-): List<ProtobufResolutionIssue> = buildList {
-    addAll(
-        validateReservationNames(
-            schemaName,
-            reservations,
-            usedNames,
-        )
-    )
-
-    val spans = reservations.mapNotNull { reservation ->
-        validateMessageReservationSpan(
-            schemaName,
-            reservation,
-            this,
-        )
-    }
-
-    addAll(
-        validateReservationNumbers(
-            schemaName,
-            spans,
-            usedNumbers,
-        )
-    )
-}
+): List<ProtobufResolutionIssue> =
+    validateReservations(schemaName, reservations, usedNames, usedNumbers, ::validateMessageReservationSpan)
 
 internal fun validateEnumReservations(
     schemaName: String,
     reservations: List<Reserved>,
     usedNames: List<String>,
     usedNumbers: List<Int>,
+): List<ProtobufResolutionIssue> =
+    validateReservations(schemaName, reservations, usedNames, usedNumbers, ::validateEnumReservationSpan)
+
+private fun validateReservations(
+    schemaName: String,
+    reservations: List<Reserved>,
+    usedNames: List<String>,
+    usedNumbers: List<Int>,
+    validateSpan: (String, Reserved, MutableList<ProtobufResolutionIssue>) -> IntRange?,
 ): List<ProtobufResolutionIssue> = buildList {
-    addAll(
-        validateReservationNames(
-            schemaName,
-            reservations,
-            usedNames,
-        )
-    )
+    addAll(validateReservationNames(schemaName, reservations, usedNames))
 
-    val spans = reservations.mapNotNull { reservation ->
-        validateEnumReservationSpan(
-            schemaName,
-            reservation,
-            this,
-        )
-    }
+    val spans = reservations.mapNotNull { reservation -> validateSpan(schemaName, reservation, this) }
 
-    addAll(
-        validateReservationNumbers(
-            schemaName,
-            spans,
-            usedNumbers,
-        )
-    )
+    addAll(validateReservationNumbers(schemaName, spans, usedNumbers))
 }
