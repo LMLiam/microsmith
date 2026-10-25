@@ -110,6 +110,47 @@ class DotnetAspServiceArtifactCompilerTests :
             requestModels.shouldContain("public nuint MaxValue { get; set; } = (nuint)4294967296UL;")
         }
 
+        "compile rejects an integer default that is out of range for its type" {
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    DotnetAspServiceArtifactCompiler()
+                        .compile(integerDefaultArtifact(DotnetFieldType.Int, 99_999_999_999L))
+                }
+
+            error.message.shouldContain("ASP.NET request default '99999999999'")
+            error.message.shouldContain("out of range for integer type 'int'")
+        }
+
+        "compile rejects a fractional default for an integer field" {
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    DotnetAspServiceArtifactCompiler().compile(integerDefaultArtifact(DotnetFieldType.Int, 1.5))
+                }
+
+            error.message.shouldContain("ASP.NET request default '1.5'")
+            error.message.shouldContain("not representable as integer type 'int'")
+        }
+
+        "compile rejects a negative default for an unsigned integer field" {
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    DotnetAspServiceArtifactCompiler().compile(integerDefaultArtifact(DotnetFieldType.UnsignedInt, -1))
+                }
+
+            error.message.shouldContain("out of range for integer type 'uint'")
+        }
+
+        "compile renders a long default with a 64-bit-safe literal" {
+            val requestModels =
+                DotnetAspServiceArtifactCompiler()
+                    .compile(integerDefaultArtifact(DotnetFieldType.Long, 99_999_999_999L))
+                    .filterIsInstance<TextFileArtifactContribution>()
+                    .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
+                    .contents
+
+            requestModels.shouldContain("public long MaxValue { get; set; } = 99999999999L;")
+        }
+
         "compile emits sorted usings before the contract namespace when request bindings use system types" {
             val requestModels =
                 DotnetAspServiceArtifactCompiler()
@@ -285,6 +326,50 @@ private fun unsignedNativeIntDefaultArtifact(): DotnetAspServiceArtifact =
                                                 type = DotnetFieldType.UnsignedNativeInt,
                                                 optional = false,
                                                 defaultValue = 4294967296L,
+                                            )
+                                        ),
+                                )
+                        ),
+                    responses =
+                        listOf(
+                            DotnetAspResponseArtifact(
+                                statusCode = 200,
+                                model = inlineModel("EmptyReport") {},
+                                headers = emptyList(),
+                            )
+                        ),
+                )
+            ),
+    )
+
+private fun integerDefaultArtifact(type: DotnetFieldType, value: Number): DotnetAspServiceArtifact =
+    DotnetAspServiceArtifact(
+        id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "ReportService.Api"),
+        serviceName = "ReportService",
+        targetFrameworkMoniker = "net8.0",
+        outputRoot = Path.of("dotnet", "Platform", "ReportService.Api"),
+        httpPort = 5002,
+        httpsPort = 5003,
+        contractModels = emptyList(),
+        endpoints =
+            listOf(
+                DotnetAspEndpointArtifact(
+                    method = "GET",
+                    route = "/reports",
+                    operationName = "GetReport",
+                    bindings =
+                        DotnetAspEndpointBindingsArtifact(
+                            query =
+                                DotnetAspRequestBindingArtifact(
+                                    typeName = "GetReportQuery",
+                                    name = "GetReportQuery",
+                                    fields =
+                                        listOf(
+                                            DotnetAspRequestFieldArtifact(
+                                                name = "maxValue",
+                                                type = type,
+                                                optional = false,
+                                                defaultValue = value,
                                             )
                                         ),
                                 )
