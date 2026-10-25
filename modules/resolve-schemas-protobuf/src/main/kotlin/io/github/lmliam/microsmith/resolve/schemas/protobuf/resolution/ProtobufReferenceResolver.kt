@@ -20,7 +20,7 @@ internal class ProtobufReferenceResolver(private val symbols: ProtobufSymbolTabl
                         schema.fullyQualifiedName,
                         location,
                         target.fullyQualifiedName,
-                    )
+                    ),
                 )
 
         return Either.Right(ResolvedProtobufReference(symbol.identity, symbol.kind))

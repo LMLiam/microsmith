@@ -18,7 +18,7 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
             "io.github.lmliam.microsmith.dsl.services.dotnet.core.service.aspNet",
             "io.github.lmliam.microsmith.dsl.services.dotnet.core.service.packages",
             "io.github.lmliam.microsmith.dsl.services.dotnet.core.solution.packages",
-            "io.github.lmliam.microsmith.dsl.schemas.core.schemas",
+            "io.github.lmliam.microsmith.dsl.schemas.schemas",
             "io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf",
             "io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service",
         )

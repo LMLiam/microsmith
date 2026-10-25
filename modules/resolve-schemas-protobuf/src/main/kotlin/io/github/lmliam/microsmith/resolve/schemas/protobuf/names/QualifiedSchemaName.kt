@@ -6,20 +6,19 @@ import kotlin.io.path.Path
 /** Parsed protobuf schema name with separated package/type segments. */
 data class QualifiedSchemaName(val fullyQualifiedName: String, val packageName: String?, val typeName: String) {
     /** Resolves a reference from this schema's package. Qualified and symbolic names remain absolute. */
-    fun resolveReference(reference: Reference): QualifiedSchemaName =
-        when (reference) {
-            is Reference.Local -> parse(packageName?.let { "$it.${reference.target}" } ?: reference.target)
-            is Reference.Relative -> {
-                val upCount = reference.expression.takeWhile { it == '.' }.length
-                val remaining = reference.expression.drop(upCount)
-                val currentPackage = packageName?.split('.').orEmpty()
-                val target = currentPackage.dropLast(upCount.coerceAtMost(currentPackage.size)) + remaining.split('.')
+    fun resolveReference(reference: Reference): QualifiedSchemaName = when (reference) {
+        is Reference.Local -> parse(packageName?.let { "$it.${reference.target}" } ?: reference.target)
+        is Reference.Relative -> {
+            val upCount = reference.expression.takeWhile { it == '.' }.length
+            val remaining = reference.expression.drop(upCount)
+            val currentPackage = packageName?.split('.').orEmpty()
+            val target = currentPackage.dropLast(upCount.coerceAtMost(currentPackage.size)) + remaining.split('.')
 
-                parse(target.joinToString("."))
-            }
-            is Reference.Qualified -> parse(reference.qualifiedName)
-            is Reference.Symbolic -> parse(reference.target.qualifiedName)
+            parse(target.joinToString("."))
         }
+        is Reference.Qualified -> parse(reference.qualifiedName)
+        is Reference.Symbolic -> parse(reference.target.qualifiedName)
+    }
 
     fun relativePath(): java.nio.file.Path = buildRelativePath(prefix = Path("proto"))
 

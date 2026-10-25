@@ -123,7 +123,7 @@ class ProtobufRpcSchemasResolverTests :
                         rpcName = "GetUser",
                         position = EndpointPosition.RESPONSE,
                         targetName = "Status",
-                    )
+                    ),
                 )
         }
 
@@ -134,12 +134,12 @@ class ProtobufRpcSchemasResolverTests :
                         ProtobufSchema(
                             name = "acme.user.v1.OtherService",
                             schema =
-                                Service(
-                                    name = "UserService",
-                                    rpcs = emptyList(),
-                                ),
-                        )
-                    )
+                            Service(
+                                name = "UserService",
+                                rpcs = emptyList(),
+                            ),
+                        ),
+                    ),
                 )
 
             val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
@@ -149,7 +149,7 @@ class ProtobufRpcSchemasResolverTests :
                     SchemaDeclarationNameMismatch(
                         schemaName = "acme.user.v1.OtherService",
                         declarationName = "UserService",
-                    )
+                    ),
                 )
         }
 
@@ -207,7 +207,7 @@ class ProtobufRpcSchemasResolverTests :
                         rpcName = "GetUser",
                         position = EndpointPosition.RESPONSE,
                         targetName = "MissingResponse",
-                    )
+                    ),
                 )
         }
     })
