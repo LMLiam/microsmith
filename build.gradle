@@ -43,6 +43,8 @@ tasks.named("check") {
     dependsOn(gradle.includedBuild("build-logic").task(":test"))
 }
 
+def testLibraries = libs
+
 subprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'maven-publish'
@@ -84,9 +86,9 @@ subprojects {
     }
 
     dependencies {
-        testImplementation libs.kotest.framework.engine
-        testImplementation libs.kotest.assertions.core
-        testImplementation libs.kotest.property
+        testImplementation testLibraries.kotest.framework.engine
+        testImplementation testLibraries.kotest.assertions.core
+        testImplementation testLibraries.kotest.property
     }
 
     sourceSets {
