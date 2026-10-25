@@ -90,6 +90,48 @@ subprojects {
         testImplementation libs.kotest.property
     }
 
+    sourceSets {
+        integrationTest {
+            compileClasspath += sourceSets.main.output
+            runtimeClasspath += sourceSets.main.output
+        }
+        e2eTest {
+            compileClasspath += sourceSets.main.output
+            runtimeClasspath += sourceSets.main.output
+        }
+    }
+
+    configurations {
+        integrationTestImplementation.extendsFrom(testImplementation)
+        integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+        e2eTestImplementation.extendsFrom(testImplementation)
+        e2eTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    }
+
+    tasks.register('integrationTest', io.kotest.framework.gradle.tasks.KotestJvmTask) {
+        description = 'Runs integration tests.'
+        group = 'verification'
+        mainClass.set('io.kotest.engine.launcher.MainKt')
+        classpath = sourceSets.integrationTest.runtimeClasspath
+        testSourceSetClasspath.set(sourceSets.integrationTest.runtimeClasspath)
+        moduleName.set(project.name)
+        moduleTestReportsDir.set(layout.buildDirectory.dir('test-results/integrationTest'))
+        rootTestReportsDir.set(rootProject.layout.buildDirectory.dir('test-results/integrationTest'))
+        inputs.files(sourceSets.integrationTest.output.classesDirs)
+    }
+
+    tasks.register('e2eTest', io.kotest.framework.gradle.tasks.KotestJvmTask) {
+        description = 'Runs end-to-end tests.'
+        group = 'verification'
+        mainClass.set('io.kotest.engine.launcher.MainKt')
+        classpath = sourceSets.e2eTest.runtimeClasspath
+        testSourceSetClasspath.set(sourceSets.e2eTest.runtimeClasspath)
+        moduleName.set(project.name)
+        moduleTestReportsDir.set(layout.buildDirectory.dir('test-results/e2eTest'))
+        rootTestReportsDir.set(rootProject.layout.buildDirectory.dir('test-results/e2eTest'))
+        inputs.files(sourceSets.e2eTest.output.classesDirs)
+    }
+
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
         options.release.set(24)
@@ -177,7 +219,11 @@ subprojects {
     tasks.named("check") {
         dependsOn(tasks.named("detektMain"))
         dependsOn(tasks.named("detektTest"))
+        dependsOn(tasks.named("detektIntegrationTest"))
+        dependsOn(tasks.named("detektE2eTest"))
         dependsOn(tasks.named("ktfmtCheck"))
+        dependsOn(tasks.named("integrationTest"))
+        dependsOn(tasks.named("e2eTest"))
     }
 
     tasks.withType(AbstractArchiveTask).configureEach {
