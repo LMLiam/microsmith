@@ -18,24 +18,8 @@ class RuntimeScriptingPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply("java-library")
 
-        val scriptTemplateSourceFile =
-            RuntimeScriptingSourceFiles.annotatedKotlinScriptSourceFile(project, "microsmith.kts")
-        val scriptTemplateFqcn = RuntimeScriptingSourceFiles.fqcnFromSourceFile(scriptTemplateSourceFile)
-        val scriptCompilationConfigurationSourceFile =
-            RuntimeScriptingSourceFiles.compilationConfigurationSourceFileFromScriptTemplateSourceFile(
-                project,
-                scriptTemplateSourceFile,
-            )
-        val scriptCompilationConfigurationFqcn =
-            RuntimeScriptingSourceFiles.fqcnFromSourceFile(scriptCompilationConfigurationSourceFile)
-        val scriptContextSourceFile =
-            RuntimeScriptingSourceFiles.contextSourceFileFromCompilationConfigurationSourceFile(
-                project,
-                scriptCompilationConfigurationSourceFile,
-            )
-        val scriptContextFqcn = RuntimeScriptingSourceFiles.fqcnFromSourceFile(scriptContextSourceFile)
         val scriptTemplateRegistrationJarEntry =
-            RuntimeScriptingBuildNames.scriptTemplateRegistrationEntry(scriptTemplateFqcn)
+            RuntimeScriptingBuildNames.scriptTemplateRegistrationEntry(RuntimeScriptingBuildNames.SCRIPT_TEMPLATE_FQCN)
 
         val libs = project.extensions.getByType(VersionCatalogsExtension::class.java).named("libs")
 
@@ -59,7 +43,7 @@ class RuntimeScriptingPlugin : Plugin<Project> {
         val runtimeScriptingPomTask = project.tasks.named("generatePomFileForGprPublication")
         val runtimeScriptingPomFile = project.layout.buildDirectory.file(RuntimeScriptingBuildNames.POM_PATH)
         val runtimeScriptingJarExpectedEntries = listOf(
-            RuntimeScriptingBuildNames.classEntryName(scriptTemplateFqcn),
+            RuntimeScriptingBuildNames.classEntryName(RuntimeScriptingBuildNames.SCRIPT_TEMPLATE_FQCN),
             scriptTemplateRegistrationJarEntry,
         )
         val runtimeScriptingPomExpectedScopes = linkedMapOf<String, String>().apply {
@@ -123,9 +107,11 @@ class RuntimeScriptingPlugin : Plugin<Project> {
         val ideFallbackShadowJarTask = project.tasks.named("shadowJar", ShadowJar::class.java)
         val ideFallbackShadowJarArchive = ideFallbackShadowJarTask.flatMap { it.archiveFile }
         val ideFallbackExpectedEntries = listOf(
-            RuntimeScriptingBuildNames.classEntryName(scriptTemplateFqcn),
-            RuntimeScriptingBuildNames.classEntryName(scriptCompilationConfigurationFqcn),
-            RuntimeScriptingBuildNames.classEntryName(scriptContextFqcn),
+            RuntimeScriptingBuildNames.classEntryName(RuntimeScriptingBuildNames.SCRIPT_TEMPLATE_FQCN),
+            RuntimeScriptingBuildNames.classEntryName(
+                RuntimeScriptingBuildNames.SCRIPT_COMPILATION_CONFIGURATION_FQCN,
+            ),
+            RuntimeScriptingBuildNames.classEntryName(RuntimeScriptingBuildNames.SCRIPT_CONTEXT_FQCN),
             "kotlin/script/experimental/jvmhost/BasicJvmScriptingHost.class",
             scriptTemplateRegistrationJarEntry,
         )

@@ -30,7 +30,7 @@ class CliPackagingPlugin : Plugin<Project> {
 
         val libs = project.extensions.getByType(VersionCatalogsExtension::class.java).named("libs")
         val application = project.extensions.getByType(JavaApplication::class.java)
-        application.mainClass.set(CliSourceFiles.applicationMainClass(project))
+        application.mainClass.set(CliPackagingBuildNames.APPLICATION_MAIN_CLASS)
 
         project.dependencies.apply {
             add("implementation", project.dependencies.project(":runtime-scripting"))
