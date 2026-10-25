@@ -1,15 +1,9 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp
 
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestFieldArtifact
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 
 internal fun renderDotnetAspModelPropertyType(type: DotnetFieldType): String =
     if (type is DotnetFieldType.Reference) type.target else type.csharpType
-
-internal fun renderDotnetAspBindingPropertyType(field: DotnetAspRequestFieldArtifact): String {
-    val baseType = renderDotnetAspModelPropertyType(field.type)
-    return if (field.optional && field.defaultValue == null) "$baseType?" else baseType
-}
 
 internal fun escapeDotnetAspCsharpStringLiteral(value: String): String = buildString {
     append('"')
