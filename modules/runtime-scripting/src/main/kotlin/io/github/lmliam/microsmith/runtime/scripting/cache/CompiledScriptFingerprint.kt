@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.runtime.scripting.cache
 
 import java.nio.ByteBuffer
 import java.security.MessageDigest
+import java.util.Locale
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.SourceCode
 
@@ -38,4 +39,4 @@ private fun Int.toByteArray() = ByteBuffer.allocate(Int.SIZE_BYTES)
     .also { it.putInt(this) }
     .array()
 
-private fun ByteArray.toHexString() = joinToString(separator = "") { "%02x".format(it) }
+private fun ByteArray.toHexString() = joinToString(separator = "") { "%02x".format(Locale.ROOT, it) }

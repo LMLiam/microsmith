@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestFieldArtifact
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+import java.util.Locale
 
 internal fun renderDotnetAspModelPropertyType(type: DotnetFieldType): String =
     if (type is DotnetFieldType.Reference) type.target else type.csharpType
@@ -24,7 +25,7 @@ internal fun escapeDotnetAspCsharpStringLiteral(value: String): String = buildSt
             '\t' -> append("\\t")
             else -> {
                 if (char.code < FIRST_NON_PRINTABLE_ASCII_CODE_POINT) {
-                    append("\\u%04x".format(char.code))
+                    append("\\u%04x".format(Locale.ROOT, char.code))
                 } else {
                     append(char)
                 }
@@ -47,7 +48,7 @@ internal fun escapeDotnetAspCsharpCharLiteral(value: Char): String = when (value
 
 private fun renderDotnetAspPrintableCharLiteral(value: Char): String =
     if (value.code < FIRST_NON_PRINTABLE_ASCII_CODE_POINT) {
-        "'\\u%04x'".format(value.code)
+        "'\\u%04x'".format(Locale.ROOT, value.code)
     } else {
         "'$value'"
     }
