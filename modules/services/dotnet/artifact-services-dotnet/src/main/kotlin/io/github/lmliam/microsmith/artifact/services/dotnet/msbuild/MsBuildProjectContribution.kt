@@ -7,7 +7,6 @@ data class MsBuildProjectContribution(
     val projectAttributes: Map<String, String> = emptyMap(),
     val properties: Map<String, String> = emptyMap(),
     val items: List<MsBuildItem> = emptyList(),
-    val origins: Set<String> = emptySet(),
 ) : ArtifactContribution<MsBuildProjectArtifact> {
     init {
         projectAttributes.keys.forEach(MsBuildNames::requireAttributeName)

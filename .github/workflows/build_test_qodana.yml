@@ -60,7 +60,6 @@ jobs:
             test -f "$project_root/UserService.Api.csproj"
             test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
             test -f "$project_root/Generated/Contracts/ResponseModels.cs"
-            test -f "$project_root/.microsmith/origins.json"
             dotnet build "$project_root/UserService.Api.csproj"
           }
 
@@ -80,7 +79,6 @@ jobs:
             mvn -B -f "$repo_root/pom.xml" microsmith:generate -Dmicrosmith.version="$VERSION"
             test -d "$generated_root"
             find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
-            test -f "$output_root/.microsmith/origins.json"
           }
 
           validate_maven_dotnet_fixture() {
@@ -91,7 +89,6 @@ jobs:
             test -f "$project_root/UserService.Api.csproj"
             test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
             test -f "$project_root/Generated/Contracts/ResponseModels.cs"
-            test -f "$project_root/.microsmith/origins.json"
             dotnet build "$project_root/UserService.Api.csproj"
           }
 
@@ -188,7 +185,6 @@ jobs:
           test -f aspnet-dist/dotnet/Platform/UserService.Api/UserService.Api.csproj
           test -f aspnet-dist/dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs
           test -f aspnet-dist/dotnet/Platform/UserService.Api/Generated/Contracts/ResponseModels.cs
-          test -f aspnet-dist/dotnet/Platform/UserService.Api/.microsmith/origins.json
           dotnet build aspnet-dist/dotnet/Platform/UserService.Api/UserService.Api.csproj
       - name: Verify dist doctor diagnostics mode (Unix)
         if: runner.os != 'Windows'
@@ -259,10 +255,6 @@ jobs:
           }
           if (-not (Test-Path "$projectRoot\Generated\Contracts\ResponseModels.cs")) {
             Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\Generated\\Contracts\\ResponseModels.cs to exist."
-            exit 1
-          }
-          if (-not (Test-Path "$projectRoot\.microsmith\origins.json")) {
-            Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\.microsmith\\origins.json to exist."
             exit 1
           }
           dotnet build "$projectRoot\UserService.Api.csproj"
@@ -352,7 +344,6 @@ jobs:
           test -f "$project_root/UserService.Api.csproj"
           test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
           test -f "$project_root/Generated/Contracts/ResponseModels.cs"
-          test -f "$project_root/.microsmith/origins.json"
           dotnet build "$project_root/UserService.Api.csproj"
       - name: Install and verify from installer (Windows)
         id: install-windows
@@ -464,10 +455,6 @@ jobs:
           }
           if (-not (Test-Path "$projectRoot\Generated\Contracts\ResponseModels.cs")) {
             Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\Generated\\Contracts\\ResponseModels.cs to exist for the .NET fixture."
-            exit 1
-          }
-          if (-not (Test-Path "$projectRoot\.microsmith\origins.json")) {
-            Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\.microsmith\\origins.json to exist for the .NET fixture."
             exit 1
           }
           dotnet build "$projectRoot\UserService.Api.csproj"

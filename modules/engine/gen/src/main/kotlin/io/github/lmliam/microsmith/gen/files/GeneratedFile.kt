@@ -6,7 +6,6 @@ class GeneratedFile(
     val relativePath: Path,
     contents: ByteArray,
     val outputRoot: Path = Path.of("."),
-    val origins: Set<String> = emptySet(),
 ) {
     private val bytes = contents.copyOf()
 

@@ -16,7 +16,6 @@ class TextFileArtifactRenderer : ArtifactRenderer<TextFileArtifact> {
             relativePath = artifact.id.relativePath,
             contents = renderedContents.toByteArray(StandardCharsets.UTF_8),
             outputRoot = artifact.id.outputRoot,
-            origins = artifact.origins,
         )
     }
 }

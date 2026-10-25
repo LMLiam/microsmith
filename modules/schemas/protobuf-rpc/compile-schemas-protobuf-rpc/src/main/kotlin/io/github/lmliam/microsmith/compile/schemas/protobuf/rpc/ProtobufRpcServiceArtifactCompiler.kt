@@ -33,18 +33,6 @@ class ProtobufRpcServiceArtifactCompiler : SchemasArtifactCompiler<ProtobufRpcSe
                             contents = ProtobufServiceRenderer.render(artifact),
                         )
                     ),
-                origins =
-                    buildSet {
-                        add(artifact.id.qualifiedName("service"))
-                        artifact.operations.forEach { operation -> add(artifact.id.qualifiedName(operation.name)) }
-                    },
             )
         )
-
-    private fun ProtobufRpcServiceArtifactId.qualifiedName(suffix: String): String = buildString {
-        append("schemas.protobuf")
-        packageName?.let { append('.').append(it) }
-        append('.').append(serviceName)
-        append('.').append(suffix)
-    }
 }

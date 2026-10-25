@@ -8,5 +8,4 @@ data class DotnetAspEndpointArtifact(
     val operationName: String,
     val bindings: DotnetAspEndpointBindingsArtifact,
     val responses: List<DotnetAspResponseArtifact>,
-    val origins: Set<String>,
 )

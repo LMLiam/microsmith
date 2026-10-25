@@ -35,10 +35,6 @@ class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetP
                                 packageReference.version?.let { mapOf(MsBuildNames.VERSION_ATTRIBUTE to it) }.orEmpty(),
                         )
                     },
-                origins =
-                    artifact.packages.mapTo(linkedSetOf()) { packageReference ->
-                        "services.${artifact.id.serviceName}.packages.${packageReference.name}"
-                    },
             )
         )
 }

@@ -10,7 +10,6 @@ A model that lives in a generator drifts from the model that lives in the codeba
 
 - you declare schemas and services in Kotlin
 - five explicit stages turn the model into resolved models, artifacts, and files
-- every generated file records its origin in `.microsmith/origins.json`
 
 The pipeline is a set of interfaces, so a new output family is a module on the classpath. The core does not need to know that the module exists.
 

@@ -36,10 +36,8 @@ class DotnetAspEndpointValidationTests :
                                             statusCode = 200,
                                             model = userModel,
                                             headers = listOf(DotnetAspResponseHeaderArtifact("body")),
-                                            origins = setOf("services.UserService.rest.GetUser.responses.200"),
                                         )
                                     ),
-                                origins = setOf("services.UserService.rest.GetUser"),
                             )
                         ),
                 )
@@ -77,10 +75,8 @@ class DotnetAspEndpointValidationTests :
                                             statusCode = 200,
                                             model = sharedModel("User"),
                                             headers = emptyList(),
-                                            origins = setOf("services.UserService.rest.GetUser.responses.200"),
                                         )
                                     ),
-                                origins = setOf("services.UserService.rest.GetUser"),
                             )
                         ),
                 )
@@ -114,5 +110,4 @@ private fun sharedModel(name: String): DotnetAspModelArtifact =
         typeName = name,
         locality = DotnetAspModelLocality.SHARED,
         model = DotnetModel(name = name, fields = listOf(DotnetField("id", DotnetFieldType.String))),
-        origins = setOf("services.UserService.models.$name"),
     )

@@ -6,5 +6,4 @@ data class DotnetAspModelArtifact(
     val typeName: String,
     val locality: DotnetAspModelLocality,
     val model: DotnetModel,
-    val origins: Set<String>,
 )

@@ -19,7 +19,6 @@ internal fun DotnetAspServiceArtifact.msBuildProjectArtifactId(kind: MsBuildProj
 internal fun DotnetAspServiceArtifact.textContribution(
     relativePath: String,
     contents: String,
-    origins: Set<String>,
 ): TextFileArtifactContribution =
     TextFileArtifactContribution(
         artifactId =
@@ -28,7 +27,6 @@ internal fun DotnetAspServiceArtifact.textContribution(
                 outputRoot = outputRoot,
             ),
         contents = contents,
-        origins = origins,
     )
 
 internal fun renderDotnetAspAppSettingsFile(artifact: DotnetAspServiceArtifact): String =
