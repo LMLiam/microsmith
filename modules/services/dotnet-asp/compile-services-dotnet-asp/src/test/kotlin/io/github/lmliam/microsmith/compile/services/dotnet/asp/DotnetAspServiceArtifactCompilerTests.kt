@@ -84,6 +84,13 @@ class DotnetAspServiceArtifactCompilerTests :
             controller.contents.shouldNotContain("X-Microsmith-Response-Status")
             controller.contents.shouldNotContain("sample-location")
 
+            val controllerBase = byPath.getValue("Generated/Controllers/MicrosmithControllerBase.cs")
+            controllerBase.contents.shouldContain(
+                "protected ActionResult Respond(" +
+                    "object? body, int statusCode, params (string Name, string? Value)[] headers)"
+            )
+            controllerBase.contents.shouldContain("protected string? ReadHeader(string headerName)")
+
             byPath
                 .getValue("Generated/Contracts/RequestModels.cs")
                 .contents
