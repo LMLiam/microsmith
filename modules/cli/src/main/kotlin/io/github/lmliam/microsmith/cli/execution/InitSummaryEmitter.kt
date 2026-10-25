@@ -5,7 +5,6 @@ import io.github.lmliam.microsmith.cli.diagnostics.CliDiagnosticEmitter
 import io.github.lmliam.microsmith.cli.init.InitBootstrapResult
 import io.github.lmliam.microsmith.cli.init.profile.JavaOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.profile.KotlinOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.profile.ScalaOnboardingProfile
 
 private const val GRADLE_PLUGIN_ID = "io.github.lmliam.microsmith"
 private const val MICROSMITH_GROUP = "io.github.lmliam.microsmith"
@@ -88,28 +87,20 @@ internal object InitSummaryEmitter {
                         "IDE support: add '$MICROSMITH_RUNTIME_SCRIPTING_COORDINATE' as a provided dependency, " +
                         "configure '$MICROSMITH_MAVEN_PLUGIN_COORDINATE', and run 'mvn microsmith:generate'."
                 )
-
-            JvmNativeBuildSystem.SBT ->
-                emitter.info(
-                    "sbt repository detected. Use 'microsmith run' directly, or migrate the build to Gradle or " +
-                        "Maven for native integration."
-                )
         }
     }
 }
 
 private fun InitBootstrapResult.nativeJvmBuildSystem(): JvmNativeBuildSystem? {
     val profile = repositoryDetection.profile
-    if (profile != JavaOnboardingProfile && profile != KotlinOnboardingProfile && profile != ScalaOnboardingProfile) {
+    if (profile != JavaOnboardingProfile && profile != KotlinOnboardingProfile) {
         return null
     }
     val hasGradleMarker = repositoryDetection.matchedMarkers.any(::isGradleMarker)
     val hasMavenMarker = repositoryDetection.matchedMarkers.any(::isMavenMarker)
-    val hasSbtMarker = repositoryDetection.matchedMarkers.any(::isSbtMarker)
     return when {
-        hasGradleMarker && !hasMavenMarker && !hasSbtMarker -> JvmNativeBuildSystem.GRADLE
-        hasMavenMarker && !hasGradleMarker && !hasSbtMarker -> JvmNativeBuildSystem.MAVEN
-        hasSbtMarker && !hasGradleMarker && !hasMavenMarker -> JvmNativeBuildSystem.SBT
+        hasGradleMarker && !hasMavenMarker -> JvmNativeBuildSystem.GRADLE
+        hasMavenMarker && !hasGradleMarker -> JvmNativeBuildSystem.MAVEN
         else -> null
     }
 }
@@ -125,15 +116,7 @@ private fun isGradleMarker(marker: String): Boolean =
 
 private fun isMavenMarker(marker: String): Boolean = marker == "pom.xml"
 
-private fun isSbtMarker(marker: String): Boolean =
-    marker in
-        setOf(
-            "build.sbt",
-            "project/build.properties",
-        )
-
 private enum class JvmNativeBuildSystem {
     GRADLE,
     MAVEN,
-    SBT,
 }

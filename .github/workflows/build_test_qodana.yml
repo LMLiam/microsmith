@@ -66,7 +66,6 @@ jobs:
 
           validate_gradle_proto_fixture examples/gradle/java
           validate_gradle_proto_fixture examples/gradle/kotlin
-          validate_gradle_proto_fixture examples/gradle/scala
           validate_gradle_dotnet_fixture examples/gradle/dotnet
       - name: Validate native Maven fixtures
         run: |
@@ -98,7 +97,6 @@ jobs:
 
           validate_maven_proto_fixture examples/maven/java
           validate_maven_proto_fixture examples/maven/kotlin
-          validate_maven_proto_fixture examples/maven/scala
           validate_maven_dotnet_fixture examples/maven/dotnet
       - name: Validate IDE fallback release assets
         run: |
@@ -310,7 +308,7 @@ jobs:
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts
           test -f proto/UserCreated.proto
-      - name: Smoke test Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
+      - name: Smoke test Java, Kotlin, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
         if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
         run: |
           set -euo pipefail
@@ -336,7 +334,6 @@ jobs:
 
           smoke_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
           smoke_unix_fixture kotlin examples/jvm/kotlin-gradle KotlinUserCreated.proto kotlin-ide-doctor.json
-          smoke_unix_fixture scala examples/gradle/scala ScalaUserCreated.proto scala-ide-doctor.json
           smoke_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
           smoke_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
           smoke_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json

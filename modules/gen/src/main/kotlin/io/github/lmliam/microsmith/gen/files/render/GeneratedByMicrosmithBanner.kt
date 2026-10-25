@@ -23,7 +23,6 @@ internal object GeneratedByMicrosmithBanner {
             "kts",
             "proto",
             "rs",
-            "scala",
             "swift",
             "ts",
             "tsx",
