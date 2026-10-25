@@ -1,3 +1,48 @@
 plugins {
     id 'io.github.lmliam.microsmith.cli-packaging'
 }
+
+dependencies {
+    implementation project(':runtime-scripting')
+    implementation project(':dsl')
+    implementation project(':dsl-services')
+    implementation project(':dsl-services-dotnet')
+    implementation project(':dsl-services-dotnet-asp')
+    implementation project(':dsl-services-dotnet-packages')
+    implementation project(':dsl-schemas')
+    implementation project(':dsl-schemas-protobuf')
+    implementation project(':dsl-schemas-protobuf-rpc')
+    implementation project(':resolve')
+    implementation project(':resolve-services')
+    implementation project(':resolve-services-dotnet')
+    implementation project(':resolve-services-dotnet-asp')
+    implementation project(':resolve-services-dotnet-packages')
+    implementation project(':resolve-schemas')
+    implementation project(':resolve-schemas-protobuf')
+    implementation project(':resolve-schemas-protobuf-rpc')
+    implementation project(':artifact')
+    implementation project(':artifact-services')
+    implementation project(':artifact-services-dotnet')
+    implementation project(':artifact-services-dotnet-asp')
+    implementation project(':artifact-services-dotnet-packages')
+    implementation project(':artifact-schemas')
+    implementation project(':artifact-schemas-protobuf')
+    implementation project(':artifact-schemas-protobuf-rpc')
+    implementation project(':compile')
+    implementation project(':compile-services')
+    implementation project(':compile-services-dotnet')
+    implementation project(':compile-services-dotnet-asp')
+    implementation project(':compile-services-dotnet-packages')
+    implementation project(':compile-schemas')
+    implementation project(':compile-schemas-protobuf')
+    implementation project(':compile-schemas-protobuf-rpc')
+    implementation project(':gen')
+    implementation libs.maven.resolver.api
+    implementation libs.maven.resolver.spi
+    implementation libs.maven.resolver.util
+    implementation libs.maven.resolver.impl
+    implementation libs.maven.resolver.supplier
+    implementation libs.maven.resolver.connector.basic
+    implementation libs.maven.resolver.transport.file
+    implementation libs.maven.resolver.transport.http
+}
