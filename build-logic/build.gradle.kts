@@ -53,18 +53,11 @@ tasks.named<Jar>("jar") {
 
 gradlePlugin {
     plugins {
-        register("runtimeScripting") {
-            id = "io.github.lmliam.microsmith.runtime-scripting"
-            implementationClass = "io.github.lmliam.microsmith.build.runtime.RuntimeScriptingPlugin"
-            displayName = "Microsmith Runtime Scripting"
-            description = "Configures runtime scripting publication and IDE fallback artifacts."
-        }
-
-        register("cliPackaging") {
-            id = "io.github.lmliam.microsmith.cli-packaging"
-            implementationClass = "io.github.lmliam.microsmith.build.cli.CliPackagingPlugin"
-            displayName = "Microsmith CLI Packaging"
-            description = "Configures CLI packaging, distributions, and release artifacts."
+        register("buildTools") {
+            id = "io.github.lmliam.microsmith.build-tools"
+            implementationClass = "io.github.lmliam.microsmith.build.BuildToolsPlugin"
+            displayName = "Microsmith Build Tools"
+            description = "Places the Microsmith build task types on the build classpath."
         }
     }
 }

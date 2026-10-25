@@ -225,7 +225,7 @@ This keeps the layering explicit:
   - `services/`: service targets under `base/`, `dotnet/`, `dotnet-asp/`, and `dotnet-packages/`
   - `runtime/`: the scripting host and its API
   - `integrations/`: `cli`, `gradle-plugin`, and `maven-plugin`
-- `build-logic/`: included Gradle build that configures CLI packaging, release archives, and runtime scripting artifacts
+- `build-logic/`: included Gradle build that provides the task types for CLI packaging, release archives, and runtime scripting artefacts. The owning modules register these tasks.
 - `examples/`: consumer-repository fixtures and onboarding examples
 - `docs/`: user and contributor documentation
 - `gradle/`: wrapper files, version catalog, and dependency locks
