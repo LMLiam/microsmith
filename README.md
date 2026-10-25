@@ -121,7 +121,7 @@ The CLI usage text has one source: run `microsmith --help`.
 ./gradlew ktfmtFormat      # rewrite formatting
 ```
 
-`./gradlew build` includes `verifyRepositoryStandards`, which checks file naming, package layout, and import rules.
+`./gradlew build` includes Detekt and Ktfmt checks for file naming, package layout, and formatting.
 
 ## Contributing
 

@@ -53,13 +53,6 @@ tasks.named<Jar>("jar") {
 
 gradlePlugin {
     plugins {
-        register("repositoryQuality") {
-            id = "io.github.lmliam.microsmith.repository-quality"
-            implementationClass = "io.github.lmliam.microsmith.build.quality.RepositoryQualityPlugin"
-            displayName = "Microsmith Repository Quality"
-            description = "Registers repository structural Kotlin quality guardrails."
-        }
-
         register("runtimeScripting") {
             id = "io.github.lmliam.microsmith.runtime-scripting"
             implementationClass = "io.github.lmliam.microsmith.build.runtime.RuntimeScriptingPlugin"
