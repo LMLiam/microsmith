@@ -4,7 +4,6 @@ import io.github.lmliam.microsmith.build.archive.VerifyJarEntries
 import io.github.lmliam.microsmith.build.archive.VerifyServiceProviders
 import io.github.lmliam.microsmith.build.runtime.VerifyPublishedPomScopes
 
-// IDE fallback packaging names.
 def scriptingVersionValue = version.toString()
 def scriptingScriptTemplateFqcn = 'io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript'
 def scriptingCompilationConfigurationFqcn =

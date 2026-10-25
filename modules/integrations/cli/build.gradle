@@ -5,7 +5,6 @@ import io.github.lmliam.microsmith.build.cli.VerifyDistLayout
 import io.github.lmliam.microsmith.build.cli.VerifyShadowJarServices
 import org.apache.tools.ant.filters.ReplaceTokens
 
-// Packaging names. One producer and several verifiers read each value.
 def cliVersionValue = version.toString()
 def cliMainClassName = 'io.github.lmliam.microsmith.cli.CliKt'
 def cliCatalogFormatVersion = 1
@@ -18,35 +17,21 @@ def cliDistRootName = "${cliShadowJarBaseName}-${cliVersionValue}".toString()
 def cliReadmeFileName = 'README.txt'
 def cliUnixLauncherName = 'microsmith'
 def cliWindowsLauncherName = 'microsmith.bat'
-def cliUnixLauncherMode = 493 // 0755
+def cliUnixLauncherMode = Integer.parseInt('755', 8)
 
-// The runtime plugin modules that the CLI bundles. The declared order is the catalog order.
 def cliBundledPluginPaths = [
-    ':resolve-services',
-    ':resolve-services-dotnet',
-    ':resolve-services-dotnet-asp',
-    ':resolve-services-dotnet-packages',
-    ':resolve-schemas',
-    ':resolve-schemas-protobuf',
-    ':resolve-schemas-protobuf-rpc',
-    ':artifact',
-    ':artifact-services',
-    ':artifact-services-dotnet',
-    ':artifact-services-dotnet-asp',
-    ':artifact-services-dotnet-packages',
-    ':artifact-schemas-protobuf',
-    ':artifact-schemas-protobuf-rpc',
-    ':compile-services',
-    ':compile-services-dotnet',
-    ':compile-services-dotnet-asp',
-    ':compile-services-dotnet-packages',
-    ':compile-schemas-protobuf',
-    ':compile-schemas-protobuf-rpc',
-    ':gen',
+    ':resolve-services', ':resolve-services-dotnet', ':resolve-services-dotnet-asp',
+    ':resolve-services-dotnet-packages', ':resolve-schemas', ':resolve-schemas-protobuf',
+    ':resolve-schemas-protobuf-rpc', ':artifact', ':artifact-services',
+    ':artifact-services-dotnet', ':artifact-services-dotnet-asp',
+    ':artifact-services-dotnet-packages', ':artifact-schemas-protobuf',
+    ':artifact-schemas-protobuf-rpc', ':compile-services', ':compile-services-dotnet',
+    ':compile-services-dotnet-asp', ':compile-services-dotnet-packages',
+    ':compile-schemas-protobuf', ':compile-schemas-protobuf-rpc', ':gen',
 ]
 
 def cliCatalogDirectory = layout.buildDirectory.dir('generated/microsmith')
-def cliCatalogFile = layout.buildDirectory.file("generated/microsmith/${cliCatalogFileName}")
+def cliCatalogFile = cliCatalogDirectory.map { dir -> dir.file(cliCatalogFileName) }
 def cliDistDirectory = layout.buildDirectory.dir('microsmith-cli-dist')
 def cliReleaseAssetsDirectory = layout.buildDirectory.dir('release-assets')
 
@@ -65,6 +50,8 @@ def cliShadowJarTask = tasks.named('shadowJar', ShadowJar)
 def cliShadowJarArchive = cliShadowJarTask.flatMap { shadowJarTask -> shadowJarTask.archiveFile }
 
 dependencies {
+    cliBundledPluginPaths.each { modulePath -> implementation project(modulePath) }
+
     implementation project(':runtime-scripting')
     implementation project(':dsl')
     implementation project(':dsl-services')
@@ -75,30 +62,9 @@ dependencies {
     implementation project(':dsl-schemas-protobuf')
     implementation project(':dsl-schemas-protobuf-rpc')
     implementation project(':resolve')
-    implementation project(':resolve-services')
-    implementation project(':resolve-services-dotnet')
-    implementation project(':resolve-services-dotnet-asp')
-    implementation project(':resolve-services-dotnet-packages')
-    implementation project(':resolve-schemas')
-    implementation project(':resolve-schemas-protobuf')
-    implementation project(':resolve-schemas-protobuf-rpc')
-    implementation project(':artifact')
-    implementation project(':artifact-services')
-    implementation project(':artifact-services-dotnet')
-    implementation project(':artifact-services-dotnet-asp')
-    implementation project(':artifact-services-dotnet-packages')
     implementation project(':artifact-schemas')
-    implementation project(':artifact-schemas-protobuf')
-    implementation project(':artifact-schemas-protobuf-rpc')
     implementation project(':compile')
-    implementation project(':compile-services')
-    implementation project(':compile-services-dotnet')
-    implementation project(':compile-services-dotnet-asp')
-    implementation project(':compile-services-dotnet-packages')
     implementation project(':compile-schemas')
-    implementation project(':compile-schemas-protobuf')
-    implementation project(':compile-schemas-protobuf-rpc')
-    implementation project(':gen')
     implementation libs.maven.resolver.api
     implementation libs.maven.resolver.spi
     implementation libs.maven.resolver.util
@@ -109,7 +75,6 @@ dependencies {
     implementation libs.maven.resolver.transport.http
 }
 
-// The catalog ships at the JAR root and under META-INF/microsmith inside the shaded JAR.
 sourceSets.main.resources.srcDir(cliCatalogDirectory)
 
 cliShadowJarTask.configure { shadowJarTask ->
@@ -178,6 +143,13 @@ def prepareDistTask = tasks.register('prepareDist', Sync) {
     from(cliCatalogFile) { into '.' }
 }
 
+def cliDistArchiveContents = {
+    into(cliDistRootName)
+    filesMatching("**/bin/${cliUnixLauncherName}") { launcher ->
+        launcher.permissions { permissions -> permissions.unix(cliUnixLauncherMode) }
+    }
+}
+
 def cliDistZipTask = tasks.register('cliDistZip', Zip) {
     dependsOn(prepareDistTask)
     inputs.property('unixLauncherPermissions', cliUnixLauncherMode)
@@ -185,13 +157,7 @@ def cliDistZipTask = tasks.register('cliDistZip', Zip) {
     archiveVersion.set(cliVersionValue)
     archiveClassifier.set('dist')
     destinationDirectory.set(layout.buildDirectory.dir('distributions'))
-    from(cliDistDirectory) {
-        into(cliDistRootName)
-        // Gradle archives use mode 0644 by default. Override the Unix launcher permission.
-        filesMatching("**/bin/${cliUnixLauncherName}") { launcher ->
-            launcher.permissions { permissions -> permissions.unix(cliUnixLauncherMode) }
-        }
-    }
+    from(cliDistDirectory, cliDistArchiveContents)
 }
 
 def cliDistTarTask = tasks.register('cliDistTar', Tar) {
@@ -203,12 +169,7 @@ def cliDistTarTask = tasks.register('cliDistTar', Tar) {
     archiveClassifier.set('dist')
     archiveExtension.set('tar.gz')
     destinationDirectory.set(layout.buildDirectory.dir('distributions'))
-    from(cliDistDirectory) {
-        into(cliDistRootName)
-        filesMatching("**/bin/${cliUnixLauncherName}") { launcher ->
-            launcher.permissions { permissions -> permissions.unix(cliUnixLauncherMode) }
-        }
-    }
+    from(cliDistDirectory, cliDistArchiveContents)
 }
 
 def verifyDistLayoutTask = tasks.register('verifyDistLayout', VerifyDistLayout) {
