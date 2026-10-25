@@ -8,7 +8,6 @@ import io.github.lmliam.microsmith.cli.init.profile.KotlinOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfile
 import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileDetection
 import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileSelectionReason
-import io.github.lmliam.microsmith.cli.init.profile.ScalaOnboardingProfile
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -66,41 +65,6 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             )
         }
 
-        "init command directs sbt-based Scala repositories to the CLI path" {
-            assertNativeJvmGuidance(
-                profile = ScalaOnboardingProfile,
-                matchedMarkers = listOf("build.sbt", "src/main/scala"),
-                expectedOutput =
-                    listOf(
-                        "Detected repository profile: Scala",
-                        "Next: microsmith run build.microsmith.kts",
-                        "Use 'microsmith run' directly",
-                    ),
-                unexpectedOutput =
-                    listOf(
-                        "Prefer the native Gradle plugin path",
-                        "Prefer the native Maven plugin path",
-                        "native sbt plugin",
-                        "Optional repository-native output path",
-                    ),
-                tempDirectoryPrefix = "microsmith-cli-init-scala-sbt",
-            )
-        }
-
-        "init command points Maven-based Scala repositories toward the native Maven plugin path" {
-            assertNativeJvmGuidance(
-                profile = ScalaOnboardingProfile,
-                matchedMarkers = listOf("pom.xml", "src/main/scala"),
-                expectedOutput =
-                    listOf(
-                        "Detected repository profile: Scala",
-                        "Prefer the native Maven plugin path",
-                        "mvn microsmith:generate",
-                    ),
-                tempDirectoryPrefix = "microsmith-cli-init-scala-maven",
-            )
-        }
-
         "init command points Gradle-based Java repositories toward the native Gradle plugin path" {
             assertNativeJvmGuidance(
                 profile = JavaOnboardingProfile,
@@ -111,38 +75,6 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
                         "Prefer the native Gradle plugin path",
                     ),
                 tempDirectoryPrefix = "microsmith-cli-init-java-gradle",
-            )
-        }
-
-        "init command points Gradle-based Scala repositories toward the native Gradle plugin path" {
-            assertNativeJvmGuidance(
-                profile = ScalaOnboardingProfile,
-                matchedMarkers = listOf("build.gradle", "src/main/scala"),
-                expectedOutput =
-                    listOf(
-                        "Detected repository profile: Scala",
-                        "Prefer the native Gradle plugin path",
-                    ),
-                tempDirectoryPrefix = "microsmith-cli-init-scala-gradle",
-            )
-        }
-
-        "init command does not guess a native build tool when Scala repositories expose mixed native markers" {
-            assertNativeJvmGuidance(
-                profile = ScalaOnboardingProfile,
-                matchedMarkers = listOf("build.sbt", "build.gradle.kts", "src/main/scala"),
-                expectedOutput =
-                    listOf(
-                        "Detected repository profile: Scala",
-                        "Next: microsmith run build.microsmith.kts",
-                    ),
-                unexpectedOutput =
-                    listOf(
-                        "Prefer the native Gradle plugin path",
-                        "Prefer the native Maven plugin path",
-                        "Prefer the native sbt plugin path",
-                    ),
-                tempDirectoryPrefix = "microsmith-cli-init-scala-mixed-native-markers",
             )
         }
     })

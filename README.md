@@ -1,7 +1,7 @@
 # Microsmith
 
 Microsmith is a Kotlin DSL and standalone CLI for declaring domain-specific models and generating artifacts from `.microsmith.kts` scripts.
-It is designed to work both inside this Gradle repository, inside consumer Gradle builds, and from standalone consumer repositories including Go, .NET, Node, Python, Ruby, Rust, Java, Kotlin, and Scala projects.
+It is designed to work both inside this Gradle repository, inside consumer Gradle builds, and from standalone consumer repositories including Go, .NET, Node, Python, Ruby, Rust, Java, and Kotlin projects.
 
 This README is the main repository documentation. Detailed installation and CI guidance lives in [`docs/`](docs/).
 
@@ -37,8 +37,8 @@ Microsmith provides:
 - a layered generation pipeline spanning authoring DSLs, resolved domain models, logical artifacts, artifact compilation, and final output rendering
 - a standalone CLI for running `.microsmith.kts` scripts without embedding Gradle in consumer repositories
 - bundled built-in providers for the default schema and protobuf workflows
-- a native Gradle plugin for Java, Kotlin, and Scala repositories that want imported-project build alignment
-- a native Maven plugin for Java, Kotlin, and Scala repositories that want imported-project build alignment
+- a native Gradle plugin for Java and Kotlin repositories that want imported-project build alignment
+- a native Maven plugin for Java and Kotlin repositories that want imported-project build alignment
 - a JetBrains IDE helper workflow for stronger type resolution in consumer repositories
 
 ## Generation architecture
@@ -575,11 +575,10 @@ microsmith run build.microsmith.kts
 
 `microsmith init` is deterministic and non-destructive by default:
 
-- it detects Node, Go, Java, Kotlin, Scala, Python, Ruby, Rust, and .NET repositories from `package.json`, `go.mod`, Java source roots such as `src/main/java` or `src/test/java`, Kotlin source roots such as `src/main/kotlin`, `src/test/kotlin`, or `src/commonMain/kotlin`, Scala source roots such as `src/main/scala`, root JVM build markers such as `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`, `build.sbt`, and `project/build.properties`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `gems.rb`, a root `*.gemspec`, a root `Cargo.toml`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
-- repositories that match multiple first-class profiles at once, including mixed Java, Kotlin, and Scala source roots, fall back to the generic bootstrap instead of guessing the dominant ecosystem
-- Java detection is intentionally conservative: it requires a Java source root either at the repository root or inside a nested Maven or Gradle module, then adds root Maven or Gradle markers when present; build-file-only JVM roots stay on the generic path so Microsmith does not guess between Java, Kotlin, and Scala from build files alone
+- it detects Node, Go, Java, Kotlin, Python, Ruby, Rust, and .NET repositories from `package.json`, `go.mod`, Java source roots such as `src/main/java` or `src/test/java`, Kotlin source roots such as `src/main/kotlin`, `src/test/kotlin`, or `src/commonMain/kotlin`, root JVM build markers such as `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`, `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `gems.rb`, a root `*.gemspec`, a root `Cargo.toml`, `*.csproj`, and `*.sln`, and otherwise falls back to a generic bootstrap
+- repositories that match multiple first-class profiles at once, including mixed Java and Kotlin source roots, fall back to the generic bootstrap instead of guessing the dominant ecosystem
+- Java detection is intentionally conservative: it requires a Java source root either at the repository root or inside a nested Maven or Gradle module, then adds root Maven or Gradle markers when present; build-file-only JVM roots stay on the generic path so Microsmith does not guess between Java and Kotlin from build files alone
 - Kotlin detection is source-root driven: it recognizes root or nested Kotlin source roots for Maven, Gradle Kotlin DSL, Gradle Groovy, multiplatform-style source-set layouts, and build-tool-light repositories; build-file-only JVM roots still stay on the generic path
-- Scala detection is intentionally conservative: it requires a Scala main source root either at the repository root or inside a nested `sbt`, Maven, or Gradle module, then adds matching root build markers when present; `src/test/scala` alone stays on the generic path so Microsmith does not guess Scala from test-only roots
 - Ruby detection covers Bundler-first app roots and gem-style repositories through a root `Gemfile`, root `gems.rb`, or root `*.gemspec`; nested gems without a root Ruby marker stay on the generic path
 - Rust detection covers both package manifests and workspace roots through a root `Cargo.toml`; nested crates without a root manifest stay on the generic path
 - it creates `settings.microsmith.kts` when missing
@@ -602,7 +601,6 @@ If your repository has a deliberate alternative output root, override `--out` ex
 - Go: `microsmith run build.microsmith.kts --out ./internal/gen`
 - Java: keep the default repository-root `./proto` output path unless you explicitly wire generated sources into Maven or Gradle later
 - Kotlin: keep the default repository-root `./proto` output path unless you explicitly wire generated sources into Gradle or Maven later
-- Scala: keep the default repository-root `./proto` output path unless you explicitly wire generated sources into Gradle or Maven later
 - Python: keep the default repository-root `./proto` output path unless your repository already has a stronger convention
 - Ruby: keep the default repository-root `./proto` output path unless your repository already has a stronger convention
 - Rust: keep the default repository-root `./proto` output path unless your repository already has a stronger convention
@@ -620,13 +618,6 @@ Kotlin-specific guidance:
 - Gradle Groovy repositories that primarily host Kotlin code: the same native Gradle plugin path applies when Kotlin is the primary source language
 - Maven Kotlin repositories: prefer the native Maven integration path documented below when you want imported-project IDE support and Maven-goal execution
 - build-tool-light Kotlin repositories: use the same default repository-root `./proto` output path and helper workflow
-
-Scala-specific guidance:
-
-- `sbt`-based Scala repositories: use `microsmith run` directly, or migrate the build to Gradle or Maven for native integration
-- Maven Scala repositories: prefer the native Maven integration path documented below when you want imported-project IDE support and Maven-goal execution
-- Gradle Scala repositories: prefer the native Gradle integration path documented below when you want imported-project IDE support and Gradle-task execution
-- test-only Scala roots stay on the generic onboarding path until a Scala main source root exists
 
 ### Direct script execution
 
@@ -665,7 +656,7 @@ microsmith run schema.microsmith.kts --isolation process
 
 ## Native Gradle integration
 
-Use the Gradle plugin as the primary path for Java, Kotlin, and Scala repositories that already build with Gradle and want imported-project IDE support.
+Use the Gradle plugin as the primary path for Java and Kotlin repositories that already build with Gradle and want imported-project IDE support.
 
 Prefer this path when:
 
@@ -759,7 +750,7 @@ dependencies {
 
 Generated-source guidance:
 
-- Microsmith does not auto-register generated directories as Java, Kotlin, or Scala sources
+- Microsmith does not auto-register generated directories as Java or Kotlin sources
 - Microsmith writes generated `.proto` files under `./proto` by default
 - only add generated directories into source sets when a generator actually emits compilable language sources for that repository
 - use the same explicit Gradle source-set wiring you already use for other generated sources; wire `./proto` only when you intentionally consume generated protobuf sources from the build
@@ -769,11 +760,11 @@ Coexistence with the CLI, helper, and fallback paths:
 - `microsmith init` still works in Gradle repositories and is the fastest way to scaffold `build.microsmith.kts`
 - once native Gradle integration is adopted, use `./gradlew microsmithGenerate` as the primary generation path
 - the JetBrains IDE helper and fallback jar remain useful when you intentionally keep Microsmith outside the Gradle build, or when you are validating CLI-managed flows
-- representative native Gradle fixtures live in `examples/gradle/java`, `examples/gradle/kotlin`, `examples/gradle/scala`, and `examples/gradle/dotnet`
+- representative native Gradle fixtures live in `examples/gradle/java`, `examples/gradle/kotlin`, and `examples/gradle/dotnet`
 
 ## Native Maven integration
 
-Use the Maven plugin as the primary path for Java, Kotlin, and Scala repositories that already build with Maven and want imported-project IDE support.
+Use the Maven plugin as the primary path for Java and Kotlin repositories that already build with Maven and want imported-project IDE support.
 
 Prefer this path when:
 
@@ -858,7 +849,7 @@ If JetBrains IDEs also need those plugin-provided types in `.microsmith.kts`, mi
 
 Generated-source guidance:
 
-- Microsmith does not auto-register generated directories as Java, Kotlin, or Scala sources in Maven
+- Microsmith does not auto-register generated directories as Java or Kotlin sources in Maven
 - Microsmith writes generated `.proto` files under `./proto` by default
 - only add concrete language source directories into the build when you have a real source-emission contract
 - use the same explicit Maven source-registration approach you already use for other generated sources, such as `build-helper-maven-plugin`, rather than adding the entire output root blindly
@@ -868,7 +859,7 @@ Coexistence with the CLI, helper, and fallback paths:
 - `microsmith init` still works in Maven repositories and is the fastest way to scaffold `build.microsmith.kts`
 - once native Maven integration is adopted, use `mvn microsmith:generate` as the primary generation path
 - the JetBrains IDE helper and fallback jar remain useful when you intentionally keep Microsmith outside Maven, or when a Maven-imported IDE project needs plugin-provided types that are not mirrored as project dependencies
-- representative native Maven fixtures live in `examples/maven/java`, `examples/maven/kotlin`, `examples/maven/scala`, and `examples/maven/dotnet`
+- representative native Maven fixtures live in `examples/maven/java`, `examples/maven/kotlin`, and `examples/maven/dotnet`
 
 ## Installation and verification
 
@@ -995,7 +986,7 @@ When `--diagnostics json` is used, each event is emitted as one JSON line with:
 
 Use the helper project when you want stronger `.microsmith.kts` type resolution in repositories that intentionally keep Microsmith outside the host build, or in non-Gradle repositories such as Go, .NET, Node, Python, Ruby, and Rust.
 
-For Java, Kotlin, and Scala repositories that already use Gradle, prefer the native Gradle integration path above first. Use the helper only when you intentionally keep Microsmith CLI-managed instead of adopting the Gradle plugin.
+For Java and Kotlin repositories that already use Gradle, prefer the native Gradle integration path above first. Use the helper only when you intentionally keep Microsmith CLI-managed instead of adopting the Gradle plugin.
 
 `microsmith init` already refreshes the helper by default. Use `microsmith ide refresh` when you skipped helper generation during init or need to repair or resynchronize the helper later.
 
@@ -1059,13 +1050,6 @@ Kotlin-specific guidance:
 
 - for Kotlin repositories, IntelliJ IDEA is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
 - Gradle-based Kotlin repositories should prefer the native Gradle plugin path; use the helper or fallback for Maven and CLI-managed Kotlin repositories
-
-Scala-specific guidance:
-
-- for Scala repositories, IntelliJ IDEA with the Scala plugin is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
-- Gradle-based Scala repositories should prefer the native Gradle plugin path
-- Maven-based Scala repositories should prefer the native Maven plugin path
-- CLI-managed Scala repositories should use the helper or fallback directly
 
 Ruby-specific guidance:
 
@@ -1238,15 +1222,12 @@ CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flow
 |------------------------|------------------------------|--------------------------------------------------------------------------------|---------------------------------------------------------------|
 | Java (native Gradle)   | `examples/gradle/java`       | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/java/.github/workflows/microsmith.yml`       |
 | Kotlin (native Gradle) | `examples/gradle/kotlin`     | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/kotlin/.github/workflows/microsmith.yml`     |
-| Scala (native Gradle)  | `examples/gradle/scala`      | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/scala/.github/workflows/microsmith.yml`      |
 | .NET (native Gradle)   | `examples/gradle/dotnet`     | `./gradlew microsmithGenerate -PmicrosmithVersion=<version>`                   | `examples/gradle/dotnet/.github/workflows/microsmith.yml`     |
 | Java (native Maven)    | `examples/maven/java`        | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/java/.github/workflows/microsmith.yml`        |
 | Kotlin (native Maven)  | `examples/maven/kotlin`      | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/kotlin/.github/workflows/microsmith.yml`      |
-| Scala (native Maven)   | `examples/maven/scala`       | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/scala/.github/workflows/microsmith.yml`       |
 | .NET (native Maven)    | `examples/maven/dotnet`      | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/dotnet/.github/workflows/microsmith.yml`      |
 | Java                   | `examples/jvm/java-maven`    | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/java-maven/.github/workflows/microsmith.yml`    |
 | Kotlin                 | `examples/jvm/kotlin-gradle` | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/kotlin-gradle/.github/workflows/microsmith.yml` |
-| Scala                  | `examples/gradle/scala`      | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/gradle/scala/.github/workflows/microsmith.yml`      |
 | Node                   | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
 | Go                     | `examples/non-gradle/go`     | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/go/.github/workflows/microsmith.yml`     |
 | Python                 | `examples/non-gradle/python` | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/python/.github/workflows/microsmith.yml` |
@@ -1263,10 +1244,10 @@ CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flow
 | CLI help and README contract  | `build-and-qodana` on Ubuntu                   | `scripts/verify_readme_cli_usage.py` compares the README usage block to built `--help`.                                                           |
 | CLI distribution smoke        | `cli-smoke` on Ubuntu, macOS, and Windows      | Dist launcher, generation, process isolation, and `doctor --diagnostics json`.                                                                    |
 | Installer and bootstrap smoke | `cli-smoke` on Ubuntu, macOS, and Windows      | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.                                                                |
-| Native Gradle fixture smoke   | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `microsmithGenerate` for Java, Kotlin, Scala, and .NET Gradle fixtures.                   |
-| Native Maven fixture smoke    | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `mvn microsmith:generate` for Java, Kotlin, Scala, and .NET Maven fixtures.               |
-| Consumer fixture onboarding   | `cli-smoke` on Ubuntu, macOS, and Windows      | Ubuntu covers Java, Kotlin, Scala, Node, Go, Python, Ruby, Rust, and .NET; macOS and Windows cover the .NET fixture through dist or installer flows. |
-| JetBrains helper lifecycle    | `cli-smoke` on Ubuntu, macOS, and Windows      | Ubuntu covers Java, Kotlin, Scala, Node, Go, Python, Ruby, Rust, and .NET helper flows; macOS and Windows validate the .NET helper path.         |
+| Native Gradle fixture smoke   | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `microsmithGenerate` for Java, Kotlin, and .NET Gradle fixtures.                            |
+| Native Maven fixture smoke    | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `mvn microsmith:generate` for Java, Kotlin, and .NET Maven fixtures.                        |
+| Consumer fixture onboarding   | `cli-smoke` on Ubuntu, macOS, and Windows      | Ubuntu covers Java, Kotlin, Node, Go, Python, Ruby, Rust, and .NET; macOS and Windows cover the .NET fixture through dist or installer flows.       |
+| JetBrains helper lifecycle    | `cli-smoke` on Ubuntu, macOS, and Windows      | Ubuntu covers Java, Kotlin, Node, Go, Python, Ruby, Rust, and .NET helper flows; macOS and Windows validate the .NET helper path.                  |
 | Fallback artifact packaging   | `build-and-qodana` on Ubuntu                   | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`.                                                  |
 | Resolver, auth, lock, offline | `./gradlew build` and module regression suites | `:cli:jvmKotest` covers authenticated repositories, lockfiles, cache policy, and offline behavior.                                                |
 
@@ -1293,7 +1274,6 @@ Support policy:
 |------------------------------|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | IntelliJ IDEA                | `examples/gradle/java`   | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
 | IntelliJ IDEA                | `examples/gradle/kotlin` | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
-| IntelliJ IDEA + Scala plugin | `examples/gradle/scala`  | Import the fixture root as a Gradle project, refresh Gradle indexing, and confirm `build.microsmith.kts` resolves Microsmith DSL symbols without the helper project. |
 
 ### Native Maven IDE validation
 
@@ -1301,7 +1281,6 @@ Support policy:
 |------------------------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | IntelliJ IDEA                | `examples/maven/java`   | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
 | IntelliJ IDEA                | `examples/maven/kotlin` | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
-| IntelliJ IDEA + Scala plugin | `examples/maven/scala`  | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
 
 Native Gradle checklist:
 
@@ -1326,7 +1305,6 @@ Native Maven checklist:
 | WebStorm      | `examples/non-gradle/node`   | Run the helper checklist below against the Node fixture.   | Run the fallback checklist below against the Node fixture.   |
 | IntelliJ IDEA | `examples/jvm/java-maven`    | Run the helper checklist below against the Java fixture.   | Run the fallback checklist below against the Java fixture.   |
 | IntelliJ IDEA | `examples/jvm/kotlin-gradle` | Run the helper checklist below against the Kotlin fixture. | Run the fallback checklist below against the Kotlin fixture. |
-| IntelliJ IDEA | `examples/gradle/scala`      | Run the helper checklist below against the Scala fixture.  | Run the fallback checklist below against the Scala fixture.  |
 | GoLand        | `examples/non-gradle/go`     | Run the helper checklist below against the Go fixture.     | Run the fallback checklist below against the Go fixture.     |
 | PyCharm       | `examples/non-gradle/python` | Run the helper checklist below against the Python fixture. | Run the fallback checklist below against the Python fixture. |
 | RubyMine      | `examples/non-gradle/ruby`   | Run the helper checklist below against the Ruby fixture.   | Run the fallback checklist below against the Ruby fixture.   |

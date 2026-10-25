@@ -14,7 +14,6 @@ internal object BuiltInOnboardingProfileMatchers {
             rootMarkerMatcher(GoOnboardingProfile, "go.mod"),
             javaMatcher(),
             kotlinMatcher(),
-            scalaMatcher(),
             rootMarkerMatcher(
                 PythonOnboardingProfile,
                 "pyproject.toml",
@@ -50,11 +49,6 @@ internal object BuiltInOnboardingProfileMatchers {
     private fun kotlinMatcher(): OnboardingProfileMatcher =
         OnboardingProfileMatcher(KotlinOnboardingProfile) { projectRoot ->
             KotlinOnboardingMarkerFinder.find(projectRoot)
-        }
-
-    private fun scalaMatcher(): OnboardingProfileMatcher =
-        OnboardingProfileMatcher(ScalaOnboardingProfile) { projectRoot ->
-            ScalaOnboardingMarkerFinder.find(projectRoot)
         }
 
     private fun findDotnetMarkers(projectRoot: Path, dotnetMarkerFinder: (Path) -> String?): List<String> =
