@@ -7,7 +7,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.file.ConfigurableFilePermissions
 import org.gradle.api.file.CopySpec
 import org.gradle.api.file.DuplicatesStrategy
@@ -28,64 +27,18 @@ class CliPackagingPlugin : Plugin<Project> {
         project.pluginManager.apply("application")
         project.pluginManager.apply("com.gradleup.shadow")
 
-        val libs = project.extensions.getByType(VersionCatalogsExtension::class.java).named("libs")
         val application = project.extensions.getByType(JavaApplication::class.java)
-        application.mainClass.set(CliPackagingBuildNames.APPLICATION_MAIN_CLASS)
-
-        project.dependencies.apply {
-            add("implementation", project.dependencies.project(":runtime-scripting"))
-            add("implementation", project.dependencies.project(":dsl"))
-            add("implementation", project.dependencies.project(":dsl-services"))
-            add("implementation", project.dependencies.project(":dsl-services-dotnet"))
-            add("implementation", project.dependencies.project(":dsl-services-dotnet-asp"))
-            add("implementation", project.dependencies.project(":dsl-services-dotnet-packages"))
-            add("implementation", project.dependencies.project(":dsl-schemas"))
-            add("implementation", project.dependencies.project(":dsl-schemas-protobuf"))
-            add("implementation", project.dependencies.project(":dsl-schemas-protobuf-rpc"))
-            add("implementation", project.dependencies.project(":resolve"))
-            add("implementation", project.dependencies.project(":resolve-services"))
-            add("implementation", project.dependencies.project(":resolve-services-dotnet"))
-            add("implementation", project.dependencies.project(":resolve-services-dotnet-asp"))
-            add("implementation", project.dependencies.project(":resolve-services-dotnet-packages"))
-            add("implementation", project.dependencies.project(":resolve-schemas"))
-            add("implementation", project.dependencies.project(":resolve-schemas-protobuf"))
-            add("implementation", project.dependencies.project(":resolve-schemas-protobuf-rpc"))
-            add("implementation", project.dependencies.project(":artifact"))
-            add("implementation", project.dependencies.project(":artifact-services"))
-            add("implementation", project.dependencies.project(":artifact-services-dotnet"))
-            add("implementation", project.dependencies.project(":artifact-services-dotnet-asp"))
-            add("implementation", project.dependencies.project(":artifact-services-dotnet-packages"))
-            add("implementation", project.dependencies.project(":artifact-schemas"))
-            add("implementation", project.dependencies.project(":artifact-schemas-protobuf"))
-            add("implementation", project.dependencies.project(":artifact-schemas-protobuf-rpc"))
-            add("implementation", project.dependencies.project(":compile"))
-            add("implementation", project.dependencies.project(":compile-services"))
-            add("implementation", project.dependencies.project(":compile-services-dotnet"))
-            add("implementation", project.dependencies.project(":compile-services-dotnet-asp"))
-            add("implementation", project.dependencies.project(":compile-services-dotnet-packages"))
-            add("implementation", project.dependencies.project(":compile-schemas"))
-            add("implementation", project.dependencies.project(":compile-schemas-protobuf"))
-            add("implementation", project.dependencies.project(":compile-schemas-protobuf-rpc"))
-            add("implementation", project.dependencies.project(":gen"))
-            add("implementation", libs.findLibrary("maven-resolver-api").orElseThrow().get())
-            add("implementation", libs.findLibrary("maven-resolver-spi").orElseThrow().get())
-            add("implementation", libs.findLibrary("maven-resolver-util").orElseThrow().get())
-            add("implementation", libs.findLibrary("maven-resolver-impl").orElseThrow().get())
-            add("implementation", libs.findLibrary("maven-resolver-supplier").orElseThrow().get())
-            add("implementation", libs.findLibrary("maven-resolver-connector-basic").orElseThrow().get())
-            add("implementation", libs.findLibrary("maven-resolver-transport-file").orElseThrow().get())
-            add("implementation", libs.findLibrary("maven-resolver-transport-http").orElseThrow().get())
-        }
+        application.mainClass.set(CliPackagingNames.APPLICATION_MAIN_CLASS)
 
         val bundledPluginCatalogDirectory = project.layout.buildDirectory.dir("generated/microsmith")
         val bundledPluginJarTasks =
-            CliPackagingBuildNames.BUNDLED_PLUGIN_PROJECT_PATHS.map { path ->
+            BundledPlugins.PROJECT_PATHS.map { path ->
                 project.project(path).tasks.named("jar", Jar::class.java)
             }
-        val bundledPlugins = CliPackagingBuildNames.BUNDLED_PLUGIN_PROJECT_PATHS.map { path ->
+        val bundledPlugins = BundledPlugins.PROJECT_PATHS.map { path ->
             val bundledProject = project.project(path)
             BundledPluginCatalogEntry(
-                coordinate = CliPackagingBuildNames.bundledPluginCoordinate(bundledProject),
+                coordinate = BundledPlugins.coordinate(bundledProject),
                 archiveFile = bundledProject.tasks.named("jar", Jar::class.java).flatMap { it.archiveFile },
             )
         }
@@ -96,15 +49,15 @@ class CliPackagingPlugin : Plugin<Project> {
         val cliVersion = project.version.toString()
         val bundledPluginCatalogOutput =
             project.layout.buildDirectory.file(
-                "generated/microsmith/${CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}",
+                "generated/microsmith/${CliPackagingNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}",
             )
-        val bundledPluginCatalogJarEntry = CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_JAR_PATH
+        val bundledPluginCatalogJarEntry = CliPackagingNames.BUNDLED_PLUGIN_CATALOG_JAR_PATH
         val shadowJarTask = project.tasks.named("shadowJar", ShadowJar::class.java)
         val shadowJarArchive = shadowJarTask.flatMap { it.archiveFile }
-        val shadowJarArchiveName = CliPackagingBuildNames.shadowJarArchiveName(cliVersion)
-        val distRootName = CliPackagingBuildNames.distRootName(cliVersion)
-        val distDirectory = project.layout.buildDirectory.dir(CliPackagingBuildNames.DIST_BUILD_DIRECTORY)
-        val releaseAssetsDirectory = project.layout.buildDirectory.dir(CliPackagingBuildNames.RELEASE_ASSETS_DIRECTORY)
+        val shadowJarArchiveName = CliPackagingNames.shadowJarArchiveName(cliVersion)
+        val distRootName = CliPackagingNames.distRootName(cliVersion)
+        val distDirectory = project.layout.buildDirectory.dir(CliPackagingNames.DIST_BUILD_DIRECTORY)
+        val releaseAssetsDirectory = project.layout.buildDirectory.dir(CliPackagingNames.RELEASE_ASSETS_DIRECTORY)
 
         project.extensions.getByType(SourceSetContainer::class.java)
             .named("main")
@@ -116,7 +69,7 @@ class CliPackagingPlugin : Plugin<Project> {
                 task.inputs.property("cliVersion", cliVersion)
                 task.inputs.property(
                     "catalogFormatVersion",
-                    CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
+                    CliPackagingNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
                 )
                 task.inputs.files(bundledPlugins.map { it.archiveFile })
                 task.outputs.file(bundledPluginCatalogOutput)
@@ -128,7 +81,7 @@ class CliPackagingPlugin : Plugin<Project> {
                     val catalogText =
                         CliBundledPluginCatalogWriter.buildText(
                             cliVersion = cliVersion,
-                            formatVersion = CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
+                            formatVersion = CliPackagingNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
                             bundledPlugins = bundledPlugins,
                             bundledServiceEntries = bundledServiceEntries,
                         )
@@ -136,7 +89,7 @@ class CliPackagingPlugin : Plugin<Project> {
                     CliBundledPluginCatalogVerifier.validate(
                         catalogText,
                         outputFile.path,
-                        CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
+                        CliPackagingNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
                         cliVersion,
                         bundledPluginCoordinates,
                         bundledServiceEntries,
@@ -159,8 +112,8 @@ class CliPackagingPlugin : Plugin<Project> {
         }
 
         shadowJarTask.configure { shadowJar ->
-            shadowJar.archiveBaseName.set(CliPackagingBuildNames.SHADOW_JAR_BASE_NAME)
-            shadowJar.archiveClassifier.set(CliPackagingBuildNames.SHADOW_JAR_CLASSIFIER)
+            shadowJar.archiveBaseName.set(CliPackagingNames.SHADOW_JAR_BASE_NAME)
+            shadowJar.archiveClassifier.set(CliPackagingNames.SHADOW_JAR_CLASSIFIER)
             shadowJar.filesMatching("META-INF/services/**") { fileCopyDetails ->
                 fileCopyDetails.duplicatesStrategy = DuplicatesStrategy.INCLUDE
             }
@@ -191,7 +144,7 @@ class CliPackagingPlugin : Plugin<Project> {
                     CliBundledPluginCatalogVerifier.validate(
                         expectedCatalogText,
                         bundledPluginCatalogOutput.get().asFile.path,
-                        CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
+                        CliPackagingNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
                         cliVersion,
                         bundledPluginCoordinates,
                         bundledServiceEntries,
@@ -236,7 +189,7 @@ class CliPackagingPlugin : Plugin<Project> {
                         CliBundledPluginCatalogVerifier.validate(
                             actualCatalogText,
                             "${shadedJar.name}!/$bundledPluginCatalogJarEntry",
-                            CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
+                            CliPackagingNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
                             cliVersion,
                             bundledPluginCoordinates,
                             bundledServiceEntries,
@@ -285,7 +238,7 @@ class CliPackagingPlugin : Plugin<Project> {
             project.tasks.register(CliTaskNames.CLI_DIST_ZIP, Zip::class.java) { task ->
                 task.dependsOn(prepareDistTask)
                 task.inputs.property("unixLauncherPermissions", CLI_EXECUTABLE_FILE_MODE)
-                task.archiveBaseName.set(CliPackagingBuildNames.SHADOW_JAR_BASE_NAME)
+                task.archiveBaseName.set(CliPackagingNames.SHADOW_JAR_BASE_NAME)
                 task.archiveVersion.set(cliVersion)
                 task.archiveClassifier.set("dist")
                 task.destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
@@ -299,7 +252,7 @@ class CliPackagingPlugin : Plugin<Project> {
                 task.dependsOn(prepareDistTask)
                 task.inputs.property("unixLauncherPermissions", CLI_EXECUTABLE_FILE_MODE)
                 task.compression = Compression.GZIP
-                task.archiveBaseName.set(CliPackagingBuildNames.SHADOW_JAR_BASE_NAME)
+                task.archiveBaseName.set(CliPackagingNames.SHADOW_JAR_BASE_NAME)
                 task.archiveVersion.set(cliVersion)
                 task.archiveClassifier.set("dist")
                 task.archiveExtension.set("tar.gz")
@@ -327,11 +280,11 @@ class CliPackagingPlugin : Plugin<Project> {
                     val distRootDirectory = distDirectory.get().asFile
                     val distCatalogFile = java.io.File(
                         distRootDirectory,
-                        CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME,
+                        CliPackagingNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME,
                     )
                     if (!distCatalogFile.isFile) {
                         throw GradleException(
-                            "Distribution directory is missing '${CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}' at ${distCatalogFile.path}.",
+                            "Distribution directory is missing '${CliPackagingNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}' at ${distCatalogFile.path}.",
                         )
                     }
                     val distCatalogText = distCatalogFile.readText(StandardCharsets.UTF_8)
@@ -343,7 +296,7 @@ class CliPackagingPlugin : Plugin<Project> {
                     CliBundledPluginCatalogVerifier.validate(
                         distCatalogText,
                         distCatalogFile.path,
-                        CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
+                        CliPackagingNames.BUNDLED_PLUGIN_CATALOG_FORMAT_VERSION,
                         cliVersion,
                         bundledPluginCoordinates,
                         bundledServiceEntries,
@@ -371,7 +324,7 @@ class CliPackagingPlugin : Plugin<Project> {
 
                     val expectedEntries =
                         setOf(
-                            "$distRootName/${CliPackagingBuildNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}",
+                            "$distRootName/${CliPackagingNames.BUNDLED_PLUGIN_CATALOG_FILE_NAME}",
                             "$distRootName/README.txt",
                             "$distRootName/bin/microsmith",
                             "$distRootName/bin/microsmith.bat",
