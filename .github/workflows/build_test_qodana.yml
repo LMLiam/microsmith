@@ -39,8 +39,6 @@ jobs:
         run: ./gradlew build --stacktrace
       - name: Publish native JVM packages to mavenLocal
         run: ./gradlew publishToMavenLocal --stacktrace
-      - name: Setup sbt
-        uses: sbt/setup-sbt@v1
       - name: Validate native Gradle fixtures
         run: |
           set -euo pipefail
@@ -102,34 +100,6 @@ jobs:
           validate_maven_proto_fixture examples/maven/kotlin
           validate_maven_proto_fixture examples/maven/scala
           validate_maven_dotnet_fixture examples/maven/dotnet
-      - name: Validate native sbt fixtures
-        run: |
-          set -euo pipefail
-          VERSION="$(./gradlew -q properties | sed -n 's/^version: //p' | head -n 1)"
-
-          validate_sbt_proto_fixture() {
-            local repo_root="$1"
-            local generated_root="$repo_root/proto"
-
-            (cd "$repo_root" && sbt -batch -Dsbt.supershell=false -Dmicrosmith.version="$VERSION" microsmithGenerate)
-            test -d "$generated_root"
-            find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
-          }
-
-          validate_sbt_dotnet_fixture() {
-            local repo_root="$1"
-            local project_root="$repo_root/Generated/dotnet/Platform/UserService.Api"
-
-            (cd "$repo_root" && sbt -batch -Dsbt.supershell=false -Dmicrosmith.version="$VERSION" microsmithGenerate)
-            test -f "$project_root/UserService.Api.csproj"
-            test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
-            test -f "$project_root/Generated/Contracts/ResponseModels.cs"
-            test -f "$project_root/.microsmith/origins.json"
-            dotnet build "$project_root/UserService.Api.csproj"
-          }
-
-          validate_sbt_proto_fixture examples/sbt/scala
-          validate_sbt_dotnet_fixture examples/sbt/dotnet
       - name: Validate IDE fallback release assets
         run: |
           ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
@@ -366,7 +336,7 @@ jobs:
 
           smoke_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
           smoke_unix_fixture kotlin examples/jvm/kotlin-gradle KotlinUserCreated.proto kotlin-ide-doctor.json
-          smoke_unix_fixture scala examples/jvm/scala-sbt ScalaUserCreated.proto scala-ide-doctor.json
+          smoke_unix_fixture scala examples/gradle/scala ScalaUserCreated.proto scala-ide-doctor.json
           smoke_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
           smoke_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
           smoke_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
