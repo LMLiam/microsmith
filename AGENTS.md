@@ -21,6 +21,14 @@ Do not add commentary to code.
 - Do not add KDoc or a docstring that repeats a class name or a method name.
 - Keep a comment only for a constraint or a side effect that the code cannot express. State it in one line.
 
+## Commits and attribution
+
+Do not attribute a commit, a pull request, or a file to an agent.
+
+- Do not add a `Co-Authored-By` trailer for an agent.
+- Do not add a "generated with" line.
+- Do not name an agent in a commit message, a pull-request body, or a code comment.
+
 ## Testing policy
 
 Write tests that protect behaviour. Cover what can regress. Do not chase a coverage number.
