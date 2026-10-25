@@ -108,6 +108,13 @@ subprojects {
         e2eTestRuntimeOnly.extendsFrom(testRuntimeOnly)
     }
 
+    kotlin.target.compilations.named('integrationTest') {
+        associateWith(kotlin.target.compilations.getByName('main'))
+    }
+    kotlin.target.compilations.named('e2eTest') {
+        associateWith(kotlin.target.compilations.getByName('main'))
+    }
+
     tasks.register('integrationTest', io.kotest.framework.gradle.tasks.KotestJvmTask) {
         description = 'Runs integration tests.'
         group = 'verification'

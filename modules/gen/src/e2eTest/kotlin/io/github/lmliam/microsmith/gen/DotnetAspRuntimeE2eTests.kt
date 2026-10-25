@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.gen.e2e
+package io.github.lmliam.microsmith.gen
 
 import io.github.lmliam.microsmith.dsl.microsmith
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.service.asp

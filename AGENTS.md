@@ -22,7 +22,7 @@ Use the lowest layer that can observe the behaviour.
 
 | Layer | Scope | Where |
 |---|---|---|
-| Unit | One function, builder, or resolver. No file system, no process, no network. | `src/test`, production package |
+| Unit | One function, builder, or resolver. No process or network. A temporary directory is allowed when the unit writes files. | `src/test`, production package |
 | Integration | Several pipeline stages composed, with real collaborators and temporary directories. | `src/integrationTest` |
 | End-to-end | A generated project built and run by its real toolchain, or the shipped artifact. | `src/e2eTest`, or a CI workflow |
 
