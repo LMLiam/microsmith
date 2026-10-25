@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.integration
+package io.github.lmliam.microsmith.compile.schemas.protobuf.rpc
 
 import io.github.lmliam.microsmith.dsl.microsmith
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
