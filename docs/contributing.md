@@ -82,6 +82,14 @@ Run tests:
 ./gradlew kotest
 ```
 
+Run integration and end-to-end tests:
+
+```bash
+./gradlew integrationTest e2eTest
+```
+
+Unit tests live in `src/test`. Integration tests live in `src/integrationTest`. End-to-end tests live in `src/e2eTest` and skip themselves when their toolchain is absent.
+
 Run static analysis and check Kotlin formatting:
 
 ```bash

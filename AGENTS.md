@@ -14,7 +14,7 @@ Quirks are optional project-local notes. Use `recall_quirks` and `add_quirk` whe
 
 ## Testing policy
 
-Write a test to catch a regression. Do not write a test to describe the current code.
+Write tests that protect behaviour. Cover what can regress. Do not chase a coverage number.
 
 ### Layers
 
@@ -22,19 +22,31 @@ Use the lowest layer that can observe the behaviour.
 
 | Layer | Scope | Where |
 |---|---|---|
-| Unit | One function, builder, or resolver. No file system, no process, no network. | `modules/*/src/test` |
-| Integration | Pipeline stages composed, with real collaborators and temporary directories. | `modules/*/src/test` |
-| End-to-end | The shipped artifact: dist launcher, archive, installer, or generated project compiled by its real toolchain. | `.github/workflows` |
+| Unit | One function, builder, or resolver. No file system, no process, no network. | `src/test`, production package |
+| Integration | Several pipeline stages composed, with real collaborators and temporary directories. | `src/integrationTest` |
+| End-to-end | A generated project built and run by its real toolchain, or the shipped artifact. | `src/e2eTest`, or a CI workflow |
+
+Each layer has its own Gradle task: `./gradlew kotest`, `./gradlew integrationTest`, and `./gradlew e2eTest`. `check` runs all three.
 
 - Do not add an end-to-end check for behaviour that a lower layer already observes.
 - Do not add a lower-layer test that only repeats an end-to-end check.
 
+### Removed behaviour
+
+Do not test that something no longer exists. Delete the test together with the code.
+
+A test that asserts a removed flag, command, file, or type is rejected is not a regression test. It cannot fail for a useful reason, and the parser, the build, or the compiler already rejects the change. Keep one test for the general rule, such as an unknown option, and delete the per-case copies.
+
+Do not keep a test only to prove that an old behaviour is gone. If a removal needs a permanent guard, that guard is a compiler error or a build check, not a test.
+
 ### End-to-end checks
 
-An end-to-end check is allowed only for what unit and integration tests cannot reach: packaging, archive permissions, installers, and generated output compiled by a real toolchain.
+An end-to-end test is allowed only for what unit and integration tests cannot reach: packaging, archive permissions, installers, a generated project compiled by its real toolchain, and launcher behaviour on a real operating system.
 
-- Name the step `Verify <target>`. Do not name it `Smoke test <target>`. A smoke test is a build-stability check, not an ad-hoc activity.
-- Run the check against a built artifact. Do not run it against classes on the test classpath.
+- Prefer a local end-to-end test when the toolchain runs on a developer machine. Put it in `src/e2eTest` and skip it when the toolchain is absent.
+- Use a CI step for what a local test cannot do: several operating systems, the published installer, and the release archives.
+- Name a CI step `Verify <target>`. Do not name it `Smoke test <target>`. A smoke test is a build-stability check, not a general end-to-end test.
+- Run the test against a built artifact or a generated project. Do not run it against classes on the test classpath.
 - Do not add a manual check without recording it as an automated test or a CI step.
 
 ### Test quality
