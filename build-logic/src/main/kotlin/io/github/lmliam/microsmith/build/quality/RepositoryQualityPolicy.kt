@@ -15,7 +15,7 @@ internal data class RepositoryQualityPolicy(
         fun default(): RepositoryQualityPolicy = RepositoryQualityPolicy(
             defaultMaxProductionFileLines = 170,
             productionFileLineOverrides = mapOf(
-                "modules/cli/src/main/kotlin/io/github/lmliam/microsmith/cli/parsing/RunOptionsParser.kt" to
+                "modules/integrations/cli/src/main/kotlin/io/github/lmliam/microsmith/cli/parsing/RunOptionsParser.kt" to
                     ProductionFileLineOverride(
                         maxLines = 220,
                         rationale =
@@ -23,7 +23,7 @@ internal data class RepositoryQualityPolicy(
                             "and will be decomposed separately rather than hidden behind " +
                             "a catch-all helper.",
                     ),
-                "modules/dsl-schemas-protobuf/src/main/kotlin/io/github/lmliam/microsmith/dsl/schemas/protobuf/" +
+                "modules/schemas/protobuf/dsl-schemas-protobuf/src/main/kotlin/io/github/lmliam/microsmith/dsl/schemas/protobuf/" +
                     "types/MessageBuilder.kt" to
                     ProductionFileLineOverride(
                         maxLines = 190,
@@ -32,7 +32,7 @@ internal data class RepositoryQualityPolicy(
                             "the temporary headroom is explicit until a narrower extraction " +
                             "is warranted.",
                     ),
-                "modules/compile-services-dotnet/src/main/kotlin/io/github/lmliam/microsmith/compile/" +
+                "modules/services/dotnet/compile-services-dotnet/src/main/kotlin/io/github/lmliam/microsmith/compile/" +
                     "services/dotnet/csharp/CSharp.kt" to
                     ProductionFileLineOverride(
                         maxLines = 400,

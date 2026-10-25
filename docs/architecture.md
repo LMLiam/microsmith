@@ -219,7 +219,12 @@ This keeps the layering explicit:
 
 ## Repository layout
 
-- `modules/`: production Gradle subprojects grouped into pipeline families such as `dsl-*`, `resolve-*`, `artifact-*`, `compile-*`, and `gen`, plus execution layers like `runtime-scripting`, `cli`, `gradle-plugin`, and `maven-plugin`
+- `modules/`: production Gradle subprojects, grouped by capability:
+  - `engine/`: the pipeline stages `dsl`, `resolve`, `artifact`, `compile`, and `gen`
+  - `schemas/`: schema targets under `base/`, `protobuf/`, and `protobuf-rpc/`
+  - `services/`: service targets under `base/`, `dotnet/`, `dotnet-asp/`, and `dotnet-packages/`
+  - `runtime/`: the scripting host and its API
+  - `integrations/`: `cli`, `gradle-plugin`, and `maven-plugin`
 - `build-logic/`: included Gradle build that owns repository-specific plugins and quality tasks
 - `examples/`: consumer-repository fixtures and onboarding examples
 - `docs/`: user and contributor documentation
