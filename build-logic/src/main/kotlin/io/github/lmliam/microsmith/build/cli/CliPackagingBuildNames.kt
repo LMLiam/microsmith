@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.build.cli
 import org.gradle.api.Project
 
 internal object CliPackagingBuildNames {
+    const val APPLICATION_MAIN_CLASS = "io.github.lmliam.microsmith.cli.CliKt"
     val BUNDLED_PLUGIN_PROJECT_PATHS = listOf(
         ":resolve-services",
         ":resolve-services-dotnet",
