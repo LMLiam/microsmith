@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controlle
 
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpTypes
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpArrayType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpNullableType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
@@ -16,14 +17,17 @@ internal fun renderRespondHelper(): CSharp.Method =
         returnType = csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ActionResult),
         parameters =
             listOf(
-                csharpParameter(csharpNullableType("object"), "body"),
-                csharpParameter("int", "statusCode"),
+                csharpParameter(csharpNullableType(DotnetCSharpTypes.Primitives.Object), "body"),
+                csharpParameter(DotnetCSharpTypes.Primitives.Int, "statusCode"),
                 csharpParameter(
                     type =
                         csharpArrayType(
                             csharpTupleType(
-                                csharpTupleElement(csharpType("string"), "Name"),
-                                csharpTupleElement(csharpNullableType("string"), "Value"),
+                                csharpTupleElement(csharpType(DotnetCSharpTypes.Primitives.String), "Name"),
+                                csharpTupleElement(
+                                    csharpNullableType(DotnetCSharpTypes.Primitives.String),
+                                    "Value",
+                                ),
                             )
                         ),
                     name = "headers",
@@ -75,8 +79,8 @@ internal fun renderReadHeaderHelper(): CSharp.Method =
     CSharp.Method(
         name = "ReadHeader",
         modifiers = listOf(CSharp.Modifier.PROTECTED),
-        returnType = csharpNullableType("string"),
-        parameters = listOf(csharpParameter("string", "headerName")),
+        returnType = csharpNullableType(DotnetCSharpTypes.Primitives.String),
+        parameters = listOf(csharpParameter(DotnetCSharpTypes.Primitives.String, "headerName")),
         body =
             CSharp.codeBlock {
                 returnStatement(
