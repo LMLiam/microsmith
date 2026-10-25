@@ -129,15 +129,15 @@ Release sign-off artifact:
 
 `./gradlew :cli:releaseArtifacts :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums` produces:
 
-- `modules/cli/build/libs/microsmith-cli-<version>-all.jar`
-- `modules/cli/build/distributions/microsmith-cli-<version>-dist.zip`
-- `modules/cli/build/distributions/microsmith-cli-<version>-dist.tar.gz`
-- `modules/cli/build/release-assets/microsmith-install.sh`
-- `modules/cli/build/release-assets/microsmith-install.ps1`
-- `modules/cli/build/release-assets/*.sha256`
-- `modules/cli/build/generated/microsmith/bundled-plugins.lock`
-- `modules/runtime-scripting/build/release-assets/microscript-definition-<version>-all.jar`
-- `modules/runtime-scripting/build/release-assets/microscript-definition-<version>-all.jar.sha256`
+- `modules/integrations/cli/build/libs/microsmith-cli-<version>-all.jar`
+- `modules/integrations/cli/build/distributions/microsmith-cli-<version>-dist.zip`
+- `modules/integrations/cli/build/distributions/microsmith-cli-<version>-dist.tar.gz`
+- `modules/integrations/cli/build/release-assets/microsmith-install.sh`
+- `modules/integrations/cli/build/release-assets/microsmith-install.ps1`
+- `modules/integrations/cli/build/release-assets/*.sha256`
+- `modules/integrations/cli/build/generated/microsmith/bundled-plugins.lock`
+- `modules/runtime/runtime-scripting/build/release-assets/microscript-definition-<version>-all.jar`
+- `modules/runtime/runtime-scripting/build/release-assets/microscript-definition-<version>-all.jar.sha256`
 
 Published packages are available from:
 

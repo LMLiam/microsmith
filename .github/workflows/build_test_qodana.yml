@@ -101,8 +101,8 @@ jobs:
       - name: Validate IDE fallback release assets
         run: |
           ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
-          find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar' | grep -q .
-          find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar.sha256' | grep -q .
+          find modules/runtime/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar' | grep -q .
+          find modules/runtime/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar.sha256' | grep -q .
       - name: Publish Test Report
         uses: dorny/test-reporter@v2
         if: ${{ always() && hashFiles('**/build/test-results/**/*.xml') != '' }}
@@ -162,7 +162,7 @@ jobs:
         run: .\gradlew.bat :cli:releaseArtifacts --stacktrace
       - name: Verify dist launcher (Unix)
         if: runner.os != 'Windows'
-        run: ./modules/cli/build/microsmith-cli-dist/bin/microsmith --help | grep -q "Usage:"
+        run: ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith --help | grep -q "Usage:"
       - name: Verify dist generation and provider discovery (Unix)
         if: runner.os != 'Windows'
         run: |
@@ -177,14 +177,14 @@ jobs:
               }
           }
           EOF
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts
+          ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts
           test -f proto/CiSmoke.proto
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --isolation process
+          ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --isolation process
           test -f proto/CiSmoke.proto
       - name: Verify dist ASP.NET generation (Unix)
         if: runner.os != 'Windows'
         run: |
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run examples/non-gradle/dotnet/schema.microsmith.kts --out aspnet-dist
+          ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith run examples/non-gradle/dotnet/schema.microsmith.kts --out aspnet-dist
           test -f aspnet-dist/dotnet/Platform/UserService.Api/UserService.Api.csproj
           test -f aspnet-dist/dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs
           test -f aspnet-dist/dotnet/Platform/UserService.Api/Generated/Contracts/ResponseModels.cs
@@ -193,7 +193,7 @@ jobs:
       - name: Verify dist doctor diagnostics mode (Unix)
         if: runner.os != 'Windows'
         run: |
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith doctor --diagnostics json > cli-doctor.json
+          ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith doctor --diagnostics json > cli-doctor.json
           grep -q "Doctor checks passed." cli-doctor.json
       - name: Verify dist launcher (Windows)
         if: runner.os == 'Windows'
@@ -285,10 +285,10 @@ jobs:
         if: ${{ always() && runner.os != 'Windows' && steps.build-release-unix.outcome == 'success' }}
         run: |
           set -eu
-          DIST_FILE="$(find modules/cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
+          DIST_FILE="$(find modules/integrations/cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
           CLI_VERSION="$(printf '%s\n' "$DIST_FILE" | sed -E 's#.*microsmith-cli-(.*)-dist.tar.gz#\1#')"
           DIST_SHA="$(awk '{print $1}' "${DIST_FILE}.sha256")"
-          sh modules/cli/build/release-assets/microsmith-install.sh \
+          sh modules/integrations/cli/build/release-assets/microsmith-install.sh \
             --version "$CLI_VERSION" \
             --install-root "$PWD/.microsmith-home" \
             --bin-dir "$PWD/.microsmith-bin" \
