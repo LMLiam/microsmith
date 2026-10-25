@@ -199,7 +199,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $help = & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat --help 2>&1
+          $help = & .\modules\integrations\cli\build\microsmith-cli-dist\bin\microsmith.bat --help 2>&1
           if ($LASTEXITCODE -ne 0) {
             Write-Output $help
             exit $LASTEXITCODE
@@ -224,7 +224,7 @@ jobs:
               }
           }
           '@ | Set-Content -Path schema.microsmith.kts -Encoding UTF8
-          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts
+          & .\modules\integrations\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
@@ -232,7 +232,7 @@ jobs:
             Write-Error "Expected proto\\CiSmoke.proto to exist."
             exit 1
           }
-          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated-process --isolation process
+          & .\modules\integrations\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated-process --isolation process
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
@@ -244,7 +244,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run examples/non-gradle/dotnet\schema.microsmith.kts --out aspnet-dist
+          & .\modules\integrations\cli\build\microsmith-cli-dist\bin\microsmith.bat run examples/non-gradle/dotnet\schema.microsmith.kts --out aspnet-dist
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
@@ -270,7 +270,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $doctor = & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat doctor --diagnostics json 2>&1
+          $doctor = & .\modules\integrations\cli\build\microsmith-cli-dist\bin\microsmith.bat doctor --diagnostics json 2>&1
           if ($LASTEXITCODE -ne 0) {
             Write-Output $doctor
             exit $LASTEXITCODE
@@ -359,7 +359,7 @@ jobs:
         if: ${{ always() && runner.os == 'Windows' && steps.build-release-windows.outcome == 'success' }}
         shell: pwsh
         run: |
-          $distAsset = Get-ChildItem -Path .\modules\cli\build\release-assets\microsmith-cli-*-dist.zip | Select-Object -First 1
+          $distAsset = Get-ChildItem -Path .\modules\integrations\cli\build\release-assets\microsmith-cli-*-dist.zip | Select-Object -First 1
           if (-not $distAsset) {
             Write-Error "Unable to locate CLI dist zip asset."
             exit 1
@@ -371,7 +371,7 @@ jobs:
             exit 1
           }
           $distSha = (Get-Content -Path $distShaPath -Raw).Split(' ', [System.StringSplitOptions]::RemoveEmptyEntries)[0]
-          & .\modules\cli\build\release-assets\microsmith-install.ps1 `
+          & .\modules\integrations\cli\build\release-assets\microsmith-install.ps1 `
             -Version $version `
             -InstallRoot "$pwd\.microsmith-home" `
             -BinDir "$pwd\.microsmith-bin" `
