@@ -15,12 +15,6 @@ internal data class BundledServiceEntry(
     val provider: String,
 )
 
-/**
- * Builds the bundled plugin profile that the CLI ships as `bundled-plugins.lock`.
- *
- * A plugin is a pair of a Maven coordinate and the JAR that provides it. The declared
- * order is the catalog order, so the generated text is deterministic.
- */
 internal object CliBundledPluginProfile {
     fun plugins(
         coordinates: List<String>,

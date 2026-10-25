@@ -5,7 +5,6 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
-/** Writes the bundled plugin catalog and verifies the text it wrote. */
 abstract class GenerateBundledPluginCatalog : CliBundledPluginTask() {
     @get:OutputFile
     abstract val catalogFile: RegularFileProperty
