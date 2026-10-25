@@ -10,7 +10,6 @@ import io.github.lmliam.microsmith.gen.MicrosmithGenerationScope
 import io.github.lmliam.microsmith.gen.errors.GenerationResolutionFailedException
 import io.github.lmliam.microsmith.gen.files.FileSpace
 import io.github.lmliam.microsmith.gen.files.TemporaryDirectory
-import io.github.lmliam.microsmith.gen.output.GeneratedOriginsManifestBuilder
 import io.github.lmliam.microsmith.gen.output.GeneratedOutputUniquenessValidator
 import io.github.lmliam.microsmith.gen.output.GeneratedOutputWriter
 import io.github.lmliam.microsmith.gen.render.ArtifactRenderingService
@@ -49,13 +48,12 @@ internal class MicrosmithGenerationRunner(
                 val contributions = artifactContributionService.contribute(resolvedModels)
                 val assembly = artifactAssemblyService.assemble(contributions)
                 val compiledAssembly = artifactCompilationService.compile(assembly)
-                val generatedWithOriginsManifest =
-                    GeneratedOriginsManifestBuilder.appendTo(artifactRenderingService.render(compiledAssembly))
+                val generatedFiles = artifactRenderingService.render(compiledAssembly)
 
-                GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(generatedWithOriginsManifest)
-                outputWriter.write(generatedWithOriginsManifest, tempSpace)
+                GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(generatedFiles)
+                outputWriter.write(generatedFiles, tempSpace)
 
-                generatedWithOriginsManifest
+                generatedFiles
             }
 
         outputWriter.write(outputs, finalDir)

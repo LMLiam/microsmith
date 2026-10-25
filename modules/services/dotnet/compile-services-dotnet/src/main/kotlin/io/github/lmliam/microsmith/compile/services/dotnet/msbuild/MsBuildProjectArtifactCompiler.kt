@@ -25,7 +25,6 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
                         outputRoot = artifact.outputRoot(),
                     ),
                 contents = MsBuildProjectXmlRenderer.render(artifact),
-                origins = artifact.origins.ifEmpty { setOf(artifact.id.originName()) },
             )
         )
 
@@ -46,12 +45,6 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
             MsBuildProjectKind.DirectoryBuildProps -> Path.of("Directory.Build.props")
             MsBuildProjectKind.Project -> Path.of("${requireNotNull(artifact.id.projectName)}.csproj")
         }
-
-    private fun MsBuildProjectArtifactId.originName(): String = buildString {
-        append("dotnet.solutions.").append(solutionName)
-        projectName?.let { append(".projects.").append(it) }
-        append(".").append(kind.name)
-    }
 
     private companion object {
         val dotnetOutputRoot: Path = Path.of("dotnet")

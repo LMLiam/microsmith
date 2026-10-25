@@ -36,7 +36,6 @@ internal class DotnetAspServiceArtifactFactory(
                     typeName = model.name,
                     locality = DotnetAspModelLocality.SHARED,
                     model = model,
-                    origins = setOf("services.${service.name}.models.${model.name}"),
                 )
         }
 
@@ -64,19 +63,17 @@ internal class DotnetAspServiceArtifactFactory(
                 operationName = endpoint.operationName,
                 bindings =
                     DotnetAspEndpointBindingsArtifact(
-                        path = endpoint.bindings.path?.toRequestBindingArtifact(endpoint, "path"),
-                        query = endpoint.bindings.query?.toRequestBindingArtifact(endpoint, "query"),
+                        path = endpoint.bindings.path?.toRequestBindingArtifact(endpoint),
+                        query = endpoint.bindings.query?.toRequestBindingArtifact(endpoint),
                         headers = endpoint.bindings.headers?.toHeadersBindingArtifact(endpoint),
                         body = endpoint.bindings.body?.toModelArtifact(endpoint, "body"),
                     ),
                 responses = endpoint.responses.map { response -> response.toResponseArtifact(endpoint) },
-                origins = setOf("services.${service.name}.rest.${endpoint.operationName}"),
             )
         }
 
     private fun ResolvedDotnetAspRequestBinding.toRequestBindingArtifact(
-        endpoint: ResolvedDotnetAspEndpoint,
-        bindingLabel: String,
+        endpoint: ResolvedDotnetAspEndpoint
     ): DotnetAspRequestBindingArtifact =
         DotnetAspRequestBindingArtifact(
             typeName = allocateDotnetAspTypeName(usedTypeNames, name, "${endpoint.operationName}$name"),
@@ -90,7 +87,6 @@ internal class DotnetAspServiceArtifactFactory(
                         defaultValue = field.defaultValue?.unwrapDotnetAspDefaultValue(),
                     )
                 },
-            origins = setOf("services.${service.name}.rest.${endpoint.operationName}.$bindingLabel.$name"),
         )
 
     private fun ResolvedDotnetAspHeadersBinding.toHeadersBindingArtifact(
@@ -100,7 +96,6 @@ internal class DotnetAspServiceArtifactFactory(
             typeName = allocateDotnetAspTypeName(usedTypeNames, name, "${endpoint.operationName}$name"),
             name = name,
             headers = headers.map { header -> DotnetAspHeaderFieldArtifact(header.name, header.headerName) },
-            origins = setOf("services.${service.name}.rest.${endpoint.operationName}.headers.$name"),
         )
 
     private fun ResolvedDotnetAspModel.toModelArtifact(
@@ -124,8 +119,6 @@ internal class DotnetAspServiceArtifactFactory(
                             ),
                         locality = DotnetAspModelLocality.INLINE,
                         model = model,
-                        origins =
-                            setOf("services.${service.name}.rest.${endpoint.operationName}.$originKind.${model.name}"),
                     )
                     .also(contractModels::add)
         }
@@ -138,9 +131,6 @@ internal class DotnetAspServiceArtifactFactory(
             statusCode = statusCode,
             model = modelArtifact,
             headers = headers.map { header -> DotnetAspResponseHeaderArtifact(header.name) },
-            origins =
-                setOf("services.${service.name}.rest.${endpoint.operationName}.responses.$statusCode") +
-                    modelArtifact.origins,
         )
     }
 }

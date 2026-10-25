@@ -23,7 +23,6 @@ class ProtobufArtifactContributor : ArtifactContributor<ResolvedProtobufSchemaMo
                 schema.identity.packageName,
                 schema.dependencies.map(QualifiedSchemaName::toImportPath),
                 listOf(ProtoDeclaration(schema.identity.typeName, renderProtobufDeclaration(schema.declaration))),
-                setOf("schemas.protobuf.${schema.identity.fullyQualifiedName}"),
             )
         }
 }
