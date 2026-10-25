@@ -10,13 +10,6 @@ import io.github.lmliam.microsmith.dsl.services.ServiceExtension
  */
 data class DotnetPackageReferencesExtension(val packages: List<DotnetPackageReferenceDeclaration> = emptyList()) :
     ServiceExtension, MergeableExtension<DotnetPackageReferencesExtension> {
-    fun findPackage(name: String): String? = packages.find { it.name == name }?.version
-
-    fun requirePackage(name: String): String {
-        require(name.isNotBlank()) { "Package name cannot be blank." }
-        return findPackage(name) ?: error("Dotnet package not found: $name")
-    }
-
     override fun merge(other: DotnetPackageReferencesExtension): DotnetPackageReferencesExtension {
         val existingNames = packages.map(DotnetPackageReferenceDeclaration::name).toSet()
         val collisions =

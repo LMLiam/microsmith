@@ -4,10 +4,6 @@ package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 class CSharpCodeBlockBuilder internal constructor() {
     private val statements = mutableListOf<CSharp.Statement>()
 
-    fun addStatement(statement: CSharp.Statement) {
-        statements += statement
-    }
-
     fun line(text: String) {
         statements += CSharp.RawStatement(text)
     }
