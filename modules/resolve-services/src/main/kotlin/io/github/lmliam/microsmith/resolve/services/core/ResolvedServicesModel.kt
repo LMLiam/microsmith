@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.resolve.services.core
 
 import io.github.lmliam.microsmith.dsl.services.core.Service
-import io.github.lmliam.microsmith.resolve.core.ResolvedModel
+import io.github.lmliam.microsmith.resolve.ResolvedModel
 
 /**
  * Finalized services model at the domain-root level.

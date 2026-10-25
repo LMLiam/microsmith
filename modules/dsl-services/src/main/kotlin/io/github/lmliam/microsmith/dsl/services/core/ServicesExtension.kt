@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.core
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import kotlin.reflect.KClass
 
 /**

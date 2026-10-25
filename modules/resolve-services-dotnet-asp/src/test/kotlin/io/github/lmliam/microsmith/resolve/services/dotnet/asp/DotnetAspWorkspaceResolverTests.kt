@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
+import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.core.services
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspDefaultValue

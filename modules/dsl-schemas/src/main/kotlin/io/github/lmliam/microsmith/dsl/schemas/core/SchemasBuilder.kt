@@ -11,8 +11,8 @@ package io.github.lmliam.microsmith.dsl.schemas.core
  *
  * The builder itself is mutable, but the result of [toExtension] is an
  * immutable [SchemasExtension] that is attached to the overall
- * [io.github.lmliam.microsmith.dsl.core.MicrosmithModel] via the
- * [io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder].
+ * [io.github.lmliam.microsmith.dsl.MicrosmithModel] via the
+ * [io.github.lmliam.microsmith.dsl.MicrosmithBuilder].
  *
  * ### Lifecyce
  * - A new [SchemasBuilder] is created when entering a `schemas { }` block.

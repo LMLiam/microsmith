@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.core
 
-import io.github.lmliam.microsmith.dsl.helpers.mergeModelExtension
+import io.github.lmliam.microsmith.dsl.merge.mergeModelExtension
 import kotlin.reflect.KClass
 
 /**

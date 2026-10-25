@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithModel
+import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import kotlin.script.experimental.api.EvaluationResult
 import kotlin.script.experimental.api.ResultValue

@@ -7,7 +7,8 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Rpc
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.RpcEndpoint
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
-import io.github.lmliam.microsmith.resolve.core.DomainResolver
+import io.github.lmliam.microsmith.resolve.DomainResolution
+import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
@@ -16,7 +17,7 @@ class ProtobufRpcSchemasResolver : DomainResolver<SchemasExtension, ResolvedProt
     override val authoringType = SchemasExtension::class
     override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 
-    override fun resolve(authoring: SchemasExtension): ResolvedProtobufRpcSchemaModel? {
+    override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufRpcSchemaModel> {
         val schemas =
             authoring.schemas
                 .filterIsInstance<ProtobufSchema>()
@@ -27,7 +28,8 @@ class ProtobufRpcSchemasResolver : DomainResolver<SchemasExtension, ResolvedProt
                 }
                 .sortedBy { it.qualifiedName.fullyQualifiedName }
 
-        return schemas.takeIf(List<*>::isNotEmpty)?.let(::ResolvedProtobufRpcSchemaModel)
+        val model = schemas.takeIf(List<*>::isNotEmpty)?.let(::ResolvedProtobufRpcSchemaModel)
+        return model?.let { DomainResolution.Success(it) } ?: DomainResolution.NotApplicable
     }
 
     private fun resolve(

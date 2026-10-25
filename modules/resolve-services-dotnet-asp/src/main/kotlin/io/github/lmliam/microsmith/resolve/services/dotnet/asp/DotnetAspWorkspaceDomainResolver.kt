@@ -2,7 +2,8 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
-import io.github.lmliam.microsmith.resolve.core.DomainResolver
+import io.github.lmliam.microsmith.resolve.DomainResolution
+import io.github.lmliam.microsmith.resolve.DomainResolver
 
 @ServiceProvider(DomainResolver::class)
 class DotnetAspWorkspaceDomainResolver(
@@ -11,8 +12,12 @@ class DotnetAspWorkspaceDomainResolver(
     override val authoringType = ServicesExtension::class
     override val resolvedType = DotnetAspWorkspace::class
 
-    override fun resolve(authoring: ServicesExtension): DotnetAspWorkspace? =
-        workspaceResolver.resolve(authoring).takeIf {
-            it.servicesByName.isNotEmpty()
+    override fun resolve(authoring: ServicesExtension): DomainResolution<DotnetAspWorkspace> {
+        val workspace = workspaceResolver.resolve(authoring)
+        return if (workspace.servicesByName.isEmpty()) {
+            DomainResolution.NotApplicable
+        } else {
+            DomainResolution.Success(workspace)
         }
+    }
 }

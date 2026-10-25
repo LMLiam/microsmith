@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.endpoint
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithDsl
+import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspHeadersBindingScope
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.request.DotnetAspRequestBindingScope
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.core.rest.response.DotnetAspResponsesScope

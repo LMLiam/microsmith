@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.schemas.core
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithDsl
+import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 
 /**
  * Marker interface for the `schemas { ... }` DSL block.

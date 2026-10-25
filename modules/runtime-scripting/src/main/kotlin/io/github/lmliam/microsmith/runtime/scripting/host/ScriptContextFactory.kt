@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host
 
-import io.github.lmliam.microsmith.gen.helpers.generateTo
+import io.github.lmliam.microsmith.gen.generateTo
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import kotlinx.coroutines.runBlocking

@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.core.solution
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
-import io.github.lmliam.microsmith.dsl.helpers.mergeModelExtension
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
+import io.github.lmliam.microsmith.dsl.merge.mergeModelExtension
 import kotlin.reflect.KClass
 
 /**

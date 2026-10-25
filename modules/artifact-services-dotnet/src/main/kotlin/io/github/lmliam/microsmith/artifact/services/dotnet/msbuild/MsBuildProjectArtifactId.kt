@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
 
-import io.github.lmliam.microsmith.artifact.core.ArtifactId
+import io.github.lmliam.microsmith.artifact.ArtifactId
 
 data class MsBuildProjectArtifactId(
     val solutionName: String,

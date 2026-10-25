@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.core
 
-import io.github.lmliam.microsmith.dsl.core.MergeableExtension
+import io.github.lmliam.microsmith.dsl.MergeableExtension
 import io.github.lmliam.microsmith.dsl.services.helpers.require
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly

@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.resolve.schemas.core
 
 import io.github.lmliam.microsmith.dsl.schemas.core.Schema
-import io.github.lmliam.microsmith.resolve.core.ResolvedModel
+import io.github.lmliam.microsmith.resolve.ResolvedModel
 
 /**
  * Finalized schemas model at the domain-root level.

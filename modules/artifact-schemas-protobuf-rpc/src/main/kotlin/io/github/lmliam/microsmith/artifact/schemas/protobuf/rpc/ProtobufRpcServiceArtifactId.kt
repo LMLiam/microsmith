@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc
 
-import io.github.lmliam.microsmith.artifact.core.ArtifactId
+import io.github.lmliam.microsmith.artifact.ArtifactId
 
 data class ProtobufRpcServiceArtifactId(val packageName: String?, val serviceName: String) :
     ArtifactId<ProtobufRpcServiceArtifact> {

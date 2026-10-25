@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp
 
 import com.github.eventhorizonlab.spi.ServiceProvider
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import io.github.lmliam.microsmith.artifact.core.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContributor
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
 
 @ServiceProvider(ArtifactContributor::class)

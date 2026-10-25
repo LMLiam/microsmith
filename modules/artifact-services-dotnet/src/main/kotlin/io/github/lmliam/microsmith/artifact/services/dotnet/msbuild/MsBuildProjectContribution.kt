@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
 
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
 
 data class MsBuildProjectContribution(
     override val artifactId: MsBuildProjectArtifactId,
