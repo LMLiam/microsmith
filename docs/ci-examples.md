@@ -1,36 +1,16 @@
 # CI examples
 
-Set repository or environment variables:
+Set these repository variables before you use the workflows:
 
-- `MICROSMITH_VERSION`
-- `MICROSMITH_INSTALLER_SH_URL`, for example `https://github.com/LMLiam/microsmith/releases/download/v<version>/microsmith-install.sh`
-- `MICROSMITH_INSTALLER_PS1_URL`, for example `https://github.com/LMLiam/microsmith/releases/download/v<version>/microsmith-install.ps1`
+| Variable | Value |
+|---|---|
+| `MICROSMITH_VERSION` | Release version, without the `v` prefix |
+| `MICROSMITH_INSTALLER_SH_URL` | `https://github.com/LMLiam/microsmith/releases/download/v<version>/microsmith-install.sh` |
+| `MICROSMITH_INSTALLER_PS1_URL` | `https://github.com/LMLiam/microsmith/releases/download/v<version>/microsmith-install.ps1` |
 
-## Node repository
+The same workflow works for any language. `microsmith init` detects the repository profile, and `microsmith run` generates the output.
 
-```yaml
-name: Microsmith Generate
-on:
-  pull_request:
-  push:
-    branches: [main]
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Microsmith CLI
-        run: |
-          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
-          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
-          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
-      - name: Bootstrap Microsmith
-        run: microsmith init
-      - name: Run Microsmith
-        run: microsmith run build.microsmith.kts
-```
-
-## Java repository
+## Unix
 
 ```yaml
 name: Microsmith Generate
@@ -46,79 +26,13 @@ jobs:
           curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
           sh microsmith-install.sh --version "$MICROSMITH_VERSION"
           echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
-      - name: Bootstrap Microsmith
-        run: microsmith init
-      - name: Generate protobuf
-        run: microsmith run build.microsmith.kts
-```
-
-## Go repository
-
-```yaml
-name: Microsmith Generate
-on:
-  pull_request:
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Microsmith CLI
+      - name: Generate
         run: |
-          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
-          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
-          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
-      - name: Bootstrap Microsmith
-        run: microsmith init
-      - name: Generate protobuf
-        run: microsmith run build.microsmith.kts
+          microsmith init
+          microsmith run build.microsmith.kts
 ```
 
-## Ruby repository
-
-```yaml
-name: Microsmith Generate
-on:
-  pull_request:
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Microsmith CLI
-        run: |
-          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
-          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
-          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
-      - name: Bootstrap Microsmith
-        run: microsmith init
-      - name: Generate protobuf
-        run: microsmith run build.microsmith.kts
-```
-
-## Rust repository
-
-```yaml
-name: Microsmith Generate
-on:
-  pull_request:
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Microsmith CLI
-        run: |
-          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
-          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
-          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
-      - name: Bootstrap Microsmith
-        run: microsmith init
-      - name: Generate protobuf
-        run: microsmith run build.microsmith.kts
-```
-
-## .NET repository
+## Windows
 
 ```yaml
 name: Microsmith Generate
@@ -135,12 +49,15 @@ jobs:
           Invoke-WebRequest -Uri $env:MICROSMITH_INSTALLER_PS1_URL -OutFile microsmith-install.ps1
           .\microsmith-install.ps1 -Version $env:MICROSMITH_VERSION
           Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $HOME ".microsmith\bin")
-      - name: Bootstrap Microsmith
+      - name: Generate
         shell: pwsh
-        run: microsmith init
-      - name: Run Microsmith
-        shell: pwsh
-        run: microsmith run build.microsmith.kts
+        run: |
+          microsmith init
+          microsmith run build.microsmith.kts
 ```
+
+## Gradle and Maven repositories
+
+A repository that already uses the native plugin does not need the CLI. Use the Gradle plugin task or the Maven goal directly. See [gradle.md](gradle.md) and [maven.md](maven.md).
 
 [Back to the README](../README.md)

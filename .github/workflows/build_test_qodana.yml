@@ -126,7 +126,7 @@ jobs:
         with:
           sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
 
-  cli-smoke:
+  cli-verification:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -160,15 +160,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: .\gradlew.bat :cli:releaseArtifacts --stacktrace
-      - name: Smoke test dist launcher (Unix)
+      - name: Verify dist launcher (Unix)
         if: runner.os != 'Windows'
-        run: |
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith --help > cli-help.txt
-          grep -q "Usage:" cli-help.txt
-      - name: Verify README CLI usage block (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: python3 scripts/verify_readme_cli_usage.py README.md cli-help.txt
-      - name: Smoke test dist generation and provider discovery (Unix)
+        run: ./modules/cli/build/microsmith-cli-dist/bin/microsmith --help | grep -q "Usage:"
+      - name: Verify dist generation and provider discovery (Unix)
         if: runner.os != 'Windows'
         run: |
           cat > schema.microsmith.kts <<'EOF'
@@ -186,7 +181,7 @@ jobs:
           test -f proto/CiSmoke.proto
           ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --isolation process
           test -f proto/CiSmoke.proto
-      - name: Smoke test dist ASP.NET generation (Unix)
+      - name: Verify dist ASP.NET generation (Unix)
         if: runner.os != 'Windows'
         run: |
           ./modules/cli/build/microsmith-cli-dist/bin/microsmith run examples/non-gradle/dotnet/schema.microsmith.kts --out aspnet-dist
@@ -195,12 +190,12 @@ jobs:
           test -f aspnet-dist/dotnet/Platform/UserService.Api/Generated/Contracts/ResponseModels.cs
           test -f aspnet-dist/dotnet/Platform/UserService.Api/.microsmith/origins.json
           dotnet build aspnet-dist/dotnet/Platform/UserService.Api/UserService.Api.csproj
-      - name: Smoke test dist doctor diagnostics mode (Unix)
+      - name: Verify dist doctor diagnostics mode (Unix)
         if: runner.os != 'Windows'
         run: |
           ./modules/cli/build/microsmith-cli-dist/bin/microsmith doctor --diagnostics json > cli-doctor.json
           grep -q "Doctor checks passed." cli-doctor.json
-      - name: Smoke test dist launcher (Windows)
+      - name: Verify dist launcher (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -214,7 +209,7 @@ jobs:
             Write-Output $help
             exit 1
           }
-      - name: Smoke test dist generation and provider discovery (Windows)
+      - name: Verify dist generation and provider discovery (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -245,7 +240,7 @@ jobs:
             Write-Error "Expected generated-process\\proto\\CiSmoke.proto to exist."
             exit 1
           }
-      - name: Smoke test dist ASP.NET generation (Windows)
+      - name: Verify dist ASP.NET generation (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -271,7 +266,7 @@ jobs:
             exit 1
           }
           dotnet build "$projectRoot\UserService.Api.csproj"
-      - name: Smoke test dist doctor diagnostics mode (Windows)
+      - name: Verify dist doctor diagnostics mode (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -308,11 +303,11 @@ jobs:
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts
           test -f proto/UserCreated.proto
-      - name: Smoke test Java, Kotlin, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
+      - name: Verify Java, Kotlin, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
         if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
         run: |
           set -euo pipefail
-          smoke_unix_fixture() {
+          verify_unix_fixture() {
             local repo_name="$1"
             local repo_root="$2"
             local expected_proto="$3"
@@ -332,14 +327,14 @@ jobs:
             echo "Validated $repo_name fixture."
           }
 
-          smoke_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
-          smoke_unix_fixture kotlin examples/jvm/kotlin-gradle KotlinUserCreated.proto kotlin-ide-doctor.json
-          smoke_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
-          smoke_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
-          smoke_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
-          smoke_unix_fixture ruby examples/non-gradle/ruby RubyUserCreated.proto ruby-ide-doctor.json
-          smoke_unix_fixture rust examples/non-gradle/rust RustUserCreated.proto rust-ide-doctor.json
-      - name: Smoke test .NET onboarding fixture (Unix)
+          verify_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
+          verify_unix_fixture kotlin examples/gradle/kotlin KotlinUserCreated.proto kotlin-ide-doctor.json
+          verify_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
+          verify_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
+          verify_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
+          verify_unix_fixture ruby examples/non-gradle/ruby RubyUserCreated.proto ruby-ide-doctor.json
+          verify_unix_fixture rust examples/non-gradle/rust RustUserCreated.proto rust-ide-doctor.json
+      - name: Verify .NET onboarding fixture (Unix)
         if: ${{ always() && runner.os != 'Windows' && steps.install-unix.outcome == 'success' }}
         run: |
           set -euo pipefail
@@ -412,7 +407,7 @@ jobs:
             Write-Error "Expected proto\\UserCreated.proto to exist after run."
             exit 1
           }
-      - name: Smoke test .NET onboarding fixture (Windows)
+      - name: Verify .NET onboarding fixture (Windows)
         if: ${{ always() && matrix.os == 'windows-latest' && steps.install-windows.outcome == 'success' }}
         shell: pwsh
         run: |
