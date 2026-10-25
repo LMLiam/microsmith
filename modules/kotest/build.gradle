@@ -1,6 +1,0 @@
-dependencies {
-    api libs.kotest.framework.engine
-    api libs.kotest.assertions.core
-    api libs.kotest.property
-    api libs.kotest.extensions.junitxml
-}

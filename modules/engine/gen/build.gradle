@@ -1,0 +1,14 @@
+apply plugin: 'org.jetbrains.kotlin.kapt'
+apply plugin: 'dev.zacsweers.metro'
+
+dependencies {
+    implementation project(":dsl")
+    implementation project(":resolve")
+    implementation project(":artifact")
+    implementation project(":compile")
+    testImplementation project(":dsl-services-dotnet-asp")
+    testImplementation project(":compile-services-dotnet-asp")
+    implementation libs.coroutines.core
+    implementation libs.spi.tooling.annotations
+    kapt libs.spi.tooling.processor
+}

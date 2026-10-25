@@ -1,0 +1,24 @@
+package io.github.lmliam.microsmith.dsl.services.dotnet.packages.service
+
+import io.github.lmliam.microsmith.dsl.MergeableExtension
+import io.github.lmliam.microsmith.dsl.services.ServiceExtension
+
+/**
+ * Per-project package references declared under `packages { ... }` inside a .NET service block. A null value means the
+ * package reference is versionless at the service level and must be satisfied by central package ownership during
+ * resolution.
+ */
+data class DotnetPackageReferencesExtension(val packages: List<DotnetPackageReferenceDeclaration> = emptyList()) :
+    ServiceExtension, MergeableExtension<DotnetPackageReferencesExtension> {
+    override fun merge(other: DotnetPackageReferencesExtension): DotnetPackageReferencesExtension {
+        val existingNames = packages.map(DotnetPackageReferenceDeclaration::name).toSet()
+        val collisions =
+            other.packages.map(DotnetPackageReferenceDeclaration::name).filter(existingNames::contains).sorted()
+
+        require(collisions.isEmpty()) {
+            "Duplicate .NET package references while merging service configuration: ${collisions.joinToString(", ")}"
+        }
+
+        return copy(packages = packages + other.packages)
+    }
+}

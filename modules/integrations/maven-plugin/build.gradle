@@ -1,0 +1,58 @@
+import groovy.xml.XmlSlurper
+
+plugins {
+    alias(libs.plugins.gradlex.maven.plugin.development)
+}
+
+dependencies {
+    implementation project(':runtime-scripting')
+    compileOnly libs.maven.plugin.api
+    testImplementation libs.maven.plugin.api
+    compileOnly libs.maven.plugin.annotations
+}
+
+mavenPlugin {
+    name = 'Microsmith Maven Plugin'
+    description = 'Native Microsmith integration for Maven repositories'
+    goalPrefix = 'microsmith'
+}
+
+// The GradleX plugin scans only the Java classes directory. Microsmith defines its mojo in Kotlin.
+tasks.named('generateMavenPluginDescriptor') {
+    classesDirs.from(tasks.named('compileKotlin'))
+}
+
+def descriptorFile = layout.buildDirectory.file('mavenPlugin/descriptor/META-INF/maven/plugin.xml')
+
+tasks.register('verifyMavenPluginDescriptor') {
+    description = 'Verifies that the generated Maven plugin descriptor declares the generate goal.'
+    group = 'verification'
+    dependsOn 'generateMavenPluginDescriptor'
+    inputs.file(descriptorFile)
+
+    doLast {
+        def descriptor = new XmlSlurper().parse(descriptorFile.get().asFile)
+        if (descriptor.goalPrefix.text() != 'microsmith') {
+            throw new GradleException("Expected goal prefix 'microsmith'.")
+        }
+        def goals = descriptor.mojos.mojo.goal*.text()
+        if (goals != ['generate']) {
+            throw new GradleException("Expected goals [generate], found ${goals}.")
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn 'verifyMavenPluginDescriptor'
+}
+
+publishing {
+    publications.named('gpr', MavenPublication) {
+        pom.withXml { xml ->
+            def root = xml.asNode()
+            if (!root.children().any { it instanceof Node && it.name() == 'packaging' }) {
+                root.appendNode('packaging', 'maven-plugin')
+            }
+        }
+    }
+}

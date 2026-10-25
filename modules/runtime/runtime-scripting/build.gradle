@@ -1,0 +1,221 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import io.github.lmliam.microsmith.build.GenerateChecksums
+import io.github.lmliam.microsmith.build.archive.VerifyJarEntries
+import io.github.lmliam.microsmith.build.archive.VerifyServiceProviders
+import io.github.lmliam.microsmith.build.runtime.VerifyPublishedPomScopes
+
+def scriptingVersionValue = version.toString()
+def scriptingScriptTemplateFqcn = 'io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript'
+def scriptingCompilationConfigurationFqcn =
+    'io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScriptCompilationConfiguration'
+def scriptingContextFqcn = 'io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext'
+def scriptingScriptTemplateMetaInfPrefix = 'META-INF/kotlin/script/templates'
+def scriptingIdeFallbackBaseName = 'microscript-definition'
+def scriptingIdeFallbackClassifier = 'all'
+
+def scriptingApiProjectPaths = [
+    ':runtime-scripting-api',
+    ':dsl',
+    ':dsl-services',
+    ':dsl-services-dotnet',
+    ':dsl-services-dotnet-asp',
+    ':dsl-services-dotnet-packages',
+    ':dsl-schemas',
+    ':dsl-schemas-protobuf',
+    ':dsl-schemas-protobuf-rpc',
+]
+
+def scriptingIdeFallbackReleaseAssetsDirectory = layout.buildDirectory.dir('release-assets')
+def scriptingPublishedPomFile = layout.buildDirectory.file('publications/gpr/pom-default.xml')
+
+def scriptingClassEntry = { String fqcn ->
+    int lastDotIndex = fqcn.lastIndexOf('.')
+    "${fqcn.substring(0, lastDotIndex).replace('.', '/')}/${fqcn.substring(lastDotIndex + 1)}.class"
+}
+
+def scriptingJarEntries = [
+    scriptingClassEntry(scriptingScriptTemplateFqcn),
+    "${scriptingScriptTemplateMetaInfPrefix}/${scriptingScriptTemplateFqcn}",
+]
+
+def scriptingIdeFallbackEntries = scriptingJarEntries + [
+    scriptingClassEntry(scriptingCompilationConfigurationFqcn),
+    scriptingClassEntry(scriptingContextFqcn),
+    'kotlin/script/experimental/jvmhost/BasicJvmScriptingHost.class',
+]
+
+def scriptingCommonLibrary = libs.kotlin.scripting.common.get()
+def scriptingPomScopes = scriptingApiProjectPaths.collect { path ->
+    def dependencyProject = project(path)
+    "${dependencyProject.group}:${dependencyProject.name}=compile"
+} + ["${scriptingCommonLibrary.group}:${scriptingCommonLibrary.name}=compile"]
+
+def scriptingIdeFallbackServiceProviders = [
+    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
+        '=io.github.lmliam.microsmith.resolve.schemas.SchemasResolver',
+    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
+        '=io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufSchemasResolver',
+    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
+        '=io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.resolution.ProtobufRpcSchemasResolver',
+    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
+        '=io.github.lmliam.microsmith.resolve.services.ServicesResolver',
+    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
+        '=io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceDomainResolver',
+    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
+        '=io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspaceDomainResolver',
+    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
+        '=io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspaceDomainResolver',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor' +
+        '=io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution.ProtobufArtifactContributor',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor' +
+        '=io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcArtifactContributor',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor' +
+        '=io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspArtifactContributor',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor' +
+        '=io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageArtifactContributor',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
+        '=io.github.lmliam.microsmith.artifact.files.BinaryFileArtifactAssembler',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
+        '=io.github.lmliam.microsmith.artifact.files.TextFileArtifactAssembler',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
+        '=io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly.ProtoFileArtifactAssembler',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
+        '=io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifactAssembler',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
+        '=io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactAssembler',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
+        '=io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactAssembler',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
+        '=io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifactAssembler',
+    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
+        '=io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifactAssembler',
+    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
+        '=io.github.lmliam.microsmith.compile.schemas.protobuf.ProtoFileArtifactCompiler',
+    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
+        '=io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.ProtobufRpcServiceArtifactCompiler',
+    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
+        '=io.github.lmliam.microsmith.compile.services.dotnet.asp.DotnetAspServiceArtifactCompiler',
+    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
+        '=io.github.lmliam.microsmith.compile.services.dotnet.msbuild.MsBuildProjectArtifactCompiler',
+    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
+        '=io.github.lmliam.microsmith.compile.services.dotnet.packages.DotnetPackageReferencesArtifactCompiler',
+    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
+        '=io.github.lmliam.microsmith.compile.services.dotnet.packages.DotnetPackageVersionsArtifactCompiler',
+    'META-INF/services/io.github.lmliam.microsmith.gen.ArtifactRenderer' +
+        '=io.github.lmliam.microsmith.gen.files.render.BinaryFileArtifactRenderer',
+    'META-INF/services/io.github.lmliam.microsmith.gen.ArtifactRenderer' +
+        '=io.github.lmliam.microsmith.gen.files.render.TextFileArtifactRenderer',
+]
+
+dependencies {
+    api project(':runtime-scripting-api')
+    api project(':dsl')
+    api project(':dsl-services')
+    api project(':dsl-services-dotnet')
+    api project(':dsl-services-dotnet-asp')
+    api project(':dsl-services-dotnet-packages')
+    api project(':dsl-schemas')
+    api project(':dsl-schemas-protobuf')
+    api project(':dsl-schemas-protobuf-rpc')
+    implementation project(':resolve')
+    implementation project(':resolve-services')
+    implementation project(':resolve-services-dotnet')
+    implementation project(':resolve-services-dotnet-asp')
+    implementation project(':resolve-services-dotnet-packages')
+    implementation project(':resolve-schemas')
+    implementation project(':resolve-schemas-protobuf')
+    implementation project(':resolve-schemas-protobuf-rpc')
+    implementation project(':artifact')
+    implementation project(':artifact-services')
+    implementation project(':artifact-services-dotnet')
+    implementation project(':artifact-services-dotnet-asp')
+    implementation project(':artifact-services-dotnet-packages')
+    implementation project(':artifact-schemas')
+    implementation project(':artifact-schemas-protobuf')
+    implementation project(':artifact-schemas-protobuf-rpc')
+    implementation project(':compile')
+    implementation project(':compile-services')
+    implementation project(':compile-services-dotnet')
+    implementation project(':compile-services-dotnet-asp')
+    implementation project(':compile-services-dotnet-packages')
+    implementation project(':compile-schemas')
+    implementation project(':compile-schemas-protobuf')
+    implementation project(':compile-schemas-protobuf-rpc')
+    implementation project(':gen')
+    implementation libs.coroutines.core
+    api libs.kotlin.scripting.common
+    implementation libs.kotlin.scripting.jvm
+    implementation libs.kotlin.scripting.jvm.host
+    implementation libs.kotlin.compiler.embeddable
+}
+
+def scriptingShadowJarTask = tasks.named('shadowJar', ShadowJar)
+
+scriptingShadowJarTask.configure { shadowJarTask ->
+    archiveBaseName.set(scriptingIdeFallbackBaseName)
+    archiveClassifier.set(scriptingIdeFallbackClassifier)
+    filesMatching('META-INF/services/**') { details ->
+        details.duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+    mergeServiceFiles()
+    manifest {
+        attributes('Implementation-Version': scriptingVersionValue)
+    }
+}
+
+tasks.register('verifyRuntimeScriptingJar', VerifyJarEntries) {
+    dependsOn(tasks.named('jar'))
+    archive.set(tasks.named('jar', Jar).flatMap { jarTask -> jarTask.archiveFile })
+    expectedEntries.set(scriptingJarEntries)
+    artifactDescription.set('Runtime-scripting jar')
+}
+
+tasks.register('verifyRuntimeScriptingPublishedPom', VerifyPublishedPomScopes) {
+    dependsOn(tasks.named('generatePomFileForGprPublication'))
+    pomFile.set(scriptingPublishedPomFile)
+    expectedScopes.set(scriptingPomScopes)
+    artifactDescription.set('Runtime-scripting published pom')
+}
+
+def verifyIdeFallbackEntriesTask = tasks.register('verifyIdeFallbackJarEntries', VerifyJarEntries) {
+    dependsOn(scriptingShadowJarTask)
+    archive.set(scriptingShadowJarTask.flatMap { shadowJarTask -> shadowJarTask.archiveFile })
+    expectedEntries.set(scriptingIdeFallbackEntries)
+    artifactDescription.set('IDE fallback shadow jar')
+}
+
+def verifyIdeFallbackProvidersTask = tasks.register('verifyIdeFallbackServiceProviders', VerifyServiceProviders) {
+    dependsOn(scriptingShadowJarTask)
+    archive.set(scriptingShadowJarTask.flatMap { shadowJarTask -> shadowJarTask.archiveFile })
+    expectedProviders.set(scriptingIdeFallbackServiceProviders)
+    artifactDescription.set('IDE fallback shadow jar')
+}
+
+def verifyIdeFallbackShadowJarTask = tasks.register('verifyIdeFallbackShadowJar') {
+    description = 'Verifies the IDE fallback shadow jar entries and merged service providers.'
+    group = 'verification'
+    dependsOn(verifyIdeFallbackEntriesTask, verifyIdeFallbackProvidersTask)
+}
+
+def ideFallbackArtifactsTask = tasks.register('ideFallbackArtifacts', Sync) {
+    dependsOn(verifyIdeFallbackShadowJarTask)
+    into(scriptingIdeFallbackReleaseAssetsDirectory)
+    from(scriptingShadowJarTask)
+}
+
+tasks.register('generateIdeFallbackChecksums', GenerateChecksums) {
+    dependsOn(ideFallbackArtifactsTask)
+    assets.from(
+        scriptingIdeFallbackReleaseAssetsDirectory.map { dir ->
+            dir.asFileTree.matching { exclude '**/*.sha256' }
+        },
+    )
+}
+
+tasks.named('check') {
+    dependsOn(
+        tasks.named('verifyRuntimeScriptingJar'),
+        tasks.named('verifyRuntimeScriptingPublishedPom'),
+        verifyIdeFallbackShadowJarTask,
+    )
+}

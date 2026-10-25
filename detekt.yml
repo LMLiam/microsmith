@@ -1,33 +1,39 @@
-build:
-  maxIssues: 0
-  excludeCorrectable: false
-
 config:
   validation: true
+  warningsAsErrors: true
 
 complexity:
   active: true
   CyclomaticComplexMethod:
     active: true
-    threshold: 15
-  LongMethod:
+    allowedComplexity: 15
+  LargeClass:
     active: true
-    threshold: 80
+    allowedLines: 170
     excludes:
       - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
+  LongMethod:
+    active: true
+    allowedLines: 80
+    excludes:
+      - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
   LongParameterList:
     active: true
-    functionThreshold: 6
-    constructorThreshold: 8
+    allowedFunctionParameters: 6
+    allowedConstructorParameters: 8
     ignoreDefaultParameters: true
     ignoreDataClasses: true
   TooManyFunctions:
     active: true
-    thresholdInFiles: 30
-    thresholdInClasses: 30
-    thresholdInInterfaces: 30
-    thresholdInObjects: 30
-    thresholdInEnums: 30
+    allowedFunctionsPerFile: 30
+    allowedFunctionsPerClass: 30
+    allowedFunctionsPerInterface: 30
+    allowedFunctionsPerObject: 30
+    allowedFunctionsPerEnum: 30
     ignoreOverridden: true
     ignorePrivate: false
 
@@ -61,11 +67,9 @@ naming:
   FunctionNaming:
     active: true
     functionPattern: '[a-z][a-zA-Z0-9]*'
-    ignoreAnnotated:
-      - 'Composable'
   PackageNaming:
     active: true
-    packagePattern: '[a-z]+(\.[a-z][A-Za-z0-9]*)*'
+    packagePattern: '^(?!.*(?:^|\.)(?:util|utils|misc)(?:\.|$))[a-z]+(\.[a-z][A-Za-z0-9]*)*$'
   TopLevelPropertyNaming:
     active: true
     constantPattern: '[A-Z][_A-Z0-9]*'
@@ -85,6 +89,8 @@ performance:
     active: true
     excludes:
       - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
 
 potential-bugs:
   active: true
@@ -120,6 +126,8 @@ style:
     ignoreAnnotation: true
     excludes:
       - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
   MaxLineLength:
     active: true
     maxLineLength: 120
@@ -135,12 +143,20 @@ style:
     excludeGuardClauses: true
     excludes:
       - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
   ThrowsCount:
     active: true
     max: 2
     excludes:
       - '**/test/**'
-  UnusedPrivateMember:
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
+  UnusedPrivateClass:
+    active: true
+  UnusedPrivateFunction:
+    active: true
+  UnusedPrivateProperty:
     active: true
   WildcardImport:
     active: true

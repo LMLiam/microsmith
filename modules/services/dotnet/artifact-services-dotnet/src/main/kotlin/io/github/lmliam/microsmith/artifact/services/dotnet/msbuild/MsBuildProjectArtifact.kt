@@ -1,0 +1,15 @@
+package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
+
+import io.github.lmliam.microsmith.artifact.services.dotnet.DotnetArtifact
+
+data class MsBuildProjectArtifact(
+    override val id: MsBuildProjectArtifactId,
+    val projectAttributes: Map<String, String> = emptyMap(),
+    val properties: Map<String, String>,
+    val items: List<MsBuildItem>,
+) : DotnetArtifact {
+    init {
+        projectAttributes.keys.forEach(MsBuildNames::requireAttributeName)
+        properties.keys.forEach(MsBuildNames::requirePropertyName)
+    }
+}

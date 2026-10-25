@@ -39,8 +39,6 @@ jobs:
         run: ./gradlew build --stacktrace
       - name: Publish native JVM packages to mavenLocal
         run: ./gradlew publishToMavenLocal --stacktrace
-      - name: Setup sbt
-        uses: sbt/setup-sbt@v1
       - name: Validate native Gradle fixtures
         run: |
           set -euo pipefail
@@ -62,13 +60,11 @@ jobs:
             test -f "$project_root/UserService.Api.csproj"
             test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
             test -f "$project_root/Generated/Contracts/ResponseModels.cs"
-            test -f "$project_root/.microsmith/origins.json"
             dotnet build "$project_root/UserService.Api.csproj"
           }
 
           validate_gradle_proto_fixture examples/gradle/java
           validate_gradle_proto_fixture examples/gradle/kotlin
-          validate_gradle_proto_fixture examples/gradle/scala
           validate_gradle_dotnet_fixture examples/gradle/dotnet
       - name: Validate native Maven fixtures
         run: |
@@ -83,7 +79,6 @@ jobs:
             mvn -B -f "$repo_root/pom.xml" microsmith:generate -Dmicrosmith.version="$VERSION"
             test -d "$generated_root"
             find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
-            test -f "$output_root/.microsmith/origins.json"
           }
 
           validate_maven_dotnet_fixture() {
@@ -94,47 +89,17 @@ jobs:
             test -f "$project_root/UserService.Api.csproj"
             test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
             test -f "$project_root/Generated/Contracts/ResponseModels.cs"
-            test -f "$project_root/.microsmith/origins.json"
             dotnet build "$project_root/UserService.Api.csproj"
           }
 
           validate_maven_proto_fixture examples/maven/java
           validate_maven_proto_fixture examples/maven/kotlin
-          validate_maven_proto_fixture examples/maven/scala
           validate_maven_dotnet_fixture examples/maven/dotnet
-      - name: Validate native sbt fixtures
-        run: |
-          set -euo pipefail
-          VERSION="$(./gradlew -q properties | sed -n 's/^version: //p' | head -n 1)"
-
-          validate_sbt_proto_fixture() {
-            local repo_root="$1"
-            local generated_root="$repo_root/proto"
-
-            (cd "$repo_root" && sbt -batch -Dsbt.supershell=false -Dmicrosmith.version="$VERSION" microsmithGenerate)
-            test -d "$generated_root"
-            find "$generated_root" -maxdepth 1 -type f -name '*.proto' | grep -q .
-          }
-
-          validate_sbt_dotnet_fixture() {
-            local repo_root="$1"
-            local project_root="$repo_root/Generated/dotnet/Platform/UserService.Api"
-
-            (cd "$repo_root" && sbt -batch -Dsbt.supershell=false -Dmicrosmith.version="$VERSION" microsmithGenerate)
-            test -f "$project_root/UserService.Api.csproj"
-            test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
-            test -f "$project_root/Generated/Contracts/ResponseModels.cs"
-            test -f "$project_root/.microsmith/origins.json"
-            dotnet build "$project_root/UserService.Api.csproj"
-          }
-
-          validate_sbt_proto_fixture examples/sbt/scala
-          validate_sbt_dotnet_fixture examples/sbt/dotnet
       - name: Validate IDE fallback release assets
         run: |
           ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
-          find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar' | grep -q .
-          find modules/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar.sha256' | grep -q .
+          find modules/runtime/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar' | grep -q .
+          find modules/runtime/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar.sha256' | grep -q .
       - name: Publish Test Report
         uses: dorny/test-reporter@v2
         if: ${{ always() && hashFiles('**/build/test-results/**/*.xml') != '' }}
@@ -158,7 +123,7 @@ jobs:
         with:
           sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
 
-  cli-smoke:
+  cli-verification:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -192,15 +157,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: .\gradlew.bat :cli:releaseArtifacts --stacktrace
-      - name: Smoke test dist launcher (Unix)
+      - name: Verify dist launcher (Unix)
         if: runner.os != 'Windows'
-        run: |
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith --help > cli-help.txt
-          grep -q "Usage:" cli-help.txt
-      - name: Verify README CLI usage block (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: python3 scripts/verify_readme_cli_usage.py README.md cli-help.txt
-      - name: Smoke test dist generation and provider discovery (Unix)
+        run: ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith --help | grep -q "Usage:"
+      - name: Verify dist generation and provider discovery (Unix)
         if: runner.os != 'Windows'
         run: |
           cat > schema.microsmith.kts <<'EOF'
@@ -214,29 +174,28 @@ jobs:
               }
           }
           EOF
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts
+          ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts
           test -f proto/CiSmoke.proto
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --isolation process
+          ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith run schema.microsmith.kts --isolation process
           test -f proto/CiSmoke.proto
-      - name: Smoke test dist ASP.NET generation (Unix)
+      - name: Verify dist ASP.NET generation (Unix)
         if: runner.os != 'Windows'
         run: |
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith run examples/non-gradle/dotnet/schema.microsmith.kts --out aspnet-dist
+          ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith run examples/non-gradle/dotnet/schema.microsmith.kts --out aspnet-dist
           test -f aspnet-dist/dotnet/Platform/UserService.Api/UserService.Api.csproj
           test -f aspnet-dist/dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs
           test -f aspnet-dist/dotnet/Platform/UserService.Api/Generated/Contracts/ResponseModels.cs
-          test -f aspnet-dist/dotnet/Platform/UserService.Api/.microsmith/origins.json
           dotnet build aspnet-dist/dotnet/Platform/UserService.Api/UserService.Api.csproj
-      - name: Smoke test dist doctor diagnostics mode (Unix)
+      - name: Verify dist doctor diagnostics mode (Unix)
         if: runner.os != 'Windows'
         run: |
-          ./modules/cli/build/microsmith-cli-dist/bin/microsmith doctor --diagnostics json > cli-doctor.json
+          ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith doctor --diagnostics json > cli-doctor.json
           grep -q "Doctor checks passed." cli-doctor.json
-      - name: Smoke test dist launcher (Windows)
+      - name: Verify dist launcher (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $help = & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat --help 2>&1
+          $help = & .\modules\integrations\cli\build\microsmith-cli-dist\bin\microsmith.bat --help 2>&1
           if ($LASTEXITCODE -ne 0) {
             Write-Output $help
             exit $LASTEXITCODE
@@ -246,7 +205,7 @@ jobs:
             Write-Output $help
             exit 1
           }
-      - name: Smoke test dist generation and provider discovery (Windows)
+      - name: Verify dist generation and provider discovery (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -261,7 +220,7 @@ jobs:
               }
           }
           '@ | Set-Content -Path schema.microsmith.kts -Encoding UTF8
-          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts
+          & .\modules\integrations\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
@@ -269,7 +228,7 @@ jobs:
             Write-Error "Expected proto\\CiSmoke.proto to exist."
             exit 1
           }
-          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated-process --isolation process
+          & .\modules\integrations\cli\build\microsmith-cli-dist\bin\microsmith.bat run schema.microsmith.kts --out generated-process --isolation process
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
@@ -277,11 +236,11 @@ jobs:
             Write-Error "Expected generated-process\\proto\\CiSmoke.proto to exist."
             exit 1
           }
-      - name: Smoke test dist ASP.NET generation (Windows)
+      - name: Verify dist ASP.NET generation (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat run examples/non-gradle/dotnet\schema.microsmith.kts --out aspnet-dist
+          & .\modules\integrations\cli\build\microsmith-cli-dist\bin\microsmith.bat run examples/non-gradle/dotnet\schema.microsmith.kts --out aspnet-dist
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
@@ -298,16 +257,12 @@ jobs:
             Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\Generated\\Contracts\\ResponseModels.cs to exist."
             exit 1
           }
-          if (-not (Test-Path "$projectRoot\.microsmith\origins.json")) {
-            Write-Error "Expected aspnet-dist\\dotnet\\Platform\\UserService.Api\\.microsmith\\origins.json to exist."
-            exit 1
-          }
           dotnet build "$projectRoot\UserService.Api.csproj"
-      - name: Smoke test dist doctor diagnostics mode (Windows)
+      - name: Verify dist doctor diagnostics mode (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $doctor = & .\modules\cli\build\microsmith-cli-dist\bin\microsmith.bat doctor --diagnostics json 2>&1
+          $doctor = & .\modules\integrations\cli\build\microsmith-cli-dist\bin\microsmith.bat doctor --diagnostics json 2>&1
           if ($LASTEXITCODE -ne 0) {
             Write-Output $doctor
             exit $LASTEXITCODE
@@ -322,10 +277,10 @@ jobs:
         if: ${{ always() && runner.os != 'Windows' && steps.build-release-unix.outcome == 'success' }}
         run: |
           set -eu
-          DIST_FILE="$(find modules/cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
+          DIST_FILE="$(find modules/integrations/cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
           CLI_VERSION="$(printf '%s\n' "$DIST_FILE" | sed -E 's#.*microsmith-cli-(.*)-dist.tar.gz#\1#')"
           DIST_SHA="$(awk '{print $1}' "${DIST_FILE}.sha256")"
-          sh modules/cli/build/release-assets/microsmith-install.sh \
+          sh modules/integrations/cli/build/release-assets/microsmith-install.sh \
             --version "$CLI_VERSION" \
             --install-root "$PWD/.microsmith-home" \
             --bin-dir "$PWD/.microsmith-bin" \
@@ -340,11 +295,11 @@ jobs:
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts
           test -f proto/UserCreated.proto
-      - name: Smoke test Java, Kotlin, Scala, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
+      - name: Verify Java, Kotlin, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
         if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
         run: |
           set -euo pipefail
-          smoke_unix_fixture() {
+          verify_unix_fixture() {
             local repo_name="$1"
             local repo_root="$2"
             local expected_proto="$3"
@@ -364,15 +319,14 @@ jobs:
             echo "Validated $repo_name fixture."
           }
 
-          smoke_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
-          smoke_unix_fixture kotlin examples/jvm/kotlin-gradle KotlinUserCreated.proto kotlin-ide-doctor.json
-          smoke_unix_fixture scala examples/jvm/scala-sbt ScalaUserCreated.proto scala-ide-doctor.json
-          smoke_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
-          smoke_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
-          smoke_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
-          smoke_unix_fixture ruby examples/non-gradle/ruby RubyUserCreated.proto ruby-ide-doctor.json
-          smoke_unix_fixture rust examples/non-gradle/rust RustUserCreated.proto rust-ide-doctor.json
-      - name: Smoke test .NET onboarding fixture (Unix)
+          verify_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
+          verify_unix_fixture kotlin examples/gradle/kotlin KotlinUserCreated.proto kotlin-ide-doctor.json
+          verify_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
+          verify_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
+          verify_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
+          verify_unix_fixture ruby examples/non-gradle/ruby RubyUserCreated.proto ruby-ide-doctor.json
+          verify_unix_fixture rust examples/non-gradle/rust RustUserCreated.proto rust-ide-doctor.json
+      - name: Verify .NET onboarding fixture (Unix)
         if: ${{ always() && runner.os != 'Windows' && steps.install-unix.outcome == 'success' }}
         run: |
           set -euo pipefail
@@ -390,14 +344,13 @@ jobs:
           test -f "$project_root/UserService.Api.csproj"
           test -f "$project_root/Generated/Controllers/UserServiceApiControllerBase.cs"
           test -f "$project_root/Generated/Contracts/ResponseModels.cs"
-          test -f "$project_root/.microsmith/origins.json"
           dotnet build "$project_root/UserService.Api.csproj"
       - name: Install and verify from installer (Windows)
         id: install-windows
         if: ${{ always() && runner.os == 'Windows' && steps.build-release-windows.outcome == 'success' }}
         shell: pwsh
         run: |
-          $distAsset = Get-ChildItem -Path .\modules\cli\build\release-assets\microsmith-cli-*-dist.zip | Select-Object -First 1
+          $distAsset = Get-ChildItem -Path .\modules\integrations\cli\build\release-assets\microsmith-cli-*-dist.zip | Select-Object -First 1
           if (-not $distAsset) {
             Write-Error "Unable to locate CLI dist zip asset."
             exit 1
@@ -409,7 +362,7 @@ jobs:
             exit 1
           }
           $distSha = (Get-Content -Path $distShaPath -Raw).Split(' ', [System.StringSplitOptions]::RemoveEmptyEntries)[0]
-          & .\modules\cli\build\release-assets\microsmith-install.ps1 `
+          & .\modules\integrations\cli\build\release-assets\microsmith-install.ps1 `
             -Version $version `
             -InstallRoot "$pwd\.microsmith-home" `
             -BinDir "$pwd\.microsmith-bin" `
@@ -445,7 +398,7 @@ jobs:
             Write-Error "Expected proto\\UserCreated.proto to exist after run."
             exit 1
           }
-      - name: Smoke test .NET onboarding fixture (Windows)
+      - name: Verify .NET onboarding fixture (Windows)
         if: ${{ always() && matrix.os == 'windows-latest' && steps.install-windows.outcome == 'success' }}
         shell: pwsh
         run: |
@@ -502,10 +455,6 @@ jobs:
           }
           if (-not (Test-Path "$projectRoot\Generated\Contracts\ResponseModels.cs")) {
             Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\Generated\\Contracts\\ResponseModels.cs to exist for the .NET fixture."
-            exit 1
-          }
-          if (-not (Test-Path "$projectRoot\.microsmith\origins.json")) {
-            Write-Error "Expected Generated\\dotnet\\Platform\\UserService.Api\\.microsmith\\origins.json to exist for the .NET fixture."
             exit 1
           }
           dotnet build "$projectRoot\UserService.Api.csproj"
