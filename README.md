@@ -3,7 +3,7 @@
 Microsmith is a Kotlin DSL and standalone CLI for declaring domain-specific models and generating artifacts from `.microsmith.kts` scripts.
 It is designed to work both inside this Gradle repository, inside consumer Gradle builds, and from standalone consumer repositories including Go, .NET, Node, Python, Ruby, Rust, Java, Kotlin, and Scala projects.
 
-This README is the canonical repository documentation.
+This README is the main repository documentation. Detailed installation and CI guidance lives in [`docs/`](docs/).
 
 ## Contents
 
@@ -17,7 +17,6 @@ This README is the canonical repository documentation.
 - Standalone CLI for consumer repositories
 - Native Gradle integration
 - Native Maven integration
-- Native sbt integration
 - Installation and verification
 - Command reference
 - JetBrains IDE helper
@@ -40,7 +39,6 @@ Microsmith provides:
 - bundled built-in providers for the default schema and protobuf workflows
 - a native Gradle plugin for Java, Kotlin, and Scala repositories that want imported-project build alignment
 - a native Maven plugin for Java, Kotlin, and Scala repositories that want imported-project build alignment
-- a native sbt plugin for Scala repositories that want build-aligned generation inside sbt
 - a JetBrains IDE helper workflow for stronger type resolution in consumer repositories
 
 ## Generation architecture
@@ -136,8 +134,6 @@ flowchart LR
         CLI[cli]
         GP[gradle-plugin]
         MP[maven-plugin]
-        SB[sbt-plugin]
-        KT[kotest]
     end
 
     Script --> D
@@ -186,13 +182,6 @@ flowchart LR
     CLI --> RT
     GP --> RT
     MP --> RT
-    SB --> RT
-
-    KT -.-> D
-    KT -.-> R
-    KT -.-> A
-    KT -.-> C
-    KT -.-> G
 ```
 
 `runtime-scripting` and `cli` currently bundle the schema and protobuf provider stack from resolver, artifact, compiler, and renderer provider modules.
@@ -254,8 +243,6 @@ This keeps the layering explicit:
 - `cli`: command-line entrypoint, diagnostics, installer packaging, IDE helper support, and built-in provider validation
 - `gradle-plugin`: native Gradle integration for `.microsmith.kts` execution and imported-project IDE alignment
 - `maven-plugin`: native Maven integration for `.microsmith.kts` execution and imported-project IDE alignment
-- `sbt-plugin`: native sbt integration for `.microsmith.kts` execution inside Scala sbt builds
-- `kotest`: shared Kotest configuration used by repository test suites
 
 ### Module boundary map
 
@@ -270,12 +257,10 @@ This keeps the layering explicit:
 - `cli` is the application layer for command parsing, diagnostics, repository onboarding, plugin resolution, installation, and JetBrains IDE helper workflows. Lower layers must not depend on `cli`.
 - `gradle-plugin` is the native Gradle integration surface for Gradle-imported JVM repositories. It should stay thin, Gradle-conventional, and explicit about task/configuration wiring rather than absorbing CLI concerns.
 - `maven-plugin` is the native Maven integration surface for Maven-imported JVM repositories. It should stay thin, Maven-conventional, and explicit about plugin configuration, generated-source wiring, and imported-project IDE expectations rather than absorbing CLI concerns.
-- `sbt-plugin` is the native sbt integration surface for Scala repositories. It should stay thin, sbt-conventional, and explicit about plugin keys, task wiring, and when helper or fallback IDE support is still needed.
-- `kotest` is test support only and should not become a production dependency surface.
 
 ## Repository layout
 
-- `modules/`: production Gradle subprojects grouped into pipeline families such as `dsl-*`, `resolve-*`, `artifact-*`, `compile-*`, and `gen`, plus execution layers like `runtime-scripting`, `cli`, `gradle-plugin`, `maven-plugin`, `sbt-plugin`, and `kotest`
+- `modules/`: production Gradle subprojects grouped into pipeline families such as `dsl-*`, `resolve-*`, `artifact-*`, `compile-*`, and `gen`, plus execution layers like `runtime-scripting`, `cli`, `gradle-plugin`, and `maven-plugin`
 - `build-logic/`: included Gradle build that owns repository-specific plugins and quality tasks
 - `examples/`: consumer-repository fixtures and onboarding examples
 - `gradle/`: wrapper files, version catalog, and dependency locks
@@ -617,7 +602,7 @@ If your repository has a deliberate alternative output root, override `--out` ex
 - Go: `microsmith run build.microsmith.kts --out ./internal/gen`
 - Java: keep the default repository-root `./proto` output path unless you explicitly wire generated sources into Maven or Gradle later
 - Kotlin: keep the default repository-root `./proto` output path unless you explicitly wire generated sources into Gradle or Maven later
-- Scala: keep the default repository-root `./proto` output path unless you explicitly wire generated sources into Gradle, `sbt`, or Maven later
+- Scala: keep the default repository-root `./proto` output path unless you explicitly wire generated sources into Gradle or Maven later
 - Python: keep the default repository-root `./proto` output path unless your repository already has a stronger convention
 - Ruby: keep the default repository-root `./proto` output path unless your repository already has a stronger convention
 - Rust: keep the default repository-root `./proto` output path unless your repository already has a stronger convention
@@ -638,10 +623,45 @@ Kotlin-specific guidance:
 
 Scala-specific guidance:
 
-- `sbt`-based Scala repositories: prefer the native sbt integration path documented below when you want build-aligned generation inside sbt
+- `sbt`-based Scala repositories: use `microsmith run` directly, or migrate the build to Gradle or Maven for native integration
 - Maven Scala repositories: prefer the native Maven integration path documented below when you want imported-project IDE support and Maven-goal execution
 - Gradle Scala repositories: prefer the native Gradle integration path documented below when you want imported-project IDE support and Gradle-task execution
 - test-only Scala roots stay on the generic onboarding path until a Scala main source root exists
+
+### Direct script execution
+
+Create a script such as `schema.microsmith.kts`:
+
+```kotlin
+microsmith {
+    schemas {
+        protobuf {
+            message("UserCreated") {
+                int32("id") { index(1) }
+                string("email") { index(2) }
+            }
+        }
+    }
+}
+```
+
+Run generation:
+
+```bash
+microsmith run schema.microsmith.kts
+```
+
+Pass script context values when needed:
+
+```bash
+microsmith run schema.microsmith.kts --var env=prod --flag emit
+```
+
+Run in a separate JVM for stronger isolation:
+
+```bash
+microsmith run schema.microsmith.kts --isolation process
+```
 
 ## Native Gradle integration
 
@@ -850,229 +870,10 @@ Coexistence with the CLI, helper, and fallback paths:
 - the JetBrains IDE helper and fallback jar remain useful when you intentionally keep Microsmith outside Maven, or when a Maven-imported IDE project needs plugin-provided types that are not mirrored as project dependencies
 - representative native Maven fixtures live in `examples/maven/java`, `examples/maven/kotlin`, `examples/maven/scala`, and `examples/maven/dotnet`
 
-## Native sbt integration
-
-Use the sbt plugin as the primary path for Scala repositories that already build with sbt and want build-aligned Microsmith generation without leaving the host build.
-
-Prefer this path when:
-
-- the repository already uses sbt as its main build tool
-- generation should run as `sbt microsmithGenerate`
-- you want Microsmith execution, cache paths, and generated outputs to stay inside sbt conventions
-
-Canonical contract:
-
-1. Keep Microsmith authoring in `build.microsmith.kts` or another `*.microsmith.kts` file.
-2. Add `io.github.lmliam.microsmith` `%` `sbt-plugin` in `project/plugins.sbt`.
-3. Add `io.github.lmliam.microsmith:runtime-scripting` as a `Provided` dependency in `build.sbt` so sbt-imported IDE projects can see the built-in Microsmith script-definition/runtime types.
-4. Enable `MicrosmithSbtPlugin` in `build.sbt`.
-5. Run `sbt microsmithGenerate`.
-
-Minimal `project/plugins.sbt` example:
-
-```scala
-val microsmithVersion =
-  sys.props.getOrElse(
-    "microsmith.version",
-    sys.error("Pass -Dmicrosmith.version=<version>."),
-  )
-
-def githubMicrosmithCredentials: Seq[Credentials] =
-  for {
-    actor <- sys.env.get("GITHUB_ACTOR").toSeq
-    token <- sys.env.get("GITHUB_TOKEN").toSeq
-  } yield Credentials("GitHub Package Registry", "maven.pkg.github.com", actor, token)
-
-resolvers += Resolver.mavenLocal
-resolvers += "GitHub Microsmith" at "https://maven.pkg.github.com/lmliam/microsmith"
-credentials ++= githubMicrosmithCredentials
-
-addSbtPlugin("io.github.lmliam.microsmith" % "sbt-plugin" % microsmithVersion)
-```
-
-Minimal `build.sbt` example:
-
-```scala
-ThisBuild / scalaVersion := "3.7.1"
-
-val microsmithVersion =
-  sys.props.getOrElse(
-    "microsmith.version",
-    sys.error("Pass -Dmicrosmith.version=<version>."),
-  )
-
-def githubMicrosmithCredentials: Seq[Credentials] =
-  for {
-    actor <- sys.env.get("GITHUB_ACTOR").toSeq
-    token <- sys.env.get("GITHUB_TOKEN").toSeq
-  } yield Credentials("GitHub Package Registry", "maven.pkg.github.com", actor, token)
-
-lazy val root = (project in file("."))
-  .enablePlugins(MicrosmithSbtPlugin)
-  .settings(
-    resolvers += Resolver.mavenLocal,
-    resolvers += "GitHub Microsmith" at "https://maven.pkg.github.com/lmliam/microsmith",
-    credentials ++= githubMicrosmithCredentials,
-    libraryDependencies += "io.github.lmliam.microsmith" % "runtime-scripting" % microsmithVersion % Provided,
-  )
-```
-
-The native sbt plugin exposes:
-
-- `microsmithGenerate`: runs the configured `.microsmith.kts` script and returns the generated files
-- `microsmithScriptFile`: defaults to `build.microsmith.kts`
-- `microsmithOutputDirectory`: defaults to the repository root, which emits `.proto` files under `./proto`
-- `microsmithCacheDirectory`: defaults to `target/tmp/microsmith/cache`
-- `microsmithVariables`: string variables exposed to the script via `requireVar` and `hasVar`
-- `microsmithFlags`: flags exposed to the script via `hasFlag`
-
-Repository credentials:
-
-- the local Maven repository at `~/.m2/repository` is enough for local fixture validation after `publishToMavenLocal`
-- when consuming releases from GitHub Packages, add matching credentials in `project/plugins.sbt` and `build.sbt` as shown above
-
-Generated-output guidance:
-
-- Microsmith does not auto-register generated directories as Scala, Java, or resource roots in sbt
-- Microsmith writes generated `.proto` files under `./proto` by default
-- only wire specific generated subdirectories into sbt when you have a real downstream source or resource consumer
-- do not add the entire output root blindly to `Compile / unmanagedSourceDirectories` or similar settings
-
-JetBrains and helper/fallback guidance:
-
-- start with the native sbt plugin plus the `Provided` `runtime-scripting` dependency when you want imported-project indexing to see built-in Microsmith types
-- if an sbt-imported JetBrains project still leaves `.microsmith.kts` unresolved, use `microsmith ide refresh` or the fallback jar as the supported recovery path
-- the helper and fallback remain compatible with native sbt integration; they are secondary IDE-support paths, not the primary generation path
-
-Coexistence with the CLI, helper, and fallback paths:
-
-- `microsmith init` still works in sbt repositories and is the fastest way to scaffold `build.microsmith.kts`
-- once native sbt integration is adopted, use `sbt microsmithGenerate` as the primary generation path
-- the JetBrains IDE helper and fallback jar remain useful when you intentionally keep Microsmith outside sbt, or when sbt-imported IDE indexing still needs explicit script-definition support
-- representative native sbt fixtures live in `examples/sbt/scala` and `examples/sbt/dotnet`
-
-### Direct script execution
-
-Create a script such as `schema.microsmith.kts`:
-
-```kotlin
-microsmith {
-    schemas {
-        protobuf {
-            message("UserCreated") {
-                int32("id") { index(1) }
-                string("email") { index(2) }
-            }
-        }
-    }
-}
-```
-
-Run generation:
-
-```bash
-microsmith run schema.microsmith.kts
-```
-
-Pass script context values when needed:
-
-```bash
-microsmith run schema.microsmith.kts --var env=prod --flag emit
-```
-
-Run in a separate JVM for stronger isolation:
-
-```bash
-microsmith run schema.microsmith.kts --isolation process
-```
-
 ## Installation and verification
 
-### macOS and Linux
-
-```bash
-VERSION=<microsmith-version>
-curl -fsSL -o microsmith-install.sh "https://github.com/LMLiam/microsmith/releases/download/v${VERSION}/microsmith-install.sh"
-sh microsmith-install.sh --version "${VERSION}"
-```
-
-### Windows (PowerShell)
-
-```powershell
-$Version = "<microsmith-version>"
-Invoke-WebRequest -Uri "https://github.com/LMLiam/microsmith/releases/download/v$Version/microsmith-install.ps1" -OutFile microsmith-install.ps1
-powershell -ExecutionPolicy Bypass -NoProfile -File .\microsmith-install.ps1 -Version $Version
-```
-
-### Verify immediately after installation
-
-Use the installed shim path before opening a new shell:
-
-```bash
-"$HOME/.microsmith/bin/microsmith" --version
-mkdir -p ./microsmith-smoke
-"$HOME/.microsmith/bin/microsmith" init --repo-root ./microsmith-smoke
-"$HOME/.microsmith/bin/microsmith" run ./microsmith-smoke/build.microsmith.kts --out ./microsmith-smoke/generated
-```
-
-```powershell
-& (Join-Path $HOME ".microsmith\bin\microsmith.cmd") --version
-New-Item -ItemType Directory -Path .\microsmith-smoke -Force | Out-Null
-& (Join-Path $HOME ".microsmith\bin\microsmith.cmd") init --repo-root .\microsmith-smoke
-& (Join-Path $HOME ".microsmith\bin\microsmith.cmd") run .\microsmith-smoke\build.microsmith.kts --out .\microsmith-smoke\generated
-```
-
-After opening a new shell, the bare `microsmith` command is available on `PATH`.
-
-### Integrity verification
-
-Release assets include SHA-256 sidecar files for:
-
-- `microsmith-cli-<version>-all.jar`
-- `microsmith-cli-<version>-dist.zip`
-- `microsmith-cli-<version>-dist.tar.gz`
-- `microsmith-install.sh`
-- `microsmith-install.ps1`
-
-Manual verification examples:
-
-```bash
-shasum -a 256 microsmith-install.sh
-cat microsmith-install.sh.sha256
-```
-
-```bash
-shasum -a 256 microsmith-cli-<version>-dist.tar.gz
-cat microsmith-cli-<version>-dist.tar.gz.sha256
-```
-
-```powershell
-Get-FileHash .\microsmith-install.ps1 -Algorithm SHA256
-Get-Content .\microsmith-install.ps1.sha256
-```
-
-```powershell
-Get-FileHash .\microsmith-cli-<version>-dist.zip -Algorithm SHA256
-Get-Content .\microsmith-cli-<version>-dist.zip.sha256
-```
-
-Installer diagnostics explicitly cover:
-
-- missing required tools such as `curl`, `tar`, `unzip`, and `python3` when automatic runtime metadata resolution is used
-- checksum mismatch for CLI or runtime archives
-- unsupported operating systems or architectures
-- runtime provisioning failures
-- missing Java 24+ when runtime provisioning is disabled
-
-### Manual channels
-
-The canonical onboarding path is the installer, but manual channels remain supported:
-
-- fat jar: `java -jar microsmith-cli-<version>-all.jar --help`
-- unpacked Unix distribution: `./microsmith-cli-<version>/bin/microsmith --help`
-- unpacked Windows distribution: `.\microsmith-cli-<version>\bin\microsmith.bat --help`
-
-Manual channels require Java 24 or newer.
+See [docs/install.md](docs/install.md) for macOS, Linux, and Windows install paths,
+checksum verification, and the manual install channels.
 
 ## Command reference
 
@@ -1264,7 +1065,6 @@ Scala-specific guidance:
 - for Scala repositories, IntelliJ IDEA with the Scala plugin is the recommended JetBrains IDE path when you want `.microsmith.kts` authoring support
 - Gradle-based Scala repositories should prefer the native Gradle plugin path
 - Maven-based Scala repositories should prefer the native Maven plugin path
-- sbt-based Scala repositories should prefer the native sbt plugin path for generation; keep the helper or fallback as the supported recovery path when sbt-imported indexing still needs explicit `.microsmith.kts` support
 - CLI-managed Scala repositories should use the helper or fallback directly
 
 Ruby-specific guidance:
@@ -1426,153 +1226,13 @@ microsmith run schema.microsmith.kts --plugin com.acme:private-emitter:1.2.3
 
 ## CI examples
 
-Set repository or environment variables:
-
-- `MICROSMITH_VERSION`
-- `MICROSMITH_INSTALLER_SH_URL`, for example `https://github.com/LMLiam/microsmith/releases/download/v<version>/microsmith-install.sh`
-- `MICROSMITH_INSTALLER_PS1_URL`, for example `https://github.com/LMLiam/microsmith/releases/download/v<version>/microsmith-install.ps1`
-
-### Node repository
-
-```yaml
-name: Microsmith Generate
-on:
-  pull_request:
-  push:
-    branches: [main]
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Microsmith CLI
-        run: |
-          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
-          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
-          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
-      - name: Bootstrap Microsmith
-        run: microsmith init
-      - name: Run Microsmith
-        run: microsmith run build.microsmith.kts
-```
-
-### Java repository
-
-```yaml
-name: Microsmith Generate
-on:
-  pull_request:
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Microsmith CLI
-        run: |
-          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
-          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
-          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
-      - name: Bootstrap Microsmith
-        run: microsmith init
-      - name: Generate protobuf
-        run: microsmith run build.microsmith.kts
-```
-
-### Go repository
-
-```yaml
-name: Microsmith Generate
-on:
-  pull_request:
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Microsmith CLI
-        run: |
-          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
-          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
-          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
-      - name: Bootstrap Microsmith
-        run: microsmith init
-      - name: Generate protobuf
-        run: microsmith run build.microsmith.kts
-```
-
-### Ruby repository
-
-```yaml
-name: Microsmith Generate
-on:
-  pull_request:
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Microsmith CLI
-        run: |
-          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
-          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
-          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
-      - name: Bootstrap Microsmith
-        run: microsmith init
-      - name: Generate protobuf
-        run: microsmith run build.microsmith.kts
-```
-
-### Rust repository
-
-```yaml
-name: Microsmith Generate
-on:
-  pull_request:
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Microsmith CLI
-        run: |
-          curl -fsSL -o microsmith-install.sh "$MICROSMITH_INSTALLER_SH_URL"
-          sh microsmith-install.sh --version "$MICROSMITH_VERSION"
-          echo "$HOME/.microsmith/bin" >> "$GITHUB_PATH"
-      - name: Bootstrap Microsmith
-        run: microsmith init
-      - name: Generate protobuf
-        run: microsmith run build.microsmith.kts
-```
-
-### .NET repository
-
-```yaml
-name: Microsmith Generate
-on:
-  pull_request:
-jobs:
-  generate:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Microsmith CLI
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri $env:MICROSMITH_INSTALLER_PS1_URL -OutFile microsmith-install.ps1
-          .\microsmith-install.ps1 -Version $env:MICROSMITH_VERSION
-          Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $HOME ".microsmith\bin")
-      - name: Bootstrap Microsmith
-        shell: pwsh
-        run: microsmith init
-      - name: Run Microsmith
-        shell: pwsh
-        run: microsmith run build.microsmith.kts
-```
+See [docs/ci-examples.md](docs/ci-examples.md) for copy-ready workflows for Node, Java,
+Go, Ruby, Rust, and .NET repositories.
 
 ## Example fixtures
 
 The repository includes fixture repositories under `examples/non-gradle/`, `examples/jvm/`, `examples/gradle/`, and `examples/maven/`.
-CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flows. Native Gradle fixtures exercise `./gradlew microsmithGenerate`. Native Maven fixtures exercise `mvn microsmith:generate`. Native sbt fixtures exercise `sbt microsmithGenerate`.
+CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flows. Native Gradle fixtures exercise `./gradlew microsmithGenerate`. Native Maven fixtures exercise `mvn microsmith:generate`.
 
 | Fixture                | Directory                    | Local command from fixture root                                                | CI workflow                                                   |
 |------------------------|------------------------------|--------------------------------------------------------------------------------|---------------------------------------------------------------|
@@ -1584,11 +1244,9 @@ CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flow
 | Kotlin (native Maven)  | `examples/maven/kotlin`      | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/kotlin/.github/workflows/microsmith.yml`      |
 | Scala (native Maven)   | `examples/maven/scala`       | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/scala/.github/workflows/microsmith.yml`       |
 | .NET (native Maven)    | `examples/maven/dotnet`      | `mvn microsmith:generate -Dmicrosmith.version=<version>`                       | `examples/maven/dotnet/.github/workflows/microsmith.yml`      |
-| Scala (native sbt)     | `examples/sbt/scala`         | `sbt -Dmicrosmith.version=<version> microsmithGenerate`                        | `examples/sbt/scala/.github/workflows/microsmith.yml`         |
-| .NET (native sbt)      | `examples/sbt/dotnet`        | `sbt -Dmicrosmith.version=<version> microsmithGenerate`                        | `examples/sbt/dotnet/.github/workflows/microsmith.yml`        |
 | Java                   | `examples/jvm/java-maven`    | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/java-maven/.github/workflows/microsmith.yml`    |
 | Kotlin                 | `examples/jvm/kotlin-gradle` | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/kotlin-gradle/.github/workflows/microsmith.yml` |
-| Scala                  | `examples/jvm/scala-sbt`     | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/jvm/scala-sbt/.github/workflows/microsmith.yml`     |
+| Scala                  | `examples/gradle/scala`      | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/gradle/scala/.github/workflows/microsmith.yml`      |
 | Node                   | `examples/non-gradle/node`   | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/node/.github/workflows/microsmith.yml`   |
 | Go                     | `examples/non-gradle/go`     | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/go/.github/workflows/microsmith.yml`     |
 | Python                 | `examples/non-gradle/python` | `microsmith init` then `microsmith run build.microsmith.kts`                   | `examples/non-gradle/python/.github/workflows/microsmith.yml` |
@@ -1607,7 +1265,6 @@ CLI-managed fixtures exercise `microsmith init` and direct `microsmith run` flow
 | Installer and bootstrap smoke | `cli-smoke` on Ubuntu, macOS, and Windows      | Installer, `--version`, `microsmith init`, and canonical `init -> run` generation.                                                                |
 | Native Gradle fixture smoke   | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `microsmithGenerate` for Java, Kotlin, Scala, and .NET Gradle fixtures.                   |
 | Native Maven fixture smoke    | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `mvn microsmith:generate` for Java, Kotlin, Scala, and .NET Maven fixtures.               |
-| Native sbt fixture smoke      | `build-and-qodana` on Ubuntu                   | Publishes required packages to `mavenLocal`, then runs `sbt microsmithGenerate` for Scala and .NET sbt fixtures.                                  |
 | Consumer fixture onboarding   | `cli-smoke` on Ubuntu, macOS, and Windows      | Ubuntu covers Java, Kotlin, Scala, Node, Go, Python, Ruby, Rust, and .NET; macOS and Windows cover the .NET fixture through dist or installer flows. |
 | JetBrains helper lifecycle    | `cli-smoke` on Ubuntu, macOS, and Windows      | Ubuntu covers Java, Kotlin, Scala, Node, Go, Python, Ruby, Rust, and .NET helper flows; macOS and Windows validate the .NET helper path.         |
 | Fallback artifact packaging   | `build-and-qodana` on Ubuntu                   | `:runtime-scripting:ideFallbackArtifacts` and `:runtime-scripting:generateIdeFallbackChecksums`.                                                  |
@@ -1646,12 +1303,6 @@ Support policy:
 | IntelliJ IDEA                | `examples/maven/kotlin` | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
 | IntelliJ IDEA + Scala plugin | `examples/maven/scala`  | Import the fixture root as a Maven project, reload Maven indexing, and confirm `build.microsmith.kts` resolves the built-in Microsmith DSL symbols without the helper project. |
 
-### Native sbt IDE validation
-
-| Product                      | Fixture root         | Required validation path                                                                                                                                                                                                                                                                                                                                                      |
-|------------------------------|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| IntelliJ IDEA + Scala plugin | `examples/sbt/scala` | Import the fixture root as an sbt project, reload sbt indexing, and confirm the `Provided` `runtime-scripting` dependency exposes the built-in Microsmith DSL symbols in `build.microsmith.kts`. If imported sbt indexing still leaves `.microsmith.kts` unresolved, confirm the helper or fallback path restores resolution without changing the native sbt generation path. |
-
 Native Gradle checklist:
 
 1. Install or publish the release-candidate Microsmith Gradle plugin and runtime packages.
@@ -1668,15 +1319,6 @@ Native Maven checklist:
 4. Run `mvn microsmith:generate -Dmicrosmith.version=<version>`.
 5. Confirm `microsmith {}`, `schemas {}`, and `protobuf {}` resolve in `build.microsmith.kts` without importing `.microsmith/ide`.
 
-Native sbt checklist:
-
-1. Install or publish the release-candidate Microsmith sbt plugin and runtime packages.
-2. Import the fixture root as an sbt project in IntelliJ IDEA with the Scala plugin.
-3. Reload sbt indexing.
-4. Run `sbt microsmithGenerate`.
-5. Confirm `microsmith {}`, `schemas {}`, and `protobuf {}` resolve in `build.microsmith.kts`.
-6. If indexing is still incomplete, validate that `microsmith ide refresh` or the fallback jar restores script resolution without changing the native sbt generation path.
-
 ### Helper and fallback IDE validation
 
 | Product       | Fixture root                 | Required helper smoke path                                 | Required fallback smoke path                                 |
@@ -1684,7 +1326,7 @@ Native sbt checklist:
 | WebStorm      | `examples/non-gradle/node`   | Run the helper checklist below against the Node fixture.   | Run the fallback checklist below against the Node fixture.   |
 | IntelliJ IDEA | `examples/jvm/java-maven`    | Run the helper checklist below against the Java fixture.   | Run the fallback checklist below against the Java fixture.   |
 | IntelliJ IDEA | `examples/jvm/kotlin-gradle` | Run the helper checklist below against the Kotlin fixture. | Run the fallback checklist below against the Kotlin fixture. |
-| IntelliJ IDEA | `examples/jvm/scala-sbt`     | Run the helper checklist below against the Scala fixture.  | Run the fallback checklist below against the Scala fixture.  |
+| IntelliJ IDEA | `examples/gradle/scala`      | Run the helper checklist below against the Scala fixture.  | Run the fallback checklist below against the Scala fixture.  |
 | GoLand        | `examples/non-gradle/go`     | Run the helper checklist below against the Go fixture.     | Run the fallback checklist below against the Go fixture.     |
 | PyCharm       | `examples/non-gradle/python` | Run the helper checklist below against the Python fixture. | Run the fallback checklist below against the Python fixture. |
 | RubyMine      | `examples/non-gradle/ruby`   | Run the helper checklist below against the Ruby fixture.   | Run the fallback checklist below against the Ruby fixture.   |

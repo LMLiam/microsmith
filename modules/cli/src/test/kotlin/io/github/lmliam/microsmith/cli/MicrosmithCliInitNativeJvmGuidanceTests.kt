@@ -66,7 +66,7 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             )
         }
 
-        "init command points sbt-based Scala repositories toward the native sbt plugin path" {
+        "init command directs sbt-based Scala repositories to the CLI path" {
             assertNativeJvmGuidance(
                 profile = ScalaOnboardingProfile,
                 matchedMarkers = listOf("build.sbt", "src/main/scala"),
@@ -74,13 +74,13 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
                     listOf(
                         "Detected repository profile: Scala",
                         "Next: microsmith run build.microsmith.kts",
-                        "Prefer the native sbt plugin path",
-                        "sbt microsmithGenerate",
+                        "Use 'microsmith run' directly",
                     ),
                 unexpectedOutput =
                     listOf(
                         "Prefer the native Gradle plugin path",
                         "Prefer the native Maven plugin path",
+                        "native sbt plugin",
                         "Optional repository-native output path",
                     ),
                 tempDirectoryPrefix = "microsmith-cli-init-scala-sbt",

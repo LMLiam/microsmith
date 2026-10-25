@@ -10,7 +10,6 @@ import io.github.lmliam.microsmith.cli.init.profile.ScalaOnboardingProfile
 private const val GRADLE_PLUGIN_ID = "io.github.lmliam.microsmith"
 private const val MICROSMITH_GROUP = "io.github.lmliam.microsmith"
 private const val MICROSMITH_MAVEN_PLUGIN_ARTIFACT = "maven-plugin"
-private const val MICROSMITH_SBT_PLUGIN_ARTIFACT = "sbt-plugin"
 private const val MICROSMITH_RUNTIME_SCRIPTING_COORDINATE = "$MICROSMITH_GROUP:runtime-scripting"
 private const val MICROSMITH_MAVEN_PLUGIN_COORDINATE = "$MICROSMITH_GROUP:$MICROSMITH_MAVEN_PLUGIN_ARTIFACT"
 
@@ -92,10 +91,8 @@ internal object InitSummaryEmitter {
 
             JvmNativeBuildSystem.SBT ->
                 emitter.info(
-                    "sbt repository detected. Prefer the native sbt plugin path when you want build-aligned " +
-                        "generation: add '$MICROSMITH_GROUP' % '$MICROSMITH_SBT_PLUGIN_ARTIFACT' in " +
-                        "project/plugins.sbt, " +
-                        "enable 'MicrosmithSbtPlugin', and run 'sbt microsmithGenerate'."
+                    "sbt repository detected. Use 'microsmith run' directly, or migrate the build to Gradle or " +
+                        "Maven for native integration."
                 )
         }
     }
