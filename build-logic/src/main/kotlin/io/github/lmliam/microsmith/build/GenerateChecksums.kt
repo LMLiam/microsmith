@@ -11,12 +11,6 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
-/**
- * Writes a SHA-256 sidecar next to each asset file.
- *
- * Each sidecar holds the checksum and the file name, in the format that `sha256sum -c`
- * and `shasum -a 256 -c` accept.
- */
 abstract class GenerateChecksums : DefaultTask() {
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.NAME_ONLY)
