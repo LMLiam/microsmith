@@ -106,7 +106,7 @@ The CLI usage text has one source: run `microsmith --help`.
 ## Repository layout
 
 - `modules/`: production Gradle subprojects, grouped by capability: `engine/` holds the pipeline stages (`dsl`, `resolve`, `artifact`, `compile`, `gen`), `schemas/` and `services/` hold the target families, `runtime/` holds the scripting host, and `integrations/` holds the CLI and the Gradle and Maven plugins
-- `build-logic/`: included Gradle build that owns repository plugins and quality tasks
+- `build-logic/`: included Gradle build that configures CLI packaging, release archives, and runtime scripting artifacts
 - `examples/`: consumer-repository fixtures
 - `docs/`: user and contributor documentation
 - `gradle/`: wrapper files, version catalog, and dependency locks
