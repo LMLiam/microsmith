@@ -12,6 +12,8 @@ coroutines = "1.10.2"
 spiTooling = "0.1.22"
 mavenResolver = "1.9.22"
 mavenPluginApi = "3.9.9"
+mavenPluginTools = "3.15.1"
+gradlexMavenPlugin = "1.0.3"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
@@ -32,6 +34,7 @@ maven-resolver-connector-basic = { module = "org.apache.maven.resolver:maven-res
 maven-resolver-transport-file = { module = "org.apache.maven.resolver:maven-resolver-transport-file", version.ref = "mavenResolver" }
 maven-resolver-transport-http = { module = "org.apache.maven.resolver:maven-resolver-transport-http", version.ref = "mavenResolver" }
 maven-plugin-api = { module = "org.apache.maven:maven-plugin-api", version.ref = "mavenPluginApi" }
+maven-plugin-annotations = { module = "org.apache.maven.plugin-tools:maven-plugin-annotations", version.ref = "mavenPluginTools" }
 spi-tooling-annotations = { module = "io.github.eventhorizonlab:spi-tooling-annotations", version.ref = "spiTooling" }
 spi-tooling-processor = { module = "io.github.eventhorizonlab:spi-tooling-processor", version.ref = "spiTooling" }
 shadow-gradle-plugin = { module = "com.gradleup.shadow:shadow-gradle-plugin", version.ref = "shadow" }
@@ -47,3 +50,4 @@ detekt = { id = "dev.detekt", version.ref = "detekt" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmtGradle" }
 axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axionRelease" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+gradlex-maven-plugin-development = { id = "org.gradlex.maven-plugin-development", version.ref = "gradlexMavenPlugin" }
