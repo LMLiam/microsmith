@@ -109,7 +109,7 @@ class DotnetAspServiceArtifactCompilerTests :
         "compile emits nuint defaults with a 64-bit-safe literal" {
             val requestModels =
                 DotnetAspServiceArtifactCompiler()
-                    .compile(unsignedNativeIntDefaultArtifact())
+                    .compile(integerDefaultArtifact(DotnetFieldType.UnsignedNativeInt, 4294967296L))
                     .filterIsInstance<TextFileArtifactContribution>()
                     .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
                     .contents
@@ -304,50 +304,6 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
             ),
     )
 }
-
-private fun unsignedNativeIntDefaultArtifact(): DotnetAspServiceArtifact =
-    DotnetAspServiceArtifact(
-        id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "ReportService.Api"),
-        serviceName = "ReportService",
-        targetFrameworkMoniker = "net8.0",
-        outputRoot = Path.of("dotnet", "Platform", "ReportService.Api"),
-        httpPort = 5002,
-        httpsPort = 5003,
-        contractModels = emptyList(),
-        endpoints =
-            listOf(
-                DotnetAspEndpointArtifact(
-                    method = "GET",
-                    route = "/reports",
-                    operationName = "GetReport",
-                    bindings =
-                        DotnetAspEndpointBindingsArtifact(
-                            query =
-                                DotnetAspRequestBindingArtifact(
-                                    typeName = "GetReportQuery",
-                                    name = "GetReportQuery",
-                                    fields =
-                                        listOf(
-                                            DotnetAspRequestFieldArtifact(
-                                                name = "maxValue",
-                                                type = DotnetFieldType.UnsignedNativeInt,
-                                                optional = false,
-                                                defaultValue = 4294967296L,
-                                            )
-                                        ),
-                                )
-                        ),
-                    responses =
-                        listOf(
-                            DotnetAspResponseArtifact(
-                                statusCode = 200,
-                                model = inlineModel("EmptyReport") {},
-                                headers = emptyList(),
-                            )
-                        ),
-                )
-            ),
-    )
 
 private fun integerDefaultArtifact(type: DotnetFieldType, value: Number): DotnetAspServiceArtifact =
     DotnetAspServiceArtifact(
