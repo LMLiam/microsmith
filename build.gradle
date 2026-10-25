@@ -105,6 +105,8 @@ subprojects {
         associateWith(kotlin.target.compilations.getByName('main'))
     }
 
+    def hasIntegrationTestSources = !sourceSets.integrationTest.allSource.isEmpty()
+
     tasks.register('integrationTest', io.kotest.framework.gradle.tasks.KotestJvmTask) {
         description = 'Runs integration tests.'
         group = 'verification'
@@ -115,7 +117,10 @@ subprojects {
         moduleTestReportsDir.set(layout.buildDirectory.dir('test-results/integrationTest'))
         rootTestReportsDir.set(rootProject.layout.buildDirectory.dir('test-results/integrationTest'))
         inputs.files(sourceSets.integrationTest.output.classesDirs)
+        onlyIf { hasIntegrationTestSources }
     }
+
+    def hasE2eTestSources = !sourceSets.e2eTest.allSource.isEmpty()
 
     tasks.register('e2eTest', io.kotest.framework.gradle.tasks.KotestJvmTask) {
         description = 'Runs end-to-end tests.'
@@ -127,6 +132,7 @@ subprojects {
         moduleTestReportsDir.set(layout.buildDirectory.dir('test-results/e2eTest'))
         rootTestReportsDir.set(rootProject.layout.buildDirectory.dir('test-results/e2eTest'))
         inputs.files(sourceSets.e2eTest.output.classesDirs)
+        onlyIf { hasE2eTestSources }
     }
 
     tasks.withType(JavaCompile).configureEach {
