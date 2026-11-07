@@ -1,8 +1,6 @@
 package io.github.lmliam.microsmith.build.cli
 
 import java.io.File
-import java.io.FileInputStream
-import java.nio.charset.StandardCharsets
 import java.util.jar.JarFile
 import java.util.zip.GZIPInputStream
 import java.util.zip.ZipFile
@@ -13,7 +11,18 @@ internal data class BundledServiceEntry(
     val coordinate: String,
     val servicePath: String,
     val provider: String,
-)
+) : Comparable<BundledServiceEntry> {
+    override fun compareTo(other: BundledServiceEntry): Int = COMPARATOR.compare(this, other)
+
+    companion object {
+        private val COMPARATOR =
+            compareBy<BundledServiceEntry>(
+                { it.coordinate },
+                { it.servicePath },
+                { it.provider },
+            )
+    }
+}
 
 internal object CliBundledPluginProfile {
     fun plugins(
@@ -22,8 +31,7 @@ internal object CliBundledPluginProfile {
     ): List<Pair<String, File>> {
         if (coordinates.size != jars.size) {
             throw GradleException(
-                "Bundled plugin coordinates (${coordinates.size}) do not match the bundled plugin jars " +
-                    "(${jars.size}).",
+                "Bundled plugin coordinates (${coordinates.size}) do not match the bundled plugin jars (${jars.size}).",
             )
         }
         return coordinates.zip(jars)
@@ -44,10 +52,13 @@ internal object CliBundledPluginProfile {
             appendLine("# Plugin coordinates are pinned to the CLI release version for deterministic runtime behavior.")
             appendLine("format=$formatVersion")
             appendLine("cliVersion=$cliVersion")
-            val serviceEntriesByCoordinate = serviceEntries(plugins).groupBy { entry -> entry.coordinate }
-            plugins.forEach { plugin ->
-                appendLine("plugin=${plugin.first}")
-                serviceEntriesByCoordinate.getOrDefault(plugin.first, emptyList()).forEach { entry ->
+
+            val serviceEntriesByCoordinate = serviceEntries(plugins).groupBy { it.coordinate }
+
+            for ((coordinate, _) in plugins) {
+                appendLine("plugin=$coordinate")
+                val entries = serviceEntriesByCoordinate[coordinate].orEmpty()
+                for (entry in entries) {
                     appendLine("service=${entry.coordinate}|${entry.servicePath}|${entry.provider}")
                 }
             }
@@ -68,61 +79,42 @@ internal object CliBundledPluginCatalogVerifier {
         val pluginCoordinates = mutableListOf<String>()
         val serviceEntries = mutableListOf<BundledServiceEntry>()
 
-        catalogText.lineSequence().withIndex().forEach { indexedLine ->
-            val index = indexedLine.index
-            val line = indexedLine.value.trim()
-            if (line.isEmpty() || line.startsWith("#")) {
-                return@forEach
-            }
+        catalogText.lineSequence().withIndex().forEach { (index, rawLine) ->
+            val line = rawLine.trim()
+            if (line.isEmpty() || line.startsWith("#")) return@forEach
+            val lineNumber = index + 1
 
-            when {
-                line.startsWith("format=") -> formatValue = line.removePrefix("format=")
-                line.startsWith("cliVersion=") -> cliVersion = line.removePrefix("cliVersion=")
-                line.startsWith("plugin=") -> pluginCoordinates += line.removePrefix("plugin=")
-                line.startsWith("service=") -> {
-                    val components = line.removePrefix("service=").split("|", limit = 3)
-                    if (components.size != 3 || components.any { it.isEmpty() }) {
-                        throw GradleException(
-                            "Invalid service declaration at ${source}:${index + 1}. Expected " +
-                                "'service=<coordinate>|<service-path>|<provider>'.",
-                        )
-                    }
-                    serviceEntries += BundledServiceEntry(
-                        coordinate = components[0],
-                        servicePath = components[1],
-                        provider = components[2],
-                    )
-                }
-                else -> {
-                    throw GradleException("Unrecognized bundled plugin catalog entry at ${source}:${index + 1}: '$line'")
-                }
+            val (key, value) =
+                line.split('=', limit = 2).takeIf { it.size == 2 }
+                    ?: throw GradleException("Unrecognized entry at $source:$lineNumber: '$line'")
+
+            when (key) {
+                "format" -> formatValue = value
+                "cliVersion" -> cliVersion = value
+                "plugin" -> pluginCoordinates += value
+                "service" -> serviceEntries += parseServiceDeclaration(value, source, lineNumber)
+                else -> throw GradleException("Unrecognized entry at $source:$lineNumber: '$line'")
             }
         }
 
         if (formatValue != expectedFormatVersion.toString()) {
             throw GradleException(
-                "Bundled plugin catalog '${source}' has format '${formatValue}', expected '${expectedFormatVersion}'.",
+                "Bundled plugin catalog '$source' has format '$formatValue', expected '$expectedFormatVersion'.",
             )
         }
-
         if (cliVersion != expectedCliVersion) {
             throw GradleException(
-                "Bundled plugin catalog '${source}' has cliVersion '${cliVersion}', expected '${expectedCliVersion}'.",
+                "Bundled plugin catalog '$source' has cliVersion '$cliVersion', expected '$expectedCliVersion'.",
             )
         }
-
         if (pluginCoordinates != expectedCoordinates) {
             throw GradleException(
-                "Bundled plugin catalog '${source}' defines coordinates ${pluginCoordinates}, " +
-                    "expected ${expectedCoordinates}.",
+                "Bundled plugin catalog '$source' defines coordinates $pluginCoordinates, expected $expectedCoordinates.",
             )
         }
-
-        val sortedExpectedEntries = sortServiceEntries(expectedServiceEntries)
-        val sortedActualEntries = sortServiceEntries(serviceEntries)
-        if (sortedActualEntries != sortedExpectedEntries) {
+        if (serviceEntries.sorted() != expectedServiceEntries.sorted()) {
             throw GradleException(
-                "Bundled plugin catalog '${source}' service declarations do not match expected providers.",
+                "Bundled plugin catalog '$source' service declarations do not match expected providers.",
             )
         }
     }
@@ -130,62 +122,62 @@ internal object CliBundledPluginCatalogVerifier {
     fun collectServiceEntries(
         jarFile: File,
         coordinate: String,
-    ): List<BundledServiceEntry> {
-        val entries = mutableListOf<BundledServiceEntry>()
-        JarFile(jarFile).use { jarFileHandle ->
-            jarFileHandle.entries().asSequence()
-                .filter { entry -> !entry.isDirectory && entry.name.startsWith("META-INF/services/") }
-                .forEach { entry ->
-                    val providers =
-                        jarFileHandle.getInputStream(entry)
-                            .bufferedReader(StandardCharsets.UTF_8)
-                            .use { reader ->
-                                reader.lineSequence()
-                                    .map(String::trim)
-                                    .filter { line -> line.isNotEmpty() && !line.startsWith("#") }
-                                    .toList()
-                            }
+    ): List<BundledServiceEntry> = jarFile.readServiceEntries(coordinate).sorted()
 
-                    providers.forEach { provider ->
-                        entries += BundledServiceEntry(
-                            coordinate = coordinate,
-                            servicePath = entry.name,
-                            provider = provider,
-                        )
-                    }
-                }
+    fun collectZipEntries(zipArchive: File): Set<String> = zipArchive.readZipEntries()
+
+    fun collectTarGzEntries(tarGzArchive: File): Set<String> = tarGzArchive.readTarGzEntries()
+
+    private fun parseServiceDeclaration(
+        value: String,
+        source: String,
+        lineNumber: Int,
+    ): BundledServiceEntry {
+        val parts = value.split('|')
+        if (parts.size != 3 || parts.any { it.isBlank() }) {
+            throw GradleException(
+                "Invalid service declaration at $source:$lineNumber. Expected 'service=<coordinate>|<service-path>|<provider>'.",
+            )
         }
-
-        return sortServiceEntries(entries)
+        return BundledServiceEntry(coordinate = parts[0], servicePath = parts[1], provider = parts[2])
     }
-
-    fun collectZipEntries(zipArchive: File): Set<String> {
-        val entries = linkedSetOf<String>()
-        ZipFile(zipArchive).use { zipFile ->
-            zipFile.entries().asSequence()
-                .filterNot { entry -> entry.isDirectory }
-                .forEach { entry -> entries += entry.name }
-        }
-        return entries
-    }
-
-    fun collectTarGzEntries(tarGzArchive: File): Set<String> {
-        val entries = linkedSetOf<String>()
-        TarInputStream(GZIPInputStream(FileInputStream(tarGzArchive))).use { tarStream ->
-            while (true) {
-                val entry = tarStream.getNextEntry() ?: break
-                if (!entry.isDirectory) {
-                    entries += entry.name
-                }
-            }
-        }
-        return entries
-    }
-
-    private fun sortServiceEntries(entries: List<BundledServiceEntry>): List<BundledServiceEntry> =
-        entries.sortedWith(
-            compareBy<BundledServiceEntry> { it.coordinate }
-                .thenBy { it.servicePath }
-                .thenBy { it.provider },
-        )
 }
+
+private fun File.readServiceEntries(coordinate: String): List<BundledServiceEntry> =
+    JarFile(this).use { jar ->
+        jar
+            .entries()
+            .asSequence()
+            .filter { !it.isDirectory && it.name.startsWith("META-INF/services/") }
+            .flatMap { entry ->
+                jar.getInputStream(entry).bufferedReader(Charsets.UTF_8).use { reader ->
+                    reader
+                        .lineSequence()
+                        .map { it.substringBefore('#').trim() }
+                        .filter { it.isNotEmpty() }
+                        .map { provider ->
+                            BundledServiceEntry(
+                                coordinate = coordinate,
+                                servicePath = entry.name,
+                                provider = provider,
+                            )
+                        }.toList()
+                }
+            }.toList()
+    }
+
+private fun File.readZipEntries(): Set<String> =
+    ZipFile(this).use { zip ->
+        zip
+            .entries()
+            .asSequence()
+            .filterNot { it.isDirectory }
+            .mapTo(linkedSetOf()) { it.name }
+    }
+
+private fun File.readTarGzEntries(): Set<String> =
+    TarInputStream(GZIPInputStream(inputStream().buffered())).use { tar ->
+        generateSequence { tar.nextEntry }
+            .filterNot { it.isDirectory }
+            .mapTo(linkedSetOf()) { it.name }
+    }

@@ -13,53 +13,81 @@ import org.gradle.api.GradleException
 
 private const val LAUNCHER_ENTRY = "microsmith-cli/bin/microsmith"
 
+private const val MODE_755 = 0b111_101_101
+private const val MODE_644 = 0b110_100_100
+private const val MODE_100 = 0b001_000_000
+
 class CliArchiveLauncherPermissionsTests :
     StringSpec({
+
         "accepts executable launchers in both archive formats" {
-            withArchives("755", "755") { zip, tar ->
+            withArchives(zipMode = MODE_755, tarMode = MODE_755) { zip, tar ->
                 verifyCliArchiveLauncherPermissions(zip, tar, LAUNCHER_ENTRY)
             }
         }
 
         "rejects a ZIP archive with a non-executable Unix launcher" {
-            withArchives("644", "755") { zip, tar ->
-                shouldThrow<GradleException> { verifyCliArchiveLauncherPermissions(zip, tar, LAUNCHER_ENTRY) }
+            withArchives(zipMode = MODE_644, tarMode = MODE_755) { zip, tar ->
+                shouldThrow<GradleException> {
+                    verifyCliArchiveLauncherPermissions(zip, tar, LAUNCHER_ENTRY)
+                }
             }
         }
 
         "rejects a TAR archive with a non-executable Unix launcher" {
-            withArchives("755", "644") { zip, tar ->
-                shouldThrow<GradleException> { verifyCliArchiveLauncherPermissions(zip, tar, LAUNCHER_ENTRY) }
+            withArchives(zipMode = MODE_755, tarMode = MODE_644) { zip, tar ->
+                shouldThrow<GradleException> {
+                    verifyCliArchiveLauncherPermissions(zip, tar, LAUNCHER_ENTRY)
+                }
             }
         }
 
         "rejects an execute-only launcher that does not match the release permission policy" {
-            withArchives("100", "100") { zip, tar ->
-                shouldThrow<GradleException> { verifyCliArchiveLauncherPermissions(zip, tar, LAUNCHER_ENTRY) }
+            withArchives(zipMode = MODE_100, tarMode = MODE_100) { zip, tar ->
+                shouldThrow<GradleException> {
+                    verifyCliArchiveLauncherPermissions(zip, tar, LAUNCHER_ENTRY)
+                }
             }
         }
     })
 
-private fun withArchives(zipMode: String, tarMode: String, block: (File, File) -> Unit) {
-    val root = Files.createTempDirectory("cli-archive-permissions").toFile()
+private fun withArchives(
+    zipMode: Int,
+    tarMode: Int,
+    block: (zipFile: File, tarFile: File) -> Unit,
+) {
+    val tempDir = Files.createTempDirectory("cli-archive-permissions").toFile()
     try {
-        val zip = File(root, "cli.zip")
-        val tar = File(root, "cli.tar.gz")
-        ZipOutputStream(zip).use { output ->
-            output.putNextEntry(ZipEntry(LAUNCHER_ENTRY).apply { unixMode = zipMode.toInt(8) })
-            output.closeEntry()
-        }
-        TarOutputStream(GZIPOutputStream(tar.outputStream())).use { output ->
-            output.putNextEntry(
-                TarEntry(LAUNCHER_ENTRY).apply {
-                    mode = tarMode.toInt(8)
-                    size = 0
-                }
-            )
-            output.closeEntry()
-        }
-        block(zip, tar)
+        val zipFile = tempDir.resolve("cli.zip").apply { writeZipEntry(LAUNCHER_ENTRY, zipMode) }
+        val tarFile = tempDir.resolve("cli.tar.gz").apply { writeTarGzEntry(LAUNCHER_ENTRY, tarMode) }
+
+        block(zipFile, tarFile)
     } finally {
-        root.deleteRecursively()
+        tempDir.deleteRecursively()
+    }
+}
+
+private fun File.writeZipEntry(
+    entryPath: String,
+    mode: Int,
+) {
+    ZipOutputStream(outputStream().buffered()).use { zip ->
+        zip.putNextEntry(ZipEntry(entryPath).apply { unixMode = mode })
+        zip.closeEntry()
+    }
+}
+
+private fun File.writeTarGzEntry(
+    entryPath: String,
+    mode: Int,
+) {
+    TarOutputStream(GZIPOutputStream(outputStream().buffered())).use { tar ->
+        tar.putNextEntry(
+            TarEntry(entryPath).apply {
+                this.mode = mode
+                size = 0
+            },
+        )
+        tar.closeEntry()
     }
 }
