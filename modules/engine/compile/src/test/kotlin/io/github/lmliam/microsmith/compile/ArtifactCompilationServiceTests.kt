@@ -12,11 +12,12 @@ import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
 import java.nio.file.Path
 
 class ArtifactCompilationServiceTests :
     StringSpec({
-        "compile recursively compiles artifacts until only terminal artifacts remain" {
+        "recursively compiles artifacts until only terminal artifacts remain" {
             val assemblyService =
                 ArtifactAssemblyService(
                     listOf(
@@ -37,7 +38,7 @@ class ArtifactCompilationServiceTests :
             compiled.artifacts().map { it.id.artifactType } shouldContainExactly listOf(TextFileArtifact::class)
         }
 
-        "compile rejects immediate self-cycles from compilers" {
+        "rejects immediate self-cycles from compilers" {
             val assemblyService = ArtifactAssemblyService(listOf(StageOneArtifactAssembler()))
             val compilationService =
                 ArtifactCompilationService(
@@ -46,10 +47,15 @@ class ArtifactCompilationServiceTests :
                 )
             val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
 
-            shouldThrow<IllegalArgumentException> { compilationService.compile(initial) }
+            val error = shouldThrow<IllegalArgumentException> { compilationService.compile(initial) }
+
+            error.message shouldBe
+                "'io.github.lmliam.microsmith.compile.SelfCyclingCompiler' compiled " +
+                    "'io.github.lmliam.microsmith.compile.StageOneArtifact' into the same artifact type, " +
+                    "creating an immediate compilation cycle."
         }
 
-        "compile rejects indirect cycles across compiler stages" {
+        "rejects indirect cycles across compiler stages" {
             val assemblyService =
                 ArtifactAssemblyService(
                     listOf(
@@ -64,101 +70,119 @@ class ArtifactCompilationServiceTests :
                 )
             val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
 
-            shouldThrow<IllegalArgumentException> { compilationService.compile(initial) }
+            val error = shouldThrow<IllegalArgumentException> { compilationService.compile(initial) }
+
+            error.message shouldBe
+                "Artifact compilation cycle detected for assembly: " +
+                    "'io.github.lmliam.microsmith.compile.StageOneArtifact:StageOneId(name=start)'."
         }
     })
 
-private data class StageOneArtifact(override val id: StageOneId, val contents: String) : Artifact
+private data class StageOneArtifact(
+    override val id: StageOneId,
+    val contents: String,
+) : Artifact
 
 private data class StageOneId(val name: String) : ArtifactId<StageOneArtifact> {
     override val artifactType = StageOneArtifact::class
 }
 
-private data class StageOneContribution(override val artifactId: StageOneId, val contents: String) :
-    ArtifactContribution<StageOneArtifact>
+private data class StageOneContribution(
+    override val artifactId: StageOneId,
+    val contents: String,
+) : ArtifactContribution<StageOneArtifact>
 
 private class StageOneArtifactAssembler : ArtifactAssembler<StageOneArtifact> {
     override val artifactType = StageOneArtifact::class
 
-    override fun create(first: ArtifactContribution<StageOneArtifact>): StageOneArtifact =
-        StageOneArtifact(requireContribution(first).artifactId, requireContribution(first).contents)
+    override fun create(contribution: ArtifactContribution<StageOneArtifact>): StageOneArtifact {
+        val stageOne = contribution.requireStageOne()
+        return StageOneArtifact(stageOne.artifactId, stageOne.contents)
+    }
 
     override fun merge(
         current: StageOneArtifact,
         contribution: ArtifactContribution<StageOneArtifact>,
     ): StageOneArtifact {
-        val next = requireContribution(contribution)
+        val next = contribution.requireStageOne()
         require(current.contents == next.contents)
         return current
     }
 
-    private fun requireContribution(contribution: ArtifactContribution<StageOneArtifact>): StageOneContribution {
-        require(contribution is StageOneContribution)
-        return contribution
+    private fun ArtifactContribution<StageOneArtifact>.requireStageOne(): StageOneContribution {
+        require(this is StageOneContribution)
+        return this
     }
 }
 
-private data class StageTwoArtifact(override val id: StageTwoId, val contents: String) : Artifact
+private data class StageTwoArtifact(
+    override val id: StageTwoId,
+    val contents: String,
+) : Artifact
 
 private data class StageTwoId(val name: String) : ArtifactId<StageTwoArtifact> {
     override val artifactType = StageTwoArtifact::class
 }
 
-private data class StageTwoContribution(override val artifactId: StageTwoId, val contents: String) :
-    ArtifactContribution<StageTwoArtifact>
+private data class StageTwoContribution(
+    override val artifactId: StageTwoId,
+    val contents: String,
+) : ArtifactContribution<StageTwoArtifact>
 
 private class StageTwoArtifactAssembler : ArtifactAssembler<StageTwoArtifact> {
     override val artifactType = StageTwoArtifact::class
 
-    override fun create(first: ArtifactContribution<StageTwoArtifact>): StageTwoArtifact =
-        StageTwoArtifact(requireContribution(first).artifactId, requireContribution(first).contents)
+    override fun create(contribution: ArtifactContribution<StageTwoArtifact>): StageTwoArtifact {
+        val stageTwo = contribution.requireStageTwo()
+        return StageTwoArtifact(stageTwo.artifactId, stageTwo.contents)
+    }
 
     override fun merge(
         current: StageTwoArtifact,
         contribution: ArtifactContribution<StageTwoArtifact>,
     ): StageTwoArtifact {
-        val next = requireContribution(contribution)
+        val next = contribution.requireStageTwo()
         require(current.contents == next.contents)
         return current
     }
 
-    private fun requireContribution(contribution: ArtifactContribution<StageTwoArtifact>): StageTwoContribution {
-        require(contribution is StageTwoContribution)
-        return contribution
+    private fun ArtifactContribution<StageTwoArtifact>.requireStageTwo(): StageTwoContribution {
+        require(this is StageTwoContribution)
+        return this
     }
 }
 
 private class StageOneCompiler : ArtifactCompiler<StageOneArtifact> {
     override val artifactType = StageOneArtifact::class
 
-    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> =
+    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<Artifact>> =
         listOf(StageTwoContribution(StageTwoId("middle"), artifact.contents))
 }
 
 private class StageTwoCompiler : ArtifactCompiler<StageTwoArtifact> {
     override val artifactType = StageTwoArtifact::class
 
-    override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<out Artifact>> =
+    override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<Artifact>> =
         listOf(TextFileArtifactContribution(TextFileArtifactId(Path.of("result.txt")), artifact.contents))
 }
 
 private class SelfCyclingCompiler : ArtifactCompiler<StageOneArtifact> {
     override val artifactType = StageOneArtifact::class
 
-    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> =
+    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<Artifact>> =
         listOf(StageOneContribution(StageOneId("cycle"), artifact.contents))
 }
 
 private class StageOneToStageTwoCompiler : ArtifactCompiler<StageOneArtifact> {
     override val artifactType = StageOneArtifact::class
 
-    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<out Artifact>> =
+    override fun compile(artifact: StageOneArtifact): List<ArtifactContribution<Artifact>> =
         listOf(StageTwoContribution(StageTwoId(artifact.id.name), artifact.contents))
 }
 
 private class StageTwoToStageOneCompiler : ArtifactCompiler<StageTwoArtifact> {
     override val artifactType = StageTwoArtifact::class
 
-    override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<out Artifact>> =
+    override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<Artifact>> =
         listOf(StageOneContribution(StageOneId(artifact.id.name), artifact.contents))
 }

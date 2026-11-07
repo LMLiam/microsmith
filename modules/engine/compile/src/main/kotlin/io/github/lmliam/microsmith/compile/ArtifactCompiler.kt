@@ -9,5 +9,5 @@ import kotlin.reflect.KClass
 interface ArtifactCompiler<A : Artifact> {
     val artifactType: KClass<A>
 
-    fun compile(artifact: A): List<ArtifactContribution<out Artifact>>
+    fun compile(artifact: A): List<ArtifactContribution<Artifact>>
 }

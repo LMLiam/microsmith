@@ -4,25 +4,23 @@ import io.github.lmliam.microsmith.artifact.Artifact
 import kotlin.reflect.KClass
 
 internal class ArtifactCompilerRegistry(compilers: List<ArtifactCompiler<*>>) {
-    private val compilersByType = indexCompilers(compilers)
+    private val compilersByType: Map<KClass<out Artifact>, ArtifactCompiler<*>>
 
-    fun resolveOrNull(artifact: Artifact): ArtifactCompiler<Artifact>? =
-        compilersByType[artifact.id.artifactType]?.cast()
-
-    private fun indexCompilers(compilers: List<ArtifactCompiler<*>>): Map<KClass<out Artifact>, ArtifactCompiler<*>> {
-        val duplicates = compilers.groupBy(ArtifactCompiler<*>::artifactType).filterValues { it.size > 1 }
+    init {
+        val duplicates = compilers.groupBy { it.artifactType }.filterValues { it.size > 1 }.keys
 
         require(duplicates.isEmpty()) {
-            val types = duplicates.keys.map(::formatType).sorted().joinToString(", ")
-
-            "Duplicate artifact compilers registered for artifact types: $types"
+            val types = duplicates.map { it.displayName }.sorted().joinToString(", ")
+            "Duplicate artifact compilers registered for artifact type(s): $types"
         }
 
-        return compilers.associateBy(ArtifactCompiler<*>::artifactType)
+        compilersByType = compilers.associateBy { it.artifactType }
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun ArtifactCompiler<*>.cast(): ArtifactCompiler<Artifact> = this as ArtifactCompiler<Artifact>
-
-    private fun formatType(type: KClass<out Artifact>): String = type.qualifiedName ?: type.toString()
+    fun <A : Artifact> resolveOrNull(artifact: A): ArtifactCompiler<A>? =
+        compilersByType[artifact.id.artifactType] as ArtifactCompiler<A>?
 }
+
+internal val KClass<*>.displayName: String
+    get() = qualifiedName ?: simpleName ?: toString()
