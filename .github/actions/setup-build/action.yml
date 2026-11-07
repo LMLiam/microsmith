@@ -1,0 +1,14 @@
+name: Setup build toolchain
+description: Install JDK 24 and configure Gradle with a read-write cache.
+runs:
+  using: composite
+  steps:
+    - name: Setup JDK
+      uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: 24
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v5
+      with:
+        cache-read-only: false

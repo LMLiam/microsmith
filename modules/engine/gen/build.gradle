@@ -12,3 +12,16 @@ dependencies {
     implementation libs.spi.tooling.annotations
     kapt libs.spi.tooling.processor
 }
+
+def windows = org.gradle.internal.os.OperatingSystem.current().isWindows()
+def dotnetVersion = providers.exec {
+    if (windows) {
+        commandLine 'cmd', '/c', 'dotnet --version 2>nul || echo unavailable'
+    } else {
+        commandLine 'sh', '-c', 'dotnet --version 2>/dev/null || echo unavailable'
+    }
+}.standardOutput.asText.map { it.trim() }
+
+tasks.named('e2eTest') {
+    inputs.property('dotnetVersion', dotnetVersion)
+}
