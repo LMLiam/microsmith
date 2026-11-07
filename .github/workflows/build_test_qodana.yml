@@ -24,6 +24,8 @@ jobs:
       code: ${{ steps.filter.outputs.code != 'false' }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Filter changed paths
         id: filter
         if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
@@ -44,6 +46,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-build
       - name: Run detekt and ktfmt
         run: ./gradlew detektMain detektTest detektIntegrationTest detektE2eTest ktfmtCheck --stacktrace
@@ -56,6 +60,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-build
       - name: Run unit tests
         run: ./gradlew kotest :build-logic:test --stacktrace
@@ -76,6 +82,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-build
       - name: Run integration tests
         run: ./gradlew integrationTest --stacktrace
@@ -96,6 +104,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-build
       - name: Run end-to-end tests
         run: ./gradlew e2eTest --stacktrace
@@ -116,6 +126,8 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-build
       - name: Publish native JVM packages to mavenLocal
         run: ./gradlew publishToMavenLocal --stacktrace
@@ -155,6 +167,8 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-build
       - name: Publish native JVM packages to mavenLocal
         run: ./gradlew publishToMavenLocal --stacktrace
@@ -196,6 +210,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-build
       - name: Build CLI release assets
         run: ./gradlew :cli:releaseArtifacts :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
@@ -227,6 +243,8 @@ jobs:
           - windows-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
@@ -563,6 +581,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
+          persist-credentials: false
       - name: Qodana Scan
         if: ${{ env.QODANA_TOKEN != '' }}
         uses: JetBrains/qodana-action@v2025.2
@@ -593,6 +612,8 @@ jobs:
       checks: write
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Download test results
         uses: actions/download-artifact@v4
         with:
