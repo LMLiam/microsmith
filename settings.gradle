@@ -85,6 +85,7 @@ rootProject.name = 'microsmith'
     'compile-services-dotnet-asp',
     'compile-services-dotnet-packages',
     'gen',
+    'runtime-scripting-api',
     'runtime-scripting',
     'cli',
     'gradle-plugin',

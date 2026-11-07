@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.cache
 import java.nio.ByteBuffer
 import java.security.MessageDigest
-import java.util.Locale
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.SourceCode
 
