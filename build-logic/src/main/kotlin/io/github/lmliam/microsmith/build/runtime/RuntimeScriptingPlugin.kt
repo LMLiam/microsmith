@@ -72,7 +72,7 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                     "io.github.lmliam.microsmith.resolve.schemas.SchemasResolver",
                     "io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufSchemasResolver",
                     "io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.resolution.ProtobufRpcSchemasResolver",
-                    "io.github.lmliam.microsmith.resolve.services.core.ServicesResolver",
+                    "io.github.lmliam.microsmith.resolve.services.ServicesResolver",
                     "io.github.lmliam.microsmith.resolve.services.dotnet.DotnetWorkspaceDomainResolver",
                     "io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspaceDomainResolver",
                     "io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspaceDomainResolver",
