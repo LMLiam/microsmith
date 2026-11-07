@@ -14,47 +14,39 @@ internal fun verifyCliArchiveLauncherPermissions(
     tarArchive: File,
     launcherEntry: String,
 ) {
-    zipArchive.requireLauncherMode(launcherEntry, readZipLauncherMode(zipArchive, launcherEntry))
-    tarArchive.requireLauncherMode(launcherEntry, readTarGzLauncherMode(tarArchive, launcherEntry))
+    zipArchive.verifyLauncherPermissions(launcherEntry, zipArchive.readZipEntryMode(launcherEntry))
+    tarArchive.verifyLauncherPermissions(launcherEntry, tarArchive.readTarGzEntryMode(launcherEntry))
 }
 
-private fun readZipLauncherMode(
-    archive: File,
-    launcherEntry: String,
-): Int =
-    ZipFile(archive).use { zip ->
-        zip.getEntry(launcherEntry)?.unixMode
-            ?: throw missingLauncher(archive, launcherEntry)
+private fun File.readZipEntryMode(entryPath: String): Int =
+    ZipFile(this).use { zip ->
+        zip.getEntry(entryPath)?.unixMode
+            ?: throw missingLauncherException(entryPath)
     }
 
-private fun readTarGzLauncherMode(
-    archive: File,
-    launcherEntry: String,
-): Int =
-    TarInputStream(GZIPInputStream(archive.inputStream())).use { tar ->
+private fun File.readTarGzEntryMode(entryPath: String): Int =
+    TarInputStream(GZIPInputStream(inputStream().buffered())).use { tar ->
         generateSequence { tar.nextEntry }
-            .firstOrNull { it.name == launcherEntry }
+            .firstOrNull { it.name == entryPath }
             ?.mode
-            ?: throw missingLauncher(archive, launcherEntry)
+            ?: throw missingLauncherException(entryPath)
     }
 
-private fun File.requireLauncherMode(
+private fun File.verifyLauncherPermissions(
     launcherEntry: String,
-    mode: Int,
+    rawMode: Int,
 ) {
-    val permissions = mode and UNIX_PERMISSION_MASK
+    val permissions = rawMode and UNIX_PERMISSION_MASK
 
     if (permissions != CLI_EXECUTABLE_FILE_MODE) {
         throw GradleException(
-            "Unix launcher '$launcherEntry' in $name has mode ${permissions.toOctal()}; " +
-                "expected ${CLI_EXECUTABLE_FILE_MODE.toOctal()}.",
+            "Unix launcher '$launcherEntry' in '$name' has mode ${permissions.toOctalMode()}; " +
+                "expected ${CLI_EXECUTABLE_FILE_MODE.toOctalMode()}.",
         )
     }
 }
 
-private fun missingLauncher(
-    archive: File,
-    launcherEntry: String,
-): GradleException = GradleException("Missing Unix launcher '$launcherEntry' in ${archive.name}.")
+private fun File.missingLauncherException(launcherEntry: String): GradleException =
+    GradleException("Missing Unix launcher '$launcherEntry' in '$name'.")
 
-private fun Int.toOctal(): String = toString(radix = 8)
+private fun Int.toOctalMode(): String = "0" + toString(radix = 8)

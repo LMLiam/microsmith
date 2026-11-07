@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.build.cli
 
-import java.nio.charset.StandardCharsets
+import java.io.File
 import java.util.jar.JarFile
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
@@ -23,80 +23,107 @@ abstract class VerifyShadowJarServices : CliBundledPluginTask() {
     @get:Input
     abstract val catalogJarPath: Property<String>
 
+    init {
+        group = "verification"
+        description = "Verifies merged SPI service providers and embedded catalog metadata in the Shadow JAR."
+    }
+
     @TaskAction
     fun verify() {
         val plugins = bundledPlugins()
         val serviceEntries = CliBundledPluginProfile.serviceEntries(plugins)
-        val coordinates = plugins.map { (coordinate) -> coordinate }
-        val cliVersionValue = cliVersion.get()
-        val formatVersionValue = formatVersion.get()
+        val coordinates = plugins.map { it.first }
+        val currentCliVersion = cliVersion.get()
+        val currentFormatVersion = formatVersion.get()
 
-        val generatedCatalogFile = catalogFile.get().asFile
-        val expectedCatalogText = generatedCatalogFile.readText(StandardCharsets.UTF_8)
+        val generatedCatalog = catalogFile.asFile.get()
+        val expectedCatalogText = generatedCatalog.readText()
         CliBundledPluginCatalogVerifier.validate(
-            expectedCatalogText,
-            generatedCatalogFile.path,
-            formatVersionValue,
-            cliVersionValue,
-            coordinates,
-            serviceEntries,
+            catalogText = expectedCatalogText,
+            source = generatedCatalog.path,
+            expectedFormatVersion = currentFormatVersion,
+            expectedCliVersion = currentCliVersion,
+            expectedCoordinates = coordinates,
+            expectedServiceEntries = serviceEntries,
         )
 
-        val catalogJarEntry = catalogJarPath.get()
-        val shadedJar = shadowJarFile.get().asFile
-        val expectedProvidersByDescriptor =
-            serviceEntries.groupBy { entry -> entry.servicePath }.mapValues { (_, entries) ->
-                entries.map { entry -> entry.provider }
-            }
+        val shadowJar = shadowJarFile.asFile.get()
+        val catalogEntryPath = catalogJarPath.get()
+        val expectedProvidersByService = serviceEntries.groupBy({ it.servicePath }, { it.provider })
 
-        JarFile(shadedJar).use { jarFile ->
-            expectedProvidersByDescriptor.forEach { (servicePath, expectedProviders) ->
-                val entry =
-                    jarFile.getJarEntry(servicePath)
-                        ?: throw GradleException(
-                            "Missing merged service descriptor '$servicePath' in ${shadedJar.name}.",
-                        )
-                val providers =
-                    jarFile.getInputStream(entry)
-                        .bufferedReader(StandardCharsets.UTF_8)
-                        .use { reader ->
-                            reader.lineSequence()
-                                .map(String::trim)
-                                .filter { line -> line.isNotEmpty() && !line.startsWith("#") }
-                                .toList()
-                        }
-                expectedProviders.forEach { expectedProvider ->
-                    if (expectedProvider !in providers) {
-                        throw GradleException(
-                            "Service '$servicePath' is missing expected provider '$expectedProvider' " +
-                                "in ${shadedJar.name}.",
-                        )
-                    }
-                }
-            }
-
-            val catalogEntry =
-                jarFile.getJarEntry(catalogJarEntry)
-                    ?: throw GradleException(
-                        "Missing bundled plugin catalog '$catalogJarEntry' in ${shadedJar.name}.",
-                    )
-            val actualCatalogText =
-                jarFile.getInputStream(catalogEntry)
-                    .bufferedReader(StandardCharsets.UTF_8)
-                    .use { reader -> reader.readText() }
-            if (actualCatalogText != expectedCatalogText) {
-                throw GradleException(
-                    "Bundled plugin catalog in ${shadedJar.name} does not match generated metadata.",
-                )
-            }
-            CliBundledPluginCatalogVerifier.validate(
-                actualCatalogText,
-                "${shadedJar.name}!/$catalogJarEntry",
-                formatVersionValue,
-                cliVersionValue,
-                coordinates,
-                serviceEntries,
+        JarFile(shadowJar).use { jar ->
+            jar.verifyServiceProviders(shadowJar, expectedProvidersByService)
+            jar.verifyEmbeddedCatalog(
+                shadowJar = shadowJar,
+                catalogEntryPath = catalogEntryPath,
+                expectedCatalogText = expectedCatalogText,
+                formatVersion = currentFormatVersion,
+                cliVersion = currentCliVersion,
+                coordinates = coordinates,
+                serviceEntries = serviceEntries,
             )
         }
+    }
+
+    private fun JarFile.verifyServiceProviders(
+        jarFile: File,
+        expectedProvidersByService: Map<String, List<String>>,
+    ) {
+        expectedProvidersByService.forEach { (servicePath, expectedProviders) ->
+            val actualProviders =
+                readServiceProviders(servicePath)
+                    ?: throw GradleException("Missing merged service descriptor '$servicePath' in '${jarFile.name}'.")
+
+            val missing = expectedProviders.filterNot(actualProviders::contains)
+            if (missing.isNotEmpty()) {
+                val formattedMissing = missing.joinToString(", ")
+                throw GradleException(
+                    "Service '$servicePath' is missing expected provider(s) '$formattedMissing' in '${jarFile.name}'.",
+                )
+            }
+        }
+    }
+
+    private fun JarFile.verifyEmbeddedCatalog(
+        shadowJar: File,
+        catalogEntryPath: String,
+        expectedCatalogText: String,
+        formatVersion: Int,
+        cliVersion: String,
+        coordinates: List<String>,
+        serviceEntries: List<BundledServiceEntry>,
+    ) {
+        val actualCatalogText =
+            readEntryText(catalogEntryPath)
+                ?: throw GradleException("Missing bundled plugin catalog '$catalogEntryPath' in '${shadowJar.name}'.")
+
+        if (actualCatalogText != expectedCatalogText) {
+            throw GradleException("Bundled plugin catalog in '${shadowJar.name}' does not match generated metadata.")
+        }
+
+        CliBundledPluginCatalogVerifier.validate(
+            catalogText = actualCatalogText,
+            source = "${shadowJar.name}!/$catalogEntryPath",
+            expectedFormatVersion = formatVersion,
+            expectedCliVersion = cliVersion,
+            expectedCoordinates = coordinates,
+            expectedServiceEntries = serviceEntries,
+        )
+    }
+
+    private fun JarFile.readServiceProviders(servicePath: String): Set<String>? {
+        val entry = getJarEntry(servicePath) ?: return null
+        return getInputStream(entry).bufferedReader(Charsets.UTF_8).use { reader ->
+            reader
+                .lineSequence()
+                .map { it.substringBefore('#').trim() }
+                .filter { it.isNotEmpty() }
+                .toSet()
+        }
+    }
+
+    private fun JarFile.readEntryText(entryPath: String): String? {
+        val entry = getJarEntry(entryPath) ?: return null
+        return getInputStream(entry).bufferedReader(Charsets.UTF_8).use { it.readText() }
     }
 }
