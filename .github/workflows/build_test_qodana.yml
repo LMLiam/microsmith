@@ -108,8 +108,8 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
 
-  fixtures:
-    name: Native fixtures
+  gradle-fixtures:
+    name: Native Gradle fixtures
     needs: changes
     if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
@@ -146,6 +146,18 @@ jobs:
           validate_gradle_proto_fixture examples/gradle/java
           validate_gradle_proto_fixture examples/gradle/kotlin
           validate_gradle_dotnet_fixture examples/gradle/dotnet
+
+  maven-fixtures:
+    name: Native Maven fixtures
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-build
+      - name: Publish native JVM packages to mavenLocal
+        run: ./gradlew publishToMavenLocal --stacktrace
       - name: Validate native Maven fixtures
         run: |
           set -euo pipefail
@@ -604,7 +616,8 @@ jobs:
       - unit-tests
       - integration-tests
       - e2e-tests
-      - fixtures
+      - gradle-fixtures
+      - maven-fixtures
       - cli-dist
       - cli-verify
       - qodana
