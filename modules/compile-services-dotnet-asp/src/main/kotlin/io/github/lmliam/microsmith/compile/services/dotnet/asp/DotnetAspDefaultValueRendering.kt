@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestFieldArtifact
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 import java.util.Locale
 
 internal fun renderDotnetAspInitializer(type: DotnetFieldType): String = FIXED_TYPE_INITIALIZERS[type]

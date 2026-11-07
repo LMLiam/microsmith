@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.resolve.services
 import com.github.eventhorizonlab.spi.ServiceProvider
-import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
+import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.DomainResolver
 

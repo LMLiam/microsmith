@@ -1,10 +1,10 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.packages
 
-import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspace
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageReference
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageService
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageSolution
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageVersion
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
