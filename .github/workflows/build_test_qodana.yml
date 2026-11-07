@@ -405,37 +405,6 @@ jobs:
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts
           test -f proto/UserCreated.proto
-      - name: Verify Java, Kotlin, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
-        if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
-        run: |
-          set -euo pipefail
-          verify_unix_fixture() {
-            local repo_name="$1"
-            local repo_root="$2"
-            local expected_proto="$3"
-            local doctor_output="$4"
-
-            ./.microsmith-bin/microsmith init --repo-root "$repo_root"
-            ./.microsmith-bin/microsmith init --repo-root "$repo_root"
-            test -f "$repo_root/build.microsmith.kts"
-            test -f "$repo_root/settings.microsmith.kts"
-            test -f "$repo_root/.microsmith/ide/build.gradle.kts"
-            test -f "$repo_root/.microsmith/ide/README.md"
-            ./.microsmith-bin/microsmith ide refresh --repo-root "$repo_root"
-            ./.microsmith-bin/microsmith ide doctor --repo-root "$repo_root" --diagnostics json > "$doctor_output"
-            grep -q "JetBrains IDE helper doctor checks passed." "$doctor_output"
-            ./.microsmith-bin/microsmith run "$repo_root/build.microsmith.kts"
-            test -f "proto/$expected_proto"
-            echo "Validated $repo_name fixture."
-          }
-
-          verify_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
-          verify_unix_fixture kotlin examples/gradle/kotlin KotlinUserCreated.proto kotlin-ide-doctor.json
-          verify_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
-          verify_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
-          verify_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
-          verify_unix_fixture ruby examples/non-gradle/ruby RubyUserCreated.proto ruby-ide-doctor.json
-          verify_unix_fixture rust examples/non-gradle/rust RustUserCreated.proto rust-ide-doctor.json
       - name: Verify .NET onboarding fixture (Unix)
         if: ${{ always() && runner.os != 'Windows' && steps.install-unix.outcome == 'success' }}
         run: |
@@ -572,6 +541,83 @@ jobs:
             exit $LASTEXITCODE
           }
 
+  cli-onboarding:
+    name: CLI onboarding fixtures (Linux)
+    needs: cli-dist
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 24
+      - name: Download CLI distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: cli-dist
+      - name: Extract CLI distribution
+        id: extract-dist
+        shell: bash
+        run: tar -xzf cli-dist.tgz
+      - name: Install and verify from installer (Unix)
+        id: install-unix
+        if: ${{ steps.extract-dist.outcome == 'success' }}
+        run: |
+          set -eu
+          DIST_FILE="$(find modules/integrations/cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
+          CLI_VERSION="$(printf '%s\n' "$DIST_FILE" | sed -E 's#.*microsmith-cli-(.*)-dist.tar.gz#\1#')"
+          DIST_SHA="$(awk '{print $1}' "${DIST_FILE}.sha256")"
+          sh modules/integrations/cli/build/release-assets/microsmith-install.sh \
+            --version "$CLI_VERSION" \
+            --install-root "$PWD/.microsmith-home" \
+            --bin-dir "$PWD/.microsmith-bin" \
+            --dist-file "$DIST_FILE" \
+            --dist-sha256 "$DIST_SHA" \
+            --force-runtime-provision \
+            --no-profile-update
+          ./.microsmith-bin/microsmith --version
+          mkdir -p install-smoke-repo
+          ./.microsmith-bin/microsmith init --repo-root install-smoke-repo
+          test -f install-smoke-repo/build.microsmith.kts
+          test -f install-smoke-repo/settings.microsmith.kts
+          ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts
+          test -f proto/UserCreated.proto
+      - name: Verify Java, Kotlin, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
+        if: ${{ always() && steps.install-unix.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          verify_unix_fixture() {
+            local repo_name="$1"
+            local repo_root="$2"
+            local expected_proto="$3"
+            local doctor_output="$4"
+
+            ./.microsmith-bin/microsmith init --repo-root "$repo_root"
+            ./.microsmith-bin/microsmith init --repo-root "$repo_root"
+            test -f "$repo_root/build.microsmith.kts"
+            test -f "$repo_root/settings.microsmith.kts"
+            test -f "$repo_root/.microsmith/ide/build.gradle.kts"
+            test -f "$repo_root/.microsmith/ide/README.md"
+            ./.microsmith-bin/microsmith ide refresh --repo-root "$repo_root"
+            ./.microsmith-bin/microsmith ide doctor --repo-root "$repo_root" --diagnostics json > "$doctor_output"
+            grep -q "JetBrains IDE helper doctor checks passed." "$doctor_output"
+            ./.microsmith-bin/microsmith run "$repo_root/build.microsmith.kts"
+            test -f "proto/$expected_proto"
+            echo "Validated $repo_name fixture."
+          }
+
+          verify_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
+          verify_unix_fixture kotlin examples/gradle/kotlin KotlinUserCreated.proto kotlin-ide-doctor.json
+          verify_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
+          verify_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
+          verify_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
+          verify_unix_fixture ruby examples/non-gradle/ruby RubyUserCreated.proto ruby-ide-doctor.json
+          verify_unix_fixture rust examples/non-gradle/rust RustUserCreated.proto rust-ide-doctor.json
+
   qodana:
     name: Qodana
     needs: changes
@@ -650,6 +696,7 @@ jobs:
       - maven-fixtures
       - cli-dist
       - cli-verify
+      - cli-onboarding
       - qodana
     if: ${{ always() }}
     runs-on: ubuntu-latest
