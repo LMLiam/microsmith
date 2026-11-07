@@ -12,7 +12,7 @@ class BinaryFileArtifactRenderer : ArtifactRenderer<BinaryFileArtifact> {
     override fun render(artifact: BinaryFileArtifact): GeneratedFile =
         GeneratedFile(
             relativePath = artifact.id.relativePath,
-            contents = artifact.copiedContents,
+            contents = artifact.contents,
             outputRoot = artifact.id.outputRoot,
         )
 }

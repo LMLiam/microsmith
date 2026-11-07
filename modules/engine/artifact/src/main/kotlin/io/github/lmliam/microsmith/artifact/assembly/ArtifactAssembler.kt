@@ -9,7 +9,10 @@ import kotlin.reflect.KClass
 interface ArtifactAssembler<A : Artifact> {
     val artifactType: KClass<A>
 
-    fun create(first: ArtifactContribution<A>): A
+    fun create(contribution: ArtifactContribution<A>): A
 
-    fun merge(current: A, contribution: ArtifactContribution<A>): A
+    fun merge(
+        current: A,
+        contribution: ArtifactContribution<A>,
+    ): A
 }

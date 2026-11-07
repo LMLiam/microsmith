@@ -11,13 +11,13 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArti
 class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
     override val artifactType = ProtoFileArtifact::class
 
-    override fun create(first: ArtifactContribution<ProtoFileArtifact>): ProtoFileArtifact {
-        val contribution = requireContribution(first)
+    override fun create(contribution: ArtifactContribution<ProtoFileArtifact>): ProtoFileArtifact {
+        val protoContribution = requireContribution(contribution)
         return ProtoFileArtifact(
-            id = contribution.artifactId,
-            packageName = contribution.packageName,
-            imports = contribution.imports.distinct().sorted(),
-            declarations = contribution.declarations,
+            id = protoContribution.artifactId,
+            packageName = protoContribution.packageName,
+            imports = protoContribution.imports.distinct().sorted(),
+            declarations = protoContribution.declarations,
         )
     }
 

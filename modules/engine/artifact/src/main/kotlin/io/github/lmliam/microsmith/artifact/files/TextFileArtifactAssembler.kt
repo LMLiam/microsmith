@@ -8,11 +8,11 @@ import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 class TextFileArtifactAssembler : ArtifactAssembler<TextFileArtifact> {
     override val artifactType = TextFileArtifact::class
 
-    override fun create(first: ArtifactContribution<TextFileArtifact>): TextFileArtifact {
-        val contribution = requireContribution(first)
+    override fun create(contribution: ArtifactContribution<TextFileArtifact>): TextFileArtifact {
+        val textContribution = contribution.requireTextContribution()
         return TextFileArtifact(
-            id = contribution.artifactId,
-            contents = contribution.contents,
+            id = textContribution.artifactId,
+            contents = textContribution.contents,
         )
     }
 
@@ -20,20 +20,18 @@ class TextFileArtifactAssembler : ArtifactAssembler<TextFileArtifact> {
         current: TextFileArtifact,
         contribution: ArtifactContribution<TextFileArtifact>,
     ): TextFileArtifact {
-        val next = requireContribution(contribution)
-        require(current.contents == next.contents) {
+        val nextContribution = contribution.requireTextContribution()
+        require(current.contents == nextContribution.contents) {
             "Conflicting text artifact contributions for '${current.id.relativePath}' " +
                 "under '${current.id.outputRoot}'."
         }
         return current
     }
 
-    private fun requireContribution(
-        contribution: ArtifactContribution<TextFileArtifact>
-    ): TextFileArtifactContribution {
-        require(contribution is TextFileArtifactContribution) {
-            "Unsupported text artifact contribution type: ${contribution::class}"
+    private fun ArtifactContribution<TextFileArtifact>.requireTextContribution(): TextFileArtifactContribution {
+        require(this is TextFileArtifactContribution) {
+            "Unsupported text artifact contribution type '${this::class.qualifiedName ?: this::class.simpleName}'."
         }
-        return contribution
+        return this
     }
 }

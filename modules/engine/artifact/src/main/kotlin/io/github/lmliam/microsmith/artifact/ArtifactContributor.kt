@@ -8,5 +8,5 @@ import kotlin.reflect.KClass
 interface ArtifactContributor<R : ResolvedModel> {
     val resolvedType: KClass<R>
 
-    fun contribute(model: R): List<ArtifactContribution<out Artifact>>
+    fun contribute(model: R): List<ArtifactContribution<Artifact>>
 }

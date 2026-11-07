@@ -8,17 +8,17 @@ import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 class DotnetAspServiceArtifactAssembler : ArtifactAssembler<DotnetAspServiceArtifact> {
     override val artifactType = DotnetAspServiceArtifact::class
 
-    override fun create(first: ArtifactContribution<DotnetAspServiceArtifact>): DotnetAspServiceArtifact {
-        val contribution = requireContribution(first)
+    override fun create(contribution: ArtifactContribution<DotnetAspServiceArtifact>): DotnetAspServiceArtifact {
+        val serviceContribution = requireContribution(contribution)
         return DotnetAspServiceArtifact(
-            id = contribution.artifactId,
-            serviceName = contribution.serviceName,
-            targetFrameworkMoniker = contribution.targetFrameworkMoniker,
-            outputRoot = contribution.outputRoot,
-            httpPort = contribution.httpPort,
-            httpsPort = contribution.httpsPort,
-            contractModels = contribution.contractModels,
-            endpoints = contribution.endpoints,
+            id = serviceContribution.artifactId,
+            serviceName = serviceContribution.serviceName,
+            targetFrameworkMoniker = serviceContribution.targetFrameworkMoniker,
+            outputRoot = serviceContribution.outputRoot,
+            httpPort = serviceContribution.httpPort,
+            httpsPort = serviceContribution.httpsPort,
+            contractModels = serviceContribution.contractModels,
+            endpoints = serviceContribution.endpoints,
         )
     }
 
