@@ -18,42 +18,34 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
 
     override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufSchemaModel> {
         val protobufSchemas = authoring.schemas.filterIsInstance<ProtobufSchema>()
-        val schemas =
-            protobufSchemas
-                .filter { schema ->
-                    when (schema.schema) {
-                        is Message,
-                        is Enum -> true
-                        else -> false
-                    }
-                }
-                .sortedBy(ProtobufSchema::name)
-
-        if (schemas.isEmpty()) {
-            return DomainResolution.NotApplicable
-        }
+        val schemas = protobufSchemas.sortedBy(ProtobufSchema::name)
 
         val symbolTable = ProtobufSymbolTable(protobufSchemas)
         val resolver = ProtobufDeclarationResolver(ProtobufReferenceResolver(symbolTable))
         val issues = mutableListOf<ProtobufResolutionIssue>()
         val resolved = schemas.mapNotNull { schema ->
-            resolver
-                .resolve(schema)
-                .fold(
-                    ifLeft = { failures ->
-                        issues.addAll(failures)
-                        null
-                    },
-                    ifRight = { it },
-                )
+            val resolution =
+                when (val declaration = schema.schema) {
+                    is Message -> resolver.resolveMessage(schema, declaration)
+                    is Enum -> resolver.resolveEnum(schema, declaration)
+                    else -> null
+                }
+
+            resolution?.fold(
+                ifLeft = { failures ->
+                    issues.addAll(failures)
+                    null
+                },
+                ifRight = { it },
+            )
         }
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 
-        return if (accumulatedIssues != null) {
-            DomainResolution.Failure(accumulatedIssues)
-        } else {
-            DomainResolution.Success(ResolvedProtobufSchemaModel(resolved))
+        return when {
+            accumulatedIssues != null -> DomainResolution.Failure(accumulatedIssues)
+            resolved.isEmpty() -> DomainResolution.NotApplicable
+            else -> DomainResolution.Success(ResolvedProtobufSchemaModel(resolved))
         }
     }
 }

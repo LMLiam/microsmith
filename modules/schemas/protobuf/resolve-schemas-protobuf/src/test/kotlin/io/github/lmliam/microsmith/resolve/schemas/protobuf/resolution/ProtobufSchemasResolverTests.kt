@@ -8,6 +8,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 import io.github.lmliam.microsmith.dsl.schemas.schemas
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
@@ -121,6 +122,21 @@ class ProtobufSchemasResolverTests :
                 )
         }
 
+        "ignores declarations the resolver does not own" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(name = "User", schema = Message(name = "User")),
+                        ProtobufSchema(name = "Broken", schema = UnknownDeclaration(name = "Broken")),
+                    )
+                )
+
+            val success =
+                resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Success<ResolvedProtobufSchemaModel>>()
+
+            success.model.schemas.single().declaration.shouldBeTypeOf<ResolvedProtobufMessage>()
+        }
+
         "returns a typed issue when schema and declaration names disagree" {
             val schemas =
                 SchemasExtension(
@@ -179,3 +195,5 @@ class ProtobufSchemasResolverTests :
                 )
         }
     })
+
+private class UnknownDeclaration(override val name: String) : Type
