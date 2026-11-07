@@ -1,5 +1,5 @@
 package io.github.lmliam.microsmith.artifact
 
-interface ArtifactContribution<A : Artifact> {
+interface ArtifactContribution<out A : Artifact> {
     val artifactId: ArtifactId<A>
 }

@@ -4,20 +4,24 @@ import io.github.lmliam.microsmith.resolve.ResolvedModel
 import kotlin.reflect.KClass
 
 internal class ArtifactContributorRegistry(contributors: List<ArtifactContributor<*>>) {
-    private val contributorsByResolvedType: Map<KClass<out ResolvedModel>, List<ArtifactContributor<*>>> =
-        contributors
-            .onEach(::validateResolvedTypeDeclaration)
-            .groupBy { it.resolvedType }
-            .mapValues { (resolvedType, registrations) ->
-                requireDistinctImplementations(resolvedType, registrations)
-                registrations.sortedBy { it::class.displayName() }
-            }
+    private val contributorsByResolvedType: Map<KClass<out ResolvedModel>, List<ArtifactContributor<*>>>
 
-    fun resolve(model: ResolvedModel): List<ArtifactContributor<ResolvedModel>> {
+    init {
+        contributors.forEach(::validateResolvedTypeDeclaration)
+
+        contributorsByResolvedType =
+            contributors
+                .groupBy { it.resolvedType }
+                .mapValues { (resolvedType, registrations) ->
+                    requireDistinctImplementations(resolvedType, registrations)
+                    registrations.sortedBy { it::class.displayName }
+                }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <M : ResolvedModel> resolve(model: M): List<ArtifactContributor<M>> {
         val contributors = contributorsByResolvedType[model::class].orEmpty()
-
-        @Suppress("UNCHECKED_CAST")
-        return contributors as List<ArtifactContributor<ResolvedModel>>
+        return contributors as List<ArtifactContributor<M>>
     }
 
     private fun validateResolvedTypeDeclaration(contributor: ArtifactContributor<*>) {
@@ -25,9 +29,9 @@ internal class ArtifactContributorRegistry(contributors: List<ArtifactContributo
         val genericType = contributor.findGenericResolvedType()
 
         require(genericType == declaredType) {
-            "${contributor::class.displayName()} declares resolvedType ${declaredType.displayName()}, " +
-                "but implements ArtifactContributor<${genericType.displayName()}>. " +
-                "Ensure resolvedType matches the ArtifactContributor<R> generic type."
+            "'${contributor::class.displayName}' declares resolvedType '${declaredType.displayName}', " +
+                "but implements ArtifactContributor<${genericType.displayName}>. " +
+                "Ensure resolvedType matches the ArtifactContributor generic type argument."
         }
     }
 
@@ -35,14 +39,14 @@ internal class ArtifactContributorRegistry(contributors: List<ArtifactContributo
         resolvedType: KClass<out ResolvedModel>,
         contributors: List<ArtifactContributor<*>>,
     ) {
-        val duplicateImplementations = contributors.groupingBy { it::class }.eachCount().filterValues { it > 1 }.keys
+        val duplicates = contributors.groupBy { it::class }.filterValues { it.size > 1 }.keys
 
-        require(duplicateImplementations.isEmpty()) {
-            val names = duplicateImplementations.map { it.displayName() }.sorted().joinToString(", ")
-
-            "Duplicate artifact contributors registered for resolved type ${resolvedType.displayName()}: $names"
+        require(duplicates.isEmpty()) {
+            val names = duplicates.map { it.displayName }.sorted().joinToString(", ")
+            "Duplicate artifact contributors registered for resolved type '${resolvedType.displayName}': $names"
         }
     }
 }
 
-private fun KClass<*>.displayName(): String = qualifiedName ?: toString()
+private val KClass<*>.displayName: String
+    get() = qualifiedName ?: simpleName ?: toString()

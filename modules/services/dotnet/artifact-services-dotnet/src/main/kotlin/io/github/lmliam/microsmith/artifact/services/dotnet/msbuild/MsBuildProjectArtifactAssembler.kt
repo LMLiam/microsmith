@@ -8,13 +8,13 @@ import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact> {
     override val artifactType = MsBuildProjectArtifact::class
 
-    override fun create(first: ArtifactContribution<MsBuildProjectArtifact>): MsBuildProjectArtifact {
-        val contribution = requireContribution(first)
+    override fun create(contribution: ArtifactContribution<MsBuildProjectArtifact>): MsBuildProjectArtifact {
+        val projectContribution = requireContribution(contribution)
         return MsBuildProjectArtifact(
-            id = contribution.artifactId,
-            projectAttributes = linkedMapOf<String, String>().apply { putAll(contribution.projectAttributes) },
-            properties = linkedMapOf<String, String>().apply { putAll(contribution.properties) },
-            items = contribution.items.toList(),
+            id = projectContribution.artifactId,
+            projectAttributes = linkedMapOf<String, String>().apply { putAll(projectContribution.projectAttributes) },
+            properties = linkedMapOf<String, String>().apply { putAll(projectContribution.properties) },
+            items = projectContribution.items.toList(),
         )
     }
 

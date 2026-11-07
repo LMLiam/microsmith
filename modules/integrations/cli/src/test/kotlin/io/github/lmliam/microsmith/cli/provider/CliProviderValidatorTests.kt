@@ -211,13 +211,13 @@ private class ContributorStub<T : ResolvedModel>(override val resolvedType: KCla
 private class ProtoFileAssemblerStub : ArtifactAssembler<ProtoFileArtifact> {
     override val artifactType = ProtoFileArtifact::class
 
-    override fun create(first: ArtifactContribution<ProtoFileArtifact>): ProtoFileArtifact {
-        val contribution = first as ProtoFileContribution
+    override fun create(contribution: ArtifactContribution<ProtoFileArtifact>): ProtoFileArtifact {
+        val protoContribution = contribution as ProtoFileContribution
         return ProtoFileArtifact(
-            id = contribution.artifactId,
-            packageName = contribution.packageName,
-            imports = contribution.imports,
-            declarations = contribution.declarations,
+            id = protoContribution.artifactId,
+            packageName = protoContribution.packageName,
+            imports = protoContribution.imports,
+            declarations = protoContribution.declarations,
         )
     }
 
@@ -230,7 +230,7 @@ private class ProtoFileAssemblerStub : ArtifactAssembler<ProtoFileArtifact> {
 private class ProtobufRpcAssemblerStub : ArtifactAssembler<ProtobufRpcServiceArtifact> {
     override val artifactType = ProtobufRpcServiceArtifact::class
 
-    override fun create(first: ArtifactContribution<ProtobufRpcServiceArtifact>): ProtobufRpcServiceArtifact {
+    override fun create(contribution: ArtifactContribution<ProtobufRpcServiceArtifact>): ProtobufRpcServiceArtifact {
         error("Not used in provider validator tests.")
     }
 
@@ -241,7 +241,7 @@ private class ProtobufRpcAssemblerStub : ArtifactAssembler<ProtobufRpcServiceArt
 }
 
 private class AssemblerStub<T : Artifact>(override val artifactType: KClass<T>) : ArtifactAssembler<T> {
-    override fun create(first: ArtifactContribution<T>): T {
+    override fun create(contribution: ArtifactContribution<T>): T {
         error("Not used in provider validator tests.")
     }
 
@@ -251,11 +251,11 @@ private class AssemblerStub<T : Artifact>(override val artifactType: KClass<T>) 
 private class TextFileAssemblerStub : ArtifactAssembler<TextFileArtifact> {
     override val artifactType = TextFileArtifact::class
 
-    override fun create(first: ArtifactContribution<TextFileArtifact>): TextFileArtifact {
-        val contribution = first as TextFileArtifactContribution
+    override fun create(contribution: ArtifactContribution<TextFileArtifact>): TextFileArtifact {
+        val textContribution = contribution as TextFileArtifactContribution
         return TextFileArtifact(
-            id = contribution.artifactId,
-            contents = contribution.contents,
+            id = textContribution.artifactId,
+            contents = textContribution.contents,
         )
     }
 
