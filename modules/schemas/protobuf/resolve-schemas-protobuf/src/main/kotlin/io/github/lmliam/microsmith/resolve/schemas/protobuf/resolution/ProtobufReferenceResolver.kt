@@ -12,7 +12,13 @@ internal class ProtobufReferenceResolver(private val symbols: ProtobufSymbolTabl
         reference: Reference,
         location: ProtobufResolutionIssue.ReferenceLocation,
     ): Either<ProtobufResolutionIssue, ResolvedProtobufReference> {
-        val target = schema.resolveReference(reference)
+        val target =
+            when (val resolved = schema.resolveReference(reference)) {
+                is Either.Left -> return Either.Left(resolved.value)
+
+                is Either.Right -> resolved.value
+            }
+
         val symbol =
             symbols.find(target)
                 ?: return Either.Left(

@@ -1,18 +1,39 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.names
 
+import arrow.core.Either
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
+
 object ProtobufNameValidation {
-    fun normalizeQualifiedName(value: String, label: String): String {
+    fun normalizeQualifiedName(value: String): Either<ProtobufResolutionIssue.InvalidSchemaName, String> {
         val normalized = value.trim()
-        require(normalized.isNotBlank()) { "$label cannot be blank." }
-        require(!normalized.startsWith(".")) { "$label cannot start with '.': '$value'" }
-        require(!normalized.endsWith(".")) { "$label cannot end with '.': '$value'" }
-        require(normalized.none(Char::isWhitespace)) { "$label cannot contain whitespace: '$value'" }
+
+        if (normalized.isBlank()) {
+            return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK)
+        }
+
+        if (normalized.startsWith(".")) {
+            return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT)
+        }
+
+        if (normalized.endsWith(".")) {
+            return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.TRAILING_DOT)
+        }
+
+        if (normalized.any(Char::isWhitespace)) {
+            return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.WHITESPACE)
+        }
 
         val segments = normalized.split('.')
-        require(segments.none(String::isBlank)) { "$label contains an empty segment: '$value'" }
-        segments.forEachIndexed { index, segment -> requireIdentifier(segment, "$label segment[$index]") }
 
-        return segments.joinToString(".")
+        if (segments.any(String::isBlank)) {
+            return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT)
+        }
+
+        if (segments.any { !isIdentifier(it) }) {
+            return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.INVALID_IDENTIFIER_SEGMENT)
+        }
+
+        return Either.Right(segments.joinToString("."))
     }
 
     fun requireIdentifier(value: String, label: String) {
@@ -21,6 +42,12 @@ object ProtobufNameValidation {
 
     fun isIdentifier(value: String): Boolean =
         value.isNotBlank() && value == value.trim() && PROTO_IDENTIFIER.matches(value)
+
+    private fun invalid(
+        value: String,
+        reason: ProtobufResolutionIssue.InvalidSchemaName.Reason,
+    ): Either<ProtobufResolutionIssue.InvalidSchemaName, String> =
+        Either.Left(ProtobufResolutionIssue.InvalidSchemaName(value, reason))
 
     private val PROTO_IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*")
 }

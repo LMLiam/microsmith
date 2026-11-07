@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution
 
 import arrow.core.Either
 import arrow.core.EitherNel
+import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
@@ -59,7 +60,13 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                 MutableSet<QualifiedSchemaName>,
             ) -> ResolvedProtobufDeclaration,
     ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> {
-        val identity = QualifiedSchemaName.parse(schema.name)
+        val identity =
+            when (val parsed = QualifiedSchemaName.parse(schema.name)) {
+                is Either.Left -> return Either.Left(nonEmptyListOf(parsed.value))
+
+                is Either.Right -> parsed.value
+            }
+
         val issues = mutableListOf<ProtobufResolutionIssue>()
         val dependencies = mutableSetOf<QualifiedSchemaName>()
         issues += validator.validate(identity.fullyQualifiedName, source)
