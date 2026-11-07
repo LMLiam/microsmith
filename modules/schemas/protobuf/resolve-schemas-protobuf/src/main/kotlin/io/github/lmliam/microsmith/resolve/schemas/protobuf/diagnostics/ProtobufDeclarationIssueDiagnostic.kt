@@ -13,6 +13,12 @@ internal fun ProtobufResolutionIssue.DeclarationIssue.toDiagnostic(): Resolution
                         "but the schema identity and declaration name must match.",
             )
 
+        is ProtobufResolutionIssue.InvalidSchemaName ->
+            protobufDiagnostic(
+                code = "protobuf.invalid-schema-name",
+                message = "Protobuf schema name '$schemaName' is invalid: it ${reason.displayName()}.",
+            )
+
         is ProtobufResolutionIssue.InvalidIdentifier ->
             protobufDiagnostic(
                 code = "protobuf.invalid-identifier",

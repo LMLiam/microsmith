@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.diagnostics
 
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -21,6 +22,10 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
                         position = ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
                         targetName = "Status",
                     ),
+                    ProtobufRpcResolutionIssue.InvalidSchemaName(
+                        schemaName = ".UserService",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT,
+                    ),
                 )
                 .map(mapper::map) shouldContainExactly
                 listOf(
@@ -31,6 +36,10 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
                     ResolutionDiagnostic(
                         code = "protobuf.rpc.endpoint-not-message",
                         message = "RPC 'GetUser' response must target a protobuf message, but was 'Status'.",
+                    ),
+                    ResolutionDiagnostic(
+                        code = "protobuf.rpc.invalid-schema-name",
+                        message = "Schema name '.UserService' is invalid: it starts with a leading dot.",
                     ),
                 )
         }

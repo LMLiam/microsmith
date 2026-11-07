@@ -19,8 +19,7 @@ internal class ProtobufSymbolTable(schemas: Collection<ProtobufSchema>) {
                     }
 
                 kind?.let {
-                    val identity = QualifiedSchemaName.parse(schema.name)
-                    Symbol(identity, kind)
+                    QualifiedSchemaName.parse(schema.name).getOrNull()?.let { identity -> Symbol(identity, kind) }
                 }
             }
             .associateBy { it.identity.fullyQualifiedName }

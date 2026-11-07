@@ -27,7 +27,14 @@ internal class ProtobufRpcSchemaResolver {
         service: Service,
         schemasByName: Map<String, ProtobufSchema>,
     ): EitherNel<ProtobufRpcResolutionIssue, ResolvedProtobufRpcSchema> {
-        val qualifiedName = QualifiedSchemaName.parse(schema.name)
+        val qualifiedName =
+            when (val parsed = QualifiedSchemaName.parse(schema.name)) {
+                is Either.Left ->
+                    return ProtobufRpcResolutionIssue.InvalidSchemaName(parsed.value.schemaName, parsed.value.reason)
+                        .leftNel()
+
+                is Either.Right -> parsed.value
+            }
 
         if (qualifiedName.typeName != service.name) {
             return ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch(
@@ -112,7 +119,12 @@ internal class ProtobufRpcSchemaResolver {
         position: ProtobufRpcResolutionIssue.EndpointPosition,
         schemasByName: Map<String, ProtobufSchema>,
     ): Either<ProtobufRpcResolutionIssue, ResolvedProtobufRpcEndpoint> = either {
-        val targetName = current.resolveReference(endpoint.reference).fullyQualifiedName
+        val targetName =
+            current
+                .resolveReference(endpoint.reference)
+                .map { it.fullyQualifiedName }
+                .mapLeft { ProtobufRpcResolutionIssue.InvalidSchemaName(it.schemaName, it.reason) }
+                .bind()
 
         val target =
             ensureNotNull(schemasByName[targetName]) {
