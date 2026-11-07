@@ -81,7 +81,7 @@ class DotnetAspServiceArtifactCompilerTests :
             )
             controller.contents.shouldContain(
                 """_ => throw new InvalidOperationException($"Unsupported GetUser result type """ +
-                    """'{result.GetType().FullName}'.")"""
+                    """'{result.GetType().FullName}'.")""",
             )
             controller.contents.shouldNotContain("X-Microsmith-Response-Status")
             controller.contents.shouldNotContain("sample-location")

@@ -90,10 +90,10 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                     "io.github.lmliam.microsmith.artifact.files.TextFileArtifactAssembler",
                     "io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly.ProtoFileArtifactAssembler",
                     "io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifactAssembler",
-                    "io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactAssembler",
                     "io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactAssembler",
-                    "io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifactAssembler",
-                    "io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifactAssembler",
                 ),
             "META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler" to
                 listOf(
