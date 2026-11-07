@@ -170,6 +170,15 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-build
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            !~/.m2/repository/io/github/lmliam
+          key: maven-fixtures-${{ runner.os }}-${{ hashFiles('examples/maven/**/pom.xml') }}
+          restore-keys: |
+            maven-fixtures-${{ runner.os }}-
       - name: Publish native JVM packages to mavenLocal
         run: ./gradlew publishToMavenLocal --stacktrace
       - name: Validate native Maven fixtures
