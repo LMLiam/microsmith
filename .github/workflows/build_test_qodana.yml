@@ -5,38 +5,130 @@ on:
   push:
     branches:
       - master
+  schedule:
+    - cron: '17 3 * * 1,4'
 concurrency:
   group: build-qodana-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+permissions:
+  contents: read
 jobs:
-  build-and-qodana:
+  changes:
+    name: Detect changes
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    env:
-      QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+    timeout-minutes: 5
     permissions:
       contents: read
-      pull-requests: write
-      checks: write
-      security-events: write
+      pull-requests: read
+    outputs:
+      code: ${{ steps.filter.outputs.code != 'false' }}
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
-      - name: Setup JDK
-        uses: actions/setup-java@v5
+          persist-credentials: false
+      - name: Filter changed paths
+        id: filter
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
+        uses: dorny/paths-filter@v4.0.3
         with:
-          distribution: temurin
-          java-version: 24
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
+          predicate-quantifier: every
+          filters: |
+            code:
+              - '**'
+              - '!**/*.md'
+              - '!docs/**'
+
+  lint:
+    name: Lint
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
         with:
-          dotnet-version: 8.0.x
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Build
-        run: ./gradlew build --stacktrace
+          persist-credentials: false
+      - uses: ./.github/actions/setup-build
+      - name: Run detekt and ktfmt
+        run: ./gradlew detektMain detektTest detektIntegrationTest detektE2eTest ktfmtCheck --stacktrace
+
+  unit-tests:
+    name: Unit tests
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-build
+      - name: Run unit tests
+        run: ./gradlew kotest :build-logic:test --stacktrace
+      - name: Upload test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-unit
+          path: '**/build/test-results/**/*.xml'
+          if-no-files-found: ignore
+          retention-days: 3
+
+  integration-tests:
+    name: Integration tests
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-build
+      - name: Run integration tests
+        run: ./gradlew integrationTest --stacktrace
+      - name: Upload test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-integration
+          path: '**/build/test-results/**/*.xml'
+          if-no-files-found: ignore
+          retention-days: 3
+
+  e2e-tests:
+    name: End-to-end tests
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-build
+      - name: Run end-to-end tests
+        run: ./gradlew e2eTest --stacktrace
+      - name: Upload test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-e2e
+          path: '**/build/test-results/**/*.xml'
+          if-no-files-found: ignore
+          retention-days: 3
+
+  gradle-fixtures:
+    name: Native Gradle fixtures
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-build
       - name: Publish native JVM packages to mavenLocal
         run: ./gradlew publishToMavenLocal --stacktrace
       - name: Validate native Gradle fixtures
@@ -66,6 +158,29 @@ jobs:
           validate_gradle_proto_fixture examples/gradle/java
           validate_gradle_proto_fixture examples/gradle/kotlin
           validate_gradle_dotnet_fixture examples/gradle/dotnet
+
+  maven-fixtures:
+    name: Native Maven fixtures
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-build
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            !~/.m2/repository/io/github/lmliam
+          key: maven-fixtures-${{ runner.os }}-${{ hashFiles('examples/maven/**/pom.xml') }}
+          restore-keys: |
+            maven-fixtures-${{ runner.os }}-
+      - name: Publish native JVM packages to mavenLocal
+        run: ./gradlew publishToMavenLocal --stacktrace
       - name: Validate native Maven fixtures
         run: |
           set -euo pipefail
@@ -95,37 +210,39 @@ jobs:
           validate_maven_proto_fixture examples/maven/java
           validate_maven_proto_fixture examples/maven/kotlin
           validate_maven_dotnet_fixture examples/maven/dotnet
+
+  cli-dist:
+    name: CLI distribution
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-build
+      - name: Build CLI release assets
+        run: ./gradlew :cli:releaseArtifacts :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
       - name: Validate IDE fallback release assets
         run: |
-          ./gradlew :runtime-scripting:ideFallbackArtifacts :runtime-scripting:generateIdeFallbackChecksums --stacktrace
           find modules/runtime/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar' | grep -q .
           find modules/runtime/runtime-scripting/build/release-assets -maxdepth 1 -type f -name 'microscript-definition-*-all.jar.sha256' | grep -q .
-      - name: Publish Test Report
-        uses: dorny/test-reporter@v2
-        if: ${{ always() && hashFiles('**/build/test-results/**/*.xml') != '' }}
+      - name: Archive CLI distribution
+        run: tar -czf cli-dist.tgz modules/integrations/cli/build/microsmith-cli-dist modules/integrations/cli/build/release-assets
+      - name: Upload CLI distribution
+        uses: actions/upload-artifact@v4
         with:
-          name: JVM Test Results
-          path: '**/build/test-results/**/*.xml'
-          reporter: java-junit
-      - name: 'Qodana Scan'
-        if: ${{ env.QODANA_TOKEN != '' }}
-        uses: JetBrains/qodana-action@v2025.2
-        with:
-          pr-mode: ${{ github.event_name == 'pull_request' }}
-          use-caches: true
-          post-pr-comment: true
-          use-annotations: true
-          upload-result: false
-          push-fixes: 'none'
-      - uses: github/codeql-action/upload-sarif@v3
-        name: Upload SARIF
-        if: ${{ always() && env.QODANA_TOKEN != '' }}
-        with:
-          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+          name: cli-dist
+          path: cli-dist.tgz
+          compression-level: 0
+          retention-days: 3
 
-  cli-verification:
+  cli-verify:
+    name: CLI verification (${{ matrix.os }})
+    needs: cli-dist
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -133,30 +250,23 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - windows-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 24
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
+      - name: Download CLI distribution
+        uses: actions/download-artifact@v4
         with:
-          dotnet-version: 8.0.x
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Build CLI release assets (Unix)
-        id: build-release-unix
-        if: runner.os != 'Windows'
-        run: ./gradlew :cli:releaseArtifacts --stacktrace
-      - name: Build CLI release assets (Windows)
-        id: build-release-windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: .\gradlew.bat :cli:releaseArtifacts --stacktrace
+          name: cli-dist
+      - name: Extract CLI distribution
+        id: extract-dist
+        shell: bash
+        run: tar -xzf cli-dist.tgz
       - name: Verify dist launcher (Unix)
         if: runner.os != 'Windows'
         run: ./modules/integrations/cli/build/microsmith-cli-dist/bin/microsmith --help | grep -q "Usage:"
@@ -274,7 +384,7 @@ jobs:
           }
       - name: Install and verify from installer (Unix)
         id: install-unix
-        if: ${{ always() && runner.os != 'Windows' && steps.build-release-unix.outcome == 'success' }}
+        if: ${{ always() && runner.os != 'Windows' && steps.extract-dist.outcome == 'success' }}
         run: |
           set -eu
           DIST_FILE="$(find modules/integrations/cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
@@ -295,37 +405,6 @@ jobs:
           test -f install-smoke-repo/settings.microsmith.kts
           ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts
           test -f proto/UserCreated.proto
-      - name: Verify Java, Kotlin, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
-        if: ${{ always() && matrix.os == 'ubuntu-latest' && steps.install-unix.outcome == 'success' }}
-        run: |
-          set -euo pipefail
-          verify_unix_fixture() {
-            local repo_name="$1"
-            local repo_root="$2"
-            local expected_proto="$3"
-            local doctor_output="$4"
-
-            ./.microsmith-bin/microsmith init --repo-root "$repo_root"
-            ./.microsmith-bin/microsmith init --repo-root "$repo_root"
-            test -f "$repo_root/build.microsmith.kts"
-            test -f "$repo_root/settings.microsmith.kts"
-            test -f "$repo_root/.microsmith/ide/build.gradle.kts"
-            test -f "$repo_root/.microsmith/ide/README.md"
-            ./.microsmith-bin/microsmith ide refresh --repo-root "$repo_root"
-            ./.microsmith-bin/microsmith ide doctor --repo-root "$repo_root" --diagnostics json > "$doctor_output"
-            grep -q "JetBrains IDE helper doctor checks passed." "$doctor_output"
-            ./.microsmith-bin/microsmith run "$repo_root/build.microsmith.kts"
-            test -f "proto/$expected_proto"
-            echo "Validated $repo_name fixture."
-          }
-
-          verify_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
-          verify_unix_fixture kotlin examples/gradle/kotlin KotlinUserCreated.proto kotlin-ide-doctor.json
-          verify_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
-          verify_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
-          verify_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
-          verify_unix_fixture ruby examples/non-gradle/ruby RubyUserCreated.proto ruby-ide-doctor.json
-          verify_unix_fixture rust examples/non-gradle/rust RustUserCreated.proto rust-ide-doctor.json
       - name: Verify .NET onboarding fixture (Unix)
         if: ${{ always() && runner.os != 'Windows' && steps.install-unix.outcome == 'success' }}
         run: |
@@ -347,7 +426,7 @@ jobs:
           dotnet build "$project_root/UserService.Api.csproj"
       - name: Install and verify from installer (Windows)
         id: install-windows
-        if: ${{ always() && runner.os == 'Windows' && steps.build-release-windows.outcome == 'success' }}
+        if: ${{ always() && runner.os == 'Windows' && steps.extract-dist.outcome == 'success' }}
         shell: pwsh
         run: |
           $distAsset = Get-ChildItem -Path .\modules\integrations\cli\build\release-assets\microsmith-cli-*-dist.zip | Select-Object -First 1
@@ -461,3 +540,168 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
           }
+
+  cli-onboarding:
+    name: CLI onboarding fixtures (Linux)
+    needs: cli-dist
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 24
+      - name: Download CLI distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: cli-dist
+      - name: Extract CLI distribution
+        id: extract-dist
+        shell: bash
+        run: tar -xzf cli-dist.tgz
+      - name: Install and verify from installer (Unix)
+        id: install-unix
+        if: ${{ steps.extract-dist.outcome == 'success' }}
+        run: |
+          set -eu
+          DIST_FILE="$(find modules/integrations/cli/build/release-assets -maxdepth 1 -type f -name 'microsmith-cli-*-dist.tar.gz' | head -n 1)"
+          CLI_VERSION="$(printf '%s\n' "$DIST_FILE" | sed -E 's#.*microsmith-cli-(.*)-dist.tar.gz#\1#')"
+          DIST_SHA="$(awk '{print $1}' "${DIST_FILE}.sha256")"
+          sh modules/integrations/cli/build/release-assets/microsmith-install.sh \
+            --version "$CLI_VERSION" \
+            --install-root "$PWD/.microsmith-home" \
+            --bin-dir "$PWD/.microsmith-bin" \
+            --dist-file "$DIST_FILE" \
+            --dist-sha256 "$DIST_SHA" \
+            --force-runtime-provision \
+            --no-profile-update
+          ./.microsmith-bin/microsmith --version
+          mkdir -p install-smoke-repo
+          ./.microsmith-bin/microsmith init --repo-root install-smoke-repo
+          test -f install-smoke-repo/build.microsmith.kts
+          test -f install-smoke-repo/settings.microsmith.kts
+          ./.microsmith-bin/microsmith run install-smoke-repo/build.microsmith.kts
+          test -f proto/UserCreated.proto
+      - name: Verify Java, Kotlin, Node, Go, Python, Ruby, and Rust onboarding fixtures (Linux)
+        if: ${{ always() && steps.install-unix.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          verify_unix_fixture() {
+            local repo_name="$1"
+            local repo_root="$2"
+            local expected_proto="$3"
+            local doctor_output="$4"
+
+            ./.microsmith-bin/microsmith init --repo-root "$repo_root"
+            ./.microsmith-bin/microsmith init --repo-root "$repo_root"
+            test -f "$repo_root/build.microsmith.kts"
+            test -f "$repo_root/settings.microsmith.kts"
+            test -f "$repo_root/.microsmith/ide/build.gradle.kts"
+            test -f "$repo_root/.microsmith/ide/README.md"
+            ./.microsmith-bin/microsmith ide refresh --repo-root "$repo_root"
+            ./.microsmith-bin/microsmith ide doctor --repo-root "$repo_root" --diagnostics json > "$doctor_output"
+            grep -q "JetBrains IDE helper doctor checks passed." "$doctor_output"
+            ./.microsmith-bin/microsmith run "$repo_root/build.microsmith.kts"
+            test -f "proto/$expected_proto"
+            echo "Validated $repo_name fixture."
+          }
+
+          verify_unix_fixture java examples/jvm/java-maven JavaUserCreated.proto java-ide-doctor.json
+          verify_unix_fixture kotlin examples/gradle/kotlin KotlinUserCreated.proto kotlin-ide-doctor.json
+          verify_unix_fixture node examples/non-gradle/node NodeUserCreated.proto node-ide-doctor.json
+          verify_unix_fixture go examples/non-gradle/go GoUserCreated.proto go-ide-doctor.json
+          verify_unix_fixture python examples/non-gradle/python PythonUserCreated.proto python-ide-doctor.json
+          verify_unix_fixture ruby examples/non-gradle/ruby RubyUserCreated.proto ruby-ide-doctor.json
+          verify_unix_fixture rust examples/non-gradle/rust RustUserCreated.proto rust-ide-doctor.json
+
+  qodana:
+    name: Qodana
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+      security-events: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Qodana Scan
+        if: ${{ env.QODANA_TOKEN != '' }}
+        uses: JetBrains/qodana-action@v2025.2
+        with:
+          pr-mode: ${{ github.event_name == 'pull_request' }}
+          use-caches: true
+          post-pr-comment: true
+          use-annotations: true
+          upload-result: false
+          push-fixes: 'none'
+      - uses: github/codeql-action/upload-sarif@v3
+        name: Upload SARIF
+        if: ${{ always() && env.QODANA_TOKEN != '' }}
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+
+  report:
+    name: Test report
+    needs:
+      - unit-tests
+      - integration-tests
+      - e2e-tests
+    if: ${{ always() && needs.unit-tests.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          merge-multiple: true
+      - name: Publish Test Report
+        if: ${{ hashFiles('**/build/test-results/**/*.xml') != '' }}
+        continue-on-error: true
+        uses: dorny/test-reporter@v2
+        with:
+          name: JVM Test Results
+          path: '**/build/test-results/**/*.xml'
+          reporter: java-junit
+          fail-on-error: false
+
+  ci-ok:
+    name: CI result
+    needs:
+      - changes
+      - lint
+      - unit-tests
+      - integration-tests
+      - e2e-tests
+      - gradle-fixtures
+      - maven-fixtures
+      - cli-dist
+      - cli-verify
+      - cli-onboarding
+      - qodana
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every job to pass or be skipped
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: exit 1
