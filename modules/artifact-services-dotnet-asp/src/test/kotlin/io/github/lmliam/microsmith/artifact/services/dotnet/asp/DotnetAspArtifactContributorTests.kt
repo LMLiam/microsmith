@@ -1,9 +1,9 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp
 
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspPorts
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRest
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspService
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

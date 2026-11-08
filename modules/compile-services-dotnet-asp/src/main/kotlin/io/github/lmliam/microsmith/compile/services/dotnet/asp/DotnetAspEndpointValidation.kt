@@ -3,7 +3,7 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeadersBindingArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestBindingArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 
 internal fun validateEndpointGenerationInputs(artifact: DotnetAspServiceArtifact) {
     validateRequestBindings(artifact)

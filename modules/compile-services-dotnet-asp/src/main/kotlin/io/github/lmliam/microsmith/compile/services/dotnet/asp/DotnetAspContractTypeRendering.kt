@@ -10,7 +10,7 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpAutoProp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpNullableType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetField
 
 internal fun renderRecordType(typeName: String, fields: List<DotnetField>): CSharp.Type = CSharp.Type(
     kind = CSharp.TypeKind.RECORD,

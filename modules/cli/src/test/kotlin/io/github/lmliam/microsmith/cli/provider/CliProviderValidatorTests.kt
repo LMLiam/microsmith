@@ -15,7 +15,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPacka
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
-import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
+import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.gen.ArtifactRenderer
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import io.github.lmliam.microsmith.resolve.DomainResolution
@@ -23,8 +23,8 @@ import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.ResolvedModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
-import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspace
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize

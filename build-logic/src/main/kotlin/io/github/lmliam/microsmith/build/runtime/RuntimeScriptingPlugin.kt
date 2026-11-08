@@ -73,9 +73,9 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                     "io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufSchemasResolver",
                     "io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.resolution.ProtobufRpcSchemasResolver",
                     "io.github.lmliam.microsmith.resolve.services.ServicesResolver",
-                    "io.github.lmliam.microsmith.resolve.services.dotnet.DotnetWorkspaceDomainResolver",
-                    "io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspaceDomainResolver",
-                    "io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspaceDomainResolver",
+                    "io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceDomainResolver",
+                    "io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspaceDomainResolver",
+                    "io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspaceDomainResolver",
                 ),
             "META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor" to
                 listOf(

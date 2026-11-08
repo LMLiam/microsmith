@@ -16,9 +16,9 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspService
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetField
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetFieldType
-import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetField
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
+import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
