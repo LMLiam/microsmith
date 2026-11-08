@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.defaults
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestFieldArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.escapeDotnetAspCsharpCharLiteral
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.escapeDotnetAspCsharpStringLiteral
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.requireDotnetRepresentableInteger
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 import java.util.Locale
 
@@ -45,19 +46,48 @@ private fun renderDirectDefaultExpression(type: DotnetFieldType, defaultValue: A
 
 private fun renderNumericDefaultExpression(type: DotnetFieldType, defaultValue: Any): String? =
     when {
-        type in UNSUFFIXED_NUMERIC_DEFAULT_TYPES -> defaultValue.toString()
-        type in SUFFIXED_NUMERIC_DEFAULT_TYPES -> "${defaultValue}${SUFFIXED_NUMERIC_DEFAULT_TYPES.getValue(type)}"
-
-        else ->
-            when {
-                type == DotnetFieldType.NativeInt -> "(nint)$defaultValue"
-                type == DotnetFieldType.UnsignedNativeInt -> "(nuint)${defaultValue}UL"
-                type == DotnetFieldType.Float -> "${defaultValue.toString().ensureDotnetAspDecimal()}F"
-                type == DotnetFieldType.Double -> "${defaultValue.toString().ensureDotnetAspDecimal()}D"
-                type == DotnetFieldType.Decimal -> "${defaultValue.toString().ensureDotnetAspDecimal()}M"
-                else -> null
-            }
+        type in INTEGER_DEFAULT_TYPES -> renderIntegerDefaultExpression(type, defaultValue)
+        type == DotnetFieldType.Float -> "${defaultValue.toString().ensureDotnetAspDecimal()}F"
+        type == DotnetFieldType.Double -> "${defaultValue.toString().ensureDotnetAspDecimal()}D"
+        type == DotnetFieldType.Decimal -> "${defaultValue.toString().ensureDotnetAspDecimal()}M"
+        else -> null
     }
+
+private fun renderIntegerDefaultExpression(type: DotnetFieldType, defaultValue: Any): String {
+    val number =
+        requireNotNull(defaultValue as? Number) {
+            "ASP.NET request default '$defaultValue' is not numeric for type '$type'."
+        }
+    val integer = requireDotnetRepresentableInteger(type, number, "ASP.NET request default")
+
+    return when (type) {
+        DotnetFieldType.UnsignedInt -> "${integer}U"
+        DotnetFieldType.Long -> "${integer}L"
+        DotnetFieldType.UnsignedLong -> "${integer}UL"
+        DotnetFieldType.NativeInt -> "(nint)$integer"
+        DotnetFieldType.UnsignedNativeInt -> "(nuint)${integer}UL"
+
+        DotnetFieldType.Byte,
+        DotnetFieldType.SignedByte,
+        DotnetFieldType.Short,
+        DotnetFieldType.UnsignedShort,
+        DotnetFieldType.Int -> integer.toString()
+
+        DotnetFieldType.Float,
+        DotnetFieldType.Double,
+        DotnetFieldType.Decimal,
+        DotnetFieldType.String,
+        DotnetFieldType.Char,
+        DotnetFieldType.Bool,
+        DotnetFieldType.Guid,
+        DotnetFieldType.DateOnly,
+        DotnetFieldType.TimeOnly,
+        DotnetFieldType.DateTime,
+        DotnetFieldType.DateTimeOffset,
+        DotnetFieldType.TimeSpan,
+        is DotnetFieldType.Reference -> error("Unsupported ASP.NET integer literal type '$type'.")
+    }
+}
 
 private fun renderTemporalDefaultExpression(type: DotnetFieldType, defaultValue: Any): String? =
     when {
@@ -129,17 +159,16 @@ private val FIXED_TYPE_INITIALIZERS =
         DotnetFieldType.DateTimeOffset to " = DateTimeOffset.UnixEpoch;",
         DotnetFieldType.TimeSpan to " = TimeSpan.Zero;",
     )
-private val UNSUFFIXED_NUMERIC_DEFAULT_TYPES =
+private val INTEGER_DEFAULT_TYPES =
     setOf(
         DotnetFieldType.Byte,
         DotnetFieldType.SignedByte,
         DotnetFieldType.Short,
         DotnetFieldType.UnsignedShort,
         DotnetFieldType.Int,
-    )
-private val SUFFIXED_NUMERIC_DEFAULT_TYPES =
-    mapOf(
-        DotnetFieldType.UnsignedInt to "U",
-        DotnetFieldType.Long to "L",
-        DotnetFieldType.UnsignedLong to "UL",
+        DotnetFieldType.UnsignedInt,
+        DotnetFieldType.Long,
+        DotnetFieldType.UnsignedLong,
+        DotnetFieldType.NativeInt,
+        DotnetFieldType.UnsignedNativeInt,
     )

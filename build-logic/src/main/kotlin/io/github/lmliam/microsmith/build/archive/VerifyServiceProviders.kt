@@ -12,11 +12,6 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
-/**
- * Fails the build when a merged service descriptor is missing an expected provider.
- *
- * Each expected provider is declared as `<service-descriptor>=<provider-class>`.
- */
 abstract class VerifyServiceProviders : DefaultTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NAME_ONLY)

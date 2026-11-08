@@ -11,10 +11,6 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
-/**
- * Fails the build when the shaded CLI JAR is missing a bundled service provider or
- * when the catalog inside the JAR differs from the generated catalog.
- */
 abstract class VerifyShadowJarServices : CliBundledPluginTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NAME_ONLY)

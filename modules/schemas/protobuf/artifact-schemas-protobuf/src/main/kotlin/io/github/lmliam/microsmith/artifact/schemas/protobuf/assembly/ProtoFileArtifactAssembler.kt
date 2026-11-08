@@ -18,7 +18,6 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
             packageName = contribution.packageName,
             imports = contribution.imports.distinct().sorted(),
             declarations = contribution.declarations,
-            origins = contribution.origins,
         )
     }
 
@@ -43,7 +42,6 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
         return current.copy(
             imports = (current.imports + next.imports).distinct().sorted(),
             declarations = mergedDeclarations.values.toList(),
-            origins = current.origins + next.origins,
         )
     }
 

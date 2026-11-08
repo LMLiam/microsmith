@@ -14,10 +14,6 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
-/**
- * Fails the build when the unpacked distribution or either archive deviates from the
- * release layout, from the generated catalog, or from the Unix launcher permission policy.
- */
 abstract class VerifyDistLayout : DefaultTask() {
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)

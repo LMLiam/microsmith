@@ -20,7 +20,6 @@ class ProtoFileArtifactCompiler : SchemasArtifactCompiler<ProtoFileArtifact> {
             TextFileArtifactContribution(
                 artifactId = TextFileArtifactId(relativePath = artifact.relativePath()),
                 contents = ProtobufFileRenderer.render(artifact),
-                origins = artifact.origins,
             )
         )
 

@@ -155,8 +155,6 @@ dotnet/
           UserServiceApiControllerBase.cs
       Properties/
         launchSettings.json
-      .microsmith/
-        origins.json
 ```
 
 Canonical generation policy:
@@ -166,7 +164,6 @@ Canonical generation policy:
 - handwritten service behavior belongs outside `Generated/`, typically in a user-authored controller that derives from the generated base type
 - generator-owned scaffold files such as `Program.cs`, `appsettings.json`, `Properties/launchSettings.json`, and everything under `Generated/` are overwritten in place on rerun
 - handwritten files outside those generator-owned paths are not overwritten by Microsmith
-- `.microsmith/origins.json` records the structural Microsmith origins associated with each generated file
 
 ### Script defaults
 

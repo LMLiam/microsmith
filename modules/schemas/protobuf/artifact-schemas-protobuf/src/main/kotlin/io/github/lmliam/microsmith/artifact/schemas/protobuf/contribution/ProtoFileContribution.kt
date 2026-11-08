@@ -10,7 +10,6 @@ data class ProtoFileContribution(
     val packageName: String?,
     val imports: List<String> = emptyList(),
     val declarations: List<ProtoDeclaration>,
-    val origins: Set<String> = emptySet(),
 ) : ArtifactContribution<ProtoFileArtifact> {
     init {
         require(declarations.isNotEmpty()) {

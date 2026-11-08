@@ -47,7 +47,6 @@ class DotnetAspServiceArtifactCompilerTests :
                     MsBuildNames.NULLABLE_PROPERTY to "enable",
                     MsBuildNames.TARGET_FRAMEWORK_PROPERTY to "net8.0",
                 )
-            msbuild.origins shouldBe setOf("services.UserService")
 
             textFiles.map { it.artifactId.relativePath.toString() } shouldContainExactlyInAnyOrder
                 listOf(
@@ -84,8 +83,13 @@ class DotnetAspServiceArtifactCompilerTests :
             )
             controller.contents.shouldNotContain("X-Microsmith-Response-Status")
             controller.contents.shouldNotContain("sample-location")
-            controller.origins shouldContain "services.UserService.rest.GetUser"
-            controller.origins shouldContain "services.UserService.rest.CreateUser.body.CreateUserBody"
+
+            val controllerBase = byPath.getValue("Generated/Controllers/MicrosmithControllerBase.cs")
+            controllerBase.contents.shouldContain(
+                "protected ActionResult Respond(" +
+                    "object? body, int statusCode, params (string Name, string? Value)[] headers)"
+            )
+            controllerBase.contents.shouldContain("protected string? ReadHeader(string headerName)")
 
             byPath
                 .getValue("Generated/Contracts/RequestModels.cs")
@@ -105,12 +109,53 @@ class DotnetAspServiceArtifactCompilerTests :
         "compile emits nuint defaults with a 64-bit-safe literal" {
             val requestModels =
                 DotnetAspServiceArtifactCompiler()
-                    .compile(unsignedNativeIntDefaultArtifact())
+                    .compile(integerDefaultArtifact(DotnetFieldType.UnsignedNativeInt, 4294967296L))
                     .filterIsInstance<TextFileArtifactContribution>()
                     .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
                     .contents
 
             requestModels.shouldContain("public nuint MaxValue { get; set; } = (nuint)4294967296UL;")
+        }
+
+        "compile rejects an integer default that is out of range for its type" {
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    DotnetAspServiceArtifactCompiler()
+                        .compile(integerDefaultArtifact(DotnetFieldType.Int, 99_999_999_999L))
+                }
+
+            error.message.shouldContain("ASP.NET request default '99999999999'")
+            error.message.shouldContain("out of range for integer type 'int'")
+        }
+
+        "compile rejects a fractional default for an integer field" {
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    DotnetAspServiceArtifactCompiler().compile(integerDefaultArtifact(DotnetFieldType.Int, 1.5))
+                }
+
+            error.message.shouldContain("ASP.NET request default '1.5'")
+            error.message.shouldContain("not representable as integer type 'int'")
+        }
+
+        "compile rejects a negative default for an unsigned integer field" {
+            val error =
+                shouldThrow<IllegalArgumentException> {
+                    DotnetAspServiceArtifactCompiler().compile(integerDefaultArtifact(DotnetFieldType.UnsignedInt, -1))
+                }
+
+            error.message.shouldContain("out of range for integer type 'uint'")
+        }
+
+        "compile renders a long default with a 64-bit-safe literal" {
+            val requestModels =
+                DotnetAspServiceArtifactCompiler()
+                    .compile(integerDefaultArtifact(DotnetFieldType.Long, 99_999_999_999L))
+                    .filterIsInstance<TextFileArtifactContribution>()
+                    .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
+                    .contents
+
+            requestModels.shouldContain("public long MaxValue { get; set; } = 99999999999L;")
         }
 
         "compile emits sorted usings before the contract namespace when request bindings use system types" {
@@ -159,15 +204,12 @@ class DotnetAspServiceArtifactCompilerTests :
 
 private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServiceArtifact {
     val userModel =
-        sharedModel("User", "services.UserService.models.User") {
+        sharedModel("User") {
             stringField("id")
             stringField("email")
         }
-    val problemModel = sharedModel("Problem", "services.UserService.models.Problem") { stringField("detail") }
-    val createUserBody =
-        inlineModel("CreateUserBody", "services.UserService.rest.CreateUser.body.CreateUserBody") {
-            stringField("email")
-        }
+    val problemModel = sharedModel("Problem") { stringField("detail") }
+    val createUserBody = inlineModel("CreateUserBody") { stringField("email") }
 
     return DotnetAspServiceArtifact(
         id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "UserService.Api"),
@@ -198,7 +240,6 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
                                                 defaultValue = null,
                                             )
                                         ),
-                                    origins = setOf("services.UserService.rest.GetUser.path.GetUserPath"),
                                 ),
                             query =
                                 DotnetAspRequestBindingArtifact(
@@ -213,7 +254,6 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
                                                 defaultValue = false,
                                             )
                                         ),
-                                    origins = setOf("services.UserService.rest.GetUser.query.GetUserQuery"),
                                 ),
                             headers =
                                 DotnetAspHeadersBindingArtifact(
@@ -226,7 +266,6 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
                                                 headerName = "X-Correlation-Id",
                                             )
                                         ),
-                                    origins = setOf("services.UserService.rest.GetUser.headers.GetUserHeaders"),
                                 ),
                         ),
                     responses =
@@ -235,16 +274,13 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
                                 statusCode = 200,
                                 model = userModel,
                                 headers = listOf(DotnetAspResponseHeaderArtifact("ETag")),
-                                origins = setOf("services.UserService.rest.GetUser.responses.200"),
                             ),
                             DotnetAspResponseArtifact(
                                 statusCode = 404,
                                 model = problemModel,
                                 headers = emptyList(),
-                                origins = setOf("services.UserService.rest.GetUser.responses.404"),
                             ),
                         ),
-                    origins = setOf("services.UserService.rest.GetUser"),
                 ),
                 DotnetAspEndpointArtifact(
                     method = "POST",
@@ -257,22 +293,19 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
                                 statusCode = 201,
                                 model = userModel,
                                 headers = listOf(DotnetAspResponseHeaderArtifact("Location")),
-                                origins = setOf("services.UserService.rest.CreateUser.responses.201"),
                             ),
                             DotnetAspResponseArtifact(
                                 statusCode = 400,
                                 model = problemModel,
                                 headers = emptyList(),
-                                origins = setOf("services.UserService.rest.CreateUser.responses.400"),
                             ),
                         ),
-                    origins = setOf("services.UserService.rest.CreateUser"),
                 ),
             ),
     )
 }
 
-private fun unsignedNativeIntDefaultArtifact(): DotnetAspServiceArtifact =
+private fun integerDefaultArtifact(type: DotnetFieldType, value: Number): DotnetAspServiceArtifact =
     DotnetAspServiceArtifact(
         id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "ReportService.Api"),
         serviceName = "ReportService",
@@ -297,28 +330,21 @@ private fun unsignedNativeIntDefaultArtifact(): DotnetAspServiceArtifact =
                                         listOf(
                                             DotnetAspRequestFieldArtifact(
                                                 name = "maxValue",
-                                                type = DotnetFieldType.UnsignedNativeInt,
+                                                type = type,
                                                 optional = false,
-                                                defaultValue = 4294967296L,
+                                                defaultValue = value,
                                             )
                                         ),
-                                    origins = setOf("services.ReportService.rest.GetReport.query.GetReportQuery"),
                                 )
                         ),
                     responses =
                         listOf(
                             DotnetAspResponseArtifact(
                                 statusCode = 200,
-                                model =
-                                    inlineModel(
-                                        "EmptyReport",
-                                        "services.ReportService.rest.GetReport.responses.200.EmptyReport",
-                                    ) {},
+                                model = inlineModel("EmptyReport") {},
                                 headers = emptyList(),
-                                origins = setOf("services.ReportService.rest.GetReport.responses.200"),
                             )
                         ),
-                    origins = setOf("services.ReportService.rest.GetReport"),
                 )
             ),
     )
@@ -353,7 +379,6 @@ private fun requestBindingTypesArtifact(): DotnetAspServiceArtifact =
                                                 defaultValue = null,
                                             )
                                         ),
-                                    origins = setOf("services.UserService.rest.GetReport.path.GetReportPath"),
                                 ),
                             query =
                                 DotnetAspRequestBindingArtifact(
@@ -380,35 +405,22 @@ private fun requestBindingTypesArtifact(): DotnetAspServiceArtifact =
                                                 defaultValue = null,
                                             ),
                                         ),
-                                    origins = setOf("services.UserService.rest.GetReport.query.GetReportQuery"),
                                 ),
                         ),
                     responses =
                         listOf(
                             DotnetAspResponseArtifact(
                                 statusCode = 200,
-                                model =
-                                    inlineModel(
-                                        "Report",
-                                        "services.UserService.rest.GetReport.responses.200.Report",
-                                    ) {},
+                                model = inlineModel("Report") {},
                                 headers = emptyList(),
-                                origins = setOf("services.UserService.rest.GetReport.responses.200"),
                             )
                         ),
-                    origins = setOf("services.UserService.rest.GetReport"),
                 )
             ),
     )
 
 private fun noContentBodyArtifact(): DotnetAspServiceArtifact {
-    val deletedUserModel =
-        inlineModel(
-            "DeletedUser",
-            "services.UserService.rest.DeleteUser.responses.204.DeletedUser",
-        ) {
-            stringField("id")
-        }
+    val deletedUserModel = inlineModel("DeletedUser") { stringField("id") }
 
     return DotnetAspServiceArtifact(
         id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "UserService.Api"),
@@ -431,10 +443,8 @@ private fun noContentBodyArtifact(): DotnetAspServiceArtifact {
                                 statusCode = 204,
                                 model = deletedUserModel,
                                 headers = emptyList(),
-                                origins = setOf("services.UserService.rest.DeleteUser.responses.204"),
                             )
                         ),
-                    origins = setOf("services.UserService.rest.DeleteUser"),
                 )
             ),
     )
@@ -442,26 +452,22 @@ private fun noContentBodyArtifact(): DotnetAspServiceArtifact {
 
 private fun sharedModel(
     typeName: String,
-    origin: String,
     fields: MutableList<DotnetField>.() -> Unit,
 ): DotnetAspModelArtifact =
     DotnetAspModelArtifact(
         typeName = typeName,
         locality = DotnetAspModelLocality.SHARED,
         model = DotnetModel(name = typeName, fields = buildList(fields)),
-        origins = setOf(origin),
     )
 
 private fun inlineModel(
     typeName: String,
-    origin: String,
     fields: MutableList<DotnetField>.() -> Unit,
 ): DotnetAspModelArtifact =
     DotnetAspModelArtifact(
         typeName = typeName,
         locality = DotnetAspModelLocality.INLINE,
         model = DotnetModel(name = typeName, fields = buildList(fields)),
-        origins = setOf(origin),
     )
 
 private fun MutableList<DotnetField>.stringField(name: String) {

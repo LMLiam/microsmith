@@ -15,6 +15,7 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultVaria
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.defaults.renderDotnetAspBindingInitializer
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.defaults.renderDotnetAspInitializer
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpAutoProperty
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpNullableType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
@@ -76,7 +77,7 @@ internal fun renderHeadersBindingType(binding: DotnetAspHeadersBindingArtifact):
         members =
             binding.headers.map { header ->
                 csharpAutoProperty(
-                    type = csharpNullableType("string"),
+                    type = csharpNullableType(DotnetCSharpTypes.Primitives.String),
                     name = dotnetAspPascalIdentifier(header.name),
                     modifiers = listOf(CSharp.Modifier.PUBLIC),
                     initializer = NULL_LITERAL,
@@ -107,7 +108,7 @@ internal fun renderResultVariantType(
                 response.headers.forEach { header ->
                     add(
                         csharpParameter(
-                            type = csharpNullableType("string"),
+                            type = csharpNullableType(DotnetCSharpTypes.Primitives.String),
                             name = dotnetAspHeaderPropertyName(header.name),
                             defaultValue = NULL_LITERAL,
                         )

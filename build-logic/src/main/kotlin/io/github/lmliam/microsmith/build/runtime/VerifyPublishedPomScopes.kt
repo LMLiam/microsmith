@@ -13,11 +13,6 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
-/**
- * Fails the build when a published POM gives a dependency an unexpected scope.
- *
- * Each expected dependency is declared as `<groupId>:<artifactId>=<scope>`.
- */
 abstract class VerifyPublishedPomScopes : DefaultTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NAME_ONLY)

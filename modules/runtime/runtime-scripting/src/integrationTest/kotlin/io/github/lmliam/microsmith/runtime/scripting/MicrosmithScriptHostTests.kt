@@ -147,7 +147,6 @@ class MicrosmithScriptHostTests :
                         "dotnet/Platform/UserService.Api/Generated/Controllers/" + "UserServiceApiControllerBase.cs"
                     )
                     .exists() shouldBe true
-                output.resolve("dotnet/Platform/UserService.Api/.microsmith/origins.json").exists() shouldBe true
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -274,7 +273,6 @@ class MicrosmithScriptHostTests :
                         "dotnet/Platform/UserService.Api/Generated/Controllers/" + "UserServiceApiControllerBase.cs"
                     )
                     .exists() shouldBe true
-                output.resolve("dotnet/Platform/UserService.Api/.microsmith/origins.json").exists() shouldBe true
                 output
                     .resolve("dotnet/Platform/UserService.Api/Generated/Controllers/UserServiceApiControllerBase.cs")
                     .readText()

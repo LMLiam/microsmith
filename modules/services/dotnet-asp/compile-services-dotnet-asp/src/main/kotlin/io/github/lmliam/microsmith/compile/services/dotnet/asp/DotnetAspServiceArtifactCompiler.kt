@@ -9,10 +9,6 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.contribution.controllerOriginsFor
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.contribution.requestModelOriginsFor
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.contribution.responseModelOriginsFor
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.contribution.sharedContractModelOriginsFor
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllerBaseRelativePath
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.microsmithControllerBaseRelativePath
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.DotnetAspProjectRenderer
@@ -28,10 +24,6 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
 
     override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> {
         validateEndpointGenerationInputs(artifact)
-        val serviceOrigin = setOf("services.${artifact.serviceName}")
-        val requestModelOrigins = requestModelOriginsFor(artifact, serviceOrigin)
-        val responseModelOrigins = responseModelOriginsFor(artifact, serviceOrigin)
-        val controllerOrigins = controllerOriginsFor(artifact, serviceOrigin)
 
         return buildList {
             add(
@@ -44,64 +36,50 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
                             MsBuildNames.NULLABLE_PROPERTY to "enable",
                             MsBuildNames.TARGET_FRAMEWORK_PROPERTY to artifact.targetFrameworkMoniker,
                         ),
-                    origins = serviceOrigin,
                 )
             )
-            add(
-                artifact.textContribution(
-                    "Program.cs",
-                    DotnetAspProjectRenderer.renderProgramFile(artifact),
-                    serviceOrigin,
-                )
-            )
-            add(artifact.textContribution("appsettings.json", renderDotnetAspAppSettingsFile(artifact), serviceOrigin))
+            add(artifact.textContribution("Program.cs", DotnetAspProjectRenderer.renderProgramFile(artifact)))
+            add(artifact.textContribution("appsettings.json", renderDotnetAspAppSettingsFile(artifact)))
             add(
                 artifact.textContribution(
                     "Properties/launchSettings.json",
                     renderDotnetAspLaunchSettingsFile(artifact),
-                    serviceOrigin,
                 )
             )
             add(
                 artifact.textContribution(
                     "Generated/Hosting/MicrosmithHostingExtensions.cs",
                     DotnetAspProjectRenderer.renderHostingExtensionsFile(artifact),
-                    serviceOrigin,
                 )
             )
             add(
                 artifact.textContribution(
                     "Generated/Contracts/ServiceModels.cs",
                     DotnetAspProjectRenderer.renderServiceModelsFile(artifact),
-                    sharedContractModelOriginsFor(artifact, serviceOrigin),
                 )
             )
             add(
                 artifact.textContribution(
                     "Generated/Contracts/RequestModels.cs",
                     DotnetAspProjectRenderer.renderRequestModelsFile(artifact),
-                    requestModelOrigins,
                 )
             )
             add(
                 artifact.textContribution(
                     "Generated/Contracts/ResponseModels.cs",
                     DotnetAspProjectRenderer.renderResponseModelsFile(artifact),
-                    responseModelOrigins,
                 )
             )
             add(
                 artifact.textContribution(
                     microsmithControllerBaseRelativePath(),
                     DotnetAspProjectRenderer.renderMicrosmithControllerBaseFile(artifact),
-                    serviceOrigin,
                 )
             )
             add(
                 artifact.textContribution(
                     controllerBaseRelativePath(artifact),
                     DotnetAspProjectRenderer.renderControllerBaseFile(artifact),
-                    controllerOrigins,
                 )
             )
         }
