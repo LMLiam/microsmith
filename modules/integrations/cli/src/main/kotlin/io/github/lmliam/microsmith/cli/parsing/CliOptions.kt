@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.parsing
+
 internal const val INIT_COMMAND = "init"
 internal const val RUN_COMMAND = "run"
 internal const val DOCTOR_COMMAND = "doctor"

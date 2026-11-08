@@ -34,9 +34,6 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.nio.file.Path
 
-// detekt 2.0 reports UnusedPrivateProperty for constructor properties that only the
-// property initialisers below read. Every flagged property is used there.
-@Suppress("UnusedPrivateProperty")
 internal class MicrosmithCli(
     private val stdout: (String) -> Unit = ::println,
     stderr: (String) -> Unit = { System.err.println(it) },

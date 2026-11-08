@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names
+
 internal class NameRegistry {
     private val used = mutableSetOf<String>()
     private val reserved = mutableSetOf<String>()

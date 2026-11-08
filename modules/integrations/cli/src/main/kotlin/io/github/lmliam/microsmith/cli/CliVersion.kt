@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli
+
 internal const val FALLBACK_CLI_VERSION = "dev"
 
 internal fun resolveCliVersion(): String {
