@@ -38,16 +38,18 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
         message: Message,
     ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
         val identity = identityOf(schema).bind()
-        val declaration =
-            zipOrAccumulate(
-                { checkDeclaration(identity, message) },
-                { resolveFields(identity, message) },
-                { resolveOneofs(identity, message) },
-            ) { _, fields, oneofs ->
-                ResolvedProtobufMessage(message.name, fields, oneofs, message.reserved)
-            }
+        with(identity) {
+            val declaration =
+                zipOrAccumulate(
+                    { checkDeclaration(message) },
+                    { resolveFields(message) },
+                    { resolveOneofs(message) },
+                ) { _, fields, oneofs ->
+                    ResolvedProtobufMessage(message.name, fields, oneofs, message.reserved)
+                }
 
-        schemaFor(identity, declaration)
+            schemaFor(declaration)
+        }
     }
 
     fun resolveEnum(
@@ -55,25 +57,24 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
         enumDeclaration: Enum,
     ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
         val identity = identityOf(schema).bind()
-        val declaration =
-            zipOrAccumulate(
-                { checkDeclaration(identity, enumDeclaration) },
-                { enumDeclaration.values.map { ResolvedProtobufEnumValue(it.name, it.index) } },
-            ) { _, values ->
-                ResolvedProtobufEnum(enumDeclaration.name, values, enumDeclaration.reserved)
-            }
+        with(identity) {
+            val declaration =
+                zipOrAccumulate(
+                    { checkDeclaration(enumDeclaration) },
+                    { enumDeclaration.values.map { ResolvedProtobufEnumValue(it.name, it.index) } },
+                ) { _, values ->
+                    ResolvedProtobufEnum(enumDeclaration.name, values, enumDeclaration.reserved)
+                }
 
-        schemaFor(identity, declaration)
+            schemaFor(declaration)
+        }
     }
 
     private fun identityOf(schema: ProtobufSchema): EitherNel<ProtobufResolutionIssue, QualifiedSchemaName> =
         QualifiedSchemaName.parse(schema.name).mapLeft { nonEmptyListOf<ProtobufResolutionIssue>(it) }
 
-    context(_: RaiseAccumulate<ProtobufResolutionIssue>)
-    private fun checkDeclaration(
-        identity: QualifiedSchemaName,
-        declaration: Type,
-    ) {
+    context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
+    private fun checkDeclaration(declaration: Type) {
         val nameMismatch =
             ProtobufResolutionIssue.SchemaDeclarationNameMismatch(identity.fullyQualifiedName, declaration.name)
                 .takeIf { identity.typeName != declaration.name }
@@ -83,11 +84,8 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
         }
     }
 
-    context(_: RaiseAccumulate<ProtobufResolutionIssue>)
-    private fun resolveFields(
-        identity: QualifiedSchemaName,
-        message: Message,
-    ): List<ResolvedProtobufField> =
+    context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
+    private fun resolveFields(message: Message): List<ResolvedProtobufField> =
         message.fields.mapOrAccumulate { field ->
             when (field) {
                 is ScalarField ->
@@ -104,7 +102,6 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                         field.index,
                         referenceResolver
                             .resolve(
-                                identity,
                                 field.reference,
                                 ProtobufResolutionIssue.ReferenceLocation.Field(field.name),
                             )
@@ -118,7 +115,6 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                         field.index,
                         field.type.key,
                         resolveValueType(
-                            identity,
                             field.type.value,
                             ProtobufResolutionIssue.ReferenceLocation.MapValue(field.name),
                         ),
@@ -126,11 +122,8 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
             }
         }
 
-    context(_: RaiseAccumulate<ProtobufResolutionIssue>)
-    private fun resolveOneofs(
-        identity: QualifiedSchemaName,
-        message: Message,
-    ): List<ResolvedProtobufOneof> =
+    context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
+    private fun resolveOneofs(message: Message): List<ResolvedProtobufOneof> =
         message.oneofs.mapOrAccumulate { oneof ->
             ResolvedProtobufOneof(
                 oneof.name,
@@ -140,7 +133,6 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                             field.name,
                             field.index,
                             resolveValueType(
-                                identity,
                                 field.fieldType,
                                 ProtobufResolutionIssue.ReferenceLocation.OneofField(oneof.name, field.name),
                             ),
@@ -149,23 +141,19 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
             )
         }
 
-    context(_: RaiseAccumulate<ProtobufResolutionIssue>)
+    context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
     private fun resolveValueType(
-        identity: QualifiedSchemaName,
         value: ValueType,
         location: ProtobufResolutionIssue.ReferenceLocation,
     ): ResolvedProtobufValueType =
         when (value) {
             is PrimitiveType -> ResolvedProtobufValueType.Primitive(value)
 
-            is Reference ->
-                ResolvedProtobufValueType.Reference(referenceResolver.resolve(identity, value, location).bind())
+            is Reference -> ResolvedProtobufValueType.Reference(referenceResolver.resolve(value, location).bind())
         }
 
-    private fun schemaFor(
-        identity: QualifiedSchemaName,
-        declaration: ResolvedProtobufDeclaration,
-    ): ResolvedProtobufSchema =
+    context(identity: QualifiedSchemaName)
+    private fun schemaFor(declaration: ResolvedProtobufDeclaration): ResolvedProtobufSchema =
         ResolvedProtobufSchema(
             identity,
             declaration,

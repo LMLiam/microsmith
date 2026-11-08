@@ -10,17 +10,17 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufRefe
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 internal class ProtobufReferenceResolver(private val symbols: ProtobufSymbolTable) {
+    context(identity: QualifiedSchemaName)
     fun resolve(
-        schema: QualifiedSchemaName,
         reference: Reference,
         location: ProtobufResolutionIssue.ReferenceLocation,
     ): Either<ProtobufResolutionIssue, ResolvedProtobufReference> = either {
         val target =
-            schema
+            identity
                 .resolveReference(reference)
                 .mapLeft { invalid ->
                     ProtobufResolutionIssue.InvalidReferenceName(
-                        schema.fullyQualifiedName,
+                        identity.fullyQualifiedName,
                         location,
                         invalid.schemaName,
                         invalid.reason,
@@ -32,7 +32,7 @@ internal class ProtobufReferenceResolver(private val symbols: ProtobufSymbolTabl
             symbols.find(target)
                 ?: raise(
                     ProtobufResolutionIssue.UnresolvedReference(
-                        schema.fullyQualifiedName,
+                        identity.fullyQualifiedName,
                         location,
                         target.fullyQualifiedName,
                     )
