@@ -1,6 +1,9 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
+import io.kotest.framework.gradle.tasks.KotestJvmTask
+import javax.inject.Inject
+import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
@@ -20,6 +23,10 @@ plugins {
     id 'maven-publish'
     alias(libs.plugins.kotest) apply false
     alias(libs.plugins.shadow) apply false
+}
+
+interface KotestFileSystem {
+    @Inject FileSystemOperations getFileSystem()
 }
 
 scmVersion {
@@ -107,32 +114,48 @@ subprojects {
 
     def hasIntegrationTestSources = !sourceSets.integrationTest.allSource.isEmpty()
 
-    tasks.register('integrationTest', io.kotest.framework.gradle.tasks.KotestJvmTask) {
+    tasks.register('integrationTest', KotestJvmTask) {
         description = 'Runs integration tests.'
         group = 'verification'
         mainClass.set('io.kotest.engine.launcher.MainKt')
         classpath = sourceSets.integrationTest.runtimeClasspath
-        testSourceSetClasspath.set(sourceSets.integrationTest.runtimeClasspath)
+        testSourceSetClasspath.set(files(sourceSets.integrationTest.runtimeClasspath))
         moduleName.set(project.name)
-        moduleTestReportsDir.set(layout.buildDirectory.dir('test-results/integrationTest'))
-        rootTestReportsDir.set(rootProject.layout.buildDirectory.dir('test-results/integrationTest'))
         inputs.files(sourceSets.integrationTest.output.classesDirs)
         onlyIf { hasIntegrationTestSources }
     }
 
     def hasE2eTestSources = !sourceSets.e2eTest.allSource.isEmpty()
 
-    tasks.register('e2eTest', io.kotest.framework.gradle.tasks.KotestJvmTask) {
+    tasks.register('e2eTest', KotestJvmTask) {
         description = 'Runs end-to-end tests.'
         group = 'verification'
         mainClass.set('io.kotest.engine.launcher.MainKt')
         classpath = sourceSets.e2eTest.runtimeClasspath
-        testSourceSetClasspath.set(sourceSets.e2eTest.runtimeClasspath)
+        testSourceSetClasspath.set(files(sourceSets.e2eTest.runtimeClasspath))
         moduleName.set(project.name)
-        moduleTestReportsDir.set(layout.buildDirectory.dir('test-results/e2eTest'))
-        rootTestReportsDir.set(rootProject.layout.buildDirectory.dir('test-results/e2eTest'))
         inputs.files(sourceSets.e2eTest.output.classesDirs)
+        inputs.property('osName', providers.systemProperty('os.name'))
+        inputs.property('osArch', providers.systemProperty('os.arch'))
         onlyIf { hasE2eTestSources }
+    }
+
+    def kotestFileSystem = objects.newInstance(KotestFileSystem).fileSystem
+
+    tasks.withType(KotestJvmTask).configureEach { kotestTask ->
+        def engineReportsDir = layout.buildDirectory.dir("test-results/${kotestTask.name}-engine")
+        def engineRootReportsDir = layout.buildDirectory.dir("tmp/${kotestTask.name}-engine-root")
+        def resultsDir = layout.buildDirectory.dir("test-results/${kotestTask.name}")
+        kotestTask.moduleTestReportsDir.set(engineReportsDir)
+        kotestTask.rootTestReportsDir.set(engineRootReportsDir)
+        kotestTask.outputs.dir(resultsDir)
+        kotestTask.doFirst {
+            kotestFileSystem.delete { it.delete(engineReportsDir, engineRootReportsDir, resultsDir) }
+        }
+        kotestTask.doLast {
+            kotestFileSystem.sync { it.from(engineReportsDir).into(resultsDir) }
+            kotestFileSystem.delete { it.delete(engineReportsDir, engineRootReportsDir) }
+        }
     }
 
     tasks.withType(JavaCompile).configureEach {
