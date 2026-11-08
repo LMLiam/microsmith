@@ -14,11 +14,11 @@ class EnumEmissionValidatorTests :
         "enum reservations can start at the maximum integer and extend to max" {
             val declaration =
                 ResolvedProtobufEnum(
-                    name = "Status",
+                    name = protoIdentifier("Status"),
                     values =
                         listOf(
                             ResolvedProtobufEnumValue(
-                                name = "UNSPECIFIED",
+                                name = protoIdentifier("UNSPECIFIED"),
                                 number = 0,
                             )
                         ),
@@ -31,11 +31,11 @@ class EnumEmissionValidatorTests :
         "enum reservations reject descending ranges" {
             val declaration =
                 ResolvedProtobufEnum(
-                    name = "Status",
+                    name = protoIdentifier("Status"),
                     values =
                         listOf(
                             ResolvedProtobufEnumValue(
-                                name = "UNSPECIFIED",
+                                name = protoIdentifier("UNSPECIFIED"),
                                 number = 0,
                             )
                         ),
@@ -50,11 +50,11 @@ class EnumEmissionValidatorTests :
         "enum reservations to max overlap reservations above the message field-number limit" {
             val declaration =
                 ResolvedProtobufEnum(
-                    name = "Status",
+                    name = protoIdentifier("Status"),
                     values =
                         listOf(
                             ResolvedProtobufEnumValue(
-                                name = "UNSPECIFIED",
+                                name = protoIdentifier("UNSPECIFIED"),
                                 number = 0,
                             )
                         ),
@@ -69,15 +69,15 @@ class EnumEmissionValidatorTests :
         "enum reservations to max reject used numbers above the message field-number limit" {
             val declaration =
                 ResolvedProtobufEnum(
-                    name = "Status",
+                    name = protoIdentifier("Status"),
                     values =
                         listOf(
                             ResolvedProtobufEnumValue(
-                                name = "UNSPECIFIED",
+                                name = protoIdentifier("UNSPECIFIED"),
                                 number = 0,
                             ),
                             ResolvedProtobufEnumValue(
-                                name = "HIGH",
+                                name = protoIdentifier("HIGH"),
                                 number = Int.MAX_VALUE,
                             ),
                         ),
@@ -92,11 +92,11 @@ class EnumEmissionValidatorTests :
         "enum reservations use the signed integer domain rather than message field-number restrictions" {
             val declaration =
                 ResolvedProtobufEnum(
-                    name = "Status",
+                    name = protoIdentifier("Status"),
                     values =
                         listOf(
                             ResolvedProtobufEnumValue(
-                                name = "UNSPECIFIED",
+                                name = protoIdentifier("UNSPECIFIED"),
                                 number = 0,
                             )
                         ),

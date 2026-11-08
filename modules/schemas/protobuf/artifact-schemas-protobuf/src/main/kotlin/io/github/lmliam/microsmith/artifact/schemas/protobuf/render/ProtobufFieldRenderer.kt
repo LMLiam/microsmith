@@ -12,7 +12,7 @@ internal object ProtobufFieldRenderer {
                 renderCardinalityField(
                     field.cardinality,
                     ProtobufValueTypeRenderer.render(field.type),
-                    field.name,
+                    field.name.value,
                     field.number,
                 )
 
@@ -20,7 +20,7 @@ internal object ProtobufFieldRenderer {
                 renderCardinalityField(
                     field.cardinality,
                     field.reference.target.fullyQualifiedName,
-                    field.name,
+                    field.name.value,
                     field.number,
                 )
 
@@ -31,7 +31,7 @@ internal object ProtobufFieldRenderer {
                     append(", ")
                     append(ProtobufValueTypeRenderer.render(field.value))
                     append("> ")
-                    append(field.name)
+                    append(field.name.value)
                     append(" = ")
                     append(field.number)
                     append(";")

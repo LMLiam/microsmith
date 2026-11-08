@@ -19,11 +19,11 @@ class ProtobufSchemaEmissionValidatorTests :
         "validate rejects duplicate field names across fields and oneofs" {
             val declaration =
                 ResolvedProtobufMessage(
-                    name = "Contact",
+                    name = protoIdentifier("Contact"),
                     fields =
                         listOf(
                             ResolvedProtobufField.Scalar(
-                                name = "value",
+                                name = protoIdentifier("value"),
                                 number = 1,
                                 type = PrimitiveType.STRING,
                                 cardinality = Cardinality.SINGULAR,
@@ -32,11 +32,11 @@ class ProtobufSchemaEmissionValidatorTests :
                     oneofs =
                         listOf(
                             ResolvedProtobufOneof(
-                                name = "channel",
+                                name = protoIdentifier("channel"),
                                 fields =
                                     listOf(
                                         ResolvedProtobufOneof.Field(
-                                            name = "value",
+                                            name = protoIdentifier("value"),
                                             number = 2,
                                             type = ResolvedProtobufValueType.Primitive(PrimitiveType.STRING),
                                         )
@@ -52,11 +52,11 @@ class ProtobufSchemaEmissionValidatorTests :
         "validate rejects duplicate field numbers across fields and oneofs" {
             val declaration =
                 ResolvedProtobufMessage(
-                    name = "Contact",
+                    name = protoIdentifier("Contact"),
                     fields =
                         listOf(
                             ResolvedProtobufField.Scalar(
-                                name = "primary",
+                                name = protoIdentifier("primary"),
                                 number = 1,
                                 type = PrimitiveType.STRING,
                                 cardinality = Cardinality.SINGULAR,
@@ -65,11 +65,11 @@ class ProtobufSchemaEmissionValidatorTests :
                     oneofs =
                         listOf(
                             ResolvedProtobufOneof(
-                                name = "channel",
+                                name = protoIdentifier("channel"),
                                 fields =
                                     listOf(
                                         ResolvedProtobufOneof.Field(
-                                            name = "secondary",
+                                            name = protoIdentifier("secondary"),
                                             number = 1,
                                             type = ResolvedProtobufValueType.Primitive(PrimitiveType.STRING),
                                         )
@@ -85,27 +85,27 @@ class ProtobufSchemaEmissionValidatorTests :
         "validate rejects duplicate oneof names" {
             val declaration =
                 ResolvedProtobufMessage(
-                    name = "Contact",
+                    name = protoIdentifier("Contact"),
                     fields = emptyList(),
                     oneofs =
                         listOf(
                             ResolvedProtobufOneof(
-                                name = "channel",
+                                name = protoIdentifier("channel"),
                                 fields =
                                     listOf(
                                         ResolvedProtobufOneof.Field(
-                                            name = "email",
+                                            name = protoIdentifier("email"),
                                             number = 1,
                                             type = ResolvedProtobufValueType.Primitive(PrimitiveType.STRING),
                                         )
                                     ),
                             ),
                             ResolvedProtobufOneof(
-                                name = "channel",
+                                name = protoIdentifier("channel"),
                                 fields =
                                     listOf(
                                         ResolvedProtobufOneof.Field(
-                                            name = "phone",
+                                            name = protoIdentifier("phone"),
                                             number = 2,
                                             type = ResolvedProtobufValueType.Primitive(PrimitiveType.STRING),
                                         )
@@ -121,7 +121,7 @@ class ProtobufSchemaEmissionValidatorTests :
         "validate rejects overlapping reserved numeric ranges" {
             val declaration =
                 ResolvedProtobufMessage(
-                    name = "Contact",
+                    name = protoIdentifier("Contact"),
                     fields = emptyList(),
                     oneofs = emptyList(),
                     reservations =
@@ -137,15 +137,15 @@ class ProtobufSchemaEmissionValidatorTests :
         "validate rejects reserved enum names that collide with values" {
             val declaration =
                 ResolvedProtobufEnum(
-                    name = "Status",
+                    name = protoIdentifier("Status"),
                     values =
                         listOf(
                             ResolvedProtobufEnumValue(
-                                name = "UNSPECIFIED",
+                                name = protoIdentifier("UNSPECIFIED"),
                                 number = 0,
                             ),
                             ResolvedProtobufEnumValue(
-                                name = "ACTIVE",
+                                name = protoIdentifier("ACTIVE"),
                                 number = 1,
                             ),
                         ),
@@ -158,11 +158,11 @@ class ProtobufSchemaEmissionValidatorTests :
         "validate rejects reserved name and number collisions with used fields" {
             val declaration =
                 ResolvedProtobufMessage(
-                    name = "Contact",
+                    name = protoIdentifier("Contact"),
                     fields =
                         listOf(
                             ResolvedProtobufField.Scalar(
-                                name = "legacy_name",
+                                name = protoIdentifier("legacy_name"),
                                 number = 10,
                                 type = PrimitiveType.STRING,
                                 cardinality = Cardinality.SINGULAR,

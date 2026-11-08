@@ -10,20 +10,14 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 
 internal fun validateEnum(enum: ResolvedProtobufEnum) {
-    ProtobufNameValidation.requireIdentifier(enum.name, "Enum name")
     require(enum.values.isNotEmpty()) { "Enum '${enum.name}' must contain at least one value" }
     require(enum.values.first().number == 0) { "Enum '${enum.name}' must declare first value at index 0" }
 
-    enum.values.forEach(::validateEnumValue)
     enum.reservations.forEach(::validateEnumReserved)
 
     requireUniqueEnumValueNames(enum)
     requireUniqueEnumValueIndexes(enum)
     validateReservedUsage(enum)
-}
-
-private fun validateEnumValue(value: ResolvedProtobufEnumValue) {
-    ProtobufNameValidation.requireIdentifier(value.name, "Enum value name")
 }
 
 private fun validateEnumReserved(reserved: Reserved) {
@@ -41,7 +35,7 @@ private fun validateEnumReserved(reserved: Reserved) {
 }
 
 private fun requireUniqueEnumValueNames(enum: ResolvedProtobufEnum) {
-    val duplicates = enum.values.groupBy(ResolvedProtobufEnumValue::name).filterValues { it.size > 1 }
+    val duplicates = enum.values.groupBy { it.name.value }.filterValues { it.size > 1 }
     require(duplicates.isEmpty()) {
         val names = duplicates.keys.sorted().joinToString(", ")
         "Enum '${enum.name}' has duplicate value names: $names"

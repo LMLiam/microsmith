@@ -10,16 +10,16 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMess
 
 internal fun validateReservedUsage(message: ResolvedProtobufMessage) {
     validateNames(
-        owner = ReservedUsageOwner.message(message.name),
+        owner = ReservedUsageOwner.message(message.name.value),
         reservedNames = message.reservations.filterIsInstance<ReservedName>().map(ReservedName::name),
         usedNames =
             buildList {
-                message.fields.forEach { add(it.name) }
-                message.oneofs.forEach { oneof -> oneof.fields.forEach { add(it.name) } }
+                message.fields.forEach { add(it.name.value) }
+                message.oneofs.forEach { oneof -> oneof.fields.forEach { add(it.name.value) } }
             },
     )
     validateNumbers(
-        owner = ReservedUsageOwner.message(message.name),
+        owner = ReservedUsageOwner.message(message.name.value),
         reserved = message.reservations,
         usedNumbers =
             buildList {
@@ -32,12 +32,12 @@ internal fun validateReservedUsage(message: ResolvedProtobufMessage) {
 
 internal fun validateReservedUsage(enum: ResolvedProtobufEnum) {
     validateNames(
-        owner = ReservedUsageOwner.enum(enum.name),
+        owner = ReservedUsageOwner.enum(enum.name.value),
         reservedNames = enum.reservations.filterIsInstance<ReservedName>().map(ReservedName::name),
-        usedNames = enum.values.map { it.name },
+        usedNames = enum.values.map { it.name.value },
     )
     validateNumbers(
-        owner = ReservedUsageOwner.enum(enum.name),
+        owner = ReservedUsageOwner.enum(enum.name.value),
         reserved = enum.reservations,
         usedNumbers = enum.values.map { it.number },
         maxNumber = Int.MAX_VALUE,
