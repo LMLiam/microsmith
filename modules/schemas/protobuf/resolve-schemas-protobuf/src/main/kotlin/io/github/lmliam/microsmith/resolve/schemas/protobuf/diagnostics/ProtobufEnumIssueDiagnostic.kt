@@ -30,4 +30,14 @@ internal fun ProtobufResolutionIssue.EnumIssue.toDiagnostic(): ResolutionDiagnos
                 code = "protobuf.duplicate-enum-value-numbers",
                 message = "Protobuf enum '$schemaName' has duplicate value numbers: " + numbers.joinToString(),
             )
+
+        is ProtobufResolutionIssue.EnumValueNameCollision ->
+            protobufDiagnostic(
+                code = "protobuf.enum-value-name-collision",
+                message =
+                    "Protobuf enum '$schemaName' has values that clash once the enum name prefix, case " +
+                        "and underscores are ignored: " +
+                        valueNames.joinToString() +
+                        ".",
+            )
     }

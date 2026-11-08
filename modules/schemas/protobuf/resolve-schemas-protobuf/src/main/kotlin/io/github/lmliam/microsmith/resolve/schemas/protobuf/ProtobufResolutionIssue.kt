@@ -14,6 +14,8 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
     data class UnresolvedReference(val schemaName: String, val location: ReferenceLocation, val targetName: String) :
         ReferenceIssue
 
+    data class CircularSchemaImports(val schemas: List<String>) : ReferenceIssue
+
     data class InvalidReferenceName(
         val schemaName: String,
         val location: ReferenceLocation,
@@ -48,6 +50,12 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
 
     data class EmptyOneof(val schemaName: String, val oneofName: String) : DeclarationIssue
 
+    data class SymbolNameCollision(val scope: String, val name: String, val declarations: List<SymbolDeclaration>) :
+        DeclarationIssue
+
+    data class FieldJsonNameCollision(val schemaName: String, val jsonName: String, val fieldNames: List<String>) :
+        DeclarationIssue
+
     data class EmptyEnum(val schemaName: String) : EnumIssue
 
     data class EnumFirstValueMustBeZero(val schemaName: String, val firstValueName: String, val number: Int) : EnumIssue
@@ -55,6 +63,8 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
     data class DuplicateEnumValueNames(val schemaName: String, val names: List<String>) : EnumIssue
 
     data class DuplicateEnumValueNumbers(val schemaName: String, val numbers: List<Int>) : EnumIssue
+
+    data class EnumValueNameCollision(val schemaName: String, val valueNames: List<String>) : EnumIssue
 
     data class InvalidReservationRange(val schemaName: String, val start: Int, val endInclusive: Int) : ReservationIssue
 
@@ -78,6 +88,20 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
         data class EnumValue(val valueName: String) : IdentifierLocation
 
         data class Reservation(val name: String) : IdentifierLocation
+    }
+
+    sealed interface SymbolDeclaration {
+        data class Package(val packageName: String) : SymbolDeclaration
+
+        data class Type(val schemaName: String) : SymbolDeclaration
+
+        data class EnumValue(val schemaName: String, val valueName: String) : SymbolDeclaration
+
+        data class Field(val schemaName: String, val fieldName: String) : SymbolDeclaration
+
+        data class Oneof(val schemaName: String, val oneofName: String) : SymbolDeclaration
+
+        data class MapEntry(val schemaName: String, val fieldName: String) : SymbolDeclaration
     }
 
     sealed interface FieldLocation {

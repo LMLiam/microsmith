@@ -20,4 +20,13 @@ internal fun ProtobufResolutionIssue.ReferenceIssue.toDiagnostic(): ResolutionDi
                     "Protobuf schema '$schemaName' ${location.displayName()} " +
                         "references invalid type name '$targetName': it ${reason.displayName()}.",
             )
+
+        is ProtobufResolutionIssue.CircularSchemaImports ->
+            protobufDiagnostic(
+                code = "protobuf.circular-schema-imports",
+                message =
+                    "Protobuf schemas import each other in a cycle: " +
+                        (schemas + schemas.first()).joinToString(" -> ") +
+                        ".",
+            )
     }

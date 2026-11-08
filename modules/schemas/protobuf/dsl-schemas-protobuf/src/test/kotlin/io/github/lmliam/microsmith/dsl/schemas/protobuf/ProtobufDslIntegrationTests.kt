@@ -107,12 +107,24 @@ class ProtobufDslIntegrationTests :
             color.schema.name shouldBe "Color"
             (color.schema as Enum).values.associate { it.name to it.index } shouldContainExactly
                 mapOf(
-                    "UNSPECIFIED" to 0,
+                    "COLOR_UNSPECIFIED" to 0,
                     "RED" to 1,
                     "GREEN" to 2,
                 )
             color.schema.reserved.filterIsInstance<ReservedIndex>().first().index shouldBe 99
             color.schema.reserved.filterIsInstance<ReservedName>().first().name shouldBe "OBSOLETE"
+        }
+
+        "protobuf DSL builds an enum whose own zero value replaces the default" {
+            val schemasBuilder = SchemasBuilder()
+            schemasBuilder.protobuf {
+                enum("Result") {
+                    +"FAILED"
+                    value("OK") { index(0) }
+                }
+            }
+            val result = schemasBuilder.toExtension().schemas.filterIsInstance<ProtobufSchema>().single().schema as Enum
+            result.values.associate { it.name to it.index } shouldContainExactly mapOf("OK" to 0, "FAILED" to 1)
         }
 
         "nested namespaces and versioning produce qualified names" {

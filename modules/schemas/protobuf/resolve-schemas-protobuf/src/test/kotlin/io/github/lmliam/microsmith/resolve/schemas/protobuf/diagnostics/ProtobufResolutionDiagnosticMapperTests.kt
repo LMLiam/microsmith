@@ -90,4 +90,89 @@ class ProtobufResolutionDiagnosticMapperTests :
                         "Protobuf schema name 'pkg.1User' is invalid: it contains an " + "invalid identifier segment.",
                 )
         }
+
+        "maps a symbol name collision with each declaration" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(
+                ProtobufResolutionIssue.SymbolNameCollision(
+                    scope = "pkg",
+                    name = "UNSPECIFIED",
+                    declarations =
+                        listOf(
+                            ProtobufResolutionIssue.SymbolDeclaration.EnumValue("pkg.First", "UNSPECIFIED"),
+                            ProtobufResolutionIssue.SymbolDeclaration.Type("pkg.UNSPECIFIED"),
+                        ),
+                )
+            ) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.symbol-name-collision",
+                    message =
+                        "Protobuf scope 'pkg' declares 'UNSPECIFIED' more than once: " +
+                            "enum value 'UNSPECIFIED' of 'pkg.First', type 'pkg.UNSPECIFIED'.",
+                )
+        }
+
+        "maps a symbol name collision in the global scope" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(
+                ProtobufResolutionIssue.SymbolNameCollision(
+                    scope = "",
+                    name = "x",
+                    declarations =
+                        listOf(
+                            ProtobufResolutionIssue.SymbolDeclaration.Package("x"),
+                            ProtobufResolutionIssue.SymbolDeclaration.Type("x"),
+                        ),
+                )
+            ) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.symbol-name-collision",
+                    message = "The global protobuf scope declares 'x' more than once: package 'x', type 'x'.",
+                )
+        }
+
+        "maps a field JSON name collision with the fields and the shared JSON name" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(
+                ProtobufResolutionIssue.FieldJsonNameCollision(
+                    schemaName = "pkg.User",
+                    jsonName = "fooBar",
+                    fieldNames = listOf("foo_bar", "fooBar"),
+                )
+            ) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.field-json-name-collision",
+                    message = "Protobuf schema 'pkg.User' fields 'foo_bar', 'fooBar' share the JSON name 'fooBar'.",
+                )
+        }
+
+        "maps an enum value name collision with the enum and the values" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(
+                ProtobufResolutionIssue.EnumValueNameCollision(
+                    schemaName = "pkg.Color",
+                    valueNames = listOf("COLOR_RED", "RED"),
+                )
+            ) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.enum-value-name-collision",
+                    message =
+                        "Protobuf enum 'pkg.Color' has values that clash once the enum name prefix, case " +
+                            "and underscores are ignored: COLOR_RED, RED.",
+                )
+        }
+
+        "maps a circular schema import with its path" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(ProtobufResolutionIssue.CircularSchemaImports(listOf("pkg.A", "pkg.B", "pkg.C"))) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.circular-schema-imports",
+                    message = "Protobuf schemas import each other in a cycle: pkg.A -> pkg.B -> pkg.C -> pkg.A.",
+                )
+        }
     })

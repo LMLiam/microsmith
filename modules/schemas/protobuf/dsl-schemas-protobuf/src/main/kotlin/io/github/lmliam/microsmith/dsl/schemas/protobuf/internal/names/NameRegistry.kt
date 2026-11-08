@@ -18,9 +18,11 @@ internal class NameRegistry {
         reserved += name
     }
 
-    fun validate(name: String) {
+    fun validate(name: String, explanation: String? = null) {
         require(name.isNotBlank()) { "Name cannot be blank." }
-        require(name !in reserved) { "Name already reserved: $name" }
-        require(name !in used) { "Name already used: $name" }
+        require(name !in reserved) { "Name already reserved: $name${explanation.asSuffix()}" }
+        require(name !in used) { "Name already used: $name${explanation.asSuffix()}" }
     }
+
+    private fun String?.asSuffix() = this?.let { " ($it)" }.orEmpty()
 }

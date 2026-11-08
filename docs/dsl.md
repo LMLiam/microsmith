@@ -43,6 +43,8 @@ microsmith {
 }
 ```
 
+An enum gets a generated `USER_STATUS_UNSPECIFIED = 0` value unless one of its values claims index 0, as in `value("OK") { index(0) }`. Values without an index are numbered from 1.
+
 ### ASP.NET service generation DSL
 
 ```kotlin

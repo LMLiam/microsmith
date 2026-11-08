@@ -455,6 +455,42 @@ class ProtobufSchemasResolverTests :
                 )
         }
 
+        "returns a typed issue when a schema name has surrounding whitespace" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = " User",
+                            schema = Message(name = "User"),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.InvalidSchemaName(
+                        schemaName = " User",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.WHITESPACE,
+                    )
+                )
+        }
+
+        "returns a typed issue when a schema name has trailing whitespace" {
+            val schemas = SchemasExtension(setOf(ProtobufSchema(name = "User ", schema = Message(name = "User"))))
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.InvalidSchemaName(
+                        schemaName = "User ",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.WHITESPACE,
+                    )
+                )
+        }
+
         "reports an invalid schema name once and still resolves its sibling schemas" {
             val schemas =
                 SchemasExtension(

@@ -14,6 +14,13 @@ class IndexAllocatorTests :
             allocator.allocate() shouldBe 3
         }
 
+        "allocate starts at firstAutomatic while explicit requests may use min" {
+            val allocator = IndexAllocator(min = 0, firstAutomatic = 1)
+            allocator.allocate() shouldBe 1
+            allocator.allocate(0) shouldBe 0
+            allocator.allocate() shouldBe 2
+        }
+
         "allocate skips used indexes" {
             val allocator = IndexAllocator(min = 1)
             allocator.allocate(3)

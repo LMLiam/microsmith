@@ -3,13 +3,17 @@ package io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Max
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.merge
 
-internal class IndexAllocator(private val min: Int, private val protoReserved: IntRange? = null) {
+internal class IndexAllocator(
+    private val min: Int,
+    private val protoReserved: IntRange? = null,
+    firstAutomatic: Int = min,
+) {
     private val reserved = mutableSetOf<IntRange>()
 
     fun reserved() = reserved.toSet()
 
     private val used = mutableSetOf<Int>()
-    private var next = min
+    private var next = firstAutomatic
 
     fun allocate(requested: Int? = null): Int {
         if (requested != null) {
