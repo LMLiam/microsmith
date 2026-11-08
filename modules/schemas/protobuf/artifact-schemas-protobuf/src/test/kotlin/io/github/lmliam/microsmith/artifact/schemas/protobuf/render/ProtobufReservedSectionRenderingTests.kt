@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 
 import arrow.core.nonEmptyListOf
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.enumDeclaration
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.messageDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.protoIdentifier
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.rangeSpan
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.renderProtobufDeclaration
@@ -9,7 +10,6 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.reservatio
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.singleSpan
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.toMaxSpan
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.EnumValueNumber
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
@@ -19,14 +19,7 @@ import io.kotest.matchers.shouldBe
 class ProtobufReservedSectionRenderingTests :
     StringSpec({
         fun renderMessage(reservations: ResolvedProtobufReservations = ResolvedProtobufReservations.NONE) =
-            renderProtobufDeclaration(
-                ResolvedProtobufMessage(
-                    name = protoIdentifier("Contact"),
-                    fields = emptyList(),
-                    oneofs = emptyList(),
-                    reservations = reservations,
-                )
-            )
+            renderProtobufDeclaration(messageDeclaration(name = "Contact", reservations = reservations))
 
         fun renderEnum(reservations: ResolvedProtobufReservations) =
             renderProtobufDeclaration(

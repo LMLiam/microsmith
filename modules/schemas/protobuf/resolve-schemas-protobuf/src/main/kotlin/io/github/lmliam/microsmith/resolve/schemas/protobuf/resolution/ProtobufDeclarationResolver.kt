@@ -30,6 +30,7 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufFiel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufRejection
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchema
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
@@ -47,7 +48,7 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
         message: Message,
     ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
         with(identity) {
-            val declaration =
+            val parts =
                 zipOrAccumulate(
                     { declarationName(message.name) },
                     { parseMessageDeclaration(identity.fullyQualifiedName, message).bindNel() },
@@ -55,13 +56,16 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                     { resolveFields(message) },
                     { resolveOneofs(message) },
                 ) { name, parsed, _, fields, oneofs ->
-                    ResolvedProtobufMessage(
+                    MessageParts(
                         name,
                         parsed.fields.buildEach(fields),
                         parsed.oneofs.buildEach(oneofs),
                         parsed.reservations,
                     )
                 }
+
+            val declaration =
+                ResolvedProtobufMessage.of(parts.name, parts.fields, parts.oneofs, parts.reservations).asIssues().bind()
 
             schemaFor(declaration)
         }
@@ -188,6 +192,13 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                 declaration.referencedSchemas().filter { it != identity }.distinct().sortedBy { it.fullyQualifiedName },
         )
 }
+
+private data class MessageParts(
+    val name: ProtoIdentifier,
+    val fields: List<ResolvedProtobufField>,
+    val oneofs: List<ResolvedProtobufOneof>,
+    val reservations: ResolvedProtobufReservations,
+)
 
 private typealias FieldBuilder = (ParsedField) -> ResolvedProtobufField
 

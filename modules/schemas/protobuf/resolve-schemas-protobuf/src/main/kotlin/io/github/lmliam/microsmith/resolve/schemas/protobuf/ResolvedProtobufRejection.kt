@@ -20,4 +20,6 @@ sealed interface ResolvedProtobufRejection {
     data class ReservedNameCollision(val names: List<String>) : ResolvedProtobufRejection
 
     data class ReservedNumberCollision(val numbers: List<Int>) : ResolvedProtobufRejection
+
+    data class ReservedNumberOutOfRange(val notation: String, val number: Int) : ResolvedProtobufRejection
 }

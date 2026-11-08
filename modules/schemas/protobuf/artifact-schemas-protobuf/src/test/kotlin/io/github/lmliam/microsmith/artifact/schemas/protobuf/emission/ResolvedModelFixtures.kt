@@ -4,6 +4,7 @@ import arrow.core.NonEmptyList
 import arrow.core.getOrElse
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
@@ -20,3 +21,11 @@ internal fun enumDeclaration(
     reservations: ResolvedProtobufReservations = ResolvedProtobufReservations.NONE,
 ): ResolvedProtobufEnum =
     ResolvedProtobufEnum.of(protoIdentifier(name), values, reservations).getOrElse { error("invalid enum: $it") }
+
+internal fun messageDeclaration(
+    name: String,
+    reservations: ResolvedProtobufReservations = ResolvedProtobufReservations.NONE,
+): ResolvedProtobufMessage =
+    ResolvedProtobufMessage.of(protoIdentifier(name), emptyList(), emptyList(), reservations).getOrElse {
+        error("invalid message: $it")
+    }
