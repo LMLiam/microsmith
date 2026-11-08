@@ -1,30 +1,64 @@
 package io.github.lmliam.microsmith.build.cli
 
-import org.apache.tools.tar.TarInputStream
-import org.gradle.api.GradleException
-import org.gradle.api.file.RegularFile
-import org.gradle.api.provider.Provider
-
 import java.io.File
 import java.io.FileInputStream
 import java.nio.charset.StandardCharsets
 import java.util.jar.JarFile
 import java.util.zip.GZIPInputStream
 import java.util.zip.ZipFile
-
-internal data class BundledPluginCatalogEntry(
-    val coordinate: String,
-    val archiveFile: Provider<RegularFile>,
-) {
-    fun collectServiceEntries(): List<BundledServiceEntry> =
-        CliBundledPluginCatalogVerifier.collectServiceEntries(archiveFile.get().asFile, coordinate)
-}
+import org.apache.tools.tar.TarInputStream
+import org.gradle.api.GradleException
 
 internal data class BundledServiceEntry(
     val coordinate: String,
     val servicePath: String,
     val provider: String,
 )
+
+/**
+ * Builds the bundled plugin profile that the CLI ships as `bundled-plugins.lock`.
+ *
+ * A plugin is a pair of a Maven coordinate and the JAR that provides it. The declared
+ * order is the catalog order, so the generated text is deterministic.
+ */
+internal object CliBundledPluginProfile {
+    fun plugins(
+        coordinates: List<String>,
+        jars: List<File>,
+    ): List<Pair<String, File>> {
+        if (coordinates.size != jars.size) {
+            throw GradleException(
+                "Bundled plugin coordinates (${coordinates.size}) do not match the bundled plugin jars " +
+                    "(${jars.size}).",
+            )
+        }
+        return coordinates.zip(jars)
+    }
+
+    fun serviceEntries(plugins: List<Pair<String, File>>): List<BundledServiceEntry> =
+        plugins.flatMap { (coordinate, jarFile) ->
+            CliBundledPluginCatalogVerifier.collectServiceEntries(jarFile, coordinate)
+        }
+
+    fun catalogText(
+        cliVersion: String,
+        formatVersion: Int,
+        plugins: List<Pair<String, File>>,
+    ): String =
+        buildString {
+            appendLine("# Microsmith bundled plugin profile")
+            appendLine("# Plugin coordinates are pinned to the CLI release version for deterministic runtime behavior.")
+            appendLine("format=$formatVersion")
+            appendLine("cliVersion=$cliVersion")
+            val serviceEntriesByCoordinate = serviceEntries(plugins).groupBy { entry -> entry.coordinate }
+            plugins.forEach { plugin ->
+                appendLine("plugin=${plugin.first}")
+                serviceEntriesByCoordinate.getOrDefault(plugin.first, emptyList()).forEach { entry ->
+                    appendLine("service=${entry.coordinate}|${entry.servicePath}|${entry.provider}")
+                }
+            }
+        }
+}
 
 internal object CliBundledPluginCatalogVerifier {
     fun validate(
@@ -99,7 +133,10 @@ internal object CliBundledPluginCatalogVerifier {
         }
     }
 
-    fun collectServiceEntries(jarFile: File, coordinate: String): List<BundledServiceEntry> {
+    fun collectServiceEntries(
+        jarFile: File,
+        coordinate: String,
+    ): List<BundledServiceEntry> {
         val entries = mutableListOf<BundledServiceEntry>()
         JarFile(jarFile).use { jarFileHandle ->
             jarFileHandle.entries().asSequence()
@@ -157,26 +194,4 @@ internal object CliBundledPluginCatalogVerifier {
                 .thenBy { it.servicePath }
                 .thenBy { it.provider },
         )
-}
-
-internal object CliBundledPluginCatalogWriter {
-    fun buildText(
-        cliVersion: String,
-        formatVersion: Int,
-        bundledPlugins: List<BundledPluginCatalogEntry>,
-        bundledServiceEntries: List<BundledServiceEntry>,
-    ): String =
-        buildString {
-            appendLine("# Microsmith bundled plugin profile")
-            appendLine("# Plugin coordinates are pinned to the CLI release version for deterministic runtime behavior.")
-            appendLine("format=$formatVersion")
-            appendLine("cliVersion=$cliVersion")
-            val serviceEntriesByCoordinate = bundledServiceEntries.groupBy { it.coordinate }
-            bundledPlugins.forEach { plugin ->
-                appendLine("plugin=${plugin.coordinate}")
-                serviceEntriesByCoordinate.getOrDefault(plugin.coordinate, emptyList()).forEach { entry ->
-                    appendLine("service=${entry.coordinate}|${entry.servicePath}|${entry.provider}")
-                }
-            }
-        }
 }

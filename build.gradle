@@ -9,7 +9,7 @@ import org.gradle.api.file.DuplicatesStrategy
 
 plugins {
     id 'base'
-    id 'io.github.lmliam.microsmith.repository-quality'
+    id 'io.github.lmliam.microsmith.build-tools'
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.metro) apply false
@@ -43,6 +43,8 @@ allprojects {
 tasks.named("check") {
     dependsOn(gradle.includedBuild("build-logic").task(":test"))
 }
+
+def testLibraries = libs
 
 subprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
@@ -85,9 +87,9 @@ subprojects {
     }
 
     dependencies {
-        testImplementation libs.kotest.framework.engine
-        testImplementation libs.kotest.assertions.core
-        testImplementation libs.kotest.property
+        testImplementation testLibraries.kotest.framework.engine
+        testImplementation testLibraries.kotest.assertions.core
+        testImplementation testLibraries.kotest.property
     }
 
     sourceSets {

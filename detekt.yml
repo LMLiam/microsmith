@@ -7,6 +7,13 @@ complexity:
   CyclomaticComplexMethod:
     active: true
     allowedComplexity: 15
+  LargeClass:
+    active: true
+    allowedLines: 170
+    excludes:
+      - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
   LongMethod:
     active: true
     allowedLines: 80
@@ -62,7 +69,7 @@ naming:
     functionPattern: '[a-z][a-zA-Z0-9]*'
   PackageNaming:
     active: true
-    packagePattern: '[a-z]+(\.[a-z][A-Za-z0-9]*)*'
+    packagePattern: '^(?!.*(?:^|\.)(?:util|utils|misc)(?:\.|$))[a-z]+(\.[a-z][A-Za-z0-9]*)*$'
   TopLevelPropertyNaming:
     active: true
     constantPattern: '[A-Z][_A-Z0-9]*'

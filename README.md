@@ -106,7 +106,7 @@ The CLI usage text has one source: run `microsmith --help`.
 ## Repository layout
 
 - `modules/`: production Gradle subprojects, grouped by capability: `engine/` holds the pipeline stages (`dsl`, `resolve`, `artifact`, `compile`, `gen`), `schemas/` and `services/` hold the target families, `runtime/` holds the scripting host, and `integrations/` holds the CLI and the Gradle and Maven plugins
-- `build-logic/`: included Gradle build that owns repository plugins and quality tasks
+- `build-logic/`: included Gradle build that provides the task types for CLI packaging, release archives, and runtime scripting artefacts. The owning modules register these tasks.
 - `examples/`: consumer-repository fixtures
 - `docs/`: user and contributor documentation
 - `gradle/`: wrapper files, version catalog, and dependency locks
@@ -121,7 +121,7 @@ The CLI usage text has one source: run `microsmith --help`.
 ./gradlew ktfmtFormat      # rewrite formatting
 ```
 
-`./gradlew build` includes `verifyRepositoryStandards`, which checks file naming, package layout, and import rules.
+`./gradlew build` includes Detekt and Ktfmt checks for file naming, package layout, and formatting.
 
 ## Contributing
 

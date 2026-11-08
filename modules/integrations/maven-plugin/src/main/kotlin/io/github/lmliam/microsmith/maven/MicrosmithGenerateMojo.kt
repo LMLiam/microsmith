@@ -10,14 +10,32 @@ import java.util.Properties
 import org.apache.maven.plugin.AbstractMojo
 import org.apache.maven.plugin.MojoExecutionException
 import org.apache.maven.plugin.MojoFailureException
+import org.apache.maven.plugins.annotations.LifecyclePhase
+import org.apache.maven.plugins.annotations.Mojo
+import org.apache.maven.plugins.annotations.Parameter
 
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true)
 class MicrosmithGenerateMojo : AbstractMojo() {
-    var projectBaseDirectory: File = File(".")
+    @Parameter(defaultValue = "\${project.basedir}", readonly = true) var projectBaseDirectory: File = File(".")
+
+    @Parameter(property = "microsmith.scriptFile", defaultValue = "\${project.basedir}/build.microsmith.kts")
     var scriptFile: File = File("build.microsmith.kts")
+
+    @Parameter(
+        property = "microsmith.outputDirectory",
+        defaultValue = "\${project.build.directory}/generated/microsmith",
+    )
     var outputDirectory: File = File(".")
+
+    @Parameter(
+        property = "microsmith.cacheDirectory",
+        defaultValue = "\${project.build.directory}/tmp/microsmith/cache",
+    )
     var cacheDirectory: File = File("target/tmp/microsmith/cache")
-    var variables: Properties? = null
-    var flags: List<String>? = null
+
+    @Parameter(property = "microsmith.variables") var variables: Properties? = null
+
+    @Parameter(property = "microsmith.flags") var flags: List<String>? = null
 
     internal var requestFactory: MicrosmithMavenExecutionRequestFactory = MicrosmithMavenExecutionRequestFactory()
     internal var scriptHostRunner: MicrosmithScriptHostRunner = DefaultMicrosmithScriptHostRunner

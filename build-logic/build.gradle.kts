@@ -53,32 +53,11 @@ tasks.named<Jar>("jar") {
 
 gradlePlugin {
     plugins {
-        register("repositoryQuality") {
-            id = "io.github.lmliam.microsmith.repository-quality"
-            implementationClass = "io.github.lmliam.microsmith.build.quality.RepositoryQualityPlugin"
-            displayName = "Microsmith Repository Quality"
-            description = "Registers repository structural Kotlin quality guardrails."
-        }
-
-        register("runtimeScripting") {
-            id = "io.github.lmliam.microsmith.runtime-scripting"
-            implementationClass = "io.github.lmliam.microsmith.build.runtime.RuntimeScriptingPlugin"
-            displayName = "Microsmith Runtime Scripting"
-            description = "Configures runtime scripting publication and IDE fallback artifacts."
-        }
-
-        register("cliPackaging") {
-            id = "io.github.lmliam.microsmith.cli-packaging"
-            implementationClass = "io.github.lmliam.microsmith.build.cli.CliPackagingPlugin"
-            displayName = "Microsmith CLI Packaging"
-            description = "Configures CLI packaging, distributions, and release artifacts."
-        }
-
-        register("mavenPluginDescriptor") {
-            id = "io.github.lmliam.microsmith.maven-plugin"
-            implementationClass = "io.github.lmliam.microsmith.build.maven.MavenPluginDescriptorPlugin"
-            displayName = "Microsmith Maven Plugin Descriptor"
-            description = "Configures Maven plugin descriptor generation and publication metadata."
+        register("buildTools") {
+            id = "io.github.lmliam.microsmith.build-tools"
+            implementationClass = "io.github.lmliam.microsmith.build.BuildToolsPlugin"
+            displayName = "Microsmith Build Tools"
+            description = "Places the Microsmith build task types on the build classpath."
         }
     }
 }
