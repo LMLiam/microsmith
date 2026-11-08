@@ -29,6 +29,23 @@ class ProtobufGenerationIntegrationTests :
             }
         }
 
+        "generateTo imports a message declared in another package by its file path" {
+            val model = microsmith {
+                schemas {
+                    protobuf {
+                        "acme.shared.v1" { message("Address") { string("street") } }
+                        "acme.user.v1" { message("User") { ref("home", "acme.shared.v1.Address") } }
+                    }
+                }
+            }
+
+            TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
+                model.generateTo(outputSpace.root)
+                Files.readString(outputSpace.root.resolve("proto/acme/user/v1/User.proto"))
+                    .shouldContain("import \"acme/shared/v1/Address.proto\";")
+            }
+        }
+
         "generateTo emits enum values across the int32 range with the zero value first" {
             val model = microsmith {
                 schemas {
