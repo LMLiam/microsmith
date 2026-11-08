@@ -1,10 +1,10 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.merge
 
 internal class IndexAllocator(
     private val min: Int,
+    val max: Int,
     private val protoReserved: IntRange? = null,
     firstAutomatic: Int = min,
 ) {
@@ -13,7 +13,7 @@ internal class IndexAllocator(
     fun reserved() = reserved.toSet()
 
     private val used = mutableSetOf<Int>()
-    private var next = firstAutomatic
+    private var next = firstAutomatic.toLong()
 
     fun allocate(requested: Int? = null): Int {
         if (requested != null) {
@@ -22,16 +22,29 @@ internal class IndexAllocator(
             return requested
         }
 
-        return generateSequence(next) { it + 1 }
-            .first { candidate ->
-                candidate !in used && reserved.none { candidate in it } && protoReserved?.contains(candidate) != true
-            }
-            .also { candidate ->
-                validate(candidate)
-                used += candidate
-                next = candidate + 1
-            }
+        return nextFreeIndex().also { index ->
+            used += index
+            next = index.toLong() + 1
+        }
     }
+
+    private fun nextFreeIndex(): Int {
+        val blockedRanges = reserved + listOfNotNull(protoReserved)
+        var candidate = next
+        while (candidate <= max) {
+            val index = candidate.toInt()
+            val blocking = blockedRanges.firstOrNull { index in it }
+            candidate =
+                when {
+                    blocking != null -> blocking.last.toLong() + 1
+                    index in used -> candidate + 1
+                    else -> return index
+                }
+        }
+        throw IllegalArgumentException("No index available up to $max")
+    }
+
+    fun reserveToMax(from: Int) = reserve(from..max)
 
     fun reserve(index: Int) {
         validateReservable(index)
@@ -49,7 +62,7 @@ internal class IndexAllocator(
     }
 
     private fun validateReservable(index: Int) {
-        require(index in min..ProtobufNumberLimits.FIELD_MAX) { "Invalid index: $index" }
+        require(index in min..max) { "Invalid index: $index" }
         require(index !in used) { "Index $index already used" }
         require(reserved.none { index in it }) { "Index $index is in reserved range" }
     }

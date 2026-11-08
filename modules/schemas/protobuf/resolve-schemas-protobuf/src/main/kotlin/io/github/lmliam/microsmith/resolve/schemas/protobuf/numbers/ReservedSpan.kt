@@ -24,7 +24,7 @@ data class ReservedSpan private constructor(val first: Int, val last: Int, val d
 
     enum class Domain(val min: Int, val max: Int) {
         MESSAGE(ProtobufNumberLimits.FIELD_MIN, ProtobufNumberLimits.FIELD_MAX),
-        ENUM(Int.MIN_VALUE, Int.MAX_VALUE),
+        ENUM(ProtobufNumberLimits.ENUM_MIN, ProtobufNumberLimits.ENUM_MAX),
     }
 
     sealed interface Rejection {

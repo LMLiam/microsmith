@@ -7,7 +7,7 @@ internal fun MutableSet<IntRange>.merge(newRange: IntRange) {
         it.first
     }
         .fold(newRange) { current, range ->
-            if (range.last + 1 < current.first || current.last + 1 < range.first) {
+            if (range.last.toLong() + 1 < current.first || current.last.toLong() + 1 < range.first) {
                 // disjoint, remember it
                 disjoint += range
                 current

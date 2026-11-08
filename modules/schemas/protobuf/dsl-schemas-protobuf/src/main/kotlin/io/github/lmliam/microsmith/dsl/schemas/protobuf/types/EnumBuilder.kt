@@ -11,7 +11,8 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.enum.EnumValueScop
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.reserved.ReservedScope
 
 internal class EnumBuilder(private val name: String) : EnumScope {
-    private val allocator = IndexAllocator(min = 0, firstAutomatic = 1)
+    private val allocator =
+        IndexAllocator(min = ProtobufNumberLimits.ENUM_MIN, max = ProtobufNumberLimits.ENUM_MAX, firstAutomatic = 1)
     private val nameRegistry = NameRegistry()
 
     private val values = mutableSetOf<EnumValue>()
@@ -29,7 +30,7 @@ internal class EnumBuilder(private val name: String) : EnumScope {
 
     override fun reserved(vararg indexRanges: IntRange) = indexRanges.forEach { allocator.reserve(it) }
 
-    override fun reserved(toMax: MaxRange) = allocator.reserve(toMax.from..ProtobufNumberLimits.FIELD_MAX)
+    override fun reserved(toMax: MaxRange) = allocator.reserveToMax(toMax.from)
 
     override fun reserved(vararg names: String) = names.forEach { this.nameRegistry.reserve(it) }
 
@@ -40,7 +41,8 @@ internal class EnumBuilder(private val name: String) : EnumScope {
     fun build() =
         Enum(
             name = name,
-            values = (values + defaultZeroValue()).sortedBy { it.index },
+            values =
+                (values + defaultZeroValue()).sortedWith(compareBy<EnumValue> { it.index != 0 }.thenBy { it.index }),
             reserved = buildReservedDeclarations(allocator, nameRegistry),
         )
 

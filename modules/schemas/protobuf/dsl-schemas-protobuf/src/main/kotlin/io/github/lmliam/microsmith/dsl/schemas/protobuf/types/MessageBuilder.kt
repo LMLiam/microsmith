@@ -32,7 +32,11 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.reserved.ReservedS
 
 internal class MessageBuilder(private val name: String) : MessageScope {
     private val allocator =
-        IndexAllocator(ProtobufNumberLimits.FIELD_MIN, ProtobufNumberLimits.FIELD_IMPLEMENTATION_RESERVED)
+        IndexAllocator(
+            min = ProtobufNumberLimits.FIELD_MIN,
+            max = ProtobufNumberLimits.FIELD_MAX,
+            protoReserved = ProtobufNumberLimits.FIELD_IMPLEMENTATION_RESERVED,
+        )
     private val nameRegistry = NameRegistry()
 
     private val fields = mutableMapOf<String, MessageField>()
@@ -109,7 +113,7 @@ internal class MessageBuilder(private val name: String) : MessageScope {
 
     override fun reserved(vararg indexRanges: IntRange) = indexRanges.forEach { allocator.reserve(it) }
 
-    override fun reserved(toMax: MaxRange) = allocator.reserve(toMax.from..ProtobufNumberLimits.FIELD_MAX)
+    override fun reserved(toMax: MaxRange) = allocator.reserveToMax(toMax.from)
 
     override fun reserved(vararg names: String) = names.forEach { this.nameRegistry.reserve(it) }
 

@@ -2,7 +2,6 @@ package io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation.IndexAllocator
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names.NameRegistry
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.reserved.ReservedScope
 
 internal class ReservedBuilder(private val allocator: IndexAllocator, private val names: NameRegistry) : ReservedScope {
@@ -19,6 +18,6 @@ internal class ReservedBuilder(private val allocator: IndexAllocator, private va
     }
 
     override fun range(range: MaxRange) {
-        allocator.reserve(range.from..ProtobufNumberLimits.FIELD_MAX)
+        allocator.reserveToMax(range.from)
     }
 }

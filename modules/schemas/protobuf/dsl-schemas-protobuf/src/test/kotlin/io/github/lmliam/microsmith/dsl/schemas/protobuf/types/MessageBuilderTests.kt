@@ -313,6 +313,27 @@ class MessageBuilderTests :
             shouldThrow<IllegalArgumentException> { b.int32("foo") { index(101) } }
         }
 
+        "a field index above the field maximum is rejected" {
+            val b = builder()
+            shouldThrow<IllegalArgumentException> { b.int32("foo") { index(536_870_912) } }
+        }
+
+        "a field index below one is rejected" {
+            val b = builder()
+            shouldThrow<IllegalArgumentException> { b.int32("foo") { index(0) } }
+        }
+
+        "a reserved range above the field maximum is rejected" {
+            val b = builder()
+            shouldThrow<IllegalArgumentException> { b.reserved(5..536_870_912) }
+        }
+
+        "a reserved range ending at the field maximum becomes reserved to max" {
+            val b = builder()
+            b.reserved(5..536_870_911)
+            b.build().reserved shouldContainExactly listOf(ReservedToMax(5))
+        }
+
         "reserved accepts a single index in the implementation range" {
             val b = builder()
             b.reserved(19_500)
