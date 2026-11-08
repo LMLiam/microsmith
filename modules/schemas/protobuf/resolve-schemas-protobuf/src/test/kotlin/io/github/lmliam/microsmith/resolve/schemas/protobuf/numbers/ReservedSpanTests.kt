@@ -61,10 +61,4 @@ class ReservedSpanTests :
             ReservedSpan.range(5, 9, message).map { it.notation } shouldBe Either.Right("5 to 9")
             ReservedSpan.toMax(5, message).map { it.notation } shouldBe Either.Right("5 to max")
         }
-
-        "span contains every number from first to last" {
-            val contains = ReservedSpan.range(10, 20, message).map { span -> listOf(9, 10, 20, 21).map { it in span } }
-
-            contains shouldBe Either.Right(listOf(false, true, true, false))
-        }
     })

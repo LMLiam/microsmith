@@ -1,32 +1,28 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.ProtobufEmissionInvariantException
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
 
 internal object ProtobufValueTypeRenderer {
-    private val primitiveKeywords =
-        mapOf(
-            PrimitiveType.INT32 to "int32",
-            PrimitiveType.INT64 to "int64",
-            PrimitiveType.UINT32 to "uint32",
-            PrimitiveType.UINT64 to "uint64",
-            PrimitiveType.SINT32 to "sint32",
-            PrimitiveType.SINT64 to "sint64",
-            PrimitiveType.FIXED32 to "fixed32",
-            PrimitiveType.FIXED64 to "fixed64",
-            PrimitiveType.SFIXED32 to "sfixed32",
-            PrimitiveType.SFIXED64 to "sfixed64",
-            PrimitiveType.STRING to "string",
-            PrimitiveType.BOOL to "bool",
-            PrimitiveType.FLOAT to "float",
-            PrimitiveType.DOUBLE to "double",
-            PrimitiveType.BYTES to "bytes",
-        )
-
+    @Suppress("CyclomaticComplexMethod")
     fun render(type: PrimitiveType): String =
-        primitiveKeywords[type]
-            ?: throw ProtobufEmissionInvariantException("Unsupported protobuf primitive type: $type")
+        when (type) {
+            PrimitiveType.INT32 -> "int32"
+            PrimitiveType.INT64 -> "int64"
+            PrimitiveType.UINT32 -> "uint32"
+            PrimitiveType.UINT64 -> "uint64"
+            PrimitiveType.SINT32 -> "sint32"
+            PrimitiveType.SINT64 -> "sint64"
+            PrimitiveType.FIXED32 -> "fixed32"
+            PrimitiveType.FIXED64 -> "fixed64"
+            PrimitiveType.SFIXED32 -> "sfixed32"
+            PrimitiveType.SFIXED64 -> "sfixed64"
+            PrimitiveType.STRING -> "string"
+            PrimitiveType.BOOL -> "bool"
+            PrimitiveType.FLOAT -> "float"
+            PrimitiveType.DOUBLE -> "double"
+            PrimitiveType.BYTES -> "bytes"
+        }
 
     fun render(type: ResolvedProtobufValueType): String =
         when (type) {

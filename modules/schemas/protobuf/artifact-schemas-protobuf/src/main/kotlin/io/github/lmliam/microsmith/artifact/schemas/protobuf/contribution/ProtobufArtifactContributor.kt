@@ -4,7 +4,6 @@ import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.renderProtobufDeclaration
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.validateProtobufDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifactId
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
@@ -16,8 +15,6 @@ class ProtobufArtifactContributor : ArtifactContributor<ResolvedProtobufSchemaMo
 
     override fun contribute(model: ResolvedProtobufSchemaModel): List<ArtifactContribution<*>> =
         model.schemas.map { schema ->
-            validateProtobufDeclaration(schema.declaration)
-
             ProtoFileContribution(
                 ProtoFileArtifactId(schema.identity.packageName, schema.identity.typeName.value),
                 schema.identity.packageName,
