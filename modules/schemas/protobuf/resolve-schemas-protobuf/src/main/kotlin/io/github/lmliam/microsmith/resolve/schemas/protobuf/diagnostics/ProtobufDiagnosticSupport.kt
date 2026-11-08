@@ -57,3 +57,20 @@ internal fun ProtobufResolutionIssue.FieldLocation.displayName(): String =
 
         is ProtobufResolutionIssue.FieldLocation.Reservation -> "reservation '$description'"
     }
+
+internal fun String.displayScope(): String = if (isEmpty()) "The global protobuf scope" else "Protobuf scope '$this'"
+
+internal fun ProtobufResolutionIssue.SymbolDeclaration.displayName(): String =
+    when (this) {
+        is ProtobufResolutionIssue.SymbolDeclaration.Package -> "package '$packageName'"
+
+        is ProtobufResolutionIssue.SymbolDeclaration.Type -> "type '$schemaName'"
+
+        is ProtobufResolutionIssue.SymbolDeclaration.EnumValue -> "enum value '$valueName' of '$schemaName'"
+
+        is ProtobufResolutionIssue.SymbolDeclaration.Field -> "field '$fieldName' of '$schemaName'"
+
+        is ProtobufResolutionIssue.SymbolDeclaration.Oneof -> "oneof '$oneofName' of '$schemaName'"
+
+        is ProtobufResolutionIssue.SymbolDeclaration.MapEntry -> "map entry of field '$fieldName' of '$schemaName'"
+    }

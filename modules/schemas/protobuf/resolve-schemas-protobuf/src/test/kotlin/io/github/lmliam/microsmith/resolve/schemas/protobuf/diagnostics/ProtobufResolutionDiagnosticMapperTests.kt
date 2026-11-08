@@ -90,4 +90,46 @@ class ProtobufResolutionDiagnosticMapperTests :
                         "Protobuf schema name 'pkg.1User' is invalid: it contains an " + "invalid identifier segment.",
                 )
         }
+
+        "maps a symbol name collision with each declaration" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(
+                ProtobufResolutionIssue.SymbolNameCollision(
+                    scope = "pkg",
+                    name = "UNSPECIFIED",
+                    declarations =
+                        listOf(
+                            ProtobufResolutionIssue.SymbolDeclaration.EnumValue("pkg.First", "UNSPECIFIED"),
+                            ProtobufResolutionIssue.SymbolDeclaration.Type("pkg.UNSPECIFIED"),
+                        ),
+                )
+            ) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.symbol-name-collision",
+                    message =
+                        "Protobuf scope 'pkg' declares 'UNSPECIFIED' more than once: " +
+                            "enum value 'UNSPECIFIED' of 'pkg.First', type 'pkg.UNSPECIFIED'.",
+                )
+        }
+
+        "maps a symbol name collision in the global scope" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(
+                ProtobufResolutionIssue.SymbolNameCollision(
+                    scope = "",
+                    name = "x",
+                    declarations =
+                        listOf(
+                            ProtobufResolutionIssue.SymbolDeclaration.Package("x"),
+                            ProtobufResolutionIssue.SymbolDeclaration.Type("x"),
+                        ),
+                )
+            ) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.symbol-name-collision",
+                    message = "The global protobuf scope declares 'x' more than once: package 'x', type 'x'.",
+                )
+        }
     })

@@ -22,7 +22,8 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
     override val resolvedType = ResolvedProtobufSchemaModel::class
 
     override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufSchemaModel> {
-        val declared = authoring.schemas.filterIsInstance<ProtobufSchema>().mapNotNull(::declaredSchemaOf)
+        val protobufSchemas = authoring.schemas.filterIsInstance<ProtobufSchema>()
+        val declared = protobufSchemas.mapNotNull(::declaredSchemaOf)
 
         val (_, symbols) = declared.map { it.symbol() }.separateEither()
         val resolver = ProtobufDeclarationResolver(ProtobufReferenceResolver(ProtobufSymbolTable(symbols)))
@@ -47,6 +48,8 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
                             ifRight = { it },
                         )
                 }
+
+        issues.addAll(findSymbolCollisions(protobufSchemas))
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 

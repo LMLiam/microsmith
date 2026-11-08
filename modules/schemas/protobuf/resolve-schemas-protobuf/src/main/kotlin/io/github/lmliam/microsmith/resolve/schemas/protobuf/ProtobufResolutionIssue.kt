@@ -48,6 +48,9 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
 
     data class EmptyOneof(val schemaName: String, val oneofName: String) : DeclarationIssue
 
+    data class SymbolNameCollision(val scope: String, val name: String, val declarations: List<SymbolDeclaration>) :
+        DeclarationIssue
+
     data class EmptyEnum(val schemaName: String) : EnumIssue
 
     data class EnumFirstValueMustBeZero(val schemaName: String, val firstValueName: String, val number: Int) : EnumIssue
@@ -78,6 +81,20 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
         data class EnumValue(val valueName: String) : IdentifierLocation
 
         data class Reservation(val name: String) : IdentifierLocation
+    }
+
+    sealed interface SymbolDeclaration {
+        data class Package(val packageName: String) : SymbolDeclaration
+
+        data class Type(val schemaName: String) : SymbolDeclaration
+
+        data class EnumValue(val schemaName: String, val valueName: String) : SymbolDeclaration
+
+        data class Field(val schemaName: String, val fieldName: String) : SymbolDeclaration
+
+        data class Oneof(val schemaName: String, val oneofName: String) : SymbolDeclaration
+
+        data class MapEntry(val schemaName: String, val fieldName: String) : SymbolDeclaration
     }
 
     sealed interface FieldLocation {

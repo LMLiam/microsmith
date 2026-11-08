@@ -56,4 +56,13 @@ internal fun ProtobufResolutionIssue.DeclarationIssue.toDiagnostic(): Resolution
                 code = "protobuf.empty-oneof",
                 message = "Protobuf schema '$schemaName' oneof '$oneofName' has no fields.",
             )
+
+        is ProtobufResolutionIssue.SymbolNameCollision ->
+            protobufDiagnostic(
+                code = "protobuf.symbol-name-collision",
+                message =
+                    "${scope.displayScope()} declares '$name' more than once: " +
+                        declarations.joinToString { it.displayName() } +
+                        ".",
+            )
     }
