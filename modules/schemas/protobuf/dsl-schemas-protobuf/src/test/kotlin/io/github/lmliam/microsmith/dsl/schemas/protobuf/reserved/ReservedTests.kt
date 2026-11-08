@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved
 
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
@@ -10,8 +11,8 @@ class ReservedTests :
             reserved shouldBe ReservedIndex(5)
         }
 
-        "fromRange returns ReservedToMax when last == Max.VALUE" {
-            val reserved = Reserved.fromRange(5..Max.VALUE)
+        "fromRange returns ReservedToMax when last == ProtobufNumberLimits.FIELD_MAX" {
+            val reserved = Reserved.fromRange(5..ProtobufNumberLimits.FIELD_MAX)
             reserved shouldBe ReservedToMax(5)
         }
 

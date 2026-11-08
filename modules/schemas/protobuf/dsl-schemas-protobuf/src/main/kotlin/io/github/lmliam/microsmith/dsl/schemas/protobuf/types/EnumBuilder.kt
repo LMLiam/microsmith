@@ -2,7 +2,7 @@ package io.github.lmliam.microsmith.dsl.schemas.protobuf.types
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation.IndexAllocator
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names.NameRegistry
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Max
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.buildReservedDeclarations
@@ -29,7 +29,7 @@ internal class EnumBuilder(private val name: String) : EnumScope {
 
     override fun reserved(vararg indexRanges: IntRange) = indexRanges.forEach { allocator.reserve(it) }
 
-    override fun reserved(toMax: MaxRange) = allocator.reserve(toMax.from..Max.VALUE)
+    override fun reserved(toMax: MaxRange) = allocator.reserve(toMax.from..ProtobufNumberLimits.FIELD_MAX)
 
     override fun reserved(vararg names: String) = names.forEach { this.nameRegistry.reserve(it) }
 

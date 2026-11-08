@@ -14,13 +14,12 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarFieldBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.withCardinality
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation.IndexAllocator
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation.protobufReservedFieldIndexes
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names.NameRegistry
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference.textualReference
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.OneofBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.ProtobufTypeRef
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Max
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.buildReservedDeclarations
@@ -32,7 +31,8 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.oneof.OneofScope
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.reserved.ReservedScope
 
 internal class MessageBuilder(private val name: String) : MessageScope {
-    private val allocator = IndexAllocator(1, protobufReservedFieldIndexes)
+    private val allocator =
+        IndexAllocator(ProtobufNumberLimits.FIELD_MIN, ProtobufNumberLimits.FIELD_IMPLEMENTATION_RESERVED)
     private val nameRegistry = NameRegistry()
 
     private val fields = mutableMapOf<String, MessageField>()
@@ -109,7 +109,7 @@ internal class MessageBuilder(private val name: String) : MessageScope {
 
     override fun reserved(vararg indexRanges: IntRange) = indexRanges.forEach { allocator.reserve(it) }
 
-    override fun reserved(toMax: MaxRange) = allocator.reserve(toMax.from..Max.VALUE)
+    override fun reserved(toMax: MaxRange) = allocator.reserve(toMax.from..ProtobufNumberLimits.FIELD_MAX)
 
     override fun reserved(vararg names: String) = names.forEach { this.nameRegistry.reserve(it) }
 

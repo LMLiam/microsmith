@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Max
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.merge
 
 internal class IndexAllocator(
@@ -49,7 +49,7 @@ internal class IndexAllocator(
     }
 
     private fun validateReservable(index: Int) {
-        require(index in min..Max.VALUE) { "Invalid index: $index" }
+        require(index in min..ProtobufNumberLimits.FIELD_MAX) { "Invalid index: $index" }
         require(index !in used) { "Index $index already used" }
         require(reserved.none { index in it }) { "Index $index is in reserved range" }
     }

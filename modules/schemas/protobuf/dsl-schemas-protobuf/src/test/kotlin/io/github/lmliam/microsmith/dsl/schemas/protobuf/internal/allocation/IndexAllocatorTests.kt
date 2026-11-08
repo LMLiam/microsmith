@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Max
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -87,9 +87,9 @@ class IndexAllocatorTests :
             shouldThrow<IllegalArgumentException> { allocator.validate(4) }
         }
 
-        "validate throws for index above Max.VALUE" {
+        "validate throws for index above ProtobufNumberLimits.FIELD_MAX" {
             val allocator = IndexAllocator(min = 5)
-            shouldThrow<IllegalArgumentException> { allocator.validate(Max.VALUE + 1) }
+            shouldThrow<IllegalArgumentException> { allocator.validate(ProtobufNumberLimits.FIELD_MAX + 1) }
         }
 
         "validate throws for index in protoReserved range" {
