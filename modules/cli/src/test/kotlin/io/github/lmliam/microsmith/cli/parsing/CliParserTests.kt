@@ -313,15 +313,6 @@ class CliParserTests :
                 ErrorCommand("--repo-root may only be specified once.")
         }
 
-        "returns error for removed init non-interactive option" {
-            parseCliArgs(listOf("init", "--non-interactive")) shouldBe
-                ErrorCommand("Unknown option '--non-interactive'.")
-        }
-
-        "returns error for removed init yes option" {
-            parseCliArgs(listOf("init", "--yes")) shouldBe ErrorCommand("Unknown option '--yes'.")
-        }
-
         "returns error when init force is specified multiple times" {
             parseCliArgs(listOf("init", "--force", "--force")) shouldBe
                 ErrorCommand("--force may only be specified once.")

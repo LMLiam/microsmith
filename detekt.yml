@@ -12,6 +12,8 @@ complexity:
     allowedLines: 80
     excludes:
       - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
   LongParameterList:
     active: true
     allowedFunctionParameters: 6
@@ -80,6 +82,8 @@ performance:
     active: true
     excludes:
       - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
 
 potential-bugs:
   active: true
@@ -115,6 +119,8 @@ style:
     ignoreAnnotation: true
     excludes:
       - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
   MaxLineLength:
     active: true
     maxLineLength: 120
@@ -130,11 +136,15 @@ style:
     excludeGuardClauses: true
     excludes:
       - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
   ThrowsCount:
     active: true
     max: 2
     excludes:
       - '**/test/**'
+      - '**/integrationTest/**'
+      - '**/e2eTest/**'
   UnusedPrivateClass:
     active: true
   UnusedPrivateFunction:
