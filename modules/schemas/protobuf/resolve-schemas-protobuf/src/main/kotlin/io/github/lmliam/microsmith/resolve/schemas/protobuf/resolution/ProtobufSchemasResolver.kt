@@ -50,6 +50,7 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
                 }
 
         issues.addAll(findSymbolCollisions(protobufSchemas))
+        issues.addAll(findImportCycles(resolved))
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 

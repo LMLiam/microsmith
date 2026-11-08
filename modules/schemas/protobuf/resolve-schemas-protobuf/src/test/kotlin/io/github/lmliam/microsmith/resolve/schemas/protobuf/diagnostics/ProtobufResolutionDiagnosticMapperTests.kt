@@ -132,4 +132,14 @@ class ProtobufResolutionDiagnosticMapperTests :
                     message = "The global protobuf scope declares 'x' more than once: package 'x', type 'x'.",
                 )
         }
+
+        "maps a circular schema import with its path" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(ProtobufResolutionIssue.CircularSchemaImports(listOf("pkg.A", "pkg.B", "pkg.C"))) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.circular-schema-imports",
+                    message = "Protobuf schemas import each other in a cycle: pkg.A -> pkg.B -> pkg.C -> pkg.A.",
+                )
+        }
     })
