@@ -6,25 +6,23 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIs
 
 object ProtobufNameValidation {
     fun parseQualifiedName(value: String): Either<ProtobufResolutionIssue.InvalidSchemaName, List<ProtoIdentifier>> {
-        val normalized = value.trim()
-
-        if (normalized.isBlank()) {
+        if (value.isBlank()) {
             return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK)
         }
 
-        if (normalized.startsWith(".")) {
+        if (value.startsWith(".")) {
             return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT)
         }
 
-        if (normalized.endsWith(".")) {
+        if (value.endsWith(".")) {
             return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.TRAILING_DOT)
         }
 
-        if (normalized.any(Char::isWhitespace)) {
+        if (value.any(Char::isWhitespace)) {
             return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.WHITESPACE)
         }
 
-        val segments = normalized.split('.')
+        val segments = value.split('.')
 
         if (segments.any(String::isBlank)) {
             return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT)
