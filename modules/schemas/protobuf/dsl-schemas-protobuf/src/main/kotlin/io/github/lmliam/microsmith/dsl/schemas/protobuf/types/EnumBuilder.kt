@@ -11,17 +11,10 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.enum.EnumValueScop
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.reserved.ReservedScope
 
 internal class EnumBuilder(private val name: String) : EnumScope {
-    private val allocator = IndexAllocator(0)
+    private val allocator = IndexAllocator(min = 0, firstAutomatic = 1)
     private val nameRegistry = NameRegistry()
 
     private val values = mutableSetOf<EnumValue>()
-
-    init {
-        val defaultName = unspecifiedValueName(name)
-
-        nameRegistry.use(defaultName, "the default zero value of enum $name")
-        values += EnumValue(defaultName, allocator.allocate(0))
-    }
 
     override fun value(name: String, block: EnumValueScope.() -> Unit) {
         nameRegistry.validate(name)
@@ -47,7 +40,15 @@ internal class EnumBuilder(private val name: String) : EnumScope {
     fun build() =
         Enum(
             name = name,
-            values = values.sortedBy { it.index },
+            values = (values + defaultZeroValue()).sortedBy { it.index },
             reserved = buildReservedDeclarations(allocator, nameRegistry),
         )
+
+    private fun defaultZeroValue(): List<EnumValue> {
+        if (values.any { it.index == 0 } || allocator.reserved().any { 0 in it }) return emptyList()
+
+        val defaultName = unspecifiedValueName(name)
+        nameRegistry.validate(defaultName, "the default zero value of enum $name")
+        return listOf(EnumValue(defaultName, 0))
+    }
 }

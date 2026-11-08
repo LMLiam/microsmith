@@ -134,15 +134,83 @@ class EnumBuilderTests :
             builder.build().values.map { it.name } shouldContainExactly listOf("E_UNSPECIFIED", "FOO")
         }
 
-        "a value named like the default zero value is rejected as the default zero value" {
-            val builder = EnumBuilder("OrderStatus")
-            shouldThrow<IllegalArgumentException> { builder.value("ORDER_STATUS_UNSPECIFIED") }.message shouldContain
-                "default zero value"
+        "a value declared at index 0 replaces the default zero value" {
+            val builder = EnumBuilder("E")
+            builder.value("OK") { index(0) }
+            builder.value("FAILED")
+            val enum = builder.build()
+            enum.values.map { it.name } shouldContainExactly listOf("OK", "FAILED")
+            enum.values.map { it.index } shouldContainExactly listOf(0, 1)
         }
 
-        "a reserved name equal to the default zero value is rejected as the default zero value" {
+        "a value without an index never takes zero before an explicit zero is declared" {
+            val builder = EnumBuilder("E")
+            builder.value("FAILED")
+            builder.value("OK") { index(0) }
+            val enum = builder.build()
+            enum.values.map { it.name } shouldContainExactly listOf("OK", "FAILED")
+            enum.values.map { it.index } shouldContainExactly listOf(0, 1)
+        }
+
+        "values are sorted by index when the explicit zero is declared last" {
+            val builder = EnumBuilder("E")
+            builder.value("FAILED") { index(5) }
+            builder.value("OK") { index(0) }
+            builder.build().values.map { it.index } shouldContainExactly listOf(0, 5)
+        }
+
+        "the explicit zero value may use the name of the default zero value" {
             val builder = EnumBuilder("OrderStatus")
-            shouldThrow<IllegalArgumentException> { builder.reserved("ORDER_STATUS_UNSPECIFIED") }.message shouldContain
-                "default zero value"
+            builder.value("ORDER_STATUS_UNSPECIFIED") { index(0) }
+            builder.build().values.map { it.name } shouldContainExactly listOf("ORDER_STATUS_UNSPECIFIED")
+        }
+
+        "building twice produces the same enum" {
+            val builder = EnumBuilder("E")
+            builder.value("FOO")
+            builder.build() shouldBe builder.build()
+        }
+
+        "a value named like the default zero value is rejected when the default zero value is needed" {
+            val builder = EnumBuilder("OrderStatus")
+            builder.value("ORDER_STATUS_UNSPECIFIED") { index(5) }
+            shouldThrow<IllegalArgumentException> { builder.build() }.message shouldBe
+                "Name already used: ORDER_STATUS_UNSPECIFIED (the default zero value of enum OrderStatus)"
+        }
+
+        "a reserved name equal to the default zero value is rejected when the default zero value is needed" {
+            val builder = EnumBuilder("OrderStatus")
+            builder.reserved("ORDER_STATUS_UNSPECIFIED")
+            builder.value("FOO")
+            shouldThrow<IllegalArgumentException> { builder.build() }.message shouldBe
+                "Name already reserved: ORDER_STATUS_UNSPECIFIED (the default zero value of enum OrderStatus)"
+        }
+
+        "a reserved name equal to the default zero value is accepted when an explicit zero value exists" {
+            val builder = EnumBuilder("OrderStatus")
+            builder.reserved("ORDER_STATUS_UNSPECIFIED")
+            builder.value("OK") { index(0) }
+            builder.build().values.map { it.name } shouldContainExactly listOf("OK")
+        }
+
+        "reserving index 0 without declaring a zero value generates no default zero value" {
+            val builder = EnumBuilder("E")
+            builder.reserved(0)
+            builder.value("FOO")
+            val enum = builder.build()
+            enum.values.map { it.name } shouldContainExactly listOf("FOO")
+            enum.values.map { it.index } shouldContainExactly listOf(1)
+        }
+
+        "a value cannot take index 0 once it is reserved" {
+            val builder = EnumBuilder("E")
+            builder.reserved(0)
+            shouldThrow<IllegalArgumentException> { builder.value("OK") { index(0) } }
+        }
+
+        "index 0 cannot be reserved once a value declared it" {
+            val builder = EnumBuilder("E")
+            builder.value("OK") { index(0) }
+            shouldThrow<IllegalArgumentException> { builder.reserved(0) }
         }
     })

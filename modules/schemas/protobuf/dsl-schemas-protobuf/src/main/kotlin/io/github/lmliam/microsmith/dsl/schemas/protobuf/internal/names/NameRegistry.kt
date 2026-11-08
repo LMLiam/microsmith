@@ -1,16 +1,16 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names
 
 internal class NameRegistry {
-    private val used = mutableMapOf<String, String?>()
+    private val used = mutableSetOf<String>()
     private val reserved = mutableSetOf<String>()
 
     fun reserved() = reserved.toSet()
 
-    fun used() = used.keys.toSet()
+    fun used() = used.toSet()
 
-    fun use(name: String, explanation: String? = null) {
+    fun use(name: String) {
         validate(name)
-        used[name] = explanation
+        used += name
     }
 
     fun reserve(name: String) {
@@ -18,9 +18,11 @@ internal class NameRegistry {
         reserved += name
     }
 
-    fun validate(name: String) {
+    fun validate(name: String, explanation: String? = null) {
         require(name.isNotBlank()) { "Name cannot be blank." }
-        require(name !in reserved) { "Name already reserved: $name" }
-        require(name !in used) { "Name already used: $name${used[name]?.let { " ($it)" }.orEmpty()}" }
+        require(name !in reserved) { "Name already reserved: $name${explanation.asSuffix()}" }
+        require(name !in used) { "Name already used: $name${explanation.asSuffix()}" }
     }
+
+    private fun String?.asSuffix() = this?.let { " ($it)" }.orEmpty()
 }
