@@ -8,8 +8,8 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
-import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersion
-import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersion
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
 

@@ -5,10 +5,10 @@ import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension

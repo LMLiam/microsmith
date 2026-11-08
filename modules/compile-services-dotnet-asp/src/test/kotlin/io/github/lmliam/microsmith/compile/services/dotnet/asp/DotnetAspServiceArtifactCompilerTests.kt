@@ -1,18 +1,18 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspEndpointBindingsArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeaderFieldArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspHeadersBindingArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspModelLocality
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestBindingArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspRequestFieldArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspResponseHeaderArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifactId
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointBindingsArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelLocality
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeaderFieldArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeadersBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestFieldArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseHeaderArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
@@ -78,6 +78,10 @@ class DotnetAspServiceArtifactCompilerTests :
             controller.contents.shouldContain(
                 "CreateUserCreated response => Respond(" +
                     "response.Body, 201, (\"Location\", response.Location))",
+            )
+            controller.contents.shouldContain(
+                """_ => throw new InvalidOperationException($"Unsupported GetUser result type """ +
+                    """'{result.GetType().FullName}'.")""",
             )
             controller.contents.shouldNotContain("X-Microsmith-Response-Status")
             controller.contents.shouldNotContain("sample-location")
