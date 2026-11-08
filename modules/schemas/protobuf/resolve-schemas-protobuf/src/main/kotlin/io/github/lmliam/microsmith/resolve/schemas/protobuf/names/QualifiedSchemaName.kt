@@ -27,6 +27,13 @@ private constructor(
             is Reference.Symbolic -> parse(reference.target.qualifiedName)
         }
 
+    internal fun withTypeName(typeName: ProtoIdentifier): QualifiedSchemaName =
+        QualifiedSchemaName(
+            fullyQualifiedName = packageName?.let { "$it.$typeName" } ?: typeName.value,
+            packageName = packageName,
+            typeName = typeName,
+        )
+
     fun relativePath(): java.nio.file.Path = buildRelativePath(prefix = Path("proto"))
 
     fun buildRelativePath(prefix: java.nio.file.Path): java.nio.file.Path =

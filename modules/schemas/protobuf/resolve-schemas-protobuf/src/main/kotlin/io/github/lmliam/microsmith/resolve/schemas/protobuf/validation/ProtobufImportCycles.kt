@@ -1,24 +1,20 @@
-package io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution
+package io.github.lmliam.microsmith.resolve.schemas.protobuf.validation
 
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchema
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
-internal fun findImportCycles(
-    schemas: List<ResolvedProtobufSchema>
-): List<ProtobufResolutionIssue.CircularSchemaImports> {
+internal fun findImportCycles(nodes: List<SchemaNode>): List<List<String>> {
     val graph =
         ImportGraph(
-            schemas.associate { schema ->
-                schema.identity.fullyQualifiedName to
-                    schema.dependencies.map(QualifiedSchemaName::fullyQualifiedName).sorted()
+            nodes.associate { node ->
+                node.identity.fullyQualifiedName to
+                    node.dependencies.map(QualifiedSchemaName::fullyQualifiedName).sorted()
             }
         )
 
     return graph.files
         .map { file -> file to graph.shortestCycleThrough(file) }
         .filter { (file, cycle) -> cycle.isNotEmpty() && file == graph.mutuallyReachableWith(file).min() }
-        .map { (_, cycle) -> ProtobufResolutionIssue.CircularSchemaImports(cycle) }
+        .map { (_, cycle) -> cycle }
 }
 
 private class ImportGraph(declaredImports: Map<String, List<String>>) {

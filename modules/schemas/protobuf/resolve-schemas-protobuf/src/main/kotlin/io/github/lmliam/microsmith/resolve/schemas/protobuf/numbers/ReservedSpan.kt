@@ -9,7 +9,7 @@ import arrow.core.raise.context.zipOrAccumulate
 import arrow.core.toEitherNel
 
 @ConsistentCopyVisibility
-data class ReservedSpan private constructor(val first: Int, val last: Int, private val form: Form) {
+data class ReservedSpan private constructor(val first: Int, val last: Int, val domain: Domain, private val form: Form) {
     val notation: String
         get() =
             when (form) {
@@ -18,7 +18,10 @@ data class ReservedSpan private constructor(val first: Int, val last: Int, priva
                 Form.TO_MAX -> "$first to max"
             }
 
-    operator fun contains(number: Int): Boolean = number in first..last
+    val numbers: IntRange
+        get() = first..last
+
+    operator fun contains(number: Int): Boolean = number in numbers
 
     enum class Domain(val min: Int, val max: Int) {
         MESSAGE(FieldNumber.MIN_VALUE, FieldNumber.MAX_VALUE),
@@ -39,7 +42,7 @@ data class ReservedSpan private constructor(val first: Int, val last: Int, priva
 
     companion object {
         fun single(number: Int, domain: Domain): EitherNel<Rejection, ReservedSpan> =
-            inDomain(number, domain).map { ReservedSpan(number, number, Form.SINGLE) }.toEitherNel()
+            inDomain(number, domain).map { ReservedSpan(number, number, domain, Form.SINGLE) }.toEitherNel()
 
         fun range(first: Int, last: Int, domain: Domain): EitherNel<Rejection, ReservedSpan> =
             if (first > last) {
@@ -47,13 +50,13 @@ data class ReservedSpan private constructor(val first: Int, val last: Int, priva
             } else {
                 either {
                     zipOrAccumulate({ inDomain(first, domain).bind() }, { inDomain(last, domain).bind() }) { _, _ ->
-                        ReservedSpan(first, last, Form.RANGE)
+                        ReservedSpan(first, last, domain, Form.RANGE)
                     }
                 }
             }
 
         fun toMax(first: Int, domain: Domain): EitherNel<Rejection, ReservedSpan> =
-            inDomain(first, domain).map { ReservedSpan(first, domain.max, Form.TO_MAX) }.toEitherNel()
+            inDomain(first, domain).map { ReservedSpan(first, domain.max, domain, Form.TO_MAX) }.toEitherNel()
 
         private fun inDomain(number: Int, domain: Domain): Either<Rejection, Int> =
             if (number in domain.min..domain.max) {

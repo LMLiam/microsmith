@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution
 
 import arrow.core.EitherNel
+import arrow.core.NonEmptyList
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.context.bind
@@ -28,6 +29,8 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufRejection
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchema
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
@@ -37,12 +40,13 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.ParsedOneof
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseEnumDeclaration
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseMessageDeclaration
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.toIssue
 
 internal class ProtobufDeclarationResolver(private val referenceResolver: ProtobufReferenceResolver) {
     fun resolveMessage(
         identity: QualifiedSchemaName,
         message: Message,
-    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
+    ): EitherNel<ProtobufResolutionIssue, SchemaDraft> = either {
         with(identity) {
             val declaration =
                 zipOrAccumulate(
@@ -52,7 +56,7 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                     { resolveFields(message) },
                     { resolveOneofs(message) },
                 ) { name, parsed, _, fields, oneofs ->
-                    ResolvedProtobufMessage(
+                    DeclarationDraft.OfMessage(
                         name,
                         parsed.fields.buildEach(fields),
                         parsed.oneofs.buildEach(oneofs),
@@ -60,29 +64,32 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                     )
                 }
 
-            schemaFor(declaration)
+            SchemaDraft(identity, declaration)
         }
     }
 
     fun resolveEnum(
         identity: QualifiedSchemaName,
         enumDeclaration: Enum,
-    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
+    ): EitherNel<ProtobufResolutionIssue, SchemaDraft> = either {
         with(identity) {
-            val declaration =
+            val (name, parsed) =
                 zipOrAccumulate(
                     { declarationName(enumDeclaration.name) },
                     { parseEnumDeclaration(identity.fullyQualifiedName, enumDeclaration).bindNel() },
                     { checkTypeName(enumDeclaration) },
                 ) { name, parsed, _ ->
-                    ResolvedProtobufEnum(
-                        name,
-                        parsed.values.map { ResolvedProtobufEnumValue(it.name, it.number) },
-                        parsed.reservations,
-                    )
+                    name to parsed
                 }
 
-            schemaFor(declaration)
+            SchemaDraft(
+                identity,
+                DeclarationDraft.OfEnum(
+                    name,
+                    parsed.values.map { ResolvedProtobufEnumValue(it.name, it.number) },
+                    parsed.reservations,
+                ),
+            )
         }
     }
 
@@ -140,7 +147,7 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
     private fun resolveOneof(oneof: Oneof): (ParsedOneof) -> ResolvedProtobufOneof {
         val fields = oneof.fields.mapOrAccumulate { resolveOneofField(oneof, it) }
 
-        return { parsed -> ResolvedProtobufOneof(parsed.name, parsed.fields.buildEach(fields)) }
+        return { parsed -> ResolvedProtobufOneof(parsed.name, parsed.fields.buildEachNonEmpty(fields)) }
     }
 
     context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
@@ -164,15 +171,6 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
 
             is Reference -> ResolvedProtobufValueType.Reference(referenceResolver.resolve(value, location).bind())
         }
-
-    context(identity: QualifiedSchemaName)
-    private fun schemaFor(declaration: ResolvedProtobufDeclaration): ResolvedProtobufSchema =
-        ResolvedProtobufSchema(
-            identity,
-            declaration,
-            dependencies =
-                declaration.referencedSchemas().filter { it != identity }.distinct().sortedBy { it.fullyQualifiedName },
-        )
 }
 
 private typealias FieldBuilder = (ParsedField) -> ResolvedProtobufField
@@ -180,22 +178,7 @@ private typealias FieldBuilder = (ParsedField) -> ResolvedProtobufField
 private fun <P, R> List<P>.buildEach(builders: List<(P) -> R>): List<R> =
     zip(builders) { parsed, build -> build(parsed) }
 
-private fun ResolvedProtobufDeclaration.referencedSchemas(): List<QualifiedSchemaName> =
-    when (this) {
-        is ResolvedProtobufMessage -> messageReferences()
-        is ResolvedProtobufEnum -> emptyList()
+private fun <P, R> NonEmptyList<P>.buildEachNonEmpty(builders: List<(P) -> R>): NonEmptyList<R> =
+    mapIndexed { index, parsed ->
+        builders[index](parsed)
     }
-
-private fun ResolvedProtobufMessage.messageReferences(): List<QualifiedSchemaName> =
-    fields.flatMap { field ->
-        when (field) {
-            is ResolvedProtobufField.Scalar -> emptyList()
-
-            is ResolvedProtobufField.Reference -> listOf(field.reference.target)
-
-            is ResolvedProtobufField.Map -> listOfNotNull(field.value.referencedSchema())
-        }
-    } + oneofs.flatMap { oneof -> oneof.fields.mapNotNull { it.type.referencedSchema() } }
-
-private fun ResolvedProtobufValueType.referencedSchema(): QualifiedSchemaName? =
-    (this as? ResolvedProtobufValueType.Reference)?.reference?.target
