@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf
-
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.kotest.assertions.throwables.shouldThrow

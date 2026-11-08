@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
-
 internal data class ReservedUsageOwner(val kind: Kind, val name: String) {
     val displayName: String
         get() = kind.displayName

@@ -69,9 +69,9 @@ class RuntimeScriptingPlugin : Plugin<Project> {
         val runtimeScriptingShadowJarExpectedProviders = mapOf(
             "META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver" to
                 listOf(
-                    "io.github.lmliam.microsmith.resolve.schemas.core.SchemasResolver",
-                    "io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufSchemasResolver",
-                    "io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcSchemasResolver",
+                    "io.github.lmliam.microsmith.resolve.schemas.SchemasResolver",
+                    "io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufSchemasResolver",
+                    "io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.resolution.ProtobufRpcSchemasResolver",
                     "io.github.lmliam.microsmith.resolve.services.core.ServicesResolver",
                     "io.github.lmliam.microsmith.resolve.services.dotnet.DotnetWorkspaceDomainResolver",
                     "io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspaceDomainResolver",
@@ -79,7 +79,7 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                 ),
             "META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor" to
                 listOf(
-                    "io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtobufArtifactContributor",
+                    "io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution.ProtobufArtifactContributor",
                     "io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcArtifactContributor",
                     "io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspArtifactContributor",
                     "io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageArtifactContributor",
@@ -88,7 +88,7 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                 listOf(
                     "io.github.lmliam.microsmith.artifact.files.BinaryFileArtifactAssembler",
                     "io.github.lmliam.microsmith.artifact.files.TextFileArtifactAssembler",
-                    "io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifactAssembler",
+                    "io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly.ProtoFileArtifactAssembler",
                     "io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifactAssembler",
                     "io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspServiceArtifactAssembler",
                     "io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactAssembler",

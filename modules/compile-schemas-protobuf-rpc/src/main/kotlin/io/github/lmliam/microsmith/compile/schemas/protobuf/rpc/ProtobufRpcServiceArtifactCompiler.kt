@@ -3,9 +3,9 @@ package io.github.lmliam.microsmith.compile.schemas.protobuf.rpc
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoDeclaration
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifactId
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileContribution
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution.ProtoFileContribution
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoDeclaration
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifactId
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifactId
 import io.github.lmliam.microsmith.compile.ArtifactCompiler

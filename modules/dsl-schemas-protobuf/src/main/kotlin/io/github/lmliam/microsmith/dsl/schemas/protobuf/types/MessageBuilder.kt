@@ -1,38 +1,41 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.types
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.MapFieldScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.MessageScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.OneofScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.ReferenceFieldScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.ReservedScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.ScalarFieldScope
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Cardinality
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.CardinalityField
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Field
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapFieldBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapType
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MessageField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceFieldBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarFieldBuilder
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.withCardinality
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation.IndexAllocator
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation.protobufReservedFieldIndexes
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names.NameRegistry
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference.textualReference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.OneofBuilder
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.ProtobufTypeRef
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Max
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.buildReservedDeclarations
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.IndexAllocator
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.NameRegistry
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.getReferencePath
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.MapFieldScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.ReferenceFieldScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.ScalarFieldScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.message.MessageScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.oneof.OneofScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.reserved.ReservedScope
 
-internal class MessageBuilder(private val name: String, private val segments: List<String>) : MessageScope {
-    private val allocator = IndexAllocator(1, protoReservedIndexes)
+internal class MessageBuilder(private val name: String) : MessageScope {
+    private val allocator = IndexAllocator(1, protobufReservedFieldIndexes)
     private val nameRegistry = NameRegistry()
 
-    private val fields = mutableMapOf<String, Field>()
+    private val fields = mutableMapOf<String, MessageField>()
     private val oneofs = mutableSetOf<Oneof>()
 
     fun build() = Message(
@@ -64,8 +67,7 @@ internal class MessageBuilder(private val name: String, private val segments: Li
         val builder =
             OneofBuilder(
                 name,
-                segments,
-                ::allocateIndex,
+                allocator::allocate,
                 nameRegistry::use,
             ).apply(block)
 
@@ -76,29 +78,30 @@ internal class MessageBuilder(private val name: String, private val segments: Li
         require(name.isNotBlank()) { "Field name cannot be blank" }
         nameRegistry.validate(name)
 
-        val builder = MapFieldBuilder(segments).apply(block)
+        val builder = MapFieldBuilder().apply(block)
 
         val key = requireNotNull(builder.key) { "Map key type must be set" }
         val value = requireNotNull(builder.value) { "Map value type must be set" }
 
-        val index = allocateIndex(builder.index)
+        val index = allocator.allocate(builder.index)
         nameRegistry.use(name)
 
         return MapField(name, index, MapType(key, value)).also { fields[name] = it }
     }
 
-    override fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit): ReferenceField {
-        nameRegistry.use(name)
+    override fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit): ReferenceField =
+        addReference(
+            name,
+            textualReference(target),
+            block,
+        )
 
-        val fqName = getReferencePath(segments, target).joinToString(".")
-
-        val (cardinality, index) =
-            ReferenceFieldBuilder()
-                .apply(block)
-                .let { it.cardinality to allocateIndex(it.index) }
-
-        return ReferenceField(name, index, Reference(fqName), cardinality).also { fields[name] = it }
-    }
+    override fun ref(name: String, target: ProtobufTypeRef, block: ReferenceFieldScope.() -> Unit): ReferenceField =
+        addReference(
+            name,
+            Reference.Symbolic(target),
+            block,
+        )
 
     override fun reserved(vararg indexes: Int) = indexes.forEach { allocator.reserve(it..it) }
 
@@ -146,7 +149,29 @@ internal class MessageBuilder(private val name: String, private val segments: Li
 
     override fun bool(name: String, block: ScalarFieldScope.() -> Unit) = addField(name, PrimitiveType.BOOL, block)
 
-    private fun allocateIndex(idx: Int? = null): Int = allocator.allocate(idx)
+    private fun addReference(
+        name: String,
+        reference: Reference,
+        block: ReferenceFieldScope.() -> Unit,
+    ): ReferenceField {
+        nameRegistry.use(name)
+
+        val (cardinality, index) =
+            ReferenceFieldBuilder()
+                .apply(block)
+                .let { builder ->
+                    builder.cardinality to allocator.allocate(builder.index)
+                }
+
+        return ReferenceField(
+            name,
+            index,
+            reference,
+            cardinality,
+        ).also { field ->
+            fields[name] = field
+        }
+    }
 
     private fun addField(name: String, type: PrimitiveType, block: ScalarFieldScope.() -> Unit): ScalarField {
         nameRegistry.use(name)
@@ -154,22 +179,7 @@ internal class MessageBuilder(private val name: String, private val segments: Li
         return ScalarFieldBuilder()
             .apply(block)
             .let { builder ->
-                ScalarField(name, allocateIndex(builder.index), type, builder.cardinality)
+                ScalarField(name, allocator.allocate(builder.index), type, builder.cardinality)
             }.also { field -> fields[name] = field }
-    }
-
-    private fun CardinalityField.withCardinality(cardinality: Cardinality): CardinalityField {
-        require(this.cardinality == Cardinality.REQUIRED) {
-            "Field cardinality already set to ${this.cardinality}"
-        }
-
-        return when (this) {
-            is ReferenceField -> copy(cardinality = cardinality)
-            is ScalarField -> copy(cardinality = cardinality)
-        }
-    }
-
-    companion object {
-        private val protoReservedIndexes = 19_000..19_999
     }
 }

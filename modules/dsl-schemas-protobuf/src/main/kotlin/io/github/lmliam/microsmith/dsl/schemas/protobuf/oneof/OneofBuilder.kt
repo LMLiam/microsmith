@@ -1,32 +1,36 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.OneofFieldScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.OneofReferenceFieldScope
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.OneofScope
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofFieldBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceFieldBuilder
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.support.getReferencePath
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference.textualReference
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.ProtobufTypeRef
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.OneofFieldScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.OneofReferenceFieldScope
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.oneof.OneofScope
 
 internal class OneofBuilder(
     private val name: String,
-    private val segments: List<String>,
     private val allocateIndex: (Int?) -> Int,
     private val useName: (String) -> Unit,
 ) : OneofScope {
     private val fields = mutableMapOf<String, OneofField>()
 
-    override fun ref(name: String, target: String, block: OneofReferenceFieldScope.() -> Unit): OneofField {
-        useName(name)
+    override fun ref(name: String, target: String, block: OneofReferenceFieldScope.() -> Unit): OneofField =
+        addReference(
+            name,
+            textualReference(target),
+            block,
+        )
 
-        val fqName = getReferencePath(segments, target).joinToString(".")
-
-        val index = allocateIndex(ReferenceFieldBuilder().apply(block).index)
-
-        return OneofField(name, index, Reference(fqName)).also { fields[name] = it }
-    }
+    override fun ref(name: String, target: ProtobufTypeRef, block: OneofReferenceFieldScope.() -> Unit): OneofField =
+        addReference(
+            name,
+            Reference.Symbolic(target),
+            block,
+        )
 
     override fun int32(name: String, block: OneofFieldScope.() -> Unit): OneofField =
         addField(name, PrimitiveType.INT32, block)
@@ -72,6 +76,33 @@ internal class OneofBuilder(
 
     override fun bool(name: String, block: OneofFieldScope.() -> Unit): OneofField =
         addField(name, PrimitiveType.BOOL, block)
+
+    private fun addReference(
+        name: String,
+        reference: Reference,
+        block: OneofReferenceFieldScope.() -> Unit,
+    ): OneofField {
+        require(name !in fields) {
+            "Duplicate field in oneof: $name"
+        }
+
+        useName(name)
+
+        val index =
+            allocateIndex(
+                ReferenceFieldBuilder()
+                    .apply(block)
+                    .index,
+            )
+
+        return OneofField(
+            name,
+            index,
+            reference,
+        ).also { field ->
+            fields[name] = field
+        }
+    }
 
     private fun addField(name: String, type: PrimitiveType, block: OneofFieldScope.() -> Unit): OneofField {
         require(name !in fields) { "Duplicate field in oneof: $name" }

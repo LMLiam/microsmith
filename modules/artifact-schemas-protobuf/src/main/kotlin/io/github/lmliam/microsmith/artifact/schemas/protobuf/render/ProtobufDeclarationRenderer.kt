@@ -1,27 +1,29 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+private const val INDENT = "  "
 
-internal object ProtobufDeclarationRenderer {
-    private const val INDENT = "  "
+internal fun renderDeclaration(message: ResolvedProtobufMessage): String = buildString {
+    appendLine("message ${message.name} {")
 
-    fun render(message: Message): String = buildString {
-        appendLine("message ${message.name} {")
-        ProtobufReservedSectionRenderer.render(message)?.let { appendIndentedLine(it) }
-        message.fields.forEach { appendIndentedLine(ProtobufFieldRenderer.render(it)) }
-        message.oneofs.forEach { appendIndentedLine(ProtobufFieldRenderer.render(it)) }
-        append("}")
-    }
+    ProtobufReservedSectionRenderer.render(message.reservations)?.let { appendIndentedLine(it) }
 
-    fun render(enum: Enum): String = buildString {
-        appendLine("enum ${enum.name} {")
-        ProtobufReservedSectionRenderer.render(enum)?.let { appendLine(it.prependIndent(INDENT)) }
-        enum.values.forEach { appendLine(ProtobufFieldRenderer.render(it).prependIndent(INDENT)) }
-        append("}")
-    }
+    message.fields.forEach { appendIndentedLine(ProtobufFieldRenderer.render(it)) }
+    message.oneofs.forEach { appendIndentedLine(ProtobufFieldRenderer.render(it)) }
 
-    private fun StringBuilder.appendIndentedLine(value: String) {
-        appendLine(value.prependIndent(INDENT))
-    }
+    append("}")
+}
+
+internal fun renderDeclaration(enum: ResolvedProtobufEnum): String = buildString {
+    appendLine("enum ${enum.name} {")
+
+    ProtobufReservedSectionRenderer.render(enum.reservations)?.let { appendLine(it.prependIndent(INDENT)) }
+    enum.values.forEach { appendLine(ProtobufFieldRenderer.render(it).prependIndent(INDENT)) }
+
+    append("}")
+}
+
+private fun StringBuilder.appendIndentedLine(value: String) {
+    appendLine(value.prependIndent(INDENT))
 }

@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.compile.schemas.protobuf.integration
 
 import io.github.lmliam.microsmith.dsl.microsmith
-import io.github.lmliam.microsmith.dsl.schemas.core.schemas
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
+import io.github.lmliam.microsmith.dsl.schemas.schemas
 import io.github.lmliam.microsmith.gen.files.TemporaryDirectory
 import io.github.lmliam.microsmith.gen.generateTo
 import io.kotest.core.spec.style.StringSpec
