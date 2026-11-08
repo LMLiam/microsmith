@@ -11,6 +11,9 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkSpan
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueFieldNames
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueFieldNumbers
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueOneofNames
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findJsonNameCollisions
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findMessageSymbolCollisions
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.rejectAll
 
 @ConsistentCopyVisibility
 data class ResolvedProtobufMessage
@@ -33,6 +36,7 @@ private constructor(
                 ownFields.map { it.name.value to it.number.value } +
                     ownOneofs.flatMap { oneof -> oneof.fields.map { it.name.value to it.number.value } }
             val memberNames = members.map { it.first }
+            val mapFieldNames = ownFields.filterIsInstance<ResolvedProtobufField.Map>().map { it.name.value }
             val memberNumbers = members.map { it.second }
 
             zipOrAccumulate(
@@ -42,7 +46,9 @@ private constructor(
                 { checkNoReservedNameUse(reservations.names.map(ProtoIdentifier::value), memberNames) },
                 { checkNoReservedNumberUse(reservations.spans.map(ReservedSpan::numbers), memberNumbers) },
                 { checkSpansReachFieldNumbers(reservations.spans) },
-            ) { _, _, _, _, _, _ ->
+                { rejectAll(findJsonNameCollisions(memberNames)) },
+                { rejectAll(findMessageSymbolCollisions(memberNames, ownOneofs.map { it.name.value }, mapFieldNames)) },
+            ) { _, _, _, _, _, _, _, _ ->
                 ResolvedProtobufMessage(name, ownFields, ownOneofs, reservations)
             }
         }

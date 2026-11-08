@@ -20,6 +20,16 @@ internal fun ResolvedProtobufRejection.toIssue(schemaName: String): ProtobufReso
         is ResolvedProtobufRejection.DuplicateOneofNames ->
             ProtobufResolutionIssue.DuplicateOneofNames(schemaName, names)
 
+        is ResolvedProtobufRejection.FieldJsonNameCollision ->
+            ProtobufResolutionIssue.FieldJsonNameCollision(schemaName, jsonName, fieldNames)
+
+        is ResolvedProtobufRejection.MessageSymbolCollision ->
+            ProtobufResolutionIssue.SymbolNameCollision(
+                scope = schemaName,
+                name = name,
+                declarations = declarations.map { it.declaredIn(schemaName) },
+            )
+
         is ResolvedProtobufRejection.EnumFirstValueMustBeZero ->
             ProtobufResolutionIssue.EnumFirstValueMustBeZero(schemaName, firstValueName, number)
 
@@ -28,6 +38,9 @@ internal fun ResolvedProtobufRejection.toIssue(schemaName: String): ProtobufReso
 
         is ResolvedProtobufRejection.DuplicateEnumValueNumbers ->
             ProtobufResolutionIssue.DuplicateEnumValueNumbers(schemaName, numbers)
+
+        is ResolvedProtobufRejection.EnumValueNameCollision ->
+            ProtobufResolutionIssue.EnumValueNameCollision(schemaName, valueNames)
 
         is ResolvedProtobufRejection.DuplicateReservedNames ->
             ProtobufResolutionIssue.DuplicateReservedNames(schemaName, names)
@@ -47,4 +60,18 @@ internal fun ResolvedProtobufRejection.toIssue(schemaName: String): ProtobufReso
                 ProtobufResolutionIssue.FieldLocation.Reservation(notation),
                 number,
             )
+    }
+
+internal fun ResolvedProtobufRejection.MessageSymbol.declaredIn(
+    schemaName: String
+): ProtobufResolutionIssue.SymbolDeclaration =
+    when (this) {
+        is ResolvedProtobufRejection.MessageSymbol.Field ->
+            ProtobufResolutionIssue.SymbolDeclaration.Field(schemaName, fieldName)
+
+        is ResolvedProtobufRejection.MessageSymbol.Oneof ->
+            ProtobufResolutionIssue.SymbolDeclaration.Oneof(schemaName, oneofName)
+
+        is ResolvedProtobufRejection.MessageSymbol.MapEntry ->
+            ProtobufResolutionIssue.SymbolDeclaration.MapEntry(schemaName, fieldName)
     }

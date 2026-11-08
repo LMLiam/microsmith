@@ -7,6 +7,9 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.toIssue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findEnumValueNameCollisions
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findJsonNameCollisions
 
 internal fun findNameConflicts(schemas: List<ProtobufSchema>): List<ProtobufResolutionIssue> =
     schemas.sortedBy(ProtobufSchema::name).flatMap(::nameConflictsOf)
@@ -26,50 +29,13 @@ private fun nameConflictsOf(schema: ProtobufSchema): List<ProtobufResolutionIssu
             },
         )
 
-private fun fieldJsonNameCollisions(
-    schemaName: String,
-    message: Message,
-): List<ProtobufResolutionIssue.FieldJsonNameCollision> =
-    (message.fields + message.oneofs.flatMap(Oneof::fields))
-        .map(Field::name)
-        .filter(::isIdentifier)
-        .distinct()
-        .groupBy(::defaultJsonName)
-        .filterValues { it.size > 1 }
-        .map { (jsonName, fieldNames) ->
-            ProtobufResolutionIssue.FieldJsonNameCollision(schemaName, jsonName, fieldNames)
-        }
+private fun fieldJsonNameCollisions(schemaName: String, message: Message): List<ProtobufResolutionIssue> =
+    findJsonNameCollisions(
+            (message.fields + message.oneofs.flatMap(Oneof::fields)).map(Field::name).filter(::isIdentifier)
+        )
+        .map { it.toIssue(schemaName) }
 
-private fun defaultJsonName(fieldName: String): String = fieldName.underscoresToCamelCase(capitalizeFirst = false)
-
-private fun enumValueNameCollisions(
-    identity: QualifiedSchemaName,
-    enum: Enum,
-): List<ProtobufResolutionIssue.EnumValueNameCollision> =
-    enum.values
-        .map { it.name }
-        .filter(::isIdentifier)
-        .distinct()
-        .groupBy { enumValueKey(identity.typeName.value, it) }
-        .filterValues { it.size > 1 }
-        .map { (_, valueNames) ->
-            ProtobufResolutionIssue.EnumValueNameCollision(identity.fullyQualifiedName, valueNames)
-        }
-
-private fun enumValueKey(enumName: String, valueName: String): String =
-    withoutEnumPrefix(enumName, valueName).split('_').joinToString("") {
-        it.lowercase().replaceFirstChar(Char::uppercaseChar)
+private fun enumValueNameCollisions(identity: QualifiedSchemaName, enum: Enum): List<ProtobufResolutionIssue> =
+    findEnumValueNameCollisions(identity.typeName.value, enum.values.map { it.name }.filter(::isIdentifier)).map {
+        it.toIssue(identity.fullyQualifiedName)
     }
-
-private fun withoutEnumPrefix(enumName: String, valueName: String): String {
-    val prefix = enumName.filter { it != '_' }.lowercase()
-    val prefixLetters = valueName.withIndex().filter { it.value != '_' }.take(prefix.length)
-    val startsWithPrefix =
-        prefixLetters.size == prefix.length && prefixLetters.joinToString("") { it.value.lowercase() } == prefix
-
-    if (!startsWithPrefix) return valueName
-
-    val remainder = valueName.substring(prefixLetters.lastOrNull()?.let { it.index + 1 } ?: 0).trimStart('_')
-
-    return remainder.ifEmpty { valueName }
-}

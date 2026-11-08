@@ -132,6 +132,81 @@ class ResolvedProtobufMessageTests :
                 )
         }
 
+        "rejects field names that share a JSON name" {
+            messageOf(fields = listOf(scalar("foo_bar", 1), scalar("fooBar", 2))) shouldBe
+                rejection(ResolvedProtobufRejection.FieldJsonNameCollision("fooBar", listOf("foo_bar", "fooBar")))
+        }
+
+        "rejects a oneof field and a map field that share a JSON name" {
+            messageOf(fields = listOf(map("foo_bar", 1)), oneofs = listOf(oneof("channel", "fooBar" to 2))) shouldBe
+                rejection(ResolvedProtobufRejection.FieldJsonNameCollision("fooBar", listOf("foo_bar", "fooBar")))
+        }
+
+        "reports each JSON name that several field names share" {
+            messageOf(fields = listOf(scalar("a_b", 1), scalar("aB", 2), scalar("c_d", 3), scalar("cD", 4))) shouldBe
+                rejection(
+                    ResolvedProtobufRejection.FieldJsonNameCollision("aB", listOf("a_b", "aB")),
+                    ResolvedProtobufRejection.FieldJsonNameCollision("cD", listOf("c_d", "cD")),
+                )
+        }
+
+        "rejects a oneof named like a field" {
+            messageOf(fields = listOf(scalar("x", 1)), oneofs = listOf(oneof("x", "y" to 2))) shouldBe
+                rejection(
+                    ResolvedProtobufRejection.MessageSymbolCollision(
+                        "x",
+                        listOf(
+                            ResolvedProtobufRejection.MessageSymbol.Field("x"),
+                            ResolvedProtobufRejection.MessageSymbol.Oneof("x"),
+                        ),
+                    )
+                )
+        }
+
+        "rejects a field named like the entry message of a map field" {
+            messageOf(fields = listOf(map("foo", 1), scalar("FooEntry", 2))) shouldBe
+                rejection(
+                    ResolvedProtobufRejection.MessageSymbolCollision(
+                        "FooEntry",
+                        listOf(
+                            ResolvedProtobufRejection.MessageSymbol.Field("FooEntry"),
+                            ResolvedProtobufRejection.MessageSymbol.MapEntry("foo"),
+                        ),
+                    )
+                )
+        }
+
+        "rejects a oneof named like the entry message of a map field" {
+            messageOf(fields = listOf(map("foo", 1)), oneofs = listOf(oneof("FooEntry", "y" to 2))) shouldBe
+                rejection(
+                    ResolvedProtobufRejection.MessageSymbolCollision(
+                        "FooEntry",
+                        listOf(
+                            ResolvedProtobufRejection.MessageSymbol.Oneof("FooEntry"),
+                            ResolvedProtobufRejection.MessageSymbol.MapEntry("foo"),
+                        ),
+                    )
+                )
+        }
+
+        "rejects two map fields that synthesise the same entry message name" {
+            messageOf(fields = listOf(map("foo_bar", 1), map("fooBar", 2))) shouldBe
+                rejection(
+                    ResolvedProtobufRejection.FieldJsonNameCollision("fooBar", listOf("foo_bar", "fooBar")),
+                    ResolvedProtobufRejection.MessageSymbolCollision(
+                        "FooBarEntry",
+                        listOf(
+                            ResolvedProtobufRejection.MessageSymbol.MapEntry("foo_bar"),
+                            ResolvedProtobufRejection.MessageSymbol.MapEntry("fooBar"),
+                        ),
+                    ),
+                )
+        }
+
+        "accepts a field whose name differs from a map entry name only by case" {
+            messageOf(fields = listOf(map("foo", 1), scalar("fooEntry", 2))).isRight() shouldBe true
+        }
+
         "reports every rejection in the order the resolver reports issues" {
             messageOf(
                 fields = listOf(scalar("a", 1), scalar("a", 1)),

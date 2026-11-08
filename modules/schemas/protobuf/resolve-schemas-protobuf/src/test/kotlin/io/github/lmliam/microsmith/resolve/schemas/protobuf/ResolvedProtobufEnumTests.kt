@@ -80,6 +80,27 @@ class ResolvedProtobufEnumTests :
                 .isRight() shouldBe true
         }
 
+        "rejects value names that collide once the enum name prefix is stripped" {
+            enumOf(
+                nonEmptyListOf(
+                    value("STATUS_UNSPECIFIED", 0),
+                    value("STATUS_ACTIVE", 1),
+                    value("ACTIVE", 2),
+                    value("Active", 3),
+                )
+            ) shouldBe
+                Either.Left(
+                    nonEmptyListOf(
+                        ResolvedProtobufRejection.EnumValueNameCollision(listOf("STATUS_ACTIVE", "ACTIVE", "Active"))
+                    )
+                )
+        }
+
+        "accepts value names that stay distinct once the enum name prefix is stripped" {
+            enumOf(nonEmptyListOf(value("STATUS_UNSPECIFIED", 0), value("STATUS_ACTIVE", 1), value("PAUSED", 2)))
+                .isRight() shouldBe true
+        }
+
         "reports every rejection in the order the resolver reports issues" {
             enumOf(
                 nonEmptyListOf(value("ACTIVE", 1), value("ACTIVE", 1)),

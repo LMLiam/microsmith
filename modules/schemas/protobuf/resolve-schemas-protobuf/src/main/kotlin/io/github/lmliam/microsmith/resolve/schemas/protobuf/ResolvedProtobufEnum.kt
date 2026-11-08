@@ -11,6 +11,8 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoRe
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoReservedNumberUse
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueEnumValueNames
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueEnumValueNumbers
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findEnumValueNameCollisions
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.rejectAll
 
 @ConsistentCopyVisibility
 data class ResolvedProtobufEnum
@@ -34,7 +36,8 @@ private constructor(
                 { checkUniqueEnumValueNumbers(valueNumbers) },
                 { checkNoReservedNameUse(reservations.names.map(ProtoIdentifier::value), valueNames) },
                 { checkNoReservedNumberUse(reservations.spans.map(ReservedSpan::numbers), valueNumbers) },
-            ) { _, _, _, _, _ ->
+                { rejectAll(findEnumValueNameCollisions(name.value, valueNames)) },
+            ) { _, _, _, _, _, _ ->
                 ResolvedProtobufEnum(name, values, reservations)
             }
         }

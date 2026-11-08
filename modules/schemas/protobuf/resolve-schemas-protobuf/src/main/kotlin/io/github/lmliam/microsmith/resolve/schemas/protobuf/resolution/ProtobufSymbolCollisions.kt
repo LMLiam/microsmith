@@ -10,22 +10,19 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue.SymbolDeclaration
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.declaredIn
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.ScopedSymbol
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findSymbolClashes
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.messageSymbols
 
 internal fun findSymbolCollisions(schemas: List<ProtobufSchema>): List<ProtobufResolutionIssue.SymbolNameCollision> =
-    schemas
-        .sortedBy(ProtobufSchema::name)
-        .flatMap(::scopedSymbolsOf)
-        .distinct()
-        .groupBy { it.scope to it.name }
-        .values
-        .filter { it.size > 1 }
-        .map { symbols ->
-            ProtobufResolutionIssue.SymbolNameCollision(
-                scope = symbols.first().scope.name,
-                name = symbols.first().name,
-                declarations = symbols.map(ScopedSymbol::declaration),
-            )
-        }
+    findSymbolClashes(schemas.sortedBy(ProtobufSchema::name).flatMap(::scopedSymbolsOf)).map { clash ->
+        ProtobufResolutionIssue.SymbolNameCollision(
+            scope = clash.scope.name,
+            name = clash.name,
+            declarations = clash.declarations,
+        )
+    }
 
 private data class Scope(val kind: Kind, val name: String) {
     enum class Kind {
@@ -34,16 +31,16 @@ private data class Scope(val kind: Kind, val name: String) {
     }
 }
 
-private data class ScopedSymbol(val scope: Scope, val name: String, val declaration: SymbolDeclaration)
+private typealias PackageOrMessageSymbol = ScopedSymbol<Scope, SymbolDeclaration>
 
-private fun scopedSymbolsOf(schema: ProtobufSchema): List<ScopedSymbol> =
+private fun scopedSymbolsOf(schema: ProtobufSchema): List<PackageOrMessageSymbol> =
     QualifiedSchemaName.parse(schema.name)
         .fold(
             ifLeft = { emptyList() },
             ifRight = { identity -> packageSymbols(identity) + declarationSymbols(identity, schema.schema) },
         )
 
-private fun packageSymbols(identity: QualifiedSchemaName): List<ScopedSymbol> {
+private fun packageSymbols(identity: QualifiedSchemaName): List<PackageOrMessageSymbol> {
     val segments = identity.packageName?.split('.').orEmpty()
 
     return segments.indices.map { index ->
@@ -55,14 +52,14 @@ private fun packageSymbols(identity: QualifiedSchemaName): List<ScopedSymbol> {
     }
 }
 
-private fun declarationSymbols(identity: QualifiedSchemaName, declaration: Type): List<ScopedSymbol> {
+private fun declarationSymbols(identity: QualifiedSchemaName, declaration: Type): List<PackageOrMessageSymbol> {
     val packageScope = Scope(Scope.Kind.PACKAGE, identity.packageName.orEmpty())
     val schemaName = identity.fullyQualifiedName
     val type = ScopedSymbol(packageScope, identity.typeName.value, SymbolDeclaration.Type(schemaName))
 
     return listOf(type) +
         when (declaration) {
-            is Message -> messageSymbols(schemaName, declaration)
+            is Message -> scopedMessageSymbols(schemaName, declaration)
 
             is Enum ->
                 declaration.values
@@ -74,19 +71,14 @@ private fun declarationSymbols(identity: QualifiedSchemaName, declaration: Type)
         }
 }
 
-private fun messageSymbols(schemaName: String, message: Message): List<ScopedSymbol> {
+private fun scopedMessageSymbols(schemaName: String, message: Message): List<PackageOrMessageSymbol> {
     val scope = Scope(Scope.Kind.MESSAGE, schemaName)
-    val fields = message.fields + message.oneofs.flatMap(Oneof::fields)
 
-    return fields.map(Field::name).filter(::isIdentifier).map {
-        ScopedSymbol(scope, it, SymbolDeclaration.Field(schemaName, it))
-    } +
-        message.oneofs.map(Oneof::name).filter(::isIdentifier).map {
-            ScopedSymbol(scope, it, SymbolDeclaration.Oneof(schemaName, it))
-        } +
-        message.fields.filterIsInstance<MapField>().map(MapField::name).filter(::isIdentifier).map {
-            ScopedSymbol(scope, mapEntryName(it), SymbolDeclaration.MapEntry(schemaName, it))
-        }
+    return messageSymbols(
+            fieldNames =
+                (message.fields + message.oneofs.flatMap(Oneof::fields)).map(Field::name).filter(::isIdentifier),
+            oneofNames = message.oneofs.map(Oneof::name).filter(::isIdentifier),
+            mapFieldNames = message.fields.filterIsInstance<MapField>().map(MapField::name).filter(::isIdentifier),
+        )
+        .map { ScopedSymbol(scope, it.name, it.declaration.declaredIn(schemaName)) }
 }
-
-private fun mapEntryName(fieldName: String): String = fieldName.underscoresToCamelCase(capitalizeFirst = true) + "Entry"
