@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init
+
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
 import io.github.lmliam.microsmith.cli.init.profile.OnboardingProfileDetection
 import java.nio.file.Path

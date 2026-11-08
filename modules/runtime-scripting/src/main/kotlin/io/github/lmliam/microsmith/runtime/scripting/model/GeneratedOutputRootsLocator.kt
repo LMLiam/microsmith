@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.model
+
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -19,9 +20,8 @@ object GeneratedOutputRootsLocator {
         Files.walk(normalizedOutputDirectory).use { paths ->
             return paths
                 .filter(::isOriginsManifest)
-                .map { manifestPath ->
-                    manifestPath.parent?.parent ?: normalizedOutputDirectory
-                }.map(Path::normalize)
+                .map { manifestPath -> manifestPath.parent?.parent ?: normalizedOutputDirectory }
+                .map(Path::normalize)
                 .distinct()
                 .sorted()
                 .toList()
@@ -42,16 +42,16 @@ object GeneratedOutputRootsLocator {
         return when (normalizedRoots.size) {
             0 -> normalizedOutputDirectory.toString()
             1 -> normalizedRoots.single().toString()
-            else -> buildString {
-                append(normalizedOutputDirectory)
-                append(" (roots: ")
-                append(normalizedRoots.joinToString())
-                append(')')
-            }
+            else ->
+                buildString {
+                    append(normalizedOutputDirectory)
+                    append(" (roots: ")
+                    append(normalizedRoots.joinToString())
+                    append(')')
+                }
         }
     }
 
-    private fun isOriginsManifest(path: Path): Boolean = path.isRegularFile() &&
-        path.name == ORIGINS_MANIFEST_NAME &&
-        path.parent?.name == ORIGINS_DIRECTORY_NAME
+    private fun isOriginsManifest(path: Path): Boolean =
+        path.isRegularFile() && path.name == ORIGINS_MANIFEST_NAME && path.parent?.name == ORIGINS_DIRECTORY_NAME
 }

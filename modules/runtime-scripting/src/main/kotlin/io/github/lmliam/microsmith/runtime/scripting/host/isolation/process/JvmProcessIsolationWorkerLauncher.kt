@@ -1,9 +1,10 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
+
 import java.nio.file.Files
 import java.nio.file.Path
 
 internal class JvmProcessIsolationWorkerLauncher(
-    private val resultCodec: ProcessIsolationResultCodec = ProcessIsolationResultCodec(),
+    private val resultCodec: ProcessIsolationResultCodec = ProcessIsolationResultCodec()
 ) : ProcessIsolationWorkerLauncher {
     override fun execute(requestFile: Path, resultFile: Path): ProcessIsolationExecutionOutcome {
         val process = ProcessBuilder(buildCommand(requestFile, resultFile)).redirectErrorStream(true).start()

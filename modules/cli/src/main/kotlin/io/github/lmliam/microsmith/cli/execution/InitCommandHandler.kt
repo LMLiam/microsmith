@@ -13,10 +13,10 @@ internal class InitCommandHandler(
 ) {
     fun execute(command: InitCommand): Int {
         val emitter = emitterFactory.create(command.diagnosticsFormat, command.verbose)
-        val result =
-            runCatching {
-                initRunner(command)
-            }.getOrElse { error ->
+        val result = runCatching {
+            initRunner(command)
+        }
+            .getOrElse { error ->
                 val code =
                     when (error) {
                         is InitConflictException -> CliFailureCode.INIT_CONFLICT
@@ -31,18 +31,18 @@ internal class InitCommandHandler(
         emitter.info(
             "Microsmith init completed at '$projectRoot'.",
             details =
-            mapOf(
-                "projectRoot" to projectRoot.toString(),
-                "repositoryProfile" to result.repositoryDetection.profile.id,
-                "repositoryProfileDisplayName" to result.repositoryDetection.profile.displayName,
-                "matchedMarkers" to result.repositoryDetection.matchedMarkers.joinToString(separator = ","),
-                "createdFiles" to result.createdFiles.size.toString(),
-                "overwrittenFiles" to result.overwrittenFiles.size.toString(),
-                "preservedFiles" to result.preservedFiles.size.toString(),
-                "ideHelperUpdatedFiles" to (result.ideHelperResult?.updatedFiles?.size ?: 0).toString(),
-                "ideHelperSkipped" to command.skipIdeHelper.toString(),
-                "force" to command.force.toString(),
-            ),
+                mapOf(
+                    "projectRoot" to projectRoot.toString(),
+                    "repositoryProfile" to result.repositoryDetection.profile.id,
+                    "repositoryProfileDisplayName" to result.repositoryDetection.profile.displayName,
+                    "matchedMarkers" to result.repositoryDetection.matchedMarkers.joinToString(separator = ","),
+                    "createdFiles" to result.createdFiles.size.toString(),
+                    "overwrittenFiles" to result.overwrittenFiles.size.toString(),
+                    "preservedFiles" to result.preservedFiles.size.toString(),
+                    "ideHelperUpdatedFiles" to (result.ideHelperResult?.updatedFiles?.size ?: 0).toString(),
+                    "ideHelperSkipped" to command.skipIdeHelper.toString(),
+                    "force" to command.force.toString(),
+                ),
         )
         emitter.info("Detected repository profile: ${result.repositoryDetection.describeForSummary()}.")
         InitSummaryEmitter.emit(emitter = emitter, command = command, result = result)

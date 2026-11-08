@@ -17,9 +17,7 @@ internal class EnumBuilder(private val name: String) : EnumScope {
     private val values = mutableSetOf<EnumValue>()
 
     init {
-        value(Enum.UNSPECIFIED) {
-            index(0)
-        }
+        value(Enum.UNSPECIFIED) { index(0) }
     }
 
     override fun value(name: String, block: EnumValueScope.() -> Unit) {
@@ -44,9 +42,10 @@ internal class EnumBuilder(private val name: String) : EnumScope {
         ReservedBuilder(allocator, nameRegistry).apply(block)
     }
 
-    fun build() = Enum(
-        name = name,
-        values = values.sortedBy { it.index },
-        reserved = buildReservedDeclarations(allocator, nameRegistry),
-    )
+    fun build() =
+        Enum(
+            name = name,
+            values = values.sortedBy { it.index },
+            reserved = buildReservedDeclarations(allocator, nameRegistry),
+        )
 }

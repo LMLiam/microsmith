@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve
+
 import arrow.core.compareTo
 import arrow.core.toNonEmptyListOrNull
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
@@ -12,18 +13,17 @@ class DomainResolutionService(resolvers: List<DomainResolver<*, *>>) {
         val resolvedModels = mutableListOf<ResolvedModel>()
         val issues = mutableListOf<ResolutionIssue>()
 
-        model.extensions()
+        model
+            .extensions()
             .sortedBy { it::class.qualifiedName ?: it::class.toString() }
             .forEach { extension ->
-                resolverRegistry
-                    .resolve(extension)
-                    .forEach { resolver ->
-                        when (val resolution = resolver.resolveUnchecked(extension)) {
-                            DomainResolution.NotApplicable -> Unit
-                            is DomainResolution.Success -> resolvedModels += resolution.model
-                            is DomainResolution.Failure -> issues += resolution.issues
-                        }
+                resolverRegistry.resolve(extension).forEach { resolver ->
+                    when (val resolution = resolver.resolveUnchecked(extension)) {
+                        DomainResolution.NotApplicable -> Unit
+                        is DomainResolution.Success -> resolvedModels += resolution.model
+                        is DomainResolution.Failure -> issues += resolution.issues
                     }
+                }
             }
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
@@ -37,5 +37,5 @@ class DomainResolutionService(resolvers: List<DomainResolver<*, *>>) {
 }
 
 private fun DomainResolver<MicrosmithExtension, ResolvedModel>.resolveUnchecked(
-    extension: MicrosmithExtension,
+    extension: MicrosmithExtension
 ): DomainResolution<ResolvedModel> = resolve(extension)

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
+
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
@@ -23,13 +24,13 @@ class ProcessIsolationProtocolTests :
                 val request =
                     ProcessIsolationRequest(
                         request =
-                        ScriptRunRequest(
-                            script = tempDir.resolve("schema.microsmith.kts"),
-                            outputDir = tempDir.resolve("generated"),
-                            variables = mapOf("schema" to "User", "package" to "pkg"),
-                            flags = setOf("emit", "strict"),
-                            pluginClasspath = listOf(tempDir.resolve("plugins/custom.jar")),
-                        ),
+                            ScriptRunRequest(
+                                script = tempDir.resolve("schema.microsmith.kts"),
+                                outputDir = tempDir.resolve("generated"),
+                                variables = mapOf("schema" to "User", "package" to "pkg"),
+                                flags = setOf("emit", "strict"),
+                                pluginClasspath = listOf(tempDir.resolve("plugins/custom.jar")),
+                            ),
                         scriptPath = tempDir.resolve("schema.microsmith.kts"),
                         outputPath = tempDir.resolve("generated"),
                         cacheDirectory = tempDir.resolve("cache"),
@@ -52,10 +53,10 @@ class ProcessIsolationProtocolTests :
                         cacheHit = true,
                         elapsedMillis = Int.MAX_VALUE.toLong() + 1,
                         generatedRoots =
-                        listOf(
-                            Path.of("/tmp/generated"),
-                            Path.of("/tmp/generated/dotnet/Platform/UserService.Api"),
-                        ),
+                            listOf(
+                                Path.of("/tmp/generated"),
+                                Path.of("/tmp/generated/dotnet/Platform/UserService.Api"),
+                            ),
                     )
 
                 ProcessIsolationProtocol.writeResult(resultFile, success)
@@ -94,9 +95,7 @@ class ProcessIsolationProtocolTests :
                         setProperty("result.diagnostics.count", "1")
                         setProperty("result.diagnostics.0", "legacy failure")
                     }
-                Files.newOutputStream(resultFile).use { output ->
-                    properties.store(output, "legacy test payload")
-                }
+                Files.newOutputStream(resultFile).use { output -> properties.store(output, "legacy test payload") }
 
                 val decoded = ProcessIsolationProtocol.readResult(resultFile).shouldBeInstanceOf<ScriptRunFailure>()
 

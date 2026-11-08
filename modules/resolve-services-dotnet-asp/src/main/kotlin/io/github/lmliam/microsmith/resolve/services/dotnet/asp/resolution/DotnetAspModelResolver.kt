@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution
+
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.nonEmptyListOf
@@ -17,10 +18,11 @@ internal class DotnetAspModelResolver {
         models: Map<String, DotnetModel>,
         reference: DotnetAspModelReference,
         source: DotnetAspBindingResolutionIssue.ModelReferenceSource,
-    ): EitherNel<DotnetAspResolutionIssue, ResolvedDotnetAspModel> = when (reference) {
-        is DotnetAspModelReference.Shared -> resolveShared(context, models, reference.target, source)
-        is DotnetAspModelReference.Inline -> resolveInline(context, models, reference.model)
-    }
+    ): EitherNel<DotnetAspResolutionIssue, ResolvedDotnetAspModel> =
+        when (reference) {
+            is DotnetAspModelReference.Shared -> resolveShared(context, models, reference.target, source)
+            is DotnetAspModelReference.Inline -> resolveInline(context, models, reference.model)
+        }
 
     private fun resolveShared(
         context: DotnetAspOperationContext,
@@ -40,8 +42,8 @@ internal class DotnetAspModelResolver {
                         context.operationName,
                         source,
                         target,
-                    ),
-                ),
+                    )
+                )
             )
         }
     }
@@ -51,17 +53,18 @@ internal class DotnetAspModelResolver {
         models: Map<String, DotnetModel>,
         model: DotnetModel,
     ): EitherNel<DotnetAspResolutionIssue, ResolvedDotnetAspModel> {
-        val issues = model.fields.mapNotNull { field ->
-            val reference = field.type as? DotnetFieldType.Reference ?: return@mapNotNull null
-            if (reference.target in models) return@mapNotNull null
+        val issues =
+            model.fields.mapNotNull { field ->
+                val reference = field.type as? DotnetFieldType.Reference ?: return@mapNotNull null
+                if (reference.target in models) return@mapNotNull null
 
-            DotnetAspBindingResolutionIssue.UnknownSharedModelReference(
-                context.serviceName,
-                context.operationName,
-                DotnetAspBindingResolutionIssue.ModelReferenceSource.InlineModelField(model.name, field.name),
-                reference.target,
-            )
-        }
+                DotnetAspBindingResolutionIssue.UnknownSharedModelReference(
+                    context.serviceName,
+                    context.operationName,
+                    DotnetAspBindingResolutionIssue.ModelReferenceSource.InlineModelField(model.name, field.name),
+                    reference.target,
+                )
+            }
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 

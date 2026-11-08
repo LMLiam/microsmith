@@ -59,12 +59,9 @@ class MicrosmithScriptCacheTests :
                 pluginJar.parent.createDirectories()
                 pluginJar.writeText("v1")
 
-                val compilationConfiguration =
-                    ScriptCompilationConfiguration {
-                        jvm {
-                            updateClasspath(listOf(pluginJar.toFile()))
-                        }
-                    }
+                val compilationConfiguration = ScriptCompilationConfiguration {
+                    jvm { updateClasspath(listOf(pluginJar.toFile())) }
+                }
                 val scriptSource = FileScriptSource(scriptFile.toFile())
 
                 val firstFingerprint =
@@ -95,41 +92,33 @@ class MicrosmithScriptCacheTests :
                 val scriptFile = tempDir.resolve("schema.microsmith.kts")
                 scriptFile.writeText("microsmith { }")
 
-                val firstConfiguration =
-                    ScriptCompilationConfiguration {
-                        ScriptCompilationConfiguration
-                            .microsmithScriptSymbols
-                            .put(
-                                listOf(
-                                    CompiledScriptSymbol(
-                                        propertyName = "User",
-                                        typeName =
-                                        "io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef",
-                                        contributorId = "microsmith.protobuf",
-                                        kind = "message",
-                                        valueKey = "one.User",
-                                    ),
-                                ),
+                val firstConfiguration = ScriptCompilationConfiguration {
+                    ScriptCompilationConfiguration.microsmithScriptSymbols.put(
+                        listOf(
+                            CompiledScriptSymbol(
+                                propertyName = "User",
+                                typeName = "io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef",
+                                contributorId = "microsmith.protobuf",
+                                kind = "message",
+                                valueKey = "one.User",
                             )
-                    }
+                        )
+                    )
+                }
 
-                val secondConfiguration =
-                    ScriptCompilationConfiguration {
-                        ScriptCompilationConfiguration
-                            .microsmithScriptSymbols
-                            .put(
-                                listOf(
-                                    CompiledScriptSymbol(
-                                        propertyName = "User",
-                                        typeName =
-                                        "io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef",
-                                        contributorId = "microsmith.protobuf",
-                                        kind = "message",
-                                        valueKey = "two.User",
-                                    ),
-                                ),
+                val secondConfiguration = ScriptCompilationConfiguration {
+                    ScriptCompilationConfiguration.microsmithScriptSymbols.put(
+                        listOf(
+                            CompiledScriptSymbol(
+                                propertyName = "User",
+                                typeName = "io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef",
+                                contributorId = "microsmith.protobuf",
+                                kind = "message",
+                                valueKey = "two.User",
                             )
-                    }
+                        )
+                    )
+                }
 
                 val source = FileScriptSource(scriptFile.toFile())
 

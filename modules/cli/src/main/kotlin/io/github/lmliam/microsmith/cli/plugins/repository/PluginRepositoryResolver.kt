@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.repository
+
 import io.github.lmliam.microsmith.cli.command.RunCommand
 import io.github.lmliam.microsmith.cli.plugins.PluginResolverErrorCategory
 import io.github.lmliam.microsmith.cli.plugins.PluginResolverSettings
@@ -30,19 +31,18 @@ internal class PluginRepositoryResolver {
         command: RunCommand,
         settings: PluginResolverSettings,
         repositoryPolicy: RepositoryAllowlistPolicy,
-    ): List<String> = try {
-        val override = command.repositoryOverride?.trim()?.takeIf(String::isNotEmpty)
-        val repositories =
-            (listOfNotNull(override) + settings.defaultRepositories)
-                .map(::normalizeRepositoryUri)
-                .distinct()
-        repositories.forEach(repositoryPolicy::validate)
-        repositories
-    } catch (error: IllegalArgumentException) {
-        throw PluginResolutionDiagnosticException(
-            category = PluginResolverErrorCategory.REPOSITORY_POLICY,
-            message = error.message ?: "Repository configuration was rejected by policy.",
-            cause = error,
-        )
-    }
+    ): List<String> =
+        try {
+            val override = command.repositoryOverride?.trim()?.takeIf(String::isNotEmpty)
+            val repositories =
+                (listOfNotNull(override) + settings.defaultRepositories).map(::normalizeRepositoryUri).distinct()
+            repositories.forEach(repositoryPolicy::validate)
+            repositories
+        } catch (error: IllegalArgumentException) {
+            throw PluginResolutionDiagnosticException(
+                category = PluginResolverErrorCategory.REPOSITORY_POLICY,
+                message = error.message ?: "Repository configuration was rejected by policy.",
+                cause = error,
+            )
+        }
 }

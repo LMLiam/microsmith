@@ -10,6 +10,6 @@ class KotestConfig : AbstractProjectConfig() {
                 includeContainers = false,
                 useTestPathAsName = false,
                 outputDir = "${System.getProperty("gradle.build.dir")}/test-results/kotest",
-            ),
+            )
         )
 }

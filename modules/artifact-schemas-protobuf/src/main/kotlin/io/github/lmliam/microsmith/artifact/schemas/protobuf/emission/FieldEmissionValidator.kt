@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
+
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
@@ -6,9 +7,7 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameVa
 internal fun validateOneof(oneof: ResolvedProtobufOneof) {
     ProtobufNameValidation.requireIdentifier(oneof.name, "Oneof name")
 
-    require(oneof.fields.isNotEmpty()) {
-        "Oneof '${oneof.name}' must contain at least one field"
-    }
+    require(oneof.fields.isNotEmpty()) { "Oneof '${oneof.name}' must contain at least one field" }
 
     oneof.fields.forEach(::validateOneofField)
 }

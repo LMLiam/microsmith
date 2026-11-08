@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
+
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.ProtobufEmissionInvariantException
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
@@ -23,11 +24,13 @@ internal object ProtobufValueTypeRenderer {
             PrimitiveType.BYTES to "bytes",
         )
 
-    fun render(type: PrimitiveType): String = primitiveKeywords[type]
-        ?: throw ProtobufEmissionInvariantException("Unsupported protobuf primitive type: $type")
+    fun render(type: PrimitiveType): String =
+        primitiveKeywords[type]
+            ?: throw ProtobufEmissionInvariantException("Unsupported protobuf primitive type: $type")
 
-    fun render(type: ResolvedProtobufValueType): String = when (type) {
-        is ResolvedProtobufValueType.Primitive -> render(type.type)
-        is ResolvedProtobufValueType.Reference -> type.reference.target.fullyQualifiedName
-    }
+    fun render(type: ResolvedProtobufValueType): String =
+        when (type) {
+            is ResolvedProtobufValueType.Primitive -> render(type.type)
+            is ResolvedProtobufValueType.Reference -> type.reference.target.fullyQualifiedName
+        }
 }

@@ -17,23 +17,27 @@ import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
 class DotnetPackageVersionsArtifactCompiler : ServicesArtifactCompiler<DotnetPackageVersionsArtifact> {
     override val artifactType = DotnetPackageVersionsArtifact::class
 
-    override fun compile(artifact: DotnetPackageVersionsArtifact): List<ArtifactContribution<out Artifact>> = listOf(
-        MsBuildProjectContribution(
-            artifactId = MsBuildProjectArtifactId(
-                solutionName = artifact.id.solutionName,
-                kind = MsBuildProjectKind.DirectoryPackagesProps,
-            ),
-            properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
-            items = artifact.packages.sortedBy(DotnetPackageVersion::name).map { packageVersion ->
-                MsBuildItem(
-                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                    include = packageVersion.name,
-                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to packageVersion.version),
-                )
-            },
-            origins = artifact.packages.mapTo(linkedSetOf()) { packageVersion ->
-                "services.solutions.${artifact.id.solutionName}.packages.${packageVersion.name}"
-            },
-        ),
-    )
+    override fun compile(artifact: DotnetPackageVersionsArtifact): List<ArtifactContribution<out Artifact>> =
+        listOf(
+            MsBuildProjectContribution(
+                artifactId =
+                    MsBuildProjectArtifactId(
+                        solutionName = artifact.id.solutionName,
+                        kind = MsBuildProjectKind.DirectoryPackagesProps,
+                    ),
+                properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
+                items =
+                    artifact.packages.sortedBy(DotnetPackageVersion::name).map { packageVersion ->
+                        MsBuildItem(
+                            itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                            include = packageVersion.name,
+                            attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to packageVersion.version),
+                        )
+                    },
+                origins =
+                    artifact.packages.mapTo(linkedSetOf()) { packageVersion ->
+                        "services.solutions.${artifact.id.solutionName}.packages.${packageVersion.name}"
+                    },
+            )
+        )
 }

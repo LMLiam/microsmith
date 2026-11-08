@@ -19,26 +19,19 @@ class DotnetAspArtifactContributorTests :
             val contributor = DotnetAspArtifactContributor()
             val userOnlyWorkspace =
                 DotnetAspWorkspace(
-                    servicesByName =
-                    linkedMapOf(
-                        "UserService" to resolvedAspService("UserService", "UserService.Api"),
-                    ),
+                    servicesByName = linkedMapOf("UserService" to resolvedAspService("UserService", "UserService.Api"))
                 )
             val expandedWorkspace =
                 DotnetAspWorkspace(
                     servicesByName =
-                    linkedMapOf(
-                        "AdminService" to resolvedAspService("AdminService", "AdminService.Api"),
-                        "UserService" to resolvedAspService("UserService", "UserService.Api"),
-                    ),
+                        linkedMapOf(
+                            "AdminService" to resolvedAspService("AdminService", "AdminService.Api"),
+                            "UserService" to resolvedAspService("UserService", "UserService.Api"),
+                        )
                 )
 
             val userOnlyPort =
-                contributor
-                    .contribute(userOnlyWorkspace)
-                    .single()
-                    .let { it as DotnetAspServiceContribution }
-                    .httpPort
+                contributor.contribute(userOnlyWorkspace).single().let { it as DotnetAspServiceContribution }.httpPort
             val expandedUserPort =
                 contributor
                     .contribute(expandedWorkspace)
@@ -55,16 +48,13 @@ class DotnetAspArtifactContributorTests :
             val workspace =
                 DotnetAspWorkspace(
                     servicesByName =
-                    linkedMapOf(
-                        "LeftService" to resolvedAspService("LeftService", collision.first.projectName),
-                        "RightService" to resolvedAspService("RightService", collision.second.projectName),
-                    ),
+                        linkedMapOf(
+                            "LeftService" to resolvedAspService("LeftService", collision.first.projectName),
+                            "RightService" to resolvedAspService("RightService", collision.second.projectName),
+                        )
                 )
 
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    contributor.contribute(workspace)
-                }
+            val error = shouldThrow<IllegalArgumentException> { contributor.contribute(workspace) }
 
             error.message.shouldContain("colliding launch ports")
         }
@@ -74,19 +64,17 @@ class DotnetAspArtifactContributorTests :
             val workspace =
                 DotnetAspWorkspace(
                     servicesByName =
-                    linkedMapOf(
-                        "UserService" to resolvedAspService(
-                            name = "UserService",
-                            projectName = "UserService.Api",
-                            ports = ResolvedDotnetAspPorts(http = 7000, https = 7443),
-                        ),
-                    ),
+                        linkedMapOf(
+                            "UserService" to
+                                resolvedAspService(
+                                    name = "UserService",
+                                    projectName = "UserService.Api",
+                                    ports = ResolvedDotnetAspPorts(http = 7000, https = 7443),
+                                )
+                        )
                 )
 
-            val contribution =
-                contributor
-                    .contribute(workspace)
-                    .single() as DotnetAspServiceContribution
+            val contribution = contributor.contribute(workspace).single() as DotnetAspServiceContribution
 
             contribution.httpPort shouldBe 7000
             contribution.httpsPort shouldBe 7443
@@ -97,16 +85,17 @@ private fun resolvedAspService(
     name: String,
     projectName: String,
     ports: ResolvedDotnetAspPorts? = null,
-): ResolvedDotnetAspService = ResolvedDotnetAspService(
-    name = name,
-    solutionName = "Platform",
-    projectName = projectName,
-    targetFrameworkMoniker = "net8.0",
-    outputRoot = Path.of("dotnet", "Platform", projectName),
-    ports = ports,
-    models = emptyMap(),
-    rest = ResolvedDotnetAspRest.empty(),
-)
+): ResolvedDotnetAspService =
+    ResolvedDotnetAspService(
+        name = name,
+        solutionName = "Platform",
+        projectName = projectName,
+        targetFrameworkMoniker = "net8.0",
+        outputRoot = Path.of("dotnet", "Platform", projectName),
+        ports = ports,
+        models = emptyMap(),
+        rest = ResolvedDotnetAspRest.empty(),
+    )
 
 private fun findCollidingServiceIds(): Pair<DotnetAspServiceArtifactId, DotnetAspServiceArtifactId>? {
     val byPort = mutableMapOf<Int, DotnetAspServiceArtifactId>()

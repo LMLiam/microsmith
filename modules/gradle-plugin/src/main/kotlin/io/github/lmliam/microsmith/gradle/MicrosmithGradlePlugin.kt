@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gradle
+
 import io.github.lmliam.microsmith.gradle.configuration.MicrosmithGradleConfigurations
 import io.github.lmliam.microsmith.gradle.configuration.MicrosmithRuntimeDependencyNotation
 import io.github.lmliam.microsmith.gradle.task.MicrosmithGenerateTask
@@ -26,8 +27,7 @@ class MicrosmithGradlePlugin : Plugin<Project> {
                 configuration.isCanBeConsumed = false
                 configuration.isCanBeResolved = true
                 configuration.isVisible = false
-                configuration.description =
-                    "Classpath for external Microsmith generator plugins used by Gradle tasks."
+                configuration.description = "Classpath for external Microsmith generator plugins used by Gradle tasks."
             }
 
         val microsmithRuntime =
@@ -35,15 +35,14 @@ class MicrosmithGradlePlugin : Plugin<Project> {
                 configuration.isCanBeConsumed = false
                 configuration.isCanBeResolved = true
                 configuration.isVisible = false
-                configuration.description =
-                    "Classpath for the isolated Microsmith worker JVM used by Gradle tasks."
+                configuration.description = "Classpath for the isolated Microsmith worker JVM used by Gradle tasks."
                 configuration.attributes.attribute(
                     Bundling.BUNDLING_ATTRIBUTE,
                     project.objects.named(Bundling::class.java, Bundling.SHADOWED),
                 )
                 configuration.defaultDependencies { dependencies ->
                     dependencies.add(
-                        project.dependencies.create(MicrosmithRuntimeDependencyNotation.runtimeScripting()),
+                        project.dependencies.create(MicrosmithRuntimeDependencyNotation.runtimeScripting())
                     )
                 }
             }

@@ -5,7 +5,7 @@ metro = "1.4.4"
 mappie = "2.4.20-2.4.3"
 kotest = "6.2.5"
 detekt = "2.0.0-alpha.6"
-ktlintGradle = "14.2.0"
+ktfmtGradle = "0.27.0"
 axionRelease = "1.21.3"
 shadow = "9.6.1"
 coroutines = "1.10.2"
@@ -47,6 +47,6 @@ metro = { id = "dev.zacsweers.metro", version.ref = "metro" }
 mappie = { id = "tech.mappie.plugin", version.ref = "mappie" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle" }
+ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmtGradle" }
 axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axionRelease" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

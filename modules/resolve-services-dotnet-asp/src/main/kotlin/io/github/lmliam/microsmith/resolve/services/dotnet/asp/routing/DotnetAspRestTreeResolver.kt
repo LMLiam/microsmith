@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing
+
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.toNonEmptyListOrNull
@@ -27,14 +28,15 @@ internal class DotnetAspRestTreeResolver {
         models: Map<String, DotnetModel>,
         group: DotnetAspRouteGroup,
         parentRoute: DotnetAspRouteFragment,
-    ): EitherNel<DotnetResolutionIssue, List<ResolvedDotnetAspEndpoint>> = routeResolver
-        .parseDeclaredRoute(group.path, DotnetAspResolutionIssue.RouteDeclarationKind.GROUP)
-        .fold(
-            ifLeft = { Either.Left(it) },
-            ifRight = { groupRoute ->
-                resolveEntries(serviceName, models, group.endpoints, group.groups, parentRoute + groupRoute)
-            },
-        )
+    ): EitherNel<DotnetResolutionIssue, List<ResolvedDotnetAspEndpoint>> =
+        routeResolver
+            .parseDeclaredRoute(group.path, DotnetAspResolutionIssue.RouteDeclarationKind.GROUP)
+            .fold(
+                ifLeft = { Either.Left(it) },
+                ifRight = { groupRoute ->
+                    resolveEntries(serviceName, models, group.endpoints, group.groups, parentRoute + groupRoute)
+                },
+            )
 
     private fun resolveEntries(
         serviceName: String,
@@ -47,7 +49,8 @@ internal class DotnetAspRestTreeResolver {
         val resolved = mutableListOf<ResolvedDotnetAspEndpoint>()
 
         endpoints.forEach { endpoint ->
-            endpointResolver.resolve(serviceName, endpoint, parentRoute, models)
+            endpointResolver
+                .resolve(serviceName, endpoint, parentRoute, models)
                 .fold(
                     ifLeft = issues::addAll,
                     ifRight = resolved::add,

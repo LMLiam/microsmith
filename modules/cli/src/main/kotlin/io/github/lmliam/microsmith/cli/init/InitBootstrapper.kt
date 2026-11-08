@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init
+
 import io.github.lmliam.microsmith.cli.command.IdeRefreshCommand
 import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.ide.IdeHelperConflictException
@@ -62,25 +63,22 @@ internal class InitBootstrapper(
                     projectRoot = projectRoot,
                     diagnosticsFormat = command.diagnosticsFormat,
                     verbose = command.verbose,
-                ),
+                )
             )
-        }.getOrElse { error ->
-            when (error) {
-                is IdeHelperConflictException ->
-                    throw InitConflictException(error.message ?: "IDE helper path is invalid.")
-
-                else -> throw error
-            }
         }
+            .getOrElse { error ->
+                when (error) {
+                    is IdeHelperConflictException ->
+                        throw InitConflictException(error.message ?: "IDE helper path is invalid.")
+
+                    else -> throw error
+                }
+            }
     }
 
     private fun validateProjectRoot(projectRoot: Path) {
-        requireInit(Files.exists(projectRoot)) {
-            "Repository root '$projectRoot' does not exist."
-        }
-        requireInit(Files.isDirectory(projectRoot)) {
-            "Repository root '$projectRoot' is not a directory."
-        }
+        requireInit(Files.exists(projectRoot)) { "Repository root '$projectRoot' does not exist." }
+        requireInit(Files.isDirectory(projectRoot)) { "Repository root '$projectRoot' is not a directory." }
     }
 }
 

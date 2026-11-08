@@ -38,12 +38,13 @@ internal class MessageBuilder(private val name: String) : MessageScope {
     private val fields = mutableMapOf<String, MessageField>()
     private val oneofs = mutableSetOf<Oneof>()
 
-    fun build() = Message(
-        name = name,
-        fields = fields.values.sortedBy { it.index },
-        oneofs = oneofs.sortedBy { it.name },
-        reserved = buildReservedDeclarations(allocator, nameRegistry),
-    )
+    fun build() =
+        Message(
+            name = name,
+            fields = fields.values.sortedBy { it.index },
+            oneofs = oneofs.sortedBy { it.name },
+            reserved = buildReservedDeclarations(allocator, nameRegistry),
+        )
 
     override fun optional(field: CardinalityField) {
         fields[field.name] = field.withCardinality(Cardinality.OPTIONAL)
@@ -66,10 +67,11 @@ internal class MessageBuilder(private val name: String) : MessageScope {
     override fun oneof(name: String, block: OneofScope.() -> Unit) {
         val builder =
             OneofBuilder(
-                name,
-                allocator::allocate,
-                nameRegistry::use,
-            ).apply(block)
+                    name,
+                    allocator::allocate,
+                    nameRegistry::use,
+                )
+                .apply(block)
 
         oneofs += builder.build()
     }
@@ -157,20 +159,17 @@ internal class MessageBuilder(private val name: String) : MessageScope {
         nameRegistry.use(name)
 
         val (cardinality, index) =
-            ReferenceFieldBuilder()
-                .apply(block)
-                .let { builder ->
-                    builder.cardinality to allocator.allocate(builder.index)
-                }
+            ReferenceFieldBuilder().apply(block).let { builder ->
+                builder.cardinality to allocator.allocate(builder.index)
+            }
 
         return ReferenceField(
-            name,
-            index,
-            reference,
-            cardinality,
-        ).also { field ->
-            fields[name] = field
-        }
+                name,
+                index,
+                reference,
+                cardinality,
+            )
+            .also { field -> fields[name] = field }
     }
 
     private fun addField(name: String, type: PrimitiveType, block: ScalarFieldScope.() -> Unit): ScalarField {
@@ -178,8 +177,7 @@ internal class MessageBuilder(private val name: String) : MessageScope {
 
         return ScalarFieldBuilder()
             .apply(block)
-            .let { builder ->
-                ScalarField(name, allocator.allocate(builder.index), type, builder.cardinality)
-            }.also { field -> fields[name] = field }
+            .let { builder -> ScalarField(name, allocator.allocate(builder.index), type, builder.cardinality) }
+            .also { field -> fields[name] = field }
     }
 }

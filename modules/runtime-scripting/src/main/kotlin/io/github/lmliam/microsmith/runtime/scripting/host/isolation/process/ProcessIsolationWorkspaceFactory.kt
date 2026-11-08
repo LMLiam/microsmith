@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
+
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Comparator
@@ -20,9 +21,7 @@ internal class ProcessIsolationWorkspaceFactory {
         }
 
         Files.walk(workspace.workingDirectory).use { stream ->
-            stream.sorted(Comparator.reverseOrder()).forEach { entry ->
-                Files.deleteIfExists(entry)
-            }
+            stream.sorted(Comparator.reverseOrder()).forEach { entry -> Files.deleteIfExists(entry) }
         }
     }
 }

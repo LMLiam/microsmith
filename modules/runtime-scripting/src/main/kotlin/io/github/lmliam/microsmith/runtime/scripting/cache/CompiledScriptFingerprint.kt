@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.cache
+
 import java.nio.ByteBuffer
 import java.security.MessageDigest
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
@@ -33,6 +34,4 @@ private fun MessageDigest.addChunk(chunk: String) {
     update(chunkBytes)
 }
 
-private fun Int.toByteArray() = ByteBuffer.allocate(Int.SIZE_BYTES)
-    .also { it.putInt(this) }
-    .array()
+private fun Int.toByteArray() = ByteBuffer.allocate(Int.SIZE_BYTES).also { it.putInt(this) }.array()

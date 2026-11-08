@@ -30,9 +30,10 @@ internal class DotnetDefaultsBuilder : DotnetDefaultsContext {
         model = model.with(type, ext)
     }
 
-    fun build() = DotnetDefaultsExtension(
-        target = target,
-        solutions = solutionsByName.toMap(),
-        model = model,
-    )
+    fun build() =
+        DotnetDefaultsExtension(
+            target = target,
+            solutions = solutionsByName.toMap(),
+            model = model,
+        )
 }

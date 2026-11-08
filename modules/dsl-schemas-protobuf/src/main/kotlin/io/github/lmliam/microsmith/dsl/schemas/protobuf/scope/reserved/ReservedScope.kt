@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.reserved
+
 import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Max
@@ -6,7 +7,8 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
 
 @MicrosmithDsl
 interface ReservedScope {
-    val max get() = Max
+    val max
+        get() = Max
 
     fun index(index: Int)
 

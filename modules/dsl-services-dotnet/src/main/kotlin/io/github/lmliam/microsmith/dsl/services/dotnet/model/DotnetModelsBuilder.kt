@@ -15,9 +15,7 @@ internal class DotnetModelsBuilder : DotnetModelsScope {
     fun build(): Map<String, DotnetModel> = modelsByName.toMap()
 
     private fun register(model: DotnetModel) {
-        require(model.name !in modelsByName) {
-            "Duplicate .NET model registration for '${model.name}'."
-        }
+        require(model.name !in modelsByName) { "Duplicate .NET model registration for '${model.name}'." }
 
         modelsByName[model.name] = model
     }

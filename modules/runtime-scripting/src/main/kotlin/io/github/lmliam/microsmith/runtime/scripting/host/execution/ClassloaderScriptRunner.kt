@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.execution
+
 import io.github.lmliam.microsmith.runtime.scripting.cache.MicrosmithScriptCache
 import io.github.lmliam.microsmith.runtime.scripting.cache.RuntimeClasspathFingerprint
 import io.github.lmliam.microsmith.runtime.scripting.host.configuration.ScriptHostConfigurationFactory
@@ -36,12 +37,13 @@ internal class ClassloaderScriptRunner(private val cacheDirectory: Path) {
                     scriptContext = scriptContext,
                     cacheHit = cache.retrievedScripts > 0,
                 )
-            }.getOrElse { exception ->
-                val message = exception.message ?: exception::class.simpleName ?: "unknown error"
-                ScriptRunFailure(
-                    diagnostics = listOf("Unhandled script host failure: $message"),
-                    type = ScriptFailureType.HOST,
-                )
             }
+                .getOrElse { exception ->
+                    val message = exception.message ?: exception::class.simpleName ?: "unknown error"
+                    ScriptRunFailure(
+                        diagnostics = listOf("Unhandled script host failure: $message"),
+                        type = ScriptFailureType.HOST,
+                    )
+                }
         }
 }

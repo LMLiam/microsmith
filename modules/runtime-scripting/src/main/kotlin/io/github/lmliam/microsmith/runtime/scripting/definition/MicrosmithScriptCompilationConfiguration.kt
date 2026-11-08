@@ -10,8 +10,8 @@ import kotlin.script.experimental.jvm.jvm
 import kotlin.script.experimental.jvm.updateClasspath
 import kotlin.script.experimental.jvm.util.classpathFromClassloader
 
-object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration(
-    {
+object MicrosmithScriptCompilationConfiguration :
+    ScriptCompilationConfiguration({
         defaultImports(
             "io.github.lmliam.microsmith.dsl.microsmith",
             "io.github.lmliam.microsmith.dsl.services.services",
@@ -30,16 +30,12 @@ object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration
         jvm {
             updateClasspath(
                 classpathFromClassloader(
-                    MicrosmithScript::class.java.classLoader,
-                    unpackJarCollections = true,
-                ).orEmpty(),
+                        MicrosmithScript::class.java.classLoader,
+                        unpackJarCollections = true,
+                    )
+                    .orEmpty()
             )
         }
 
-        refineConfiguration {
-            beforeCompiling(
-                ::refineMicrosmithScriptSymbols,
-            )
-        }
-    },
-)
+        refineConfiguration { beforeCompiling(::refineMicrosmithScriptSymbols) }
+    })

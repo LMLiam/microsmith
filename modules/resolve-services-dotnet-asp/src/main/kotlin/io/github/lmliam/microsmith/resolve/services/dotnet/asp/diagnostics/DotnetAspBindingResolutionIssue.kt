@@ -46,7 +46,9 @@ sealed interface DotnetAspBindingResolutionIssue : DotnetAspResolutionIssue {
 
     sealed interface ModelReferenceSource {
         data object RequestBody : ModelReferenceSource
+
         data class Response(val statusCode: Int) : ModelReferenceSource
+
         data class InlineModelField(val modelName: String, val fieldName: String) : ModelReferenceSource
     }
 

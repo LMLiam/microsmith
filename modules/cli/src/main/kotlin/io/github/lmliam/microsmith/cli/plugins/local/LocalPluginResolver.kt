@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.local
+
 import io.github.lmliam.microsmith.cli.plugins.LOCAL_KIND
 import io.github.lmliam.microsmith.cli.plugins.integrity.PluginChecksumAllowlist
 import io.github.lmliam.microsmith.cli.plugins.integrity.PluginResolutionIntegrityVerifier
@@ -18,7 +19,8 @@ internal class LocalPluginResolver(private val checksumCalculator: (Path) -> Str
                         artifactPath = requestedPath.toAbsolutePath().normalize(),
                         lockKey = requestedPath.toLocalPluginLockKey(),
                     )
-                }.sortedBy(LocalPluginJar::lockKey)
+                }
+                .sortedBy(LocalPluginJar::lockKey)
         localPluginJars.forEach { localJar ->
             require(Files.exists(localJar.artifactPath) && Files.isRegularFile(localJar.artifactPath)) {
                 "Plugin jar '${localJar.artifactPath}' does not exist or is not a file."

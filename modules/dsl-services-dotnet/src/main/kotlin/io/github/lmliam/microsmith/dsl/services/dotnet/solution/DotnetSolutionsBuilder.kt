@@ -15,9 +15,7 @@ internal class DotnetSolutionsBuilder : DotnetSolutionsScope {
     fun build(): Map<String, DotnetSolution> = solutionsByName.toMap()
 
     private fun register(solution: DotnetSolution) {
-        require(solution.name !in solutionsByName) {
-            "Duplicate .NET solution registration for '${solution.name}'."
-        }
+        require(solution.name !in solutionsByName) { "Duplicate .NET solution registration for '${solution.name}'." }
 
         solutionsByName[solution.name] = solution
     }

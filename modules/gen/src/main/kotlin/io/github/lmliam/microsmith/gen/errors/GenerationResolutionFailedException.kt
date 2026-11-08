@@ -7,14 +7,11 @@ import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 class GenerationResolutionFailedException(
     val issues: NonEmptyList<ResolutionIssue>,
     val diagnostics: NonEmptyList<ResolutionDiagnostic>,
-) : RuntimeException(
-    buildString {
-        append("Microsmith model resolution failed with ${issues.size} semantic issue(s): ")
+) :
+    RuntimeException(
+        buildString {
+            append("Microsmith model resolution failed with ${issues.size} semantic issue(s): ")
 
-        append(
-            diagnostics.joinToString("; ") {
-                "[${it.code}] ${it.message}"
-            },
-        )
-    },
-)
+            append(diagnostics.joinToString("; ") { "[${it.code}] ${it.message}" })
+        }
+    )

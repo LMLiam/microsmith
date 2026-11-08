@@ -13,66 +13,60 @@ private sealed interface TestIssue : ResolutionIssue {
 }
 
 private class TestIssueMapper : ResolutionIssueDiagnosticMapper<TestIssue> {
-    override val issueType =
-        TestIssue::class
+    override val issueType = TestIssue::class
 
-    override fun map(issue: TestIssue): ResolutionDiagnostic = when (issue) {
-        TestIssue.Alpha ->
-            ResolutionDiagnostic(
-                code = "test.alpha",
-                message = "Alpha failed",
-            )
+    override fun map(issue: TestIssue): ResolutionDiagnostic =
+        when (issue) {
+            TestIssue.Alpha ->
+                ResolutionDiagnostic(
+                    code = "test.alpha",
+                    message = "Alpha failed",
+                )
 
-        TestIssue.Beta ->
-            ResolutionDiagnostic(
-                code = "test.beta",
-                message = "Beta failed",
-            )
-    }
+            TestIssue.Beta ->
+                ResolutionDiagnostic(
+                    code = "test.beta",
+                    message = "Beta failed",
+                )
+        }
 }
 
 private class AlphaIssueMapper : ResolutionIssueDiagnosticMapper<TestIssue.Alpha> {
-    override val issueType =
-        TestIssue.Alpha::class
+    override val issueType = TestIssue.Alpha::class
 
-    override fun map(issue: TestIssue.Alpha): ResolutionDiagnostic = ResolutionDiagnostic(
-        code = "test.alpha-specific",
-        message = "Specific alpha failure",
-    )
+    override fun map(issue: TestIssue.Alpha): ResolutionDiagnostic =
+        ResolutionDiagnostic(
+            code = "test.alpha-specific",
+            message = "Specific alpha failure",
+        )
 }
 
 private class DuplicateTestIssueMapper : ResolutionIssueDiagnosticMapper<TestIssue> {
-    override val issueType =
-        TestIssue::class
+    override val issueType = TestIssue::class
 
-    override fun map(issue: TestIssue): ResolutionDiagnostic = ResolutionDiagnostic(
-        code = "test.duplicate",
-        message = "Duplicate",
-    )
+    override fun map(issue: TestIssue): ResolutionDiagnostic =
+        ResolutionDiagnostic(
+            code = "test.duplicate",
+            message = "Duplicate",
+        )
 }
 
 private class IncorrectIssueTypeMapper : ResolutionIssueDiagnosticMapper<TestIssue.Alpha> {
-    @Suppress("UNCHECKED_CAST")
-    override val issueType =
-        TestIssue.Beta::class as
-            KClass<TestIssue.Alpha>
+    @Suppress("UNCHECKED_CAST") override val issueType = TestIssue.Beta::class as KClass<TestIssue.Alpha>
 
-    override fun map(issue: TestIssue.Alpha): ResolutionDiagnostic = ResolutionDiagnostic(
-        code = "test.invalid",
-        message = "Invalid",
-    )
+    override fun map(issue: TestIssue.Alpha): ResolutionDiagnostic =
+        ResolutionDiagnostic(
+            code = "test.invalid",
+            message = "Invalid",
+        )
 }
 
-private data object UnmappedIssue :
-    ResolutionIssue
+private data object UnmappedIssue : ResolutionIssue
 
 class ResolutionDiagnosticServiceTests :
     StringSpec({
         "describe maps subtype issues through a hierarchy mapper" {
-            val service =
-                ResolutionDiagnosticService(
-                    listOf(TestIssueMapper()),
-                )
+            val service = ResolutionDiagnosticService(listOf(TestIssueMapper()))
 
             service.describe(TestIssue.Alpha) shouldBe
                 ResolutionDiagnostic(
@@ -87,7 +81,7 @@ class ResolutionDiagnosticServiceTests :
                     listOf(
                         TestIssueMapper(),
                         AlphaIssueMapper(),
-                    ),
+                    )
                 )
 
             service.describe(TestIssue.Alpha) shouldBe
@@ -104,13 +98,10 @@ class ResolutionDiagnosticServiceTests :
         }
 
         "describe returns a safe fallback for unmapped issues" {
-            ResolutionDiagnosticService()
-                .describe(UnmappedIssue) shouldBe
+            ResolutionDiagnosticService().describe(UnmappedIssue) shouldBe
                 ResolutionDiagnostic(
                     code = "resolution.unmapped-issue",
-                    message =
-                    "Resolution failed with issue type " +
-                        "'${UnmappedIssue::class.qualifiedName}'.",
+                    message = "Resolution failed with issue type " + "'${UnmappedIssue::class.qualifiedName}'.",
                 )
         }
 
@@ -120,18 +111,12 @@ class ResolutionDiagnosticServiceTests :
                     listOf(
                         TestIssueMapper(),
                         DuplicateTestIssueMapper(),
-                    ),
+                    )
                 )
             }
         }
 
         "registry rejects issueType declarations that disagree with the generic contract" {
-            shouldThrow<IllegalArgumentException> {
-                ResolutionDiagnosticService(
-                    listOf(
-                        IncorrectIssueTypeMapper(),
-                    ),
-                )
-            }
+            shouldThrow<IllegalArgumentException> { ResolutionDiagnosticService(listOf(IncorrectIssueTypeMapper())) }
         }
     })

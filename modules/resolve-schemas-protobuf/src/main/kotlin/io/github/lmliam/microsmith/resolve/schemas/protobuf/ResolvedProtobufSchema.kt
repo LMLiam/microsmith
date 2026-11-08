@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf
+
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 data class ResolvedProtobufSchema(

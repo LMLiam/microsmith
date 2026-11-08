@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas
+
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -24,9 +25,7 @@ class SchemasBuilderTests :
             val builder = SchemasBuilder()
             val schema = FakeSchema(name = "")
 
-            shouldThrow<IllegalArgumentException> {
-                builder.register(schema)
-            }
+            shouldThrow<IllegalArgumentException> { builder.register(schema) }
         }
 
         "register throws for duplicate schema type and name" {
@@ -35,9 +34,7 @@ class SchemasBuilderTests :
 
             builder.register(schema)
 
-            shouldThrow<IllegalArgumentException> {
-                builder.register(FakeSchema(name = "User"))
-            }
+            shouldThrow<IllegalArgumentException> { builder.register(FakeSchema(name = "User")) }
         }
 
         "build produces SchemasExtension with all schemas" {

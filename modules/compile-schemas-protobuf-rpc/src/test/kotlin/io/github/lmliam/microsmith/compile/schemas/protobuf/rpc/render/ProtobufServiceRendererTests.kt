@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.render
+
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcEndpoint
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcOperation
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
@@ -14,31 +15,36 @@ class ProtobufServiceRendererTests :
                     ProtobufRpcServiceArtifact(
                         id = ProtobufRpcServiceArtifactId(packageName = "pkg", serviceName = "UserService"),
                         imports = emptyList(),
-                        operations = listOf(
-                            ProtobufRpcOperation(
-                                name = "GetUser",
-                                request = ProtobufRpcEndpoint(
-                                    typeName = "pkg.GetUserRequest",
-                                    streaming = false,
+                        operations =
+                            listOf(
+                                ProtobufRpcOperation(
+                                    name = "GetUser",
+                                    request =
+                                        ProtobufRpcEndpoint(
+                                            typeName = "pkg.GetUserRequest",
+                                            streaming = false,
+                                        ),
+                                    response =
+                                        ProtobufRpcEndpoint(
+                                            typeName = "pkg.GetUserResponse",
+                                            streaming = false,
+                                        ),
                                 ),
-                                response = ProtobufRpcEndpoint(
-                                    typeName = "pkg.GetUserResponse",
-                                    streaming = false,
+                                ProtobufRpcOperation(
+                                    name = "ChatUsers",
+                                    request =
+                                        ProtobufRpcEndpoint(
+                                            typeName = "pkg.ChatRequest",
+                                            streaming = true,
+                                        ),
+                                    response =
+                                        ProtobufRpcEndpoint(
+                                            typeName = "pkg.ChatResponse",
+                                            streaming = true,
+                                        ),
                                 ),
                             ),
-                            ProtobufRpcOperation(
-                                name = "ChatUsers",
-                                request = ProtobufRpcEndpoint(
-                                    typeName = "pkg.ChatRequest",
-                                    streaming = true,
-                                ),
-                                response = ProtobufRpcEndpoint(
-                                    typeName = "pkg.ChatResponse",
-                                    streaming = true,
-                                ),
-                            ),
-                        ),
-                    ),
+                    )
                 )
 
             rendered.shouldContain("rpc GetUser (pkg.GetUserRequest) returns (pkg.GetUserResponse);")

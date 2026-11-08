@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init
+
 import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.ide.IdeHelperConflictException
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
@@ -50,7 +51,7 @@ class InitBootstrapTests :
                     listOf(
                         repoRoot.resolve("build.microsmith.kts"),
                         repoRoot.resolve("settings.microsmith.kts"),
-                    ),
+                    )
                 )
                 result.overwrittenFiles shouldBe emptyList()
                 result.preservedFiles shouldBe emptyList()
@@ -59,7 +60,8 @@ class InitBootstrapTests :
                 repoRoot.resolve("settings.microsmith.kts").isRegularFile() shouldBe true
                 repoRoot.resolve("build.microsmith.kts").readText().shouldContain("NodeUserCreated")
                 repoRoot.resolve("build.microsmith.kts").readText().shouldContain("./proto")
-                repoRoot.resolve("settings.microsmith.kts")
+                repoRoot
+                    .resolve("settings.microsmith.kts")
                     .readText()
                     .shouldContain("Detected repository profile: Node")
             } finally {
@@ -69,13 +71,16 @@ class InitBootstrapTests :
 
         "creates repo-aware bootstrap files for Python repositories without a repository-native output override" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-python")
-            repoRoot.resolve("pyproject.toml").writeText(
-                """
-                [project]
-                name = "fixture-python"
-                version = "0.1.0"
-                """.trimIndent() + "\n",
-            )
+            repoRoot
+                .resolve("pyproject.toml")
+                .writeText(
+                    """
+                    [project]
+                    name = "fixture-python"
+                    version = "0.1.0"
+                    """
+                        .trimIndent() + "\n"
+                )
             try {
                 val helperRoot = repoRoot.resolve(".microsmith/ide")
                 val result =
@@ -109,15 +114,18 @@ class InitBootstrapTests :
 
         "creates ASP.NET bootstrap files for .NET repositories" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-dotnet")
-            repoRoot.resolve("MicrosmithFixture.csproj").writeText(
-                """
-                <Project Sdk="Microsoft.NET.Sdk">
-                  <PropertyGroup>
-                    <TargetFramework>net9.0</TargetFramework>
-                  </PropertyGroup>
-                </Project>
-                """.trimIndent() + "\n",
-            )
+            repoRoot
+                .resolve("MicrosmithFixture.csproj")
+                .writeText(
+                    """
+                    <Project Sdk="Microsoft.NET.Sdk">
+                      <PropertyGroup>
+                        <TargetFramework>net9.0</TargetFramework>
+                      </PropertyGroup>
+                    </Project>
+                    """
+                        .trimIndent() + "\n"
+                )
             try {
                 val helperRoot = repoRoot.resolve(".microsmith/ide")
                 val result =
@@ -158,20 +166,26 @@ class InitBootstrapTests :
         "creates repo-aware bootstrap files for Rust workspace roots without a repository-native output override" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-rust")
             repoRoot.resolve("crates/app/src").createDirectories()
-            repoRoot.resolve("Cargo.toml").writeText(
-                """
-                [workspace]
-                members = ["crates/app"]
-                """.trimIndent() + "\n",
-            )
-            repoRoot.resolve("crates/app/Cargo.toml").writeText(
-                """
-                [package]
-                name = "fixture-rust-app"
-                version = "0.1.0"
-                edition = "2024"
-                """.trimIndent() + "\n",
-            )
+            repoRoot
+                .resolve("Cargo.toml")
+                .writeText(
+                    """
+                    [workspace]
+                    members = ["crates/app"]
+                    """
+                        .trimIndent() + "\n"
+                )
+            repoRoot
+                .resolve("crates/app/Cargo.toml")
+                .writeText(
+                    """
+                    [package]
+                    name = "fixture-rust-app"
+                    version = "0.1.0"
+                    edition = "2024"
+                    """
+                        .trimIndent() + "\n"
+                )
             try {
                 val helperRoot = repoRoot.resolve(".microsmith/ide")
                 val result =
@@ -237,10 +251,7 @@ class InitBootstrapTests :
             val originalBytes = byteArrayOf(0xC3.toByte(), 0x28)
             Files.write(buildScript, originalBytes)
             try {
-                val result =
-                    runInitBootstrap(
-                        command = InitCommand(projectRoot = repoRoot, skipIdeHelper = true),
-                    )
+                val result = runInitBootstrap(command = InitCommand(projectRoot = repoRoot, skipIdeHelper = true))
 
                 result.createdFiles.shouldContainExactly(listOf(repoRoot.resolve("settings.microsmith.kts")))
                 result.overwrittenFiles shouldBe emptyList()
@@ -290,9 +301,7 @@ class InitBootstrapTests :
             Files.write(buildScript, byteArrayOf(0xC3.toByte(), 0x28))
             try {
                 val result =
-                    runInitBootstrap(
-                        command = InitCommand(projectRoot = repoRoot, force = true, skipIdeHelper = true),
-                    )
+                    runInitBootstrap(command = InitCommand(projectRoot = repoRoot, force = true, skipIdeHelper = true))
 
                 result.createdFiles.shouldContainExactly(listOf(repoRoot.resolve("settings.microsmith.kts")))
                 result.overwrittenFiles.shouldContainExactly(listOf(buildScript))
@@ -326,9 +335,7 @@ class InitBootstrapTests :
                     shouldThrow<InitConflictException> {
                         runInitBootstrap(
                             command = InitCommand(projectRoot = repoRoot),
-                            ideRefreshRunner = {
-                                throw IdeHelperConflictException("IDE helper path is invalid.")
-                            },
+                            ideRefreshRunner = { throw IdeHelperConflictException("IDE helper path is invalid.") },
                         )
                     }
 
@@ -356,27 +363,29 @@ class InitBootstrapTests :
             }
         }
 
-        "throws conflict when bootstrap path exists as a symlink".config(enabled = !runningOnWindows()) {
-            val repoRoot = createTempDirectory("microsmith-init-bootstrap-symlink")
-            val targetFile = createTempDirectory("microsmith-init-bootstrap-symlink-target")
-                .resolve("external-build.microsmith.kts")
-            targetFile.writeText("// external build script")
-            Files.createSymbolicLink(repoRoot.resolve("build.microsmith.kts"), targetFile)
-            try {
-                val error =
-                    shouldThrow<InitConflictException> {
-                        runInitBootstrap(
-                            command = InitCommand(projectRoot = repoRoot, force = true),
-                            ideRefreshRunner = { error("should not refresh IDE helper when conflict exists") },
-                        )
-                    }
+        "throws conflict when bootstrap path exists as a symlink"
+            .config(enabled = !runningOnWindows()) {
+                val repoRoot = createTempDirectory("microsmith-init-bootstrap-symlink")
+                val targetFile =
+                    createTempDirectory("microsmith-init-bootstrap-symlink-target")
+                        .resolve("external-build.microsmith.kts")
+                targetFile.writeText("// external build script")
+                Files.createSymbolicLink(repoRoot.resolve("build.microsmith.kts"), targetFile)
+                try {
+                    val error =
+                        shouldThrow<InitConflictException> {
+                            runInitBootstrap(
+                                command = InitCommand(projectRoot = repoRoot, force = true),
+                                ideRefreshRunner = { error("should not refresh IDE helper when conflict exists") },
+                            )
+                        }
 
-                error.message.shouldContain("exists but is not a regular file")
-            } finally {
-                runCatching { repoRoot.deleteRecursively() }
-                runCatching { targetFile.parent.deleteRecursively() }
+                    error.message.shouldContain("exists but is not a regular file")
+                } finally {
+                    runCatching { repoRoot.deleteRecursively() }
+                    runCatching { targetFile.parent.deleteRecursively() }
+                }
             }
-        }
 
         "throws validation error when repository root does not exist" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-missing")

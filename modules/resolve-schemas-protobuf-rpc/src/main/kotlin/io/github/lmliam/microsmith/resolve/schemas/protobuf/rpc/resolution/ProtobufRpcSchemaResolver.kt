@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.resolution
+
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.leftNel
@@ -30,9 +31,10 @@ internal class ProtobufRpcSchemaResolver {
 
         if (qualifiedName.typeName != service.name) {
             return ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch(
-                schemaName = schema.name,
-                declarationName = service.name,
-            ).leftNel()
+                    schemaName = schema.name,
+                    declarationName = service.name,
+                )
+                .leftNel()
         }
 
         ProtobufNameValidation.requireIdentifier(service.name, "Service name")
@@ -40,24 +42,26 @@ internal class ProtobufRpcSchemaResolver {
         return service.rpcs
             .mapOrAccumulate { rpc ->
                 resolveRpc(
-                    service = service,
-                    rpc = rpc,
-                    current = qualifiedName,
-                    schemasByName = schemasByName,
-                ).bind()
+                        service = service,
+                        rpc = rpc,
+                        current = qualifiedName,
+                        schemasByName = schemasByName,
+                    )
+                    .bind()
             }
             .map { resolvedRpcs ->
                 ResolvedProtobufRpcSchema(
                     qualifiedName = qualifiedName,
-                    imports = resolvedRpcs
-                        .flatMap { rpc ->
-                            listOfNotNull(
-                                rpc.request.importPath(qualifiedName),
-                                rpc.response.importPath(qualifiedName),
-                            )
-                        }
-                        .distinct()
-                        .sorted(),
+                    imports =
+                        resolvedRpcs
+                            .flatMap { rpc ->
+                                listOfNotNull(
+                                    rpc.request.importPath(qualifiedName),
+                                    rpc.response.importPath(qualifiedName),
+                                )
+                            }
+                            .distinct()
+                            .sorted(),
                     rpcs = resolvedRpcs,
                 )
             }
@@ -71,23 +75,27 @@ internal class ProtobufRpcSchemaResolver {
     ): Either<ProtobufRpcResolutionIssue, ResolvedProtobufRpc> = either {
         ProtobufNameValidation.requireIdentifier(rpc.name, "RPC name")
 
-        val request = resolveEndpoint(
-            service = service,
-            rpc = rpc,
-            endpoint = rpc.request,
-            current = current,
-            position = ProtobufRpcResolutionIssue.EndpointPosition.REQUEST,
-            schemasByName = schemasByName,
-        ).bind()
+        val request =
+            resolveEndpoint(
+                    service = service,
+                    rpc = rpc,
+                    endpoint = rpc.request,
+                    current = current,
+                    position = ProtobufRpcResolutionIssue.EndpointPosition.REQUEST,
+                    schemasByName = schemasByName,
+                )
+                .bind()
 
-        val response = resolveEndpoint(
-            service = service,
-            rpc = rpc,
-            endpoint = rpc.response,
-            current = current,
-            position = ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
-            schemasByName = schemasByName,
-        ).bind()
+        val response =
+            resolveEndpoint(
+                    service = service,
+                    rpc = rpc,
+                    endpoint = rpc.response,
+                    current = current,
+                    position = ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
+                    schemasByName = schemasByName,
+                )
+                .bind()
 
         ResolvedProtobufRpc(
             name = rpc.name,
@@ -108,23 +116,21 @@ internal class ProtobufRpcSchemaResolver {
 
         val target =
             ensureNotNull(schemasByName[targetName]) {
-                ProtobufRpcResolutionIssue
-                    .EndpointTargetNotFound(
-                        serviceName = service.name,
-                        rpcName = rpc.name,
-                        position = position,
-                        targetName = targetName,
-                    )
-            }
-
-        ensure(target.schema is Message) {
-            ProtobufRpcResolutionIssue
-                .EndpointMustTargetMessage(
+                ProtobufRpcResolutionIssue.EndpointTargetNotFound(
                     serviceName = service.name,
                     rpcName = rpc.name,
                     position = position,
                     targetName = targetName,
                 )
+            }
+
+        ensure(target.schema is Message) {
+            ProtobufRpcResolutionIssue.EndpointMustTargetMessage(
+                serviceName = service.name,
+                rpcName = rpc.name,
+                position = position,
+                targetName = targetName,
+            )
         }
 
         ResolvedProtobufRpcEndpoint(
@@ -134,7 +140,5 @@ internal class ProtobufRpcSchemaResolver {
     }
 }
 
-private fun ResolvedProtobufRpcEndpoint.importPath(current: QualifiedSchemaName): String? = qualifiedTypeName
-    .takeUnless { it == current.fullyQualifiedName }
-    ?.replace('.', '/')
-    ?.plus(".proto")
+private fun ResolvedProtobufRpcEndpoint.importPath(current: QualifiedSchemaName): String? =
+    qualifiedTypeName.takeUnless { it == current.fullyQualifiedName }?.replace('.', '/')?.plus(".proto")

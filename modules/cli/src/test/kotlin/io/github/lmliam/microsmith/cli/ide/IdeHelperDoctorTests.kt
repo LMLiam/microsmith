@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.ide
+
 import io.github.lmliam.microsmith.cli.command.IdeDoctorCommand
 import io.github.lmliam.microsmith.cli.command.IdeRefreshCommand
 import io.kotest.core.spec.style.StringSpec
@@ -105,8 +106,9 @@ class IdeHelperDoctorTests :
                 val requiredFilesCheck = result.checks.first { check -> check.id == "required-files" }
                 requiredFilesCheck.passed shouldBe false
                 requiredFilesCheck.message.shouldContain("conflicting managed paths")
-                requiredFilesCheck.details["invalidFiles"]
-                    .shouldContain(helperRoot.resolve("build.gradle.kts").toString())
+                requiredFilesCheck.details["invalidFiles"].shouldContain(
+                    helperRoot.resolve("build.gradle.kts").toString()
+                )
             } finally {
                 runCatching { repoRoot.deleteRecursively() }
             }

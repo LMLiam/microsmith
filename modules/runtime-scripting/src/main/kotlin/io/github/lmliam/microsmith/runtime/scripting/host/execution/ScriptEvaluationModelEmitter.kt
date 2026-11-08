@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.execution
+
 import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import kotlin.script.experimental.api.EvaluationResult
@@ -12,8 +13,7 @@ internal class ScriptEvaluationModelEmitter {
             is ResultValue.Value -> emitReturnedModelIfNeeded(returnValue.value, scriptContext)
 
             is ResultValue.Unit,
-            ResultValue.NotEvaluated,
-            -> requireGenerated(scriptContext)
+            ResultValue.NotEvaluated -> requireGenerated(scriptContext)
         }
     }
 

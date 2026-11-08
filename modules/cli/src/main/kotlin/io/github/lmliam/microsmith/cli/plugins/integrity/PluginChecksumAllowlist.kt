@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.integrity
+
 import io.github.lmliam.microsmith.cli.plugins.LOCAL_KIND
 import io.github.lmliam.microsmith.cli.plugins.REMOTE_ARTIFACT_KIND
 import io.github.lmliam.microsmith.cli.plugins.REMOTE_KIND
@@ -15,9 +16,7 @@ internal data class PluginChecksumAllowlist(val entries: Map<LockKey, String>) {
         val missing = requestedKeys - entries.keys
         require(missing.isEmpty()) {
             val details =
-                missing
-                    .sortedWith(compareBy(LockKey::kind, LockKey::key))
-                    .joinToString { "${it.kind}:${it.key}" }
+                missing.sortedWith(compareBy(LockKey::kind, LockKey::key)).joinToString { "${it.kind}:${it.key}" }
             "Plugin allowlist is missing required entries: $details."
         }
     }
@@ -33,14 +32,9 @@ internal data class PluginChecksumAllowlist(val entries: Map<LockKey, String>) {
 }
 
 internal fun loadPluginChecksumAllowlistFromEnvironment(
-    allowlistPath: String? = System.getenv(CHECKSUM_ALLOWLIST_PATH_ENV),
+    allowlistPath: String? = System.getenv(CHECKSUM_ALLOWLIST_PATH_ENV)
 ): PluginChecksumAllowlist? {
-    val resolvedPath =
-        allowlistPath
-            ?.trim()
-            ?.takeIf { it.isNotEmpty() }
-            ?.let(Path::of)
-            ?: return null
+    val resolvedPath = allowlistPath?.trim()?.takeIf { it.isNotEmpty() }?.let(Path::of) ?: return null
     return loadPluginChecksumAllowlistFromPath(resolvedPath)
 }
 
@@ -74,9 +68,7 @@ private fun parseAllowlistEntry(line: String): LockEntry {
         "Invalid plugin allowlist entry kind '$kind'."
     }
     require(key.isNotBlank()) { "Plugin allowlist entry key must not be blank." }
-    require(isSha256(checksum)) {
-        "Plugin allowlist checksum for '$key' is invalid."
-    }
+    require(isSha256(checksum)) { "Plugin allowlist checksum for '$key' is invalid." }
 
     return LockEntry(kind = kind, key = key, checksum = checksum)
 }

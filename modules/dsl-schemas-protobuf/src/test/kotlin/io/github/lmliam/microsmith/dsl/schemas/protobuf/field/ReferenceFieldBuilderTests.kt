@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
+
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -39,32 +40,24 @@ class ReferenceFieldBuilderTests :
         "calling optional twice throws" {
             val builder = ReferenceFieldBuilder()
             builder.optional()
-            shouldThrow<IllegalArgumentException> {
-                builder.optional()
-            }
+            shouldThrow<IllegalArgumentException> { builder.optional() }
         }
 
         "calling repeated twice throws" {
             val builder = ReferenceFieldBuilder()
             builder.repeated()
-            shouldThrow<IllegalArgumentException> {
-                builder.repeated()
-            }
+            shouldThrow<IllegalArgumentException> { builder.repeated() }
         }
 
         "calling optional then repeated throws" {
             val builder = ReferenceFieldBuilder()
             builder.optional()
-            shouldThrow<IllegalArgumentException> {
-                builder.repeated()
-            }
+            shouldThrow<IllegalArgumentException> { builder.repeated() }
         }
 
         "calling repeated then optional throws" {
             val builder = ReferenceFieldBuilder()
             builder.repeated()
-            shouldThrow<IllegalArgumentException> {
-                builder.optional()
-            }
+            shouldThrow<IllegalArgumentException> { builder.optional() }
         }
     })

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
+
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
@@ -30,13 +31,12 @@ internal class ProcessIsolationFailureFactory {
     }
 
     private fun unknownFailure(exitCode: Int, processOutput: String): ScriptRunFailure {
-        val diagnostics =
-            buildList {
-                add("Process isolation execution failed with exit code $exitCode.")
-                if (processOutput.isNotEmpty()) {
-                    add("Process stderr/stdout: $processOutput")
-                }
+        val diagnostics = buildList {
+            add("Process isolation execution failed with exit code $exitCode.")
+            if (processOutput.isNotEmpty()) {
+                add("Process stderr/stdout: $processOutput")
             }
+        }
         return ScriptRunFailure(diagnostics = diagnostics, type = ScriptFailureType.HOST)
     }
 }

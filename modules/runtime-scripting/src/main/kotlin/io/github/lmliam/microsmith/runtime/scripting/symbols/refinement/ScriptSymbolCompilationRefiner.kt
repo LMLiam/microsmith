@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.refinement
+
 import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolContributorRegistry
 import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolDiscovery
 import io.github.lmliam.microsmith.runtime.scripting.symbols.model.DiscoveredScriptSymbol
@@ -11,35 +12,35 @@ import kotlin.script.experimental.api.makeFailureResult
 import kotlin.script.experimental.api.providedProperties
 
 internal fun refineMicrosmithScriptSymbols(
-    context: ScriptConfigurationRefinementContext,
+    context: ScriptConfigurationRefinementContext
 ): ResultWithDiagnostics<ScriptCompilationConfiguration> = runCatching {
     val registry = ScriptSymbolContributorRegistry.discover()
 
-    val symbols = ScriptSymbolDiscovery.discover(
-        sourceName = context.script.name ?: "script.microsmith.kts",
-        sourceText = context.script.text,
-        registry = registry,
-    )
+    val symbols =
+        ScriptSymbolDiscovery.discover(
+            sourceName = context.script.name ?: "script.microsmith.kts",
+            sourceText = context.script.text,
+            registry = registry,
+        )
 
     ScriptCompilationConfiguration(context.compilationConfiguration) {
         if (symbols.isNotEmpty()) {
             providedProperties.append(
                 symbols.associate { symbol ->
                     symbol.definition.propertyName to KotlinType(symbol.definition.valueType)
-                },
+                }
             )
 
-            ScriptCompilationConfiguration
-                .microsmithScriptSymbols
-                .put(symbols.map(DiscoveredScriptSymbol::compiled))
+            ScriptCompilationConfiguration.microsmithScriptSymbols.put(symbols.map(DiscoveredScriptSymbol::compiled))
         }
     }
-}.fold(
-    onSuccess = { it.asSuccess() },
-    onFailure = {
-        makeFailureResult(
-            message = it.message ?: "Failed to discover automatic Microsmith script symbols",
-            path = context.script.locationId,
-        )
-    },
-)
+}
+    .fold(
+        onSuccess = { it.asSuccess() },
+        onFailure = {
+            makeFailureResult(
+                message = it.message ?: "Failed to discover automatic Microsmith script symbols",
+                path = context.script.locationId,
+            )
+        },
+    )

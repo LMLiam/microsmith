@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init.profile
+
 import java.nio.file.Path
 
 internal object JavaOnboardingMarkerFinder {
@@ -9,7 +10,8 @@ internal object JavaOnboardingMarkerFinder {
         JAVA_SOURCE_ROOT_MARKERS.any(relativeDirectory::endsWith)
 }
 
-private val JAVA_SOURCE_ROOT_MARKERS = listOf(
-    Path.of("src/main/java"),
-    Path.of("src/test/java"),
-)
+private val JAVA_SOURCE_ROOT_MARKERS =
+    listOf(
+        Path.of("src/main/java"),
+        Path.of("src/test/java"),
+    )
