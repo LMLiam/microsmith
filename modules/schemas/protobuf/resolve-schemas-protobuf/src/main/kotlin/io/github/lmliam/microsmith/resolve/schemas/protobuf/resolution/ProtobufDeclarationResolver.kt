@@ -56,7 +56,7 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                         name,
                         parsed.fields.buildEach(fields),
                         parsed.oneofs.buildEach(oneofs),
-                        message.reserved,
+                        parsed.reservations,
                     )
                 }
 
@@ -78,7 +78,7 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                     ResolvedProtobufEnum(
                         name,
                         parsed.values.map { ResolvedProtobufEnumValue(it.name, it.number) },
-                        enumDeclaration.reserved,
+                        parsed.reservations,
                     )
                 }
 

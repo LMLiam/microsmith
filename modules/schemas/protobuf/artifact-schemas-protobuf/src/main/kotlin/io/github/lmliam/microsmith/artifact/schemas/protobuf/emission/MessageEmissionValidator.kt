@@ -4,7 +4,6 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMess
 
 internal fun validateMessage(message: ResolvedProtobufMessage) {
     message.oneofs.forEach(::validateOneof)
-    message.reservations.forEach(::validateReserved)
 
     requireUniqueFieldNames(message)
     requireUniqueFieldNumbers(message)

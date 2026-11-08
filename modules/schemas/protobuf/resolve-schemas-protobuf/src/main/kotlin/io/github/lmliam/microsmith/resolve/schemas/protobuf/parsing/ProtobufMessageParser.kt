@@ -13,9 +13,8 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoDuplicates
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.raiseEach
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.validateMessageReservations
 
 internal fun parseMessageDeclaration(
     schemaName: String,
@@ -42,16 +41,17 @@ internal fun parseMessageDeclaration(
             }
         },
         {
-            validateMessageReservations(
+            parseReservations(
                     schemaName,
                     message.reserved,
+                    ReservedSpan.Domain.MESSAGE,
                     usedNames = allFields.map(Field::name),
                     usedNumbers = allFields.map(Field::index),
                 )
-                .raiseEach()
+                .bindNel()
         },
-    ) { fields, oneofs, _, _, _, _ ->
-        ParsedMessage(fields, oneofs)
+    ) { fields, oneofs, _, _, _, reservations ->
+        ParsedMessage(fields, oneofs, reservations)
     }
 }
 
