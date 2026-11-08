@@ -1,15 +1,13 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
 
+import arrow.core.nonEmptyListOf
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Cardinality
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.EnumValueNumber
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 
@@ -33,7 +31,7 @@ class ProtobufSchemaEmissionValidatorTests :
                             ResolvedProtobufOneof(
                                 name = protoIdentifier("channel"),
                                 fields =
-                                    listOf(
+                                    nonEmptyListOf(
                                         ResolvedProtobufOneof.Field(
                                             name = protoIdentifier("value"),
                                             number = fieldNumber(2),
@@ -66,7 +64,7 @@ class ProtobufSchemaEmissionValidatorTests :
                             ResolvedProtobufOneof(
                                 name = protoIdentifier("channel"),
                                 fields =
-                                    listOf(
+                                    nonEmptyListOf(
                                         ResolvedProtobufOneof.Field(
                                             name = protoIdentifier("secondary"),
                                             number = fieldNumber(1),
@@ -91,7 +89,7 @@ class ProtobufSchemaEmissionValidatorTests :
                             ResolvedProtobufOneof(
                                 name = protoIdentifier("channel"),
                                 fields =
-                                    listOf(
+                                    nonEmptyListOf(
                                         ResolvedProtobufOneof.Field(
                                             name = protoIdentifier("email"),
                                             number = fieldNumber(1),
@@ -102,7 +100,7 @@ class ProtobufSchemaEmissionValidatorTests :
                             ResolvedProtobufOneof(
                                 name = protoIdentifier("channel"),
                                 fields =
-                                    listOf(
+                                    nonEmptyListOf(
                                         ResolvedProtobufOneof.Field(
                                             name = protoIdentifier("phone"),
                                             number = fieldNumber(2),
@@ -112,27 +110,6 @@ class ProtobufSchemaEmissionValidatorTests :
                             ),
                         ),
                     reservations = ResolvedProtobufReservations.NONE,
-                )
-
-            shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
-        }
-
-        "validate rejects reserved enum names that collide with values" {
-            val declaration =
-                ResolvedProtobufEnum(
-                    name = protoIdentifier("Status"),
-                    values =
-                        listOf(
-                            ResolvedProtobufEnumValue(
-                                name = protoIdentifier("UNSPECIFIED"),
-                                number = EnumValueNumber(0),
-                            ),
-                            ResolvedProtobufEnumValue(
-                                name = protoIdentifier("ACTIVE"),
-                                number = EnumValueNumber(1),
-                            ),
-                        ),
-                    reservations = reservations(names = listOf(protoIdentifier("ACTIVE"))),
                 )
 
             shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }

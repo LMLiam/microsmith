@@ -1,12 +1,14 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing
 
 import arrow.core.EitherNel
+import arrow.core.NonEmptyList
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.context.bindNel
 import arrow.core.raise.context.either
-import arrow.core.raise.context.ensure
+import arrow.core.raise.context.ensureNotNull
 import arrow.core.raise.context.mapOrAccumulate
 import arrow.core.raise.context.zipOrAccumulate
+import arrow.core.toNonEmptyListOrNull
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Field
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MessageField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofField
@@ -71,16 +73,21 @@ private fun parseOneofs(schemaName: String, oneofs: List<Oneof>): List<ParsedOne
 private fun parseOneof(schemaName: String, oneof: Oneof): EitherNel<ProtobufResolutionIssue, ParsedOneof> = either {
     zipOrAccumulate(
         { parseIdentifier(schemaName, ProtobufResolutionIssue.IdentifierLocation.Oneof(oneof.name), oneof.name) },
-        { ensure(oneof.fields.isNotEmpty()) { ProtobufResolutionIssue.EmptyOneof(schemaName, oneof.name) } },
         { parseOneofFields(schemaName, oneof) },
-    ) { name, _, fields ->
+    ) { name, fields ->
         ParsedOneof(name, fields)
     }
 }
 
 context(_: RaiseAccumulate<ProtobufResolutionIssue>)
-private fun parseOneofFields(schemaName: String, oneof: Oneof): List<ParsedField> =
-    oneof.fields.mapOrAccumulate { parseOneofField(schemaName, oneof, it).bindNel() }
+private fun parseOneofFields(schemaName: String, oneof: Oneof): NonEmptyList<ParsedField> {
+    val fields =
+        ensureNotNull(oneof.fields.toNonEmptyListOrNull()) {
+            ProtobufResolutionIssue.EmptyOneof(schemaName, oneof.name)
+        }
+
+    return fields.mapOrAccumulate { parseOneofField(schemaName, oneof, it).bindNel() }
+}
 
 private fun parseOneofField(
     schemaName: String,

@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution
 
 import arrow.core.EitherNel
+import arrow.core.NonEmptyList
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.context.bind
@@ -28,6 +29,7 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufRejection
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchema
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
@@ -37,6 +39,7 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.ParsedOneof
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseEnumDeclaration
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseMessageDeclaration
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.toIssue
 
 internal class ProtobufDeclarationResolver(private val referenceResolver: ProtobufReferenceResolver) {
     fun resolveMessage(
@@ -69,22 +72,33 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
         enumDeclaration: Enum,
     ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
         with(identity) {
-            val declaration =
+            val (name, parsed) =
                 zipOrAccumulate(
                     { declarationName(enumDeclaration.name) },
                     { parseEnumDeclaration(identity.fullyQualifiedName, enumDeclaration).bindNel() },
                     { checkTypeName(enumDeclaration) },
                 ) { name, parsed, _ ->
-                    ResolvedProtobufEnum(
+                    name to parsed
+                }
+
+            val declaration =
+                ResolvedProtobufEnum.of(
                         name,
                         parsed.values.map { ResolvedProtobufEnumValue(it.name, it.number) },
                         parsed.reservations,
                     )
-                }
+                    .asIssues()
+                    .bind()
 
             schemaFor(declaration)
         }
     }
+
+    context(identity: QualifiedSchemaName)
+    private fun <A> EitherNel<ResolvedProtobufRejection, A>.asIssues(): EitherNel<ProtobufResolutionIssue, A> =
+        mapLeft { rejections ->
+            rejections.map { it.toIssue(identity.fullyQualifiedName) }
+        }
 
     context(identity: QualifiedSchemaName, _: Raise<ProtobufResolutionIssue>)
     private fun declarationName(raw: String): ProtoIdentifier =
@@ -140,7 +154,7 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
     private fun resolveOneof(oneof: Oneof): (ParsedOneof) -> ResolvedProtobufOneof {
         val fields = oneof.fields.mapOrAccumulate { resolveOneofField(oneof, it) }
 
-        return { parsed -> ResolvedProtobufOneof(parsed.name, parsed.fields.buildEach(fields)) }
+        return { parsed -> ResolvedProtobufOneof(parsed.name, parsed.fields.buildEachNonEmpty(fields)) }
     }
 
     context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
@@ -179,6 +193,11 @@ private typealias FieldBuilder = (ParsedField) -> ResolvedProtobufField
 
 private fun <P, R> List<P>.buildEach(builders: List<(P) -> R>): List<R> =
     zip(builders) { parsed, build -> build(parsed) }
+
+private fun <P, R> NonEmptyList<P>.buildEachNonEmpty(builders: List<(P) -> R>): NonEmptyList<R> =
+    mapIndexed { index, parsed ->
+        builders[index](parsed)
+    }
 
 private fun ResolvedProtobufDeclaration.referencedSchemas(): List<QualifiedSchemaName> =
     when (this) {

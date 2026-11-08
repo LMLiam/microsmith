@@ -1,12 +1,13 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 
+import arrow.core.nonEmptyListOf
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.enumDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.protoIdentifier
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.rangeSpan
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.renderProtobufDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.reservations
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.singleSpan
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.toMaxSpan
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
@@ -29,9 +30,10 @@ class ProtobufReservedSectionRenderingTests :
 
         fun renderEnum(reservations: ResolvedProtobufReservations) =
             renderProtobufDeclaration(
-                ResolvedProtobufEnum(
-                    name = protoIdentifier("Status"),
-                    values = listOf(ResolvedProtobufEnumValue(protoIdentifier("UNSPECIFIED"), EnumValueNumber(0))),
+                enumDeclaration(
+                    name = "Status",
+                    values =
+                        nonEmptyListOf(ResolvedProtobufEnumValue(protoIdentifier("UNSPECIFIED"), EnumValueNumber(0))),
                     reservations = reservations,
                 )
             )

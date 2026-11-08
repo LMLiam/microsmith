@@ -69,6 +69,18 @@ class ProtobufDeclarationIssueResolutionTests :
                 )
         }
 
+        "reports an invalid oneof name before the oneof being empty" {
+            issuesOf("M", message(oneofs = listOf(oneof("1choice")))) shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.InvalidIdentifier(
+                        "M",
+                        ProtobufResolutionIssue.IdentifierLocation.Oneof("1choice"),
+                        "1choice",
+                    ),
+                    ProtobufResolutionIssue.EmptyOneof("M", "1choice"),
+                )
+        }
+
         "rejects a field name that a oneof field repeats" {
             val declaration = message(fields = listOf(string("a", 1)), oneofs = listOf(oneof("choice", "a" to 2)))
 
