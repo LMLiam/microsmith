@@ -85,9 +85,9 @@ subprojects {
     }
 
     dependencies {
-        if (project.name != 'kotest') {
-            testImplementation project(':kotest')
-        }
+        testImplementation libs.kotest.framework.engine
+        testImplementation libs.kotest.assertions.core
+        testImplementation libs.kotest.property
     }
 
     tasks.withType(JavaCompile).configureEach {
@@ -118,7 +118,6 @@ subprojects {
             showCauses = true
             showStackTraces = true
         }
-        systemProperty("gradle.build.dir", project.layout.buildDirectory.get().asFile)
     }
 
     tasks.named("build") {
@@ -225,17 +224,3 @@ subprojects {
     }
 }
 
-tasks.register("allJar", ShadowJar) {
-    archiveBaseName.set("microsmith-all")
-    archiveVersion.set(project.version.toString())
-    archiveClassifier.set("all")
-    destinationDirectory.set(layout.buildDirectory.dir("libs"))
-    subprojects.each { sub ->
-        dependsOn(sub.tasks.named("jar"))
-        from(sub.sourceSets.main.output)
-    }
-    configurations.set(subprojects.collect { it.configurations.runtimeClasspath })
-    mergeServiceFiles()
-    preserveFileTimestamps = false
-    reproducibleFileOrder = true
-}

@@ -5,12 +5,10 @@ import io.github.lmliam.microsmith.cli.diagnostics.CliDiagnosticEmitter
 import io.github.lmliam.microsmith.cli.init.InitBootstrapResult
 import io.github.lmliam.microsmith.cli.init.profile.JavaOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.profile.KotlinOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.profile.ScalaOnboardingProfile
 
 private const val GRADLE_PLUGIN_ID = "io.github.lmliam.microsmith"
 private const val MICROSMITH_GROUP = "io.github.lmliam.microsmith"
 private const val MICROSMITH_MAVEN_PLUGIN_ARTIFACT = "maven-plugin"
-private const val MICROSMITH_SBT_PLUGIN_ARTIFACT = "sbt-plugin"
 private const val MICROSMITH_RUNTIME_SCRIPTING_COORDINATE = "$MICROSMITH_GROUP:runtime-scripting"
 private const val MICROSMITH_MAVEN_PLUGIN_COORDINATE = "$MICROSMITH_GROUP:$MICROSMITH_MAVEN_PLUGIN_ARTIFACT"
 
@@ -89,30 +87,20 @@ internal object InitSummaryEmitter {
                         "IDE support: add '$MICROSMITH_RUNTIME_SCRIPTING_COORDINATE' as a provided dependency, " +
                         "configure '$MICROSMITH_MAVEN_PLUGIN_COORDINATE', and run 'mvn microsmith:generate'."
                 )
-
-            JvmNativeBuildSystem.SBT ->
-                emitter.info(
-                    "sbt repository detected. Prefer the native sbt plugin path when you want build-aligned " +
-                        "generation: add '$MICROSMITH_GROUP' % '$MICROSMITH_SBT_PLUGIN_ARTIFACT' " +
-                        "in project/plugins.sbt, " +
-                        "enable 'MicrosmithSbtPlugin', and run 'sbt microsmithGenerate'."
-                )
         }
     }
 }
 
 private fun InitBootstrapResult.nativeJvmBuildSystem(): JvmNativeBuildSystem? {
     val profile = repositoryDetection.profile
-    if (profile != JavaOnboardingProfile && profile != KotlinOnboardingProfile && profile != ScalaOnboardingProfile) {
+    if (profile != JavaOnboardingProfile && profile != KotlinOnboardingProfile) {
         return null
     }
     val hasGradleMarker = repositoryDetection.matchedMarkers.any(::isGradleMarker)
     val hasMavenMarker = repositoryDetection.matchedMarkers.any(::isMavenMarker)
-    val hasSbtMarker = repositoryDetection.matchedMarkers.any(::isSbtMarker)
     return when {
-        hasGradleMarker && !hasMavenMarker && !hasSbtMarker -> JvmNativeBuildSystem.GRADLE
-        hasMavenMarker && !hasGradleMarker && !hasSbtMarker -> JvmNativeBuildSystem.MAVEN
-        hasSbtMarker && !hasGradleMarker && !hasMavenMarker -> JvmNativeBuildSystem.SBT
+        hasGradleMarker && !hasMavenMarker -> JvmNativeBuildSystem.GRADLE
+        hasMavenMarker && !hasGradleMarker -> JvmNativeBuildSystem.MAVEN
         else -> null
     }
 }
@@ -128,15 +116,7 @@ private fun isGradleMarker(marker: String): Boolean =
 
 private fun isMavenMarker(marker: String): Boolean = marker == "pom.xml"
 
-private fun isSbtMarker(marker: String): Boolean =
-    marker in
-        setOf(
-            "build.sbt",
-            "project/build.properties",
-        )
-
 private enum class JvmNativeBuildSystem {
     GRADLE,
     MAVEN,
-    SBT,
 }
