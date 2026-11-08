@@ -29,7 +29,7 @@ object ProtobufNameValidation {
             return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT)
         }
 
-        if (segments.any { !isIdentifier(it) }) {
+        if (segments.any { ProtoIdentifier.parse(it).isLeft() }) {
             return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.INVALID_IDENTIFIER_SEGMENT)
         }
 
@@ -37,17 +37,12 @@ object ProtobufNameValidation {
     }
 
     fun requireIdentifier(value: String, label: String) {
-        require(isIdentifier(value)) { "$label is not a valid protobuf identifier: '$value'" }
+        require(ProtoIdentifier.parse(value).isRight()) { "$label is not a valid protobuf identifier: '$value'" }
     }
-
-    fun isIdentifier(value: String): Boolean =
-        value.isNotBlank() && value == value.trim() && PROTO_IDENTIFIER.matches(value)
 
     private fun invalid(
         value: String,
         reason: ProtobufResolutionIssue.InvalidSchemaName.Reason,
     ): Either<ProtobufResolutionIssue.InvalidSchemaName, String> =
         Either.Left(ProtobufResolutionIssue.InvalidSchemaName(value, reason))
-
-    private val PROTO_IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*")
 }

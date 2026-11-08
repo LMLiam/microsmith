@@ -1,10 +1,8 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
 
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 
 internal fun validateMessage(message: ResolvedProtobufMessage) {
-    ProtobufNameValidation.requireIdentifier(message.name, "Message name")
     message.fields.forEach(::validateField)
     message.oneofs.forEach(::validateOneof)
     message.reservations.forEach(::validateReserved)
@@ -16,15 +14,15 @@ internal fun validateMessage(message: ResolvedProtobufMessage) {
 }
 
 private fun requireUniqueFieldNames(message: ResolvedProtobufMessage) {
-    requireUniqueUsages(message.name, "field names", collectFieldNameUsages(message))
+    requireUniqueUsages(message.name.value, "field names", collectFieldNameUsages(message))
 }
 
 private fun requireUniqueFieldNumbers(message: ResolvedProtobufMessage) {
-    requireUniqueUsages(message.name, "field numbers", collectFieldNumberUsages(message))
+    requireUniqueUsages(message.name.value, "field numbers", collectFieldNumberUsages(message))
 }
 
 private fun requireUniqueOneofNames(message: ResolvedProtobufMessage) {
-    val duplicates = message.oneofs.groupBy { it.name }.filterValues { it.size > 1 }
+    val duplicates = message.oneofs.groupBy { it.name.value }.filterValues { it.size > 1 }
 
     require(duplicates.isEmpty()) {
         val names = duplicates.keys.sorted().joinToString(", ")
@@ -33,9 +31,11 @@ private fun requireUniqueOneofNames(message: ResolvedProtobufMessage) {
 }
 
 private fun collectFieldNameUsages(message: ResolvedProtobufMessage): List<FieldUsage<String>> = buildList {
-    message.fields.forEach { field -> add(FieldUsage(field.name, "field '${field.name}'")) }
+    message.fields.forEach { field -> add(FieldUsage(field.name.value, "field '${field.name}'")) }
     message.oneofs.forEach { oneof ->
-        oneof.fields.forEach { field -> add(FieldUsage(field.name, "oneof '${oneof.name}' field '${field.name}'")) }
+        oneof.fields.forEach { field ->
+            add(FieldUsage(field.name.value, "oneof '${oneof.name}' field '${field.name}'"))
+        }
     }
 }
 

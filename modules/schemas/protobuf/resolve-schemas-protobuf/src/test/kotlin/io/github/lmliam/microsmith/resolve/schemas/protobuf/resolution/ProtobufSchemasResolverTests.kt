@@ -196,7 +196,7 @@ class ProtobufSchemasResolverTests :
             val message = source.declaration.shouldBeTypeOf<ResolvedProtobufMessage>()
 
             message.fields.filterIsInstance<ResolvedProtobufField.Reference>().associate {
-                it.name to it.reference.target.fullyQualifiedName
+                it.name.value to it.reference.target.fullyQualifiedName
             } shouldBe
                 mapOf(
                     "local" to "root.child.Peer",
@@ -239,6 +239,33 @@ class ProtobufSchemasResolverTests :
                         schemaName = "pkg.Contact",
                         declarationName = "Profile",
                     )
+                )
+        }
+
+        "reports an invalid declaration name before a declaration name mismatch" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = "pkg.Contact",
+                            schema = Message(name = "user-name"),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.InvalidIdentifier(
+                        schemaName = "pkg.Contact",
+                        location = ProtobufResolutionIssue.IdentifierLocation.Declaration,
+                        value = "user-name",
+                    ),
+                    ProtobufResolutionIssue.SchemaDeclarationNameMismatch(
+                        schemaName = "pkg.Contact",
+                        declarationName = "user-name",
+                    ),
                 )
         }
 
