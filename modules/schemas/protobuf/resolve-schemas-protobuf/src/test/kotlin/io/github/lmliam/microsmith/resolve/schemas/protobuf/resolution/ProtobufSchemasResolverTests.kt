@@ -4,11 +4,17 @@ import io.github.lmliam.microsmith.dsl.microsmith
 import io.github.lmliam.microsmith.dsl.require
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapType
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.EnumValue
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 import io.github.lmliam.microsmith.dsl.schemas.schemas
@@ -78,6 +84,81 @@ class ProtobufSchemasResolverTests :
                         "User",
                         ProtobufResolutionIssue.ReferenceLocation.OneofField("contact", "email"),
                         "MissingContact",
+                    ),
+                )
+        }
+
+        "reports every unresolved reference across fields, map values and each oneof" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = "User",
+                            schema =
+                                Message(
+                                    name = "User",
+                                    fields =
+                                        listOf(
+                                            ReferenceField("manager", 1, Reference.Local("MissingManager")),
+                                            ReferenceField("peer", 2, Reference.Local("MissingPeer")),
+                                            MapField(
+                                                "labels",
+                                                3,
+                                                MapType(PrimitiveType.STRING, Reference.Local("MissingLabel")),
+                                            ),
+                                        ),
+                                    oneofs =
+                                        listOf(
+                                            Oneof(
+                                                "contact",
+                                                listOf(
+                                                    OneofField("email", 4, Reference.Local("MissingEmail")),
+                                                    OneofField("phone", 5, Reference.Local("MissingPhone")),
+                                                ),
+                                            ),
+                                            Oneof(
+                                                "account",
+                                                listOf(OneofField("owner", 6, Reference.Local("MissingOwner"))),
+                                            ),
+                                        ),
+                                ),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.Field("manager"),
+                        "MissingManager",
+                    ),
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.Field("peer"),
+                        "MissingPeer",
+                    ),
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.MapValue("labels"),
+                        "MissingLabel",
+                    ),
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.OneofField("contact", "email"),
+                        "MissingEmail",
+                    ),
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.OneofField("contact", "phone"),
+                        "MissingPhone",
+                    ),
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.OneofField("account", "owner"),
+                        "MissingOwner",
                     ),
                 )
         }
@@ -197,6 +278,32 @@ class ProtobufSchemasResolverTests :
                 )
         }
 
+        "accumulates enum value issues before a declaration name mismatch" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = "pkg.Contact",
+                            schema =
+                                Enum(
+                                    name = "Status",
+                                    values = listOf(EnumValue("ACTIVE", 1), EnumValue("ACTIVE", 1)),
+                                ),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.EnumFirstValueMustBeZero("pkg.Contact", "ACTIVE", 1),
+                    ProtobufResolutionIssue.DuplicateEnumValueNames("pkg.Contact", listOf("ACTIVE")),
+                    ProtobufResolutionIssue.DuplicateEnumValueNumbers("pkg.Contact", listOf(1)),
+                    ProtobufResolutionIssue.SchemaDeclarationNameMismatch("pkg.Contact", "Status"),
+                )
+        }
+
         "returns a typed issue when a reference name is blank" {
             val schemas =
                 SchemasExtension(
@@ -216,10 +323,64 @@ class ProtobufSchemasResolverTests :
 
             failure.issues.toList() shouldContainExactly
                 listOf(
-                    ProtobufResolutionIssue.InvalidSchemaName(
-                        schemaName = "",
+                    ProtobufResolutionIssue.InvalidReferenceName(
+                        schemaName = "User",
+                        location = ProtobufResolutionIssue.ReferenceLocation.Field("owner"),
+                        targetName = "",
                         reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK,
                     )
+                )
+        }
+
+        "returns a typed issue at each reference location when a reference name is invalid" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = "User",
+                            schema =
+                                Message(
+                                    name = "User",
+                                    fields =
+                                        listOf(
+                                            ReferenceField("owner", 1, Reference.Qualified("pkg..Owner")),
+                                            MapField(
+                                                "labels",
+                                                2,
+                                                MapType(PrimitiveType.STRING, Reference.Qualified("Label.")),
+                                            ),
+                                        ),
+                                    oneofs =
+                                        listOf(
+                                            Oneof("contact", listOf(OneofField("email", 3, Reference.Qualified("a b"))))
+                                        ),
+                                ),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.InvalidReferenceName(
+                        schemaName = "User",
+                        location = ProtobufResolutionIssue.ReferenceLocation.Field("owner"),
+                        targetName = "pkg..Owner",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT,
+                    ),
+                    ProtobufResolutionIssue.InvalidReferenceName(
+                        schemaName = "User",
+                        location = ProtobufResolutionIssue.ReferenceLocation.MapValue("labels"),
+                        targetName = "Label.",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.TRAILING_DOT,
+                    ),
+                    ProtobufResolutionIssue.InvalidReferenceName(
+                        schemaName = "User",
+                        location = ProtobufResolutionIssue.ReferenceLocation.OneofField("contact", "email"),
+                        targetName = "a b",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.WHITESPACE,
+                    ),
                 )
         }
 

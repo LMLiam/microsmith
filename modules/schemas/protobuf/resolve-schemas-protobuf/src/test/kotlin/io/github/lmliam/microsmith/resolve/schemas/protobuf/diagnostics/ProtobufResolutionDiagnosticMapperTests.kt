@@ -56,6 +56,25 @@ class ProtobufResolutionDiagnosticMapperTests :
                 )
         }
 
+        "maps an invalid reference name with its location" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(
+                ProtobufResolutionIssue.InvalidReferenceName(
+                    schemaName = "User",
+                    location = ProtobufResolutionIssue.ReferenceLocation.Field("owner"),
+                    targetName = "pkg..Owner",
+                    reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT,
+                )
+            ) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.invalid-reference-name",
+                    message =
+                        "Protobuf schema 'User' field 'owner' references invalid type name 'pkg..Owner': " +
+                            "it contains an empty segment.",
+                )
+        }
+
         "maps an invalid schema name" {
             val mapper = ProtobufResolutionDiagnosticMapper()
 
