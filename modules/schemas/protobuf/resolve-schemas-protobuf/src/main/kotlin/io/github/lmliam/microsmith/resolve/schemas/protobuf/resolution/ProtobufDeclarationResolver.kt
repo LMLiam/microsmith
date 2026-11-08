@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution
 
 import arrow.core.EitherNel
-import arrow.core.nonEmptyListOf
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.context.bind
@@ -10,7 +9,6 @@ import arrow.core.raise.context.either
 import arrow.core.raise.context.ensure
 import arrow.core.raise.context.mapOrAccumulate
 import arrow.core.raise.context.zipOrAccumulate
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MessageField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofField
@@ -42,10 +40,9 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseMessage
 
 internal class ProtobufDeclarationResolver(private val referenceResolver: ProtobufReferenceResolver) {
     fun resolveMessage(
-        schema: ProtobufSchema,
+        identity: QualifiedSchemaName,
         message: Message,
     ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
-        val identity = identityOf(schema).bind()
         with(identity) {
             val declaration =
                 zipOrAccumulate(
@@ -68,10 +65,9 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
     }
 
     fun resolveEnum(
-        schema: ProtobufSchema,
+        identity: QualifiedSchemaName,
         enumDeclaration: Enum,
     ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
-        val identity = identityOf(schema).bind()
         with(identity) {
             val declaration =
                 zipOrAccumulate(
@@ -94,12 +90,9 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
     private fun declarationName(raw: String): ProtoIdentifier =
         parseIdentifier(identity.fullyQualifiedName, ProtobufResolutionIssue.IdentifierLocation.Declaration, raw)
 
-    private fun identityOf(schema: ProtobufSchema): EitherNel<ProtobufResolutionIssue, QualifiedSchemaName> =
-        QualifiedSchemaName.parse(schema.name).mapLeft { nonEmptyListOf<ProtobufResolutionIssue>(it) }
-
     context(identity: QualifiedSchemaName, _: Raise<ProtobufResolutionIssue>)
     private fun checkTypeName(declaration: Type) {
-        ensure(identity.typeName == declaration.name) {
+        ensure(identity.typeName.value == declaration.name) {
             ProtobufResolutionIssue.SchemaDeclarationNameMismatch(identity.fullyQualifiedName, declaration.name)
         }
     }

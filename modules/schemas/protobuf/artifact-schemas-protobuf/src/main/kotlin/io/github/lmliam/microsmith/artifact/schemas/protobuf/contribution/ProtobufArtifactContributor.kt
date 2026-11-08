@@ -19,10 +19,10 @@ class ProtobufArtifactContributor : ArtifactContributor<ResolvedProtobufSchemaMo
             validateProtobufDeclaration(schema.declaration)
 
             ProtoFileContribution(
-                ProtoFileArtifactId(schema.identity.packageName, schema.identity.typeName),
+                ProtoFileArtifactId(schema.identity.packageName, schema.identity.typeName.value),
                 schema.identity.packageName,
                 schema.dependencies.map(QualifiedSchemaName::toImportPath),
-                listOf(ProtoDeclaration(schema.identity.typeName, renderProtobufDeclaration(schema.declaration))),
+                listOf(ProtoDeclaration(schema.identity.typeName.value, renderProtobufDeclaration(schema.declaration))),
             )
         }
 }
@@ -32,6 +32,6 @@ private fun QualifiedSchemaName.toImportPath(): String = buildString {
         append(it.replace('.', '/'))
         append('/')
     }
-    append(typeName)
+    append(typeName.value)
     append(".proto")
 }

@@ -454,6 +454,40 @@ class ProtobufSchemasResolverTests :
                     )
                 )
         }
+
+        "reports an invalid schema name once and still resolves its sibling schemas" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = "pkg.1User",
+                            schema = Message(name = "User"),
+                        ),
+                        ProtobufSchema(
+                            name = "pkg.Profile",
+                            schema = Message(name = "Other"),
+                        ),
+                        ProtobufSchema(
+                            name = "pkg.Status",
+                            schema = Enum(name = "Status", values = listOf(EnumValue("ACTIVE", 0))),
+                        ),
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.InvalidSchemaName(
+                        schemaName = "pkg.1User",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.INVALID_IDENTIFIER_SEGMENT,
+                    ),
+                    ProtobufResolutionIssue.SchemaDeclarationNameMismatch(
+                        schemaName = "pkg.Profile",
+                        declarationName = "Other",
+                    ),
+                )
+        }
     })
 
 private class UnknownDeclaration(override val name: String) : Type

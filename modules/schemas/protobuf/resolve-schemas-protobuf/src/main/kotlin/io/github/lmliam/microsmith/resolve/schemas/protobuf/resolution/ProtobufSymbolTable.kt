@@ -1,28 +1,11 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
-internal class ProtobufSymbolTable(schemas: Collection<ProtobufSchema>) {
+internal class ProtobufSymbolTable(symbols: Collection<Symbol>) {
     data class Symbol(val identity: QualifiedSchemaName, val kind: ProtobufDeclarationKind)
 
-    private val symbols =
-        schemas
-            .mapNotNull { schema ->
-                val kind =
-                    when (schema.schema) {
-                        is Message -> ProtobufDeclarationKind.MESSAGE
-                        is Enum -> ProtobufDeclarationKind.ENUM
-                        else -> null
-                    }
-
-                kind?.let {
-                    QualifiedSchemaName.parse(schema.name).getOrNull()?.let { identity -> Symbol(identity, kind) }
-                }
-            }
-            .associateBy { it.identity.fullyQualifiedName }
+    private val symbols = symbols.associateBy { it.identity.fullyQualifiedName }
 
     fun find(identity: QualifiedSchemaName): Symbol? = symbols[identity.fullyQualifiedName]
 }
