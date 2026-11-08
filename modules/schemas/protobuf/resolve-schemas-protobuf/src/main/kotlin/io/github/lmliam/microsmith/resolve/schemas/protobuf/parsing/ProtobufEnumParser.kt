@@ -12,7 +12,9 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.EnumValueNumber
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoDuplicates
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkEnumStartsAtZero
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueEnumValueNames
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueEnumValueNumbers
 
 internal fun parseEnumDeclaration(
     schemaName: String,
@@ -21,16 +23,8 @@ internal fun parseEnumDeclaration(
     zipOrAccumulate(
         { checkFirstValueIsZero(schemaName, enum) },
         { parseEnumValues(schemaName, enum) },
-        {
-            checkNoDuplicates(enum.values.map { it.name }) {
-                ProtobufResolutionIssue.DuplicateEnumValueNames(schemaName, it)
-            }
-        },
-        {
-            checkNoDuplicates(enum.values.map { it.index }) {
-                ProtobufResolutionIssue.DuplicateEnumValueNumbers(schemaName, it)
-            }
-        },
+        { checking(schemaName) { checkUniqueEnumValueNames(enum.values.map { it.name }) } },
+        { checking(schemaName) { checkUniqueEnumValueNumbers(enum.values.map { it.index }) } },
         {
             parseReservations(
                     schemaName,
@@ -51,7 +45,8 @@ private fun checkFirstValueIsZero(schemaName: String, enum: Enum) {
     val first = enum.values.firstOrNull()
 
     ensure(first != null) { ProtobufResolutionIssue.EmptyEnum(schemaName) }
-    ensure(first.index == 0) { ProtobufResolutionIssue.EnumFirstValueMustBeZero(schemaName, first.name, first.index) }
+
+    checking(schemaName) { checkEnumStartsAtZero(first.name, first.index) }
 }
 
 context(_: RaiseAccumulate<ProtobufResolutionIssue>)

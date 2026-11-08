@@ -14,7 +14,9 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoDuplicates
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueFieldNames
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueFieldNumbers
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueOneofNames
 
 internal fun parseMessageDeclaration(
     schemaName: String,
@@ -25,21 +27,9 @@ internal fun parseMessageDeclaration(
     zipOrAccumulate(
         { parseMessageFields(schemaName, message.fields) },
         { parseOneofs(schemaName, message.oneofs) },
-        {
-            checkNoDuplicates(allFields.map(Field::name)) {
-                ProtobufResolutionIssue.DuplicateFieldNames(schemaName, it)
-            }
-        },
-        {
-            checkNoDuplicates(allFields.map(Field::index)) {
-                ProtobufResolutionIssue.DuplicateFieldNumbers(schemaName, it)
-            }
-        },
-        {
-            checkNoDuplicates(message.oneofs.map(Oneof::name)) {
-                ProtobufResolutionIssue.DuplicateOneofNames(schemaName, it)
-            }
-        },
+        { checking(schemaName) { checkUniqueFieldNames(allFields.map(Field::name)) } },
+        { checking(schemaName) { checkUniqueFieldNumbers(allFields.map(Field::index)) } },
+        { checking(schemaName) { checkUniqueOneofNames(message.oneofs.map(Oneof::name)) } },
         {
             parseReservations(
                     schemaName,

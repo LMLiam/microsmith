@@ -6,7 +6,6 @@ import arrow.core.raise.Raise
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.context.bindNel
 import arrow.core.raise.context.either
-import arrow.core.raise.context.ensure
 import arrow.core.raise.context.mapOrAccumulate
 import arrow.core.raise.context.zipOrAccumulate
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Reserved
@@ -18,7 +17,10 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIs
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoDuplicates
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoOverlap
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoReservedNameUse
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoReservedNumberUse
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueReservedNames
 
 internal fun parseReservations(
     schemaName: String,
@@ -45,7 +47,7 @@ private fun parseReservedNames(
 
     zipOrAccumulate(
         { parseReservedIdentifiers(schemaName, names) },
-        { checkNoDuplicates(names) { ProtobufResolutionIssue.DuplicateReservedNames(schemaName, it) } },
+        { checking(schemaName) { checkUniqueReservedNames(names) } },
         { checkNoUsedNames(schemaName, names, usedNames) },
     ) { identifiers, _, _ ->
         identifiers
@@ -60,9 +62,7 @@ private fun parseReservedIdentifiers(schemaName: String, names: List<String>): L
 
 context(_: Raise<ProtobufResolutionIssue>)
 private fun checkNoUsedNames(schemaName: String, reservedNames: List<String>, usedNames: List<String>) {
-    val collisions = reservedNames.toSet().intersect(usedNames.toSet()).sorted()
-
-    ensure(collisions.isEmpty()) { ProtobufResolutionIssue.ReservedNameCollision(schemaName, collisions) }
+    checking(schemaName) { checkNoReservedNameUse(reservedNames, usedNames) }
 }
 
 private fun parseReservedSpans(
@@ -137,14 +137,10 @@ private fun numbersClaimedEvenIfInvalid(reservation: Reserved, domain: ReservedS
 
 context(_: Raise<ProtobufResolutionIssue>)
 private fun checkNoOverlap(schemaName: String, occupied: List<IntRange>) {
-    val overlapping = occupied.sortedBy(IntRange::first).zipWithNext().any { (left, right) -> left.last >= right.first }
-
-    ensure(!overlapping) { ProtobufResolutionIssue.OverlappingReservedNumbers(schemaName) }
+    checking(schemaName) { checkNoOverlap(occupied) }
 }
 
 context(_: Raise<ProtobufResolutionIssue>)
 private fun checkNoUsedNumbers(schemaName: String, occupied: List<IntRange>, usedNumbers: List<Int>) {
-    val collisions = usedNumbers.distinct().filter { number -> occupied.any { number in it } }.sorted()
-
-    ensure(collisions.isEmpty()) { ProtobufResolutionIssue.ReservedNumberCollision(schemaName, collisions) }
+    checking(schemaName) { checkNoReservedNumberUse(occupied, usedNumbers) }
 }
