@@ -12,6 +12,14 @@ sealed interface ProtobufRpcResolutionIssue : ResolutionIssue {
         val reason: ProtobufResolutionIssue.InvalidSchemaName.Reason,
     ) : ProtobufRpcResolutionIssue
 
+    data class InvalidEndpointTargetName(
+        val serviceName: String,
+        val rpcName: String,
+        val position: EndpointPosition,
+        val targetName: String,
+        val reason: ProtobufResolutionIssue.InvalidSchemaName.Reason,
+    ) : ProtobufRpcResolutionIssue
+
     data class EndpointMustTargetMessage(
         val serviceName: String,
         val rpcName: String,

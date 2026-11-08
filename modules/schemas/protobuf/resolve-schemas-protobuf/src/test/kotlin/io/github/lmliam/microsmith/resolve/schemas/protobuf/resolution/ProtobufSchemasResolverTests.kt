@@ -4,10 +4,14 @@ import io.github.lmliam.microsmith.dsl.microsmith
 import io.github.lmliam.microsmith.dsl.require
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapType
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
@@ -216,10 +220,64 @@ class ProtobufSchemasResolverTests :
 
             failure.issues.toList() shouldContainExactly
                 listOf(
-                    ProtobufResolutionIssue.InvalidSchemaName(
-                        schemaName = "",
+                    ProtobufResolutionIssue.InvalidReferenceName(
+                        schemaName = "User",
+                        location = ProtobufResolutionIssue.ReferenceLocation.Field("owner"),
+                        targetName = "",
                         reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK,
                     )
+                )
+        }
+
+        "returns a typed issue at each reference location when a reference name is invalid" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = "User",
+                            schema =
+                                Message(
+                                    name = "User",
+                                    fields =
+                                        listOf(
+                                            ReferenceField("owner", 1, Reference.Qualified("pkg..Owner")),
+                                            MapField(
+                                                "labels",
+                                                2,
+                                                MapType(PrimitiveType.STRING, Reference.Qualified("Label.")),
+                                            ),
+                                        ),
+                                    oneofs =
+                                        listOf(
+                                            Oneof("contact", listOf(OneofField("email", 3, Reference.Qualified("a b"))))
+                                        ),
+                                ),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.InvalidReferenceName(
+                        schemaName = "User",
+                        location = ProtobufResolutionIssue.ReferenceLocation.Field("owner"),
+                        targetName = "pkg..Owner",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT,
+                    ),
+                    ProtobufResolutionIssue.InvalidReferenceName(
+                        schemaName = "User",
+                        location = ProtobufResolutionIssue.ReferenceLocation.MapValue("labels"),
+                        targetName = "Label.",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.TRAILING_DOT,
+                    ),
+                    ProtobufResolutionIssue.InvalidReferenceName(
+                        schemaName = "User",
+                        location = ProtobufResolutionIssue.ReferenceLocation.OneofField("contact", "email"),
+                        targetName = "a b",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.WHITESPACE,
+                    ),
                 )
         }
 

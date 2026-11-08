@@ -1,6 +1,9 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution
 
 import arrow.core.Either
+import arrow.core.raise.context.bind
+import arrow.core.raise.context.either
+import arrow.core.raise.context.raise
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReference
@@ -11,17 +14,23 @@ internal class ProtobufReferenceResolver(private val symbols: ProtobufSymbolTabl
         schema: QualifiedSchemaName,
         reference: Reference,
         location: ProtobufResolutionIssue.ReferenceLocation,
-    ): Either<ProtobufResolutionIssue, ResolvedProtobufReference> {
+    ): Either<ProtobufResolutionIssue, ResolvedProtobufReference> = either {
         val target =
-            when (val resolved = schema.resolveReference(reference)) {
-                is Either.Left -> return Either.Left(resolved.value)
-
-                is Either.Right -> resolved.value
-            }
+            schema
+                .resolveReference(reference)
+                .mapLeft { invalid ->
+                    ProtobufResolutionIssue.InvalidReferenceName(
+                        schema.fullyQualifiedName,
+                        location,
+                        invalid.schemaName,
+                        invalid.reason,
+                    )
+                }
+                .bind()
 
         val symbol =
             symbols.find(target)
-                ?: return Either.Left(
+                ?: raise(
                     ProtobufResolutionIssue.UnresolvedReference(
                         schema.fullyQualifiedName,
                         location,
@@ -29,6 +38,6 @@ internal class ProtobufReferenceResolver(private val symbols: ProtobufSymbolTabl
                     )
                 )
 
-        return Either.Right(ResolvedProtobufReference(symbol.identity, symbol.kind))
+        ResolvedProtobufReference(symbol.identity, symbol.kind)
     }
 }

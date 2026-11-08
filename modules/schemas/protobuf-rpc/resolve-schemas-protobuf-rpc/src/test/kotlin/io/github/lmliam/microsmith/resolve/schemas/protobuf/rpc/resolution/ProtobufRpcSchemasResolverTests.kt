@@ -14,6 +14,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.dsl.schemas.schemas
 import io.github.lmliam.microsmith.resolve.DomainResolution
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.EndpointMustTargetMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.EndpointPosition
@@ -207,6 +208,41 @@ class ProtobufRpcSchemasResolverTests :
                         rpcName = "GetUser",
                         position = EndpointPosition.RESPONSE,
                         targetName = "MissingResponse",
+                    )
+                )
+        }
+
+        "returns a typed issue at the endpoint position when an rpc endpoint target name is invalid" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema("acme.user.v1.Response", Message("Response")),
+                        ProtobufSchema(
+                            "acme.user.v1.UserService",
+                            Service(
+                                "UserService",
+                                listOf(
+                                    Rpc(
+                                        "GetUser",
+                                        request = RpcEndpoint(Reference.Qualified("acme..Request")),
+                                        response = RpcEndpoint(Reference.Qualified("acme.user.v1.Response")),
+                                    )
+                                ),
+                            ),
+                        ),
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufRpcResolutionIssue.InvalidEndpointTargetName(
+                        serviceName = "UserService",
+                        rpcName = "GetUser",
+                        position = EndpointPosition.REQUEST,
+                        targetName = "acme..Request",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT,
                     )
                 )
         }

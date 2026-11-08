@@ -19,7 +19,6 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResol
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpc
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcEndpoint
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchema
-import kotlin.collections.sorted
 
 internal class ProtobufRpcSchemaResolver {
     fun resolve(
@@ -123,7 +122,15 @@ internal class ProtobufRpcSchemaResolver {
             current
                 .resolveReference(endpoint.reference)
                 .map { it.fullyQualifiedName }
-                .mapLeft { ProtobufRpcResolutionIssue.InvalidSchemaName(it.schemaName, it.reason) }
+                .mapLeft { invalid ->
+                    ProtobufRpcResolutionIssue.InvalidEndpointTargetName(
+                        serviceName = service.name,
+                        rpcName = rpc.name,
+                        position = position,
+                        targetName = invalid.schemaName,
+                        reason = invalid.reason,
+                    )
+                }
                 .bind()
 
         val target =

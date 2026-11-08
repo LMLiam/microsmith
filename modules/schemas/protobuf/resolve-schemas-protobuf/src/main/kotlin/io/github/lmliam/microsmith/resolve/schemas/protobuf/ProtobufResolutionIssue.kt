@@ -14,6 +14,13 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
     data class UnresolvedReference(val schemaName: String, val location: ReferenceLocation, val targetName: String) :
         ReferenceIssue
 
+    data class InvalidReferenceName(
+        val schemaName: String,
+        val location: ReferenceLocation,
+        val targetName: String,
+        val reason: InvalidSchemaName.Reason,
+    ) : ReferenceIssue
+
     data class SchemaDeclarationNameMismatch(val schemaName: String, val declarationName: String) : DeclarationIssue
 
     data class InvalidSchemaName(val schemaName: String, val reason: Reason) : DeclarationIssue {

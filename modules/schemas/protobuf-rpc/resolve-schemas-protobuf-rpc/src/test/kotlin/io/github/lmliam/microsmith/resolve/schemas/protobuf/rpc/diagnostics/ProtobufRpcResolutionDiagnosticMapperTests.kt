@@ -26,6 +26,13 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
                         schemaName = ".UserService",
                         reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT,
                     ),
+                    ProtobufRpcResolutionIssue.InvalidEndpointTargetName(
+                        serviceName = "UserService",
+                        rpcName = "GetUser",
+                        position = ProtobufRpcResolutionIssue.EndpointPosition.REQUEST,
+                        targetName = "acme..Request",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT,
+                    ),
                 )
                 .map(mapper::map) shouldContainExactly
                 listOf(
@@ -40,6 +47,12 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
                     ResolutionDiagnostic(
                         code = "protobuf.rpc.invalid-schema-name",
                         message = "Schema name '.UserService' is invalid: it starts with a leading dot.",
+                    ),
+                    ResolutionDiagnostic(
+                        code = "protobuf.rpc.invalid-endpoint-target-name",
+                        message =
+                            "RPC 'GetUser' request references invalid protobuf type name 'acme..Request': " +
+                                "it contains an empty segment.",
                     ),
                 )
         }

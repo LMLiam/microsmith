@@ -12,4 +12,12 @@ internal fun ProtobufResolutionIssue.ReferenceIssue.toDiagnostic(): ResolutionDi
                     "Protobuf schema '$schemaName' ${location.displayName()} " +
                         "references unknown type '$targetName'.",
             )
+
+        is ProtobufResolutionIssue.InvalidReferenceName ->
+            protobufDiagnostic(
+                code = "protobuf.invalid-reference-name",
+                message =
+                    "Protobuf schema '$schemaName' ${location.displayName()} " +
+                        "references invalid type name '$targetName': it ${reason.displayName()}.",
+            )
     }
