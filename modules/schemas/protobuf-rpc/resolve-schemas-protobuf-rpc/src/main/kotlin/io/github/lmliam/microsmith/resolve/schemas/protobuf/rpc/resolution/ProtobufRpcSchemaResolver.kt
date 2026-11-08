@@ -45,38 +45,29 @@ internal class ProtobufRpcSchemaResolver {
 
         ProtobufNameValidation.requireIdentifier(service.name, "Service name")
 
-        return service.rpcs
-            .mapOrAccumulate { rpc ->
-                resolveRpc(
-                        service = service,
-                        rpc = rpc,
-                        current = qualifiedName,
-                        schemasByName = schemasByName,
+        return with(qualifiedName) {
+            service.rpcs
+                .mapOrAccumulate { rpc ->
+                    resolveRpc(service = service, rpc = rpc, schemasByName = schemasByName).bind()
+                }
+                .map { resolvedRpcs ->
+                    ResolvedProtobufRpcSchema(
+                        qualifiedName = qualifiedName,
+                        imports =
+                            resolvedRpcs
+                                .flatMap { rpc -> listOfNotNull(rpc.request.importPath(), rpc.response.importPath()) }
+                                .distinct()
+                                .sorted(),
+                        rpcs = resolvedRpcs,
                     )
-                    .bind()
-            }
-            .map { resolvedRpcs ->
-                ResolvedProtobufRpcSchema(
-                    qualifiedName = qualifiedName,
-                    imports =
-                        resolvedRpcs
-                            .flatMap { rpc ->
-                                listOfNotNull(
-                                    rpc.request.importPath(qualifiedName),
-                                    rpc.response.importPath(qualifiedName),
-                                )
-                            }
-                            .distinct()
-                            .sorted(),
-                    rpcs = resolvedRpcs,
-                )
-            }
+                }
+        }
     }
 
+    context(identity: QualifiedSchemaName)
     private fun resolveRpc(
         service: Service,
         rpc: Rpc,
-        current: QualifiedSchemaName,
         schemasByName: Map<String, ProtobufSchema>,
     ): Either<ProtobufRpcResolutionIssue, ResolvedProtobufRpc> = either {
         ProtobufNameValidation.requireIdentifier(rpc.name, "RPC name")
@@ -86,7 +77,6 @@ internal class ProtobufRpcSchemaResolver {
                     service = service,
                     rpc = rpc,
                     endpoint = rpc.request,
-                    current = current,
                     position = ProtobufRpcResolutionIssue.EndpointPosition.REQUEST,
                     schemasByName = schemasByName,
                 )
@@ -97,7 +87,6 @@ internal class ProtobufRpcSchemaResolver {
                     service = service,
                     rpc = rpc,
                     endpoint = rpc.response,
-                    current = current,
                     position = ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
                     schemasByName = schemasByName,
                 )
@@ -110,16 +99,16 @@ internal class ProtobufRpcSchemaResolver {
         )
     }
 
+    context(identity: QualifiedSchemaName)
     private fun resolveEndpoint(
         service: Service,
         rpc: Rpc,
         endpoint: RpcEndpoint,
-        current: QualifiedSchemaName,
         position: ProtobufRpcResolutionIssue.EndpointPosition,
         schemasByName: Map<String, ProtobufSchema>,
     ): Either<ProtobufRpcResolutionIssue, ResolvedProtobufRpcEndpoint> = either {
         val targetName =
-            current
+            identity
                 .resolveReference(endpoint.reference)
                 .map { it.fullyQualifiedName }
                 .mapLeft { invalid ->
@@ -159,5 +148,6 @@ internal class ProtobufRpcSchemaResolver {
     }
 }
 
-private fun ResolvedProtobufRpcEndpoint.importPath(current: QualifiedSchemaName): String? =
-    qualifiedTypeName.takeUnless { it == current.fullyQualifiedName }?.replace('.', '/')?.plus(".proto")
+context(identity: QualifiedSchemaName)
+private fun ResolvedProtobufRpcEndpoint.importPath(): String? =
+    qualifiedTypeName.takeUnless { it == identity.fullyQualifiedName }?.replace('.', '/')?.plus(".proto")
