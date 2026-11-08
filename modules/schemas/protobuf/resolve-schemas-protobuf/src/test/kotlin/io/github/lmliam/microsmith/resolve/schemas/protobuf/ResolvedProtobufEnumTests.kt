@@ -57,6 +57,18 @@ class ResolvedProtobufEnumTests :
                 Either.Left(nonEmptyListOf(ResolvedProtobufRejection.DuplicateEnumValueNumbers(listOf(1))))
         }
 
+        "rejects a reserved span written for message field numbers" {
+            val messageSpan =
+                ReservedSpan.single(5, ReservedSpan.Domain.MESSAGE).getOrElse { error("5 is not reservable") }
+
+            enumOf(nonEmptyListOf(value("UNSPECIFIED", 0)), reservations(spans = listOf(messageSpan))) shouldBe
+                Either.Left(
+                    nonEmptyListOf(
+                        ResolvedProtobufRejection.ReservedSpanDomainMismatch("5", 5, ReservedSpan.Domain.ENUM)
+                    )
+                )
+        }
+
         "rejects a value whose name is reserved" {
             enumOf(
                 nonEmptyListOf(value("UNSPECIFIED", 0), value("ACTIVE", 1)),

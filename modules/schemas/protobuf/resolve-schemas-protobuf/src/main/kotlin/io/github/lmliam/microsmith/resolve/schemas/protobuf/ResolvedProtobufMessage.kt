@@ -7,7 +7,7 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifie
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoReservedNameUse
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoReservedNumberUse
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkSpansReachFieldNumbers
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkSpansBelongTo
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueFieldNames
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueFieldNumbers
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueOneofNames
@@ -45,7 +45,7 @@ private constructor(
                 { checkUniqueOneofNames(ownOneofs.map { it.name.value }) },
                 { checkNoReservedNameUse(reservations.names.map(ProtoIdentifier::value), memberNames) },
                 { checkNoReservedNumberUse(reservations.spans.map(ReservedSpan::numbers), memberNumbers) },
-                { checkSpansReachFieldNumbers(reservations.spans) },
+                { checkSpansBelongTo(ReservedSpan.Domain.MESSAGE, reservations.spans) },
                 { rejectAll(findJsonNameCollisions(memberNames)) },
                 { rejectAll(findMessageSymbolCollisions(memberNames, ownOneofs.map { it.name.value }, mapFieldNames)) },
             ) { _, _, _, _, _, _, _, _ ->

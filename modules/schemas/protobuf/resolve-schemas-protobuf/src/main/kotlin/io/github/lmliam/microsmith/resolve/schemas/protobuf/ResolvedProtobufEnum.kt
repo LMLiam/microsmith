@@ -9,6 +9,7 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkEnumStartsAtZero
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoReservedNameUse
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoReservedNumberUse
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkSpansBelongTo
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueEnumValueNames
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueEnumValueNumbers
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findEnumValueNameCollisions
@@ -36,8 +37,9 @@ private constructor(
                 { checkUniqueEnumValueNumbers(valueNumbers) },
                 { checkNoReservedNameUse(reservations.names.map(ProtoIdentifier::value), valueNames) },
                 { checkNoReservedNumberUse(reservations.spans.map(ReservedSpan::numbers), valueNumbers) },
+                { checkSpansBelongTo(ReservedSpan.Domain.ENUM, reservations.spans) },
                 { rejectAll(findEnumValueNameCollisions(name.value, valueNames)) },
-            ) { _, _, _, _, _, _ ->
+            ) { _, _, _, _, _, _, _ ->
                 ResolvedProtobufEnum(name, values, reservations)
             }
         }

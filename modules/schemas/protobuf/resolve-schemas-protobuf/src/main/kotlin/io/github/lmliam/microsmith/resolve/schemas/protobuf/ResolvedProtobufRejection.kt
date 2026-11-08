@@ -1,5 +1,7 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf
 
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
+
 sealed interface ResolvedProtobufRejection {
     data class DuplicateFieldNames(val names: List<String>) : ResolvedProtobufRejection
 
@@ -28,7 +30,8 @@ sealed interface ResolvedProtobufRejection {
 
     data class ReservedNumberCollision(val numbers: List<Int>) : ResolvedProtobufRejection
 
-    data class ReservedNumberOutOfRange(val notation: String, val number: Int) : ResolvedProtobufRejection
+    data class ReservedSpanDomainMismatch(val notation: String, val first: Int, val expected: ReservedSpan.Domain) :
+        ResolvedProtobufRejection
 
     sealed interface MessageSymbol {
         data class Field(val fieldName: String) : MessageSymbol

@@ -124,11 +124,10 @@ class ResolvedProtobufMessageTests :
                 rejection(ResolvedProtobufRejection.ReservedNumberCollision(listOf(5)))
         }
 
-        "rejects a reserved span that field numbers cannot reach" {
-            messageOf(reservations = reservations(spans = listOf(span(-5, -1, ReservedSpan.Domain.ENUM)))) shouldBe
+        "rejects a reserved span written for enum values" {
+            messageOf(reservations = reservations(spans = listOf(span(1, 5, ReservedSpan.Domain.ENUM)))) shouldBe
                 rejection(
-                    ResolvedProtobufRejection.ReservedNumberOutOfRange("-5 to -1", -5),
-                    ResolvedProtobufRejection.ReservedNumberOutOfRange("-5 to -1", -1),
+                    ResolvedProtobufRejection.ReservedSpanDomainMismatch("1 to 5", 1, ReservedSpan.Domain.MESSAGE)
                 )
         }
 

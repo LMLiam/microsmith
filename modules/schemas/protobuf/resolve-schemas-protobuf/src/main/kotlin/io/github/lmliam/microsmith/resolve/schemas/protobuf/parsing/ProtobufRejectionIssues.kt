@@ -54,11 +54,11 @@ internal fun ResolvedProtobufRejection.toIssue(schemaName: String): ProtobufReso
         is ResolvedProtobufRejection.ReservedNumberCollision ->
             ProtobufResolutionIssue.ReservedNumberCollision(schemaName, numbers)
 
-        is ResolvedProtobufRejection.ReservedNumberOutOfRange ->
+        is ResolvedProtobufRejection.ReservedSpanDomainMismatch ->
             ProtobufResolutionIssue.InvalidFieldNumber(
                 schemaName,
                 ProtobufResolutionIssue.FieldLocation.Reservation(notation),
-                number,
+                first,
             )
     }
 
