@@ -1,10 +1,11 @@
 package io.github.lmliam.microsmith.build.runtime
 
-import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ExternalModuleDependency
 
 internal object RuntimeScriptingBuildNames {
     val API_PROJECT_PATHS = listOf(
+        ":runtime-scripting-api",
         ":dsl",
         ":dsl-services",
         ":dsl-services-dotnet",
@@ -62,12 +63,9 @@ internal object RuntimeScriptingBuildNames {
         return classEntryName(packagePath, simpleName)
     }
 
-    fun scriptTemplateRegistrationEntry(templateFqcn: String): String =
-        "$SCRIPT_TEMPLATE_META_INF_PREFIX/$templateFqcn"
+    fun scriptTemplateRegistrationEntry(templateFqcn: String): String = "$SCRIPT_TEMPLATE_META_INF_PREFIX/$templateFqcn"
 
-    fun projectCoordinate(dependencyProject: Project): String =
-        "${dependencyProject.group}:${dependencyProject.name}"
+    fun projectCoordinate(dependencyProject: Project): String = "${dependencyProject.group}:${dependencyProject.name}"
 
-    fun libraryCoordinate(dependency: ExternalModuleDependency): String =
-        "${dependency.group}:${dependency.name}"
+    fun libraryCoordinate(dependency: ExternalModuleDependency): String = "${dependency.group}:${dependency.name}"
 }

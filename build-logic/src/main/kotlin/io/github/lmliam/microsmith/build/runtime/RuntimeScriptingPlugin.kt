@@ -2,14 +2,13 @@ package io.github.lmliam.microsmith.build.runtime
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.Sync
 import org.gradle.jvm.tasks.Jar
-
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.jar.JarFile
@@ -41,12 +40,18 @@ class RuntimeScriptingPlugin : Plugin<Project> {
         val libs = project.extensions.getByType(VersionCatalogsExtension::class.java).named("libs")
 
         project.dependencies.apply {
-            RuntimeScriptingBuildNames.API_PROJECT_PATHS.forEach { add("api", project.project(it)) }
-            RuntimeScriptingBuildNames.IMPLEMENTATION_PROJECT_PATHS.forEach { add("implementation", project.project(it)) }
+            RuntimeScriptingBuildNames.API_PROJECT_PATHS.forEach { add("api", project.dependencies.project(it)) }
+            RuntimeScriptingBuildNames.IMPLEMENTATION_PROJECT_PATHS.forEach {
+                add("implementation", project.dependencies.project(it))
+            }
             add("implementation", libs.findLibrary("coroutines-core").orElseThrow().get())
             add("api", libs.findLibrary("kotlin-scripting-common").orElseThrow().get())
             add("implementation", libs.findLibrary("kotlin-scripting-jvm").orElseThrow().get())
             add("implementation", libs.findLibrary("kotlin-scripting-jvm-host").orElseThrow().get())
+            add(
+                "implementation",
+                libs.findLibrary("kotlin-compiler-embeddable").orElseThrow().get(),
+            )
         }
 
         val runtimeScriptingJarTask = project.tasks.named("jar", Jar::class.java)
@@ -62,7 +67,12 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                 val dependencyProject = project.project(path)
                 put(RuntimeScriptingBuildNames.projectCoordinate(dependencyProject), "compile")
             }
-            put(RuntimeScriptingBuildNames.libraryCoordinate(libs.findLibrary("kotlin-scripting-common").orElseThrow().get()), "compile")
+            put(
+                RuntimeScriptingBuildNames.libraryCoordinate(
+                    libs.findLibrary("kotlin-scripting-common").orElseThrow().get(),
+                ),
+                "compile",
+            )
         }
         val ideFallbackReleaseAssetsDirectory =
             project.layout.buildDirectory.dir(RuntimeScriptingBuildNames.RELATIVE_RELEASE_ASSETS_DIRECTORY)
@@ -134,7 +144,11 @@ class RuntimeScriptingPlugin : Plugin<Project> {
             )
         }
 
-        val verifyJarEntries = { archiveFile: java.io.File, expectedEntries: List<String>, artifactDescription: String ->
+        val verifyJarEntries = {
+                archiveFile: java.io.File,
+                expectedEntries: List<String>,
+                artifactDescription: String,
+            ->
             if (!archiveFile.isFile) {
                 throw GradleException("$artifactDescription '${archiveFile.path}' was not created.")
             }
@@ -144,7 +158,9 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                 val missingEntries = expectedEntries.filterNot(entryNames::contains)
                 if (missingEntries.isNotEmpty()) {
                     throw GradleException(
-                        "$artifactDescription '${archiveFile.name}' is missing expected entries: ${missingEntries.joinToString(", ")}",
+                        "$artifactDescription '${archiveFile.name}' is missing expected entries: ${missingEntries.joinToString(
+                            ", ",
+                        )}",
                     )
                 }
             }
@@ -191,7 +207,9 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                         "$dependencyCoordinates expected $expectedScope scope"
                     }
                     throw GradleException(
-                        "Runtime-scripting published pom '${pomFile.name}' had unexpected dependency scopes: ${formattedInvalidScopes.joinToString(", ")}",
+                        "Runtime-scripting published pom '${pomFile.name}' had unexpected dependency scopes: ${formattedInvalidScopes.joinToString(
+                            ", ",
+                        )}",
                     )
                 }
             }
@@ -246,7 +264,10 @@ class RuntimeScriptingPlugin : Plugin<Project> {
 
                 sourceFiles.forEach { file ->
                     val checksum = MessageDigest.getInstance("SHA-256").digest(file.readBytes()).encodeHex()
-                    java.io.File(releaseDir, "${file.name}.sha256").writeText("$checksum  ${file.name}\n", StandardCharsets.UTF_8)
+                    java.io.File(
+                        releaseDir,
+                        "${file.name}.sha256",
+                    ).writeText("$checksum  ${file.name}\n", StandardCharsets.UTF_8)
                 }
             }
         }
