@@ -12,20 +12,22 @@ internal class ArtifactAssemblerRegistry(assemblers: List<ArtifactAssembler<*>>)
         val duplicateTypes = grouped.filterValues { it.size > 1 }.keys
 
         require(duplicateTypes.isEmpty()) {
-            val types = duplicateTypes.map { it.qualifiedName ?: it.toString() }.sorted().joinToString(", ")
-
-            "Duplicate artifact assemblers registered for artifact type $types"
+            val formattedTypes = duplicateTypes.map { it.displayName }.sorted().joinToString(", ")
+            "Duplicate artifact assemblers registered for artifact type(s): $formattedTypes"
         }
 
         assemblersByType = grouped.mapValues { (_, registrations) -> registrations.single() }
     }
 
-    fun resolve(artifactId: ArtifactId<out Artifact>): ArtifactAssembler<Artifact> {
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Artifact> resolve(artifactId: ArtifactId<T>): ArtifactAssembler<T> {
         val assembler =
             assemblersByType[artifactId.artifactType]
-                ?: error("No artifact assembler found for artifact type: ${artifactId.artifactType}")
+                ?: error("No artifact assembler registered for artifact type: ${artifactId.artifactType.displayName}")
 
-        @Suppress("UNCHECKED_CAST")
-        return assembler as ArtifactAssembler<Artifact>
+        return assembler as ArtifactAssembler<T>
     }
 }
+
+private val KClass<*>.displayName: String
+    get() = qualifiedName ?: simpleName ?: toString()

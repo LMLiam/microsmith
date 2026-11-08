@@ -8,11 +8,11 @@ import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 class BinaryFileArtifactAssembler : ArtifactAssembler<BinaryFileArtifact> {
     override val artifactType = BinaryFileArtifact::class
 
-    override fun create(first: ArtifactContribution<BinaryFileArtifact>): BinaryFileArtifact {
-        val contribution = requireContribution(first)
+    override fun create(contribution: ArtifactContribution<BinaryFileArtifact>): BinaryFileArtifact {
+        val binaryContribution = contribution.requireBinaryContribution()
         return BinaryFileArtifact(
-            id = contribution.artifactId,
-            contents = contribution.copiedContents,
+            id = binaryContribution.artifactId,
+            contents = binaryContribution.contents,
         )
     }
 
@@ -20,20 +20,18 @@ class BinaryFileArtifactAssembler : ArtifactAssembler<BinaryFileArtifact> {
         current: BinaryFileArtifact,
         contribution: ArtifactContribution<BinaryFileArtifact>,
     ): BinaryFileArtifact {
-        val next = requireContribution(contribution)
-        require(current.copiedContents.contentEquals(next.copiedContents)) {
+        val nextContribution = contribution.requireBinaryContribution()
+        require(current.contents.contentEquals(nextContribution.contents)) {
             "Conflicting binary artifact contributions for '${current.id.relativePath}' " +
                 "under '${current.id.outputRoot}'."
         }
         return current
     }
 
-    private fun requireContribution(
-        contribution: ArtifactContribution<BinaryFileArtifact>
-    ): BinaryFileArtifactContribution {
-        require(contribution is BinaryFileArtifactContribution) {
-            "Unsupported binary artifact contribution type: ${contribution::class}"
+    private fun ArtifactContribution<BinaryFileArtifact>.requireBinaryContribution(): BinaryFileArtifactContribution {
+        require(this is BinaryFileArtifactContribution) {
+            "Unsupported binary artifact contribution type '${this::class.qualifiedName ?: this::class.simpleName}'."
         }
-        return contribution
+        return this
     }
 }

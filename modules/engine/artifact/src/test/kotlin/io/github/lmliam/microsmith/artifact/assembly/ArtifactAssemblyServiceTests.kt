@@ -1,6 +1,5 @@
-package io.github.lmliam.microsmith.artifact
+package io.github.lmliam.microsmith.artifact.assembly
 
-import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssemblyService
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactAssembler
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
@@ -13,9 +12,10 @@ import java.nio.file.Path
 
 class ArtifactAssemblyServiceTests :
     StringSpec({
-        "assembly service merges identical text contributions into one artifact" {
-            val service = ArtifactAssemblyService(listOf(TextFileArtifactAssembler()))
-            val sharedId = TextFileArtifactId(relativePath = Path.of("shared.txt"))
+        val service = ArtifactAssemblyService(listOf(TextFileArtifactAssembler()))
+
+        "merges identical text contributions into a single artifact" {
+            val sharedId = TextFileArtifactId(Path.of("shared.txt"))
 
             val assembly =
                 service.assemble(
@@ -28,9 +28,8 @@ class ArtifactAssemblyServiceTests :
             assembly.artifacts() shouldContainExactly listOf(TextFileArtifact(sharedId, "same"))
         }
 
-        "assembly service rejects conflicting text contribution for the same artifact" {
-            val service = ArtifactAssemblyService(listOf(TextFileArtifactAssembler()))
-            val sharedId = TextFileArtifactId(relativePath = Path.of("shared.txt"))
+        "rejects conflicting text contributions for the same artifact ID" {
+            val sharedId = TextFileArtifactId(Path.of("shared.txt"))
 
             val error =
                 shouldThrow<IllegalArgumentException> {

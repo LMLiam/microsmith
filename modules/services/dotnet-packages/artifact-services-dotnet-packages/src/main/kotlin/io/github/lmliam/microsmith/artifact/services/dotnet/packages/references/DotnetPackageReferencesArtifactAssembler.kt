@@ -8,13 +8,20 @@ import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackageReferencesArtifact> {
     override val artifactType = DotnetPackageReferencesArtifact::class
 
-    override fun create(first: ArtifactContribution<DotnetPackageReferencesArtifact>): DotnetPackageReferencesArtifact {
-        val contribution = requireContribution(first)
+    override fun create(
+        contribution: ArtifactContribution<DotnetPackageReferencesArtifact>
+    ): DotnetPackageReferencesArtifact {
+        val referencesContribution = requireContribution(contribution)
         return DotnetPackageReferencesArtifact(
-            id = contribution.artifactId,
-            solutionName = contribution.solutionName,
-            projectName = contribution.projectName,
-            packages = mergePackages(emptyList(), contribution.packages, contribution.artifactId.serviceName),
+            id = referencesContribution.artifactId,
+            solutionName = referencesContribution.solutionName,
+            projectName = referencesContribution.projectName,
+            packages =
+                mergePackages(
+                    emptyList(),
+                    referencesContribution.packages,
+                    referencesContribution.artifactId.serviceName,
+                ),
         )
     }
 

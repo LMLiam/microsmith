@@ -1,3 +1,6 @@
+### Write-up / Dissertation ###
+diss/
+
 ### Build system ###
 .gradle/
 **/.gradle/

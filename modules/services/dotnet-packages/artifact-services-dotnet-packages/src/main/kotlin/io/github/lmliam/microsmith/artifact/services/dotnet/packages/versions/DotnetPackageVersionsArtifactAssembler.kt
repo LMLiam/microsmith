@@ -8,11 +8,14 @@ import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 class DotnetPackageVersionsArtifactAssembler : ArtifactAssembler<DotnetPackageVersionsArtifact> {
     override val artifactType = DotnetPackageVersionsArtifact::class
 
-    override fun create(first: ArtifactContribution<DotnetPackageVersionsArtifact>): DotnetPackageVersionsArtifact {
-        val contribution = requireContribution(first)
+    override fun create(
+        contribution: ArtifactContribution<DotnetPackageVersionsArtifact>
+    ): DotnetPackageVersionsArtifact {
+        val versionsContribution = requireContribution(contribution)
         return DotnetPackageVersionsArtifact(
-            id = contribution.artifactId,
-            packages = mergePackages(emptyList(), contribution.packages, contribution.artifactId.solutionName),
+            id = versionsContribution.artifactId,
+            packages =
+                mergePackages(emptyList(), versionsContribution.packages, versionsContribution.artifactId.solutionName),
         )
     }
 

@@ -4,18 +4,21 @@ import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembly
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssemblyService
-import kotlin.collections.linkedSetOf
 
-class ArtifactCompilationService(
-    compilers: List<ArtifactCompiler<*>>,
+class ArtifactCompilationService
+internal constructor(
+    private val compilerRegistry: ArtifactCompilerRegistry,
     private val assemblyService: ArtifactAssemblyService,
 ) {
-    private val compilerRegistry = ArtifactCompilerRegistry(compilers)
+    constructor(
+        compilers: List<ArtifactCompiler<*>>,
+        assemblyService: ArtifactAssemblyService,
+    ) : this(ArtifactCompilerRegistry(compilers), assemblyService)
 
     fun compile(assembly: ArtifactAssembly): ArtifactAssembly =
         compileUntilStable(
             current = assembly,
-            seenSignatures = linkedSetOf(),
+            seenSignatures = mutableSetOf(),
         )
 
     private tailrec fun compileUntilStable(
@@ -24,7 +27,7 @@ class ArtifactCompilationService(
     ): ArtifactAssembly {
         val signature = current.signature()
 
-        require(seenSignatures.add(signature)) { "Artifact compilation cycle detected for assembly: $signature" }
+        require(seenSignatures.add(signature)) { "Artifact compilation cycle detected for assembly: '$signature'." }
 
         val next = compileSinglePass(current) ?: return current
 
@@ -33,36 +36,28 @@ class ArtifactCompilationService(
 
     private fun compileSinglePass(current: ArtifactAssembly): ArtifactAssembly? {
         val passthroughArtifacts = mutableListOf<Artifact>()
-        val compiledContributions = mutableListOf<ArtifactContribution<out Artifact>>()
-
+        val compiledContributions = mutableListOf<ArtifactContribution<Artifact>>()
         var compiledAny = false
 
-        current.artifacts().forEach { artifact ->
+        for (artifact in current.artifacts()) {
             val compiler = compilerRegistry.resolveOrNull(artifact)
-
             if (compiler == null) {
                 passthroughArtifacts += artifact
-                return@forEach
+                continue
             }
 
             val contributions = compiler.compile(artifact)
 
             require(contributions.none { it.artifactId.artifactType == artifact.id.artifactType }) {
-                val compilerName = compiler::class.qualifiedName ?: compiler::class.toString()
-
-                val artifactTypeName = artifact.id.artifactType.toString()
-
-                "Artifact compiler $compilerName compiled $artifactTypeName into the same artifact type, " +
-                    "which would create an immediate compilation cycle"
+                "'${compiler::class.displayName}' compiled '${artifact.id.artifactType.displayName}' " +
+                    "into the same artifact type, creating an immediate compilation cycle."
             }
 
             compiledContributions += contributions
             compiledAny = true
         }
 
-        if (!compiledAny) {
-            return null
-        }
+        if (!compiledAny) return null
 
         return assemblyService.assembleRetaining(
             retainedArtifacts = passthroughArtifacts,
@@ -71,12 +66,5 @@ class ArtifactCompilationService(
     }
 
     private fun ArtifactAssembly.signature(): String =
-        artifacts()
-            .map { artifact ->
-                val typeName = artifact.id.artifactType.qualifiedName ?: artifact.id.artifactType.toString()
-
-                "$typeName:${artifact.id}"
-            }
-            .sorted()
-            .joinToString("|")
+        artifacts().map { "${it.id.artifactType.displayName}:${it.id}" }.sorted().joinToString("|")
 }

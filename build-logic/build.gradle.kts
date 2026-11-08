@@ -1,7 +1,5 @@
 import org.gradle.api.JavaVersion
 import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.testing.Test
-import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -16,7 +14,6 @@ repositories {
 
 dependencies {
     implementation(libs.shadow.gradle.plugin)
-    compileOnly(gradleApi())
     testImplementation(gradleTestKit())
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
@@ -24,6 +21,7 @@ dependencies {
 
 kotlin {
     jvmToolchain(24)
+
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_22)
         progressiveMode.set(true)
@@ -43,12 +41,8 @@ tasks.withType<JavaCompile>().configureEach {
     options.release.set(22)
 }
 
-tasks.named<Test>("test") {
+tasks.test {
     useJUnitPlatform()
-}
-
-tasks.named<Jar>("jar") {
-    from(sourceSets.main.get().output)
 }
 
 gradlePlugin {

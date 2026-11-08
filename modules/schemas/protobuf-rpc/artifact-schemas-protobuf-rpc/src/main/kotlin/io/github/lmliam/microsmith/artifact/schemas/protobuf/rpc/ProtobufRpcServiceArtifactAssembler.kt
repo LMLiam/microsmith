@@ -8,12 +8,12 @@ import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 class ProtobufRpcServiceArtifactAssembler : ArtifactAssembler<ProtobufRpcServiceArtifact> {
     override val artifactType = ProtobufRpcServiceArtifact::class
 
-    override fun create(first: ArtifactContribution<ProtobufRpcServiceArtifact>): ProtobufRpcServiceArtifact {
-        val contribution = requireContribution(first)
+    override fun create(contribution: ArtifactContribution<ProtobufRpcServiceArtifact>): ProtobufRpcServiceArtifact {
+        val rpcContribution = requireContribution(contribution)
         return ProtobufRpcServiceArtifact(
-            id = contribution.artifactId,
-            imports = contribution.imports.distinct().sorted(),
-            operations = contribution.operations,
+            id = rpcContribution.artifactId,
+            imports = rpcContribution.imports.distinct().sorted(),
+            operations = rpcContribution.operations,
         )
     }
 
