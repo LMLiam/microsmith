@@ -3,9 +3,9 @@ package io.github.lmliam.microsmith.cli.execution
 import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.diagnostics.CliDiagnosticEmitter
 import io.github.lmliam.microsmith.cli.init.InitBootstrapResult
-import io.github.lmliam.microsmith.cli.init.JavaOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.KotlinOnboardingProfile
-import io.github.lmliam.microsmith.cli.init.ScalaOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.JavaOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.KotlinOnboardingProfile
+import io.github.lmliam.microsmith.cli.init.profile.ScalaOnboardingProfile
 
 private const val GRADLE_PLUGIN_ID = "io.github.lmliam.microsmith"
 private const val MICROSMITH_GROUP = "io.github.lmliam.microsmith"

@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.ide
-
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files

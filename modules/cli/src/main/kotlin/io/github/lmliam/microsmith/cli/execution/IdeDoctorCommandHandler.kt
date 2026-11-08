@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.execution
-
 import io.github.lmliam.microsmith.cli.command.IdeDoctorCommand
 import io.github.lmliam.microsmith.cli.diagnostics.CliFailureCode
 import io.github.lmliam.microsmith.cli.ide.IdeDoctorResult

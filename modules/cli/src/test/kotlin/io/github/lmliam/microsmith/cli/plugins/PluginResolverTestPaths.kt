@@ -1,5 +1,4 @@
 package io.github.lmliam.microsmith.cli.plugins
-
 import java.nio.file.Files
 import java.nio.file.Path
 

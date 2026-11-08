@@ -39,10 +39,10 @@ import java.nio.file.Path
 @Suppress("UnusedPrivateProperty")
 internal class MicrosmithCli(
     private val stdout: (String) -> Unit = ::println,
-    private val stderr: (String) -> Unit = { System.err.println(it) },
-    private val providerValidator: () -> List<String> = ::verifyBuiltinProviders,
-    private val pluginResolver: (RunCommand) -> PluginResolutionResult = ::resolvePlugins,
-    private val scriptRunner: (RunCommand, List<Path>) -> ScriptRunResult = { command, pluginClasspath ->
+    stderr: (String) -> Unit = { System.err.println(it) },
+    providerValidator: () -> List<String> = ::verifyBuiltinProviders,
+    pluginResolver: (RunCommand) -> PluginResolutionResult = ::resolvePlugins,
+    scriptRunner: (RunCommand, List<Path>) -> ScriptRunResult = { command, pluginClasspath ->
         MicrosmithScriptHost().run(
             ScriptRunRequest(
                 script = command.script,
@@ -54,14 +54,14 @@ internal class MicrosmithCli(
             ),
         )
     },
-    private val doctorRunner: () -> DoctorResult = {
+    doctorRunner: () -> DoctorResult = {
         runDoctorChecks(providerValidator = providerValidator)
     },
     private val versionProvider: () -> String = ::resolveCliVersion,
-    private val initRunner: (InitCommand) -> InitBootstrapResult = ::runInitBootstrap,
-    private val ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult = ::refreshIdeHelperProject,
-    private val ideDoctorRunner: (IdeDoctorCommand) -> IdeDoctorResult = ::runIdeHelperDoctor,
-    private val eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,
+    initRunner: (InitCommand) -> InitBootstrapResult = ::runInitBootstrap,
+    ideRefreshRunner: (IdeRefreshCommand) -> IdeHelperRefreshResult = ::refreshIdeHelperProject,
+    ideDoctorRunner: (IdeDoctorCommand) -> IdeDoctorResult = ::runIdeHelperDoctor,
+    eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,
 ) {
     private val emitterFactory = CliDiagnosticEmitterFactory(stdout = stdout, stderr = stderr)
     private val usageErrorHandler = UsageErrorCommandHandler(emitterFactory = emitterFactory, stderr = stderr)
