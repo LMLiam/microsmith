@@ -90,14 +90,14 @@ class ProtobufSymbolCollisionResolutionTests :
         }
 
         "rejects two map fields that synthesise the same entry message name" {
-            val schema = ProtobufSchema("M", Message("M", listOf(mapField("foo_bar", 1), mapField("fooBar", 2))))
+            val schema = ProtobufSchema("M", Message("M", listOf(mapField("foo_bar", 1), mapField("Foo_bar", 2))))
 
             resolve(schema).issues() shouldContainExactly
                 listOf(
                     ProtobufResolutionIssue.SymbolNameCollision(
                         "M",
                         "FooBarEntry",
-                        listOf(SymbolDeclaration.MapEntry("M", "foo_bar"), SymbolDeclaration.MapEntry("M", "fooBar")),
+                        listOf(SymbolDeclaration.MapEntry("M", "foo_bar"), SymbolDeclaration.MapEntry("M", "Foo_bar")),
                     )
                 )
         }

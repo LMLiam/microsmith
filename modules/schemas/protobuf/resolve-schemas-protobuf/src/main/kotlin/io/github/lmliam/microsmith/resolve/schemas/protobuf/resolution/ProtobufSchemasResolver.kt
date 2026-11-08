@@ -49,6 +49,7 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
                         )
                 }
 
+        issues.addAll(findNameConflicts(protobufSchemas))
         issues.addAll(findSymbolCollisions(protobufSchemas))
         issues.addAll(findImportCycles(resolved))
 

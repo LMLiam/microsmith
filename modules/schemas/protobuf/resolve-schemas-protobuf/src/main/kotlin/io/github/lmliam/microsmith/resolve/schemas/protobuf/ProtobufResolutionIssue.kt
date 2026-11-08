@@ -53,6 +53,9 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
     data class SymbolNameCollision(val scope: String, val name: String, val declarations: List<SymbolDeclaration>) :
         DeclarationIssue
 
+    data class FieldJsonNameCollision(val schemaName: String, val jsonName: String, val fieldNames: List<String>) :
+        DeclarationIssue
+
     data class EmptyEnum(val schemaName: String) : EnumIssue
 
     data class EnumFirstValueMustBeZero(val schemaName: String, val firstValueName: String, val number: Int) : EnumIssue
@@ -60,6 +63,8 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
     data class DuplicateEnumValueNames(val schemaName: String, val names: List<String>) : EnumIssue
 
     data class DuplicateEnumValueNumbers(val schemaName: String, val numbers: List<Int>) : EnumIssue
+
+    data class EnumValueNameCollision(val schemaName: String, val valueNames: List<String>) : EnumIssue
 
     data class InvalidReservationRange(val schemaName: String, val start: Int, val endInclusive: Int) : ReservationIssue
 

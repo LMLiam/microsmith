@@ -65,4 +65,13 @@ internal fun ProtobufResolutionIssue.DeclarationIssue.toDiagnostic(): Resolution
                         declarations.joinToString { it.displayName() } +
                         ".",
             )
+
+        is ProtobufResolutionIssue.FieldJsonNameCollision ->
+            protobufDiagnostic(
+                code = "protobuf.field-json-name-collision",
+                message =
+                    "Protobuf schema '$schemaName' fields " +
+                        fieldNames.joinToString { "'$it'" } +
+                        " share the JSON name '$jsonName'.",
+            )
     }

@@ -133,6 +133,39 @@ class ProtobufResolutionDiagnosticMapperTests :
                 )
         }
 
+        "maps a field JSON name collision with the fields and the shared JSON name" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(
+                ProtobufResolutionIssue.FieldJsonNameCollision(
+                    schemaName = "pkg.User",
+                    jsonName = "fooBar",
+                    fieldNames = listOf("foo_bar", "fooBar"),
+                )
+            ) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.field-json-name-collision",
+                    message = "Protobuf schema 'pkg.User' fields 'foo_bar', 'fooBar' share the JSON name 'fooBar'.",
+                )
+        }
+
+        "maps an enum value name collision with the enum and the values" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(
+                ProtobufResolutionIssue.EnumValueNameCollision(
+                    schemaName = "pkg.Color",
+                    valueNames = listOf("COLOR_RED", "RED"),
+                )
+            ) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.enum-value-name-collision",
+                    message =
+                        "Protobuf enum 'pkg.Color' has values that clash once the enum name prefix, case " +
+                            "and underscores are ignored: COLOR_RED, RED.",
+                )
+        }
+
         "maps a circular schema import with its path" {
             val mapper = ProtobufResolutionDiagnosticMapper()
 

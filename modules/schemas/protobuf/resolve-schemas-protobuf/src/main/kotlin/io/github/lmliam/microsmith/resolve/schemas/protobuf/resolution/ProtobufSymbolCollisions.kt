@@ -9,7 +9,6 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue.SymbolDeclaration
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 internal fun findSymbolCollisions(schemas: List<ProtobufSchema>): List<ProtobufResolutionIssue.SymbolNameCollision> =
@@ -90,13 +89,4 @@ private fun messageSymbols(schemaName: String, message: Message): List<ScopedSym
         }
 }
 
-private fun isIdentifier(raw: String): Boolean = ProtoIdentifier.parse(raw).isRight()
-
-private fun mapEntryName(fieldName: String): String {
-    val camelCase =
-        fieldName.split('_').joinToString("") { part ->
-            part.replaceFirstChar { if (it in 'a'..'z') it.uppercaseChar() else it }
-        }
-
-    return camelCase + "Entry"
-}
+private fun mapEntryName(fieldName: String): String = fieldName.underscoresToCamelCase(capitalizeFirst = true) + "Entry"
