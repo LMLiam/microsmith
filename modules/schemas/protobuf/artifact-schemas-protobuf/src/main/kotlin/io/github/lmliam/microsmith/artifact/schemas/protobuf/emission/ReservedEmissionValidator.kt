@@ -9,9 +9,9 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameVa
 
 internal fun validateReserved(reserved: Reserved) {
     when (reserved) {
-        is ReservedIndex -> requireValidFieldNumber(reserved.index, "Reserved index")
+        is ReservedIndex -> requireValidReservedNumber(reserved.index, "Reserved index")
         is ReservedRange -> validateReservedRange(reserved)
-        is ReservedToMax -> requireValidFieldNumber(reserved.from, "Reserved-to-max start")
+        is ReservedToMax -> requireValidReservedNumber(reserved.from, "Reserved-to-max start")
         is ReservedName -> ProtobufNameValidation.requireIdentifier(reserved.name, "Reserved name")
     }
 }
@@ -20,6 +20,6 @@ private fun validateReservedRange(range: ReservedRange) {
     require(range.indexRange.first <= range.indexRange.last) {
         "Reserved range must be ascending, but was ${range.indexRange}"
     }
-    requireValidFieldNumber(range.indexRange.first, "Reserved range start")
-    requireValidFieldNumber(range.indexRange.last, "Reserved range end")
+    requireValidReservedNumber(range.indexRange.first, "Reserved range start")
+    requireValidReservedNumber(range.indexRange.last, "Reserved range end")
 }

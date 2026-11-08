@@ -37,12 +37,12 @@ internal fun MutableList<ProtobufResolutionIssue>.validateIdentifier(
     }
 }
 
-internal fun MutableList<ProtobufResolutionIssue>.validateFieldNumber(
+internal fun MutableList<ProtobufResolutionIssue>.validateReservedNumber(
     schemaName: String,
     location: ProtobufResolutionIssue.FieldLocation,
     number: Int,
 ) {
-    if (FieldNumber.parse(number).isLeft()) {
+    if (number !in FieldNumber.RANGE) {
         add(
             ProtobufResolutionIssue.InvalidFieldNumber(
                 schemaName,

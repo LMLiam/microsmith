@@ -8,8 +8,10 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.EnumRef
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.MaxRange
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -309,6 +311,45 @@ class MessageBuilderTests :
             val b = builder()
             b.reserved(MaxRange(100))
             shouldThrow<IllegalArgumentException> { b.int32("foo") { index(101) } }
+        }
+
+        "reserved accepts a single index in the implementation range" {
+            val b = builder()
+            b.reserved(19_500)
+            b.build().reserved shouldContainExactly listOf(ReservedIndex(19_500))
+        }
+
+        "reserved accepts a range covering the implementation range" {
+            val b = builder()
+            b.reserved(18_000..20_000)
+            b.build().reserved shouldContainExactly listOf(ReservedRange(18_000..20_000))
+        }
+
+        "reserved accepts exactly the implementation range" {
+            val b = builder()
+            b.reserved(19_000..19_999)
+            b.build().reserved shouldContainExactly listOf(ReservedRange(19_000..19_999))
+        }
+
+        "reserved to max accepts a start in the implementation range" {
+            val b = builder()
+            b.reserved(MaxRange(19_500))
+            b.build().reserved shouldContainExactly listOf(ReservedToMax(19_500))
+        }
+
+        "field index in the implementation range is rejected" {
+            val b = builder()
+            shouldThrow<IllegalArgumentException> { b.int32("foo") { index(19_500) } }
+        }
+
+        "auto allocation skips numbers reserved around the implementation range" {
+            val b = builder()
+            b.reserved(18_000..20_000)
+            for (i in 1..17_999) {
+                b.int32("field$i")
+            }
+            b.int32("next")
+            b.build().fields.last().index shouldBe 20_001
         }
 
         "reserved names prevent using same name for fields" {

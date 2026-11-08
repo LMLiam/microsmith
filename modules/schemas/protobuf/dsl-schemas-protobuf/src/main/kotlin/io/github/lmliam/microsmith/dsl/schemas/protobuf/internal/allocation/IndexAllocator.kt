@@ -30,25 +30,33 @@ internal class IndexAllocator(private val min: Int, private val protoReserved: I
     }
 
     fun reserve(index: Int) {
-        validate(index)
+        validateReservable(index)
         reserved.merge(index..index)
     }
 
     fun reserve(range: IntRange) {
-        validate(range)
+        validateReservable(range)
         reserved.merge(range)
     }
 
     fun validate(index: Int) {
-        require(index in min..Max.VALUE) { "Invalid index: $index" }
+        validateReservable(index)
         protoReserved?.let { require(index !in it) { "Index $index is in proto reserved range" } }
+    }
+
+    private fun validateReservable(index: Int) {
+        require(index in min..Max.VALUE) { "Invalid index: $index" }
         require(index !in used) { "Index $index already used" }
         require(reserved.none { index in it }) { "Index $index is in reserved range" }
     }
 
-    fun validate(range: IntRange) {
-        validate(range.first)
-        validate(range.last)
+    private fun validateReservable(range: IntRange) {
+        validateReservable(range.first)
+        validateReservable(range.last)
+        validateNoOverlap(range)
+    }
+
+    private fun validateNoOverlap(range: IntRange) {
         require(used.none { it in range }) { "Range $range overlaps with used indexes" }
         require(reserved.none { existing -> existing.first <= range.last && range.first <= existing.last }) {
             "Range $range overlaps with already reserved ranges"

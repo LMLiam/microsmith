@@ -17,7 +17,7 @@ internal fun validateMessageReservationSpan(
         is ReservedName -> null
 
         is ReservedIndex -> {
-            issues.validateFieldNumber(
+            issues.validateReservedNumber(
                 schemaName,
                 ProtobufResolutionIssue.FieldLocation.Reservation(reservation.index.toString()),
                 reservation.index,
@@ -34,7 +34,7 @@ internal fun validateMessageReservationSpan(
             )
 
         is ReservedToMax -> {
-            issues.validateFieldNumber(
+            issues.validateReservedNumber(
                 schemaName,
                 ProtobufResolutionIssue.FieldLocation.Reservation("${reservation.from} to max"),
                 reservation.from,
@@ -75,13 +75,13 @@ private fun validateMessageReservationRange(
 
     val location = ProtobufResolutionIssue.FieldLocation.Reservation(range.toString())
 
-    issues.validateFieldNumber(
+    issues.validateReservedNumber(
         schemaName,
         location,
         range.first,
     )
 
-    issues.validateFieldNumber(
+    issues.validateReservedNumber(
         schemaName,
         location,
         range.last,
