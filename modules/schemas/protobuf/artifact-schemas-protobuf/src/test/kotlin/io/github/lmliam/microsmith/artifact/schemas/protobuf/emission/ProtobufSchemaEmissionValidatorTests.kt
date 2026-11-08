@@ -42,7 +42,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                     ),
                             )
                         ),
-                    reservations = ResolvedProtobufReservations(),
+                    reservations = ResolvedProtobufReservations.NONE,
                 )
 
             shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
@@ -75,7 +75,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                     ),
                             )
                         ),
-                    reservations = ResolvedProtobufReservations(),
+                    reservations = ResolvedProtobufReservations.NONE,
                 )
 
             shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
@@ -111,19 +111,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                     ),
                             ),
                         ),
-                    reservations = ResolvedProtobufReservations(),
-                )
-
-            shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
-        }
-
-        "validate rejects overlapping reserved numeric ranges" {
-            val declaration =
-                ResolvedProtobufMessage(
-                    name = protoIdentifier("Contact"),
-                    fields = emptyList(),
-                    oneofs = emptyList(),
-                    reservations = ResolvedProtobufReservations(spans = listOf(singleSpan(10), rangeSpan(10, 20))),
+                    reservations = ResolvedProtobufReservations.NONE,
                 )
 
             shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
@@ -144,7 +132,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                 number = EnumValueNumber(1),
                             ),
                         ),
-                    reservations = ResolvedProtobufReservations(names = listOf(protoIdentifier("ACTIVE"))),
+                    reservations = reservations(names = listOf(protoIdentifier("ACTIVE"))),
                 )
 
             shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
@@ -165,7 +153,7 @@ class ProtobufSchemaEmissionValidatorTests :
                         ),
                     oneofs = emptyList(),
                     reservations =
-                        ResolvedProtobufReservations(
+                        reservations(
                             names = listOf(protoIdentifier("legacy_name")),
                             spans = listOf(singleSpan(10)),
                         ),

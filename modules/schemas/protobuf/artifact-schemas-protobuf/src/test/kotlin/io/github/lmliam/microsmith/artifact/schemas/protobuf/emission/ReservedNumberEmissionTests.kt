@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
 
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
 import io.kotest.core.spec.style.StringSpec
 
@@ -12,7 +11,7 @@ class ReservedNumberEmissionTests :
                 name = protoIdentifier("Contact"),
                 fields = emptyList(),
                 oneofs = emptyList(),
-                reservations = ResolvedProtobufReservations(spans = spans.toList()),
+                reservations = reservations(spans = spans.toList()),
             )
 
         "message reservations accept a single number in the implementation range" {

@@ -2,7 +2,6 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
 
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.EnumValueNumber
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
 import io.kotest.assertions.throwables.shouldThrow
@@ -24,32 +23,10 @@ class EnumEmissionValidatorTests :
                                 number = EnumValueNumber(0),
                             )
                         ),
-                    reservations = ResolvedProtobufReservations(spans = listOf(toMaxSpan(Int.MAX_VALUE, enumDomain))),
+                    reservations = reservations(spans = listOf(toMaxSpan(Int.MAX_VALUE, enumDomain))),
                 )
 
             validateProtobufDeclaration(declaration)
-        }
-
-        "enum reservations to max overlap reservations above the message field-number limit" {
-            val declaration =
-                ResolvedProtobufEnum(
-                    name = protoIdentifier("Status"),
-                    values =
-                        listOf(
-                            ResolvedProtobufEnumValue(
-                                name = protoIdentifier("UNSPECIFIED"),
-                                number = EnumValueNumber(0),
-                            )
-                        ),
-                    reservations =
-                        ResolvedProtobufReservations(
-                            spans = listOf(toMaxSpan(1, enumDomain), singleSpan(Int.MAX_VALUE, enumDomain))
-                        ),
-                )
-
-            val error = shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
-
-            error.message shouldBe "Enum 'Status' has overlapping reserved ranges: " + "1 to max overlaps 2147483647"
         }
 
         "enum reservations to max reject used numbers above the message field-number limit" {
@@ -67,7 +44,7 @@ class EnumEmissionValidatorTests :
                                 number = EnumValueNumber(Int.MAX_VALUE),
                             ),
                         ),
-                    reservations = ResolvedProtobufReservations(spans = listOf(toMaxSpan(1, enumDomain))),
+                    reservations = reservations(spans = listOf(toMaxSpan(1, enumDomain))),
                 )
 
             val error = shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
@@ -87,7 +64,7 @@ class EnumEmissionValidatorTests :
                             )
                         ),
                     reservations =
-                        ResolvedProtobufReservations(
+                        reservations(
                             spans =
                                 listOf(
                                     singleSpan(Int.MIN_VALUE, enumDomain),

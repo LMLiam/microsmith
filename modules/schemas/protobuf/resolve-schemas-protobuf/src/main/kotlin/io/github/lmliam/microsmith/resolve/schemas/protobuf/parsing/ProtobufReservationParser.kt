@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.context.bind
 import arrow.core.raise.context.bindNel
 import arrow.core.raise.context.either
 import arrow.core.raise.context.mapOrAccumulate
@@ -29,13 +30,18 @@ internal fun parseReservations(
     usedNames: List<String>,
     usedNumbers: List<Int>,
 ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufReservations> = either {
-    zipOrAccumulate(
-        { parseReservedNames(schemaName, reservations.filterIsInstance<ReservedName>(), usedNames).bindNel() },
-        { parseReservedSpans(schemaName, reservations, domain).bindNel() },
-        { checkReservedNumbers(schemaName, reservations, domain, usedNumbers).bindNel() },
-    ) { names, spans, _ ->
-        ResolvedProtobufReservations(names, spans)
-    }
+    val (names, spans) =
+        zipOrAccumulate(
+            { parseReservedNames(schemaName, reservations.filterIsInstance<ReservedName>(), usedNames).bindNel() },
+            { parseReservedSpans(schemaName, reservations, domain).bindNel() },
+            { checkReservedNumbers(schemaName, reservations, domain, usedNumbers).bindNel() },
+        ) { names, spans, _ ->
+            names to spans
+        }
+
+    ResolvedProtobufReservations.of(names, spans)
+        .mapLeft { it.map { rejection -> rejection.toIssue(schemaName) } }
+        .bind()
 }
 
 private fun parseReservedNames(
