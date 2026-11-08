@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.validation
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Field
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
@@ -27,7 +28,7 @@ internal fun validateMessageDeclaration(schemaName: String, message: Message): L
                 ProtobufResolutionIssue.DuplicateFieldNames(
                     schemaName,
                     it,
-                ),
+                )
             )
         }
 
@@ -36,7 +37,7 @@ internal fun validateMessageDeclaration(schemaName: String, message: Message): L
                 ProtobufResolutionIssue.DuplicateFieldNumbers(
                     schemaName,
                     it,
-                ),
+                )
             )
         }
 
@@ -45,7 +46,7 @@ internal fun validateMessageDeclaration(schemaName: String, message: Message): L
                 ProtobufResolutionIssue.DuplicateOneofNames(
                     schemaName,
                     it,
-                ),
+                )
             )
         }
 
@@ -55,7 +56,7 @@ internal fun validateMessageDeclaration(schemaName: String, message: Message): L
                 message.reserved,
                 usedNames = allFields.map(Field::name),
                 usedNumbers = allFields.map(Field::index),
-            ),
+            )
         )
     }
 
@@ -85,7 +86,7 @@ private fun MutableList<ProtobufResolutionIssue>.validateOneof(schemaName: Strin
             ProtobufResolutionIssue.EmptyOneof(
                 schemaName,
                 oneof.name,
-            ),
+            )
         )
     }
 

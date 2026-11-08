@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.command
+
 import io.github.lmliam.microsmith.cli.diagnostics.DiagnosticFormat
 import java.nio.file.Path
 

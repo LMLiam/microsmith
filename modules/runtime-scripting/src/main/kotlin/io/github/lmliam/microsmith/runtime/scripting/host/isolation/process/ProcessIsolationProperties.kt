@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
+
 import java.nio.file.Path
 import java.util.Properties
 
@@ -29,7 +30,5 @@ internal fun Properties.requiredLong(key: String): Long =
 
 internal fun Properties.requiredPath(key: String): Path = requiredString(key).let(Path::of)
 
-private fun Properties.requiredString(key: String): String = getProperty(key)
-    ?.trim()
-    ?.takeIf(String::isNotEmpty)
-    ?: error("Missing or invalid '$key'.")
+private fun Properties.requiredString(key: String): String =
+    getProperty(key)?.trim()?.takeIf(String::isNotEmpty) ?: error("Missing or invalid '$key'.")

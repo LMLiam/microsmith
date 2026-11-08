@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen.output
+
 import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.github.lmliam.microsmith.gen.files.FileSpace
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
@@ -23,9 +24,7 @@ internal object GeneratedOutputPathResolver {
     }
 
     fun resolve(space: FileSpace, relativePath: Path): Path {
-        require(!relativePath.isAbsolute) {
-            "Generated output path must be relative, but was '$relativePath'."
-        }
+        require(!relativePath.isAbsolute) { "Generated output path must be relative, but was '$relativePath'." }
 
         val normalizedRoot = space.root.toAbsolutePath().normalize()
         ensureOutputRootIsSafe(normalizedRoot)
@@ -42,9 +41,7 @@ internal object GeneratedOutputPathResolver {
     }
 
     fun resolveRoot(root: Path, outputRoot: Path): Path {
-        require(!outputRoot.isAbsolute) {
-            "Generated output root must be relative, but was '$outputRoot'."
-        }
+        require(!outputRoot.isAbsolute) { "Generated output root must be relative, but was '$outputRoot'." }
 
         val normalizedRoot = root.toAbsolutePath().normalize()
         ensureOutputRootIsSafe(normalizedRoot)
@@ -62,12 +59,8 @@ internal object GeneratedOutputPathResolver {
 
     private fun ensureOutputRootIsSafe(root: Path) {
         if (Files.exists(root, LinkOption.NOFOLLOW_LINKS)) {
-            require(Files.isDirectory(root, LinkOption.NOFOLLOW_LINKS)) {
-                "Output root '$root' must be a directory."
-            }
-            require(!Files.isSymbolicLink(root)) {
-                "Output root '$root' must not be a symbolic link."
-            }
+            require(Files.isDirectory(root, LinkOption.NOFOLLOW_LINKS)) { "Output root '$root' must be a directory." }
+            require(!Files.isSymbolicLink(root)) { "Output root '$root' must not be a symbolic link." }
             return
         }
 

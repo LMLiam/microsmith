@@ -16,36 +16,36 @@ import java.nio.file.Path
 class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectArtifact> {
     override val artifactType = MsBuildProjectArtifact::class
 
-    override fun compile(artifact: MsBuildProjectArtifact): List<ArtifactContribution<out Artifact>> = listOf(
-        TextFileArtifactContribution(
-            artifactId = TextFileArtifactId(
-                relativePath = projectRelativePath(artifact),
-                outputRoot = artifact.outputRoot(),
-            ),
-            contents = MsBuildProjectXmlRenderer.render(artifact),
-            origins = artifact.origins.ifEmpty { setOf(artifact.id.originName()) },
-        ),
-    )
+    override fun compile(artifact: MsBuildProjectArtifact): List<ArtifactContribution<out Artifact>> =
+        listOf(
+            TextFileArtifactContribution(
+                artifactId =
+                    TextFileArtifactId(
+                        relativePath = projectRelativePath(artifact),
+                        outputRoot = artifact.outputRoot(),
+                    ),
+                contents = MsBuildProjectXmlRenderer.render(artifact),
+                origins = artifact.origins.ifEmpty { setOf(artifact.id.originName()) },
+            )
+        )
 
-    private fun MsBuildProjectArtifact.outputRoot(): Path = when (id.kind) {
-        MsBuildProjectKind.DirectoryPackagesProps -> dotnetOutputRoot.resolve(id.solutionName)
+    private fun MsBuildProjectArtifact.outputRoot(): Path =
+        when (id.kind) {
+            MsBuildProjectKind.DirectoryPackagesProps -> dotnetOutputRoot.resolve(id.solutionName)
 
-        MsBuildProjectKind.DirectoryBuildProps ->
-            dotnetOutputRoot
-                .resolve(id.solutionName)
-                .resolve(requireNotNull(id.projectName))
+            MsBuildProjectKind.DirectoryBuildProps ->
+                dotnetOutputRoot.resolve(id.solutionName).resolve(requireNotNull(id.projectName))
 
-        MsBuildProjectKind.Project ->
-            dotnetOutputRoot
-                .resolve(id.solutionName)
-                .resolve(requireNotNull(id.projectName))
-    }
+            MsBuildProjectKind.Project ->
+                dotnetOutputRoot.resolve(id.solutionName).resolve(requireNotNull(id.projectName))
+        }
 
-    private fun projectRelativePath(artifact: MsBuildProjectArtifact): Path = when (artifact.id.kind) {
-        MsBuildProjectKind.DirectoryPackagesProps -> Path.of("Directory.Packages.props")
-        MsBuildProjectKind.DirectoryBuildProps -> Path.of("Directory.Build.props")
-        MsBuildProjectKind.Project -> Path.of("${requireNotNull(artifact.id.projectName)}.csproj")
-    }
+    private fun projectRelativePath(artifact: MsBuildProjectArtifact): Path =
+        when (artifact.id.kind) {
+            MsBuildProjectKind.DirectoryPackagesProps -> Path.of("Directory.Packages.props")
+            MsBuildProjectKind.DirectoryBuildProps -> Path.of("Directory.Build.props")
+            MsBuildProjectKind.Project -> Path.of("${requireNotNull(artifact.id.projectName)}.csproj")
+        }
 
     private fun MsBuildProjectArtifactId.originName(): String = buildString {
         append("dotnet.solutions.").append(solutionName)

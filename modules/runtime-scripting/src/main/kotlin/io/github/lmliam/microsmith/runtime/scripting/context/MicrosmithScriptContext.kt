@@ -14,10 +14,7 @@ class MicrosmithScriptContext(
 
     fun emit(model: MicrosmithModel) {
         generatedRoots =
-            (generatedRoots + emitHandler(model))
-                .map { path -> path.toAbsolutePath().normalize() }
-                .distinct()
-                .sorted()
+            (generatedRoots + emitHandler(model)).map { path -> path.toAbsolutePath().normalize() }.distinct().sorted()
         emitted = true
     }
 

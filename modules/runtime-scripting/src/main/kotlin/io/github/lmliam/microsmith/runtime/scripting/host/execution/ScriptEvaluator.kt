@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.execution
+
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScriptCompilationConfiguration
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScriptEvaluationConfiguration
@@ -26,17 +27,11 @@ internal object ScriptEvaluator {
         val compilationConfiguration =
             ScriptCompilationConfiguration(MicrosmithScriptCompilationConfiguration) {
                 hostConfiguration.update { runtimeHostConfiguration }
-                jvm {
-                    updateClasspath(pluginClasspath.map(Path::toFile))
-                }
+                jvm { updateClasspath(pluginClasspath.map(Path::toFile)) }
             }
         val evaluationConfiguration =
-            ScriptEvaluationConfiguration(
-                MicrosmithScriptEvaluationConfiguration,
-            ) {
-                hostConfiguration.update {
-                    runtimeHostConfiguration
-                }
+            ScriptEvaluationConfiguration(MicrosmithScriptEvaluationConfiguration) {
+                hostConfiguration.update { runtimeHostConfiguration }
 
                 implicitReceivers(scriptContext)
             }

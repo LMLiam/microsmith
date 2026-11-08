@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.validation
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
@@ -18,7 +19,7 @@ internal class ProtobufDeclarationValidator {
                     validateMessageDeclaration(
                         schemaName,
                         declaration,
-                    ),
+                    )
                 )
 
             is Enum ->
@@ -26,7 +27,7 @@ internal class ProtobufDeclarationValidator {
                     validateEnumDeclaration(
                         schemaName,
                         declaration,
-                    ),
+                    )
                 )
         }
     }

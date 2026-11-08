@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp.service
+
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
@@ -34,7 +35,7 @@ class DotnetAspServiceArtifactAssembler : ArtifactAssembler<DotnetAspServiceArti
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<DotnetAspServiceArtifact>,
+        contribution: ArtifactContribution<DotnetAspServiceArtifact>
     ): DotnetAspServiceContribution {
         require(contribution is DotnetAspServiceContribution) {
             "Unsupported ASP.NET service contribution type: ${contribution::class}"

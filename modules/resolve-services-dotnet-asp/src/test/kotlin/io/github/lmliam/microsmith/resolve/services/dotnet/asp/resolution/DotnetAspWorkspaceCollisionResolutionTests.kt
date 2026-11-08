@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution
+
 import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspHttpMethod
@@ -15,12 +16,11 @@ private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
 
 private fun DotnetAspWorkspaceResolver.resolveIssues(extension: ServicesExtension): List<DotnetResolutionIssue> =
-    resolve(extension).fold(
-        ifLeft = { it.toList() },
-        ifRight = {
-            error("Expected ASP.NET resolution failure")
-        },
-    )
+    resolve(extension)
+        .fold(
+            ifLeft = { it.toList() },
+            ifRight = { error("Expected ASP.NET resolution failure") },
+        )
 
 class DotnetAspWorkspaceCollisionResolutionTests :
     StringSpec({
@@ -31,9 +31,7 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                 dotnet {
                     target(NET8)
 
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
@@ -41,45 +39,25 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                         solution("Platform")
                         project("UserService.Api")
 
-                        models {
-                            "User" {
-                                string("id")
-                            }
-                        }
+                        models { "User" { string("id") } }
 
                         asp {
                             rest {
-                                "/users" {
-                                    get("GetUser") {
-                                        responses {
-                                            ok("User")
-                                        }
-                                    }
-                                }
+                                "/users" { get("GetUser") { responses { ok("User") } } }
 
-                                "/admins" {
-                                    get("GetUser") {
-                                        responses {
-                                            ok("User")
-                                        }
-                                    }
-                                }
+                                "/admins" { get("GetUser") { responses { ok("User") } } }
                             }
                         }
                     }
                 }
             }
 
-            DotnetAspWorkspaceResolver()
-                .resolveIssues(
-                    builder.requireServicesExtension(),
-                ) shouldContainExactly
+            DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                 listOf(
-                    DotnetAspResolutionIssue
-                        .DuplicateOperationName(
-                            serviceName = "UserService",
-                            operationName = "GetUser",
-                        ),
+                    DotnetAspResolutionIssue.DuplicateOperationName(
+                        serviceName = "UserService",
+                        operationName = "GetUser",
+                    )
                 )
         }
 
@@ -90,9 +68,7 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                 dotnet {
                     target(NET8)
 
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
@@ -100,46 +76,26 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                         solution("Platform")
                         project("UserService.Api")
 
-                        models {
-                            "User" {
-                                string("id")
-                            }
-                        }
+                        models { "User" { string("id") } }
 
                         asp {
                             rest {
-                                "/users" {
-                                    get("ListUsers") {
-                                        responses {
-                                            ok("User")
-                                        }
-                                    }
-                                }
+                                "/users" { get("ListUsers") { responses { ok("User") } } }
 
-                                "/users" {
-                                    get("GetUsersDuplicate") {
-                                        responses {
-                                            ok("User")
-                                        }
-                                    }
-                                }
+                                "/users" { get("GetUsersDuplicate") { responses { ok("User") } } }
                             }
                         }
                     }
                 }
             }
 
-            DotnetAspWorkspaceResolver()
-                .resolveIssues(
-                    builder.requireServicesExtension(),
-                ) shouldContainExactly
+            DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                 listOf(
-                    DotnetAspResolutionIssue
-                        .DuplicateRestEndpoint(
-                            serviceName = "UserService",
-                            method = DotnetAspHttpMethod.GET,
-                            route = "/users",
-                        ),
+                    DotnetAspResolutionIssue.DuplicateRestEndpoint(
+                        serviceName = "UserService",
+                        method = DotnetAspHttpMethod.GET,
+                        route = "/users",
+                    )
                 )
         }
 
@@ -150,9 +106,7 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                 dotnet {
                     target(NET8)
 
-                    solutions {
-                        "Platform" {}
-                    }
+                    solutions { "Platform" {} }
                 }
 
                 "UserService" {
@@ -172,25 +126,21 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                 }
             }
 
-            DotnetAspWorkspaceResolver()
-                .resolveIssues(
-                    builder.requireServicesExtension(),
-                ) shouldContainExactly
+            DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                 listOf(
-                    DotnetAspResolutionIssue
-                        .OutputRootCollision(
-                            outputRoot =
+                    DotnetAspResolutionIssue.OutputRootCollision(
+                        outputRoot =
                             Path.of(
                                 "dotnet",
                                 "Platform",
                                 "Shared.Api",
                             ),
-                            serviceNames =
+                        serviceNames =
                             listOf(
                                 "AdminService",
                                 "UserService",
                             ),
-                        ),
+                    )
                 )
         }
     })

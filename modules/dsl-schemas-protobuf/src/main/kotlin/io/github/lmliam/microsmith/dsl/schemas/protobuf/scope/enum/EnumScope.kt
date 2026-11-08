@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.enum
+
 import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.Reservable
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf

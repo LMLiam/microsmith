@@ -1,9 +1,11 @@
 package io.github.lmliam.microsmith.cli.parsing
+
 import io.github.lmliam.microsmith.cli.diagnostics.DiagnosticFormat
 
 internal class DiagnosticOptionsState {
     var diagnosticsFormat: DiagnosticFormat = DiagnosticFormat.TEXT
         private set
+
     var verbose: Boolean = false
         private set
 

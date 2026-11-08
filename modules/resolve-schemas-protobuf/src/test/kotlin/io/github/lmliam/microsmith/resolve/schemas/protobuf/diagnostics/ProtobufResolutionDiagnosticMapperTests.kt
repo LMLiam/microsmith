@@ -11,46 +11,46 @@ class ProtobufResolutionDiagnosticMapperTests :
             val mapper = ProtobufResolutionDiagnosticMapper()
 
             listOf(
-                ProtobufResolutionIssue
-                    .UnresolvedReference(
+                    ProtobufResolutionIssue.UnresolvedReference(
                         schemaName = "User",
                         location = ProtobufResolutionIssue.ReferenceLocation.Field("manager"),
                         targetName = "MissingUser",
                     ),
-                ProtobufResolutionIssue
-                    .UnresolvedReference(
+                    ProtobufResolutionIssue.UnresolvedReference(
                         schemaName = "User",
                         location = ProtobufResolutionIssue.ReferenceLocation.MapValue("labels"),
                         targetName = "MissingLabel",
                     ),
-                ProtobufResolutionIssue
-                    .UnresolvedReference(
+                    ProtobufResolutionIssue.UnresolvedReference(
                         schemaName = "User",
-                        location = ProtobufResolutionIssue.ReferenceLocation.OneofField(
-                            oneofName = "contact",
-                            fieldName = "email",
-                        ),
+                        location =
+                            ProtobufResolutionIssue.ReferenceLocation.OneofField(
+                                oneofName = "contact",
+                                fieldName = "email",
+                            ),
                         targetName = "MissingContact",
                     ),
-            ).map(mapper::map) shouldContainExactly
+                )
+                .map(mapper::map) shouldContainExactly
                 listOf(
                     ResolutionDiagnostic(
                         code = "protobuf.unresolved-reference",
-                        message = "Protobuf schema 'User' field " +
-                            "'manager' references unknown " +
-                            "type 'MissingUser'.",
+                        message =
+                            "Protobuf schema 'User' field " + "'manager' references unknown " + "type 'MissingUser'.",
                     ),
                     ResolutionDiagnostic(
                         code = "protobuf.unresolved-reference",
-                        message = "Protobuf schema 'User' map field " +
-                            "'labels' value references unknown " +
-                            "type 'MissingLabel'.",
+                        message =
+                            "Protobuf schema 'User' map field " +
+                                "'labels' value references unknown " +
+                                "type 'MissingLabel'.",
                     ),
                     ResolutionDiagnostic(
                         code = "protobuf.unresolved-reference",
-                        message = "Protobuf schema 'User' oneof " +
-                            "'contact' field 'email' references " +
-                            "unknown type 'MissingContact'.",
+                        message =
+                            "Protobuf schema 'User' oneof " +
+                                "'contact' field 'email' references " +
+                                "unknown type 'MissingContact'.",
                     ),
                 )
         }

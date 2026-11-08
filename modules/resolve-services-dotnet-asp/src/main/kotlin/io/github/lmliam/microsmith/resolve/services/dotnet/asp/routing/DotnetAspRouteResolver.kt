@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing
+
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.nonEmptyListOf
@@ -45,11 +46,10 @@ internal class DotnetAspRouteResolver {
                 )
         }
 
-        val segments = normalized
-            .split('/')
-            .filter(String::isNotBlank)
-            .mapNotNull { segment ->
-                segmentParser.parse(segment, route, kind)
+        val segments =
+            normalized.split('/').filter(String::isNotBlank).mapNotNull { segment ->
+                segmentParser
+                    .parse(segment, route, kind)
                     .fold(
                         ifLeft = {
                             issues += it
@@ -74,15 +74,12 @@ internal class DotnetAspRouteResolver {
     ): EitherNel<DotnetAspResolutionIssue, ResolvedDotnetAspRoute> {
         val path = if (fragment.segments.isEmpty()) "/" else "/" + fragment.segments.joinToString("/") { it.text }
 
-        val placeholders = fragment.segments
-            .filterIsInstance<DotnetAspRouteSegment.Placeholder>()
-            .map(DotnetAspRouteSegment.Placeholder::name)
+        val placeholders =
+            fragment.segments
+                .filterIsInstance<DotnetAspRouteSegment.Placeholder>()
+                .map(DotnetAspRouteSegment.Placeholder::name)
 
-        val duplicates = placeholders
-            .groupBy { it }
-            .filterValues { it.size > 1 }
-            .keys
-            .sorted()
+        val duplicates = placeholders.groupBy { it }.filterValues { it.size > 1 }.keys.sorted()
 
         return if (duplicates.isEmpty()) {
             Either.Right(ResolvedDotnetAspRoute(path, placeholders))
@@ -94,8 +91,8 @@ internal class DotnetAspRouteResolver {
                         context.operationName,
                         path,
                         duplicates,
-                    ),
-                ),
+                    )
+                )
             )
         }
     }

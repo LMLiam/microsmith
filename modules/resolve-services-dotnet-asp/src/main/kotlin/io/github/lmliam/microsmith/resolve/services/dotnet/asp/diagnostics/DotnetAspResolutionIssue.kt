@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics
+
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspHttpMethod
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
 import java.nio.file.Path
@@ -11,10 +12,15 @@ sealed interface DotnetAspResolutionIssue : DotnetResolutionIssue {
 
     sealed interface RouteProblem {
         data object Blank : RouteProblem
+
         data object MissingLeadingSlash : RouteProblem
+
         data object EmptyPathSegment : RouteProblem
+
         data class InvalidSegment(val segment: String) : RouteProblem
+
         data class BlankOrPaddedPlaceholder(val segment: String) : RouteProblem
+
         data class InvalidPlaceholderIdentifier(val placeholder: String) : RouteProblem
     }
 

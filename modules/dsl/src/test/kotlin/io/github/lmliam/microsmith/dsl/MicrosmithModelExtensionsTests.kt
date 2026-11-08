@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl
+
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import io.kotest.assertions.throwables.shouldThrow
@@ -31,9 +32,7 @@ class MicrosmithModelExtensionsTests :
 
         "require() throws if extension is missing" {
             val model = MicrosmithModel.empty()
-            shouldThrow<IllegalStateException> {
-                model.require<FooExt>()
-            }
+            shouldThrow<IllegalStateException> { model.require<FooExt>() }
         }
 
         "extensions() returns all attached extensions" {

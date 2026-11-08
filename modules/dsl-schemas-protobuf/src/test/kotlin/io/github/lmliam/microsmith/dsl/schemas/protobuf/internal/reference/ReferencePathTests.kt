@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference
+
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -43,8 +44,7 @@ class ReferencePathTests :
             getReferencePath(
                 listOf("pkg", "sub"),
                 "....Foo",
-            ) shouldBe
-                listOf("Foo")
+            ) shouldBe listOf("Foo")
         }
 
         "relative with nested path works correctly" {

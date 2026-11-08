@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.model
+
 import java.nio.file.Path
 
 data class ScriptRunSuccess(

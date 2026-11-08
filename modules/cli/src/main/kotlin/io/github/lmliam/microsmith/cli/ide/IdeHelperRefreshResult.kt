@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.ide
+
 import java.nio.file.Path
 
 internal data class IdeHelperRefreshResult(

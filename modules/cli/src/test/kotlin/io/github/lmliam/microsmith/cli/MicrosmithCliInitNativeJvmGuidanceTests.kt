@@ -13,10 +13,10 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
+import java.nio.file.Path as NioPath
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
-import java.nio.file.Path as NioPath
 
 @OptIn(ExperimentalPathApi::class)
 class MicrosmithCliInitNativeJvmGuidanceTests :
@@ -25,12 +25,13 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             assertNativeJvmGuidance(
                 profile = JavaOnboardingProfile,
                 matchedMarkers = listOf("pom.xml", "src/main/java"),
-                expectedOutput = listOf(
-                    "Detected repository profile: Java",
-                    "Next: microsmith run build.microsmith.kts",
-                    "Prefer the native Maven plugin path",
-                    "mvn microsmith:generate",
-                ),
+                expectedOutput =
+                    listOf(
+                        "Detected repository profile: Java",
+                        "Next: microsmith run build.microsmith.kts",
+                        "Prefer the native Maven plugin path",
+                        "mvn microsmith:generate",
+                    ),
                 unexpectedOutput = listOf("Optional repository-native output path"),
                 tempDirectoryPrefix = "microsmith-cli-init-java-maven",
             )
@@ -40,11 +41,12 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             assertNativeJvmGuidance(
                 profile = KotlinOnboardingProfile,
                 matchedMarkers = listOf("pom.xml", "src/main/kotlin"),
-                expectedOutput = listOf(
-                    "Detected repository profile: Kotlin",
-                    "Prefer the native Maven plugin path",
-                    "mvn microsmith:generate",
-                ),
+                expectedOutput =
+                    listOf(
+                        "Detected repository profile: Kotlin",
+                        "Prefer the native Maven plugin path",
+                        "mvn microsmith:generate",
+                    ),
                 tempDirectoryPrefix = "microsmith-cli-init-kotlin-maven",
             )
         }
@@ -53,11 +55,12 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             assertNativeJvmGuidance(
                 profile = KotlinOnboardingProfile,
                 matchedMarkers = listOf("build.gradle.kts", "src/main/kotlin"),
-                expectedOutput = listOf(
-                    "Detected repository profile: Kotlin",
-                    "Next: microsmith run build.microsmith.kts",
-                    "Prefer the native Gradle plugin path",
-                ),
+                expectedOutput =
+                    listOf(
+                        "Detected repository profile: Kotlin",
+                        "Next: microsmith run build.microsmith.kts",
+                        "Prefer the native Gradle plugin path",
+                    ),
                 unexpectedOutput = listOf("Optional repository-native output path"),
                 tempDirectoryPrefix = "microsmith-cli-init-kotlin-gradle",
             )
@@ -67,17 +70,19 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             assertNativeJvmGuidance(
                 profile = ScalaOnboardingProfile,
                 matchedMarkers = listOf("build.sbt", "src/main/scala"),
-                expectedOutput = listOf(
-                    "Detected repository profile: Scala",
-                    "Next: microsmith run build.microsmith.kts",
-                    "Prefer the native sbt plugin path",
-                    "sbt microsmithGenerate",
-                ),
-                unexpectedOutput = listOf(
-                    "Prefer the native Gradle plugin path",
-                    "Prefer the native Maven plugin path",
-                    "Optional repository-native output path",
-                ),
+                expectedOutput =
+                    listOf(
+                        "Detected repository profile: Scala",
+                        "Next: microsmith run build.microsmith.kts",
+                        "Prefer the native sbt plugin path",
+                        "sbt microsmithGenerate",
+                    ),
+                unexpectedOutput =
+                    listOf(
+                        "Prefer the native Gradle plugin path",
+                        "Prefer the native Maven plugin path",
+                        "Optional repository-native output path",
+                    ),
                 tempDirectoryPrefix = "microsmith-cli-init-scala-sbt",
             )
         }
@@ -86,11 +91,12 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             assertNativeJvmGuidance(
                 profile = ScalaOnboardingProfile,
                 matchedMarkers = listOf("pom.xml", "src/main/scala"),
-                expectedOutput = listOf(
-                    "Detected repository profile: Scala",
-                    "Prefer the native Maven plugin path",
-                    "mvn microsmith:generate",
-                ),
+                expectedOutput =
+                    listOf(
+                        "Detected repository profile: Scala",
+                        "Prefer the native Maven plugin path",
+                        "mvn microsmith:generate",
+                    ),
                 tempDirectoryPrefix = "microsmith-cli-init-scala-maven",
             )
         }
@@ -99,10 +105,11 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             assertNativeJvmGuidance(
                 profile = JavaOnboardingProfile,
                 matchedMarkers = listOf("build.gradle.kts", "src/main/java"),
-                expectedOutput = listOf(
-                    "Detected repository profile: Java",
-                    "Prefer the native Gradle plugin path",
-                ),
+                expectedOutput =
+                    listOf(
+                        "Detected repository profile: Java",
+                        "Prefer the native Gradle plugin path",
+                    ),
                 tempDirectoryPrefix = "microsmith-cli-init-java-gradle",
             )
         }
@@ -111,10 +118,11 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             assertNativeJvmGuidance(
                 profile = ScalaOnboardingProfile,
                 matchedMarkers = listOf("build.gradle", "src/main/scala"),
-                expectedOutput = listOf(
-                    "Detected repository profile: Scala",
-                    "Prefer the native Gradle plugin path",
-                ),
+                expectedOutput =
+                    listOf(
+                        "Detected repository profile: Scala",
+                        "Prefer the native Gradle plugin path",
+                    ),
                 tempDirectoryPrefix = "microsmith-cli-init-scala-gradle",
             )
         }
@@ -123,15 +131,17 @@ class MicrosmithCliInitNativeJvmGuidanceTests :
             assertNativeJvmGuidance(
                 profile = ScalaOnboardingProfile,
                 matchedMarkers = listOf("build.sbt", "build.gradle.kts", "src/main/scala"),
-                expectedOutput = listOf(
-                    "Detected repository profile: Scala",
-                    "Next: microsmith run build.microsmith.kts",
-                ),
-                unexpectedOutput = listOf(
-                    "Prefer the native Gradle plugin path",
-                    "Prefer the native Maven plugin path",
-                    "Prefer the native sbt plugin path",
-                ),
+                expectedOutput =
+                    listOf(
+                        "Detected repository profile: Scala",
+                        "Next: microsmith run build.microsmith.kts",
+                    ),
+                unexpectedOutput =
+                    listOf(
+                        "Prefer the native Gradle plugin path",
+                        "Prefer the native Maven plugin path",
+                        "Prefer the native sbt plugin path",
+                    ),
                 tempDirectoryPrefix = "microsmith-cli-init-scala-mixed-native-markers",
             )
         }
@@ -179,19 +189,21 @@ private fun nativeJvmBootstrapResult(
     val helperRoot = projectRoot.resolve(".microsmith/ide")
     return InitBootstrapResult(
         projectRoot = command.projectRoot.toAbsolutePath().normalize(),
-        repositoryDetection = OnboardingProfileDetection(
-            profile = profile,
-            selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
-            matchedMarkers = matchedMarkers,
-        ),
+        repositoryDetection =
+            OnboardingProfileDetection(
+                profile = profile,
+                selectionReason = OnboardingProfileSelectionReason.MATCHED_PROFILE,
+                matchedMarkers = matchedMarkers,
+            ),
         createdFiles = listOf(projectRoot.resolve("build.microsmith.kts")),
         overwrittenFiles = emptyList(),
         preservedFiles = emptyList(),
-        ideHelperResult = IdeHelperRefreshResult(
-            projectRoot = projectRoot,
-            helperRoot = helperRoot,
-            updatedFiles = emptyList(),
-            classpathEntries = listOf(projectRoot.resolve("microsmith-cli-all.jar")),
-        ),
+        ideHelperResult =
+            IdeHelperRefreshResult(
+                projectRoot = projectRoot,
+                helperRoot = helperRoot,
+                updatedFiles = emptyList(),
+                classpathEntries = listOf(projectRoot.resolve("microsmith-cli-all.jar")),
+            ),
     )
 }

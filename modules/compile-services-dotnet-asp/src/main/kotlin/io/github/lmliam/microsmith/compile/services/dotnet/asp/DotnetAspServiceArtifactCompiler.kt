@@ -38,20 +38,21 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
                 MsBuildProjectContribution(
                     artifactId = artifact.msBuildProjectArtifactId(MsBuildProjectKind.Project),
                     projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
-                    properties = mapOf(
-                        MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
-                        MsBuildNames.NULLABLE_PROPERTY to "enable",
-                        MsBuildNames.TARGET_FRAMEWORK_PROPERTY to artifact.targetFrameworkMoniker,
-                    ),
+                    properties =
+                        mapOf(
+                            MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
+                            MsBuildNames.NULLABLE_PROPERTY to "enable",
+                            MsBuildNames.TARGET_FRAMEWORK_PROPERTY to artifact.targetFrameworkMoniker,
+                        ),
                     origins = serviceOrigin,
-                ),
+                )
             )
             add(
                 artifact.textContribution(
                     "Program.cs",
                     DotnetAspProjectRenderer.renderProgramFile(artifact),
                     serviceOrigin,
-                ),
+                )
             )
             add(artifact.textContribution("appsettings.json", renderDotnetAspAppSettingsFile(artifact), serviceOrigin))
             add(
@@ -59,49 +60,49 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
                     "Properties/launchSettings.json",
                     renderDotnetAspLaunchSettingsFile(artifact),
                     serviceOrigin,
-                ),
+                )
             )
             add(
                 artifact.textContribution(
                     "Generated/Hosting/MicrosmithHostingExtensions.cs",
                     DotnetAspProjectRenderer.renderHostingExtensionsFile(artifact),
                     serviceOrigin,
-                ),
+                )
             )
             add(
                 artifact.textContribution(
                     "Generated/Contracts/ServiceModels.cs",
                     DotnetAspProjectRenderer.renderServiceModelsFile(artifact),
                     sharedContractModelOriginsFor(artifact, serviceOrigin),
-                ),
+                )
             )
             add(
                 artifact.textContribution(
                     "Generated/Contracts/RequestModels.cs",
                     DotnetAspProjectRenderer.renderRequestModelsFile(artifact),
                     requestModelOrigins,
-                ),
+                )
             )
             add(
                 artifact.textContribution(
                     "Generated/Contracts/ResponseModels.cs",
                     DotnetAspProjectRenderer.renderResponseModelsFile(artifact),
                     responseModelOrigins,
-                ),
+                )
             )
             add(
                 artifact.textContribution(
                     microsmithControllerBaseRelativePath(),
                     DotnetAspProjectRenderer.renderMicrosmithControllerBaseFile(artifact),
                     serviceOrigin,
-                ),
+                )
             )
             add(
                 artifact.textContribution(
                     controllerBaseRelativePath(artifact),
                     DotnetAspProjectRenderer.renderControllerBaseFile(artifact),
                     controllerOrigins,
-                ),
+                )
             )
         }
     }

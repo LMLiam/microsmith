@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.types
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
@@ -16,31 +17,28 @@ class MessageTests :
                     ScalarField(
                         name = "id",
                         index = 1,
-                        primitive =
-                        PrimitiveType.INT64,
+                        primitive = PrimitiveType.INT64,
                     ),
                     ReferenceField(
                         name = "owner",
                         index = 2,
-                        reference =
-                        Reference.Qualified("Owner"),
+                        reference = Reference.Qualified("Owner"),
                     ),
                     MapField(
                         name = "metadata",
                         index = 3,
                         type =
-                        MapType(
-                            key =
-                            PrimitiveType.STRING,
-                            value =
-                            PrimitiveType.STRING,
-                        ),
+                            MapType(
+                                key = PrimitiveType.STRING,
+                                value = PrimitiveType.STRING,
+                            ),
                     ),
                 )
 
             Message(
-                name = "Thing",
-                fields = fields,
-            ).fields shouldContainExactly fields
+                    name = "Thing",
+                    fields = fields,
+                )
+                .fields shouldContainExactly fields
         }
     })

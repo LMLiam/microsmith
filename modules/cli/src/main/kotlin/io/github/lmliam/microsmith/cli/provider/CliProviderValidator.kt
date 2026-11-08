@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.provider
+
 import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
 import io.github.lmliam.microsmith.gen.plugins.discoverMicrosmithPlugins
 

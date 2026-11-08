@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.remote
+
 import io.github.lmliam.microsmith.cli.plugins.diagnostics.PluginDependencyResolutionDiagnostics
 import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.RepositorySystemSession
@@ -12,7 +13,7 @@ import org.eclipse.aether.util.artifact.JavaScopes
 import org.eclipse.aether.util.filter.DependencyFilterUtils
 
 internal class MavenDependencyGraphResolver(
-    private val diagnostics: PluginDependencyResolutionDiagnostics = PluginDependencyResolutionDiagnostics(),
+    private val diagnostics: PluginDependencyResolutionDiagnostics = PluginDependencyResolutionDiagnostics()
 ) {
     fun resolve(
         repositorySystem: RepositorySystem,

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly
+
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution.ProtoFileContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifactId
@@ -21,7 +22,7 @@ class ProtoFileArtifactAssemblerTests :
                             packageName = "acme.user.v1",
                             imports = listOf("acme/user/v1/Role.proto"),
                             declarations = listOf(ProtoDeclaration("User", "message User {}")),
-                        ),
+                        )
                     ),
                     ProtoFileContribution(
                         artifactId = sharedId,
@@ -46,7 +47,7 @@ class ProtoFileArtifactAssemblerTests :
                         artifactId = sharedId,
                         packageName = "acme.user.v1",
                         declarations = listOf(ProtoDeclaration("User", "message User {}")),
-                    ),
+                    )
                 )
 
             val error =
@@ -61,7 +62,6 @@ class ProtoFileArtifactAssemblerTests :
                     )
                 }
 
-            error.message shouldBe
-                "Conflicting protobuf declaration 'User' for 'acme.user.v1.User'."
+            error.message shouldBe "Conflicting protobuf declaration 'User' for 'acme.user.v1.User'."
         }
     })

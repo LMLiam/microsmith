@@ -32,15 +32,13 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
 
     data class EmptyEnum(val schemaName: String) : EnumIssue
 
-    data class EnumFirstValueMustBeZero(val schemaName: String, val firstValueName: String, val number: Int) :
-        EnumIssue
+    data class EnumFirstValueMustBeZero(val schemaName: String, val firstValueName: String, val number: Int) : EnumIssue
 
     data class DuplicateEnumValueNames(val schemaName: String, val names: List<String>) : EnumIssue
 
     data class DuplicateEnumValueNumbers(val schemaName: String, val numbers: List<Int>) : EnumIssue
 
-    data class InvalidReservationRange(val schemaName: String, val start: Int, val endInclusive: Int) :
-        ReservationIssue
+    data class InvalidReservationRange(val schemaName: String, val start: Int, val endInclusive: Int) : ReservationIssue
 
     data class DuplicateReservedNames(val schemaName: String, val names: List<String>) : ReservationIssue
 

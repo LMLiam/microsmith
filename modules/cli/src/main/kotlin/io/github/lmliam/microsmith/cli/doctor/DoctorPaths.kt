@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.doctor
+
 import java.nio.file.Path
 
 internal fun defaultScriptCacheDirectory(): Path {

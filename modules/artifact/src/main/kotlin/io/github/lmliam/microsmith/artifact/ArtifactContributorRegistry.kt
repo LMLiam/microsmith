@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact
+
 import io.github.lmliam.microsmith.resolve.ResolvedModel
 import kotlin.reflect.KClass
 
@@ -34,17 +35,10 @@ internal class ArtifactContributorRegistry(contributors: List<ArtifactContributo
         resolvedType: KClass<out ResolvedModel>,
         contributors: List<ArtifactContributor<*>>,
     ) {
-        val duplicateImplementations = contributors
-            .groupingBy { it::class }
-            .eachCount()
-            .filterValues { it > 1 }
-            .keys
+        val duplicateImplementations = contributors.groupingBy { it::class }.eachCount().filterValues { it > 1 }.keys
 
         require(duplicateImplementations.isEmpty()) {
-            val names = duplicateImplementations
-                .map { it.displayName() }
-                .sorted()
-                .joinToString(", ")
+            val names = duplicateImplementations.map { it.displayName() }.sorted().joinToString(", ")
 
             "Duplicate artifact contributors registered for resolved type ${resolvedType.displayName()}: $names"
         }

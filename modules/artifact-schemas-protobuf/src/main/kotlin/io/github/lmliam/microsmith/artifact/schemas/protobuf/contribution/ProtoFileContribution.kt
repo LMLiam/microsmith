@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution
+
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact

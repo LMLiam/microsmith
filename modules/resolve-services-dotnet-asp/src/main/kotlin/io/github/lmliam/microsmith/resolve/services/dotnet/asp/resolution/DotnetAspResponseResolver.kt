@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution
+
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.toNonEmptyListOrNull
@@ -21,24 +22,24 @@ internal class DotnetAspResponseResolver {
         val resolved = mutableListOf<ResolvedDotnetAspResponse>()
 
         endpoint.responses.forEach { response ->
-            modelResolver.resolve(
-                context,
-                models,
-                response.model,
-                DotnetAspBindingResolutionIssue.ModelReferenceSource.Response(response.statusCode),
-            ).fold(
-                ifLeft = issues::addAll,
-                ifRight = { model ->
-                    resolved +=
-                        ResolvedDotnetAspResponse(
-                            response.statusCode,
-                            model,
-                            headers = response.headers.map {
-                                ResolvedDotnetAspResponseHeader(it.name)
-                            },
-                        )
-                },
-            )
+            modelResolver
+                .resolve(
+                    context,
+                    models,
+                    response.model,
+                    DotnetAspBindingResolutionIssue.ModelReferenceSource.Response(response.statusCode),
+                )
+                .fold(
+                    ifLeft = issues::addAll,
+                    ifRight = { model ->
+                        resolved +=
+                            ResolvedDotnetAspResponse(
+                                response.statusCode,
+                                model,
+                                headers = response.headers.map { ResolvedDotnetAspResponseHeader(it.name) },
+                            )
+                    },
+                )
         }
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()

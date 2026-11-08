@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.model
+
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.string.shouldContain
@@ -17,10 +18,11 @@ class GeneratedOutputRootsLocatorTests :
             protoManifest.writeText("""{"files":[]}""")
             aspManifest.writeText("""{"files":[]}""")
 
-            GeneratedOutputRootsLocator.locate(outputDir) shouldContainExactly listOf(
-                outputDir.resolve("dotnet/Platform/UserService.Api").toAbsolutePath().normalize(),
-                outputDir.resolve("proto").toAbsolutePath().normalize(),
-            )
+            GeneratedOutputRootsLocator.locate(outputDir) shouldContainExactly
+                listOf(
+                    outputDir.resolve("dotnet/Platform/UserService.Api").toAbsolutePath().normalize(),
+                    outputDir.resolve("proto").toAbsolutePath().normalize(),
+                )
         }
 
         "describe summarizes multiple generated roots" {
@@ -37,7 +39,7 @@ class GeneratedOutputRootsLocatorTests :
             description.shouldContain(outputDir.toAbsolutePath().normalize().toString())
             description.shouldContain(outputDir.resolve("proto").toAbsolutePath().normalize().toString())
             description.shouldContain(
-                outputDir.resolve("dotnet/Platform/UserService.Api").toAbsolutePath().normalize().toString(),
+                outputDir.resolve("dotnet/Platform/UserService.Api").toAbsolutePath().normalize().toString()
             )
         }
     })

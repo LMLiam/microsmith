@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.remote
+
 import java.nio.file.Path
 
 internal data class ResolvedRemotePlugin(

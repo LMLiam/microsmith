@@ -33,7 +33,7 @@ class TextFileArtifactAssembler : ArtifactAssembler<TextFileArtifact> {
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<TextFileArtifact>,
+        contribution: ArtifactContribution<TextFileArtifact>
     ): TextFileArtifactContribution {
         require(contribution is TextFileArtifactContribution) {
             "Unsupported text artifact contribution type: ${contribution::class}"

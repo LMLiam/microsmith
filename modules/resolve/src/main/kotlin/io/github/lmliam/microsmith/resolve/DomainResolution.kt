@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve
+
 import arrow.core.NonEmptyList
 
 sealed interface DomainResolution<out R : ResolvedModel> {

@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.diagnostics
+
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 import io.kotest.core.spec.style.StringSpec
@@ -10,17 +11,18 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
             val mapper = ProtobufRpcResolutionDiagnosticMapper()
 
             listOf(
-                ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch(
-                    schemaName = "acme.user.v1.OtherService",
-                    declarationName = "UserService",
-                ),
-                ProtobufRpcResolutionIssue.EndpointMustTargetMessage(
-                    serviceName = "UserService",
-                    rpcName = "GetUser",
-                    position = ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
-                    targetName = "Status",
-                ),
-            ).map(mapper::map) shouldContainExactly
+                    ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch(
+                        schemaName = "acme.user.v1.OtherService",
+                        declarationName = "UserService",
+                    ),
+                    ProtobufRpcResolutionIssue.EndpointMustTargetMessage(
+                        serviceName = "UserService",
+                        rpcName = "GetUser",
+                        position = ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
+                        targetName = "Status",
+                    ),
+                )
+                .map(mapper::map) shouldContainExactly
                 listOf(
                     ResolutionDiagnostic(
                         code = "protobuf.rpc.schema-declaration-name-mismatch",

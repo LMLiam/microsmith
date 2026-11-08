@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas
+
 import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -21,9 +22,7 @@ class SchemasScopeTests :
         "schemas block attaches SchemasExtension to builder" {
             val builder = MicrosmithBuilder()
 
-            builder.schemas {
-                fake(ScopeTestSchemaTypes.PROTOBUF, "User")
-            }
+            builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") }
 
             val ext = builder.model.get<SchemasExtension>()
             ext shouldBe SchemasExtension(setOf(ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User")))
@@ -43,20 +42,16 @@ class SchemasScopeTests :
                     setOf(
                         ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User"),
                         ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User"),
-                    ),
+                    )
                 )
         }
 
         "multiple schemas blocks are merged" {
             val builder = MicrosmithBuilder()
 
-            builder.schemas {
-                fake(ScopeTestSchemaTypes.PROTOBUF, "User")
-            }
+            builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") }
 
-            builder.schemas {
-                fake(ScopeTestSchemaTypes.JSON, "User")
-            }
+            builder.schemas { fake(ScopeTestSchemaTypes.JSON, "User") }
 
             val ext = builder.model.get<SchemasExtension>()
             ext shouldBe
@@ -64,21 +59,15 @@ class SchemasScopeTests :
                     setOf(
                         ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User"),
                         ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User"),
-                    ),
+                    )
                 )
         }
 
         "multiple schemas blocks reject duplicate schema keys" {
             val builder = MicrosmithBuilder()
 
-            builder.schemas {
-                fake(ScopeTestSchemaTypes.PROTOBUF, "User")
-            }
+            builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") }
 
-            shouldThrow<IllegalArgumentException> {
-                builder.schemas {
-                    fake(ScopeTestSchemaTypes.PROTOBUF, "User")
-                }
-            }
+            shouldThrow<IllegalArgumentException> { builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") } }
         }
     })

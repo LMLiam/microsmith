@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.service
 
-internal fun mergeDotnetAspRest(existing: DotnetAspRest, incoming: DotnetAspRest) = DotnetAspRest(
-    groups = existing.groups + incoming.groups,
-    endpoints = existing.endpoints + incoming.endpoints,
-)
+internal fun mergeDotnetAspRest(existing: DotnetAspRest, incoming: DotnetAspRest) =
+    DotnetAspRest(
+        groups = existing.groups + incoming.groups,
+        endpoints = existing.endpoints + incoming.endpoints,
+    )

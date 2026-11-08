@@ -12,8 +12,6 @@ data class DotnetAspEndpoint(
 ) {
     init {
         validateDotnetIdentifier(operationName, "ASP.NET operation name")
-        require(responses.isNotEmpty()) {
-            "ASP.NET endpoint '$operationName' must declare at least one response."
-        }
+        require(responses.isNotEmpty()) { "ASP.NET endpoint '$operationName' must declare at least one response." }
     }
 }

@@ -39,8 +39,5 @@ fun discoverMicrosmithPlugins(classLoader: ClassLoader = defaultPluginClassLoade
 private fun defaultPluginClassLoader(): ClassLoader =
     Thread.currentThread().contextClassLoader ?: MicrosmithPluginCatalog::class.java.classLoader
 
-private fun <T : Any> loadServices(type: KClass<T>, classLoader: ClassLoader): List<T> = ServiceLoader
-    .load(type.java, classLoader)
-    .iterator()
-    .asSequence()
-    .toList()
+private fun <T : Any> loadServices(type: KClass<T>, classLoader: ClassLoader): List<T> =
+    ServiceLoader.load(type.java, classLoader).iterator().asSequence().toList()

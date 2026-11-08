@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.repository
+
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
@@ -21,7 +22,8 @@ class PluginRepositoryCredentialsTests :
                 credentialsFile.writeText(
                     """
                     https://repo1.maven.org/maven2|file-user|$fileCredential
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val resolver =
@@ -67,11 +69,13 @@ class PluginRepositoryCredentialsTests :
 
         "fails when only one global credential environment variable is configured" {
             shouldThrow<IllegalArgumentException> {
-                defaultRepositoryCredentialsResolver(
-                    repositoryUsernameEnv = "ci-user",
-                    repositoryPasswordEnv = null,
-                )
-            }.message.shouldContain("Set both MICROSMITH_REPOSITORY_USERNAME and MICROSMITH_REPOSITORY_PASSWORD")
+                    defaultRepositoryCredentialsResolver(
+                        repositoryUsernameEnv = "ci-user",
+                        repositoryPasswordEnv = null,
+                    )
+                }
+                .message
+                .shouldContain("Set both MICROSMITH_REPOSITORY_USERNAME and MICROSMITH_REPOSITORY_PASSWORD")
         }
 
         "fails when repository credentials file has duplicate repository entries" {
@@ -84,14 +88,15 @@ class PluginRepositoryCredentialsTests :
                     """
                     https://repo1.maven.org/maven2|first|$firstCredential
                     https://repo1.maven.org/maven2|second|$secondCredential
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 shouldThrow<IllegalArgumentException> {
-                    defaultRepositoryCredentialsResolver(
-                        repositoryCredentialsFileEnv = credentialsFile.toString(),
-                    )
-                }.message.shouldContain("Duplicate repository credentials entry")
+                        defaultRepositoryCredentialsResolver(repositoryCredentialsFileEnv = credentialsFile.toString())
+                    }
+                    .message
+                    .shouldContain("Duplicate repository credentials entry")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -107,7 +112,8 @@ class PluginRepositoryCredentialsTests :
                 credentialsFile.writeText(
                     """
                     https://repo1.maven.org/maven2|file-user|$fileCredential
-                    """.trimIndent(),
+                    """
+                        .trimIndent()
                 )
 
                 val resolver =
@@ -131,10 +137,7 @@ class PluginRepositoryCredentialsTests :
         }
 
         "redacts overlapping secrets using longest-first replacement" {
-            val sanitized =
-                "token=alphabet".redactSensitiveValues(
-                    setOf("alpha", "alphabet"),
-                )
+            val sanitized = "token=alphabet".redactSensitiveValues(setOf("alpha", "alphabet"))
 
             sanitized shouldBe "token=<redacted>"
         }

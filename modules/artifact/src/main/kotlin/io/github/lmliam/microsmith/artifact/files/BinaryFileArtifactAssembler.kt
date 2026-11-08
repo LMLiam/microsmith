@@ -29,7 +29,7 @@ class BinaryFileArtifactAssembler : ArtifactAssembler<BinaryFileArtifact> {
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<BinaryFileArtifact>,
+        contribution: ArtifactContribution<BinaryFileArtifact>
     ): BinaryFileArtifactContribution {
         require(contribution is BinaryFileArtifactContribution) {
             "Unsupported binary artifact contribution type: ${contribution::class}"

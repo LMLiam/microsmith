@@ -30,9 +30,7 @@ internal class DotnetServiceBuilder : DotnetServiceContext {
     override fun models(block: DotnetModelsScope.() -> Unit) {
         val builder = DotnetModelsBuilder().apply(block)
         builder.build().forEach { (name, model) ->
-            require(name !in modelsByName) {
-                "Duplicate .NET model registration for '$name'."
-            }
+            require(name !in modelsByName) { "Duplicate .NET model registration for '$name'." }
             modelsByName[name] = model
         }
     }
@@ -41,11 +39,12 @@ internal class DotnetServiceBuilder : DotnetServiceContext {
         model = model.with(type, ext)
     }
 
-    fun build() = DotnetServiceExtension(
-        target = target,
-        solution = solution,
-        project = project,
-        models = modelsByName.toMap(),
-        model = model,
-    )
+    fun build() =
+        DotnetServiceExtension(
+            target = target,
+            solution = solution,
+            project = project,
+            models = modelsByName.toMap(),
+            model = model,
+        )
 }

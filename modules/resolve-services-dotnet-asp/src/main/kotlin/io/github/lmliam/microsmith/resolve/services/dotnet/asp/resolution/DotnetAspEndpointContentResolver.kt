@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution
+
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.toNonEmptyListOrNull
@@ -25,15 +26,19 @@ internal class DotnetAspEndpointContentResolver {
         var bindings: ResolvedDotnetAspEndpointBindings? = null
         var responses: List<ResolvedDotnetAspResponse>? = null
 
-        bindingsResolver.resolve(context, endpoint, route, models).fold(
-            ifLeft = issues::addAll,
-            ifRight = { bindings = it },
-        )
+        bindingsResolver
+            .resolve(context, endpoint, route, models)
+            .fold(
+                ifLeft = issues::addAll,
+                ifRight = { bindings = it },
+            )
 
-        responseResolver.resolve(context, endpoint, models).fold(
-            ifLeft = issues::addAll,
-            ifRight = { responses = it },
-        )
+        responseResolver
+            .resolve(context, endpoint, models)
+            .fold(
+                ifLeft = issues::addAll,
+                ifRight = { responses = it },
+            )
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 
@@ -49,7 +54,7 @@ internal class DotnetAspEndpointContentResolver {
                 endpoint.operationName,
                 bindings = checkNotNull(bindings),
                 responses = checkNotNull(responses),
-            ),
+            )
         )
     }
 }

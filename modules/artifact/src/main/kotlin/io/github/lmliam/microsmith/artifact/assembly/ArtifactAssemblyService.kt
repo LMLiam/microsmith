@@ -8,10 +8,11 @@ import kotlin.collections.emptyList
 class ArtifactAssemblyService(assemblers: List<ArtifactAssembler<*>>) {
     private val assemblerRegistry = ArtifactAssemblerRegistry(assemblers)
 
-    fun assemble(contributions: List<ArtifactContribution<out Artifact>>): ArtifactAssembly = assembleRetaining(
-        retainedArtifacts = emptyList(),
-        contributions = contributions,
-    )
+    fun assemble(contributions: List<ArtifactContribution<out Artifact>>): ArtifactAssembly =
+        assembleRetaining(
+            retainedArtifacts = emptyList(),
+            contributions = contributions,
+        )
 
     fun assembleRetaining(
         retainedArtifacts: List<Artifact>,
@@ -22,9 +23,7 @@ class ArtifactAssemblyService(assemblers: List<ArtifactAssembler<*>>) {
         for (artifact in retainedArtifacts) {
             val previous = artifactsById.put(artifact.id, artifact)
 
-            require(previous == null || previous == artifact) {
-                "Conflicting retained artifact for '${artifact.id}'"
-            }
+            require(previous == null || previous == artifact) { "Conflicting retained artifact for '${artifact.id}'" }
         }
 
         for (contribution in contributions) {
@@ -32,8 +31,7 @@ class ArtifactAssemblyService(assemblers: List<ArtifactAssembler<*>>) {
             val assembler = assemblerRegistry.resolve(artifactId)
             val current = artifactsById[artifactId]
 
-            @Suppress("UNCHECKED_CAST")
-            val typedContribution = contribution as ArtifactContribution<Artifact>
+            @Suppress("UNCHECKED_CAST") val typedContribution = contribution as ArtifactContribution<Artifact>
 
             artifactsById[artifactId] =
                 if (current == null) {

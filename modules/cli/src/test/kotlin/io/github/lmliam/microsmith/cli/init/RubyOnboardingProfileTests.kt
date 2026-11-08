@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init
+
 import io.github.lmliam.microsmith.cli.command.InitCommand
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
 import io.github.lmliam.microsmith.cli.init.profile.GenericOnboardingProfile
@@ -21,21 +22,27 @@ class RubyOnboardingProfileTests :
     StringSpec({
         "creates repo-aware bootstrap files for Ruby repositories without a repository-native output override" {
             val repoRoot = createTempDirectory("microsmith-init-bootstrap-ruby")
-            repoRoot.resolve("Gemfile").writeText(
-                """
-                source "https://rubygems.org"
-                gemspec
-                """.trimIndent() + "\n",
-            )
-            repoRoot.resolve("microsmith-ruby-fixture.gemspec").writeText(
-                """
-                Gem::Specification.new do |spec|
-                  spec.name = "microsmith-ruby-fixture"
-                  spec.version = "0.1.0"
-                  spec.summary = "Microsmith Ruby fixture"
-                end
-                """.trimIndent() + "\n",
-            )
+            repoRoot
+                .resolve("Gemfile")
+                .writeText(
+                    """
+                    source "https://rubygems.org"
+                    gemspec
+                    """
+                        .trimIndent() + "\n"
+                )
+            repoRoot
+                .resolve("microsmith-ruby-fixture.gemspec")
+                .writeText(
+                    """
+                    Gem::Specification.new do |spec|
+                      spec.name = "microsmith-ruby-fixture"
+                      spec.version = "0.1.0"
+                      spec.summary = "Microsmith Ruby fixture"
+                    end
+                    """
+                        .trimIndent() + "\n"
+                )
             try {
                 val helperRoot = repoRoot.resolve(".microsmith/ide")
                 val result =
@@ -70,12 +77,15 @@ class RubyOnboardingProfileTests :
         "detects Ruby repositories from Gemfile" {
             val rubyRoot = createTempDirectory("microsmith-init-detect-ruby-gemfile")
             try {
-                rubyRoot.resolve("Gemfile").writeText(
-                    """
-                    source "https://rubygems.org"
-                    gemspec
-                    """.trimIndent() + "\n",
-                )
+                rubyRoot
+                    .resolve("Gemfile")
+                    .writeText(
+                        """
+                        source "https://rubygems.org"
+                        gemspec
+                        """
+                            .trimIndent() + "\n"
+                    )
 
                 detectOnboardingProfile(rubyRoot) shouldBe
                     OnboardingProfileDetection(
@@ -91,12 +101,15 @@ class RubyOnboardingProfileTests :
         "detects Ruby repositories from gems.rb" {
             val rubyRoot = createTempDirectory("microsmith-init-detect-ruby-gems-rb")
             try {
-                rubyRoot.resolve("gems.rb").writeText(
-                    """
-                    source "https://rubygems.org"
-                    gem "rack"
-                    """.trimIndent() + "\n",
-                )
+                rubyRoot
+                    .resolve("gems.rb")
+                    .writeText(
+                        """
+                        source "https://rubygems.org"
+                        gem "rack"
+                        """
+                            .trimIndent() + "\n"
+                    )
 
                 detectOnboardingProfile(rubyRoot) shouldBe
                     OnboardingProfileDetection(
@@ -112,14 +125,17 @@ class RubyOnboardingProfileTests :
         "detects Ruby repositories from a root gemspec" {
             val rubyRoot = createTempDirectory("microsmith-init-detect-ruby-gemspec")
             try {
-                rubyRoot.resolve("microsmith-ruby-fixture.gemspec").writeText(
-                    """
-                    Gem::Specification.new do |spec|
-                      spec.name = "microsmith-ruby-fixture"
-                      spec.version = "0.1.0"
-                    end
-                    """.trimIndent() + "\n",
-                )
+                rubyRoot
+                    .resolve("microsmith-ruby-fixture.gemspec")
+                    .writeText(
+                        """
+                        Gem::Specification.new do |spec|
+                          spec.name = "microsmith-ruby-fixture"
+                          spec.version = "0.1.0"
+                        end
+                        """
+                            .trimIndent() + "\n"
+                    )
 
                 detectOnboardingProfile(rubyRoot) shouldBe
                     OnboardingProfileDetection(
@@ -135,20 +151,26 @@ class RubyOnboardingProfileTests :
         "keeps the Ruby profile when both Gemfile and root gemspec are present" {
             val rubyRoot = createTempDirectory("microsmith-init-detect-ruby-multi")
             try {
-                rubyRoot.resolve("Gemfile").writeText(
-                    """
-                    source "https://rubygems.org"
-                    gemspec
-                    """.trimIndent() + "\n",
-                )
-                rubyRoot.resolve("microsmith-ruby-fixture.gemspec").writeText(
-                    """
-                    Gem::Specification.new do |spec|
-                      spec.name = "microsmith-ruby-fixture"
-                      spec.version = "0.1.0"
-                    end
-                    """.trimIndent() + "\n",
-                )
+                rubyRoot
+                    .resolve("Gemfile")
+                    .writeText(
+                        """
+                        source "https://rubygems.org"
+                        gemspec
+                        """
+                            .trimIndent() + "\n"
+                    )
+                rubyRoot
+                    .resolve("microsmith-ruby-fixture.gemspec")
+                    .writeText(
+                        """
+                        Gem::Specification.new do |spec|
+                          spec.name = "microsmith-ruby-fixture"
+                          spec.version = "0.1.0"
+                        end
+                        """
+                            .trimIndent() + "\n"
+                    )
 
                 detectOnboardingProfile(rubyRoot) shouldBe
                     OnboardingProfileDetection(
@@ -165,14 +187,17 @@ class RubyOnboardingProfileTests :
             val repoRoot = createTempDirectory("microsmith-init-detect-ruby-nested-only")
             try {
                 repoRoot.resolve("vendor/ruby-fixture").createDirectories()
-                repoRoot.resolve("vendor/ruby-fixture/microsmith-ruby-fixture.gemspec").writeText(
-                    """
-                    Gem::Specification.new do |spec|
-                      spec.name = "microsmith-ruby-fixture"
-                      spec.version = "0.1.0"
-                    end
-                    """.trimIndent() + "\n",
-                )
+                repoRoot
+                    .resolve("vendor/ruby-fixture/microsmith-ruby-fixture.gemspec")
+                    .writeText(
+                        """
+                        Gem::Specification.new do |spec|
+                          spec.name = "microsmith-ruby-fixture"
+                          spec.version = "0.1.0"
+                        end
+                        """
+                            .trimIndent() + "\n"
+                    )
 
                 detectOnboardingProfile(repoRoot) shouldBe
                     OnboardingProfileDetection(

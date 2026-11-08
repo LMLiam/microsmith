@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith
+
 import io.kotest.core.config.AbstractProjectConfig
 import io.kotest.extensions.junitxml.JunitXmlReporter
 
@@ -9,6 +10,6 @@ class KotestConfig : AbstractProjectConfig() {
                 includeContainers = false,
                 useTestPathAsName = false,
                 outputDir = "${System.getProperty("gradle.build.dir")}/test-results/kotest",
-            ),
+            )
         )
 }

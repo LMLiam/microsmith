@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile
+
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembly
@@ -11,10 +12,11 @@ class ArtifactCompilationService(
 ) {
     private val compilerRegistry = ArtifactCompilerRegistry(compilers)
 
-    fun compile(assembly: ArtifactAssembly): ArtifactAssembly = compileUntilStable(
-        current = assembly,
-        seenSignatures = linkedSetOf(),
-    )
+    fun compile(assembly: ArtifactAssembly): ArtifactAssembly =
+        compileUntilStable(
+            current = assembly,
+            seenSignatures = linkedSetOf(),
+        )
 
     private tailrec fun compileUntilStable(
         current: ArtifactAssembly,
@@ -22,9 +24,7 @@ class ArtifactCompilationService(
     ): ArtifactAssembly {
         val signature = current.signature()
 
-        require(seenSignatures.add(signature)) {
-            "Artifact compilation cycle detected for assembly: $signature"
-        }
+        require(seenSignatures.add(signature)) { "Artifact compilation cycle detected for assembly: $signature" }
 
         val next = compileSinglePass(current) ?: return current
 
@@ -33,8 +33,7 @@ class ArtifactCompilationService(
 
     private fun compileSinglePass(current: ArtifactAssembly): ArtifactAssembly? {
         val passthroughArtifacts = mutableListOf<Artifact>()
-        val compiledContributions =
-            mutableListOf<ArtifactContribution<out Artifact>>()
+        val compiledContributions = mutableListOf<ArtifactContribution<out Artifact>>()
 
         var compiledAny = false
 
@@ -48,11 +47,7 @@ class ArtifactCompilationService(
 
             val contributions = compiler.compile(artifact)
 
-            require(
-                contributions.none {
-                    it.artifactId.artifactType == artifact.id.artifactType
-                },
-            ) {
+            require(contributions.none { it.artifactId.artifactType == artifact.id.artifactType }) {
                 val compilerName = compiler::class.qualifiedName ?: compiler::class.toString()
 
                 val artifactTypeName = artifact.id.artifactType.toString()
@@ -75,13 +70,13 @@ class ArtifactCompilationService(
         )
     }
 
-    private fun ArtifactAssembly.signature(): String = artifacts()
-        .map { artifact ->
-            val typeName = artifact.id.artifactType.qualifiedName
-                ?: artifact.id.artifactType.toString()
+    private fun ArtifactAssembly.signature(): String =
+        artifacts()
+            .map { artifact ->
+                val typeName = artifact.id.artifactType.qualifiedName ?: artifact.id.artifactType.toString()
 
-            "$typeName:${artifact.id}"
-        }
-        .sorted()
-        .joinToString("|")
+                "$typeName:${artifact.id}"
+            }
+            .sorted()
+            .joinToString("|")
 }

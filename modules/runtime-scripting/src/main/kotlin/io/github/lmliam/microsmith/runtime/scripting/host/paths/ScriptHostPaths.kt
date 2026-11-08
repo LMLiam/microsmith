@@ -1,12 +1,10 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.paths
+
 import java.nio.file.Path
 
 internal object ScriptHostPaths {
     fun defaultCacheDirectory(): Path {
-        val envPath =
-            System.getenv("MICROSMITH_SCRIPT_CACHE_DIR")
-                ?.trim()
-                ?.takeIf { it.isNotEmpty() }
+        val envPath = System.getenv("MICROSMITH_SCRIPT_CACHE_DIR")?.trim()?.takeIf { it.isNotEmpty() }
         if (envPath != null) {
             return Path.of(envPath)
         }

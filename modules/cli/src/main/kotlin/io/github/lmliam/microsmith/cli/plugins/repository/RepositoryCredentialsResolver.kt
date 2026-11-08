@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.plugins.repository
+
 import kotlin.LazyThreadSafetyMode
 
 internal interface RepositoryCredentialsResolver {
@@ -8,7 +9,7 @@ internal interface RepositoryCredentialsResolver {
 }
 
 internal fun lazyDefaultRepositoryCredentialsResolver(
-    resolverFactory: () -> RepositoryCredentialsResolver = ::defaultRepositoryCredentialsResolver,
+    resolverFactory: () -> RepositoryCredentialsResolver = ::defaultRepositoryCredentialsResolver
 ): RepositoryCredentialsResolver {
     val delegate by lazy(LazyThreadSafetyMode.NONE, resolverFactory)
     return object : RepositoryCredentialsResolver {

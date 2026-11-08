@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp
+
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import java.util.Locale
 
@@ -18,11 +19,12 @@ internal object DotnetAspCSharpAttributes {
                         CSharp.namedArgument("Name", CSharp.stringLiteral(operationName)),
                     )
 
-                fun producesResponseType(typeName: String, statusCode: Int): CSharp.Attribute = CSharp.attribute(
-                    name = "ProducesResponseType",
-                    CSharp.positionalArgument(CSharp.rawExpression("typeof($typeName)")),
-                    CSharp.positionalArgument(CSharp.intLiteral(statusCode)),
-                )
+                fun producesResponseType(typeName: String, statusCode: Int): CSharp.Attribute =
+                    CSharp.attribute(
+                        name = "ProducesResponseType",
+                        CSharp.positionalArgument(CSharp.rawExpression("typeof($typeName)")),
+                        CSharp.positionalArgument(CSharp.intLiteral(statusCode)),
+                    )
             }
         }
     }

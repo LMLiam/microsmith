@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.gen.files.render
+
 import java.nio.file.Path
 
 internal object GeneratedByMicrosmithBanner {
@@ -75,8 +76,9 @@ internal object GeneratedByMicrosmithBanner {
         }
     }
 
-    private fun commentText(comment: String, text: String): String = when (comment) {
-        "xml" -> "<!-- $text -->"
-        else -> "$comment $text"
-    }
+    private fun commentText(comment: String, text: String): String =
+        when (comment) {
+            "xml" -> "<!-- $text -->"
+            else -> "$comment $text"
+        }
 }

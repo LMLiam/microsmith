@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc
+
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufDeclarationContext
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef
 
@@ -46,17 +47,12 @@ internal class RpcBuilder(private val name: String, declarationContext: Protobuf
     override fun RpcEndpointMarker.to(other: RpcEndpointMarker) =
         useShorthand(endpoints.endpoint(this), endpoints.endpoint(other))
 
-    fun build(): Rpc = Rpc(
-        name = name,
-        request =
-        requireNotNull(request) {
-            "RPC '$name' must define a request type"
-        },
-        response =
-        requireNotNull(response) {
-            "RPC '$name' must define a response type"
-        },
-    )
+    fun build(): Rpc =
+        Rpc(
+            name = name,
+            request = requireNotNull(request) { "RPC '$name' must define a request type" },
+            response = requireNotNull(response) { "RPC '$name' must define a response type" },
+        )
 
     private fun setExplicitRequest(endpoint: RpcEndpoint) {
         useDeclarationStyle(RpcDeclarationStyle.EXPLICIT)
@@ -75,17 +71,13 @@ internal class RpcBuilder(private val name: String, declarationContext: Protobuf
     }
 
     private fun setRequest(endpoint: RpcEndpoint) {
-        require(request == null) {
-            "RPC '$name' request already defined"
-        }
+        require(request == null) { "RPC '$name' request already defined" }
 
         request = endpoint
     }
 
     private fun setResponse(endpoint: RpcEndpoint) {
-        require(response == null) {
-            "RPC '$name' response already defined"
-        }
+        require(response == null) { "RPC '$name' response already defined" }
 
         response = endpoint
     }

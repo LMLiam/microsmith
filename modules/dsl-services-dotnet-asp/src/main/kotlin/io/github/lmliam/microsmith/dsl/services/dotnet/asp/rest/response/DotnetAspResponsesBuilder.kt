@@ -20,9 +20,7 @@ internal class DotnetAspResponsesBuilder : DotnetAspResponsesScope {
     fun build(): List<DotnetAspResponse> = responsesByStatus.values.toList()
 
     private fun addResponse(statusCode: Int, modelName: String, block: (DotnetAspResponseScope.() -> Unit)?) {
-        require(statusCode !in responsesByStatus) {
-            "ASP.NET responses already declare status $statusCode."
-        }
+        require(statusCode !in responsesByStatus) { "ASP.NET responses already declare status $statusCode." }
 
         val scope = DotnetAspResponseBuilder(modelName)
         block?.let(scope::apply)

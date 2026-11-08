@@ -5,7 +5,9 @@ internal fun allocateDotnetAspTypeName(usedTypeNames: MutableSet<String>, vararg
         .map(String::trim)
         .filter(String::isNotBlank)
         .firstOrNull { candidate -> usedTypeNames.add(candidate) }
-        ?.let { return it }
+        ?.let {
+            return it
+        }
 
     val fallbackBase = candidates.firstOrNull(String::isNotBlank)?.trim().orEmpty()
     var suffix = 2

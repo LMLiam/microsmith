@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.services
+
 import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -13,9 +14,7 @@ class ServicesScopeTests :
         "services block attaches ServicesExtension to builder" {
             val builder = MicrosmithBuilder()
 
-            builder.services {
-                fake("UserService")
-            }
+            builder.services { fake("UserService") }
 
             val ext = builder.model.get<ServicesExtension>()
             ext shouldBe ServicesExtension(setOf(Service(name = "UserService", model = ServiceModel.empty())))
@@ -35,20 +34,16 @@ class ServicesScopeTests :
                     setOf(
                         Service(name = "UserService", model = ServiceModel.empty()),
                         Service(name = "OrderService", model = ServiceModel.empty()),
-                    ),
+                    )
                 )
         }
 
         "multiple services blocks are merged" {
             val builder = MicrosmithBuilder()
 
-            builder.services {
-                fake("UserService")
-            }
+            builder.services { fake("UserService") }
 
-            builder.services {
-                fake("OrderService")
-            }
+            builder.services { fake("OrderService") }
 
             val ext = builder.model.get<ServicesExtension>()
             ext shouldBe
@@ -56,21 +51,15 @@ class ServicesScopeTests :
                     setOf(
                         Service(name = "UserService", model = ServiceModel.empty()),
                         Service(name = "OrderService", model = ServiceModel.empty()),
-                    ),
+                    )
                 )
         }
 
         "multiple services blocks reject duplicate service keys" {
             val builder = MicrosmithBuilder()
 
-            builder.services {
-                fake("UserService")
-            }
+            builder.services { fake("UserService") }
 
-            shouldThrow<IllegalArgumentException> {
-                builder.services {
-                    fake("UserService")
-                }
-            }
+            shouldThrow<IllegalArgumentException> { builder.services { fake("UserService") } }
         }
     })

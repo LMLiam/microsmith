@@ -4,15 +4,16 @@ import io.github.lmliam.microsmith.resolve.ResolutionIssue
 import kotlin.reflect.KClass
 
 internal class ResolutionIssueDiagnosticMapperRegistry(mappers: List<ResolutionIssueDiagnosticMapper<*>>) {
-    private val mappers = mappers
-        .onEach(::validateIssueTypeDeclaration)
-        .also(::requireDistinctIssueTypes)
-        .sortedWith(
-            compareBy(
-                { it.issueType.displayName() },
-                { it::class.displayName() },
-            ),
-        )
+    private val mappers =
+        mappers
+            .onEach(::validateIssueTypeDeclaration)
+            .also(::requireDistinctIssueTypes)
+            .sortedWith(
+                compareBy(
+                    { it.issueType.displayName() },
+                    { it::class.displayName() },
+                )
+            )
 
     fun resolve(issue: ResolutionIssue): ResolutionIssueDiagnosticMapper<ResolutionIssue>? {
         val issueClass = issue::class
@@ -27,13 +28,9 @@ internal class ResolutionIssueDiagnosticMapperRegistry(mappers: List<ResolutionI
         }
 
         require(mostSpecific.size == 1) {
-            val mapperNames = mostSpecific
-                .map { it::class.displayName() }
-                .sorted()
-                .joinToString(", ")
+            val mapperNames = mostSpecific.map { it::class.displayName() }.sorted().joinToString(", ")
 
-            "Ambiguous resolution diagnostic mappers for " +
-                "${issueClass.displayName()}: $mapperNames"
+            "Ambiguous resolution diagnostic mappers for " + "${issueClass.displayName()}: $mapperNames"
         }
 
         return mostSpecific.single().cast()
@@ -52,25 +49,19 @@ internal class ResolutionIssueDiagnosticMapperRegistry(mappers: List<ResolutionI
     }
 
     private fun requireDistinctIssueTypes(mappers: List<ResolutionIssueDiagnosticMapper<*>>) {
-        val duplicates = mappers
-            .groupBy(ResolutionIssueDiagnosticMapper<*>::issueType)
-            .filterValues { it.size > 1 }
+        val duplicates = mappers.groupBy(ResolutionIssueDiagnosticMapper<*>::issueType).filterValues { it.size > 1 }
 
         require(duplicates.isEmpty()) {
-            val registrations = duplicates
-                .entries
-                .sortedBy { it.key.displayName() }
-                .joinToString("; ") { (issueType, issueMappers) ->
-                    val mapperNames = issueMappers
-                        .map { it::class.displayName() }
-                        .sorted()
-                        .joinToString(", ")
+            val registrations =
+                duplicates.entries
+                    .sortedBy { it.key.displayName() }
+                    .joinToString("; ") { (issueType, issueMappers) ->
+                        val mapperNames = issueMappers.map { it::class.displayName() }.sorted().joinToString(", ")
 
-                    "${issueType.displayName()}: $mapperNames"
-                }
+                        "${issueType.displayName()}: $mapperNames"
+                    }
 
-            "Multiple resolution diagnostic mappers registered " +
-                "for the same issue type: $registrations"
+            "Multiple resolution diagnostic mappers registered " + "for the same issue type: $registrations"
         }
     }
 
