@@ -15,6 +15,8 @@ import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.toIssue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.schemaGraphRejections
 
 @ServiceProvider(DomainResolver::class)
 class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobufSchemaModel> {
@@ -28,7 +30,7 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
         val (_, symbols) = declared.map { it.symbol() }.separateEither()
         val resolver = ProtobufDeclarationResolver(ProtobufReferenceResolver(ProtobufSymbolTable(symbols)))
         val issues = mutableListOf<ProtobufResolutionIssue>()
-        val resolved =
+        val drafts =
             declared
                 .sortedBy { it.schema.name }
                 .mapNotNull { declaredSchema ->
@@ -49,20 +51,36 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
                         )
                 }
 
-        val model = ResolvedProtobufSchemaModel.of(resolved).mapLeft { rejections -> rejections.map(::modelIssue) }
-
         issues.addAll(findNameConflicts(protobufSchemas))
         issues.addAll(findSymbolCollisions(protobufSchemas))
-        model.onLeft(issues::addAll)
+        issues.addAll(schemaGraphRejections(drafts.map(SchemaDraft::node)).map(::modelIssue))
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 
         return when {
             accumulatedIssues != null -> DomainResolution.Failure(accumulatedIssues)
-            resolved.isEmpty() -> DomainResolution.NotApplicable
-            else -> model.fold(ifLeft = { DomainResolution.Failure(it) }, ifRight = { DomainResolution.Success(it) })
+            drafts.isEmpty() -> DomainResolution.NotApplicable
+            else -> seal(drafts)
         }
     }
+}
+
+private fun seal(drafts: List<SchemaDraft>): DomainResolution<ResolvedProtobufSchemaModel> {
+    val (rejected, schemas) =
+        drafts
+            .map { draft ->
+                draft.seal().mapLeft { rejections ->
+                    rejections.map { rejection -> rejection.toIssue(draft.identity.fullyQualifiedName) }
+                }
+            }
+            .separateEither()
+
+    return rejected.flatten().toNonEmptyListOrNull()?.let { DomainResolution.Failure(it) }
+        ?: ResolvedProtobufSchemaModel.of(schemas)
+            .fold(
+                ifLeft = { rejections -> DomainResolution.Failure(rejections.map(::modelIssue)) },
+                ifRight = { DomainResolution.Success(it) },
+            )
 }
 
 private fun modelIssue(rejection: ResolvedProtobufSchemaModel.Rejection): ProtobufResolutionIssue =

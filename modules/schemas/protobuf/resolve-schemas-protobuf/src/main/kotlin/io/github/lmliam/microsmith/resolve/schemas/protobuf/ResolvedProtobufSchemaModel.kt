@@ -5,7 +5,8 @@ import arrow.core.EitherNel
 import arrow.core.toNonEmptyListOrNone
 import io.github.lmliam.microsmith.resolve.ResolvedModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findImportCycles
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.SchemaNode
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.schemaGraphRejections
 
 @ConsistentCopyVisibility
 data class ResolvedProtobufSchemaModel private constructor(val schemas: List<ResolvedProtobufSchema>) : ResolvedModel {
@@ -18,15 +19,7 @@ data class ResolvedProtobufSchemaModel private constructor(val schemas: List<Res
     companion object {
         fun of(schemas: List<ResolvedProtobufSchema>): EitherNel<Rejection, ResolvedProtobufSchemaModel> {
             val ownSchemas = schemas.toList()
-            val duplicates =
-                ownSchemas
-                    .groupingBy { it.identity }
-                    .eachCount()
-                    .filterValues { it > 1 }
-                    .map { (identity, occurrences) -> Rejection.DuplicateSchema(identity, occurrences) }
-            val cycles = findImportCycles(ownSchemas).map(Rejection::CircularImports)
-
-            return (duplicates + cycles)
+            return schemaGraphRejections(ownSchemas.map { SchemaNode(it.identity, it.dependencies) })
                 .toNonEmptyListOrNone()
                 .fold(ifEmpty = { Either.Right(ResolvedProtobufSchemaModel(ownSchemas)) }, ifSome = { Either.Left(it) })
         }

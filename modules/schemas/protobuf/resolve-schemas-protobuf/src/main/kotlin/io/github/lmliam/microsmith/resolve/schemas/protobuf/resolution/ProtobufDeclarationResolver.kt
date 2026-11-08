@@ -46,9 +46,9 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
     fun resolveMessage(
         identity: QualifiedSchemaName,
         message: Message,
-    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
+    ): EitherNel<ProtobufResolutionIssue, SchemaDraft> = either {
         with(identity) {
-            val parts =
+            val declaration =
                 zipOrAccumulate(
                     { declarationName(message.name) },
                     { parseMessageDeclaration(identity.fullyQualifiedName, message).bindNel() },
@@ -56,7 +56,7 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                     { resolveFields(message) },
                     { resolveOneofs(message) },
                 ) { name, parsed, _, fields, oneofs ->
-                    MessageParts(
+                    DeclarationDraft.OfMessage(
                         name,
                         parsed.fields.buildEach(fields),
                         parsed.oneofs.buildEach(oneofs),
@@ -64,17 +64,14 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                     )
                 }
 
-            val declaration =
-                ResolvedProtobufMessage.of(parts.name, parts.fields, parts.oneofs, parts.reservations).asIssues().bind()
-
-            schemaFor(declaration)
+            SchemaDraft(identity, declaration)
         }
     }
 
     fun resolveEnum(
         identity: QualifiedSchemaName,
         enumDeclaration: Enum,
-    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
+    ): EitherNel<ProtobufResolutionIssue, SchemaDraft> = either {
         with(identity) {
             val (name, parsed) =
                 zipOrAccumulate(
@@ -85,24 +82,16 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
                     name to parsed
                 }
 
-            val declaration =
-                ResolvedProtobufEnum.of(
-                        name,
-                        parsed.values.map { ResolvedProtobufEnumValue(it.name, it.number) },
-                        parsed.reservations,
-                    )
-                    .asIssues()
-                    .bind()
-
-            schemaFor(declaration)
+            SchemaDraft(
+                identity,
+                DeclarationDraft.OfEnum(
+                    name,
+                    parsed.values.map { ResolvedProtobufEnumValue(it.name, it.number) },
+                    parsed.reservations,
+                ),
+            )
         }
     }
-
-    context(identity: QualifiedSchemaName)
-    private fun <A> EitherNel<ResolvedProtobufRejection, A>.asIssues(): EitherNel<ProtobufResolutionIssue, A> =
-        mapLeft { rejections ->
-            rejections.map { it.toIssue(identity.fullyQualifiedName) }
-        }
 
     context(identity: QualifiedSchemaName, _: Raise<ProtobufResolutionIssue>)
     private fun declarationName(raw: String): ProtoIdentifier =
@@ -182,18 +171,7 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
 
             is Reference -> ResolvedProtobufValueType.Reference(referenceResolver.resolve(value, location).bind())
         }
-
-    context(identity: QualifiedSchemaName)
-    private fun schemaFor(declaration: ResolvedProtobufDeclaration): ResolvedProtobufSchema =
-        ResolvedProtobufSchema.of(declaration, packageOf = identity)
 }
-
-private data class MessageParts(
-    val name: ProtoIdentifier,
-    val fields: List<ResolvedProtobufField>,
-    val oneofs: List<ResolvedProtobufOneof>,
-    val reservations: ResolvedProtobufReservations,
-)
 
 private typealias FieldBuilder = (ParsedField) -> ResolvedProtobufField
 

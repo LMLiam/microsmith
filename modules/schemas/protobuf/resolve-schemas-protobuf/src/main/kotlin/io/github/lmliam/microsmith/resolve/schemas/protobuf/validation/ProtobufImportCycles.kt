@@ -1,14 +1,13 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.validation
 
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchema
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
-internal fun findImportCycles(schemas: List<ResolvedProtobufSchema>): List<List<String>> {
+internal fun findImportCycles(nodes: List<SchemaNode>): List<List<String>> {
     val graph =
         ImportGraph(
-            schemas.associate { schema ->
-                schema.identity.fullyQualifiedName to
-                    schema.dependencies.map(QualifiedSchemaName::fullyQualifiedName).sorted()
+            nodes.associate { node ->
+                node.identity.fullyQualifiedName to
+                    node.dependencies.map(QualifiedSchemaName::fullyQualifiedName).sorted()
             }
         )
 

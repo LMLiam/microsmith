@@ -13,31 +13,13 @@ private constructor(
         fun of(declaration: ResolvedProtobufDeclaration, packageOf: QualifiedSchemaName): ResolvedProtobufSchema {
             val identity = packageOf.withTypeName(declaration.name)
 
-            return ResolvedProtobufSchema(
-                identity,
-                declaration,
-                declaration.referencedSchemas().filter { it != identity }.distinct().sortedBy { it.fullyQualifiedName },
-            )
+            return ResolvedProtobufSchema(identity, declaration, dependenciesOf(identity, declaration.references()))
         }
     }
 }
 
-private fun ResolvedProtobufDeclaration.referencedSchemas(): List<QualifiedSchemaName> =
+private fun ResolvedProtobufDeclaration.references(): List<LocatedReference> =
     when (this) {
-        is ResolvedProtobufMessage -> messageReferences()
+        is ResolvedProtobufMessage -> referencesOf(fields, oneofs)
         is ResolvedProtobufEnum -> emptyList()
     }
-
-private fun ResolvedProtobufMessage.messageReferences(): List<QualifiedSchemaName> =
-    fields.flatMap { field ->
-        when (field) {
-            is ResolvedProtobufField.Scalar -> emptyList()
-
-            is ResolvedProtobufField.Reference -> listOf(field.reference.target)
-
-            is ResolvedProtobufField.Map -> listOfNotNull(field.value.referencedSchema())
-        }
-    } + oneofs.flatMap { oneof -> oneof.fields.mapNotNull { it.type.referencedSchema() } }
-
-private fun ResolvedProtobufValueType.referencedSchema(): QualifiedSchemaName? =
-    (this as? ResolvedProtobufValueType.Reference)?.reference?.target
