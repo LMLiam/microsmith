@@ -7,7 +7,7 @@ import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
-import io.github.lmliam.microsmith.compile.schemas.core.SchemasArtifactCompiler
+import io.github.lmliam.microsmith.compile.schemas.SchemasArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.protobuf.render.ProtobufFileRenderer
 import java.nio.file.Path
 

@@ -8,7 +8,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
-import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
+import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
 
 @ServiceProvider(ArtifactCompiler::class)
 class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServiceArtifact> {

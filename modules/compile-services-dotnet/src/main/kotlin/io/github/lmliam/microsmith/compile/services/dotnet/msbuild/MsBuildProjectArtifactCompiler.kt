@@ -9,7 +9,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
-import io.github.lmliam.microsmith.compile.services.core.ServicesArtifactCompiler
+import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
 import java.nio.file.Path
 
 @ServiceProvider(ArtifactCompiler::class)

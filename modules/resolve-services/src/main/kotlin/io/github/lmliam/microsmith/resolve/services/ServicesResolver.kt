@@ -1,5 +1,4 @@
-package io.github.lmliam.microsmith.resolve.services.core
-
+package io.github.lmliam.microsmith.resolve.services
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
 import io.github.lmliam.microsmith.resolve.DomainResolution
@@ -11,5 +10,7 @@ class ServicesResolver : DomainResolver<ServicesExtension, ResolvedServicesModel
     override val resolvedType = ResolvedServicesModel::class
 
     override fun resolve(authoring: ServicesExtension): DomainResolution<ResolvedServicesModel> =
-        DomainResolution.Success(ResolvedServicesModel(authoring.services))
+        DomainResolution.Success(
+            ResolvedServicesModel(authoring.services),
+        )
 }

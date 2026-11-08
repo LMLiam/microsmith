@@ -9,7 +9,7 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArti
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifactId
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
-import io.github.lmliam.microsmith.compile.schemas.core.SchemasArtifactCompiler
+import io.github.lmliam.microsmith.compile.schemas.SchemasArtifactCompiler
 
 @ServiceProvider(ArtifactCompiler::class)
 class ProtobufRpcServiceArtifactCompiler : SchemasArtifactCompiler<ProtobufRpcServiceArtifact> {
