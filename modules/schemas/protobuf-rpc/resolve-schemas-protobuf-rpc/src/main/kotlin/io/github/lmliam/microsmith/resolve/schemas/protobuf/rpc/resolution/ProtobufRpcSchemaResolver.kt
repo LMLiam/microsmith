@@ -35,7 +35,7 @@ internal class ProtobufRpcSchemaResolver {
                 is Either.Right -> parsed.value
             }
 
-        if (qualifiedName.typeName != service.name) {
+        if (qualifiedName.typeName.value != service.name) {
             return ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch(
                     schemaName = schema.name,
                     declarationName = service.name,

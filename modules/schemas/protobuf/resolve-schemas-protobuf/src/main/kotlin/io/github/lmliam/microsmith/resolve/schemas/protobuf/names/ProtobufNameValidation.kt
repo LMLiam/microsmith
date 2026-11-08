@@ -1,10 +1,11 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.names
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 
 object ProtobufNameValidation {
-    fun normalizeQualifiedName(value: String): Either<ProtobufResolutionIssue.InvalidSchemaName, String> {
+    fun parseQualifiedName(value: String): Either<ProtobufResolutionIssue.InvalidSchemaName, List<ProtoIdentifier>> {
         val normalized = value.trim()
 
         if (normalized.isBlank()) {
@@ -29,11 +30,13 @@ object ProtobufNameValidation {
             return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT)
         }
 
-        if (segments.any { ProtoIdentifier.parse(it).isLeft() }) {
-            return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.INVALID_IDENTIFIER_SEGMENT)
-        }
-
-        return Either.Right(segments.joinToString("."))
+        return Either.Right(
+            segments.map { segment ->
+                ProtoIdentifier.parse(segment).getOrElse {
+                    return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.INVALID_IDENTIFIER_SEGMENT)
+                }
+            }
+        )
     }
 
     fun requireIdentifier(value: String, label: String) {
@@ -43,6 +46,6 @@ object ProtobufNameValidation {
     private fun invalid(
         value: String,
         reason: ProtobufResolutionIssue.InvalidSchemaName.Reason,
-    ): Either<ProtobufResolutionIssue.InvalidSchemaName, String> =
+    ): Either<ProtobufResolutionIssue.InvalidSchemaName, Nothing> =
         Either.Left(ProtobufResolutionIssue.InvalidSchemaName(value, reason))
 }

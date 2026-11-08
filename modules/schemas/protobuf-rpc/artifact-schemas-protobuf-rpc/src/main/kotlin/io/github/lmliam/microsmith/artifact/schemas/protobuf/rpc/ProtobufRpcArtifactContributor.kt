@@ -15,7 +15,7 @@ class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSc
                 artifactId =
                     ProtobufRpcServiceArtifactId(
                         packageName = schema.qualifiedName.packageName,
-                        serviceName = schema.qualifiedName.typeName,
+                        serviceName = schema.qualifiedName.typeName.value,
                     ),
                 imports = schema.imports,
                 operations =

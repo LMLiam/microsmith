@@ -5,7 +5,13 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import kotlin.io.path.Path
 
-data class QualifiedSchemaName(val fullyQualifiedName: String, val packageName: String?, val typeName: String) {
+@ConsistentCopyVisibility
+data class QualifiedSchemaName
+private constructor(
+    val fullyQualifiedName: String,
+    val packageName: String?,
+    val typeName: ProtoIdentifier,
+) {
     fun resolveReference(reference: Reference): Either<ProtobufResolutionIssue.InvalidSchemaName, QualifiedSchemaName> =
         when (reference) {
             is Reference.Local -> parse(packageName?.let { "$it.${reference.target}" } ?: reference.target)
@@ -29,14 +35,11 @@ data class QualifiedSchemaName(val fullyQualifiedName: String, val packageName: 
 
     companion object {
         fun parse(rawName: String): Either<ProtobufResolutionIssue.InvalidSchemaName, QualifiedSchemaName> =
-            ProtobufNameValidation.normalizeQualifiedName(rawName).map { normalized ->
-                val packageName = normalized.substringBeforeLast(".", "").ifBlank { null }
-                val typeName = normalized.substringAfterLast(".")
-
+            ProtobufNameValidation.parseQualifiedName(rawName).map { segments ->
                 QualifiedSchemaName(
-                    fullyQualifiedName = normalized,
-                    packageName = packageName,
-                    typeName = typeName,
+                    fullyQualifiedName = segments.joinToString("."),
+                    packageName = segments.dropLast(1).joinToString(".").ifEmpty { null },
+                    typeName = segments.last(),
                 )
             }
     }
