@@ -41,7 +41,8 @@ class DotnetAspResolutionDiagnosticMapper : ResolutionIssueDiagnosticMapper<Dotn
                     code = "dotnet.asp.route.duplicate-placeholders",
                     message =
                         "ASP.NET route '${issue.route}' in operation '${issue.operationName}' for service " +
-                            "'${issue.serviceName}' declares duplicate placeholders: ${issue.placeholders.joinToString(", ")}.",
+                            "'${issue.serviceName}' declares duplicate placeholders: " +
+                            "${issue.placeholders.joinToString(", ")}.",
                 )
 
             is DotnetAspBindingResolutionIssue -> issue.toDiagnostic()

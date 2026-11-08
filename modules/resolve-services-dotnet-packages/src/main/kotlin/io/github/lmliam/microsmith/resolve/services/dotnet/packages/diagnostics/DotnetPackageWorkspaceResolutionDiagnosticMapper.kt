@@ -15,8 +15,8 @@ class DotnetPackageWorkspaceResolutionDiagnosticMapper :
                 ResolutionDiagnostic(
                     code = "dotnet.packages.package-not-centrally-owned",
                     message =
-                        "Dotnet service '${issue.serviceName}' references package '${issue.packageName}' but solution " +
-                            "'${issue.solutionName}' does not centrally own it.",
+                        "Dotnet service '${issue.serviceName}' references package '${issue.packageName}' " +
+                            "but solution '${issue.solutionName}' does not centrally own it.",
                 )
 
             is DotnetPackageWorkspaceResolutionIssue.PackageVersionRequired ->
@@ -33,7 +33,8 @@ class DotnetPackageWorkspaceResolutionDiagnosticMapper :
                     message =
                         "Dotnet service '${issue.serviceName}' declares package '${issue.packageName}' with an " +
                             "explicit version but solution '${issue.solutionName}' uses central package management. " +
-                            "Mixed central and direct package version management is not supported within the same solution.",
+                            "Mixed central and direct package version management is not supported " +
+                            "within the same solution.",
                 )
         }
 }

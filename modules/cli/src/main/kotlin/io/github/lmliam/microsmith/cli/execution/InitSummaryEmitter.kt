@@ -93,7 +93,8 @@ internal object InitSummaryEmitter {
             JvmNativeBuildSystem.SBT ->
                 emitter.info(
                     "sbt repository detected. Prefer the native sbt plugin path when you want build-aligned " +
-                        "generation: add '$MICROSMITH_GROUP' % '$MICROSMITH_SBT_PLUGIN_ARTIFACT' in project/plugins.sbt, " +
+                        "generation: add '$MICROSMITH_GROUP' % '$MICROSMITH_SBT_PLUGIN_ARTIFACT' " +
+                        "in project/plugins.sbt, " +
                         "enable 'MicrosmithSbtPlugin', and run 'sbt microsmithGenerate'."
                 )
         }
