@@ -185,12 +185,7 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
 
     context(identity: QualifiedSchemaName)
     private fun schemaFor(declaration: ResolvedProtobufDeclaration): ResolvedProtobufSchema =
-        ResolvedProtobufSchema(
-            identity,
-            declaration,
-            dependencies =
-                declaration.referencedSchemas().filter { it != identity }.distinct().sortedBy { it.fullyQualifiedName },
-        )
+        ResolvedProtobufSchema.of(declaration, packageOf = identity)
 }
 
 private data class MessageParts(
@@ -209,23 +204,3 @@ private fun <P, R> NonEmptyList<P>.buildEachNonEmpty(builders: List<(P) -> R>): 
     mapIndexed { index, parsed ->
         builders[index](parsed)
     }
-
-private fun ResolvedProtobufDeclaration.referencedSchemas(): List<QualifiedSchemaName> =
-    when (this) {
-        is ResolvedProtobufMessage -> messageReferences()
-        is ResolvedProtobufEnum -> emptyList()
-    }
-
-private fun ResolvedProtobufMessage.messageReferences(): List<QualifiedSchemaName> =
-    fields.flatMap { field ->
-        when (field) {
-            is ResolvedProtobufField.Scalar -> emptyList()
-
-            is ResolvedProtobufField.Reference -> listOf(field.reference.target)
-
-            is ResolvedProtobufField.Map -> listOfNotNull(field.value.referencedSchema())
-        }
-    } + oneofs.flatMap { oneof -> oneof.fields.mapNotNull { it.type.referencedSchema() } }
-
-private fun ResolvedProtobufValueType.referencedSchema(): QualifiedSchemaName? =
-    (this as? ResolvedProtobufValueType.Reference)?.reference?.target
