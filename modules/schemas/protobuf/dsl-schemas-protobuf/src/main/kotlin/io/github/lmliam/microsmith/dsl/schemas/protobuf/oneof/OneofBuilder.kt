@@ -5,7 +5,6 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofFieldBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceFieldBuilder
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference.textualReference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.ProtobufTypeRef
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.OneofFieldScope
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.OneofReferenceFieldScope
@@ -21,7 +20,7 @@ internal class OneofBuilder(
     override fun ref(name: String, target: String, block: OneofReferenceFieldScope.() -> Unit): OneofField =
         addReference(
             name,
-            textualReference(target),
+            Reference.parse(target),
             block,
         )
 

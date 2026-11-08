@@ -15,7 +15,6 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarFieldBuilder
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.withCardinality
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.allocation.IndexAllocator
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names.NameRegistry
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference.textualReference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.OneofBuilder
@@ -98,7 +97,7 @@ internal class MessageBuilder(private val name: String) : MessageScope {
     override fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit): ReferenceField =
         addReference(
             name,
-            textualReference(target),
+            Reference.parse(target),
             block,
         )
 

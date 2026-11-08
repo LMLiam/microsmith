@@ -13,19 +13,7 @@ private constructor(
     val typeName: ProtoIdentifier,
 ) {
     fun resolveReference(reference: Reference): Either<ProtobufResolutionIssue.InvalidSchemaName, QualifiedSchemaName> =
-        when (reference) {
-            is Reference.Local -> parse(packageName?.let { "$it.${reference.target}" } ?: reference.target)
-            is Reference.Relative -> {
-                val upCount = reference.expression.takeWhile { it == '.' }.length
-                val remaining = reference.expression.drop(upCount)
-                val currentPackage = packageName?.split('.').orEmpty()
-                val target = currentPackage.dropLast(upCount.coerceAtMost(currentPackage.size)) + remaining.split('.')
-
-                parse(target.joinToString("."))
-            }
-            is Reference.Qualified -> parse(reference.qualifiedName)
-            is Reference.Symbolic -> parse(reference.target.qualifiedName)
-        }
+        parse(reference.resolveSegments(packageName?.split('.').orEmpty()).joinToString("."))
 
     internal fun withTypeName(typeName: ProtoIdentifier): QualifiedSchemaName =
         QualifiedSchemaName(

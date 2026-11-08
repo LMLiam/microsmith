@@ -74,7 +74,7 @@ class ProtobufRpcSchemasResolverTests :
             val cases =
                 listOf(
                     Reference.Local("Request") to "acme.user.v1.Request",
-                    Reference.Relative(".v2.Request") to "acme.user.v2.Request",
+                    Reference.Relative(levelsUp = 1, path = listOf("v2", "Request")) to "acme.user.v2.Request",
                     Reference.Qualified("acme.shared.Request") to "acme.shared.Request",
                     Reference.Qualified("RootRequest") to "RootRequest",
                     Reference.Symbolic(MessageRef("acme.shared.Request")) to "acme.shared.Request",
