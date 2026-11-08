@@ -14,6 +14,7 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.declaredIn
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.ScopedSymbol
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findSymbolClashes
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.messageSymbols
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.packageScopeSymbols
 
 internal fun findSymbolCollisions(schemas: List<ProtobufSchema>): List<ProtobufResolutionIssue.SymbolNameCollision> =
     findSymbolClashes(schemas.sortedBy(ProtobufSchema::name).flatMap(::scopedSymbolsOf)).map { clash ->
@@ -37,39 +38,23 @@ private fun scopedSymbolsOf(schema: ProtobufSchema): List<PackageOrMessageSymbol
     QualifiedSchemaName.parse(schema.name)
         .fold(
             ifLeft = { emptyList() },
-            ifRight = { identity -> packageSymbols(identity) + declarationSymbols(identity, schema.schema) },
+            ifRight = { identity ->
+                when (val declaration = schema.schema) {
+                    is Message ->
+                        packageSymbols(identity, emptyList()) +
+                            scopedMessageSymbols(identity.fullyQualifiedName, declaration)
+
+                    is Enum -> packageSymbols(identity, declaration.values.map { it.name }.filter(::isIdentifier))
+
+                    else -> packageSymbols(identity, emptyList())
+                }
+            },
         )
 
-private fun packageSymbols(identity: QualifiedSchemaName): List<PackageOrMessageSymbol> {
-    val segments = identity.packageName?.split('.').orEmpty()
-
-    return segments.indices.map { index ->
-        ScopedSymbol(
-            Scope(Scope.Kind.PACKAGE, segments.take(index).joinToString(".")),
-            segments[index],
-            SymbolDeclaration.Package(segments.take(index + 1).joinToString(".")),
-        )
+private fun packageSymbols(identity: QualifiedSchemaName, enumValueNames: List<String>): List<PackageOrMessageSymbol> =
+    packageScopeSymbols(identity, enumValueNames).map {
+        ScopedSymbol(Scope(Scope.Kind.PACKAGE, it.scope), it.name, it.declaration)
     }
-}
-
-private fun declarationSymbols(identity: QualifiedSchemaName, declaration: Type): List<PackageOrMessageSymbol> {
-    val packageScope = Scope(Scope.Kind.PACKAGE, identity.packageName.orEmpty())
-    val schemaName = identity.fullyQualifiedName
-    val type = ScopedSymbol(packageScope, identity.typeName.value, SymbolDeclaration.Type(schemaName))
-
-    return listOf(type) +
-        when (declaration) {
-            is Message -> scopedMessageSymbols(schemaName, declaration)
-
-            is Enum ->
-                declaration.values
-                    .map { it.name }
-                    .filter(::isIdentifier)
-                    .map { ScopedSymbol(packageScope, it, SymbolDeclaration.EnumValue(schemaName, it)) }
-
-            else -> emptyList()
-        }
-}
 
 private fun scopedMessageSymbols(schemaName: String, message: Message): List<PackageOrMessageSymbol> {
     val scope = Scope(Scope.Kind.MESSAGE, schemaName)

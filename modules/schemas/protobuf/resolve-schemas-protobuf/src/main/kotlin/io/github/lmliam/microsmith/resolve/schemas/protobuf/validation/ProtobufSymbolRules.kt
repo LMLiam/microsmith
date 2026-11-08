@@ -1,6 +1,12 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.validation
 
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufRejection
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchema
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 internal fun findMessageSymbolCollisions(
     fieldNames: List<String>,
@@ -10,6 +16,47 @@ internal fun findMessageSymbolCollisions(
     findSymbolClashes(messageSymbols(fieldNames, oneofNames, mapFieldNames)).map {
         ResolvedProtobufRejection.MessageSymbolCollision(it.name, it.declarations)
     }
+
+internal fun findPackageSymbolCollisions(
+    schemas: List<ResolvedProtobufSchema>
+): List<ResolvedProtobufSchemaModel.Rejection> =
+    findSymbolClashes(
+            schemas.flatMap { schema ->
+                packageScopeSymbols(
+                    schema.identity,
+                    when (val declaration = schema.declaration) {
+                        is ResolvedProtobufEnum -> declaration.values.map { it.name.value }
+                        is ResolvedProtobufMessage -> emptyList()
+                    },
+                )
+            }
+        )
+        .map { ResolvedProtobufSchemaModel.Rejection.PackageSymbolCollision(it.scope, it.name, it.declarations) }
+
+internal fun packageScopeSymbols(
+    identity: QualifiedSchemaName,
+    enumValueNames: List<String>,
+): List<ScopedSymbol<String, ProtobufResolutionIssue.SymbolDeclaration>> {
+    val packageName = identity.packageName.orEmpty()
+    val schemaName = identity.fullyQualifiedName
+    val segments = identity.packageName?.split('.').orEmpty()
+
+    return segments.indices.map { index ->
+        ScopedSymbol(
+            segments.take(index).joinToString("."),
+            segments[index],
+            ProtobufResolutionIssue.SymbolDeclaration.Package(segments.take(index + 1).joinToString(".")),
+        )
+    } +
+        ScopedSymbol(
+            packageName,
+            identity.typeName.value,
+            ProtobufResolutionIssue.SymbolDeclaration.Type(schemaName),
+        ) +
+        enumValueNames.map {
+            ScopedSymbol(packageName, it, ProtobufResolutionIssue.SymbolDeclaration.EnumValue(schemaName, it))
+        }
+}
 
 internal fun messageSymbols(
     fieldNames: List<String>,

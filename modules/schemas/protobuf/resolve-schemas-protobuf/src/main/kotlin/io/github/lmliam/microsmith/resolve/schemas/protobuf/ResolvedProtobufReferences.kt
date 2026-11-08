@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf
 
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufDeclarationKind
 
 internal fun referencesOf(
     fields: List<ResolvedProtobufField>,
@@ -27,6 +28,18 @@ internal fun referencesOf(
                 )
             }
         }
+
+internal fun ResolvedProtobufDeclaration.references(): List<LocatedReference> =
+    when (this) {
+        is ResolvedProtobufMessage -> referencesOf(fields, oneofs)
+        is ResolvedProtobufEnum -> emptyList()
+    }
+
+internal fun ResolvedProtobufDeclaration.kind(): ProtobufDeclarationKind =
+    when (this) {
+        is ResolvedProtobufMessage -> ProtobufDeclarationKind.MESSAGE
+        is ResolvedProtobufEnum -> ProtobufDeclarationKind.ENUM
+    }
 
 internal fun dependenciesOf(
     identity: QualifiedSchemaName,

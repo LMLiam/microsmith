@@ -17,9 +17,3 @@ private constructor(
         }
     }
 }
-
-private fun ResolvedProtobufDeclaration.references(): List<LocatedReference> =
-    when (this) {
-        is ResolvedProtobufMessage -> referencesOf(fields, oneofs)
-        is ResolvedProtobufEnum -> emptyList()
-    }
