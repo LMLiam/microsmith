@@ -11,7 +11,7 @@ import kotlin.script.experimental.jvm.util.classpathFromClassloader
 object MicrosmithScriptCompilationConfiguration : ScriptCompilationConfiguration(
     {
         defaultImports(
-            "io.github.lmliam.microsmith.dsl.core.microsmith",
+            "io.github.lmliam.microsmith.dsl.microsmith",
             "io.github.lmliam.microsmith.dsl.services.core.services",
             "io.github.lmliam.microsmith.dsl.services.dotnet.core.dotnet",
             "io.github.lmliam.microsmith.dsl.services.dotnet.core.service.asp",

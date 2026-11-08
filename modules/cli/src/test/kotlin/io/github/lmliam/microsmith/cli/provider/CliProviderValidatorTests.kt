@@ -1,9 +1,9 @@
 package io.github.lmliam.microsmith.cli.provider
 
-import io.github.lmliam.microsmith.artifact.core.Artifact
-import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
-import io.github.lmliam.microsmith.artifact.core.ArtifactContribution
-import io.github.lmliam.microsmith.artifact.core.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.Artifact
+import io.github.lmliam.microsmith.artifact.ArtifactContribution
+import io.github.lmliam.microsmith.artifact.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifact
@@ -13,13 +13,14 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspService
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
-import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
+import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
-import io.github.lmliam.microsmith.gen.core.ArtifactRenderer
+import io.github.lmliam.microsmith.gen.ArtifactRenderer
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
-import io.github.lmliam.microsmith.resolve.core.DomainResolver
-import io.github.lmliam.microsmith.resolve.core.ResolvedModel
+import io.github.lmliam.microsmith.resolve.DomainResolution
+import io.github.lmliam.microsmith.resolve.DomainResolver
+import io.github.lmliam.microsmith.resolve.ResolvedModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace
@@ -160,16 +161,16 @@ private class ProtobufResolverStub : DomainResolver<SchemasExtension, ResolvedPr
     override val authoringType = SchemasExtension::class
     override val resolvedType = ResolvedProtobufSchemaModel::class
 
-    override fun resolve(authoring: SchemasExtension): ResolvedProtobufSchemaModel =
-        ResolvedProtobufSchemaModel(emptyList())
+    override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufSchemaModel> =
+        DomainResolution.Success(ResolvedProtobufSchemaModel(emptyList()))
 }
 
 private class ProtobufRpcResolverStub : DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
     override val authoringType = SchemasExtension::class
     override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 
-    override fun resolve(authoring: SchemasExtension): ResolvedProtobufRpcSchemaModel =
-        ResolvedProtobufRpcSchemaModel(emptyList())
+    override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufRpcSchemaModel> =
+        DomainResolution.Success(ResolvedProtobufRpcSchemaModel(emptyList()))
 }
 
 private class ProtobufContributorStub : ArtifactContributor<ResolvedProtobufSchemaModel> {
@@ -188,15 +189,16 @@ private class DotnetAspResolverStub : DomainResolver<ServicesExtension, DotnetAs
     override val authoringType = ServicesExtension::class
     override val resolvedType = DotnetAspWorkspace::class
 
-    override fun resolve(authoring: ServicesExtension): DotnetAspWorkspace = DotnetAspWorkspace(emptyMap())
+    override fun resolve(authoring: ServicesExtension): DomainResolution<DotnetAspWorkspace> =
+        DomainResolution.Success(DotnetAspWorkspace(emptyMap()))
 }
 
 private class DotnetPackageResolverStub : DomainResolver<ServicesExtension, DotnetPackageWorkspace> {
     override val authoringType = ServicesExtension::class
     override val resolvedType = DotnetPackageWorkspace::class
 
-    override fun resolve(authoring: ServicesExtension): DotnetPackageWorkspace =
-        DotnetPackageWorkspace(emptyMap(), emptyMap())
+    override fun resolve(authoring: ServicesExtension): DomainResolution<DotnetPackageWorkspace> =
+        DomainResolution.Success(DotnetPackageWorkspace(emptyMap(), emptyMap()))
 }
 
 private class ContributorStub<T : ResolvedModel>(override val resolvedType: KClass<T>) : ArtifactContributor<T> {

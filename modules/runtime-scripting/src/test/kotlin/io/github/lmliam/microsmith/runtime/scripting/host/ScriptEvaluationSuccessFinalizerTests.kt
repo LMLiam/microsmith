@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithModel
+import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure

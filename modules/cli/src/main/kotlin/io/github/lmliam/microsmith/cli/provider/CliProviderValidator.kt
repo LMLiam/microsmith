@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.cli.provider
 
-import io.github.lmliam.microsmith.artifact.core.ArtifactAssembler
-import io.github.lmliam.microsmith.artifact.core.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
@@ -9,11 +9,11 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspService
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifact
-import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
+import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
 import io.github.lmliam.microsmith.dsl.services.core.ServicesExtension
-import io.github.lmliam.microsmith.gen.core.ArtifactRenderer
-import io.github.lmliam.microsmith.resolve.core.DomainResolver
+import io.github.lmliam.microsmith.gen.ArtifactRenderer
+import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspace

@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.helpers
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.defaults.DotnetDefaultsExtension
 
 /**

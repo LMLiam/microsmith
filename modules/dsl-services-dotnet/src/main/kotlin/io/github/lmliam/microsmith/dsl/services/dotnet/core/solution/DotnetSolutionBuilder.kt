@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.core.solution
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.support.validateDotnetQualifiedIdentifier
 import kotlin.reflect.KClass
 

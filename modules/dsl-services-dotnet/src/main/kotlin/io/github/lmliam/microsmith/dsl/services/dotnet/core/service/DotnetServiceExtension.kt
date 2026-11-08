@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.core.service
 
-import io.github.lmliam.microsmith.dsl.core.MergeableExtension
+import io.github.lmliam.microsmith.dsl.MergeableExtension
 import io.github.lmliam.microsmith.dsl.services.core.ServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.DotnetTarget
 import io.github.lmliam.microsmith.dsl.services.dotnet.core.model.DotnetModel

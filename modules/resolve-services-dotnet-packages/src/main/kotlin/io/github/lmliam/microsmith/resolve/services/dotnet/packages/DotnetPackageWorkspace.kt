@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.packages
 
-import io.github.lmliam.microsmith.resolve.core.ResolvedModel
+import io.github.lmliam.microsmith.resolve.ResolvedModel
 
 data class DotnetPackageWorkspace(
     val solutionsByName: Map<String, ResolvedDotnetPackageSolution>,

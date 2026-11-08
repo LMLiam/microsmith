@@ -1,11 +1,12 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc
 
-import io.github.lmliam.microsmith.dsl.core.microsmith
-import io.github.lmliam.microsmith.dsl.helpers.require
+import io.github.lmliam.microsmith.dsl.microsmith
+import io.github.lmliam.microsmith.dsl.require
 import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
 import io.github.lmliam.microsmith.dsl.schemas.core.schemas
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service
+import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -32,8 +33,8 @@ class ProtobufRpcSchemasResolverTests :
                 }
                     .require<SchemasExtension>()
 
-            val resolved = resolver.resolve(schemas)
-            requireNotNull(resolved).schemas.single().also { schema ->
+            val resolved = (resolver.resolve(schemas) as DomainResolution.Success).model
+            resolved.schemas.single().also { schema ->
                 schema.qualifiedName.fullyQualifiedName shouldBe "acme.user.v1.UserService"
                 schema.imports shouldContainExactly
                     listOf(

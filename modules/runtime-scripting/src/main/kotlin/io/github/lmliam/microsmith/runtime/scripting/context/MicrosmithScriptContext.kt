@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.context
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithModel
+import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import java.nio.file.Path
 
 class MicrosmithScriptContext(

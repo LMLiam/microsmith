@@ -5,7 +5,8 @@ import io.github.lmliam.microsmith.dsl.schemas.core.SchemasExtension
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
-import io.github.lmliam.microsmith.resolve.core.DomainResolver
+import io.github.lmliam.microsmith.resolve.DomainResolution
+import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 @ServiceProvider(DomainResolver::class)
@@ -13,7 +14,7 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
     override val authoringType = SchemasExtension::class
     override val resolvedType = ResolvedProtobufSchemaModel::class
 
-    override fun resolve(authoring: SchemasExtension): ResolvedProtobufSchemaModel? {
+    override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufSchemaModel> {
         val schemas =
             authoring.schemas
                 .filterIsInstance<ProtobufSchema>()
@@ -30,6 +31,7 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
                         qualifiedName = QualifiedSchemaName.parse(schema.name),
                     )
                 }
-        return schemas.takeIf(List<*>::isNotEmpty)?.let(::ResolvedProtobufSchemaModel)
+        val model = schemas.takeIf(List<*>::isNotEmpty)?.let(::ResolvedProtobufSchemaModel)
+        return model?.let { DomainResolution.Success(it) } ?: DomainResolution.NotApplicable
     }
 }

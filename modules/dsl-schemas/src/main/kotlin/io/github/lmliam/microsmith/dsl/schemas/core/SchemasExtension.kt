@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.schemas.core
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithExtension
+import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 
 /**
  * Root extension that holds all declared schemas.

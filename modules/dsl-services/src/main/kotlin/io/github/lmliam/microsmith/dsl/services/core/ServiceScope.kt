@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.core
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithDsl
+import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 
 /**
  * Marker interface for a named service block inside `services { ... }`.

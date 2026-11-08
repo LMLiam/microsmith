@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.dsl.services.core
 
-import io.github.lmliam.microsmith.dsl.core.MicrosmithBuilder
-import io.github.lmliam.microsmith.dsl.core.MicrosmithScope
-import io.github.lmliam.microsmith.dsl.helpers.put
+import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
+import io.github.lmliam.microsmith.dsl.MicrosmithScope
+import io.github.lmliam.microsmith.dsl.put
 
 /**
  * Start a `services { ... }` block in the Microsmith DSL.

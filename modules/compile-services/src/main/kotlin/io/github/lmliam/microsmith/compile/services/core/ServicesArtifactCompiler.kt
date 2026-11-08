@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.compile.services.core
 
 import io.github.lmliam.microsmith.artifact.services.core.ServicesArtifact
-import io.github.lmliam.microsmith.compile.core.ArtifactCompiler
+import io.github.lmliam.microsmith.compile.ArtifactCompiler
 
 /**
  * Domain-root compiler contract for service artifacts.

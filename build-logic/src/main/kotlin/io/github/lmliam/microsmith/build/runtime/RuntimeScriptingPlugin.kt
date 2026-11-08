@@ -67,7 +67,7 @@ class RuntimeScriptingPlugin : Plugin<Project> {
         val ideFallbackReleaseAssetsDirectory =
             project.layout.buildDirectory.dir(RuntimeScriptingBuildNames.RELATIVE_RELEASE_ASSETS_DIRECTORY)
         val runtimeScriptingShadowJarExpectedProviders = mapOf(
-            "META-INF/services/io.github.lmliam.microsmith.resolve.core.DomainResolver" to
+            "META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver" to
                 listOf(
                     "io.github.lmliam.microsmith.resolve.schemas.core.SchemasResolver",
                     "io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufSchemasResolver",
@@ -77,14 +77,14 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                     "io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspWorkspaceDomainResolver",
                     "io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackageWorkspaceDomainResolver",
                 ),
-            "META-INF/services/io.github.lmliam.microsmith.artifact.core.ArtifactContributor" to
+            "META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor" to
                 listOf(
                     "io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtobufArtifactContributor",
                     "io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcArtifactContributor",
                     "io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspArtifactContributor",
                     "io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageArtifactContributor",
                 ),
-            "META-INF/services/io.github.lmliam.microsmith.artifact.core.ArtifactAssembler" to
+            "META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler" to
                 listOf(
                     "io.github.lmliam.microsmith.artifact.files.BinaryFileArtifactAssembler",
                     "io.github.lmliam.microsmith.artifact.files.TextFileArtifactAssembler",
@@ -95,7 +95,7 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                     "io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageReferencesArtifactAssembler",
                     "io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageVersionsArtifactAssembler",
                 ),
-            "META-INF/services/io.github.lmliam.microsmith.compile.core.ArtifactCompiler" to
+            "META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler" to
                 listOf(
                     "io.github.lmliam.microsmith.compile.schemas.protobuf.ProtoFileArtifactCompiler",
                     "io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.ProtobufRpcServiceArtifactCompiler",
@@ -104,7 +104,7 @@ class RuntimeScriptingPlugin : Plugin<Project> {
                     "io.github.lmliam.microsmith.compile.services.dotnet.packages.DotnetPackageReferencesArtifactCompiler",
                     "io.github.lmliam.microsmith.compile.services.dotnet.packages.DotnetPackageVersionsArtifactCompiler",
                 ),
-            "META-INF/services/io.github.lmliam.microsmith.gen.core.ArtifactRenderer" to
+            "META-INF/services/io.github.lmliam.microsmith.gen.ArtifactRenderer" to
                 listOf(
                     "io.github.lmliam.microsmith.gen.files.render.BinaryFileArtifactRenderer",
                     "io.github.lmliam.microsmith.gen.files.render.TextFileArtifactRenderer",
