@@ -17,17 +17,19 @@ internal class EnumBuilder(private val name: String) : EnumScope {
     private val values = mutableSetOf<EnumValue>()
 
     init {
-        value(Enum.UNSPECIFIED) { index(0) }
+        val defaultName = unspecifiedValueName(name)
+
+        nameRegistry.use(defaultName, "the default zero value of enum $name")
+        values += EnumValue(defaultName, allocator.allocate(0))
     }
 
     override fun value(name: String, block: EnumValueScope.() -> Unit) {
-        nameRegistry.use(name)
+        nameRegistry.validate(name)
 
-        EnumValueBuilder()
-            .apply(block)
-            .let { allocator.allocate(it.index) }
-            .let { EnumValue(name, it) }
-            .also { values += it }
+        val index = allocator.allocate(EnumValueBuilder().apply(block).index)
+
+        nameRegistry.use(name)
+        values += EnumValue(name, index)
     }
 
     override fun reserved(vararg indexes: Int) = indexes.forEach { allocator.reserve(it..it) }

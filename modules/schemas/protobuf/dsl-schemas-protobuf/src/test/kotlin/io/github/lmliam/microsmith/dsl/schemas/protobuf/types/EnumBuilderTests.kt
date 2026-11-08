@@ -7,22 +7,39 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 
 class EnumBuilderTests :
     StringSpec({
-        "default enum contains UNSPECIFIED at index 0" {
+        "default enum contains the prefixed unspecified value at index 0" {
             val builder = EnumBuilder("TestEnum")
             val enum = builder.build()
             enum.name shouldBe "TestEnum"
-            enum.values.map { it.name } shouldContainExactly listOf(Enum.UNSPECIFIED)
+            enum.values.map { it.name } shouldContainExactly listOf("TEST_ENUM_UNSPECIFIED")
             enum.values.map { it.index } shouldContainExactly listOf(0)
         }
+
+        listOf(
+                "E" to "E_UNSPECIFIED",
+                "Status" to "STATUS_UNSPECIFIED",
+                "OrderStatus" to "ORDER_STATUS_UNSPECIFIED",
+                "HTTPStatus" to "HTTP_STATUS_UNSPECIFIED",
+                "Http2Status" to "HTTP2_STATUS_UNSPECIFIED",
+                "Level2" to "LEVEL2_UNSPECIFIED",
+                "order_status" to "ORDER_STATUS_UNSPECIFIED",
+                "ORDER_STATUS" to "ORDER_STATUS_UNSPECIFIED",
+            )
+            .forEach { (enumName, expected) ->
+                "default value of enum $enumName is $expected" {
+                    EnumBuilder(enumName).build().values.map { it.name } shouldContainExactly listOf(expected)
+                }
+            }
 
         "can add value with explicit index" {
             val builder = EnumBuilder("E")
             builder.value("FOO") { index(5) }
             val enum = builder.build()
-            enum.values.map { it.name } shouldContainExactly listOf(Enum.UNSPECIFIED, "FOO")
+            enum.values.map { it.name } shouldContainExactly listOf("E_UNSPECIFIED", "FOO")
             enum.values.map { it.index } shouldContainExactly listOf(0, 5)
         }
 
@@ -31,7 +48,7 @@ class EnumBuilderTests :
             builder.value("FOO")
             builder.value("BAR")
             val enum = builder.build()
-            enum.values.map { it.name } shouldContainExactly listOf(Enum.UNSPECIFIED, "FOO", "BAR")
+            enum.values.map { it.name } shouldContainExactly listOf("E_UNSPECIFIED", "FOO", "BAR")
             enum.values.map { it.index } shouldContainExactly listOf(0, 1, 2)
         }
 
@@ -40,7 +57,7 @@ class EnumBuilderTests :
             builder.value("FOO") { index(5) }
             builder.value("BAR") { index(1) }
             val enum = builder.build()
-            enum.values.map { it.name } shouldContainExactly listOf(Enum.UNSPECIFIED, "BAR", "FOO")
+            enum.values.map { it.name } shouldContainExactly listOf("E_UNSPECIFIED", "BAR", "FOO")
             enum.values
                 .map { it.index }
                 .apply {
@@ -107,5 +124,25 @@ class EnumBuilderTests :
                     ReservedName("BAR"),
                     ReservedName("FOO"),
                 )
+        }
+
+        "a failed explicit index leaves the value name free for a retry" {
+            val builder = EnumBuilder("E")
+            builder.reserved(1)
+            shouldThrow<IllegalArgumentException> { builder.value("FOO") { index(1) } }
+            builder.value("FOO") { index(2) }
+            builder.build().values.map { it.name } shouldContainExactly listOf("E_UNSPECIFIED", "FOO")
+        }
+
+        "a value named like the default zero value is rejected as the default zero value" {
+            val builder = EnumBuilder("OrderStatus")
+            shouldThrow<IllegalArgumentException> { builder.value("ORDER_STATUS_UNSPECIFIED") }.message shouldContain
+                "default zero value"
+        }
+
+        "a reserved name equal to the default zero value is rejected as the default zero value" {
+            val builder = EnumBuilder("OrderStatus")
+            shouldThrow<IllegalArgumentException> { builder.reserved("ORDER_STATUS_UNSPECIFIED") }.message shouldContain
+                "default zero value"
         }
     })

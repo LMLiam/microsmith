@@ -107,7 +107,7 @@ class ProtobufDslIntegrationTests :
             color.schema.name shouldBe "Color"
             (color.schema as Enum).values.associate { it.name to it.index } shouldContainExactly
                 mapOf(
-                    "UNSPECIFIED" to 0,
+                    "COLOR_UNSPECIFIED" to 0,
                     "RED" to 1,
                     "GREEN" to 2,
                 )
