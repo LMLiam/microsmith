@@ -5,6 +5,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.EnumValueNumber
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -19,7 +20,7 @@ class EnumEmissionValidatorTests :
                         listOf(
                             ResolvedProtobufEnumValue(
                                 name = protoIdentifier("UNSPECIFIED"),
-                                number = 0,
+                                number = EnumValueNumber(0),
                             )
                         ),
                     reservations = listOf(ReservedToMax(Int.MAX_VALUE)),
@@ -36,7 +37,7 @@ class EnumEmissionValidatorTests :
                         listOf(
                             ResolvedProtobufEnumValue(
                                 name = protoIdentifier("UNSPECIFIED"),
-                                number = 0,
+                                number = EnumValueNumber(0),
                             )
                         ),
                     reservations = listOf(ReservedRange(-1..-10)),
@@ -55,7 +56,7 @@ class EnumEmissionValidatorTests :
                         listOf(
                             ResolvedProtobufEnumValue(
                                 name = protoIdentifier("UNSPECIFIED"),
-                                number = 0,
+                                number = EnumValueNumber(0),
                             )
                         ),
                     reservations = listOf(ReservedToMax(1), ReservedIndex(Int.MAX_VALUE)),
@@ -74,11 +75,11 @@ class EnumEmissionValidatorTests :
                         listOf(
                             ResolvedProtobufEnumValue(
                                 name = protoIdentifier("UNSPECIFIED"),
-                                number = 0,
+                                number = EnumValueNumber(0),
                             ),
                             ResolvedProtobufEnumValue(
                                 name = protoIdentifier("HIGH"),
-                                number = Int.MAX_VALUE,
+                                number = EnumValueNumber(Int.MAX_VALUE),
                             ),
                         ),
                     reservations = listOf(ReservedToMax(1)),
@@ -97,7 +98,7 @@ class EnumEmissionValidatorTests :
                         listOf(
                             ResolvedProtobufEnumValue(
                                 name = protoIdentifier("UNSPECIFIED"),
-                                number = 0,
+                                number = EnumValueNumber(0),
                             )
                         ),
                     reservations =

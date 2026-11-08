@@ -11,6 +11,7 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufFiel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.EnumValueNumber
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 
@@ -24,7 +25,7 @@ class ProtobufSchemaEmissionValidatorTests :
                         listOf(
                             ResolvedProtobufField.Scalar(
                                 name = protoIdentifier("value"),
-                                number = 1,
+                                number = fieldNumber(1),
                                 type = PrimitiveType.STRING,
                                 cardinality = Cardinality.SINGULAR,
                             )
@@ -37,7 +38,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                     listOf(
                                         ResolvedProtobufOneof.Field(
                                             name = protoIdentifier("value"),
-                                            number = 2,
+                                            number = fieldNumber(2),
                                             type = ResolvedProtobufValueType.Primitive(PrimitiveType.STRING),
                                         )
                                     ),
@@ -57,7 +58,7 @@ class ProtobufSchemaEmissionValidatorTests :
                         listOf(
                             ResolvedProtobufField.Scalar(
                                 name = protoIdentifier("primary"),
-                                number = 1,
+                                number = fieldNumber(1),
                                 type = PrimitiveType.STRING,
                                 cardinality = Cardinality.SINGULAR,
                             )
@@ -70,7 +71,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                     listOf(
                                         ResolvedProtobufOneof.Field(
                                             name = protoIdentifier("secondary"),
-                                            number = 1,
+                                            number = fieldNumber(1),
                                             type = ResolvedProtobufValueType.Primitive(PrimitiveType.STRING),
                                         )
                                     ),
@@ -95,7 +96,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                     listOf(
                                         ResolvedProtobufOneof.Field(
                                             name = protoIdentifier("email"),
-                                            number = 1,
+                                            number = fieldNumber(1),
                                             type = ResolvedProtobufValueType.Primitive(PrimitiveType.STRING),
                                         )
                                     ),
@@ -106,7 +107,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                     listOf(
                                         ResolvedProtobufOneof.Field(
                                             name = protoIdentifier("phone"),
-                                            number = 2,
+                                            number = fieldNumber(2),
                                             type = ResolvedProtobufValueType.Primitive(PrimitiveType.STRING),
                                         )
                                     ),
@@ -142,11 +143,11 @@ class ProtobufSchemaEmissionValidatorTests :
                         listOf(
                             ResolvedProtobufEnumValue(
                                 name = protoIdentifier("UNSPECIFIED"),
-                                number = 0,
+                                number = EnumValueNumber(0),
                             ),
                             ResolvedProtobufEnumValue(
                                 name = protoIdentifier("ACTIVE"),
-                                number = 1,
+                                number = EnumValueNumber(1),
                             ),
                         ),
                     reservations = listOf(ReservedName("ACTIVE")),
@@ -163,7 +164,7 @@ class ProtobufSchemaEmissionValidatorTests :
                         listOf(
                             ResolvedProtobufField.Scalar(
                                 name = protoIdentifier("legacy_name"),
-                                number = 10,
+                                number = fieldNumber(10),
                                 type = PrimitiveType.STRING,
                                 cardinality = Cardinality.SINGULAR,
                             )

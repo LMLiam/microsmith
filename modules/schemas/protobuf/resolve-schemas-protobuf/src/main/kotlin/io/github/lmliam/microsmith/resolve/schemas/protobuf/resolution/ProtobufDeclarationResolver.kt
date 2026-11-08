@@ -34,10 +34,11 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSche
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.OneofNames
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.parseIdentifier
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.validateEnumDeclaration
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.validateMessageDeclaration
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.ParsedField
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.ParsedOneof
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseEnumDeclaration
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseIdentifier
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseMessageDeclaration
 
 internal class ProtobufDeclarationResolver(private val referenceResolver: ProtobufReferenceResolver) {
     fun resolveMessage(
@@ -49,15 +50,15 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
             val declaration =
                 zipOrAccumulate(
                     { declarationName(message.name) },
-                    { validateMessageDeclaration(identity.fullyQualifiedName, message).bindNel() },
+                    { parseMessageDeclaration(identity.fullyQualifiedName, message).bindNel() },
                     { checkTypeName(message) },
                     { resolveFields(message) },
                     { resolveOneofs(message) },
-                ) { name, names, _, fields, oneofs ->
+                ) { name, parsed, _, fields, oneofs ->
                     ResolvedProtobufMessage(
                         name,
-                        names.fields.buildEach(fields),
-                        names.oneofs.buildEach(oneofs),
+                        parsed.fields.buildEach(fields),
+                        parsed.oneofs.buildEach(oneofs),
                         message.reserved,
                     )
                 }
@@ -75,14 +76,12 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
             val declaration =
                 zipOrAccumulate(
                     { declarationName(enumDeclaration.name) },
-                    { validateEnumDeclaration(identity.fullyQualifiedName, enumDeclaration).bindNel() },
+                    { parseEnumDeclaration(identity.fullyQualifiedName, enumDeclaration).bindNel() },
                     { checkTypeName(enumDeclaration) },
-                ) { name, valueNames, _ ->
+                ) { name, parsed, _ ->
                     ResolvedProtobufEnum(
                         name,
-                        valueNames.zip(enumDeclaration.values) { valueName, value ->
-                            ResolvedProtobufEnumValue(valueName, value.index)
-                        },
+                        parsed.values.map { ResolvedProtobufEnumValue(it.name, it.number) },
                         enumDeclaration.reserved,
                     )
                 }
@@ -106,10 +105,11 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
     }
 
     context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
-    private fun resolveFields(message: Message): List<NamedField> = message.fields.mapOrAccumulate { resolveField(it) }
+    private fun resolveFields(message: Message): List<FieldBuilder> =
+        message.fields.mapOrAccumulate { resolveField(it) }
 
     context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
-    private fun resolveField(field: MessageField): NamedField =
+    private fun resolveField(field: MessageField): FieldBuilder =
         when (field) {
             is ScalarField -> scalarField(field)
 
@@ -118,47 +118,47 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
             is MapField -> mapField(field)
         }
 
-    private fun scalarField(field: ScalarField): NamedField = { name ->
-        ResolvedProtobufField.Scalar(name, field.index, field.primitive, field.cardinality)
+    private fun scalarField(field: ScalarField): FieldBuilder = { parsed ->
+        ResolvedProtobufField.Scalar(parsed.name, parsed.number, field.primitive, field.cardinality)
     }
 
     context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
-    private fun referenceField(field: ReferenceField): NamedField {
+    private fun referenceField(field: ReferenceField): FieldBuilder {
         val reference =
             referenceResolver
                 .resolve(field.reference, ProtobufResolutionIssue.ReferenceLocation.Field(field.name))
                 .bind()
 
-        return { name -> ResolvedProtobufField.Reference(name, field.index, reference, field.cardinality) }
+        return { parsed -> ResolvedProtobufField.Reference(parsed.name, parsed.number, reference, field.cardinality) }
     }
 
     context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
-    private fun mapField(field: MapField): NamedField {
+    private fun mapField(field: MapField): FieldBuilder {
         val value = resolveValueType(field.type.value, ProtobufResolutionIssue.ReferenceLocation.MapValue(field.name))
 
-        return { name -> ResolvedProtobufField.Map(name, field.index, field.type.key, value) }
+        return { parsed -> ResolvedProtobufField.Map(parsed.name, parsed.number, field.type.key, value) }
     }
 
     context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
-    private fun resolveOneofs(message: Message): List<(OneofNames) -> ResolvedProtobufOneof> =
+    private fun resolveOneofs(message: Message): List<(ParsedOneof) -> ResolvedProtobufOneof> =
         message.oneofs.mapOrAccumulate { resolveOneof(it) }
 
     context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
-    private fun resolveOneof(oneof: Oneof): (OneofNames) -> ResolvedProtobufOneof {
+    private fun resolveOneof(oneof: Oneof): (ParsedOneof) -> ResolvedProtobufOneof {
         val fields = oneof.fields.mapOrAccumulate { resolveOneofField(oneof, it) }
 
-        return { names -> ResolvedProtobufOneof(names.name, names.fields.buildEach(fields)) }
+        return { parsed -> ResolvedProtobufOneof(parsed.name, parsed.fields.buildEach(fields)) }
     }
 
     context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
-    private fun resolveOneofField(oneof: Oneof, field: OneofField): (ProtoIdentifier) -> ResolvedProtobufOneof.Field {
+    private fun resolveOneofField(oneof: Oneof, field: OneofField): (ParsedField) -> ResolvedProtobufOneof.Field {
         val type =
             resolveValueType(
                 field.fieldType,
                 ProtobufResolutionIssue.ReferenceLocation.OneofField(oneof.name, field.name),
             )
 
-        return { name -> ResolvedProtobufOneof.Field(name, field.index, type) }
+        return { parsed -> ResolvedProtobufOneof.Field(parsed.name, parsed.number, type) }
     }
 
     context(identity: QualifiedSchemaName, _: RaiseAccumulate<ProtobufResolutionIssue>)
@@ -182,9 +182,10 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
         )
 }
 
-private typealias NamedField = (ProtoIdentifier) -> ResolvedProtobufField
+private typealias FieldBuilder = (ParsedField) -> ResolvedProtobufField
 
-private fun <N, R> List<N>.buildEach(builders: List<(N) -> R>): List<R> = zip(builders) { name, build -> build(name) }
+private fun <P, R> List<P>.buildEach(builders: List<(P) -> R>): List<R> =
+    zip(builders) { parsed, build -> build(parsed) }
 
 private fun ResolvedProtobufDeclaration.referencedSchemas(): List<QualifiedSchemaName> =
     when (this) {

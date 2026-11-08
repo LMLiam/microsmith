@@ -3,7 +3,6 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 
 internal fun validateMessage(message: ResolvedProtobufMessage) {
-    message.fields.forEach(::validateField)
     message.oneofs.forEach(::validateOneof)
     message.reservations.forEach(::validateReserved)
 
@@ -40,9 +39,11 @@ private fun collectFieldNameUsages(message: ResolvedProtobufMessage): List<Field
 }
 
 private fun collectFieldNumberUsages(message: ResolvedProtobufMessage): List<FieldUsage<Int>> = buildList {
-    message.fields.forEach { field -> add(FieldUsage(field.number, "field '${field.name}'")) }
+    message.fields.forEach { field -> add(FieldUsage(field.number.value, "field '${field.name}'")) }
     message.oneofs.forEach { oneof ->
-        oneof.fields.forEach { field -> add(FieldUsage(field.number, "oneof '${oneof.name}' field '${field.name}'")) }
+        oneof.fields.forEach { field ->
+            add(FieldUsage(field.number.value, "oneof '${oneof.name}' field '${field.name}'"))
+        }
     }
 }
 

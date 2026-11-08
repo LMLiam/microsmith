@@ -6,12 +6,11 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 
 internal fun validateEnum(enum: ResolvedProtobufEnum) {
     require(enum.values.isNotEmpty()) { "Enum '${enum.name}' must contain at least one value" }
-    require(enum.values.first().number == 0) { "Enum '${enum.name}' must declare first value at index 0" }
+    require(enum.values.first().number.value == 0) { "Enum '${enum.name}' must declare first value at index 0" }
 
     enum.reservations.forEach(::validateEnumReserved)
 
@@ -43,7 +42,7 @@ private fun requireUniqueEnumValueNames(enum: ResolvedProtobufEnum) {
 }
 
 private fun requireUniqueEnumValueIndexes(enum: ResolvedProtobufEnum) {
-    val duplicates = enum.values.groupBy(ResolvedProtobufEnumValue::number).filterValues { it.size > 1 }
+    val duplicates = enum.values.groupBy { it.number.value }.filterValues { it.size > 1 }
     require(duplicates.isEmpty()) {
         val indexes = duplicates.keys.sorted().joinToString(", ")
         "Enum '${enum.name}' has duplicate value indexes: $indexes"

@@ -6,6 +6,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.FieldNumber
 
 internal fun validateMessageReservationSpan(
     schemaName: String,
@@ -39,7 +40,7 @@ internal fun validateMessageReservationSpan(
                 reservation.from,
             )
 
-            reservation.from..MAX_PROTOBUF_FIELD_NUMBER
+            reservation.from..FieldNumber.MAX_VALUE
         }
     }
 
