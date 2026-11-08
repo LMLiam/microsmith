@@ -6,6 +6,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspService
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import java.nio.file.Path
+import java.util.Locale
 
 private const val FIRST_NON_PRINTABLE_ASCII_CODE_POINT = 0x20
 
@@ -74,7 +75,7 @@ private fun escapeDotnetAspJsonString(value: String): String {
             '\t' -> escaped.append("\\t")
             else -> {
                 if (char.code < FIRST_NON_PRINTABLE_ASCII_CODE_POINT) {
-                    escaped.append("\\u%04x".format(char.code))
+                    escaped.append("\\u%04x".format(Locale.ROOT, char.code))
                 } else {
                     escaped.append(char)
                 }

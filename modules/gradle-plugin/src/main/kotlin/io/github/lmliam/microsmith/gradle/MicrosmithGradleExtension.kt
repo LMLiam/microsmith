@@ -6,7 +6,7 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.SetProperty
 import javax.inject.Inject
 
-@Suppress("UnnecessaryAbstractClass") // Gradle instantiates managed extension properties through an abstract type.
+@Suppress("AbstractClassCanBeInterface") // Gradle instantiates managed extension properties through an abstract type.
 abstract class MicrosmithGradleExtension
 @Inject
 constructor() {

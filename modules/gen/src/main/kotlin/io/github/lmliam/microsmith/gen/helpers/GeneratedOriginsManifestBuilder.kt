@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.gen.helpers
 import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+import java.util.Locale
 
 internal object GeneratedOriginsManifestBuilder {
     private const val FIRST_PRINTABLE_CHARACTER_CODE = 0x20
@@ -65,7 +66,7 @@ internal object GeneratedOriginsManifestBuilder {
                 '\t' -> append("\\t")
                 else -> {
                     if (char.code < FIRST_PRINTABLE_CHARACTER_CODE) {
-                        append("\\u%04x".format(char.code))
+                        append("\\u%04x".format(Locale.ROOT, char.code))
                     } else {
                         append(char)
                     }

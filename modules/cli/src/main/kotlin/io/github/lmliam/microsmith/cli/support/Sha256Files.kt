@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.cli.support
 import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
+import java.util.Locale
 
 internal fun sha256(path: Path): String {
     val digest = MessageDigest.getInstance("SHA-256")
@@ -27,4 +28,4 @@ internal fun sha256IfRegularFile(path: Path): String? {
     return sha256(normalized)
 }
 
-private fun ByteArray.toHexString(): String = joinToString(separator = "") { "%02x".format(it) }
+private fun ByteArray.toHexString(): String = joinToString(separator = "") { "%02x".format(Locale.ROOT, it) }

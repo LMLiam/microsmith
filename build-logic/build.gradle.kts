@@ -3,10 +3,9 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    alias(libs.plugins.kotlin.jvm)
     `java-gradle-plugin`
 }
 
@@ -16,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.2.2")
+    implementation(libs.shadow.gradle.plugin)
     compileOnly(gradleApi())
     testImplementation(gradleTestKit())
     testImplementation(libs.kotest.runner.junit5)
@@ -25,17 +24,19 @@ dependencies {
 
 kotlin {
     jvmToolchain(24)
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_22)
+        progressiveMode.set(true)
+        freeCompilerArgs.addAll(
+            "-Xjsr305=strict",
+            "-Xexplicit-context-arguments",
+        )
+    }
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_22
     targetCompatibility = JavaVersion.VERSION_22
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_22)
-    }
 }
 
 tasks.withType<JavaCompile>().configureEach {

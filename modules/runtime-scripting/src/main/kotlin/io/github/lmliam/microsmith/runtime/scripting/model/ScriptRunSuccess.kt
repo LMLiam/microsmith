@@ -7,5 +7,4 @@ data class ScriptRunSuccess(
     val cacheHit: Boolean,
     val elapsedMillis: Long,
     val generatedRoots: List<Path> = emptyList(),
-) :
-    ScriptRunResult
+) : ScriptRunResult

@@ -1,5 +1,7 @@
 package io.github.lmliam.microsmith.cli.diagnostics
 
+import java.util.Locale
+
 internal fun toJsonValue(value: Any?): String = when (value) {
     null -> "null"
 
@@ -43,7 +45,7 @@ private fun String.escapeJson(): String {
 
             else -> {
                 if (char.code <= MAX_JSON_CONTROL_CHAR_CODE) {
-                    builder.append("\\u%04x".format(char.code))
+                    builder.append("\\u%04x".format(Locale.ROOT, char.code))
                 } else {
                     builder.append(char)
                 }

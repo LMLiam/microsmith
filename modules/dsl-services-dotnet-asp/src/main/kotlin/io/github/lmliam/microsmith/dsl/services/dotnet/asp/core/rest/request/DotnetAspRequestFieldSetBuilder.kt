@@ -74,9 +74,9 @@ internal open class DotnetAspRequestFieldSetBuilder(private val fieldContainerLa
     override fun timeSpan(name: String, block: DotnetAspRequestFieldScope.() -> Unit) =
         registerField(name, DotnetFieldType.TimeSpan, block)
 
-    override infix fun String.ref(target: String) = registerReference(this, target)
+    override infix fun String.ref(target: String): DotnetAspRequestField = registerReference(this, target)
 
-    override infix fun String.references(target: String) = registerReference(this, target)
+    override infix fun String.references(target: String): DotnetAspRequestField = registerReference(this, target)
 
     protected fun buildFields(): List<DotnetAspRequestField> = fieldsByName.values.toList()
 
@@ -104,12 +104,10 @@ internal open class DotnetAspRequestFieldSetBuilder(private val fieldContainerLa
         return register(createField(fieldName, type, options))
     }
 
-    private fun registerReference(name: String, target: String): DotnetAspRequestField {
-        throw IllegalArgumentException(
-            "ASP.NET request bindings cannot declare reference field '$name' to '$target'. " +
-                "Declare scalar transport fields instead.",
-        )
-    }
+    private fun registerReference(name: String, target: String): Nothing = throw IllegalArgumentException(
+        "ASP.NET request bindings cannot declare reference field '$name' to '$target'. " +
+            "Declare scalar transport fields instead.",
+    )
 
     private fun register(field: DotnetAspRequestField): DotnetAspRequestField {
         require(field.name !in fieldsByName) {
