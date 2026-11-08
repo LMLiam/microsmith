@@ -49,19 +49,37 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
                         )
                 }
 
+        val model = ResolvedProtobufSchemaModel.of(resolved).mapLeft { rejections -> rejections.map(::modelIssue) }
+
         issues.addAll(findNameConflicts(protobufSchemas))
         issues.addAll(findSymbolCollisions(protobufSchemas))
-        issues.addAll(findImportCycles(resolved))
+        model.onLeft(issues::addAll)
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 
         return when {
             accumulatedIssues != null -> DomainResolution.Failure(accumulatedIssues)
             resolved.isEmpty() -> DomainResolution.NotApplicable
-            else -> DomainResolution.Success(ResolvedProtobufSchemaModel(resolved))
+            else -> model.fold(ifLeft = { DomainResolution.Failure(it) }, ifRight = { DomainResolution.Success(it) })
         }
     }
 }
+
+private fun modelIssue(rejection: ResolvedProtobufSchemaModel.Rejection): ProtobufResolutionIssue =
+    when (rejection) {
+        is ResolvedProtobufSchemaModel.Rejection.DuplicateSchema ->
+            ProtobufResolutionIssue.SymbolNameCollision(
+                scope = rejection.identity.packageName.orEmpty(),
+                name = rejection.identity.typeName.value,
+                declarations =
+                    List(rejection.occurrences) {
+                        ProtobufResolutionIssue.SymbolDeclaration.Type(rejection.identity.fullyQualifiedName)
+                    },
+            )
+
+        is ResolvedProtobufSchemaModel.Rejection.CircularImports ->
+            ProtobufResolutionIssue.CircularSchemaImports(rejection.schemas)
+    }
 
 private sealed interface DeclaredSchema {
     val schema: ProtobufSchema

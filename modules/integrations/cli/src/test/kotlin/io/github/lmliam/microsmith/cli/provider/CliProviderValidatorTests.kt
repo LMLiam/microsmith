@@ -160,7 +160,8 @@ private class ProtobufResolverStub : DomainResolver<SchemasExtension, ResolvedPr
     override val resolvedType = ResolvedProtobufSchemaModel::class
 
     override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufSchemaModel> =
-        DomainResolution.Success(ResolvedProtobufSchemaModel(emptyList()))
+        ResolvedProtobufSchemaModel.of(emptyList())
+            .fold(ifLeft = { error("an empty model is valid: $it") }, ifRight = { DomainResolution.Success(it) })
 }
 
 private class ProtobufRpcResolverStub : DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
