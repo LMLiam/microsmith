@@ -21,8 +21,6 @@ data class ReservedSpan private constructor(val first: Int, val last: Int, val d
     val numbers: IntRange
         get() = first..last
 
-    operator fun contains(number: Int): Boolean = number in numbers
-
     enum class Domain(val min: Int, val max: Int) {
         MESSAGE(FieldNumber.MIN_VALUE, FieldNumber.MAX_VALUE),
         ENUM(Int.MIN_VALUE, Int.MAX_VALUE),
