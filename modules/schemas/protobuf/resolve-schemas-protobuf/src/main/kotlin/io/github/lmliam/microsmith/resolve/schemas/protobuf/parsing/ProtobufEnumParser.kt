@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.resolve.schemas.protobuf.validation
+package io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing
 
 import arrow.core.EitherNel
 import arrow.core.raise.Raise
@@ -9,15 +9,18 @@ import arrow.core.raise.context.mapOrAccumulate
 import arrow.core.raise.context.zipOrAccumulate
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.EnumValueNumber
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoDuplicates
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.raiseEach
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.validateEnumReservations
 
-internal fun validateEnumDeclaration(
+internal fun parseEnumDeclaration(
     schemaName: String,
     enum: Enum,
-): EitherNel<ProtobufResolutionIssue, List<ProtoIdentifier>> = either {
+): EitherNel<ProtobufResolutionIssue, ParsedEnum> = either {
     zipOrAccumulate(
         { checkFirstValueIsZero(schemaName, enum) },
-        { validateEnumValueNames(schemaName, enum) },
+        { parseEnumValues(schemaName, enum) },
         {
             checkNoDuplicates(enum.values.map { it.name }) {
                 ProtobufResolutionIssue.DuplicateEnumValueNames(schemaName, it)
@@ -37,8 +40,8 @@ internal fun validateEnumDeclaration(
                 )
                 .raiseEach()
         },
-    ) { _, names, _, _, _ ->
-        names
+    ) { _, values, _, _, _ ->
+        ParsedEnum(values)
     }
 }
 
@@ -51,7 +54,10 @@ private fun checkFirstValueIsZero(schemaName: String, enum: Enum) {
 }
 
 context(_: RaiseAccumulate<ProtobufResolutionIssue>)
-private fun validateEnumValueNames(schemaName: String, enum: Enum): List<ProtoIdentifier> =
+private fun parseEnumValues(schemaName: String, enum: Enum): List<ParsedEnumValue> =
     enum.values.mapOrAccumulate {
-        parseIdentifier(schemaName, ProtobufResolutionIssue.IdentifierLocation.EnumValue(it.name), it.name)
+        ParsedEnumValue(
+            parseIdentifier(schemaName, ProtobufResolutionIssue.IdentifierLocation.EnumValue(it.name), it.name),
+            EnumValueNumber(it.index),
+        )
     }

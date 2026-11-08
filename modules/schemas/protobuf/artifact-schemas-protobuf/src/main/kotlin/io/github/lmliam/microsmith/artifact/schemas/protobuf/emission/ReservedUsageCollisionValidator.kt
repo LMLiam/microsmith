@@ -7,6 +7,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedToMax
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.FieldNumber
 
 internal fun validateReservedUsage(message: ResolvedProtobufMessage) {
     validateNames(
@@ -23,10 +24,10 @@ internal fun validateReservedUsage(message: ResolvedProtobufMessage) {
         reserved = message.reservations,
         usedNumbers =
             buildList {
-                message.fields.forEach { add(it.number) }
-                message.oneofs.forEach { oneof -> oneof.fields.forEach { add(it.number) } }
+                message.fields.forEach { add(it.number.value) }
+                message.oneofs.forEach { oneof -> oneof.fields.forEach { add(it.number.value) } }
             },
-        maxNumber = MAX_FIELD_NUMBER,
+        maxNumber = FieldNumber.MAX_VALUE,
     )
 }
 
@@ -39,7 +40,7 @@ internal fun validateReservedUsage(enum: ResolvedProtobufEnum) {
     validateNumbers(
         owner = ReservedUsageOwner.enum(enum.name.value),
         reserved = enum.reservations,
-        usedNumbers = enum.values.map { it.number },
+        usedNumbers = enum.values.map { it.number.value },
         maxNumber = Int.MAX_VALUE,
     )
 }

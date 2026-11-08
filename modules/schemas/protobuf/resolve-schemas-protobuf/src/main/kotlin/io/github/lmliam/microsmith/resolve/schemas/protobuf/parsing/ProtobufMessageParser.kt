@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.resolve.schemas.protobuf.validation
+package io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing
 
 import arrow.core.EitherNel
 import arrow.core.raise.RaiseAccumulate
@@ -13,17 +13,19 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.OneofField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoDuplicates
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.raiseEach
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.validateMessageReservations
 
-internal fun validateMessageDeclaration(
+internal fun parseMessageDeclaration(
     schemaName: String,
     message: Message,
-): EitherNel<ProtobufResolutionIssue, MessageNames> = either {
+): EitherNel<ProtobufResolutionIssue, ParsedMessage> = either {
     val allFields = message.fields + message.oneofs.flatMap(Oneof::fields)
 
     zipOrAccumulate(
-        { validateMessageFields(schemaName, message.fields) },
-        { validateOneofs(schemaName, message.oneofs) },
+        { parseMessageFields(schemaName, message.fields) },
+        { parseOneofs(schemaName, message.oneofs) },
         {
             checkNoDuplicates(allFields.map(Field::name)) {
                 ProtobufResolutionIssue.DuplicateFieldNames(schemaName, it)
@@ -49,52 +51,52 @@ internal fun validateMessageDeclaration(
                 .raiseEach()
         },
     ) { fields, oneofs, _, _, _, _ ->
-        MessageNames(fields, oneofs)
+        ParsedMessage(fields, oneofs)
     }
 }
 
 context(_: RaiseAccumulate<ProtobufResolutionIssue>)
-private fun validateMessageFields(schemaName: String, fields: List<MessageField>): List<ProtoIdentifier> =
+private fun parseMessageFields(schemaName: String, fields: List<MessageField>): List<ParsedField> =
     fields.mapOrAccumulate {
-        validateMessageField(schemaName, it).bindNel()
+        parseMessageField(schemaName, it).bindNel()
     }
 
-private fun validateMessageField(
+private fun parseMessageField(
     schemaName: String,
     field: MessageField,
-): EitherNel<ProtobufResolutionIssue, ProtoIdentifier> = either {
+): EitherNel<ProtobufResolutionIssue, ParsedField> = either {
     zipOrAccumulate(
         { parseIdentifier(schemaName, ProtobufResolutionIssue.IdentifierLocation.Field(field.name), field.name) },
-        { checkFieldNumber(schemaName, ProtobufResolutionIssue.FieldLocation.Field(field.name), field.index) },
-    ) { name, _ ->
-        name
+        { parseFieldNumber(schemaName, ProtobufResolutionIssue.FieldLocation.Field(field.name), field.index) },
+    ) { name, number ->
+        ParsedField(name, number)
     }
 }
 
 context(_: RaiseAccumulate<ProtobufResolutionIssue>)
-private fun validateOneofs(schemaName: String, oneofs: List<Oneof>): List<OneofNames> = oneofs.mapOrAccumulate {
-    validateOneof(schemaName, it).bindNel()
+private fun parseOneofs(schemaName: String, oneofs: List<Oneof>): List<ParsedOneof> = oneofs.mapOrAccumulate {
+    parseOneof(schemaName, it).bindNel()
 }
 
-private fun validateOneof(schemaName: String, oneof: Oneof): EitherNel<ProtobufResolutionIssue, OneofNames> = either {
+private fun parseOneof(schemaName: String, oneof: Oneof): EitherNel<ProtobufResolutionIssue, ParsedOneof> = either {
     zipOrAccumulate(
         { parseIdentifier(schemaName, ProtobufResolutionIssue.IdentifierLocation.Oneof(oneof.name), oneof.name) },
         { ensure(oneof.fields.isNotEmpty()) { ProtobufResolutionIssue.EmptyOneof(schemaName, oneof.name) } },
-        { validateOneofFields(schemaName, oneof) },
+        { parseOneofFields(schemaName, oneof) },
     ) { name, _, fields ->
-        OneofNames(name, fields)
+        ParsedOneof(name, fields)
     }
 }
 
 context(_: RaiseAccumulate<ProtobufResolutionIssue>)
-private fun validateOneofFields(schemaName: String, oneof: Oneof): List<ProtoIdentifier> =
-    oneof.fields.mapOrAccumulate { validateOneofField(schemaName, oneof, it).bindNel() }
+private fun parseOneofFields(schemaName: String, oneof: Oneof): List<ParsedField> =
+    oneof.fields.mapOrAccumulate { parseOneofField(schemaName, oneof, it).bindNel() }
 
-private fun validateOneofField(
+private fun parseOneofField(
     schemaName: String,
     oneof: Oneof,
     field: OneofField,
-): EitherNel<ProtobufResolutionIssue, ProtoIdentifier> = either {
+): EitherNel<ProtobufResolutionIssue, ParsedField> = either {
     zipOrAccumulate(
         {
             parseIdentifier(
@@ -104,13 +106,13 @@ private fun validateOneofField(
             )
         },
         {
-            checkFieldNumber(
+            parseFieldNumber(
                 schemaName,
                 ProtobufResolutionIssue.FieldLocation.OneofField(oneof.name, field.name),
                 field.index,
             )
         },
-    ) { name, _ ->
-        name
+    ) { name, number ->
+        ParsedField(name, number)
     }
 }

@@ -13,7 +13,7 @@ internal object ProtobufFieldRenderer {
                     field.cardinality,
                     ProtobufValueTypeRenderer.render(field.type),
                     field.name.value,
-                    field.number,
+                    field.number.value,
                 )
 
             is ResolvedProtobufField.Reference ->
@@ -21,7 +21,7 @@ internal object ProtobufFieldRenderer {
                     field.cardinality,
                     field.reference.target.fullyQualifiedName,
                     field.name.value,
-                    field.number,
+                    field.number.value,
                 )
 
             is ResolvedProtobufField.Map ->
@@ -33,7 +33,7 @@ internal object ProtobufFieldRenderer {
                     append("> ")
                     append(field.name.value)
                     append(" = ")
-                    append(field.number)
+                    append(field.number.value)
                     append(";")
                 }
         }
@@ -47,9 +47,9 @@ internal object ProtobufFieldRenderer {
     }
 
     fun render(field: ResolvedProtobufOneof.Field): String =
-        "${ProtobufValueTypeRenderer.render(field.type)} ${field.name} = ${field.number};"
+        "${ProtobufValueTypeRenderer.render(field.type)} ${field.name} = ${field.number.value};"
 
-    fun render(value: ResolvedProtobufEnumValue): String = "${value.name} = ${value.number};"
+    fun render(value: ResolvedProtobufEnumValue): String = "${value.name} = ${value.number.value};"
 
     private fun renderCardinalityField(cardinality: Cardinality, type: String, name: String, number: Int): String =
         buildString {
