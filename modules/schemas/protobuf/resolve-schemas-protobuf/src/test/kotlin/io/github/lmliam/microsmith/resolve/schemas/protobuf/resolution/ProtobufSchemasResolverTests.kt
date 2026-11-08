@@ -13,6 +13,8 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.EnumValue
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 import io.github.lmliam.microsmith.dsl.schemas.schemas
@@ -82,6 +84,81 @@ class ProtobufSchemasResolverTests :
                         "User",
                         ProtobufResolutionIssue.ReferenceLocation.OneofField("contact", "email"),
                         "MissingContact",
+                    ),
+                )
+        }
+
+        "reports every unresolved reference across fields, map values and each oneof" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = "User",
+                            schema =
+                                Message(
+                                    name = "User",
+                                    fields =
+                                        listOf(
+                                            ReferenceField("manager", 1, Reference.Local("MissingManager")),
+                                            ReferenceField("peer", 2, Reference.Local("MissingPeer")),
+                                            MapField(
+                                                "labels",
+                                                3,
+                                                MapType(PrimitiveType.STRING, Reference.Local("MissingLabel")),
+                                            ),
+                                        ),
+                                    oneofs =
+                                        listOf(
+                                            Oneof(
+                                                "contact",
+                                                listOf(
+                                                    OneofField("email", 4, Reference.Local("MissingEmail")),
+                                                    OneofField("phone", 5, Reference.Local("MissingPhone")),
+                                                ),
+                                            ),
+                                            Oneof(
+                                                "account",
+                                                listOf(OneofField("owner", 6, Reference.Local("MissingOwner"))),
+                                            ),
+                                        ),
+                                ),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.Field("manager"),
+                        "MissingManager",
+                    ),
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.Field("peer"),
+                        "MissingPeer",
+                    ),
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.MapValue("labels"),
+                        "MissingLabel",
+                    ),
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.OneofField("contact", "email"),
+                        "MissingEmail",
+                    ),
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.OneofField("contact", "phone"),
+                        "MissingPhone",
+                    ),
+                    ProtobufResolutionIssue.UnresolvedReference(
+                        "User",
+                        ProtobufResolutionIssue.ReferenceLocation.OneofField("account", "owner"),
+                        "MissingOwner",
                     ),
                 )
         }
@@ -198,6 +275,32 @@ class ProtobufSchemasResolverTests :
                     ),
                     ProtobufResolutionIssue.DuplicateFieldNames("Broken", listOf("duplicate")),
                     ProtobufResolutionIssue.DuplicateFieldNumbers("Broken", listOf(0)),
+                )
+        }
+
+        "accumulates enum value issues before a declaration name mismatch" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = "pkg.Contact",
+                            schema =
+                                Enum(
+                                    name = "Status",
+                                    values = listOf(EnumValue("ACTIVE", 1), EnumValue("ACTIVE", 1)),
+                                ),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.EnumFirstValueMustBeZero("pkg.Contact", "ACTIVE", 1),
+                    ProtobufResolutionIssue.DuplicateEnumValueNames("pkg.Contact", listOf("ACTIVE")),
+                    ProtobufResolutionIssue.DuplicateEnumValueNumbers("pkg.Contact", listOf(1)),
+                    ProtobufResolutionIssue.SchemaDeclarationNameMismatch("pkg.Contact", "Status"),
                 )
         }
 

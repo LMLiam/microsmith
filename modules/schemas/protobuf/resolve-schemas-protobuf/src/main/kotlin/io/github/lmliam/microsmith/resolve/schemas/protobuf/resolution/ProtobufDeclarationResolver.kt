@@ -1,9 +1,13 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution
 
-import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.nonEmptyListOf
-import arrow.core.toNonEmptyListOrNull
+import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.context.bind
+import arrow.core.raise.context.either
+import arrow.core.raise.context.mapOrAccumulate
+import arrow.core.raise.context.raise
+import arrow.core.raise.context.zipOrAccumulate
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
@@ -21,7 +25,6 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReference
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchema
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
@@ -33,159 +36,160 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
     fun resolveMessage(
         schema: ProtobufSchema,
         message: Message,
-    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> =
-        resolve(schema, message) { identity, issues, dependencies ->
-            buildMessage(identity, message, issues, dependencies)
-        }
+    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
+        val identity = identityOf(schema).bind()
+        val declaration =
+            zipOrAccumulate(
+                { checkDeclaration(identity, message) },
+                { resolveFields(identity, message) },
+                { resolveOneofs(identity, message) },
+            ) { _, fields, oneofs ->
+                ResolvedProtobufMessage(message.name, fields, oneofs, message.reserved)
+            }
+
+        schemaFor(identity, declaration)
+    }
 
     fun resolveEnum(
         schema: ProtobufSchema,
         enumDeclaration: Enum,
-    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> =
-        resolve(schema, enumDeclaration) { _, _, _ ->
-            ResolvedProtobufEnum(
-                enumDeclaration.name,
-                values = enumDeclaration.values.map { ResolvedProtobufEnumValue(it.name, it.index) },
-                enumDeclaration.reserved,
-            )
-        }
-
-    private fun resolve(
-        schema: ProtobufSchema,
-        source: Type,
-        build:
-            (
-                QualifiedSchemaName,
-                MutableList<ProtobufResolutionIssue>,
-                MutableSet<QualifiedSchemaName>,
-            ) -> ResolvedProtobufDeclaration,
-    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> {
-        val identity =
-            when (val parsed = QualifiedSchemaName.parse(schema.name)) {
-                is Either.Left -> return Either.Left(nonEmptyListOf(parsed.value))
-
-                is Either.Right -> parsed.value
+    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> = either {
+        val identity = identityOf(schema).bind()
+        val declaration =
+            zipOrAccumulate(
+                { checkDeclaration(identity, enumDeclaration) },
+                { enumDeclaration.values.map { ResolvedProtobufEnumValue(it.name, it.index) } },
+            ) { _, values ->
+                ResolvedProtobufEnum(enumDeclaration.name, values, enumDeclaration.reserved)
             }
 
-        val issues = mutableListOf<ProtobufResolutionIssue>()
-        val dependencies = mutableSetOf<QualifiedSchemaName>()
-        issues += validator.validate(identity.fullyQualifiedName, source)
-        if (identity.typeName != source.name) {
-            issues += ProtobufResolutionIssue.SchemaDeclarationNameMismatch(identity.fullyQualifiedName, source.name)
-        }
+        schemaFor(identity, declaration)
+    }
 
-        val declaration = build(identity, issues, dependencies)
+    private fun identityOf(schema: ProtobufSchema): EitherNel<ProtobufResolutionIssue, QualifiedSchemaName> =
+        QualifiedSchemaName.parse(schema.name).mapLeft { nonEmptyListOf<ProtobufResolutionIssue>(it) }
 
-        val accumulatedIssues = issues.toNonEmptyListOrNull()
+    context(_: RaiseAccumulate<ProtobufResolutionIssue>)
+    private fun checkDeclaration(
+        identity: QualifiedSchemaName,
+        declaration: Type,
+    ) {
+        val nameMismatch =
+            ProtobufResolutionIssue.SchemaDeclarationNameMismatch(identity.fullyQualifiedName, declaration.name)
+                .takeIf { identity.typeName != declaration.name }
 
-        return if (accumulatedIssues != null) {
-            Either.Left(accumulatedIssues)
-        } else {
-            Either.Right(
-                ResolvedProtobufSchema(
-                    identity,
-                    declaration,
-                    dependencies = dependencies.filter { it != identity }.sortedBy { it.fullyQualifiedName },
-                )
-            )
+        (validator.validate(identity.fullyQualifiedName, declaration) + listOfNotNull(nameMismatch)).mapOrAccumulate {
+            raise(it)
         }
     }
 
-    private fun buildMessage(
+    context(_: RaiseAccumulate<ProtobufResolutionIssue>)
+    private fun resolveFields(
         identity: QualifiedSchemaName,
         message: Message,
-        issues: MutableList<ProtobufResolutionIssue>,
-        dependencies: MutableSet<QualifiedSchemaName>,
-    ): ResolvedProtobufMessage {
-        val fields =
-            message.fields.mapNotNull { field ->
-                when (field) {
-                    is ScalarField ->
-                        ResolvedProtobufField.Scalar(
-                            field.name,
-                            field.index,
-                            field.primitive,
-                            field.cardinality,
-                        )
+    ): List<ResolvedProtobufField> =
+        message.fields.mapOrAccumulate { field ->
+            when (field) {
+                is ScalarField ->
+                    ResolvedProtobufField.Scalar(
+                        field.name,
+                        field.index,
+                        field.primitive,
+                        field.cardinality,
+                    )
 
-                    is ReferenceField ->
-                        resolveReference(
+                is ReferenceField ->
+                    ResolvedProtobufField.Reference(
+                        field.name,
+                        field.index,
+                        referenceResolver
+                            .resolve(
                                 identity,
                                 field.reference,
                                 ProtobufResolutionIssue.ReferenceLocation.Field(field.name),
-                                issues,
-                                dependencies,
                             )
-                            ?.let { reference ->
-                                ResolvedProtobufField.Reference(field.name, field.index, reference, field.cardinality)
-                            }
+                            .bind(),
+                        field.cardinality,
+                    )
 
-                    is MapField ->
+                is MapField ->
+                    ResolvedProtobufField.Map(
+                        field.name,
+                        field.index,
+                        field.type.key,
                         resolveValueType(
-                                identity,
-                                field.type.value,
-                                ProtobufResolutionIssue.ReferenceLocation.MapValue(field.name),
-                                issues,
-                                dependencies,
-                            )
-                            ?.let { value -> ResolvedProtobufField.Map(field.name, field.index, field.type.key, value) }
-                }
+                            identity,
+                            field.type.value,
+                            ProtobufResolutionIssue.ReferenceLocation.MapValue(field.name),
+                        ),
+                    )
             }
+        }
 
-        val oneofs =
-            message.oneofs.map { oneof ->
-                ResolvedProtobufOneof(
-                    oneof.name,
-                    fields =
-                        oneof.fields.mapNotNull { field ->
+    context(_: RaiseAccumulate<ProtobufResolutionIssue>)
+    private fun resolveOneofs(
+        identity: QualifiedSchemaName,
+        message: Message,
+    ): List<ResolvedProtobufOneof> =
+        message.oneofs.mapOrAccumulate { oneof ->
+            ResolvedProtobufOneof(
+                oneof.name,
+                fields =
+                    oneof.fields.mapOrAccumulate { field ->
+                        ResolvedProtobufOneof.Field(
+                            field.name,
+                            field.index,
                             resolveValueType(
-                                    identity,
-                                    field.fieldType,
-                                    ProtobufResolutionIssue.ReferenceLocation.OneofField(oneof.name, field.name),
-                                    issues,
-                                    dependencies,
-                                )
-                                ?.let { value -> ResolvedProtobufOneof.Field(field.name, field.index, value) }
-                        },
-                )
-            }
+                                identity,
+                                field.fieldType,
+                                ProtobufResolutionIssue.ReferenceLocation.OneofField(oneof.name, field.name),
+                            ),
+                        )
+                    },
+            )
+        }
 
-        return ResolvedProtobufMessage(message.name, fields, oneofs, message.reserved)
-    }
-
+    context(_: RaiseAccumulate<ProtobufResolutionIssue>)
     private fun resolveValueType(
         identity: QualifiedSchemaName,
         value: ValueType,
         location: ProtobufResolutionIssue.ReferenceLocation,
-        issues: MutableList<ProtobufResolutionIssue>,
-        dependencies: MutableSet<QualifiedSchemaName>,
-    ): ResolvedProtobufValueType? =
+    ): ResolvedProtobufValueType =
         when (value) {
             is PrimitiveType -> ResolvedProtobufValueType.Primitive(value)
 
             is Reference ->
-                resolveReference(identity, value, location, issues, dependencies)?.let {
-                    ResolvedProtobufValueType.Reference(it)
-                }
+                ResolvedProtobufValueType.Reference(referenceResolver.resolve(identity, value, location).bind())
         }
 
-    private fun resolveReference(
+    private fun schemaFor(
         identity: QualifiedSchemaName,
-        reference: Reference,
-        location: ProtobufResolutionIssue.ReferenceLocation,
-        issues: MutableList<ProtobufResolutionIssue>,
-        dependencies: MutableSet<QualifiedSchemaName>,
-    ): ResolvedProtobufReference? =
-        referenceResolver
-            .resolve(identity, reference, location)
-            .fold(
-                ifLeft = { issue ->
-                    issues += issue
-                    null
-                },
-                ifRight = { resolved ->
-                    dependencies += resolved.target
-                    resolved
-                },
-            )
+        declaration: ResolvedProtobufDeclaration,
+    ): ResolvedProtobufSchema =
+        ResolvedProtobufSchema(
+            identity,
+            declaration,
+            dependencies =
+                declaration.referencedSchemas().filter { it != identity }.distinct().sortedBy { it.fullyQualifiedName },
+        )
 }
+
+private fun ResolvedProtobufDeclaration.referencedSchemas(): List<QualifiedSchemaName> =
+    when (this) {
+        is ResolvedProtobufMessage -> messageReferences()
+        is ResolvedProtobufEnum -> emptyList()
+    }
+
+private fun ResolvedProtobufMessage.messageReferences(): List<QualifiedSchemaName> =
+    fields.flatMap { field ->
+        when (field) {
+            is ResolvedProtobufField.Scalar -> emptyList()
+
+            is ResolvedProtobufField.Reference -> listOf(field.reference.target)
+
+            is ResolvedProtobufField.Map -> listOfNotNull(field.value.referencedSchema())
+        }
+    } + oneofs.flatMap { oneof -> oneof.fields.mapNotNull { it.type.referencedSchema() } }
+
+private fun ResolvedProtobufValueType.referencedSchema(): QualifiedSchemaName? =
+    (this as? ResolvedProtobufValueType.Reference)?.reference?.target
