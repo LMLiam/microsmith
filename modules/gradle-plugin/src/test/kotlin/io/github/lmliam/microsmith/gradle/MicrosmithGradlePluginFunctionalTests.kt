@@ -20,7 +20,7 @@ class MicrosmithGradlePluginFunctionalTests : StringSpec() {
                 tasks.register("verifyMicrosmithWiring") {
                     doLast {
                         val generateTask = tasks.named("$GENERATE_TASK_NAME").get()
-                        check(generateTask is io.github.lmliam.microsmith.gradle.MicrosmithGenerateTask)
+                        check(generateTask is io.github.lmliam.microsmith.gradle.task.MicrosmithGenerateTask)
                         check(generateTask.group == "$TASK_GROUP_NAME")
 
                         val ide = project.configurations.getByName("microsmithIde")
