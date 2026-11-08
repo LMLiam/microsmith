@@ -4,6 +4,7 @@ import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
 
 class ProtobufResolutionDiagnosticMapperTests :
     StringSpec({
@@ -52,6 +53,22 @@ class ProtobufResolutionDiagnosticMapperTests :
                                 "'contact' field 'email' references " +
                                 "unknown type 'MissingContact'.",
                     ),
+                )
+        }
+
+        "maps an invalid schema name" {
+            val mapper = ProtobufResolutionDiagnosticMapper()
+
+            mapper.map(
+                ProtobufResolutionIssue.InvalidSchemaName(
+                    schemaName = "pkg.1User",
+                    reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.INVALID_IDENTIFIER_SEGMENT,
+                )
+            ) shouldBe
+                ResolutionDiagnostic(
+                    code = "protobuf.invalid-schema-name",
+                    message =
+                        "Protobuf schema name 'pkg.1User' is invalid: it contains an " + "invalid identifier segment.",
                 )
         }
     })

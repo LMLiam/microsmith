@@ -16,6 +16,17 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
 
     data class SchemaDeclarationNameMismatch(val schemaName: String, val declarationName: String) : DeclarationIssue
 
+    data class InvalidSchemaName(val schemaName: String, val reason: Reason) : DeclarationIssue {
+        enum class Reason {
+            BLANK,
+            LEADING_DOT,
+            TRAILING_DOT,
+            WHITESPACE,
+            EMPTY_SEGMENT,
+            INVALID_IDENTIFIER_SEGMENT,
+        }
+    }
+
     data class InvalidIdentifier(val schemaName: String, val location: IdentifierLocation, val value: String) :
         DeclarationIssue
 

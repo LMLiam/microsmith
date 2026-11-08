@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference
+
 internal fun getReferencePath(currentSegments: List<String>, target: String): List<String> {
     require(target.isNotBlank()) { "Reference target cannot be blank." }
 

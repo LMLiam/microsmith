@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
+
 internal fun renderAttribute(attribute: CSharp.Attribute): String =
     attribute.arguments.takeIf(List<CSharp.AttributeArgument>::isNotEmpty)?.let { arguments ->
         "[${attribute.name}(${arguments.joinToString(", ", transform = ::renderAttributeArgument)})]"

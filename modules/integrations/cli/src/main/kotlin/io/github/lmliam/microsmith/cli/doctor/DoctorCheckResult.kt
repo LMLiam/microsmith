@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.doctor
+
 internal data class DoctorCheckResult(
     val id: String,
     val status: DoctorCheckStatus,

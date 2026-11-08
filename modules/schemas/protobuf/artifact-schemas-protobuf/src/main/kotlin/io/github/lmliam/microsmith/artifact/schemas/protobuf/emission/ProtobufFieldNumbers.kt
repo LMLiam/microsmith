@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
+
 internal const val MIN_FIELD_NUMBER = 1
 internal const val MAX_FIELD_NUMBER = 536_870_911
 internal val FORBIDDEN_RANGE = 19_000..19_999

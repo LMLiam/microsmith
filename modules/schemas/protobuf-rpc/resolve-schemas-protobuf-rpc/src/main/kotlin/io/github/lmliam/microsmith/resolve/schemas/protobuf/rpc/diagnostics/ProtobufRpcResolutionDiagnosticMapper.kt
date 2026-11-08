@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.diagnostics
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionIssueDiagnosticMapper
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 
 @ServiceProvider(ResolutionIssueDiagnosticMapper::class)
@@ -17,6 +18,12 @@ class ProtobufRpcResolutionDiagnosticMapper : ResolutionIssueDiagnosticMapper<Pr
                     message =
                         "Schema name '${issue.schemaName}' must match declaration " +
                             "name '${issue.declarationName}'.",
+                )
+
+            is ProtobufRpcResolutionIssue.InvalidSchemaName ->
+                ResolutionDiagnostic(
+                    code = "protobuf.rpc.invalid-schema-name",
+                    message = "Schema name '${issue.schemaName}' is invalid: it ${issue.reason.displayName()}.",
                 )
 
             is ProtobufRpcResolutionIssue.EndpointTargetNotFound ->
@@ -40,5 +47,21 @@ class ProtobufRpcResolutionDiagnosticMapper : ResolutionIssueDiagnosticMapper<Pr
         when (this) {
             ProtobufRpcResolutionIssue.EndpointPosition.REQUEST -> "request"
             ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE -> "response"
+        }
+
+    private fun ProtobufResolutionIssue.InvalidSchemaName.Reason.displayName(): String =
+        when (this) {
+            ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK -> "is blank"
+
+            ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT -> "starts with a leading dot"
+
+            ProtobufResolutionIssue.InvalidSchemaName.Reason.TRAILING_DOT -> "ends with a trailing dot"
+
+            ProtobufResolutionIssue.InvalidSchemaName.Reason.WHITESPACE -> "contains whitespace"
+
+            ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT -> "contains an empty segment"
+
+            ProtobufResolutionIssue.InvalidSchemaName.Reason.INVALID_IDENTIFIER_SEGMENT ->
+                "contains an invalid identifier segment"
         }
 }

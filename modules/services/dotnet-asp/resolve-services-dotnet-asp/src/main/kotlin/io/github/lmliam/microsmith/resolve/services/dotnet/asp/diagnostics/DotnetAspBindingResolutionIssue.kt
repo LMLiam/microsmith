@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics
+
 sealed interface DotnetAspBindingResolutionIssue : DotnetAspResolutionIssue {
     data class PathBindingWithoutPlaceholders(
         val serviceName: String,

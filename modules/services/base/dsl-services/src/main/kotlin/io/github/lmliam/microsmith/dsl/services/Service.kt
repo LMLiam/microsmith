@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.services
+
 /** Immutable service declaration produced by the core service DSL. */
 data class Service(val name: String, val model: ServiceModel) {
     init {

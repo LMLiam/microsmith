@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution
 
 import arrow.core.Either
 import arrow.core.EitherNel
+import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
@@ -12,7 +13,9 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ValueType
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufDeclaration
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
@@ -27,29 +30,51 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.ProtobufD
 internal class ProtobufDeclarationResolver(private val referenceResolver: ProtobufReferenceResolver) {
     private val validator = ProtobufDeclarationValidator()
 
-    fun resolve(schema: ProtobufSchema): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> {
-        val identity = QualifiedSchemaName.parse(schema.name)
+    fun resolveMessage(
+        schema: ProtobufSchema,
+        message: Message,
+    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> =
+        resolve(schema, message) { identity, issues, dependencies ->
+            buildMessage(identity, message, issues, dependencies)
+        }
+
+    fun resolveEnum(
+        schema: ProtobufSchema,
+        enumDeclaration: Enum,
+    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> =
+        resolve(schema, enumDeclaration) { _, _, _ ->
+            ResolvedProtobufEnum(
+                enumDeclaration.name,
+                values = enumDeclaration.values.map { ResolvedProtobufEnumValue(it.name, it.index) },
+                enumDeclaration.reserved,
+            )
+        }
+
+    private fun resolve(
+        schema: ProtobufSchema,
+        source: Type,
+        build:
+            (
+                QualifiedSchemaName,
+                MutableList<ProtobufResolutionIssue>,
+                MutableSet<QualifiedSchemaName>,
+            ) -> ResolvedProtobufDeclaration,
+    ): EitherNel<ProtobufResolutionIssue, ResolvedProtobufSchema> {
+        val identity =
+            when (val parsed = QualifiedSchemaName.parse(schema.name)) {
+                is Either.Left -> return Either.Left(nonEmptyListOf(parsed.value))
+
+                is Either.Right -> parsed.value
+            }
+
         val issues = mutableListOf<ProtobufResolutionIssue>()
         val dependencies = mutableSetOf<QualifiedSchemaName>()
-        val source = schema.schema
         issues += validator.validate(identity.fullyQualifiedName, source)
         if (identity.typeName != source.name) {
             issues += ProtobufResolutionIssue.SchemaDeclarationNameMismatch(identity.fullyQualifiedName, source.name)
         }
 
-        val declaration =
-            when (source) {
-                is Message -> resolveMessage(identity, source, issues, dependencies)
-
-                is Enum ->
-                    ResolvedProtobufEnum(
-                        source.name,
-                        values = source.values.map { ResolvedProtobufEnumValue(it.name, it.index) },
-                        source.reserved,
-                    )
-
-                else -> error("Unsupported protobuf declaration: ${source::class.qualifiedName}")
-            }
+        val declaration = build(identity, issues, dependencies)
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 
@@ -66,7 +91,7 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
         }
     }
 
-    private fun resolveMessage(
+    private fun buildMessage(
         identity: QualifiedSchemaName,
         message: Message,
         issues: MutableList<ProtobufResolutionIssue>,

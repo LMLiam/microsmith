@@ -5,9 +5,12 @@ import io.github.lmliam.microsmith.dsl.require
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ReferenceField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.ScalarField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 import io.github.lmliam.microsmith.dsl.schemas.schemas
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
@@ -121,6 +124,21 @@ class ProtobufSchemasResolverTests :
                 )
         }
 
+        "ignores declarations the resolver does not own" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(name = "User", schema = Message(name = "User")),
+                        ProtobufSchema(name = "Broken", schema = UnknownDeclaration(name = "Broken")),
+                    )
+                )
+
+            val success =
+                resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Success<ResolvedProtobufSchemaModel>>()
+
+            success.model.schemas.single().declaration.shouldBeTypeOf<ResolvedProtobufMessage>()
+        }
+
         "returns a typed issue when schema and declaration names disagree" {
             val schemas =
                 SchemasExtension(
@@ -178,4 +196,76 @@ class ProtobufSchemasResolverTests :
                     ProtobufResolutionIssue.DuplicateFieldNumbers("Broken", listOf(0)),
                 )
         }
+
+        "returns a typed issue when a reference name is blank" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = "User",
+                            schema =
+                                Message(
+                                    name = "User",
+                                    fields = listOf(ReferenceField("owner", 1, Reference.Qualified(""))),
+                                ),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.InvalidSchemaName(
+                        schemaName = "",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK,
+                    )
+                )
+        }
+
+        "returns a typed issue when a schema name starts with a dot" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = ".User",
+                            schema = Message(name = "User"),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.InvalidSchemaName(
+                        schemaName = ".User",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT,
+                    )
+                )
+        }
+
+        "returns a typed issue when a schema name has an invalid identifier segment" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema(
+                            name = "pkg.1User",
+                            schema = Message(name = "User"),
+                        )
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufResolutionIssue.InvalidSchemaName(
+                        schemaName = "pkg.1User",
+                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.INVALID_IDENTIFIER_SEGMENT,
+                    )
+                )
+        }
     })
+
+private class UnknownDeclaration(override val name: String) : Type

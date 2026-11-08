@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.ide
+
 internal data class IdeDoctorCheckResult(
     val id: String,
     val passed: Boolean,

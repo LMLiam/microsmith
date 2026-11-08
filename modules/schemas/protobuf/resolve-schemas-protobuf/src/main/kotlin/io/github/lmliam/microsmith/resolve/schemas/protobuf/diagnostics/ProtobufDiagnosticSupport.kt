@@ -9,6 +9,22 @@ internal fun protobufDiagnostic(code: String, message: String): ResolutionDiagno
         message = message,
     )
 
+internal fun ProtobufResolutionIssue.InvalidSchemaName.Reason.displayName(): String =
+    when (this) {
+        ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK -> "is blank"
+
+        ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT -> "starts with a leading dot"
+
+        ProtobufResolutionIssue.InvalidSchemaName.Reason.TRAILING_DOT -> "ends with a trailing dot"
+
+        ProtobufResolutionIssue.InvalidSchemaName.Reason.WHITESPACE -> "contains whitespace"
+
+        ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT -> "contains an empty segment"
+
+        ProtobufResolutionIssue.InvalidSchemaName.Reason.INVALID_IDENTIFIER_SEGMENT ->
+            "contains an invalid identifier segment"
+    }
+
 internal fun ProtobufResolutionIssue.ReferenceLocation.displayName(): String =
     when (this) {
         is ProtobufResolutionIssue.ReferenceLocation.Field -> "field '$fieldName'"

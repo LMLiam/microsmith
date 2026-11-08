@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.api
+
 interface ScriptSymbolContributor {
     val id: String
 

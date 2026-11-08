@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.cli.init.profile
+
 internal data class OnboardingProfileDetection(
     val profile: OnboardingProfile,
     val selectionReason: OnboardingProfileSelectionReason,

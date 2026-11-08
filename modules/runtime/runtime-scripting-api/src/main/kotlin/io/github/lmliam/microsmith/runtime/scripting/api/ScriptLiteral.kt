@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.api
+
 sealed interface ScriptLiteral {
     data class StringValue(val value: String) : ScriptLiteral
 

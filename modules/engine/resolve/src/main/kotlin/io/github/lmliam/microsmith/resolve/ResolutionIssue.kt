@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.resolve
+
 /**
  * Structured semantic issue produced while resolving authored Microsmith models.
  *

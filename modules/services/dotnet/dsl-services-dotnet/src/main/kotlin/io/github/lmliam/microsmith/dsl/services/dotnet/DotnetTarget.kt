@@ -1,4 +1,5 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet
+
 /** Validated .NET target framework monikers for the DSL. */
 @JvmInline
 value class DotnetTarget(val moniker: String) {
