@@ -56,6 +56,18 @@ class IndexAllocatorTests :
             allocator.reserved() shouldBe setOf(1..3)
         }
 
+        "reserve accepts indexes inside the protoReserved range" {
+            val allocator = IndexAllocator(min = 1, protoReserved = 10..20)
+            allocator.reserve(15)
+            allocator.reserved() shouldBe setOf(15..15)
+        }
+
+        "reserve accepts a range spanning the protoReserved range" {
+            val allocator = IndexAllocator(min = 1, protoReserved = 10..20)
+            allocator.reserve(8..22)
+            allocator.reserved() shouldBe setOf(8..22)
+        }
+
         "reserve merges overlapping ranges" {
             val allocator = IndexAllocator(min = 1)
             allocator.reserve(1..3)
@@ -90,16 +102,16 @@ class IndexAllocatorTests :
             shouldThrow<IllegalArgumentException> { allocator.validate(6) }
         }
 
-        "validate throws for range overlapping used indexes" {
+        "reserve throws for range overlapping used indexes" {
             val allocator = IndexAllocator(min = 5)
             allocator.allocate(8)
-            shouldThrow<IllegalArgumentException> { allocator.validate(6..10) }
+            shouldThrow<IllegalArgumentException> { allocator.reserve(6..10) }
         }
 
-        "validate throws for range overlapping reserved ranges" {
+        "reserve throws for range overlapping reserved ranges" {
             val allocator = IndexAllocator(min = 5)
             allocator.reserve(10..15)
-            shouldThrow<IllegalArgumentException> { allocator.validate(12..20) }
+            shouldThrow<IllegalArgumentException> { allocator.reserve(12..20) }
         }
 
         "multiple allocations and reservations coexist correctly" {

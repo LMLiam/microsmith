@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing
 import arrow.core.EitherNel
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.context.bindNel
 import arrow.core.raise.context.either
 import arrow.core.raise.context.ensure
 import arrow.core.raise.context.mapOrAccumulate
@@ -10,9 +11,8 @@ import arrow.core.raise.context.zipOrAccumulate
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.EnumValueNumber
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.ReservedSpan
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoDuplicates
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.raiseEach
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.validateEnumReservations
 
 internal fun parseEnumDeclaration(
     schemaName: String,
@@ -32,16 +32,17 @@ internal fun parseEnumDeclaration(
             }
         },
         {
-            validateEnumReservations(
+            parseReservations(
                     schemaName,
                     enum.reserved,
+                    ReservedSpan.Domain.ENUM,
                     usedNames = enum.values.map { it.name },
                     usedNumbers = enum.values.map { it.index },
                 )
-                .raiseEach()
+                .bindNel()
         },
-    ) { _, values, _, _, _ ->
-        ParsedEnum(values)
+    ) { _, values, _, _, reservations ->
+        ParsedEnum(values, reservations)
     }
 }
 

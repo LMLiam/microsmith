@@ -9,10 +9,11 @@ value class FieldNumber private constructor(val value: Int) {
     companion object {
         const val MIN_VALUE = 1
         const val MAX_VALUE = 536_870_911
+        private val RANGE = MIN_VALUE..MAX_VALUE
         val IMPLEMENTATION_RESERVED_RANGE = 19_000..19_999
 
         fun parse(raw: Int): Either<Int, FieldNumber> =
-            if (raw in MIN_VALUE..MAX_VALUE && raw !in IMPLEMENTATION_RESERVED_RANGE) {
+            if (raw in RANGE && raw !in IMPLEMENTATION_RESERVED_RANGE) {
                 Either.Right(FieldNumber(raw))
             } else {
                 Either.Left(raw)

@@ -2,14 +2,12 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf.emission
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Cardinality
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedIndex
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedName
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.ReservedRange
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.EnumValueNumber
 import io.kotest.assertions.throwables.shouldThrow
@@ -44,7 +42,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                     ),
                             )
                         ),
-                    reservations = emptyList(),
+                    reservations = ResolvedProtobufReservations(),
                 )
 
             shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
@@ -77,7 +75,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                     ),
                             )
                         ),
-                    reservations = emptyList(),
+                    reservations = ResolvedProtobufReservations(),
                 )
 
             shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
@@ -113,7 +111,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                     ),
                             ),
                         ),
-                    reservations = emptyList(),
+                    reservations = ResolvedProtobufReservations(),
                 )
 
             shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
@@ -125,11 +123,7 @@ class ProtobufSchemaEmissionValidatorTests :
                     name = protoIdentifier("Contact"),
                     fields = emptyList(),
                     oneofs = emptyList(),
-                    reservations =
-                        listOf(
-                            ReservedIndex(10),
-                            ReservedRange(10..20),
-                        ),
+                    reservations = ResolvedProtobufReservations(spans = listOf(singleSpan(10), rangeSpan(10, 20))),
                 )
 
             shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
@@ -150,7 +144,7 @@ class ProtobufSchemaEmissionValidatorTests :
                                 number = EnumValueNumber(1),
                             ),
                         ),
-                    reservations = listOf(ReservedName("ACTIVE")),
+                    reservations = ResolvedProtobufReservations(names = listOf(protoIdentifier("ACTIVE"))),
                 )
 
             shouldThrow<IllegalArgumentException> { validateProtobufDeclaration(declaration) }
@@ -171,9 +165,9 @@ class ProtobufSchemaEmissionValidatorTests :
                         ),
                     oneofs = emptyList(),
                     reservations =
-                        listOf(
-                            ReservedName("legacy_name"),
-                            ReservedIndex(10),
+                        ResolvedProtobufReservations(
+                            names = listOf(protoIdentifier("legacy_name")),
+                            spans = listOf(singleSpan(10)),
                         ),
                 )
 
