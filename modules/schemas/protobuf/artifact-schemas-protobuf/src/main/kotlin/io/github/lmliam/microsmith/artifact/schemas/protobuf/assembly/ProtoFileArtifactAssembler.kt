@@ -14,8 +14,7 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
         val protoContribution = requireContribution(contribution)
         return ProtoFileArtifact(
             id = protoContribution.artifactId,
-            packageName = protoContribution.packageName,
-            imports = ProtoFileMerge.imports(protoContribution.imports),
+            imports = protoContribution.imports,
             declarations = protoContribution.declarations,
         )
     }
@@ -26,7 +25,6 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
     ): ProtoFileArtifact {
         val next = requireContribution(contribution)
         val owner = current.id.fullyQualifiedName
-        require(current.packageName == next.packageName) { "Conflicting protobuf package names for '$owner'." }
 
         return current.copy(
             imports = ProtoFileMerge.imports(current.imports, next.imports),

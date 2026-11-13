@@ -217,7 +217,6 @@ private class ProtoFileAssemblerStub : ArtifactAssembler<ProtoFileArtifact> {
         val protoContribution = contribution as ProtoFileContribution
         return ProtoFileArtifact(
             id = protoContribution.artifactId,
-            packageName = protoContribution.packageName,
             imports = protoContribution.imports,
             declarations = protoContribution.declarations,
         )

@@ -4,7 +4,6 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtobufArtifact
 
 data class ProtoFileArtifact(
     override val id: ProtoFileArtifactId,
-    val packageName: String?,
     val imports: List<String>,
     val declarations: List<ProtoDeclaration>,
 ) : ProtobufArtifact
