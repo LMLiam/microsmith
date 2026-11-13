@@ -11,6 +11,5 @@ internal object DotnetPackageReferencesContributionMapper :
         to::artifactId fromProperty from::name transform { DotnetPackageReferencesArtifactId(it) }
         to::solutionName fromProperty from::solution
         to::projectName fromProperty from::project
-        to::packages fromProperty from::packages transform { DotnetPackageReferenceMapper.mapList(it) }
     }
 }

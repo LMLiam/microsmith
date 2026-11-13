@@ -9,6 +9,5 @@ internal object DotnetPackageVersionsContributionMapper :
     ObjectMappie<ResolvedDotnetPackageSolution, DotnetPackageVersionsContribution>() {
     override fun map(from: ResolvedDotnetPackageSolution): DotnetPackageVersionsContribution = mapping {
         to::artifactId fromProperty from::name transform { DotnetPackageVersionsArtifactId(it) }
-        to::packages fromProperty from::packages transform { DotnetPackageVersionMapper.mapList(it) }
     }
 }
