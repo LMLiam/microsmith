@@ -177,7 +177,7 @@ This keeps the layering explicit:
 - `resolve-schemas`: schema-domain resolved model support
 - `resolve-schemas-protobuf`: protobuf schema finalization and validation
 - `resolve-schemas-protobuf-rpc`: protobuf RPC finalization and validation
-- `resolve-services`: service-domain resolved model support
+- `resolve-services`: `ResolvedServicesModel`, the marker contract that service-domain resolved root models implement
 - `resolve-services-dotnet`: finalized .NET service workspace resolution
 - `resolve-services-dotnet-asp`: finalized ASP.NET service workspace resolution
 - `resolve-services-dotnet-packages`: finalized .NET package workspace resolution

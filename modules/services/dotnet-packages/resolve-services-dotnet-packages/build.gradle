@@ -4,6 +4,7 @@ dependencies {
     implementation libs.arrow.core
     implementation project(":dsl")
     implementation project(":resolve")
+    api project(":resolve-services")
     implementation project(":resolve-services-dotnet")
     implementation project(":dsl-services-dotnet-packages")
     api libs.spi.tooling.annotations
