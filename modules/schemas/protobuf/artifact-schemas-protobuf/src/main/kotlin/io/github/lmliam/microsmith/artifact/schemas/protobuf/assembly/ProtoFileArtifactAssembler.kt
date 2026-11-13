@@ -4,7 +4,6 @@ import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution.ProtoFileContribution
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 
 @ServiceProvider(ArtifactAssembler::class)
@@ -16,7 +15,7 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
         return ProtoFileArtifact(
             id = protoContribution.artifactId,
             packageName = protoContribution.packageName,
-            imports = protoContribution.imports.distinct().sorted(),
+            imports = ProtoFileMerge.imports(protoContribution.imports),
             declarations = protoContribution.declarations,
         )
     }
@@ -26,22 +25,13 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
         contribution: ArtifactContribution<ProtoFileArtifact>,
     ): ProtoFileArtifact {
         val next = requireContribution(contribution)
-        require(current.packageName == next.packageName) {
-            "Conflicting protobuf package names for '${current.id.fullyQualifiedName}'."
-        }
-
-        val mergedDeclarations = LinkedHashMap(current.declarations.associateBy(ProtoDeclaration::name))
-        next.declarations.forEach { declaration ->
-            val existing = mergedDeclarations[declaration.name]
-            require(existing == null || existing == declaration) {
-                "Conflicting protobuf declaration '${declaration.name}' for " + "'${current.id.fullyQualifiedName}'."
-            }
-            mergedDeclarations.putIfAbsent(declaration.name, declaration)
-        }
+        val owner = current.id.fullyQualifiedName
+        require(current.packageName == next.packageName) { "Conflicting protobuf package names for '$owner'." }
 
         return current.copy(
-            imports = (current.imports + next.imports).distinct().sorted(),
-            declarations = mergedDeclarations.values.toList(),
+            imports = ProtoFileMerge.imports(current.imports, next.imports),
+            declarations =
+                ProtoFileMerge.members(current.declarations, next.declarations, "declaration", owner) { it.name },
         )
     }
 
