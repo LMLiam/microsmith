@@ -1,5 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.ServiceDeclaration
 
-data class Service(override val name: String, val rpcs: List<Rpc>) : Type
+data class Service(override val name: String, val rpcs: List<Rpc>) : ServiceDeclaration

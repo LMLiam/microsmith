@@ -16,7 +16,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.EnumValue
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.ServiceDeclaration
 import io.github.lmliam.microsmith.dsl.schemas.schemas
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
@@ -210,7 +210,7 @@ class ProtobufSchemasResolverTests :
                 SchemasExtension(
                     setOf(
                         ProtobufSchema(name = "User", schema = Message(name = "User")),
-                        ProtobufSchema(name = "Broken", schema = UnknownDeclaration(name = "Broken")),
+                        ProtobufSchema(name = "Broken", schema = StubServiceDeclaration(name = "Broken")),
                     )
                 )
 
@@ -526,4 +526,4 @@ class ProtobufSchemasResolverTests :
         }
     })
 
-private class UnknownDeclaration(override val name: String) : Type
+private class StubServiceDeclaration(override val name: String) : ServiceDeclaration

@@ -10,6 +10,7 @@ import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.ServiceDeclaration
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
@@ -117,5 +118,5 @@ private fun declaredSchemaOf(schema: ProtobufSchema): DeclaredSchema? =
     when (val declaration = schema.schema) {
         is Message -> DeclaredSchema.OfMessage(schema, declaration, QualifiedSchemaName.parse(schema.name))
         is Enum -> DeclaredSchema.OfEnum(schema, declaration, QualifiedSchemaName.parse(schema.name))
-        else -> null
+        is ServiceDeclaration -> null
     }

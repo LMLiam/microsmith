@@ -1,5 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.types
 
-interface Type {
+sealed interface Type {
     val name: String
 }
