@@ -43,4 +43,33 @@ class ProtobufRpcArtifactContributorTests :
             contribution.imports shouldContainExactly
                 listOf("acme/shared/Response.proto", "acme/user/Reply.proto", "acme/user/Request.proto")
         }
+
+        "contributes each rpc as an operation with its endpoint type names and streaming" {
+            val streamingRpc =
+                ResolvedProtobufRpc(
+                    ProtoIdentifier.parse("Watch").getOrElse { error("not an identifier") },
+                    ResolvedProtobufRpcEndpoint(name("acme.user.WatchRequest"), streaming = false),
+                    ResolvedProtobufRpcEndpoint(name("acme.user.Event"), streaming = true),
+                )
+            val schema =
+                ResolvedProtobufRpcSchema.of(name("acme.user.UserService"), listOf(streamingRpc)).getOrElse {
+                    error("rejected: $it")
+                }
+            val model = ResolvedProtobufRpcSchemaModel.of(listOf(schema)).getOrElse { error("rejected: $it") }
+
+            val contribution =
+                ProtobufRpcArtifactContributor()
+                    .contribute(model)
+                    .single()
+                    .shouldBeInstanceOf<ProtobufRpcServiceContribution>()
+
+            contribution.operations shouldContainExactly
+                listOf(
+                    ProtobufRpcOperation(
+                        name = "Watch",
+                        request = ProtobufRpcEndpoint("acme.user.WatchRequest", streaming = false),
+                        response = ProtobufRpcEndpoint("acme.user.Event", streaming = true),
+                    )
+                )
+        }
     })

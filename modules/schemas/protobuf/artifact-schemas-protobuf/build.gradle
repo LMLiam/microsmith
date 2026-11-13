@@ -1,5 +1,4 @@
 apply plugin: 'org.jetbrains.kotlin.kapt'
-apply plugin: 'tech.mappie.plugin'
 
 dependencies {
     api project(":artifact")
