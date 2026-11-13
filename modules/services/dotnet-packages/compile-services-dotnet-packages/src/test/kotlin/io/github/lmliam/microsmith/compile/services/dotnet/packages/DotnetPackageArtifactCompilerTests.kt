@@ -4,6 +4,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReference
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferenceVersion
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersion
@@ -50,8 +51,14 @@ class DotnetPackageArtifactCompilerTests :
                     projectName = "UserService.Api",
                     packages =
                         listOf(
-                            DotnetPackageReference(name = "Serilog.Settings.Configuration", version = null),
-                            DotnetPackageReference(name = "Serilog.AspNetCore", version = null),
+                            DotnetPackageReference(
+                                name = "Serilog.Settings.Configuration",
+                                version = DotnetPackageReferenceVersion.Central,
+                            ),
+                            DotnetPackageReference(
+                                name = "Serilog.AspNetCore",
+                                version = DotnetPackageReferenceVersion.Central,
+                            ),
                         ),
                 )
 
@@ -77,8 +84,14 @@ class DotnetPackageArtifactCompilerTests :
                     projectName = "UserService.Api",
                     packages =
                         listOf(
-                            DotnetPackageReference(name = "Serilog.Settings.Configuration", version = "9.0.1"),
-                            DotnetPackageReference(name = "Serilog.AspNetCore", version = "9.0.0"),
+                            DotnetPackageReference(
+                                name = "Serilog.Settings.Configuration",
+                                version = DotnetPackageReferenceVersion.Explicit("9.0.1"),
+                            ),
+                            DotnetPackageReference(
+                                name = "Serilog.AspNetCore",
+                                version = DotnetPackageReferenceVersion.Explicit("9.0.0"),
+                            ),
                         ),
                 )
 

@@ -9,6 +9,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReference
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferenceVersion
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
@@ -32,7 +33,11 @@ class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetP
                             itemName = MsBuildNames.PACKAGE_REFERENCE_ITEM,
                             include = packageReference.name,
                             attributes =
-                                packageReference.version?.let { mapOf(MsBuildNames.VERSION_ATTRIBUTE to it) }.orEmpty(),
+                                when (val version = packageReference.version) {
+                                    DotnetPackageReferenceVersion.Central -> emptyMap()
+                                    is DotnetPackageReferenceVersion.Explicit ->
+                                        mapOf(MsBuildNames.VERSION_ATTRIBUTE to version.version)
+                                },
                         )
                     },
             )

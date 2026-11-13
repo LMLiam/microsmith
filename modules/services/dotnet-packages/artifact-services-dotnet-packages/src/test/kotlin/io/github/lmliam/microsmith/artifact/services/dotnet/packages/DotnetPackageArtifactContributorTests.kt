@@ -1,12 +1,14 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.packages
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReference
+import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferenceVersion
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersion
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsContribution
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageReference
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageReferenceVersion
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageService
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageSolution
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageVersion
@@ -50,11 +52,12 @@ class DotnetPackageArtifactContributorTests :
                                                 listOf(
                                                     ResolvedDotnetPackageReference(
                                                         name = "FluentValidation.AspNetCore",
-                                                        version = "12.0.0",
+                                                        version =
+                                                            ResolvedDotnetPackageReferenceVersion.Explicit("12.0.0"),
                                                     ),
                                                     ResolvedDotnetPackageReference(
                                                         name = "Serilog.AspNetCore",
-                                                        version = null,
+                                                        version = ResolvedDotnetPackageReferenceVersion.Central,
                                                     ),
                                                 ),
                                         )
@@ -78,8 +81,14 @@ class DotnetPackageArtifactContributorTests :
                         projectName = "UserService.Api",
                         packages =
                             listOf(
-                                DotnetPackageReference(name = "FluentValidation.AspNetCore", version = "12.0.0"),
-                                DotnetPackageReference(name = "Serilog.AspNetCore", version = null),
+                                DotnetPackageReference(
+                                    name = "FluentValidation.AspNetCore",
+                                    version = DotnetPackageReferenceVersion.Explicit("12.0.0"),
+                                ),
+                                DotnetPackageReference(
+                                    name = "Serilog.AspNetCore",
+                                    version = DotnetPackageReferenceVersion.Central,
+                                ),
                             ),
                     ),
                 )

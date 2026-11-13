@@ -13,6 +13,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.DotnetP
 import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExtension
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageReference
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageReferenceVersion
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageService
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageSolution
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageVersion
@@ -97,9 +98,10 @@ class DotnetPackageWorkspaceResolver(
         centrallyManagedPackagesByName: Map<String, ResolvedDotnetPackageVersion>,
     ): Either<DotnetPackageWorkspaceResolutionIssue, ResolvedDotnetPackageReference> {
         val usesCentralPackageManagement = centrallyManagedPackagesByName.isNotEmpty()
+        val explicitVersion = reference.version
 
         return when {
-            reference.version != null && usesCentralPackageManagement ->
+            explicitVersion != null && usesCentralPackageManagement ->
                 Either.Left(
                     DotnetPackageWorkspaceResolutionIssue.MixedPackageVersionManagement(
                         serviceName = serviceName,
@@ -108,11 +110,11 @@ class DotnetPackageWorkspaceResolver(
                     )
                 )
 
-            reference.version != null ->
+            explicitVersion != null ->
                 Either.Right(
                     ResolvedDotnetPackageReference(
                         name = reference.name,
-                        version = reference.version,
+                        version = ResolvedDotnetPackageReferenceVersion.Explicit(explicitVersion),
                     )
                 )
 
@@ -129,7 +131,7 @@ class DotnetPackageWorkspaceResolver(
                 Either.Right(
                     ResolvedDotnetPackageReference(
                         name = reference.name,
-                        version = null,
+                        version = ResolvedDotnetPackageReferenceVersion.Central,
                     )
                 )
 
