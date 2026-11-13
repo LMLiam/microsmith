@@ -9,7 +9,7 @@ internal fun protobufDiagnostic(code: String, message: String): ResolutionDiagno
         message = message,
     )
 
-internal fun ProtobufResolutionIssue.InvalidSchemaName.Reason.displayName(): String =
+fun ProtobufResolutionIssue.InvalidSchemaName.Reason.displayName(): String =
     when (this) {
         ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK -> "is blank"
 

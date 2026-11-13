@@ -11,6 +11,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Rpc
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.RpcEndpoint
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoFilePaths
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
@@ -29,17 +30,17 @@ internal class ProtobufRpcSchemaResolver {
     ): EitherNel<ProtobufRpcResolutionIssue, ResolvedProtobufRpcSchema> {
         val qualifiedName =
             when (val parsed = QualifiedSchemaName.parse(schema.name)) {
-                is Either.Left ->
-                    return ProtobufRpcResolutionIssue.InvalidSchemaName(parsed.value.schemaName, parsed.value.reason)
-                        .leftNel()
+                is Either.Left -> return ProtobufRpcResolutionIssue.SchemaIssue(parsed.value).leftNel()
 
                 is Either.Right -> parsed.value
             }
 
         if (qualifiedName.typeName.value != service.name) {
-            return ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch(
-                    schemaName = schema.name,
-                    declarationName = service.name,
+            return ProtobufRpcResolutionIssue.SchemaIssue(
+                    ProtobufResolutionIssue.SchemaDeclarationNameMismatch(
+                        schemaName = qualifiedName.fullyQualifiedName,
+                        declarationName = service.name,
+                    )
                 )
                 .leftNel()
         }

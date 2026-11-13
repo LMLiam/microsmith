@@ -4,13 +4,7 @@ import io.github.lmliam.microsmith.resolve.ResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 
 sealed interface ProtobufRpcResolutionIssue : ResolutionIssue {
-    data class SchemaDeclarationNameMismatch(val schemaName: String, val declarationName: String) :
-        ProtobufRpcResolutionIssue
-
-    data class InvalidSchemaName(
-        val schemaName: String,
-        val reason: ProtobufResolutionIssue.InvalidSchemaName.Reason,
-    ) : ProtobufRpcResolutionIssue
+    data class SchemaIssue(val issue: ProtobufResolutionIssue) : ProtobufRpcResolutionIssue
 
     data class InvalidEndpointTargetName(
         val serviceName: String,

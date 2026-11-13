@@ -18,7 +18,6 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIs
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.EndpointMustTargetMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.EndpointPosition
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -174,9 +173,27 @@ class ProtobufRpcSchemasResolverTests :
 
             failure.issues.toList() shouldContainExactly
                 listOf(
-                    SchemaDeclarationNameMismatch(
-                        schemaName = "acme.user.v1.OtherService",
-                        declarationName = "UserService",
+                    ProtobufRpcResolutionIssue.SchemaIssue(
+                        ProtobufResolutionIssue.SchemaDeclarationNameMismatch(
+                            schemaName = "acme.user.v1.OtherService",
+                            declarationName = "UserService",
+                        )
+                    )
+                )
+        }
+
+        "returns a typed issue when the service schema name is invalid" {
+            val schemas = SchemasExtension(setOf(ProtobufSchema(".UserService", Service("UserService", emptyList()))))
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufRpcResolutionIssue.SchemaIssue(
+                        ProtobufResolutionIssue.InvalidSchemaName(
+                            schemaName = ".UserService",
+                            reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT,
+                        )
                     )
                 )
         }
