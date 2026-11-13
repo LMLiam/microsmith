@@ -7,15 +7,16 @@ import arrow.core.mapOrAccumulate
 import arrow.core.raise.context.bind
 import arrow.core.raise.context.either
 import arrow.core.raise.context.ensure
-import arrow.core.raise.context.ensureNotNull
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Rpc
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.RpcEndpoint
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoFilePaths
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufDeclarationKind
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufSymbolTable
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpc
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcEndpoint
@@ -25,32 +26,28 @@ internal class ProtobufRpcSchemaResolver {
     fun resolve(
         schema: ProtobufSchema,
         service: Service,
-        schemasByName: Map<String, ProtobufSchema>,
+        symbols: ProtobufSymbolTable,
     ): EitherNel<ProtobufRpcResolutionIssue, ResolvedProtobufRpcSchema> {
         val qualifiedName =
             when (val parsed = QualifiedSchemaName.parse(schema.name)) {
-                is Either.Left ->
-                    return ProtobufRpcResolutionIssue.InvalidSchemaName(parsed.value.schemaName, parsed.value.reason)
-                        .leftNel()
+                is Either.Left -> return ProtobufRpcResolutionIssue.SchemaIssue(parsed.value).leftNel()
 
                 is Either.Right -> parsed.value
             }
 
         if (qualifiedName.typeName.value != service.name) {
-            return ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch(
-                    schemaName = schema.name,
-                    declarationName = service.name,
+            return ProtobufRpcResolutionIssue.SchemaIssue(
+                    ProtobufResolutionIssue.SchemaDeclarationNameMismatch(
+                        schemaName = qualifiedName.fullyQualifiedName,
+                        declarationName = service.name,
+                    )
                 )
                 .leftNel()
         }
 
-        ProtobufNameValidation.requireIdentifier(service.name, "Service name")
-
         return with(qualifiedName) {
             service.rpcs
-                .mapOrAccumulate { rpc ->
-                    resolveRpc(service = service, rpc = rpc, schemasByName = schemasByName).bind()
-                }
+                .mapOrAccumulate { rpc -> resolveRpc(service = service, rpc = rpc, symbols = symbols).bindNel() }
                 .map { resolvedRpcs ->
                     ResolvedProtobufRpcSchema(
                         qualifiedName = qualifiedName,
@@ -69,36 +66,29 @@ internal class ProtobufRpcSchemaResolver {
     private fun resolveRpc(
         service: Service,
         rpc: Rpc,
-        schemasByName: Map<String, ProtobufSchema>,
-    ): Either<ProtobufRpcResolutionIssue, ResolvedProtobufRpc> = either {
-        ProtobufNameValidation.requireIdentifier(rpc.name, "RPC name")
-
-        val request =
+        symbols: ProtobufSymbolTable,
+    ): EitherNel<ProtobufRpcResolutionIssue, ResolvedProtobufRpc> =
+        Either.zipOrAccumulate(
+            ProtoIdentifier.parse(rpc.name).mapLeft {
+                ProtobufRpcResolutionIssue.InvalidRpcName(service.name, rpc.name)
+            },
             resolveEndpoint(
-                    service = service,
-                    rpc = rpc,
-                    endpoint = rpc.request,
-                    position = ProtobufRpcResolutionIssue.EndpointPosition.REQUEST,
-                    schemasByName = schemasByName,
-                )
-                .bind()
-
-        val response =
+                service,
+                rpc,
+                rpc.request,
+                ProtobufRpcResolutionIssue.EndpointPosition.REQUEST,
+                symbols,
+            ),
             resolveEndpoint(
-                    service = service,
-                    rpc = rpc,
-                    endpoint = rpc.response,
-                    position = ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
-                    schemasByName = schemasByName,
-                )
-                .bind()
-
-        ResolvedProtobufRpc(
-            name = rpc.name,
-            request = request,
-            response = response,
-        )
-    }
+                service,
+                rpc,
+                rpc.response,
+                ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
+                symbols,
+            ),
+        ) { _, request, response ->
+            ResolvedProtobufRpc(name = rpc.name, request = request, response = response)
+        }
 
     context(identity: QualifiedSchemaName)
     private fun resolveEndpoint(
@@ -106,44 +96,44 @@ internal class ProtobufRpcSchemaResolver {
         rpc: Rpc,
         endpoint: RpcEndpoint,
         position: ProtobufRpcResolutionIssue.EndpointPosition,
-        schemasByName: Map<String, ProtobufSchema>,
+        symbols: ProtobufSymbolTable,
     ): Either<ProtobufRpcResolutionIssue, ResolvedProtobufRpcEndpoint> = either {
-        val targetName =
-            identity
-                .resolveReference(endpoint.reference)
-                .map { it.fullyQualifiedName }
-                .mapLeft { invalid ->
-                    ProtobufRpcResolutionIssue.InvalidEndpointTargetName(
-                        serviceName = service.name,
-                        rpcName = rpc.name,
-                        position = position,
-                        targetName = invalid.schemaName,
-                        reason = invalid.reason,
-                    )
+        val target =
+            symbols
+                .lookup(identity, endpoint.reference)
+                .mapLeft { failure ->
+                    when (failure) {
+                        is ProtobufSymbolTable.LookupFailure.InvalidName ->
+                            ProtobufRpcResolutionIssue.InvalidEndpointTargetName(
+                                serviceName = service.name,
+                                rpcName = rpc.name,
+                                position = position,
+                                targetName = failure.issue.schemaName,
+                                reason = failure.issue.reason,
+                            )
+
+                        is ProtobufSymbolTable.LookupFailure.Unknown ->
+                            ProtobufRpcResolutionIssue.EndpointTargetNotFound(
+                                serviceName = service.name,
+                                rpcName = rpc.name,
+                                position = position,
+                                targetName = failure.target.fullyQualifiedName,
+                            )
+                    }
                 }
                 .bind()
 
-        val target =
-            ensureNotNull(schemasByName[targetName]) {
-                ProtobufRpcResolutionIssue.EndpointTargetNotFound(
-                    serviceName = service.name,
-                    rpcName = rpc.name,
-                    position = position,
-                    targetName = targetName,
-                )
-            }
-
-        ensure(target.schema is Message) {
+        ensure(target.kind == ProtobufDeclarationKind.MESSAGE) {
             ProtobufRpcResolutionIssue.EndpointMustTargetMessage(
                 serviceName = service.name,
                 rpcName = rpc.name,
                 position = position,
-                targetName = targetName,
+                targetName = target.identity.fullyQualifiedName,
             )
         }
 
         ResolvedProtobufRpcEndpoint(
-            qualifiedTypeName = targetName,
+            target = target.identity,
             streaming = endpoint.streaming,
         )
     }
@@ -151,4 +141,4 @@ internal class ProtobufRpcSchemaResolver {
 
 context(identity: QualifiedSchemaName)
 private fun ResolvedProtobufRpcEndpoint.importPath(): String? =
-    qualifiedTypeName.takeUnless { it == identity.fullyQualifiedName }?.let(ProtoFilePaths::importPath)
+    target.takeUnless { it == identity }?.let { ProtoFilePaths.importPath(it.fullyQualifiedName) }

@@ -6,6 +6,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.MapField
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.ServiceDeclaration
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue.SymbolDeclaration
@@ -46,7 +47,7 @@ private fun scopedSymbolsOf(schema: ProtobufSchema): List<PackageOrMessageSymbol
 
                     is Enum -> packageSymbols(identity, declaration.values.map { it.name }.filter(::isIdentifier))
 
-                    else -> packageSymbols(identity, emptyList())
+                    is ServiceDeclaration -> packageSymbols(identity, emptyList())
                 }
             },
         )

@@ -18,7 +18,6 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIs
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.EndpointMustTargetMessage
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.EndpointPosition
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -63,9 +62,9 @@ class ProtobufRpcSchemasResolverTests :
                 schema.rpcs.single().also { rpc ->
                     rpc.name shouldBe "GetUser"
 
-                    rpc.request.qualifiedTypeName shouldBe "acme.user.v1.GetUserRequest"
+                    rpc.request.target.fullyQualifiedName shouldBe "acme.user.v1.GetUserRequest"
 
-                    rpc.response.qualifiedTypeName shouldBe "acme.user.v1.GetUserResponse"
+                    rpc.response.target.fullyQualifiedName shouldBe "acme.user.v1.GetUserResponse"
                 }
             }
         }
@@ -95,8 +94,8 @@ class ProtobufRpcSchemasResolverTests :
                         .schemas
                         .single()
 
-                resolved.rpcs.single().request.qualifiedTypeName shouldBe targetName
-                resolved.rpcs.single().response.qualifiedTypeName shouldBe targetName
+                resolved.rpcs.single().request.target.fullyQualifiedName shouldBe targetName
+                resolved.rpcs.single().response.target.fullyQualifiedName shouldBe targetName
                 resolved.imports shouldContainExactly listOf(targetName.replace('.', '/') + ".proto")
             }
         }
@@ -128,6 +127,33 @@ class ProtobufRpcSchemasResolverTests :
                 )
         }
 
+        "returns a typed issue when an rpc endpoint targets another service" {
+            val schemas = microsmith {
+                schemas {
+                    protobuf {
+                        message("GetUserRequest")
+
+                        service("AuditService") { "Record" { "GetUserRequest" to "GetUserRequest" } }
+
+                        service("UserService") { "GetUser" { "GetUserRequest" to "AuditService" } }
+                    }
+                }
+            }
+                .require<SchemasExtension>()
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    EndpointMustTargetMessage(
+                        serviceName = "UserService",
+                        rpcName = "GetUser",
+                        position = EndpointPosition.RESPONSE,
+                        targetName = "AuditService",
+                    )
+                )
+        }
+
         "returns a typed issue when schema and service names disagree" {
             val schemas =
                 SchemasExtension(
@@ -147,9 +173,27 @@ class ProtobufRpcSchemasResolverTests :
 
             failure.issues.toList() shouldContainExactly
                 listOf(
-                    SchemaDeclarationNameMismatch(
-                        schemaName = "acme.user.v1.OtherService",
-                        declarationName = "UserService",
+                    ProtobufRpcResolutionIssue.SchemaIssue(
+                        ProtobufResolutionIssue.SchemaDeclarationNameMismatch(
+                            schemaName = "acme.user.v1.OtherService",
+                            declarationName = "UserService",
+                        )
+                    )
+                )
+        }
+
+        "returns a typed issue when the service schema name is invalid" {
+            val schemas = SchemasExtension(setOf(ProtobufSchema(".UserService", Service("UserService", emptyList()))))
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufRpcResolutionIssue.SchemaIssue(
+                        ProtobufResolutionIssue.InvalidSchemaName(
+                            schemaName = ".UserService",
+                            reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT,
+                        )
                     )
                 )
         }
@@ -209,6 +253,58 @@ class ProtobufRpcSchemasResolverTests :
                         position = EndpointPosition.RESPONSE,
                         targetName = "MissingResponse",
                     )
+                )
+        }
+
+        "returns a typed issue when an rpc name is not a protobuf identifier" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema("acme.user.v1.Request", Message("Request")),
+                        ProtobufSchema(
+                            "acme.user.v1.UserService",
+                            Service(
+                                "UserService",
+                                listOf(
+                                    Rpc(
+                                        "1bad",
+                                        RpcEndpoint(Reference.Local("Request")),
+                                        RpcEndpoint(Reference.Local("Request")),
+                                    )
+                                ),
+                            ),
+                        ),
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(ProtobufRpcResolutionIssue.InvalidRpcName(serviceName = "UserService", rpcName = "1bad"))
+        }
+
+        "reports both the request and the response issue when neither endpoint target exists" {
+            val schemas = microsmith {
+                schemas { protobuf { service("UserService") { "GetUser" { "MissingRequest" to "MissingResponse" } } } }
+            }
+                .require<SchemasExtension>()
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufRpcResolutionIssue.EndpointTargetNotFound(
+                        serviceName = "UserService",
+                        rpcName = "GetUser",
+                        position = EndpointPosition.REQUEST,
+                        targetName = "MissingRequest",
+                    ),
+                    ProtobufRpcResolutionIssue.EndpointTargetNotFound(
+                        serviceName = "UserService",
+                        rpcName = "GetUser",
+                        position = EndpointPosition.RESPONSE,
+                        targetName = "MissingResponse",
+                    ),
                 )
         }
 

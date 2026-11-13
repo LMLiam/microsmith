@@ -11,7 +11,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.EnumValue
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.ServiceDeclaration
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue.SymbolDeclaration
@@ -193,7 +193,7 @@ class ProtobufSymbolCollisionResolutionTests :
             val service =
                 ProtobufSchema(
                     "p.S",
-                    object : Type {
+                    object : ServiceDeclaration {
                         override val name = "S"
                     },
                 )

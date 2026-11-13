@@ -1,3 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc
 
-data class ResolvedProtobufRpcEndpoint(val qualifiedTypeName: String, val streaming: Boolean)
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
+
+data class ResolvedProtobufRpcEndpoint(val target: QualifiedSchemaName, val streaming: Boolean)

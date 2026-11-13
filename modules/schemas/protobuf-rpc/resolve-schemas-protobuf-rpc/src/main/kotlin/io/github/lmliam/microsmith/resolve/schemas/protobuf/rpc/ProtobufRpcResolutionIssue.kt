@@ -4,13 +4,7 @@ import io.github.lmliam.microsmith.resolve.ResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 
 sealed interface ProtobufRpcResolutionIssue : ResolutionIssue {
-    data class SchemaDeclarationNameMismatch(val schemaName: String, val declarationName: String) :
-        ProtobufRpcResolutionIssue
-
-    data class InvalidSchemaName(
-        val schemaName: String,
-        val reason: ProtobufResolutionIssue.InvalidSchemaName.Reason,
-    ) : ProtobufRpcResolutionIssue
+    data class SchemaIssue(val issue: ProtobufResolutionIssue) : ProtobufRpcResolutionIssue
 
     data class InvalidEndpointTargetName(
         val serviceName: String,
@@ -33,6 +27,8 @@ sealed interface ProtobufRpcResolutionIssue : ResolutionIssue {
         val position: EndpointPosition,
         val targetName: String,
     ) : ProtobufRpcResolutionIssue
+
+    data class InvalidRpcName(val serviceName: String, val rpcName: String) : ProtobufRpcResolutionIssue
 
     enum class EndpointPosition {
         REQUEST,

@@ -12,9 +12,11 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
             val mapper = ProtobufRpcResolutionDiagnosticMapper()
 
             listOf(
-                    ProtobufRpcResolutionIssue.SchemaDeclarationNameMismatch(
-                        schemaName = "acme.user.v1.OtherService",
-                        declarationName = "UserService",
+                    ProtobufRpcResolutionIssue.SchemaIssue(
+                        ProtobufResolutionIssue.SchemaDeclarationNameMismatch(
+                            schemaName = "acme.user.v1.OtherService",
+                            declarationName = "UserService",
+                        )
                     ),
                     ProtobufRpcResolutionIssue.EndpointMustTargetMessage(
                         serviceName = "UserService",
@@ -22,10 +24,13 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
                         position = ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
                         targetName = "Status",
                     ),
-                    ProtobufRpcResolutionIssue.InvalidSchemaName(
-                        schemaName = ".UserService",
-                        reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT,
+                    ProtobufRpcResolutionIssue.SchemaIssue(
+                        ProtobufResolutionIssue.InvalidSchemaName(
+                            schemaName = ".UserService",
+                            reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT,
+                        )
                     ),
+                    ProtobufRpcResolutionIssue.InvalidRpcName(serviceName = "UserService", rpcName = "1bad"),
                     ProtobufRpcResolutionIssue.InvalidEndpointTargetName(
                         serviceName = "UserService",
                         rpcName = "GetUser",
@@ -37,16 +42,22 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
                 .map(mapper::map) shouldContainExactly
                 listOf(
                     ResolutionDiagnostic(
-                        code = "protobuf.rpc.schema-declaration-name-mismatch",
-                        message = "Schema name 'acme.user.v1.OtherService' must match declaration name 'UserService'.",
+                        code = "protobuf.schema-declaration-name-mismatch",
+                        message =
+                            "Protobuf schema 'acme.user.v1.OtherService' declares 'UserService', " +
+                                "but the schema identity and declaration name must match.",
                     ),
                     ResolutionDiagnostic(
                         code = "protobuf.rpc.endpoint-not-message",
                         message = "RPC 'GetUser' response must target a protobuf message, but was 'Status'.",
                     ),
                     ResolutionDiagnostic(
-                        code = "protobuf.rpc.invalid-schema-name",
-                        message = "Schema name '.UserService' is invalid: it starts with a leading dot.",
+                        code = "protobuf.invalid-schema-name",
+                        message = "Protobuf schema name '.UserService' is invalid: it starts with a leading dot.",
+                    ),
+                    ResolutionDiagnostic(
+                        code = "protobuf.rpc.invalid-rpc-name",
+                        message = "RPC name '1bad' of service 'UserService' is not a valid protobuf identifier.",
                     ),
                     ResolutionDiagnostic(
                         code = "protobuf.rpc.invalid-endpoint-target-name",

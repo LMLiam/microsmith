@@ -7,6 +7,9 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.DomainResolver
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufSymbolTable
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.declarationKind
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 
 @ServiceProvider(DomainResolver::class)
@@ -17,7 +20,7 @@ class ProtobufRpcSchemasResolver : DomainResolver<SchemasExtension, ResolvedProt
 
     override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufRpcSchemaModel> {
         val protobufSchemas = authoring.schemas.filterIsInstance<ProtobufSchema>()
-        val schemasByName = protobufSchemas.associateBy(ProtobufSchema::name)
+        val symbols = ProtobufSymbolTable(protobufSchemas.mapNotNull(::symbolOf))
 
         val rpcSchemas = protobufSchemas.mapNotNull { schema ->
             val service = schema.schema as? Service ?: return@mapNotNull null
@@ -29,7 +32,7 @@ class ProtobufRpcSchemasResolver : DomainResolver<SchemasExtension, ResolvedProt
         }
 
         return rpcSchemas
-            .mapOrAccumulate { (schema, service) -> schemaResolver.resolve(schema, service, schemasByName).bindNel() }
+            .mapOrAccumulate { (schema, service) -> schemaResolver.resolve(schema, service, symbols).bindNel() }
             .fold(
                 ifLeft = { DomainResolution.Failure(it) },
                 ifRight = { resolvedSchemas ->
@@ -40,3 +43,8 @@ class ProtobufRpcSchemasResolver : DomainResolver<SchemasExtension, ResolvedProt
             )
     }
 }
+
+private fun symbolOf(schema: ProtobufSchema): ProtobufSymbolTable.Symbol? =
+    QualifiedSchemaName.parse(schema.name).getOrNull()?.let {
+        ProtobufSymbolTable.Symbol(it, schema.schema.declarationKind())
+    }

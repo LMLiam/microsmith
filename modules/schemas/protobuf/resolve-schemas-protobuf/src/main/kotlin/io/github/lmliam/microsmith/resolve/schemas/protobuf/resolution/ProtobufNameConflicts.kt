@@ -5,6 +5,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Field
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.oneof.Oneof
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.ServiceDeclaration
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.toIssue
@@ -24,7 +25,7 @@ private fun nameConflictsOf(schema: ProtobufSchema): List<ProtobufResolutionIssu
 
                     is Enum -> enumValueNameCollisions(identity, declaration)
 
-                    else -> emptyList()
+                    is ServiceDeclaration -> emptyList()
                 }
             },
         )
