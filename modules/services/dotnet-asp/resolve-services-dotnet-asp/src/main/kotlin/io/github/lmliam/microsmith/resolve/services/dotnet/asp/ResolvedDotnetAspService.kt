@@ -9,7 +9,7 @@ data class ResolvedDotnetAspService(
     val projectName: String,
     val targetFrameworkMoniker: String,
     val outputRoot: Path,
-    val ports: ResolvedDotnetAspPorts?,
+    val ports: ResolvedDotnetAspPorts,
     val models: Map<String, DotnetModel>,
     val rest: ResolvedDotnetAspRest,
 )

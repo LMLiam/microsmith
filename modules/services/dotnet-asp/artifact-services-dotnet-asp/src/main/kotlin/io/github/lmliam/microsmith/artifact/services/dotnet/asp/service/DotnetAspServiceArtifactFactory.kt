@@ -4,7 +4,6 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetA
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointBindingsArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelLocality
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.ports.DotnetAspAllocatedPorts
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeaderFieldArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeadersBindingArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestBindingArtifact
@@ -24,7 +23,6 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 internal class DotnetAspServiceArtifactFactory(
     private val service: ResolvedDotnetAspService,
     private val artifactId: DotnetAspServiceArtifactId,
-    private val ports: DotnetAspAllocatedPorts,
 ) {
     private val usedTypeNames = linkedSetOf<String>()
 
@@ -48,8 +46,8 @@ internal class DotnetAspServiceArtifactFactory(
             serviceName = service.name,
             targetFrameworkMoniker = service.targetFrameworkMoniker,
             outputRoot = service.outputRoot,
-            httpPort = ports.http,
-            httpsPort = ports.https,
+            httpPort = service.ports.http,
+            httpsPort = service.ports.https,
             contractModels = contractModels.toList(),
             endpoints = endpoints,
         )
