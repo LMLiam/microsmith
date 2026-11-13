@@ -37,10 +37,6 @@ object ProtobufNameValidation {
         )
     }
 
-    fun requireIdentifier(value: String, label: String) {
-        require(ProtoIdentifier.parse(value).isRight()) { "$label is not a valid protobuf identifier: '$value'" }
-    }
-
     private fun invalid(
         value: String,
         reason: ProtobufResolutionIssue.InvalidSchemaName.Reason,
