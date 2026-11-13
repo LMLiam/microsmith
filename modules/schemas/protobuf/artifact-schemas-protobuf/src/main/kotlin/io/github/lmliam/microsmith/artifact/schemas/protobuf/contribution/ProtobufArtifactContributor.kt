@@ -7,7 +7,6 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.renderProt
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifactId
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 @ServiceProvider(ArtifactContributor::class)
 class ProtobufArtifactContributor : ArtifactContributor<ResolvedProtobufSchemaModel> {
@@ -18,17 +17,8 @@ class ProtobufArtifactContributor : ArtifactContributor<ResolvedProtobufSchemaMo
             ProtoFileContribution(
                 ProtoFileArtifactId(schema.identity.packageName, schema.identity.typeName.value),
                 schema.identity.packageName,
-                schema.dependencies.map(QualifiedSchemaName::toImportPath),
+                schema.dependencies.map { ProtoFileArtifactId(it.packageName, it.typeName.value).importPath },
                 listOf(ProtoDeclaration(schema.identity.typeName.value, renderProtobufDeclaration(schema.declaration))),
             )
         }
-}
-
-private fun QualifiedSchemaName.toImportPath(): String = buildString {
-    packageName?.let {
-        append(it.replace('.', '/'))
-        append('/')
-    }
-    append(typeName.value)
-    append(".proto")
 }

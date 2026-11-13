@@ -1,6 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference.textualReference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.MapFieldScope
 
 internal class MapFieldBuilder(var index: Int? = null, var key: MapKeyType? = null, var value: ValueType? = null) :
@@ -24,5 +23,5 @@ internal class MapFieldBuilder(var index: Int? = null, var key: MapKeyType? = nu
         value(kvpValue.second)
     }
 
-    override fun ref(target: String): Reference = textualReference(target)
+    override fun ref(target: String): Reference = Reference.parse(target)
 }

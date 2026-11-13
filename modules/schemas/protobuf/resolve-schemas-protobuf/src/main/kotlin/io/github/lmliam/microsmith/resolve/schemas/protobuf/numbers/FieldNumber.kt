@@ -1,19 +1,17 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers
 
 import arrow.core.Either
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 
 @JvmInline
 value class FieldNumber private constructor(val value: Int) {
     override fun toString(): String = value.toString()
 
     companion object {
-        const val MIN_VALUE = 1
-        const val MAX_VALUE = 536_870_911
-        private val RANGE = MIN_VALUE..MAX_VALUE
-        val IMPLEMENTATION_RESERVED_RANGE = 19_000..19_999
+        private val RANGE = ProtobufNumberLimits.FIELD_MIN..ProtobufNumberLimits.FIELD_MAX
 
         fun parse(raw: Int): Either<Int, FieldNumber> =
-            if (raw in RANGE && raw !in IMPLEMENTATION_RESERVED_RANGE) {
+            if (raw in RANGE && raw !in ProtobufNumberLimits.FIELD_IMPLEMENTATION_RESERVED) {
                 Either.Right(FieldNumber(raw))
             } else {
                 Either.Left(raw)

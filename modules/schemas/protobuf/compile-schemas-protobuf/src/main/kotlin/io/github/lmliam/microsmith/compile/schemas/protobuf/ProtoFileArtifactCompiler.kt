@@ -9,7 +9,6 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArti
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.SchemasArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.protobuf.render.ProtobufFileRenderer
-import java.nio.file.Path
 
 @ServiceProvider(ArtifactCompiler::class)
 class ProtoFileArtifactCompiler : SchemasArtifactCompiler<ProtoFileArtifact> {
@@ -18,17 +17,8 @@ class ProtoFileArtifactCompiler : SchemasArtifactCompiler<ProtoFileArtifact> {
     override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> =
         listOf(
             TextFileArtifactContribution(
-                artifactId = TextFileArtifactId(relativePath = artifact.relativePath()),
+                artifactId = TextFileArtifactId(relativePath = artifact.id.relativePath),
                 contents = ProtobufFileRenderer.render(artifact),
             )
         )
-
-    private fun ProtoFileArtifact.relativePath(): Path {
-        val packagePath = id.packageName?.replace('.', '/')
-        return if (packagePath == null) {
-            Path.of("proto", "${id.typeName}.proto")
-        } else {
-            Path.of("proto", packagePath, "${id.typeName}.proto")
-        }
-    }
 }

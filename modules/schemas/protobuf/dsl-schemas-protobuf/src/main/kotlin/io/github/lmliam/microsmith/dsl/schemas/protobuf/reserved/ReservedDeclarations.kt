@@ -5,6 +5,6 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.names.NameRegis
 
 internal fun buildReservedDeclarations(allocator: IndexAllocator, nameRegistry: NameRegistry): List<Reserved> =
     buildList {
-        allocator.reserved().sortedBy(IntRange::first).mapTo(this, Reserved::fromRange)
+        allocator.reserved().sortedBy(IntRange::first).mapTo(this) { Reserved.fromRange(it, allocator.max) }
         nameRegistry.reserved().sorted().mapTo(this, ::ReservedName)
     }

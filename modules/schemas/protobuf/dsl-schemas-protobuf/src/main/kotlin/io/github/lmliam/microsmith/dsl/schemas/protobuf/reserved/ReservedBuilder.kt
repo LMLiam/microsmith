@@ -18,6 +18,6 @@ internal class ReservedBuilder(private val allocator: IndexAllocator, private va
     }
 
     override fun range(range: MaxRange) {
-        allocator.reserve(range.from..max.VALUE)
+        allocator.reserveToMax(range.from)
     }
 }

@@ -108,13 +108,13 @@ class MessageBuilderTests :
         "ref supports relative target with leading dots dropping segments" {
             val b = builder()
             val f1 = b.ref("r1", ".Root")
-            f1.reference shouldBe Reference.Relative(expression = ".Root")
+            f1.reference shouldBe Reference.Relative(levelsUp = 1, path = listOf("Root"))
             val f2 = b.ref("r2", ".x.Sub")
-            f2.reference shouldBe Reference.Relative(expression = ".x.Sub")
+            f2.reference shouldBe Reference.Relative(levelsUp = 1, path = listOf("x", "Sub"))
             val f3 = b.ref("r3", "..Root")
-            f3.reference shouldBe Reference.Relative(expression = "..Root")
+            f3.reference shouldBe Reference.Relative(levelsUp = 2, path = listOf("Root"))
             val f4 = b.ref("r4", "...Y.Sub")
-            f4.reference shouldBe Reference.Relative(expression = "...Y.Sub")
+            f4.reference shouldBe Reference.Relative(levelsUp = 3, path = listOf("Y", "Sub"))
         }
 
         "map requires key and value, allocates index, stores field" {
@@ -311,6 +311,27 @@ class MessageBuilderTests :
             val b = builder()
             b.reserved(MaxRange(100))
             shouldThrow<IllegalArgumentException> { b.int32("foo") { index(101) } }
+        }
+
+        "a field index above the field maximum is rejected" {
+            val b = builder()
+            shouldThrow<IllegalArgumentException> { b.int32("foo") { index(536_870_912) } }
+        }
+
+        "a field index below one is rejected" {
+            val b = builder()
+            shouldThrow<IllegalArgumentException> { b.int32("foo") { index(0) } }
+        }
+
+        "a reserved range above the field maximum is rejected" {
+            val b = builder()
+            shouldThrow<IllegalArgumentException> { b.reserved(5..536_870_912) }
+        }
+
+        "a reserved range ending at the field maximum becomes reserved to max" {
+            val b = builder()
+            b.reserved(5..536_870_911)
+            b.build().reserved shouldContainExactly listOf(ReservedToMax(5))
         }
 
         "reserved accepts a single index in the implementation range" {

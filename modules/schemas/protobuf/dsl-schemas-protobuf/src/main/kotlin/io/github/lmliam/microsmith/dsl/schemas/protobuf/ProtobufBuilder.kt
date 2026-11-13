@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf
 
-import io.github.lmliam.microsmith.dsl.schemas.protobuf.internal.reference.getReferencePath
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.enum.EnumScope
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.message.MessageScope
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.EnumBuilder
@@ -38,7 +38,8 @@ internal class ProtobufBuilder(private val segments: List<String> = emptyList())
 
     override fun qualifyName(name: String): String = (segments + name).joinToString(".")
 
-    override fun resolveReference(target: String): String = getReferencePath(segments, target).joinToString(".")
+    override fun resolveReference(target: String): String =
+        Reference.parse(target).resolveSegments(segments).joinToString(".")
 
     override fun registerDeclaration(name: String, declaration: Type) {
         val fqName = qualifyName(name)

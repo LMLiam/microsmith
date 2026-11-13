@@ -7,6 +7,7 @@ import arrow.core.raise.context.bind
 import arrow.core.raise.context.either
 import arrow.core.raise.context.zipOrAccumulate
 import arrow.core.toEitherNel
+import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 
 @ConsistentCopyVisibility
 data class ReservedSpan private constructor(val first: Int, val last: Int, val domain: Domain, private val form: Form) {
@@ -22,8 +23,8 @@ data class ReservedSpan private constructor(val first: Int, val last: Int, val d
         get() = first..last
 
     enum class Domain(val min: Int, val max: Int) {
-        MESSAGE(FieldNumber.MIN_VALUE, FieldNumber.MAX_VALUE),
-        ENUM(Int.MIN_VALUE, Int.MAX_VALUE),
+        MESSAGE(ProtobufNumberLimits.FIELD_MIN, ProtobufNumberLimits.FIELD_MAX),
+        ENUM(ProtobufNumberLimits.ENUM_MIN, ProtobufNumberLimits.ENUM_MAX),
     }
 
     sealed interface Rejection {

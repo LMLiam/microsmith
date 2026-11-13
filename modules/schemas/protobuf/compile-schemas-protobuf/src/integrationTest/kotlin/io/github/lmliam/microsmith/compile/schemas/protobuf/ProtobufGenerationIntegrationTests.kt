@@ -28,4 +28,79 @@ class ProtobufGenerationIntegrationTests :
                 contents.shouldContain("string id = 1;")
             }
         }
+
+        "generateTo imports a message declared in another package by its file path" {
+            val model = microsmith {
+                schemas {
+                    protobuf {
+                        "acme.shared.v1" { message("Address") { string("street") } }
+                        "acme.user.v1" { message("User") { ref("home", "acme.shared.v1.Address") } }
+                    }
+                }
+            }
+
+            TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
+                model.generateTo(outputSpace.root)
+                Files.readString(outputSpace.root.resolve("proto/acme/user/v1/User.proto"))
+                    .shouldContain("import \"acme/shared/v1/Address.proto\";")
+            }
+        }
+
+        "generateTo emits enum values across the int32 range with the zero value first" {
+            val model = microsmith {
+                schemas {
+                    protobuf {
+                        "acme.user.v1" {
+                            enum("Level") {
+                                value("LOWEST") { index(Int.MIN_VALUE) }
+                                value("DEBT") { index(-5) }
+                                value("HIGHEST") { index(Int.MAX_VALUE) }
+                            }
+                        }
+                    }
+                }
+            }
+
+            TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
+                model.generateTo(outputSpace.root)
+                Files.readString(outputSpace.root.resolve("proto/acme/user/v1/Level.proto"))
+                    .shouldContain(
+                        "LEVEL_UNSPECIFIED = 0;\n  LOWEST = -2147483648;\n  DEBT = -5;\n  HIGHEST = 2147483647;"
+                    )
+            }
+        }
+
+        "generateTo emits negative enum reservations" {
+            val model = microsmith { schemas { protobuf { "acme.user.v1" { enum("Level") { reserved(-20..-10) } } } } }
+
+            TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
+                model.generateTo(outputSpace.root)
+                Files.readString(outputSpace.root.resolve("proto/acme/user/v1/Level.proto"))
+                    .shouldContain("reserved -20 to -10;")
+            }
+        }
+
+        "generateTo emits an enum reservation ending at the int32 maximum as reserved to max" {
+            val model = microsmith {
+                schemas { protobuf { "acme.user.v1" { enum("Level") { reserved(5..Int.MAX_VALUE) } } } }
+            }
+
+            TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
+                model.generateTo(outputSpace.root)
+                Files.readString(outputSpace.root.resolve("proto/acme/user/v1/Level.proto"))
+                    .shouldContain("reserved 5 to max;")
+            }
+        }
+
+        "generateTo emits an enum reservation ending at the field maximum as an explicit range" {
+            val model = microsmith {
+                schemas { protobuf { "acme.user.v1" { enum("Level") { reserved(5..536_870_911) } } } }
+            }
+
+            TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
+                model.generateTo(outputSpace.root)
+                Files.readString(outputSpace.root.resolve("proto/acme/user/v1/Level.proto"))
+                    .shouldContain("reserved 5 to 536870911;")
+            }
+        }
     })

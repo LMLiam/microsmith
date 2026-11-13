@@ -6,17 +6,14 @@ import io.kotest.matchers.shouldBe
 class ReservedTests :
     StringSpec({
         "fromRange returns ReservedIndex when first == last" {
-            val reserved = Reserved.fromRange(5..5)
-            reserved shouldBe ReservedIndex(5)
+            Reserved.fromRange(5..5, max = 100) shouldBe ReservedIndex(5)
         }
 
-        "fromRange returns ReservedToMax when last == Max.VALUE" {
-            val reserved = Reserved.fromRange(5..Max.VALUE)
-            reserved shouldBe ReservedToMax(5)
+        "fromRange returns ReservedToMax when last equals the maximum" {
+            Reserved.fromRange(5..100, max = 100) shouldBe ReservedToMax(5)
         }
 
-        "fromRange returns ReservedRange for general ranges" {
-            val reserved = Reserved.fromRange(10..20)
-            reserved shouldBe ReservedRange(10..20)
+        "fromRange returns ReservedRange for a range below the maximum" {
+            Reserved.fromRange(10..20, max = 100) shouldBe ReservedRange(10..20)
         }
     })

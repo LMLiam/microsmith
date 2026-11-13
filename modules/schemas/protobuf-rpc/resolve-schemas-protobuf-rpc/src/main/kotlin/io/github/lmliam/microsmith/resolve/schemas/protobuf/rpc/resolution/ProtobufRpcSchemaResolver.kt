@@ -13,6 +13,7 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Rpc
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.RpcEndpoint
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoFilePaths
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtobufNameValidation
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
@@ -150,4 +151,4 @@ internal class ProtobufRpcSchemaResolver {
 
 context(identity: QualifiedSchemaName)
 private fun ResolvedProtobufRpcEndpoint.importPath(): String? =
-    qualifiedTypeName.takeUnless { it == identity.fullyQualifiedName }?.replace('.', '/')?.plus(".proto")
+    qualifiedTypeName.takeUnless { it == identity.fullyQualifiedName }?.let(ProtoFilePaths::importPath)

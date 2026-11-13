@@ -43,12 +43,12 @@ class MapFieldBuilderTests :
 
         "ref with leading dot returns target one package back" {
             val builder = MapFieldBuilder()
-            builder.ref(".Foo") shouldBe Reference.Relative(".Foo")
+            builder.ref(".Foo") shouldBe Reference.Relative(levelsUp = 1, path = listOf("Foo"))
         }
 
         "ref with leading dot and multiple segments returns target one package back" {
             val builder = MapFieldBuilder()
-            builder.ref(".Foo.Bar") shouldBe Reference.Relative(".Foo.Bar")
+            builder.ref(".Foo.Bar") shouldBe Reference.Relative(levelsUp = 1, path = listOf("Foo", "Bar"))
         }
 
         "ref with fully qualified name returns unchanged" {
