@@ -156,13 +156,7 @@ class DotnetPackageWorkspaceResolver(
                 ResolvedDotnetPackageSolution(
                     name = solution.name,
                     packages =
-                        packageVersions
-                            .map {
-                                ResolvedDotnetPackageVersion(
-                                    name = it.name,
-                                    version = it.version,
-                                )
-                            }
+                        DotnetPackageVersionMapper.mapList(packageVersions)
                             .sortedBy(ResolvedDotnetPackageVersion::name),
                 )
         }
