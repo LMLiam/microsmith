@@ -132,7 +132,7 @@ internal class ProtobufRpcSchemaResolver {
         }
 
         ResolvedProtobufRpcEndpoint(
-            qualifiedTypeName = target.identity.fullyQualifiedName,
+            target = target.identity,
             streaming = endpoint.streaming,
         )
     }
@@ -140,4 +140,4 @@ internal class ProtobufRpcSchemaResolver {
 
 context(identity: QualifiedSchemaName)
 private fun ResolvedProtobufRpcEndpoint.importPath(): String? =
-    qualifiedTypeName.takeUnless { it == identity.fullyQualifiedName }?.let(ProtoFilePaths::importPath)
+    target.takeUnless { it == identity }?.let { ProtoFilePaths.importPath(it.fullyQualifiedName) }

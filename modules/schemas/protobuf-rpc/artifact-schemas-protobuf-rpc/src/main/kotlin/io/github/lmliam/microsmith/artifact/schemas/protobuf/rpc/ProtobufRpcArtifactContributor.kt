@@ -24,12 +24,12 @@ class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSc
                             name = rpc.name,
                             request =
                                 ProtobufRpcEndpoint(
-                                    typeName = rpc.request.qualifiedTypeName,
+                                    typeName = rpc.request.target.fullyQualifiedName,
                                     streaming = rpc.request.streaming,
                                 ),
                             response =
                                 ProtobufRpcEndpoint(
-                                    typeName = rpc.response.qualifiedTypeName,
+                                    typeName = rpc.response.target.fullyQualifiedName,
                                     streaming = rpc.response.streaming,
                                 ),
                         )

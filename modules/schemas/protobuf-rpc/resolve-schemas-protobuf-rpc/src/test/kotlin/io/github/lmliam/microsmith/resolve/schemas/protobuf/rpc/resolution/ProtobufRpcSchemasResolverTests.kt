@@ -63,9 +63,9 @@ class ProtobufRpcSchemasResolverTests :
                 schema.rpcs.single().also { rpc ->
                     rpc.name shouldBe "GetUser"
 
-                    rpc.request.qualifiedTypeName shouldBe "acme.user.v1.GetUserRequest"
+                    rpc.request.target.fullyQualifiedName shouldBe "acme.user.v1.GetUserRequest"
 
-                    rpc.response.qualifiedTypeName shouldBe "acme.user.v1.GetUserResponse"
+                    rpc.response.target.fullyQualifiedName shouldBe "acme.user.v1.GetUserResponse"
                 }
             }
         }
@@ -95,8 +95,8 @@ class ProtobufRpcSchemasResolverTests :
                         .schemas
                         .single()
 
-                resolved.rpcs.single().request.qualifiedTypeName shouldBe targetName
-                resolved.rpcs.single().response.qualifiedTypeName shouldBe targetName
+                resolved.rpcs.single().request.target.fullyQualifiedName shouldBe targetName
+                resolved.rpcs.single().response.target.fullyQualifiedName shouldBe targetName
                 resolved.imports shouldContainExactly listOf(targetName.replace('.', '/') + ".proto")
             }
         }
