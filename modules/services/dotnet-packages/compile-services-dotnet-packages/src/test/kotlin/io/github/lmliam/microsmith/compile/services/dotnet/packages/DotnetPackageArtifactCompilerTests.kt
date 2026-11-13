@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.packages
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReference
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferenceVersion
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
@@ -31,9 +31,7 @@ class DotnetPackageArtifactCompilerTests :
             val contribution =
                 DotnetPackageVersionsArtifactCompiler().compile(artifact).single() as MsBuildProjectContribution
 
-            contribution.artifactId.solutionName shouldBe "Platform"
-            contribution.artifactId.projectName shouldBe null
-            contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryPackagesProps
+            contribution.artifactId shouldBe MsBuildProjectArtifactId.DirectoryPackagesProps("Platform")
             contribution.properties shouldContainExactly
                 mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true")
             contribution.items.map { it.include to it.attributes } shouldContainExactly
@@ -65,9 +63,11 @@ class DotnetPackageArtifactCompilerTests :
             val contribution =
                 DotnetPackageReferencesArtifactCompiler().compile(artifact).single() as MsBuildProjectContribution
 
-            contribution.artifactId.solutionName shouldBe "Platform"
-            contribution.artifactId.projectName shouldBe "UserService.Api"
-            contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryBuildProps
+            contribution.artifactId shouldBe
+                MsBuildProjectArtifactId.DirectoryBuildProps(
+                    solutionName = "Platform",
+                    projectName = "UserService.Api",
+                )
             contribution.properties shouldBe emptyMap()
             contribution.items.map { it.include to it.attributes } shouldContainExactly
                 listOf(
@@ -98,9 +98,11 @@ class DotnetPackageArtifactCompilerTests :
             val contribution =
                 DotnetPackageReferencesArtifactCompiler().compile(artifact).single() as MsBuildProjectContribution
 
-            contribution.artifactId.solutionName shouldBe "Platform"
-            contribution.artifactId.projectName shouldBe "UserService.Api"
-            contribution.artifactId.kind shouldBe MsBuildProjectKind.DirectoryBuildProps
+            contribution.artifactId shouldBe
+                MsBuildProjectArtifactId.DirectoryBuildProps(
+                    solutionName = "Platform",
+                    projectName = "UserService.Api",
+                )
             contribution.properties shouldBe emptyMap()
             contribution.items.map { it.include to it.attributes } shouldContainExactly
                 listOf(

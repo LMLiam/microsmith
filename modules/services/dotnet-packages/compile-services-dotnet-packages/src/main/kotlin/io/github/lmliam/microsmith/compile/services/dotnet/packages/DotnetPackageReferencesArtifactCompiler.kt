@@ -7,7 +7,6 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReference
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferenceVersion
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
@@ -22,10 +21,9 @@ class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetP
         listOf(
             MsBuildProjectContribution(
                 artifactId =
-                    MsBuildProjectArtifactId(
+                    MsBuildProjectArtifactId.DirectoryBuildProps(
                         solutionName = artifact.solutionName,
                         projectName = artifact.projectName,
-                        kind = MsBuildProjectKind.DirectoryBuildProps,
                     ),
                 items =
                     artifact.packages.sortedBy(DotnetPackageReference::name).map { packageReference ->

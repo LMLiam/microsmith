@@ -6,7 +6,6 @@ import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllerBaseRelativePath
@@ -25,7 +24,7 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
         return buildList {
             add(
                 MsBuildProjectContribution(
-                    artifactId = artifact.msBuildProjectArtifactId(MsBuildProjectKind.Project),
+                    artifactId = artifact.msBuildProjectArtifactId(),
                     projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
                     properties =
                         mapOf(

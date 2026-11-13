@@ -14,8 +14,8 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetA
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
+import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectContribution
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetField
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
@@ -38,7 +38,8 @@ class DotnetAspServiceArtifactCompilerTests :
             val textFiles = contributions.filterIsInstance<TextFileArtifactContribution>()
             val byPath = textFiles.associateBy { it.artifactId.relativePath.toString() }
 
-            msbuild.artifactId.kind shouldBe MsBuildProjectKind.Project
+            msbuild.artifactId shouldBe
+                MsBuildProjectArtifactId.Project(solutionName = "Platform", projectName = "UserService.Api")
             msbuild.projectAttributes shouldBe mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web")
             msbuild.properties shouldBe
                 mapOf(
