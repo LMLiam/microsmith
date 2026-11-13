@@ -15,9 +15,8 @@ class ProtobufArtifactContributor : ArtifactContributor<ResolvedProtobufSchemaMo
     override fun contribute(model: ResolvedProtobufSchemaModel): List<ArtifactContribution<*>> =
         model.schemas.map { schema ->
             ProtoFileContribution(
-                ProtoFileArtifactId(schema.identity.packageName, schema.identity.typeName.value),
-                schema.identity.packageName,
-                schema.dependencies.map { ProtoFileArtifactId(it.packageName, it.typeName.value).importPath },
+                ProtoFileArtifactId.of(schema.identity),
+                schema.dependencies.map { ProtoFileArtifactId.of(it).importPath },
                 listOf(ProtoDeclaration(schema.identity.typeName.value, renderProtobufDeclaration(schema.declaration))),
             )
         }

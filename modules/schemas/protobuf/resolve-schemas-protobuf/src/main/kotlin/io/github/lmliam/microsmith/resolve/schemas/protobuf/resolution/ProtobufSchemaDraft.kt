@@ -16,11 +16,12 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.dependenciesOf
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.referencesOf
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.targets
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.SchemaNode
 
 internal data class SchemaDraft(val identity: QualifiedSchemaName, val declaration: DeclarationDraft) {
     val node: SchemaNode
-        get() = SchemaNode(identity, dependenciesOf(identity, declaration.references()))
+        get() = SchemaNode(identity, dependenciesOf(identity, declaration.references().targets()))
 
     fun seal(): EitherNel<ResolvedProtobufRejection, ResolvedProtobufSchema> =
         declaration.seal().map { ResolvedProtobufSchema.of(it, packageOf = identity) }

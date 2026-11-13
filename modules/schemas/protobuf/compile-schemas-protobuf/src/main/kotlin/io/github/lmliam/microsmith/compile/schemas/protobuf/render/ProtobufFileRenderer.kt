@@ -7,9 +7,10 @@ internal object ProtobufFileRenderer {
 
     fun render(artifact: ProtoFileArtifact): String = buildString {
         appendLine(PROTO3_SYNTAX_LINE)
-        artifact.packageName?.let { appendLine("package $it;") }
+        val packageName = artifact.id.packageName
+        packageName?.let { appendLine("package $it;") }
         artifact.imports.forEach { appendLine("import \"$it\";") }
-        if (artifact.packageName != null || artifact.imports.isNotEmpty()) {
+        if (packageName != null || artifact.imports.isNotEmpty()) {
             appendLine()
         }
         artifact.declarations.forEachIndexed { index, declaration ->

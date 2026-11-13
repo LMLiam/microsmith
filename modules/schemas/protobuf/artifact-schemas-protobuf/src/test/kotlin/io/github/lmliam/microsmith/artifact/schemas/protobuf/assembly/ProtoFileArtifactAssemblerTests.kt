@@ -19,14 +19,12 @@ class ProtoFileArtifactAssemblerTests :
                     assembler.create(
                         ProtoFileContribution(
                             artifactId = sharedId,
-                            packageName = "acme.user.v1",
                             imports = listOf("acme/user/v1/Role.proto"),
                             declarations = listOf(ProtoDeclaration("User", "message User {}")),
                         )
                     ),
                     ProtoFileContribution(
                         artifactId = sharedId,
-                        packageName = "acme.user.v1",
                         imports = listOf("acme/user/v1/Profile.proto", "acme/user/v1/Role.proto"),
                         declarations = listOf(ProtoDeclaration("Profile", "message Profile {}")),
                     ),
@@ -45,7 +43,6 @@ class ProtoFileArtifactAssemblerTests :
                 assembler.create(
                     ProtoFileContribution(
                         artifactId = sharedId,
-                        packageName = "acme.user.v1",
                         declarations = listOf(ProtoDeclaration("User", "message User {}")),
                     )
                 )
@@ -56,37 +53,11 @@ class ProtoFileArtifactAssemblerTests :
                         current,
                         ProtoFileContribution(
                             artifactId = sharedId,
-                            packageName = "acme.user.v1",
                             declarations = listOf(ProtoDeclaration("User", "message User { string id = 1; }")),
                         ),
                     )
                 }
 
             error.message shouldBe "Conflicting protobuf declaration 'User' for 'acme.user.v1.User'."
-        }
-
-        "rejects contributions that disagree on the package name" {
-            val current =
-                assembler.create(
-                    ProtoFileContribution(
-                        artifactId = sharedId,
-                        packageName = "acme.user.v1",
-                        declarations = listOf(ProtoDeclaration("User", "message User {}")),
-                    )
-                )
-
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    assembler.merge(
-                        current,
-                        ProtoFileContribution(
-                            artifactId = sharedId,
-                            packageName = "acme.other.v1",
-                            declarations = listOf(ProtoDeclaration("Profile", "message Profile {}")),
-                        ),
-                    )
-                }
-
-            error.message shouldBe "Conflicting protobuf package names for 'acme.user.v1.User'."
         }
     })

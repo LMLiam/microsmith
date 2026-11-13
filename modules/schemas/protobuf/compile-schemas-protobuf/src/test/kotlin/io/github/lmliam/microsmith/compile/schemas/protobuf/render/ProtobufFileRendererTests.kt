@@ -10,12 +10,11 @@ import io.kotest.matchers.string.shouldNotContain
 
 class ProtobufFileRendererTests :
     StringSpec({
-        "render sorts imports and renders package when present" {
+        "render emits imports in order and package when present" {
             val rendered =
                 ProtobufFileRenderer.render(
                     ProtoFileArtifact(
                         id = ProtoFileArtifactId(packageName = "pkg", typeName = "User"),
-                        packageName = "pkg",
                         imports = listOf("alpha/A.proto", "zeta/Z.proto"),
                         declarations = listOf(ProtoDeclaration("User", "message User {}")),
                     )
@@ -34,7 +33,6 @@ class ProtobufFileRendererTests :
                 ProtobufFileRenderer.render(
                     ProtoFileArtifact(
                         id = ProtoFileArtifactId(packageName = null, typeName = "User"),
-                        packageName = null,
                         imports = emptyList(),
                         declarations = listOf(ProtoDeclaration("User", "message User {}")),
                     )

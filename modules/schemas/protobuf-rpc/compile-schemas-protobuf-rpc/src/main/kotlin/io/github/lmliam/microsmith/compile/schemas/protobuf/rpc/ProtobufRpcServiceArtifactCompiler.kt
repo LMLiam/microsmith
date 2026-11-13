@@ -18,7 +18,6 @@ class ProtobufRpcServiceArtifactCompiler : SchemasArtifactCompiler<ProtobufRpcSe
         listOf(
             ProtoFileContribution(
                 artifactId = artifact.id.protoFile,
-                packageName = artifact.id.packageName,
                 imports = artifact.imports,
                 declarations =
                     listOf(

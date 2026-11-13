@@ -13,7 +13,11 @@ private constructor(
         fun of(declaration: ResolvedProtobufDeclaration, packageOf: QualifiedSchemaName): ResolvedProtobufSchema {
             val identity = packageOf.withTypeName(declaration.name)
 
-            return ResolvedProtobufSchema(identity, declaration, dependenciesOf(identity, declaration.references()))
+            return ResolvedProtobufSchema(
+                identity,
+                declaration,
+                dependenciesOf(identity, declaration.references().targets()),
+            )
         }
     }
 }

@@ -7,7 +7,6 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArti
 
 data class ProtoFileContribution(
     override val artifactId: ProtoFileArtifactId,
-    val packageName: String?,
     val imports: List<String> = emptyList(),
     val declarations: List<ProtoDeclaration>,
 ) : ArtifactContribution<ProtoFileArtifact> {

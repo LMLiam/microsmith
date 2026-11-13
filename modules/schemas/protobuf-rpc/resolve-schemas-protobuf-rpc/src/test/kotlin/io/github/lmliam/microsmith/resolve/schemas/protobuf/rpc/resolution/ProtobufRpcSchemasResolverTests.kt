@@ -53,11 +53,8 @@ class ProtobufRpcSchemasResolverTests :
             resolved.schemas.single().also { schema ->
                 schema.qualifiedName.fullyQualifiedName shouldBe "acme.user.v1.UserService"
 
-                schema.imports shouldContainExactly
-                    listOf(
-                        "acme/user/v1/GetUserRequest.proto",
-                        "acme/user/v1/GetUserResponse.proto",
-                    )
+                schema.dependencies.map { it.fullyQualifiedName } shouldContainExactly
+                    listOf("acme.user.v1.GetUserRequest", "acme.user.v1.GetUserResponse")
 
                 schema.rpcs.single().also { rpc ->
                     rpc.name.value shouldBe "GetUser"
@@ -96,7 +93,7 @@ class ProtobufRpcSchemasResolverTests :
 
                 resolved.rpcs.single().request.target.fullyQualifiedName shouldBe targetName
                 resolved.rpcs.single().response.target.fullyQualifiedName shouldBe targetName
-                resolved.imports shouldContainExactly listOf(targetName.replace('.', '/') + ".proto")
+                resolved.dependencies.map { it.fullyQualifiedName } shouldContainExactly listOf(targetName)
             }
         }
 
