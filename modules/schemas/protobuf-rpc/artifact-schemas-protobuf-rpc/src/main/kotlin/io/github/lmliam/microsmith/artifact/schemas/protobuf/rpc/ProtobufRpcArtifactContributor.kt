@@ -19,22 +19,7 @@ class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSc
                         serviceName = schema.qualifiedName.typeName.value,
                     ),
                 imports = schema.dependencies.map { ProtoFileArtifactId.of(it).importPath },
-                operations =
-                    schema.rpcs.map { rpc ->
-                        ProtobufRpcOperation(
-                            name = rpc.name.value,
-                            request =
-                                ProtobufRpcEndpoint(
-                                    typeName = rpc.request.target.fullyQualifiedName,
-                                    streaming = rpc.request.streaming,
-                                ),
-                            response =
-                                ProtobufRpcEndpoint(
-                                    typeName = rpc.response.target.fullyQualifiedName,
-                                    streaming = rpc.response.streaming,
-                                ),
-                        )
-                    },
+                operations = ProtobufRpcOperationMapper.mapList(schema.rpcs),
             )
         }
 }
