@@ -31,6 +31,7 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
                         )
                     ),
                     ProtobufRpcResolutionIssue.InvalidRpcName(serviceName = "UserService", rpcName = "1bad"),
+                    ProtobufRpcResolutionIssue.DuplicateRpcName(serviceName = "UserService", rpcName = "GetUser"),
                     ProtobufRpcResolutionIssue.InvalidEndpointTargetName(
                         serviceName = "UserService",
                         rpcName = "GetUser",
@@ -58,6 +59,10 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
                     ResolutionDiagnostic(
                         code = "protobuf.rpc.invalid-rpc-name",
                         message = "RPC name '1bad' of service 'UserService' is not a valid protobuf identifier.",
+                    ),
+                    ResolutionDiagnostic(
+                        code = "protobuf.rpc.duplicate-rpc-name",
+                        message = "Service 'UserService' declares RPC 'GetUser' more than once.",
                     ),
                     ResolutionDiagnostic(
                         code = "protobuf.rpc.invalid-endpoint-target-name",
