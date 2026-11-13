@@ -8,6 +8,7 @@ internal enum class CliFailureCode(val id: String, val exitCode: Int) {
     SCRIPT_COMPILATION_FAILED(id = "MS-CLI-2002", exitCode = 21),
     SCRIPT_EVALUATION_FAILED(id = "MS-CLI-2003", exitCode = 22),
     SCRIPT_HOST_FAILED(id = "MS-CLI-2004", exitCode = 23),
+    SCRIPT_RESOLUTION_FAILED(id = "MS-CLI-2005", exitCode = 24),
     DOCTOR_FAILED(id = "MS-CLI-3001", exitCode = 30),
     IDE_HELPER_FAILED(id = "MS-CLI-4001", exitCode = 40),
     IDE_DOCTOR_FAILED(id = "MS-CLI-4101", exitCode = 41),

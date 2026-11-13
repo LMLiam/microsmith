@@ -25,7 +25,7 @@ class ProcessIsolationFailureFactoryTests :
         }
 
         "appends process output to parsed worker failures" {
-            val failure = ScriptRunFailure(diagnostics = listOf("worker failure"), type = ScriptFailureType.COMPILATION)
+            val failure = ScriptRunFailure.withMessages(listOf("worker failure"), ScriptFailureType.COMPILATION)
 
             val result =
                 factory
@@ -38,10 +38,12 @@ class ProcessIsolationFailureFactoryTests :
                     )
                     .shouldBeTypeOf<ScriptRunFailure>()
 
-            result.diagnostics.shouldContainExactly(
-                "worker failure",
-                "Process stderr/stdout: stacktrace",
-            )
+            result.diagnostics
+                .map { it.message }
+                .shouldContainExactly(
+                    "worker failure",
+                    "Process stderr/stdout: stacktrace",
+                )
             result.type shouldBe ScriptFailureType.COMPILATION
         }
 
@@ -57,10 +59,12 @@ class ProcessIsolationFailureFactoryTests :
                     )
                     .shouldBeTypeOf<ScriptRunFailure>()
 
-            result.diagnostics.shouldContainExactly(
-                "Process isolation execution failed with exit code 2.",
-                "Process stderr/stdout: could not start",
-            )
+            result.diagnostics
+                .map { it.message }
+                .shouldContainExactly(
+                    "Process isolation execution failed with exit code 2.",
+                    "Process stderr/stdout: could not start",
+                )
             result.type shouldBe ScriptFailureType.HOST
         }
     })

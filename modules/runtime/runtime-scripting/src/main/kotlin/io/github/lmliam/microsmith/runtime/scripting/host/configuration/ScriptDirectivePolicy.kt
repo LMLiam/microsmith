@@ -18,8 +18,8 @@ internal object ScriptDirectivePolicy {
         if (violations.isEmpty()) {
             return null
         }
-        return ScriptRunFailure(
-            diagnostics =
+        return ScriptRunFailure.withMessages(
+            messages =
                 listOf("Script dependency directives are blocked by default for security hardening.") + violations,
             type = ScriptFailureType.VALIDATION,
         )

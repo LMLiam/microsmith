@@ -33,15 +33,23 @@ internal class MicrosmithMavenResultHandler {
         return when (result.type) {
             ScriptFailureType.VALIDATION,
             ScriptFailureType.COMPILATION,
-            ScriptFailureType.EVALUATION -> MojoFailureException(message)
+            ScriptFailureType.EVALUATION,
+            ScriptFailureType.RESOLUTION -> MojoFailureException(message)
 
             ScriptFailureType.HOST -> MojoExecutionException(message)
         }
     }
 
     private fun buildFailureMessage(result: ScriptRunFailure): String = buildString {
-        appendLine("Microsmith generation failed (${result.type.name.lowercase(Locale.ROOT)}).")
-        result.diagnostics.forEach(::appendLine)
+        if (result.type == ScriptFailureType.RESOLUTION) {
+            appendLine("Microsmith model resolution failed:")
+            result.diagnostics.forEach { diagnostic ->
+                appendLine(diagnostic.code?.let { code -> "[$code] ${diagnostic.message}" } ?: diagnostic.message)
+            }
+        } else {
+            appendLine("Microsmith generation failed (${result.type.name.lowercase(Locale.ROOT)}).")
+            result.diagnostics.forEach { diagnostic -> appendLine(diagnostic.message) }
+        }
     }
         .trimEnd()
 }

@@ -40,8 +40,8 @@ internal class ClassloaderScriptRunner(private val cacheDirectory: Path) {
             }
                 .getOrElse { exception ->
                     val message = exception.message ?: exception::class.simpleName ?: "unknown error"
-                    ScriptRunFailure(
-                        diagnostics = listOf("Unhandled script host failure: $message"),
+                    ScriptRunFailure.withMessages(
+                        messages = listOf("Unhandled script host failure: $message"),
                         type = ScriptFailureType.HOST,
                     )
                 }

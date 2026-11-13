@@ -23,5 +23,6 @@ internal object ProcessIsolationPropertyNames {
     const val RESULT_GENERATED_ROOT_PREFIX = "result.generatedRoots."
     const val RESULT_DIAGNOSTIC_COUNT = "result.diagnostics.count"
     const val RESULT_DIAGNOSTIC_PREFIX = "result.diagnostics."
+    const val RESULT_DIAGNOSTIC_CODE_PREFIX = "result.diagnosticCodes."
     const val RESULT_FAILURE_TYPE = "result.failure.type"
 }

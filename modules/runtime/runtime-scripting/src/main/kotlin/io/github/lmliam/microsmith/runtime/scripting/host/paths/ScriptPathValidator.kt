@@ -10,14 +10,14 @@ internal object ScriptPathValidator {
     fun validate(scriptPath: Path): ScriptRunFailure? =
         when {
             !Files.exists(scriptPath) ->
-                ScriptRunFailure(
-                    diagnostics = listOf("Script file '$scriptPath' does not exist."),
+                ScriptRunFailure.withMessages(
+                    messages = listOf("Script file '$scriptPath' does not exist."),
                     type = ScriptFailureType.VALIDATION,
                 )
 
             !Files.isRegularFile(scriptPath) ->
-                ScriptRunFailure(
-                    diagnostics = listOf("Script path '$scriptPath' is not a file."),
+                ScriptRunFailure.withMessages(
+                    messages = listOf("Script path '$scriptPath' is not a file."),
                     type = ScriptFailureType.VALIDATION,
                 )
 

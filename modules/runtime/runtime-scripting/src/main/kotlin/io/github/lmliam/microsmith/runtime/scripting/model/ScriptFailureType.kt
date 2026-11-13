@@ -4,5 +4,6 @@ enum class ScriptFailureType {
     VALIDATION,
     COMPILATION,
     EVALUATION,
+    RESOLUTION,
     HOST,
 }

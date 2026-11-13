@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
+import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
@@ -54,7 +55,10 @@ internal class ProcessIsolationResultCodec {
         properties[ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_COUNT] = result.diagnostics.size.toString()
         properties[ProcessIsolationPropertyNames.RESULT_FAILURE_TYPE] = result.type.name
         result.diagnostics.forEachIndexed { index, diagnostic ->
-            properties["${ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_PREFIX}$index"] = diagnostic
+            properties["${ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_PREFIX}$index"] = diagnostic.message
+            diagnostic.code?.let { code ->
+                properties["${ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_CODE_PREFIX}$index"] = code
+            }
         }
     }
 
@@ -79,10 +83,20 @@ internal class ProcessIsolationResultCodec {
     private fun readFailure(properties: Properties): ScriptRunFailure =
         ScriptRunFailure(
             diagnostics =
-                properties.readIndexedList(
-                    countKey = ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_COUNT,
-                    keyPrefix = ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_PREFIX,
-                ),
+                properties
+                    .readIndexedList(
+                        countKey = ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_COUNT,
+                        keyPrefix = ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_PREFIX,
+                    )
+                    .mapIndexed { index, message ->
+                        ScriptRunDiagnostic(
+                            message = message,
+                            code =
+                                properties.getProperty(
+                                    "${ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_CODE_PREFIX}$index"
+                                ),
+                        )
+                    },
             type = parseFailureType(properties.getProperty(ProcessIsolationPropertyNames.RESULT_FAILURE_TYPE)),
         )
 

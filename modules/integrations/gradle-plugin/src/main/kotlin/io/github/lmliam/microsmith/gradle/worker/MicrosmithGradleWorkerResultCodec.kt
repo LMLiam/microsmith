@@ -34,7 +34,15 @@ internal class MicrosmithGradleWorkerResultCodec {
 
             RESULT_STATUS_FAILURE ->
                 MicrosmithGradleWorkerFailure(
-                    diagnostics = properties.readValues(RESULT_DIAGNOSTIC_COUNT, RESULT_DIAGNOSTIC_PREFIX),
+                    diagnostics =
+                        properties.readValues(RESULT_DIAGNOSTIC_COUNT, RESULT_DIAGNOSTIC_PREFIX).mapIndexed {
+                            index,
+                            message ->
+                            MicrosmithGradleWorkerDiagnostic(
+                                message = message,
+                                code = properties.getProperty("$RESULT_DIAGNOSTIC_CODE_PREFIX$index"),
+                            )
+                        },
                     type = properties.getProperty(RESULT_FAILURE_TYPE) ?: missingProperty(RESULT_FAILURE_TYPE),
                 )
 
@@ -61,7 +69,8 @@ internal class MicrosmithGradleWorkerResultCodec {
             this[RESULT_FAILURE_TYPE] = result.type
             this[RESULT_DIAGNOSTIC_COUNT] = result.diagnostics.size.toString()
             result.diagnostics.forEachIndexed { index, diagnostic ->
-                this["$RESULT_DIAGNOSTIC_PREFIX$index"] = diagnostic
+                this["$RESULT_DIAGNOSTIC_PREFIX$index"] = diagnostic.message
+                diagnostic.code?.let { code -> this["$RESULT_DIAGNOSTIC_CODE_PREFIX$index"] = code }
             }
         }
 }
@@ -78,3 +87,4 @@ private const val RESULT_GENERATED_ROOT_PREFIX = "result.generatedRoot."
 private const val RESULT_FAILURE_TYPE = "result.failureType"
 private const val RESULT_DIAGNOSTIC_COUNT = "result.diagnostics.count"
 private const val RESULT_DIAGNOSTIC_PREFIX = "result.diagnostic."
+private const val RESULT_DIAGNOSTIC_CODE_PREFIX = "result.diagnosticCode."

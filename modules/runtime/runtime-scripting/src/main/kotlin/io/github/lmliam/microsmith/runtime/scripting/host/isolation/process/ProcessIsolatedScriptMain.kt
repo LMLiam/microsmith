@@ -29,8 +29,8 @@ internal object ProcessIsolatedScriptMain {
         }
             .getOrElse { error ->
                 val message = error.message ?: error::class.simpleName ?: "unknown process worker error"
-                ScriptRunFailure(
-                    diagnostics = listOf("Process-isolated worker failure: $message"),
+                ScriptRunFailure.withMessages(
+                    messages = listOf("Process-isolated worker failure: $message"),
                     type = ScriptFailureType.HOST,
                 )
             }

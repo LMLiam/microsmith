@@ -4,12 +4,15 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
+import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeTypeOf
 import java.nio.file.Files
+import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
@@ -310,8 +313,8 @@ class MicrosmithScriptHostTests :
                     )
 
                 val failure = result.shouldBeTypeOf<ScriptRunFailure>()
-                failure.diagnostics.joinToString("\n").shouldContain("[error]")
-                failure.diagnostics.joinToString("\n").shouldContain("broken.microsmith.kts")
+                failure.diagnostics.joinToString("\n") { it.message }.shouldContain("[error]")
+                failure.diagnostics.joinToString("\n") { it.message }.shouldContain("broken.microsmith.kts")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -345,8 +348,8 @@ class MicrosmithScriptHostTests :
                     )
 
                 val failure = result.shouldBeTypeOf<ScriptRunFailure>()
-                failure.diagnostics.joinToString("\n").shouldContain("dependency directives are blocked")
-                failure.diagnostics.joinToString("\n").shouldContain("@file:DependsOn")
+                failure.diagnostics.joinToString("\n") { it.message }.shouldContain("dependency directives are blocked")
+                failure.diagnostics.joinToString("\n") { it.message }.shouldContain("@file:DependsOn")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -383,8 +386,8 @@ class MicrosmithScriptHostTests :
                     )
 
                 val failure = result.shouldBeTypeOf<ScriptRunFailure>()
-                failure.diagnostics.joinToString("\n").shouldContain("dependency directives are blocked")
-                failure.diagnostics.joinToString("\n").shouldContain("@file:DependsOn")
+                failure.diagnostics.joinToString("\n") { it.message }.shouldContain("dependency directives are blocked")
+                failure.diagnostics.joinToString("\n") { it.message }.shouldContain("@file:DependsOn")
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -542,9 +545,83 @@ class MicrosmithScriptHostTests :
                 val failure = result.shouldBeTypeOf<ScriptRunFailure>()
 
                 failure.type shouldBe ScriptFailureType.COMPILATION
-                failure.diagnostics.joinToString("\n").shouldContain("MessageRef")
+                failure.diagnostics.joinToString("\n") { it.message }.shouldContain("MessageRef")
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "reports each resolution issue of a classloader run as a coded diagnostic" {
+            val tempDir = createTempDirectory("microsmith-script-host-resolution-failure")
+            try {
+                val result = runScriptWithInvalidSchema(tempDir, ScriptIsolationMode.CLASSLOADER)
+
+                val failure = result.shouldBeTypeOf<ScriptRunFailure>()
+                failure.type shouldBe ScriptFailureType.RESOLUTION
+                failure.diagnostics
+                    .map { it.code }
+                    .shouldContainExactly(
+                        "protobuf.unresolved-reference",
+                        "protobuf.unresolved-reference",
+                    )
+                failure.diagnostics
+                    .map { it.message }
+                    .let { messages ->
+                        messages.single { it.contains("MissingOwner") }
+                        messages.single { it.contains("MissingGroup") }
+                    }
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "reports each resolution issue of a process isolated run as a coded diagnostic" {
+            val tempDir = createTempDirectory("microsmith-script-host-process-resolution-failure")
+            try {
+                val result = runScriptWithInvalidSchema(tempDir, ScriptIsolationMode.PROCESS)
+
+                val failure = result.shouldBeTypeOf<ScriptRunFailure>()
+                failure.type shouldBe ScriptFailureType.RESOLUTION
+                failure.diagnostics
+                    .map { it.code }
+                    .shouldContainExactly(
+                        "protobuf.unresolved-reference",
+                        "protobuf.unresolved-reference",
+                    )
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
         }
     })
+
+private fun runScriptWithInvalidSchema(tempDir: Path, isolationMode: ScriptIsolationMode): ScriptRunResult {
+    val script = tempDir.resolve("duplicates.microsmith.kts")
+    script.writeText(
+        """
+        microsmith {
+            schemas {
+                protobuf {
+                    "pkg" {
+                        message("User") {
+                            ref("owner", "MissingOwner") { index(1) }
+                            ref("group", "MissingGroup") { index(2) }
+                        }
+                    }
+                }
+            }
+        }
+        """
+            .trimIndent()
+    )
+
+    return MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
+        .run(
+            ScriptRunRequest(
+                script = script,
+                outputDir = tempDir.resolve("generated"),
+                variables = emptyMap(),
+                flags = emptySet(),
+                isolationMode = isolationMode,
+            )
+        )
+}

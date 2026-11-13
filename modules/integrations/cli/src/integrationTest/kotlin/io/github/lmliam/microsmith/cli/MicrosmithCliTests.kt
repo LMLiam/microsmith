@@ -10,6 +10,7 @@ import io.github.lmliam.microsmith.cli.ide.IdeDoctorResult
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
 import io.github.lmliam.microsmith.cli.plugins.PluginResolutionResult
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
+import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import io.kotest.core.spec.style.StringSpec
@@ -162,8 +163,8 @@ class MicrosmithCliTests :
                     stderr = err::add,
                     providerValidator = { emptyList() },
                     scriptRunner = { _, _ ->
-                        ScriptRunFailure(
-                            diagnostics = listOf("[error] schema.microsmith.kts:1:1 broken script"),
+                        ScriptRunFailure.withMessages(
+                            messages = listOf("[error] schema.microsmith.kts:1:1 broken script"),
                             type = ScriptFailureType.COMPILATION,
                         )
                     },
@@ -175,6 +176,49 @@ class MicrosmithCliTests :
             err.joinToString("\n").shouldContain("broken script")
             err.joinToString("\n").shouldContain("MS-CLI-2002")
             out shouldBe emptyList()
+        }
+
+        "prints each resolution issue with its issue code and returns the resolution exit code" {
+            val out = mutableListOf<String>()
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = out::add,
+                    stderr = err::add,
+                    providerValidator = { emptyList() },
+                    scriptRunner = { _, _ -> resolutionFailure() },
+                )
+
+            val exitCode = cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated"))
+
+            exitCode shouldBe 24
+            err shouldBe
+                listOf(
+                    "[error] [MS-CLI-2005] [protobuf.unresolved-reference] first problem",
+                    "[error] [MS-CLI-2005] [protobuf.empty-enum] second problem",
+                )
+            out shouldBe emptyList()
+        }
+
+        "emits each resolution issue as a json event carrying its issue code" {
+            val err = mutableListOf<String>()
+            val cli =
+                MicrosmithCli(
+                    stdout = {},
+                    stderr = err::add,
+                    providerValidator = { emptyList() },
+                    scriptRunner = { _, _ -> resolutionFailure() },
+                )
+
+            val exitCode =
+                cli.run(arrayOf("run", "schema.microsmith.kts", "--out", "build/generated", "--diagnostics", "json"))
+
+            exitCode shouldBe 24
+            err.size shouldBe 2
+            err[0].shouldContain("\"code\":\"MS-CLI-2005\"")
+            err[0].shouldContain("\"issueCode\":\"protobuf.unresolved-reference\"")
+            err[0].shouldContain("\"message\":\"first problem\"")
+            err[1].shouldContain("\"issueCode\":\"protobuf.empty-enum\"")
         }
 
         "returns deterministic plugin resolution exit code when plugin resolution fails" {
@@ -530,3 +574,13 @@ class MicrosmithCliTests :
             }
         }
     })
+
+private fun resolutionFailure() =
+    ScriptRunFailure(
+        diagnostics =
+            listOf(
+                ScriptRunDiagnostic(message = "first problem", code = "protobuf.unresolved-reference"),
+                ScriptRunDiagnostic(message = "second problem", code = "protobuf.empty-enum"),
+            ),
+        type = ScriptFailureType.RESOLUTION,
+    )
