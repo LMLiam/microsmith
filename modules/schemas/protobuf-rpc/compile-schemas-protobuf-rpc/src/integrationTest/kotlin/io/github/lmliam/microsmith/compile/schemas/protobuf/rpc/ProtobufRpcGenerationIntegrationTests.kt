@@ -67,4 +67,15 @@ class ProtobufRpcGenerationIntegrationTests :
                 )
             }
         }
+
+        "generateTo emits a service without rpcs" {
+            val model = microsmith { schemas { protobuf { service("EmptyService") {} } } }
+
+            TemporaryDirectory.create(prefix = "protobuf-rpc-generation-").use { outputSpace ->
+                model.generateTo(outputSpace.root)
+                val contents = Files.readString(outputSpace.root.resolve("proto/EmptyService.proto"))
+
+                contents.shouldContain("service EmptyService {}")
+            }
+        }
     })
