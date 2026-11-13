@@ -26,6 +26,14 @@ class ProtobufRpcResolutionDiagnosticMapper : ResolutionIssueDiagnosticMapper<Pr
                     message = "Schema name '${issue.schemaName}' is invalid: it ${issue.reason.displayName()}.",
                 )
 
+            is ProtobufRpcResolutionIssue.InvalidRpcName ->
+                ResolutionDiagnostic(
+                    code = "protobuf.rpc.invalid-rpc-name",
+                    message =
+                        "RPC name '${issue.rpcName}' of service '${issue.serviceName}' " +
+                            "is not a valid protobuf identifier.",
+                )
+
             is ProtobufRpcResolutionIssue.InvalidEndpointTargetName ->
                 ResolutionDiagnostic(
                     code = "protobuf.rpc.invalid-endpoint-target-name",

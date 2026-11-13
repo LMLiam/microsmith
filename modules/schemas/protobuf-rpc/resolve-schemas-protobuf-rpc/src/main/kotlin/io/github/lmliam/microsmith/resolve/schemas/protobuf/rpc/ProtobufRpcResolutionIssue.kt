@@ -34,6 +34,8 @@ sealed interface ProtobufRpcResolutionIssue : ResolutionIssue {
         val targetName: String,
     ) : ProtobufRpcResolutionIssue
 
+    data class InvalidRpcName(val serviceName: String, val rpcName: String) : ProtobufRpcResolutionIssue
+
     enum class EndpointPosition {
         REQUEST,
         RESPONSE,

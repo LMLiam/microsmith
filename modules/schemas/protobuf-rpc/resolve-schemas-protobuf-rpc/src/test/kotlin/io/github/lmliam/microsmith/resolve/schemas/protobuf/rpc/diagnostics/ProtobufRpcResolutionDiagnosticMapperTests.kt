@@ -26,6 +26,7 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
                         schemaName = ".UserService",
                         reason = ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT,
                     ),
+                    ProtobufRpcResolutionIssue.InvalidRpcName(serviceName = "UserService", rpcName = "1bad"),
                     ProtobufRpcResolutionIssue.InvalidEndpointTargetName(
                         serviceName = "UserService",
                         rpcName = "GetUser",
@@ -47,6 +48,10 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
                     ResolutionDiagnostic(
                         code = "protobuf.rpc.invalid-schema-name",
                         message = "Schema name '.UserService' is invalid: it starts with a leading dot.",
+                    ),
+                    ResolutionDiagnostic(
+                        code = "protobuf.rpc.invalid-rpc-name",
+                        message = "RPC name '1bad' of service 'UserService' is not a valid protobuf identifier.",
                     ),
                     ResolutionDiagnostic(
                         code = "protobuf.rpc.invalid-endpoint-target-name",

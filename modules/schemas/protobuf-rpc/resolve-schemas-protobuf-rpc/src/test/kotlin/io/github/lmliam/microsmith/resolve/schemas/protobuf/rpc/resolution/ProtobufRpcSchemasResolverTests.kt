@@ -212,6 +212,58 @@ class ProtobufRpcSchemasResolverTests :
                 )
         }
 
+        "returns a typed issue when an rpc name is not a protobuf identifier" {
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema("acme.user.v1.Request", Message("Request")),
+                        ProtobufSchema(
+                            "acme.user.v1.UserService",
+                            Service(
+                                "UserService",
+                                listOf(
+                                    Rpc(
+                                        "1bad",
+                                        RpcEndpoint(Reference.Local("Request")),
+                                        RpcEndpoint(Reference.Local("Request")),
+                                    )
+                                ),
+                            ),
+                        ),
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(ProtobufRpcResolutionIssue.InvalidRpcName(serviceName = "UserService", rpcName = "1bad"))
+        }
+
+        "reports both the request and the response issue when neither endpoint target exists" {
+            val schemas = microsmith {
+                schemas { protobuf { service("UserService") { "GetUser" { "MissingRequest" to "MissingResponse" } } } }
+            }
+                .require<SchemasExtension>()
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    ProtobufRpcResolutionIssue.EndpointTargetNotFound(
+                        serviceName = "UserService",
+                        rpcName = "GetUser",
+                        position = EndpointPosition.REQUEST,
+                        targetName = "MissingRequest",
+                    ),
+                    ProtobufRpcResolutionIssue.EndpointTargetNotFound(
+                        serviceName = "UserService",
+                        rpcName = "GetUser",
+                        position = EndpointPosition.RESPONSE,
+                        targetName = "MissingResponse",
+                    ),
+                )
+        }
+
         "returns a typed issue at the endpoint position when an rpc endpoint target name is invalid" {
             val schemas =
                 SchemasExtension(
