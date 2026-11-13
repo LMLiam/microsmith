@@ -7,6 +7,10 @@ internal object ProtobufServiceRenderer {
     private const val INDENT = "  "
 
     fun render(service: ProtobufRpcServiceArtifact): String = buildString {
+        if (service.operations.isEmpty()) {
+            append("service ${service.id.serviceName} {}")
+            return@buildString
+        }
         appendLine("service ${service.id.serviceName} {")
         service.operations.forEach { operation ->
             append(INDENT)

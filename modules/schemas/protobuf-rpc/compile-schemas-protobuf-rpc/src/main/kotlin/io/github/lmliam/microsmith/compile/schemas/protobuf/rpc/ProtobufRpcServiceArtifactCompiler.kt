@@ -5,9 +5,7 @@ import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution.ProtoFileContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoDeclaration
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifactId
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifactId
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.SchemasArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.render.ProtobufServiceRenderer
@@ -19,11 +17,7 @@ class ProtobufRpcServiceArtifactCompiler : SchemasArtifactCompiler<ProtobufRpcSe
     override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> =
         listOf(
             ProtoFileContribution(
-                artifactId =
-                    ProtoFileArtifactId(
-                        packageName = artifact.id.packageName,
-                        typeName = artifact.id.serviceName,
-                    ),
+                artifactId = artifact.id.protoFile,
                 packageName = artifact.id.packageName,
                 imports = artifact.imports,
                 declarations =
