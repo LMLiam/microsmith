@@ -37,50 +37,59 @@ class DotnetAspWorkspaceResolver(
         val dotnetResolution: EitherNel<DotnetResolutionIssue, DotnetWorkspace> =
             dotnetWorkspaceResolver.resolve(extension)
 
-        return dotnetResolution.flatMap { dotnetWorkspace ->
-            dotnetWorkspace.services
-                .filterKeys(aspServiceNames::contains)
-                .values
-                .sortedBy { it.name }
-                .mapOrAccumulate { resolvedService ->
-                    val aspExtension =
-                        checkNotNull(
-                            extension
-                                .require(resolvedService.name)
-                                .model
-                                .get<DotnetServiceExtension>()
-                                ?.get<DotnetAspServiceExtension>()
-                        )
-
-                    val rest =
-                        restResolver
-                            .resolve(
-                                serviceName = resolvedService.name,
-                                models = resolvedService.models,
-                                rest = aspExtension.rest,
-                            )
-                            .bindNel()
-
-                    ResolvedDotnetAspService(
-                        name = resolvedService.name,
-                        solutionName = resolvedService.solution.name,
-                        projectName = resolvedService.project,
-                        targetFrameworkMoniker = resolvedService.target.moniker,
-                        outputRoot = Path.of("dotnet", resolvedService.solution.name, resolvedService.project),
-                        ports =
-                            aspExtension.ports?.let {
-                                ResolvedDotnetAspPorts(
-                                    http = it.http,
-                                    https = it.https,
-                                )
-                            },
-                        models = resolvedService.models,
-                        rest = rest,
-                    )
-                }
-                .flatMap(::createWorkspace)
-        }
+        return dotnetResolution.fold(
+            // Workspace issues are reported by DotnetWorkspaceDomainResolver, so this resolver yields nothing.
+            ifLeft = { Either.Right(DotnetAspWorkspace(emptyMap())) },
+            ifRight = { dotnetWorkspace -> resolveServices(extension, dotnetWorkspace, aspServiceNames) },
+        )
     }
+
+    private fun resolveServices(
+        extension: ServicesExtension,
+        dotnetWorkspace: DotnetWorkspace,
+        aspServiceNames: Set<String>,
+    ): EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> =
+        dotnetWorkspace.services
+            .filterKeys(aspServiceNames::contains)
+            .values
+            .sortedBy { it.name }
+            .mapOrAccumulate { resolvedService ->
+                val aspExtension =
+                    checkNotNull(
+                        extension
+                            .require(resolvedService.name)
+                            .model
+                            .get<DotnetServiceExtension>()
+                            ?.get<DotnetAspServiceExtension>()
+                    )
+
+                val rest =
+                    restResolver
+                        .resolve(
+                            serviceName = resolvedService.name,
+                            models = resolvedService.models,
+                            rest = aspExtension.rest,
+                        )
+                        .bindNel()
+
+                ResolvedDotnetAspService(
+                    name = resolvedService.name,
+                    solutionName = resolvedService.solution.name,
+                    projectName = resolvedService.project,
+                    targetFrameworkMoniker = resolvedService.target.moniker,
+                    outputRoot = Path.of("dotnet", resolvedService.solution.name, resolvedService.project),
+                    ports =
+                        aspExtension.ports?.let {
+                            ResolvedDotnetAspPorts(
+                                http = it.http,
+                                https = it.https,
+                            )
+                        },
+                    models = resolvedService.models,
+                    rest = rest,
+                )
+            }
+            .flatMap(::createWorkspace)
 
     private fun createWorkspace(
         services: List<ResolvedDotnetAspService>

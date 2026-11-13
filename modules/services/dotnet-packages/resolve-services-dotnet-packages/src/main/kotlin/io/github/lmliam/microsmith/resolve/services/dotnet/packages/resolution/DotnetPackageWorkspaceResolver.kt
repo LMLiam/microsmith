@@ -31,7 +31,8 @@ class DotnetPackageWorkspaceResolver(
         return dotnetWorkspaceResolver
             .resolve(extension)
             .fold(
-                ifLeft = { Either.Left(it) },
+                // Workspace issues are reported by DotnetWorkspaceDomainResolver, so this resolver yields nothing.
+                ifLeft = { Either.Right(DotnetPackageWorkspace(emptyMap(), emptyMap())) },
                 ifRight = { dotnetWorkspace ->
                     resolveServicesByName(extension, dotnetWorkspace, solutionsByName).map { servicesByName ->
                         DotnetPackageWorkspace(
