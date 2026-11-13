@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspHttpMethod
-import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnetIdentifier
 
 data class ResolvedDotnetAspEndpoint(
     val method: DotnetAspHttpMethod,
@@ -10,8 +9,4 @@ data class ResolvedDotnetAspEndpoint(
     val operationName: String,
     val bindings: ResolvedDotnetAspEndpointBindings,
     val responses: List<ResolvedDotnetAspResponse>,
-) {
-    init {
-        validateDotnetIdentifier(operationName, "ASP.NET operation name")
-    }
-}
+)
