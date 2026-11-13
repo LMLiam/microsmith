@@ -10,16 +10,7 @@ class DotnetAspServiceArtifactAssembler : ArtifactAssembler<DotnetAspServiceArti
 
     override fun create(contribution: ArtifactContribution<DotnetAspServiceArtifact>): DotnetAspServiceArtifact {
         val serviceContribution = requireContribution(contribution)
-        return DotnetAspServiceArtifact(
-            id = serviceContribution.artifactId,
-            serviceName = serviceContribution.serviceName,
-            targetFrameworkMoniker = serviceContribution.targetFrameworkMoniker,
-            outputRoot = serviceContribution.outputRoot,
-            httpPort = serviceContribution.httpPort,
-            httpsPort = serviceContribution.httpsPort,
-            contractModels = serviceContribution.contractModels,
-            endpoints = serviceContribution.endpoints,
-        )
+        return DotnetAspServiceArtifactMapper.map(serviceContribution)
     }
 
     override fun merge(

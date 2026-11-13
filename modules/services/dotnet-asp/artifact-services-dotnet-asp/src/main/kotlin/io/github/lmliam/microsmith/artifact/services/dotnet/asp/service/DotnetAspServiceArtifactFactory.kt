@@ -4,13 +4,12 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetA
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointBindingsArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelLocality
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeaderFieldArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeaderFieldArtifactMapper
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeadersBindingArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestBindingArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestFieldArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestFieldArtifactMapper
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseHeaderArtifact
-import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.request.DotnetAspDefaultValue
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseHeaderArtifactMapper
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspHeadersBinding
@@ -87,15 +86,7 @@ internal class DotnetAspServiceArtifactFactory(
         DotnetAspRequestBindingArtifact(
             typeName = allocateDotnetAspTypeName(usedTypeNames, name, "${endpoint.operationName}$name"),
             name = name,
-            fields =
-                fields.map { field ->
-                    DotnetAspRequestFieldArtifact(
-                        name = field.name,
-                        type = field.type,
-                        optional = field.optional,
-                        defaultValue = field.defaultValue?.unwrapDotnetAspDefaultValue(),
-                    )
-                },
+            fields = DotnetAspRequestFieldArtifactMapper.mapList(fields),
         )
 
     private fun ResolvedDotnetAspHeadersBinding.toHeadersBindingArtifact(
@@ -104,7 +95,7 @@ internal class DotnetAspServiceArtifactFactory(
         DotnetAspHeadersBindingArtifact(
             typeName = allocateDotnetAspTypeName(usedTypeNames, name, "${endpoint.operationName}$name"),
             name = name,
-            headers = headers.map { header -> DotnetAspHeaderFieldArtifact(header.name, header.headerName) },
+            headers = DotnetAspHeaderFieldArtifactMapper.mapList(headers),
         )
 
     private fun ResolvedDotnetAspModel.toModelArtifact(
@@ -139,22 +130,7 @@ internal class DotnetAspServiceArtifactFactory(
         return DotnetAspResponseArtifact(
             statusCode = statusCode,
             model = modelArtifact,
-            headers = headers.map { header -> DotnetAspResponseHeaderArtifact(header.name) },
+            headers = DotnetAspResponseHeaderArtifactMapper.mapList(headers),
         )
     }
 }
-
-private fun DotnetAspDefaultValue.unwrapDotnetAspDefaultValue(): Any =
-    when (this) {
-        is DotnetAspDefaultValue.StringValue -> value
-        is DotnetAspDefaultValue.CharValue -> value
-        is DotnetAspDefaultValue.NumericValue -> value
-        is DotnetAspDefaultValue.BooleanValue -> value
-        is DotnetAspDefaultValue.UuidValue -> value
-        is DotnetAspDefaultValue.LocalDateValue -> value
-        is DotnetAspDefaultValue.LocalTimeValue -> value
-        is DotnetAspDefaultValue.LocalDateTimeValue -> value
-        is DotnetAspDefaultValue.InstantValue -> value
-        is DotnetAspDefaultValue.OffsetDateTimeValue -> value
-        is DotnetAspDefaultValue.DurationValue -> value
-    }
