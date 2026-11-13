@@ -174,7 +174,7 @@ This keeps the layering explicit:
 - `dsl-services-dotnet-asp`: ASP.NET service-generation DSL support on top of `dsl-services-dotnet`
 - `dsl-services-dotnet-packages`: .NET package ownership and package reference DSL support
 - `resolve`: base resolution contracts and resolved-model orchestration
-- `resolve-schemas`: schema-domain resolved model support
+- `resolve-schemas`: `ResolvedSchemasModel`, the marker contract that schema-domain resolved root models implement
 - `resolve-schemas-protobuf`: protobuf schema finalization and validation
 - `resolve-schemas-protobuf-rpc`: protobuf RPC finalization and validation
 - `resolve-services`: `ResolvedServicesModel`, the marker contract that service-domain resolved root models implement

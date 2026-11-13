@@ -3,7 +3,7 @@ package io.github.lmliam.microsmith.resolve.schemas.protobuf
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.toNonEmptyListOrNone
-import io.github.lmliam.microsmith.resolve.ResolvedModel
+import io.github.lmliam.microsmith.resolve.schemas.ResolvedSchemasModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufDeclarationKind
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.SchemaNode
@@ -12,7 +12,8 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findRefer
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.schemaGraphRejections
 
 @ConsistentCopyVisibility
-data class ResolvedProtobufSchemaModel private constructor(val schemas: List<ResolvedProtobufSchema>) : ResolvedModel {
+data class ResolvedProtobufSchemaModel private constructor(val schemas: List<ResolvedProtobufSchema>) :
+    ResolvedSchemasModel {
     sealed interface Rejection {
         data class DuplicateSchema(val identity: QualifiedSchemaName, val occurrences: Int) : Rejection
 
