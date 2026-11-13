@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.resolution
 
 import arrow.core.Either
 import arrow.core.EitherNel
+import arrow.core.flatMap
 import arrow.core.leftNel
 import arrow.core.mapOrAccumulate
 import arrow.core.raise.context.bind
@@ -12,7 +13,6 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Rpc
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.RpcEndpoint
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoFilePaths
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufDeclarationKind
@@ -48,16 +48,10 @@ internal class ProtobufRpcSchemaResolver {
         return with(qualifiedName) {
             service.rpcs
                 .mapOrAccumulate { rpc -> resolveRpc(service = service, rpc = rpc, symbols = symbols).bindNel() }
-                .map { resolvedRpcs ->
-                    ResolvedProtobufRpcSchema(
-                        qualifiedName = qualifiedName,
-                        imports =
-                            resolvedRpcs
-                                .flatMap { rpc -> listOfNotNull(rpc.request.importPath(), rpc.response.importPath()) }
-                                .distinct()
-                                .sorted(),
-                        rpcs = resolvedRpcs,
-                    )
+                .flatMap { resolvedRpcs ->
+                    ResolvedProtobufRpcSchema.of(qualifiedName, resolvedRpcs).mapLeft { rejections ->
+                        rejections.map { it.toIssue(qualifiedName.typeName.value) }
+                    }
                 }
         }
     }
@@ -86,8 +80,8 @@ internal class ProtobufRpcSchemaResolver {
                 ProtobufRpcResolutionIssue.EndpointPosition.RESPONSE,
                 symbols,
             ),
-        ) { _, request, response ->
-            ResolvedProtobufRpc(name = rpc.name, request = request, response = response)
+        ) { name, request, response ->
+            ResolvedProtobufRpc(name = name, request = request, response = response)
         }
 
     context(identity: QualifiedSchemaName)
@@ -138,7 +132,3 @@ internal class ProtobufRpcSchemaResolver {
         )
     }
 }
-
-context(identity: QualifiedSchemaName)
-private fun ResolvedProtobufRpcEndpoint.importPath(): String? =
-    target.takeUnless { it == identity }?.let { ProtoFilePaths.importPath(it.fullyQualifiedName) }

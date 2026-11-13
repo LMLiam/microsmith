@@ -60,7 +60,7 @@ class ProtobufRpcSchemasResolverTests :
                     )
 
                 schema.rpcs.single().also { rpc ->
-                    rpc.name shouldBe "GetUser"
+                    rpc.name.value shouldBe "GetUser"
 
                     rpc.request.target.fullyQualifiedName shouldBe "acme.user.v1.GetUserRequest"
 
@@ -281,6 +281,28 @@ class ProtobufRpcSchemasResolverTests :
 
             failure.issues.toList() shouldContainExactly
                 listOf(ProtobufRpcResolutionIssue.InvalidRpcName(serviceName = "UserService", rpcName = "1bad"))
+        }
+
+        "returns a typed issue when a service declares an rpc name twice" {
+            val request = RpcEndpoint(Reference.Local("Request"))
+            val schemas =
+                SchemasExtension(
+                    setOf(
+                        ProtobufSchema("acme.user.v1.Request", Message("Request")),
+                        ProtobufSchema(
+                            "acme.user.v1.UserService",
+                            Service(
+                                "UserService",
+                                listOf(Rpc("GetUser", request, request), Rpc("GetUser", request, request)),
+                            ),
+                        ),
+                    )
+                )
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(ProtobufRpcResolutionIssue.DuplicateRpcName(serviceName = "UserService", rpcName = "GetUser"))
         }
 
         "reports both the request and the response issue when neither endpoint target exists" {

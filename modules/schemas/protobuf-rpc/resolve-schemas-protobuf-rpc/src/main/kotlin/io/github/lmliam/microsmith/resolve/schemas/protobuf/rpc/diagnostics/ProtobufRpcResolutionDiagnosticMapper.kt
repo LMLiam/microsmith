@@ -24,6 +24,12 @@ class ProtobufRpcResolutionDiagnosticMapper : ResolutionIssueDiagnosticMapper<Pr
                             "is not a valid protobuf identifier.",
                 )
 
+            is ProtobufRpcResolutionIssue.DuplicateRpcName ->
+                ResolutionDiagnostic(
+                    code = "protobuf.rpc.duplicate-rpc-name",
+                    message = "Service '${issue.serviceName}' declares RPC '${issue.rpcName}' more than once.",
+                )
+
             is ProtobufRpcResolutionIssue.InvalidEndpointTargetName ->
                 ResolutionDiagnostic(
                     code = "protobuf.rpc.invalid-endpoint-target-name",

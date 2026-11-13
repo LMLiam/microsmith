@@ -36,9 +36,11 @@ class ProtobufRpcSchemasResolver : DomainResolver<SchemasExtension, ResolvedProt
             .fold(
                 ifLeft = { DomainResolution.Failure(it) },
                 ifRight = { resolvedSchemas ->
-                    DomainResolution.Success(
-                        ResolvedProtobufRpcSchemaModel(resolvedSchemas.sortedBy { it.qualifiedName.fullyQualifiedName })
-                    )
+                    ResolvedProtobufRpcSchemaModel.of(resolvedSchemas.sortedBy { it.qualifiedName.fullyQualifiedName })
+                        .fold(
+                            ifLeft = { rejections -> DomainResolution.Failure(rejections.map { it.toIssue() }) },
+                            ifRight = { DomainResolution.Success(it) },
+                        )
                 },
             )
     }

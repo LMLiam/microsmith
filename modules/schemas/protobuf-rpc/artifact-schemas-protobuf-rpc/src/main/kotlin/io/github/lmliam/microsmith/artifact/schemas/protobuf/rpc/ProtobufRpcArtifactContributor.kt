@@ -21,7 +21,7 @@ class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSc
                 operations =
                     schema.rpcs.map { rpc ->
                         ProtobufRpcOperation(
-                            name = rpc.name,
+                            name = rpc.name.value,
                             request =
                                 ProtobufRpcEndpoint(
                                     typeName = rpc.request.target.fullyQualifiedName,
