@@ -33,7 +33,6 @@ class DotnetWorkspaceResolver {
             }
             .map { resolvedServices ->
                 DotnetWorkspace(
-                    target = defaults.target,
                     solutions = defaults.solutions,
                     services = resolvedServices.associateBy(ResolvedDotnetService::name),
                 )
