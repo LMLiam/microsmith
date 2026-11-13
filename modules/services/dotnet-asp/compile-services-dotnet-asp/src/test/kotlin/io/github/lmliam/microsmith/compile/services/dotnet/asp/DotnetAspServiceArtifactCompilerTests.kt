@@ -19,7 +19,6 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetField
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
@@ -117,36 +116,6 @@ class DotnetAspServiceArtifactCompilerTests :
             requestModels.shouldContain("public nuint MaxValue { get; set; } = (nuint)4294967296UL;")
         }
 
-        "compile rejects an integer default that is out of range for its type" {
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    DotnetAspServiceArtifactCompiler()
-                        .compile(integerDefaultArtifact(DotnetFieldType.Int, 99_999_999_999L))
-                }
-
-            error.message.shouldContain("ASP.NET request default '99999999999'")
-            error.message.shouldContain("out of range for integer type 'int'")
-        }
-
-        "compile rejects a fractional default for an integer field" {
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    DotnetAspServiceArtifactCompiler().compile(integerDefaultArtifact(DotnetFieldType.Int, 1.5))
-                }
-
-            error.message.shouldContain("ASP.NET request default '1.5'")
-            error.message.shouldContain("not representable as integer type 'int'")
-        }
-
-        "compile rejects a negative default for an unsigned integer field" {
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    DotnetAspServiceArtifactCompiler().compile(integerDefaultArtifact(DotnetFieldType.UnsignedInt, -1))
-                }
-
-            error.message.shouldContain("out of range for integer type 'uint'")
-        }
-
         "compile renders a long default with a 64-bit-safe literal" {
             val requestModels =
                 DotnetAspServiceArtifactCompiler()
@@ -189,16 +158,6 @@ class DotnetAspServiceArtifactCompilerTests :
 
             appSettings.shouldContain("\"ServiceName\": \"User\\\"Service\\\\Api\"")
             appSettings.shouldNotContain("\"ServiceName\": \"User\"Service\\Api\"")
-        }
-
-        "compile rejects 204 responses that still declare response body fields" {
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    DotnetAspServiceArtifactCompiler().compile(noContentBodyArtifact())
-                }
-
-            error.message.shouldContain("ASP.NET response 204 in operation 'DeleteUser'")
-            error.message.shouldContain("cannot declare response body fields")
         }
     })
 
@@ -418,37 +377,6 @@ private fun requestBindingTypesArtifact(): DotnetAspServiceArtifact =
                 )
             ),
     )
-
-private fun noContentBodyArtifact(): DotnetAspServiceArtifact {
-    val deletedUserModel = inlineModel("DeletedUser") { stringField("id") }
-
-    return DotnetAspServiceArtifact(
-        id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "UserService.Api"),
-        serviceName = "UserService",
-        targetFrameworkMoniker = "net8.0",
-        outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),
-        httpPort = 5000,
-        httpsPort = 5001,
-        contractModels = listOf(deletedUserModel),
-        endpoints =
-            listOf(
-                DotnetAspEndpointArtifact(
-                    method = "DELETE",
-                    route = "/users/{id}",
-                    operationName = "DeleteUser",
-                    bindings = DotnetAspEndpointBindingsArtifact(),
-                    responses =
-                        listOf(
-                            DotnetAspResponseArtifact(
-                                statusCode = 204,
-                                model = deletedUserModel,
-                                headers = emptyList(),
-                            )
-                        ),
-                )
-            ),
-    )
-}
 
 private fun sharedModel(
     typeName: String,

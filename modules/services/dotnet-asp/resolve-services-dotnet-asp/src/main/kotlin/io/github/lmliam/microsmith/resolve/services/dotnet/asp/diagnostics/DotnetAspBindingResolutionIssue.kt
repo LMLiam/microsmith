@@ -45,6 +45,24 @@ sealed interface DotnetAspBindingResolutionIssue : DotnetAspResolutionIssue {
         val targetName: String,
     ) : DotnetAspBindingResolutionIssue
 
+    data class IntegerDefaultNotIntegral(
+        val serviceName: String,
+        val operationName: String,
+        val bindingName: String,
+        val fieldName: String,
+        val csharpTypeName: String,
+        val value: String,
+    ) : DotnetAspBindingResolutionIssue
+
+    data class IntegerDefaultOutOfRange(
+        val serviceName: String,
+        val operationName: String,
+        val bindingName: String,
+        val fieldName: String,
+        val csharpTypeName: String,
+        val value: String,
+    ) : DotnetAspBindingResolutionIssue
+
     sealed interface ModelReferenceSource {
         data object RequestBody : ModelReferenceSource
 

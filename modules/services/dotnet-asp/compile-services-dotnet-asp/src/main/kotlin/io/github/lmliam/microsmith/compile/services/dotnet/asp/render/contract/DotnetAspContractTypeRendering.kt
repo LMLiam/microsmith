@@ -6,8 +6,6 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAs
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestFieldArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.renderDotnetAspModelPropertyType
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.HTTP_NO_CONTENT_STATUS_CODE
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.RESULT_BODY_PROPERTY_NAME
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.dotnetAspHeaderPropertyName
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.dotnetAspPascalIdentifier
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultBaseTypeName
@@ -21,6 +19,8 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpNullable
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetField
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.HTTP_NO_CONTENT_STATUS_CODE
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.RESULT_BODY_PROPERTY_NAME
 
 internal fun renderRecordType(typeName: String, fields: List<DotnetField>): CSharp.Type =
     CSharp.Type(

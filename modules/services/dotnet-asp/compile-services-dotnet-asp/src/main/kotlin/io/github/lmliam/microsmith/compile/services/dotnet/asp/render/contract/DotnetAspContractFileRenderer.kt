@@ -2,13 +2,13 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.contract
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelLocality
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeadersBindingArtifact
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestBindingArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpNamespaces
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.using
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.contractsNamespace
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.validation.collectHeaderBindings
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.validation.collectRequestBindings
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpFileBuilder
 
@@ -32,8 +32,8 @@ internal object DotnetAspContractFileRenderer {
                 ),
         ) {
             buildList {
-                    collectRequestBindings(artifact).forEach { add(renderRequestBindingType(it)) }
-                    collectHeaderBindings(artifact).forEach { add(renderHeadersBindingType(it)) }
+                    requestBindings(artifact).forEach { add(renderRequestBindingType(it)) }
+                    headerBindings(artifact).forEach { add(renderHeadersBindingType(it)) }
                     artifact.endpoints.forEach { endpoint ->
                         endpoint.bindings.body
                             ?.takeIf { it.locality == DotnetAspModelLocality.INLINE }
@@ -62,6 +62,16 @@ internal object DotnetAspContractFileRenderer {
                 .distinctBy(CSharp.Type::name)
                 .forEach(::addType)
         }
+
+    private fun requestBindings(artifact: DotnetAspServiceArtifact): List<DotnetAspRequestBindingArtifact> =
+        artifact.endpoints
+            .flatMap { endpoint -> listOfNotNull(endpoint.bindings.path, endpoint.bindings.query) }
+            .sortedBy(DotnetAspRequestBindingArtifact::typeName)
+
+    private fun headerBindings(artifact: DotnetAspServiceArtifact): List<DotnetAspHeadersBindingArtifact> =
+        artifact.endpoints
+            .mapNotNull { endpoint -> endpoint.bindings.headers }
+            .sortedBy(DotnetAspHeadersBindingArtifact::typeName)
 
     private fun renderContractsFile(
         artifact: DotnetAspServiceArtifact,

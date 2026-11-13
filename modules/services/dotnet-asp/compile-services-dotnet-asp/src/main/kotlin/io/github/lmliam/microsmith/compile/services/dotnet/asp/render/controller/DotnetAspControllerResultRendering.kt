@@ -3,8 +3,6 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controlle
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpTypes
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.HTTP_NO_CONTENT_STATUS_CODE
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.RESULT_BODY_PROPERTY_NAME
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.dotnetAspHeaderPropertyName
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultBaseTypeName
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultVariantTypeName
@@ -13,6 +11,8 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTy
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpGenericType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.HTTP_NO_CONTENT_STATUS_CODE
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.RESULT_BODY_PROPERTY_NAME
 
 internal fun renderResultMapper(endpoint: DotnetAspEndpointArtifact): CSharp.Method =
     CSharp.Method(

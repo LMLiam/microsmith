@@ -155,4 +155,42 @@ class DotnetAspBindingResolutionDiagnosticTests :
                     ),
                 )
         }
+
+        "maps integer default issues to diagnostics" {
+            val mapper = DotnetAspResolutionDiagnosticMapper()
+
+            listOf(
+                    DotnetAspBindingResolutionIssue.IntegerDefaultNotIntegral(
+                        serviceName = "ReportService",
+                        operationName = "GetReport",
+                        bindingName = "GetReportQuery",
+                        fieldName = "limit",
+                        csharpTypeName = "int",
+                        value = "1.5",
+                    ),
+                    DotnetAspBindingResolutionIssue.IntegerDefaultOutOfRange(
+                        serviceName = "ReportService",
+                        operationName = "GetReport",
+                        bindingName = "GetReportQuery",
+                        fieldName = "limit",
+                        csharpTypeName = "uint",
+                        value = "-1",
+                    ),
+                )
+                .map(mapper::map) shouldContainExactly
+                listOf(
+                    ResolutionDiagnostic(
+                        code = "dotnet.asp.request-binding-default-not-integral",
+                        message =
+                            "ASP.NET request binding 'GetReportQuery' field 'limit' in operation 'GetReport' " +
+                                "declares default '1.5', which is not representable as integer type 'int'.",
+                    ),
+                    ResolutionDiagnostic(
+                        code = "dotnet.asp.request-binding-default-out-of-range",
+                        message =
+                            "ASP.NET request binding 'GetReportQuery' field 'limit' in operation 'GetReport' " +
+                                "declares default '-1', which is out of range for integer type 'uint'.",
+                    ),
+                )
+        }
     })

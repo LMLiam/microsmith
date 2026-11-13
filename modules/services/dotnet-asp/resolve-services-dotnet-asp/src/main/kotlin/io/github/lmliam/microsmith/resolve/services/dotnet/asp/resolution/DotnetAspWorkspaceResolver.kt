@@ -10,8 +10,12 @@ import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.service.DotnetAspServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExtension
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
+import io.github.lmliam.microsmith.resolve.services.dotnet.ResolvedDotnetService
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspService
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspGenerationResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspControllerBaseTypeName
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspace
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceResolver
 import java.nio.file.Path
@@ -75,7 +79,10 @@ class DotnetAspWorkspaceResolver(
                 .bindNel()
         }
 
-        return Either.zipOrAccumulate(ports, rests) { allocatedPorts, resolvedRests ->
+        return Either.zipOrAccumulate(ports, rests, controllerBaseTypeCollisions(services)) {
+                allocatedPorts,
+                resolvedRests,
+                _ ->
                 services.zip(resolvedRests) { service, rest ->
                     ResolvedDotnetAspService(
                         name = service.name,
@@ -90,6 +97,25 @@ class DotnetAspWorkspaceResolver(
                 }
             }
             .flatMap(::createWorkspace)
+    }
+
+    private fun controllerBaseTypeCollisions(
+        services: List<ResolvedDotnetService>
+    ): EitherNel<DotnetResolutionIssue, Unit> {
+        val issues = services.mapNotNull { service ->
+            val typeName = dotnetAspControllerBaseTypeName(service.project)
+            if (typeName == MICROSMITH_CONTROLLER_BASE_TYPE_NAME) {
+                DotnetAspGenerationResolutionIssue.ControllerBaseTypeCollision(
+                    service.name,
+                    service.project,
+                    typeName,
+                )
+            } else {
+                null
+            }
+        }
+
+        return issues.toNonEmptyListOrNull()?.let { Either.Left(it) } ?: Either.Right(Unit)
     }
 
     private fun aspExtensionOf(extension: ServicesExtension, serviceName: String): DotnetAspServiceExtension =

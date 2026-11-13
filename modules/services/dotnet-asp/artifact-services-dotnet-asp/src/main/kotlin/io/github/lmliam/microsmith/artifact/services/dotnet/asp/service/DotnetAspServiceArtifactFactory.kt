@@ -19,6 +19,8 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRequestBinding
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspService
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspResultBaseTypeName
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspResultVariantTypeName
 
 internal class DotnetAspServiceArtifactFactory(
     private val service: ResolvedDotnetAspService,
@@ -36,6 +38,15 @@ internal class DotnetAspServiceArtifactFactory(
                     model = model,
                 )
         }
+
+    init {
+        service.rest.endpoints.forEach { endpoint ->
+            usedTypeNames += dotnetAspResultBaseTypeName(endpoint.operationName)
+            endpoint.responses.forEach { response ->
+                usedTypeNames += dotnetAspResultVariantTypeName(endpoint.operationName, response.statusCode)
+            }
+        }
+    }
 
     private val contractModels = mutableListOf<DotnetAspModelArtifact>().apply { addAll(sharedModelsByName.values) }
 

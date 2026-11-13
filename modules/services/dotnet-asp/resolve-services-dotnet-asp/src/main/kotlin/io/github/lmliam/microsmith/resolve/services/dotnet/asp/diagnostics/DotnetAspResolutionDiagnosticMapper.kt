@@ -67,6 +67,8 @@ class DotnetAspResolutionDiagnosticMapper : ResolutionIssueDiagnosticMapper<Dotn
                 )
 
             is DotnetAspBindingResolutionIssue -> issue.toDiagnostic()
+
+            is DotnetAspGenerationResolutionIssue -> issue.toDiagnostic()
         }
 
     private fun mapInvalidRoute(issue: DotnetAspResolutionIssue.InvalidRouteDeclaration): ResolutionDiagnostic {
