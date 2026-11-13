@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifactId
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 
 @ServiceProvider(ArtifactContributor::class)
@@ -17,7 +18,7 @@ class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSc
                         packageName = schema.qualifiedName.packageName,
                         serviceName = schema.qualifiedName.typeName.value,
                     ),
-                imports = schema.imports,
+                imports = schema.dependencies.map { ProtoFileArtifactId.of(it).importPath },
                 operations =
                     schema.rpcs.map { rpc ->
                         ProtobufRpcOperation(

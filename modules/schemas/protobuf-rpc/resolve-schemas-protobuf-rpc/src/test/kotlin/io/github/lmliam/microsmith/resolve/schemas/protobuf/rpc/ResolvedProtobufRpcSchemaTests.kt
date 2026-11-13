@@ -26,7 +26,7 @@ class ResolvedProtobufRpcSchemaTests :
                 ResolvedProtobufRpcSchema.of(name("acme.UserService"), emptyList()).getOrElse { error("rejected: $it") }
 
             schema.rpcs.shouldBeEmpty()
-            schema.imports.shouldBeEmpty()
+            schema.dependencies.shouldBeEmpty()
         }
 
         "rejects an rpc name declared twice" {
@@ -63,7 +63,7 @@ class ResolvedProtobufRpcSchemaTests :
                 )
         }
 
-        "derives sorted distinct import paths from the endpoint targets" {
+        "derives sorted distinct dependencies from the endpoint targets" {
             val schema =
                 ResolvedProtobufRpcSchema.of(
                         name("acme.user.UserService"),
@@ -75,11 +75,11 @@ class ResolvedProtobufRpcSchemaTests :
                     )
                     .getOrElse { error("rejected: $it") }
 
-            schema.imports shouldContainExactly
-                listOf("acme/shared/Response.proto", "acme/user/Reply.proto", "acme/user/Request.proto")
+            schema.dependencies.map { it.fullyQualifiedName } shouldContainExactly
+                listOf("acme.shared.Response", "acme.user.Reply", "acme.user.Request")
         }
 
-        "does not import its own file" {
+        "does not depend on itself" {
             val schema =
                 ResolvedProtobufRpcSchema.of(
                         name("acme.UserService"),
@@ -87,6 +87,6 @@ class ResolvedProtobufRpcSchemaTests :
                     )
                     .getOrElse { error("rejected: $it") }
 
-            schema.imports.shouldBeEmpty()
+            schema.dependencies.shouldBeEmpty()
         }
     })

@@ -41,11 +41,10 @@ internal fun ResolvedProtobufDeclaration.kind(): ProtobufDeclarationKind =
         is ResolvedProtobufEnum -> ProtobufDeclarationKind.ENUM
     }
 
-internal fun dependenciesOf(
-    identity: QualifiedSchemaName,
-    references: List<LocatedReference>,
-): List<QualifiedSchemaName> =
-    references.map { it.reference.target }.filter { it != identity }.distinct().sortedBy { it.fullyQualifiedName }
+fun dependenciesOf(identity: QualifiedSchemaName, targets: List<QualifiedSchemaName>): List<QualifiedSchemaName> =
+    targets.filter { it != identity }.distinct().sortedBy { it.fullyQualifiedName }
+
+internal fun List<LocatedReference>.targets(): List<QualifiedSchemaName> = map { it.reference.target }
 
 private fun referenceOf(
     type: ResolvedProtobufValueType,
