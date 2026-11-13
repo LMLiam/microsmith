@@ -128,6 +128,33 @@ class ProtobufRpcSchemasResolverTests :
                 )
         }
 
+        "returns a typed issue when an rpc endpoint targets another service" {
+            val schemas = microsmith {
+                schemas {
+                    protobuf {
+                        message("GetUserRequest")
+
+                        service("AuditService") { "Record" { "GetUserRequest" to "GetUserRequest" } }
+
+                        service("UserService") { "GetUser" { "GetUserRequest" to "AuditService" } }
+                    }
+                }
+            }
+                .require<SchemasExtension>()
+
+            val failure = resolver.resolve(schemas).shouldBeTypeOf<DomainResolution.Failure>()
+
+            failure.issues.toList() shouldContainExactly
+                listOf(
+                    EndpointMustTargetMessage(
+                        serviceName = "UserService",
+                        rpcName = "GetUser",
+                        position = EndpointPosition.RESPONSE,
+                        targetName = "AuditService",
+                    )
+                )
+        }
+
         "returns a typed issue when schema and service names disagree" {
             val schemas =
                 SchemasExtension(
