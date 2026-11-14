@@ -18,6 +18,7 @@ value class DotnetTarget(val moniker: String) {
                 "net8.0",
                 "net9.0",
                 "net10.0",
+                "net11.0",
             )
 
         val NET5 = DotnetTarget("net5.0")
@@ -26,6 +27,7 @@ value class DotnetTarget(val moniker: String) {
         val NET8 = DotnetTarget("net8.0")
         val NET9 = DotnetTarget("net9.0")
         val NET10 = DotnetTarget("net10.0")
+        val NET11 = DotnetTarget("net11.0")
 
         fun of(moniker: String): DotnetTarget = DotnetTarget(moniker)
     }

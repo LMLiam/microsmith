@@ -266,6 +266,7 @@ class DotnetDslTests :
             }
 
             "dotnet target validates supported tfms" {
+                DotnetTarget.of("net11.0") shouldBe DotnetTarget.NET11
                 DotnetTarget.of("net10.0") shouldBe DotnetTarget.NET10
                 DotnetTarget.of("net5.0") shouldBe DotnetTarget.NET5
 

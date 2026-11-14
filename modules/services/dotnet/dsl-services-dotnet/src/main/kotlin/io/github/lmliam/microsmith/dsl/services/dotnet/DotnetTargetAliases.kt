@@ -20,4 +20,7 @@ interface DotnetTargetAliases {
 
     val NET10: DotnetTarget
         get() = DotnetTarget.NET10
+
+    val NET11: DotnetTarget
+        get() = DotnetTarget.NET11
 }
