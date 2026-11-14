@@ -10,7 +10,7 @@ axionRelease = "1.21.4"
 shadow = "9.6.1"
 coroutines = "1.11.0"
 spiTooling = "0.1.23"
-mavenResolver = "1.9.22"
+mavenResolver = "2.0.25"
 mavenPluginApi = "3.10.0"
 mavenPluginTools = "3.16.0"
 gradlexMavenPlugin = "1.0.3"
@@ -29,10 +29,10 @@ maven-resolver-api = { module = "org.apache.maven.resolver:maven-resolver-api", 
 maven-resolver-spi = { module = "org.apache.maven.resolver:maven-resolver-spi", version.ref = "mavenResolver" }
 maven-resolver-util = { module = "org.apache.maven.resolver:maven-resolver-util", version.ref = "mavenResolver" }
 maven-resolver-impl = { module = "org.apache.maven.resolver:maven-resolver-impl", version.ref = "mavenResolver" }
-maven-resolver-supplier = { module = "org.apache.maven.resolver:maven-resolver-supplier", version.ref = "mavenResolver" }
+maven-resolver-supplier = { module = "org.apache.maven.resolver:maven-resolver-supplier-mvn3", version.ref = "mavenResolver" }
 maven-resolver-connector-basic = { module = "org.apache.maven.resolver:maven-resolver-connector-basic", version.ref = "mavenResolver" }
 maven-resolver-transport-file = { module = "org.apache.maven.resolver:maven-resolver-transport-file", version.ref = "mavenResolver" }
-maven-resolver-transport-http = { module = "org.apache.maven.resolver:maven-resolver-transport-http", version.ref = "mavenResolver" }
+maven-resolver-transport-apache = { module = "org.apache.maven.resolver:maven-resolver-transport-apache", version.ref = "mavenResolver" }
 maven-plugin-api = { module = "org.apache.maven:maven-plugin-api", version.ref = "mavenPluginApi" }
 maven-plugin-annotations = { module = "org.apache.maven.plugin-tools:maven-plugin-annotations", version.ref = "mavenPluginTools" }
 spi-tooling-annotations = { module = "io.github.eventhorizonlab:spi-tooling-annotations", version.ref = "spiTooling" }
