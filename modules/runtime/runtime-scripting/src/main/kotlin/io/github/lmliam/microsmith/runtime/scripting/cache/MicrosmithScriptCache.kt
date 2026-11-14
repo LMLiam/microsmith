@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
-import java.util.Base64
+import kotlin.io.encoding.Base64
 import kotlin.script.experimental.api.CompiledScript
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.SourceCode
@@ -63,9 +63,7 @@ internal class MicrosmithScriptCache(
     private fun File.warningsFile(): File = resolveSibling("$nameWithoutExtension.warnings")
 
     private fun readWarnings(jar: File): List<String>? = runCatching {
-        jar.warningsFile().takeIf(File::isFile)?.readLines()?.map { line ->
-            String(Base64.getDecoder().decode(line), Charsets.UTF_8)
-        }
+        jar.warningsFile().takeIf(File::isFile)?.readLines()?.map { line -> Base64.decode(line).decodeToString() }
     }
         .getOrNull()
 
@@ -74,7 +72,7 @@ internal class MicrosmithScriptCache(
         try {
             Files.write(
                 temporary,
-                warnings.map { warning -> Base64.getEncoder().encodeToString(warning.toByteArray(Charsets.UTF_8)) },
+                warnings.map { warning -> Base64.encode(warning.encodeToByteArray()) },
             )
             Files.move(temporary, file.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
         } finally {

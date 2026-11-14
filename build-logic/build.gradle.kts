@@ -27,7 +27,6 @@ kotlin {
         progressiveMode.set(true)
         freeCompilerArgs.addAll(
             "-Xjsr305=strict",
-            "-Xexplicit-context-arguments",
         )
     }
 }

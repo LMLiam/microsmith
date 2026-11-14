@@ -19,10 +19,9 @@ internal fun ArtifactContributor<*>.findGenericResolvedType(): KClass<out Resolv
 
 private fun Type.findParameterizedSupertype(targetRawClass: Class<*>): ParameterizedType? =
     when (this) {
-        is ParameterizedType -> {
-            val raw = rawType as? Class<*>
-            if (raw == targetRawClass) this else raw?.findParameterizedSupertype(targetRawClass)
-        }
+        is ParameterizedType if rawType == targetRawClass -> this
+
+        is ParameterizedType -> (rawType as? Class<*>)?.findParameterizedSupertype(targetRawClass)
 
         is Class<*> -> {
             genericInterfaces.firstNotNullOfOrNull { it.findParameterizedSupertype(targetRawClass) }

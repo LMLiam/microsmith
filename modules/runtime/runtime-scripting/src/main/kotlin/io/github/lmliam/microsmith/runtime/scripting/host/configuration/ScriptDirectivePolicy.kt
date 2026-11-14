@@ -31,25 +31,19 @@ internal object ScriptDirectivePolicy {
         var groupStartLine: Int? = null
         val groupBuffer = mutableListOf<String>()
 
-        lines.forEachIndexed { index, line ->
+        for ((index, line) in lines.withIndex()) {
             val directMatch = DIRECT_FILE_DIRECTIVE.find(line)
             if (directMatch != null) {
                 val directive = directMatch.groupValues[1]
                 violations += violationMessage(index + 1, directive)
             }
 
-            if (groupStartLine == null && GROUP_FILE_DIRECTIVE_START.containsMatchIn(line)) {
-                groupStartLine = index + 1
-                groupBuffer += line
-                flushGroupedViolationsIfComplete(groupStartLine, groupBuffer)?.let { groupViolations ->
-                    violations += groupViolations
-                    groupStartLine = null
-                }
-                return@forEachIndexed
-            }
-
             if (groupStartLine == null) {
-                return@forEachIndexed
+                if (!GROUP_FILE_DIRECTIVE_START.containsMatchIn(line)) {
+                    continue
+                }
+
+                groupStartLine = index + 1
             }
 
             groupBuffer += line

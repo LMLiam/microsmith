@@ -86,11 +86,11 @@ private fun readRepositoryCredentialsFile(credentialsFilePath: Path): Map<String
     }
 
     val credentialsByRepository = linkedMapOf<String, RepositoryCredentials>()
-    Files.readAllLines(credentialsFilePath).forEachIndexed { lineIndex, rawLine ->
+    for ((lineIndex, rawLine) in Files.readAllLines(credentialsFilePath).withIndex()) {
         val lineNumber = lineIndex + 1
         val line = rawLine.trim()
         if (line.isEmpty() || line.startsWith("#")) {
-            return@forEachIndexed
+            continue
         }
 
         val parts = line.split('|', limit = CREDENTIALS_FILE_ENTRY_PARTS)
