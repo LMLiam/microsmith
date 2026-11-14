@@ -13,13 +13,15 @@ import io.github.lmliam.microsmith.gen.RunScope
 import io.github.lmliam.microsmith.gen.execution.MicrosmithGenerationRunner
 import io.github.lmliam.microsmith.gen.files.render.BinaryFileArtifactRenderer
 import io.github.lmliam.microsmith.gen.files.render.TextFileArtifactRenderer
+import io.github.lmliam.microsmith.gen.plugins.GenerationPlugins
 import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
-import io.github.lmliam.microsmith.gen.plugins.discoverMicrosmithPlugins
+import io.github.lmliam.microsmith.gen.plugins.PluginHostServicesFactory
 import io.github.lmliam.microsmith.resolve.DomainResolutionService
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnosticService
 
 @GraphExtension(RunScope::class)
 internal interface RunGraph {
+    val plugins: GenerationPlugins
     val runner: MicrosmithGenerationRunner
 
     @GraphExtension.Factory
@@ -29,16 +31,25 @@ internal interface RunGraph {
 
     @Provides
     @SingleIn(RunScope::class)
-    fun providePluginCatalog(
+    fun provideGenerationPlugins(
         pluginClassLoader: ClassLoader,
+        hostServices: PluginHostServicesFactory,
         textRenderer: TextFileArtifactRenderer,
         binaryRenderer: BinaryFileArtifactRenderer,
-    ): MicrosmithPluginCatalog =
-        discoverMicrosmithPlugins(pluginClassLoader)
-            .including(
-                artifactAssemblers = listOf(TextFileArtifactAssembler(), BinaryFileArtifactAssembler()),
-                artifactRenderers = listOf(textRenderer, binaryRenderer),
-            )
+    ): GenerationPlugins =
+        GenerationPlugins.load(
+            classLoader = pluginClassLoader,
+            hostServices = hostServices,
+            builtIns =
+                MicrosmithPluginCatalog(
+                    artifactAssemblers = listOf(TextFileArtifactAssembler(), BinaryFileArtifactAssembler()),
+                    artifactRenderers = listOf(textRenderer, binaryRenderer),
+                ),
+        )
+
+    @Provides
+    @SingleIn(RunScope::class)
+    fun providePluginCatalog(plugins: GenerationPlugins): MicrosmithPluginCatalog = plugins.catalog
 
     @Provides
     @SingleIn(RunScope::class)
