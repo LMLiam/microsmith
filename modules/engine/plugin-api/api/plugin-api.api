@@ -1,0 +1,48 @@
+public abstract interface class io/github/lmliam/microsmith/plugin/Console {
+	public abstract fun err (Ljava/lang/String;)V
+	public abstract fun out (Ljava/lang/String;)V
+}
+
+public abstract interface class io/github/lmliam/microsmith/plugin/DiagnosticSink {
+	public abstract fun info (Ljava/lang/String;)V
+	public abstract fun warn (Ljava/lang/String;)V
+}
+
+public abstract interface class io/github/lmliam/microsmith/plugin/Environment {
+	public abstract fun property (Ljava/lang/String;)Ljava/lang/String;
+	public abstract fun variable (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/plugin/HostServices {
+	public abstract fun getClock ()Lkotlin/time/Clock;
+	public abstract fun getConsole ()Lio/github/lmliam/microsmith/plugin/Console;
+	public abstract fun getDiagnostics ()Lio/github/lmliam/microsmith/plugin/DiagnosticSink;
+	public abstract fun getEnvironment ()Lio/github/lmliam/microsmith/plugin/Environment;
+	public abstract fun getFileSystem ()Ljava/nio/file/FileSystem;
+}
+
+public abstract interface class io/github/lmliam/microsmith/plugin/MicrosmithPlugin {
+	public abstract fun getId ()Ljava/lang/String;
+	public abstract fun services (Lio/github/lmliam/microsmith/plugin/HostServices;)Lio/github/lmliam/microsmith/plugin/PluginServices;
+}
+
+public abstract interface class io/github/lmliam/microsmith/plugin/PluginServices : java/lang/AutoCloseable {
+	public fun close ()V
+	public fun getArtifactAssemblers ()Ljava/util/Set;
+	public fun getArtifactCompilers ()Ljava/util/Set;
+	public fun getArtifactContributors ()Ljava/util/Set;
+	public fun getArtifactRenderers ()Ljava/util/Set;
+	public fun getDomainResolvers ()Ljava/util/Set;
+	public fun getResolutionIssueDiagnosticMappers ()Ljava/util/Set;
+}
+
+public final class io/github/lmliam/microsmith/plugin/PluginServices$DefaultImpls {
+	public static fun close (Lio/github/lmliam/microsmith/plugin/PluginServices;)V
+	public static fun getArtifactAssemblers (Lio/github/lmliam/microsmith/plugin/PluginServices;)Ljava/util/Set;
+	public static fun getArtifactCompilers (Lio/github/lmliam/microsmith/plugin/PluginServices;)Ljava/util/Set;
+	public static fun getArtifactContributors (Lio/github/lmliam/microsmith/plugin/PluginServices;)Ljava/util/Set;
+	public static fun getArtifactRenderers (Lio/github/lmliam/microsmith/plugin/PluginServices;)Ljava/util/Set;
+	public static fun getDomainResolvers (Lio/github/lmliam/microsmith/plugin/PluginServices;)Ljava/util/Set;
+	public static fun getResolutionIssueDiagnosticMappers (Lio/github/lmliam/microsmith/plugin/PluginServices;)Ljava/util/Set;
+}
+

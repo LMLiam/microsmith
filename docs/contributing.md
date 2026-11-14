@@ -48,7 +48,7 @@
 
 ### Module layering
 
-- Pipeline layers run `dsl`, `resolve`, `artifact`, `compile`, `gen`. A module belongs to a layer by name (`dsl`, `dsl-*`, and so on) and must not depend on a later layer. Depending on an earlier layer, such as reusing DSL vocabulary types downstream, is allowed. Other modules, such as `runtime-*` and the integrations, are unconstrained.
+- Pipeline layers run `dsl`, `resolve`, `artifact`, `compile`, `plugin-api`, `gen`. A module belongs to a layer by name (`dsl`, `dsl-*`, and so on) and must not depend on a later layer. Depending on an earlier layer, such as reusing DSL vocabulary types downstream, is allowed. Other modules, such as `runtime-*` and the integrations, are unconstrained.
 - Any module may use Metro internally, but no published API module (`dsl`, `resolve`, `artifact`, `compile`, their submodules, `plugin-api` and `runtime-scripting-api`) may mention a Metro type in its ABI dump.
 - `./gradlew verifyModuleLayers` enforces both rules and runs as part of `check`.
 

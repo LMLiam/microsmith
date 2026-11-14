@@ -60,6 +60,31 @@ class ModuleLayersTests :
             violations.shouldContainExactly("compile (compile) -> gen (gen)")
         }
 
+        "rejects plugin-api depending on gen" {
+            val violations =
+                findModuleLayerViolations(
+                    mapOf("plugin-api" to listOf("gen", "compile")),
+                    abiDumps = emptyMap(),
+                )
+
+            violations.shouldContainExactly("plugin-api (plugin-api) -> gen (gen)")
+        }
+
+        "rejects compile depending on plugin-api" {
+            val violations =
+                findModuleLayerViolations(
+                    mapOf("compile" to listOf("plugin-api")),
+                    abiDumps = emptyMap(),
+                )
+
+            violations.shouldContainExactly("compile (compile) -> plugin-api (plugin-api)")
+        }
+
+        "allows gen depending on plugin-api" {
+            findModuleLayerViolations(mapOf("gen" to listOf("plugin-api", "compile")), abiDumps = emptyMap())
+                .shouldBeEmpty()
+        }
+
         "allows downstream modules to reuse dsl vocabulary" {
             val violations =
                 findModuleLayerViolations(

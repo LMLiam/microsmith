@@ -199,6 +199,7 @@ This keeps the layering explicit:
 - `compile-services-dotnet`: .NET/MSBuild artifact compilation into file artifacts
 - `compile-services-dotnet-asp`: ASP.NET project and source-file compilation from normalized REST models
 - `compile-services-dotnet-packages`: .NET package artifact compilation into file artifacts
+- `plugin-api`: the plugin entry contracts `MicrosmithPlugin`, `HostServices` and `PluginServices`, which plugins compile against instead of `gen`
 - `gen`: final file rendering, output routing, and generation orchestration
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution and built-in provider loading
 - `cli`: command-line entrypoint, diagnostics, installer packaging, IDE helper support, and built-in provider validation
@@ -222,7 +223,7 @@ This keeps the layering explicit:
 ## Repository layout
 
 - `modules/`: production Gradle subprojects, grouped by capability:
-  - `engine/`: the pipeline stages `dsl`, `resolve`, `artifact`, `compile`, and `gen`
+  - `engine/`: the pipeline stages `dsl`, `resolve`, `artifact`, `compile`, and `gen`, and the `plugin-api` contracts
   - `schemas/`: schema targets under `base/`, `protobuf/`, and `protobuf-rpc/`
   - `services/`: service targets under `base/`, `dotnet/`, `dotnet-asp/`, and `dotnet-packages/`
   - `runtime/`: the scripting host and its API

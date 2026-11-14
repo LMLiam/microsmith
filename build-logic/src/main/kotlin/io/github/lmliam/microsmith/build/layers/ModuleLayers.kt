@@ -7,6 +7,7 @@ internal enum class PipelineLayer(
     RESOLVE("resolve"),
     ARTIFACT("artifact"),
     COMPILE("compile"),
+    PLUGIN_API("plugin-api"),
     GEN("gen"),
     ;
 
@@ -15,7 +16,7 @@ internal enum class PipelineLayer(
 
 internal fun pipelineLayerOf(module: String): PipelineLayer? = PipelineLayer.entries.firstOrNull { it.owns(module) }
 
-private val publishedApiModules = setOf("plugin-api", "runtime-scripting-api")
+private val publishedApiModules = setOf("runtime-scripting-api")
 
 private val metroType = Regex("dev[/.]zacsweers[/.]metro")
 
