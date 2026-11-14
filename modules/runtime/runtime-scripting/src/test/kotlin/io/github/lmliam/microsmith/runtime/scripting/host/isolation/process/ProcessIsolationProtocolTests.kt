@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
+import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
@@ -70,16 +71,35 @@ class ProcessIsolationProtocolTests :
             val tempDir = createTempDirectory("microsmith-process-protocol")
             try {
                 val resultFile = tempDir.resolve("result.properties")
-                val failure =
-                    ScriptRunFailure(
-                        diagnostics = listOf("worker failure"),
-                        type = ScriptFailureType.COMPILATION,
-                    )
+                val failure = ScriptRunFailure.withMessages(listOf("worker failure"), ScriptFailureType.COMPILATION)
 
                 ProcessIsolationProtocol.writeResult(resultFile, failure)
                 val decoded = ProcessIsolationProtocol.readResult(resultFile).shouldBeInstanceOf<ScriptRunFailure>()
 
                 decoded shouldBe failure
+            } finally {
+                runCatching { tempDir.deleteRecursively() }
+            }
+        }
+
+        "round-trips issue codes of resolution diagnostics" {
+            val tempDir = createTempDirectory("microsmith-process-protocol-resolution")
+            try {
+                val resultFile = tempDir.resolve("result.properties")
+                val failure =
+                    ScriptRunFailure(
+                        diagnostics =
+                            listOf(
+                                ScriptRunDiagnostic(message = "first issue", code = "protobuf.first"),
+                                ScriptRunDiagnostic(message = "second issue", code = "protobuf.second"),
+                                ScriptRunDiagnostic(message = "uncoded"),
+                            ),
+                        type = ScriptFailureType.RESOLUTION,
+                    )
+
+                ProcessIsolationProtocol.writeResult(resultFile, failure)
+
+                ProcessIsolationProtocol.readResult(resultFile) shouldBe failure
             } finally {
                 runCatching { tempDir.deleteRecursively() }
             }
@@ -99,7 +119,7 @@ class ProcessIsolationProtocolTests :
 
                 val decoded = ProcessIsolationProtocol.readResult(resultFile).shouldBeInstanceOf<ScriptRunFailure>()
 
-                decoded.diagnostics shouldBe listOf("legacy failure")
+                decoded.diagnostics shouldBe listOf(ScriptRunDiagnostic("legacy failure"))
                 decoded.type shouldBe ScriptFailureType.HOST
             } finally {
                 runCatching { tempDir.deleteRecursively() }

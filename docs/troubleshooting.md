@@ -33,12 +33,14 @@ What to do:
 Symptoms:
 
 - `microsmith run` exits with compile or evaluation errors
+- `microsmith run` exits with `MS-CLI-2005` and one error per model resolution issue
 - `microsmith init` exits non-zero
 - expected bootstrap files are missing
 
 What to do:
 
 - confirm the script file ends with `.microsmith.kts`
+- fix each reported model resolution issue; the bracketed issue code, such as `protobuf.unresolved-reference`, names the rule that failed
 - rerun with `--diagnostics json --verbose`
 - ensure `--repo-root` points to an existing directory
 - run `microsmith doctor --diagnostics json --verbose` to detect incomplete bootstrap state

@@ -5,6 +5,7 @@ import kotlin.script.experimental.api.ScriptDiagnostic
 internal object ScriptDiagnosticsFormatter {
     fun format(reports: List<ScriptDiagnostic>): List<String> =
         reports
+            .filter { it.severity >= ScriptDiagnostic.Severity.WARNING }
             .sortedWith(
                 compareByDescending<ScriptDiagnostic> { it.severity }
                     .thenBy { it.sourcePath.orEmpty() }

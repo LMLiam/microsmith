@@ -1,8 +1,13 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.execution
 
+import arrow.core.nonEmptyListOf
 import io.github.lmliam.microsmith.dsl.MicrosmithModel
+import io.github.lmliam.microsmith.gen.errors.GenerationResolutionFailedException
+import io.github.lmliam.microsmith.resolve.ResolutionIssue
+import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
+import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import io.kotest.core.spec.style.StringSpec
@@ -14,6 +19,8 @@ import kotlin.io.path.createTempDirectory
 import kotlin.script.experimental.api.EvaluationResult
 import kotlin.script.experimental.api.ResultValue
 import kotlin.script.experimental.api.ScriptEvaluationConfiguration
+
+private data object TestIssue : ResolutionIssue
 
 class ScriptEvaluationSuccessFinalizerTests :
     StringSpec({
@@ -120,10 +127,57 @@ class ScriptEvaluationSuccessFinalizerTests :
                     .shouldBeTypeOf<ScriptRunFailure>()
 
             result.type shouldBe ScriptFailureType.EVALUATION
-            result.diagnostics.shouldContain("warning")
-            result.diagnostics.shouldContain(
+            val messages = result.diagnostics.map { it.message }
+            messages.shouldContain("warning")
+            messages.shouldContain(
                 "Script evaluation failed: Script must either return MicrosmithModel or call " +
                     "emit(model)/generate(model)."
+            )
+        }
+
+        "reports each resolution issue as its own coded diagnostic after the script warnings" {
+            val scriptContext =
+                MicrosmithScriptContext(
+                    outDir = createTempDirectory("microsmith-script-resolution-failure"),
+                    vars = emptyMap(),
+                    flags = emptySet(),
+                    emitHandler = { error("emit should not be called") },
+                )
+            val resolutionFailure =
+                GenerationResolutionFailedException(
+                    issues = nonEmptyListOf(TestIssue, TestIssue),
+                    diagnostics =
+                        nonEmptyListOf(
+                            ResolutionDiagnostic(code = "protobuf.first", message = "first problem"),
+                            ResolutionDiagnostic(code = "protobuf.second", message = "second problem"),
+                        ),
+                )
+            val evaluationResult =
+                EvaluationResult(
+                    returnValue =
+                        ResultValue.Error(
+                            error = IllegalStateException("script failed", resolutionFailure),
+                            wrappingException = null,
+                        ),
+                    configuration = ScriptEvaluationConfiguration {},
+                )
+
+            val result =
+                ScriptEvaluationSuccessFinalizer()
+                    .complete(
+                        evaluationResult = evaluationResult,
+                        scriptContext = scriptContext,
+                        warnings = listOf("[warning] script.kts:1:1 deprecated"),
+                        cacheHit = false,
+                        elapsedMillis = 7,
+                    )
+                    .shouldBeTypeOf<ScriptRunFailure>()
+
+            result.type shouldBe ScriptFailureType.RESOLUTION
+            result.diagnostics.shouldContainExactly(
+                ScriptRunDiagnostic(message = "[warning] script.kts:1:1 deprecated"),
+                ScriptRunDiagnostic(message = "first problem", code = "protobuf.first"),
+                ScriptRunDiagnostic(message = "second problem", code = "protobuf.second"),
             )
         }
     })

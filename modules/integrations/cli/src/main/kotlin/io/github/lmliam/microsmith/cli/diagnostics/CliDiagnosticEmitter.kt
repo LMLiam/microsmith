@@ -22,13 +22,19 @@ internal class CliDiagnosticEmitter(
         )
     }
 
-    fun error(code: CliFailureCode, message: String, details: Map<String, String> = emptyMap()) {
+    fun error(
+        code: CliFailureCode,
+        message: String,
+        details: Map<String, String> = emptyMap(),
+        issueCode: String? = null,
+    ) {
         emit(
             sink = stderr,
             event =
                 DiagnosticEvent(
                     level = DiagnosticLevel.ERROR,
                     code = code.id,
+                    issueCode = issueCode,
                     message = message,
                     details = details,
                 ),
@@ -45,7 +51,8 @@ internal class CliDiagnosticEmitter(
     private fun emitText(sink: (String) -> Unit, event: DiagnosticEvent) {
         val prefix = "[${event.level.name.lowercase()}]"
         val code = event.code?.let { "[$it] " }.orEmpty()
-        sink("$prefix $code${event.message}")
+        val issueCode = event.issueCode?.let { "[$it] " }.orEmpty()
+        sink("$prefix $code$issueCode${event.message}")
         if (verbose) {
             event.details.toSortedMap().forEach { (key, value) -> sink("  $key=$value") }
         }
@@ -60,6 +67,7 @@ internal class CliDiagnosticEmitter(
                 )
                 .apply {
                     event.code?.let { put("code", it) }
+                    event.issueCode?.let { put("issueCode", it) }
                     if (verbose && event.details.isNotEmpty()) {
                         put("details", event.details.toSortedMap())
                     }

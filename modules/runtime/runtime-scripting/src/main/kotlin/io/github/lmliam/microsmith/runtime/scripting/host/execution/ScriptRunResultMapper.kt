@@ -22,15 +22,15 @@ internal object ScriptRunResultMapper {
 
         return when (result) {
             is ResultWithDiagnostics.Failure ->
-                ScriptRunFailure(
-                    diagnostics = formattedReports.ifEmpty { listOf("Script compilation failed.") },
+                ScriptRunFailure.withMessages(
+                    messages = formattedReports.ifEmpty { listOf("Script compilation failed.") },
                     type = ScriptFailureType.COMPILATION,
                 )
 
             is ResultWithDiagnostics.Success ->
                 if (hasErrors) {
-                    ScriptRunFailure(
-                        diagnostics = formattedReports,
+                    ScriptRunFailure.withMessages(
+                        messages = formattedReports,
                         type = ScriptFailureType.COMPILATION,
                     )
                 } else {

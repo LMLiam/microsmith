@@ -164,6 +164,7 @@ When `--diagnostics json` is used, each event is emitted as one JSON line with:
 - `level`
 - `message`
 - `code` for error events
+- `issueCode` for model resolution issues, which are reported as one error event per issue
 - `details` when `--verbose` is enabled and details are available
 
 ### Exit codes
@@ -177,6 +178,7 @@ When `--diagnostics json` is used, each event is emitted as one JSON line with:
 | Script compilation  | `MS-CLI-2002` | `21` | Script compilation failed.                     |
 | Script evaluation   | `MS-CLI-2003` | `22` | Script evaluation failed.                      |
 | Script host         | `MS-CLI-2004` | `23` | Script host failed unexpectedly.               |
+| Model resolution    | `MS-CLI-2005` | `24` | The model failed semantic resolution.          |
 | Doctor              | `MS-CLI-3001` | `30` | `doctor` detected environment issues.          |
 | IDE refresh         | `MS-CLI-4001` | `40` | `ide refresh` failed.                          |
 | IDE doctor          | `MS-CLI-4101` | `41` | `ide doctor` detected issues or failed.        |

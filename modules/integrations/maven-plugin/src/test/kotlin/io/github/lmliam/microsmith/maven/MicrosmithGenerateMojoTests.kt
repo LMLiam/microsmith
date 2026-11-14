@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.maven
 
 import io.github.lmliam.microsmith.maven.execution.MicrosmithScriptHostRunner
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
+import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -161,7 +162,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
             val mojo =
                 fixture.createMojo().apply {
                     scriptHostRunner = MicrosmithScriptHostRunner { _, _ ->
-                        ScriptRunFailure(listOf("Host failure"), ScriptFailureType.HOST)
+                        ScriptRunFailure.withMessages(listOf("Host failure"), ScriptFailureType.HOST)
                     }
                 }
 
@@ -169,6 +170,29 @@ class MicrosmithGenerateMojoTests : StringSpec() {
 
             error.message shouldContain "Microsmith generation failed"
             error.message shouldContain "Host failure"
+        }
+
+        "resolution failures list each issue with its code as a MojoFailureException" {
+            val fixture = MicrosmithMavenTestProject.create("maven-plugin-resolution-failure")
+            fixture.writeFile("build.microsmith.kts", "emit(microsmith { })")
+            val mojo =
+                fixture.createMojo().apply {
+                    scriptHostRunner = MicrosmithScriptHostRunner { _, _ ->
+                        ScriptRunFailure(
+                            diagnostics =
+                                listOf(
+                                    ScriptRunDiagnostic(message = "first problem", code = "protobuf.first"),
+                                    ScriptRunDiagnostic(message = "second problem", code = "protobuf.second"),
+                                ),
+                            type = ScriptFailureType.RESOLUTION,
+                        )
+                    }
+                }
+
+            val error = shouldThrow<MojoFailureException> { mojo.execute() }
+
+            error.message shouldBe
+                "Microsmith model resolution failed:\n[protobuf.first] first problem\n[protobuf.second] second problem"
         }
 
         "unexpected execution failures surface as MojoExecutionException with the original cause" {

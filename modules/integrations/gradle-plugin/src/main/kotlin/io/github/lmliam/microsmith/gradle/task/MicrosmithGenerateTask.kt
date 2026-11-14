@@ -63,7 +63,7 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
 
         when (result) {
             is MicrosmithGradleWorkerSuccess -> reportSuccess(result)
-            is MicrosmithGradleWorkerFailure -> throw GradleException(formatFailure(result))
+            is MicrosmithGradleWorkerFailure -> throw GradleException(result.describe())
         }
     }
 
@@ -76,12 +76,6 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
                 "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)"
         )
     }
-
-    private fun formatFailure(result: MicrosmithGradleWorkerFailure): String = buildString {
-        appendLine("Microsmith generation failed (${result.type.lowercase()}).")
-        result.diagnostics.forEach(::appendLine)
-    }
-        .trimEnd()
 
     private fun describeGeneratedOutputRoots(outputDirectory: Path, roots: List<Path>): String {
         val normalizedOutputDirectory = outputDirectory.toAbsolutePath().normalize()

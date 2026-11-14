@@ -84,7 +84,9 @@ internal class RunCompletionReporter(private val eventLogWriter: (Path, RunEvent
         if (runResult.diagnostics.isEmpty()) {
             emitter.error(failureCode, "Script execution failed.")
         } else {
-            runResult.diagnostics.forEach { diagnostic -> emitter.error(failureCode, diagnostic) }
+            runResult.diagnostics.forEach { diagnostic ->
+                emitter.error(failureCode, diagnostic.message, issueCode = diagnostic.code)
+            }
         }
         return completeRun(
             command = command,
@@ -142,6 +144,7 @@ internal class RunCompletionReporter(private val eventLogWriter: (Path, RunEvent
             ScriptFailureType.VALIDATION -> CliFailureCode.SCRIPT_VALIDATION_FAILED
             ScriptFailureType.COMPILATION -> CliFailureCode.SCRIPT_COMPILATION_FAILED
             ScriptFailureType.EVALUATION -> CliFailureCode.SCRIPT_EVALUATION_FAILED
+            ScriptFailureType.RESOLUTION -> CliFailureCode.SCRIPT_RESOLUTION_FAILED
             ScriptFailureType.HOST -> CliFailureCode.SCRIPT_HOST_FAILED
         }
 }

@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
+import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 
@@ -17,8 +18,8 @@ internal class ProcessIsolationFailureFactory {
 
     fun fromException(error: Exception): ScriptRunFailure {
         val message = error.message ?: error::class.simpleName ?: "unknown process isolation error"
-        return ScriptRunFailure(
-            diagnostics = listOf("Process isolation execution failed: $message"),
+        return ScriptRunFailure.withMessages(
+            messages = listOf("Process isolation execution failed: $message"),
             type = ScriptFailureType.HOST,
         )
     }
@@ -27,7 +28,9 @@ internal class ProcessIsolationFailureFactory {
         if (processOutput.isEmpty()) {
             return failure
         }
-        return failure.copy(diagnostics = failure.diagnostics + "Process stderr/stdout: $processOutput")
+        return failure.copy(
+            diagnostics = failure.diagnostics + ScriptRunDiagnostic("Process stderr/stdout: $processOutput")
+        )
     }
 
     private fun unknownFailure(exitCode: Int, processOutput: String): ScriptRunFailure {
@@ -37,6 +40,6 @@ internal class ProcessIsolationFailureFactory {
                 add("Process stderr/stdout: $processOutput")
             }
         }
-        return ScriptRunFailure(diagnostics = diagnostics, type = ScriptFailureType.HOST)
+        return ScriptRunFailure.withMessages(messages = diagnostics, type = ScriptFailureType.HOST)
     }
 }
