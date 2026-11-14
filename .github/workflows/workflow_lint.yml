@@ -24,6 +24,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Lint GitHub Workflows
-        uses: rhysd/actionlint@v1.7.10
+        uses: rhysd/actionlint@v1.7.12
