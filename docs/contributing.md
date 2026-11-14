@@ -44,7 +44,13 @@
 
 - Document invariants, contracts, ordering guarantees, and non-obvious behavior.
 - Keep comments concise and durable. If a comment merely restates the code, remove it.
-- Add KDoc for public DSL surfaces, scripting contracts, and non-obvious extension points where contributor intent would otherwise be unclear.
+- Add KDoc only where it adds what the name and signature do not, such as a contract or a constraint on a public DSL surface, a scripting contract, or an extension point. Do not add KDoc that repeats a name.
+
+### Module layering
+
+- Pipeline layers run `dsl`, `resolve`, `artifact`, `compile`, `gen`. A module belongs to a layer by name (`dsl`, `dsl-*`, and so on) and must not depend on a later layer. Depending on an earlier layer, such as reusing DSL vocabulary types downstream, is allowed. Other modules, such as `runtime-*` and the integrations, are unconstrained.
+- Metro is internal composition: only `gen` may apply the Metro plugin or depend on the Metro runtime.
+- `./gradlew verifyModuleLayers` enforces both rules and runs as part of `check`.
 
 ### Review and PR slicing rules
 
