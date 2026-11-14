@@ -76,14 +76,13 @@ internal object ProtobufScriptSymbolContributor : ScriptSymbolContributor {
 
             is ScriptCallCallee.IntLiteral -> target += "v${callee.value}"
 
-            is ScriptCallCallee.Named -> {
-                if (callee.name == VERSION_CALL) {
-                    val version = (call.arguments.firstOrNull() as? ScriptLiteral.IntValue)?.value
+            is ScriptCallCallee.Named if callee.name == VERSION_CALL -> {
+                val version = (call.arguments.firstOrNull() as? ScriptLiteral.IntValue)?.value
 
-                    if (version != null) target += "v$version"
-                }
+                if (version != null) target += "v$version"
             }
 
+            is ScriptCallCallee.Named,
             ScriptCallCallee.Other -> Unit
         }
     }
