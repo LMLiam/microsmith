@@ -113,6 +113,24 @@ potential-bugs:
 
 style:
   active: true
+  ForbiddenMethodCall:
+    active: true
+    # Each allowlisted module is unmigrated; delete its exclude line when it moves to RelativePath or the injected FileSystem.
+    methods:
+      - value: 'java.nio.file.Path.of'
+        reason: 'Use RelativePath, or the injected FileSystem.'
+      - value: 'java.nio.file.Paths.get'
+        reason: 'Use RelativePath, or the injected FileSystem.'
+      - value: 'kotlin.io.path.Path'
+        reason: 'Use RelativePath, or the injected FileSystem.'
+    excludes:
+      - '**/src/test/**'
+      - '**/src/integrationTest/**'
+      - '**/src/e2eTest/**'
+      - '**/src/testFixtures/**'
+      - '**/modules/integrations/cli/**'
+      - '**/modules/runtime/runtime-scripting/**'
+      - '**/modules/integrations/gradle-plugin/**'
   MagicNumber:
     active: true
     ignoreNumbers:
