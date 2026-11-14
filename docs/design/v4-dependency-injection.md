@@ -309,7 +309,7 @@ Why scripting is a separate contract:
 What `ServiceLoader` finds, and what it needs:
 
 - `ServiceLoader` finds `MicrosmithPlugin` and `MicrosmithScriptingPlugin`. The seven `META-INF/services` files in [Plugin development](../plugin-development.md#6-registration) become one, or two for a plugin with script symbols.
-- `ServiceLoader` instantiates the registered provider class. So that class still needs a public no-argument constructor, or a public static `provider()` method. Individual services, such as a resolver or a compiler, no longer need one, because the plugin builds them.
+- `ServiceLoader` instantiates the registered provider class. So that class still needs a public no-argument constructor. Plugin jars are loaded from a class path, where `ServiceLoader` accepts nothing else: its static `provider()` alternative applies only to providers declared in a named module. Individual services, such as a resolver or a compiler, no longer need one, because the plugin builds them.
 - A plugin may build its services with its own Metro graph, or wire them by hand. The host cannot tell the difference.
 
 A plugin that uses Metro:
