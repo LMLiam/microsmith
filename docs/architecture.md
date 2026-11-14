@@ -12,6 +12,8 @@ Microsmith generation is organized into five explicit stages:
 
 Generators consume finalized models and compiled artifacts instead of raw authoring DSL state.
 
+The rules behind this split, such as typed failures, smart constructors, and the plugin boundary, are in [Architecture principles](architecture-principles.md). To write a plugin, see [Plugin development](plugin-development.md).
+
 The graph below shows the central runtime data flow and the Gradle subprojects that participate in each stage.
 
 ```mermaid
