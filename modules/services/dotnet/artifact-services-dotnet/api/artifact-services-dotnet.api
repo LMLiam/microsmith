@@ -1,6 +1,11 @@
 public abstract interface class io/github/lmliam/microsmith/artifact/services/dotnet/DotnetArtifact : io/github/lmliam/microsmith/artifact/services/ServicesArtifact {
 }
 
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/DotnetOutputRootsKt {
+	public static final fun dotnetProjectOutputRoot (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/files/RelativePath;
+	public static final fun dotnetSolutionOutputRoot (Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/files/RelativePath;
+}
+
 public final class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildItem {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V

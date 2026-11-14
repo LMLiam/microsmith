@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.artifact
 
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
 import io.github.lmliam.microsmith.resolve.ResolvedModel
@@ -8,7 +9,6 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import java.nio.file.Path
 import kotlin.reflect.KClass
 
 private data class AlphaResolved(val name: String) : ResolvedModel
@@ -21,7 +21,7 @@ private class AlphaContributor : ArtifactContributor<AlphaResolved> {
     override fun contribute(model: AlphaResolved): List<ArtifactContribution<Artifact>> =
         listOf(
             TextFileArtifactContribution(
-                artifactId = TextFileArtifactId(Path.of("alpha.txt")),
+                artifactId = TextFileArtifactId(RelativePath.of("alpha.txt")),
                 contents = model.name,
             ),
         )
@@ -33,7 +33,7 @@ private class BetaContributor : ArtifactContributor<BetaResolved> {
     override fun contribute(model: BetaResolved): List<ArtifactContribution<Artifact>> =
         listOf(
             TextFileArtifactContribution(
-                artifactId = TextFileArtifactId(Path.of("beta.txt")),
+                artifactId = TextFileArtifactId(RelativePath.of("beta.txt")),
                 contents = model.name,
             ),
         )
@@ -62,11 +62,11 @@ class ArtifactContributionServiceTests :
                 contributions shouldContainExactly
                     listOf(
                         TextFileArtifactContribution(
-                            artifactId = TextFileArtifactId(Path.of("alpha.txt")),
+                            artifactId = TextFileArtifactId(RelativePath.of("alpha.txt")),
                             contents = "first",
                         ),
                         TextFileArtifactContribution(
-                            artifactId = TextFileArtifactId(Path.of("beta.txt")),
+                            artifactId = TextFileArtifactId(RelativePath.of("beta.txt")),
                             contents = "second",
                         ),
                     )

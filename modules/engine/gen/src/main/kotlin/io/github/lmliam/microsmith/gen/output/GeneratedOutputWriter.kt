@@ -6,17 +6,21 @@ import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import io.github.lmliam.microsmith.gen.MicrosmithGenerationScope
 import io.github.lmliam.microsmith.gen.files.FileSpace
 import java.nio.file.Files
+import java.nio.file.Path
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Inject
 @SingleIn(MicrosmithGenerationScope::class)
-internal class GeneratedOutputWriter(private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) {
+internal class GeneratedOutputWriter(
+    private val pathResolver: GeneratedOutputPathResolver,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+) {
     suspend fun write(outputs: List<GeneratedFile>, space: FileSpace) {
         withContext(ioDispatcher) {
             outputs.forEach { output ->
-                val target = GeneratedOutputPathResolver.resolve(space, output)
+                val target = pathResolver.resolve(space, output)
 
                 target.parent?.let(Files::createDirectories)
 
@@ -24,4 +28,7 @@ internal class GeneratedOutputWriter(private val ioDispatcher: CoroutineDispatch
             }
         }
     }
+
+    fun outputRoots(outputs: List<GeneratedFile>, space: FileSpace): List<Path> =
+        outputs.map { output -> pathResolver.resolveRoot(space.root, output.outputRoot) }.distinct().sorted()
 }

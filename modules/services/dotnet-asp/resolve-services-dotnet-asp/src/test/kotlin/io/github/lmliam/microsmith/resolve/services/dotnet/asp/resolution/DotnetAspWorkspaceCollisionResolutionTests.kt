@@ -10,7 +10,6 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
-import java.nio.file.Path
 
 private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
@@ -130,12 +129,8 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                 DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspResolutionIssue.OutputRootCollision(
-                            outputRoot =
-                                Path.of(
-                                    "dotnet",
-                                    "Platform",
-                                    "Shared.Api",
-                                ),
+                            solutionName = "Platform",
+                            projectName = "Shared.Api",
                             serviceNames =
                                 listOf(
                                     "AdminService",
@@ -143,6 +138,35 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                                 ),
                         ),
                     )
+            }
+
+            "resolve orders colliding output roots by their rendered path" {
+                val builder = MicrosmithBuilder()
+
+                builder.services {
+                    dotnet {
+                        target(NET10)
+
+                        solutions {
+                            "A" {}
+                            "A.B" {}
+                        }
+                    }
+
+                    for ((service, solution) in listOf("One" to "A", "Two" to "A", "Three" to "A.B", "Four" to "A.B")) {
+                        service {
+                            dotnet {
+                                solution(solution)
+                                project("Api")
+                                asp {}
+                            }
+                        }
+                    }
+                }
+
+                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()).map {
+                    (it as DotnetAspResolutionIssue.OutputRootCollision).outputRoot
+                } shouldContainExactly listOf("dotnet/A.B/Api", "dotnet/A/Api")
             }
         },
     )

@@ -1,9 +1,12 @@
 package io.github.lmliam.microsmith.gen.output
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.artifact.files.GeneratedFile
+import java.nio.file.FileSystem
 import java.nio.file.Path
 
-internal object GeneratedOutputUniquenessValidator {
+@Inject
+internal class GeneratedOutputUniquenessValidator(private val fileSystem: FileSystem) {
     fun requireUniqueOutputPaths(outputs: List<GeneratedFile>) {
         val duplicates = outputs.groupBy { outputPathKey(it) }.filterValues { it.size > 1 }
 
@@ -13,29 +16,6 @@ internal object GeneratedOutputUniquenessValidator {
         }
     }
 
-    private fun outputPathKey(output: GeneratedFile): String {
-        requireValidOutputRoot(output.outputRoot)
-        val normalizedRelativePath = requireValidRelativePath(output.relativePath)
-
-        return output.outputRoot.normalize().resolve(normalizedRelativePath).normalize().toString()
-    }
-
-    private fun requireValidOutputRoot(outputRoot: Path) {
-        require(!outputRoot.isAbsolute) { "Generated output root must be relative, but was '$outputRoot'." }
-
-        val normalizedOutputRoot = outputRoot.normalize()
-        require(!normalizedOutputRoot.startsWith(Path.of(".."))) {
-            "Generated output root '$outputRoot' escapes the run output root."
-        }
-    }
-
-    private fun requireValidRelativePath(relativePath: Path): Path {
-        require(!relativePath.isAbsolute) { "Generated output path must be relative, but was '$relativePath'." }
-
-        val normalizedRelativePath = relativePath.normalize()
-        require(!normalizedRelativePath.startsWith(Path.of(".."))) {
-            "Generated output path '$relativePath' escapes the run output root."
-        }
-        return normalizedRelativePath
-    }
+    private fun outputPathKey(output: GeneratedFile): Path =
+        fileSystem.pathOf(output.outputRoot).resolve(fileSystem.pathOf(output.relativePath))
 }

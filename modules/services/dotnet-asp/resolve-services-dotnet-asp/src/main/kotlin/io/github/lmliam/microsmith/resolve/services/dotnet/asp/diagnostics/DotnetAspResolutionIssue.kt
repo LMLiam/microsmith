@@ -2,7 +2,6 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics
 
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspHttpMethod
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
-import java.nio.file.Path
 
 sealed interface DotnetAspResolutionIssue : DotnetResolutionIssue {
     enum class RouteDeclarationKind {
@@ -44,7 +43,14 @@ sealed interface DotnetAspResolutionIssue : DotnetResolutionIssue {
     data class DuplicateRestEndpoint(val serviceName: String, val method: DotnetAspHttpMethod, val route: String) :
         DotnetAspResolutionIssue
 
-    data class OutputRootCollision(val outputRoot: Path, val serviceNames: List<String>) : DotnetAspResolutionIssue
+    data class OutputRootCollision(
+        val solutionName: String,
+        val projectName: String,
+        val serviceNames: List<String>,
+    ) : DotnetAspResolutionIssue {
+        val outputRoot: String
+            get() = "dotnet/$solutionName/$projectName"
+    }
 
     data class PortOutOfRange(val serviceName: String, val kind: PortKind, val port: Int) : DotnetAspResolutionIssue
 

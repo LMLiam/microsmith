@@ -1,101 +1,105 @@
 package io.github.lmliam.microsmith.gen.output
 
+import com.google.common.jimfs.Configuration
+import com.google.common.jimfs.Jimfs
 import io.github.lmliam.microsmith.artifact.files.GeneratedFile
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.paths.shouldBeAbsolute
 import io.kotest.matchers.shouldBe
 import java.nio.file.Files
-import kotlin.io.path.Path
 
 class GeneratedOutputPathResolverTests :
     StringSpec(
         {
-            "resolve resolves safe relative output paths under root" {
-                val root = Files.createTempDirectory("microsmith-paths-root-")
-                val space = DirectorySpace.from(root)
+            "resolve places a relative output path under the root" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    val space = DirectorySpace.from(fileSystem.getPath("/out"))
 
-                val resolved = GeneratedOutputPathResolver.resolve(space, Path("proto/pkg/User.proto"))
+                    val resolved =
+                        GeneratedOutputPathResolver(fileSystem)
+                            .resolve(space, RelativePath.of("proto", "pkg", "User.proto"))
 
-                resolved.shouldBeAbsolute()
-                resolved.startsWith(space.root) shouldBe true
-                Files.exists(resolved) shouldBe false
-            }
-
-            "resolve routes outputs into a nested output root" {
-                val root = Files.createTempDirectory("microsmith-paths-root-")
-                val space = DirectorySpace.from(root)
-                val output =
-                    GeneratedFile(
-                        relativePath = Path("UserService.cs"),
-                        contents = byteArrayOf(),
-                        outputRoot = Path("services/UserService"),
-                    )
-
-                val resolved = GeneratedOutputPathResolver.resolve(space, output)
-
-                resolved.shouldBeAbsolute()
-                resolved.startsWith(space.root.resolve("services/UserService")) shouldBe true
-                Files.exists(resolved) shouldBe false
-            }
-
-            "resolve rejects absolute generated output paths" {
-                val root = Files.createTempDirectory("microsmith-paths-root-")
-                val space = DirectorySpace.from(root)
-                val absolutePath = root.resolve("outside.proto").toAbsolutePath()
-
-                shouldThrow<IllegalArgumentException> { GeneratedOutputPathResolver.resolve(space, absolutePath) }
-            }
-
-            "resolve rejects absolute routed output roots" {
-                val root = Files.createTempDirectory("microsmith-paths-root-")
-                val space = DirectorySpace.from(root)
-                val output =
-                    GeneratedFile(
-                        relativePath = Path("UserService.cs"),
-                        contents = byteArrayOf(),
-                        outputRoot = root.resolve("services").toAbsolutePath(),
-                    )
-
-                shouldThrow<IllegalArgumentException> { GeneratedOutputPathResolver.resolve(space, output) }
-            }
-
-            "resolve rejects root traversal output paths" {
-                val root = Files.createTempDirectory("microsmith-paths-root-")
-                val space = DirectorySpace.from(root)
-
-                shouldThrow<IllegalArgumentException> {
-                    GeneratedOutputPathResolver.resolve(space, Path("../outside.proto"))
-                }
-
-                shouldThrow<IllegalArgumentException> {
-                    GeneratedOutputPathResolver.resolve(space, Path("safe/../../outside.proto"))
+                    resolved shouldBe fileSystem.getPath("/out/proto/pkg/User.proto")
                 }
             }
 
-            "resolve rejects routed output roots that traverse outside the root" {
-                val root = Files.createTempDirectory("microsmith-paths-root-")
-                val space = DirectorySpace.from(root)
-                val output =
-                    GeneratedFile(
-                        relativePath = Path("UserService.cs"),
-                        contents = byteArrayOf(),
-                        outputRoot = Path("../services/UserService"),
-                    )
+            "resolve does not create the output file" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    val space = DirectorySpace.from(fileSystem.getPath("/out"))
 
-                shouldThrow<IllegalArgumentException> { GeneratedOutputPathResolver.resolve(space, output) }
+                    val resolved = GeneratedOutputPathResolver(fileSystem).resolve(space, RelativePath.of("User.proto"))
+
+                    Files.exists(resolved) shouldBe false
+                }
             }
 
-            "resolve rejects symlink traversal output paths" {
-                val root = Files.createTempDirectory("microsmith-paths-root-")
-                val outside = Files.createTempDirectory("microsmith-paths-outside-")
-                val symlink = root.resolve("link")
-                val linked = runCatching { Files.createSymbolicLink(symlink, outside) }.isSuccess
-                if (linked) {
-                    val space = DirectorySpace.from(root)
+            "resolve routes an output into its nested output root" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    val space = DirectorySpace.from(fileSystem.getPath("/out"))
+                    val output =
+                        GeneratedFile(
+                            relativePath = RelativePath.of("UserService.cs"),
+                            contents = byteArrayOf(),
+                            outputRoot = RelativePath.of("services", "UserService"),
+                        )
+
+                    GeneratedOutputPathResolver(fileSystem).resolve(space, output) shouldBe
+                        fileSystem.getPath("/out/services/UserService/UserService.cs")
+                }
+            }
+
+            "resolve places an output with the root output root directly under the space" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    val space = DirectorySpace.from(fileSystem.getPath("/out"))
+                    val output = GeneratedFile(RelativePath.of("User.proto"), byteArrayOf())
+
+                    GeneratedOutputPathResolver(fileSystem).resolve(space, output) shouldBe
+                        fileSystem.getPath("/out/User.proto")
+                }
+            }
+
+            "resolveRoot places a nested output root under the root" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    val resolved =
+                        GeneratedOutputPathResolver(fileSystem)
+                            .resolveRoot(fileSystem.getPath("/out"), RelativePath.of("dotnet", "Platform"))
+
+                    resolved shouldBe fileSystem.getPath("/out/dotnet/Platform")
+                }
+            }
+
+            "resolveRoot keeps the root for the root output root" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    val resolved =
+                        GeneratedOutputPathResolver(fileSystem)
+                            .resolveRoot(fileSystem.getPath("/out"), RelativePath.ROOT)
+
+                    resolved shouldBe fileSystem.getPath("/out")
+                }
+            }
+
+            "resolve rejects an output root that is a regular file" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    val outputRoot = fileSystem.getPath("/out")
+                    val space = DirectorySpace.from(outputRoot)
+                    Files.delete(outputRoot)
+                    Files.writeString(outputRoot, "not a directory")
+
                     shouldThrow<IllegalArgumentException> {
-                        GeneratedOutputPathResolver.resolve(space, Path("link/secret.proto"))
+                        GeneratedOutputPathResolver(fileSystem).resolve(space, RelativePath.of("User.proto"))
+                    }
+                }
+            }
+
+            "resolve rejects a path that passes through a regular file" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    val space = DirectorySpace.from(fileSystem.getPath("/out"))
+                    Files.writeString(fileSystem.getPath("/out/proto"), "not a directory")
+
+                    shouldThrow<IllegalArgumentException> {
+                        GeneratedOutputPathResolver(fileSystem).resolve(space, RelativePath.of("proto", "User.proto"))
                     }
                 }
             }

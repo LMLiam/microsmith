@@ -18,6 +18,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import java.nio.file.FileSystems
 import java.nio.file.Files
 
 private data object TestExtension : MicrosmithExtension
@@ -54,7 +55,9 @@ class GenerationResolutionFailureTests :
                         resolutionIssueDiagnosticMappers = listOf(TestIssueDiagnosticMapper()),
                     )
 
-                val graph = createGraphFactory<MicrosmithGenerationGraph.Factory>().create(pluginCatalog)
+                val graph =
+                    createGraphFactory<MicrosmithGenerationGraph.Factory>()
+                        .create(pluginCatalog, FileSystems.getDefault())
 
                 val model = MicrosmithBuilder().apply { put(TestExtension::class, TestExtension) }.model
 

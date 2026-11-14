@@ -153,17 +153,17 @@ public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/resp
 }
 
 public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact : io/github/lmliam/microsmith/artifact/services/ServicesArtifact {
-	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;)V
+	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/files/RelativePath;IILjava/util/List;Ljava/util/List;)V
 	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Ljava/lang/String;
-	public final fun component4 ()Ljava/nio/file/Path;
+	public final fun component4 ()Lio/github/lmliam/microsmith/artifact/files/RelativePath;
 	public final fun component5 ()I
 	public final fun component6 ()I
 	public final fun component7 ()Ljava/util/List;
 	public final fun component8 ()Ljava/util/List;
-	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;
-	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;
+	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/files/RelativePath;IILjava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/files/RelativePath;IILjava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getContractModels ()Ljava/util/List;
 	public final fun getEndpoints ()Ljava/util/List;
@@ -171,7 +171,7 @@ public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/serv
 	public final fun getHttpsPort ()I
 	public synthetic fun getId ()Lio/github/lmliam/microsmith/artifact/ArtifactId;
 	public fun getId ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;
-	public final fun getOutputRoot ()Ljava/nio/file/Path;
+	public final fun getOutputRoot ()Lio/github/lmliam/microsmith/artifact/files/RelativePath;
 	public final fun getServiceName ()Ljava/lang/String;
 	public final fun getTargetFrameworkMoniker ()Ljava/lang/String;
 	public fun hashCode ()I
@@ -202,17 +202,17 @@ public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/serv
 }
 
 public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution : io/github/lmliam/microsmith/artifact/ArtifactContribution {
-	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;)V
+	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/files/RelativePath;IILjava/util/List;Ljava/util/List;)V
 	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Ljava/lang/String;
-	public final fun component4 ()Ljava/nio/file/Path;
+	public final fun component4 ()Lio/github/lmliam/microsmith/artifact/files/RelativePath;
 	public final fun component5 ()I
 	public final fun component6 ()I
 	public final fun component7 ()Ljava/util/List;
 	public final fun component8 ()Ljava/util/List;
-	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution;
-	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution;
+	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/files/RelativePath;IILjava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/files/RelativePath;IILjava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution;
 	public fun equals (Ljava/lang/Object;)Z
 	public synthetic fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/ArtifactId;
 	public fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;
@@ -220,7 +220,7 @@ public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/serv
 	public final fun getEndpoints ()Ljava/util/List;
 	public final fun getHttpPort ()I
 	public final fun getHttpsPort ()I
-	public final fun getOutputRoot ()Ljava/nio/file/Path;
+	public final fun getOutputRoot ()Lio/github/lmliam/microsmith/artifact/files/RelativePath;
 	public final fun getServiceName ()Ljava/lang/String;
 	public final fun getTargetFrameworkMoniker ()Ljava/lang/String;
 	public fun hashCode ()I

@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp
 
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceContribution
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspHttpMethod
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
@@ -15,7 +16,6 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import java.nio.file.Path
 
 class DotnetAspArtifactContributorTests :
     StringSpec(
@@ -39,6 +39,19 @@ class DotnetAspArtifactContributorTests :
 
                 contribution.httpPort shouldBe 7000
                 contribution.httpsPort shouldBe 7443
+            }
+
+            "contribute routes the service under its solution and project directory" {
+                val workspace =
+                    DotnetAspWorkspace(
+                        servicesByName =
+                            linkedMapOf("UserService" to resolvedAspService("UserService", "UserService.Api")),
+                    )
+
+                val contribution =
+                    DotnetAspArtifactContributor().contribute(workspace).single() as DotnetAspServiceContribution
+
+                contribution.outputRoot shouldBe RelativePath.of("dotnet", "Platform", "UserService.Api")
             }
 
             "contribute keeps allocated contract type names clear of generated result type names" {
@@ -100,7 +113,6 @@ private fun resolvedAspService(
         solutionName = "Platform",
         projectName = projectName,
         targetFrameworkMoniker = "net8.0",
-        outputRoot = Path.of("dotnet", "Platform", projectName),
         ports = ports,
         models = emptyMap(),
         rest = rest,

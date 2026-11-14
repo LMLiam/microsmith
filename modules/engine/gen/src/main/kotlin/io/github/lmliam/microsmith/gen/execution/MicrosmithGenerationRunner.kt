@@ -27,6 +27,7 @@ internal class MicrosmithGenerationRunner(
     private val artifactAssemblyService: ArtifactAssemblyService,
     private val artifactCompilationService: ArtifactCompilationService,
     private val artifactRenderingService: ArtifactRenderingService,
+    private val uniquenessValidator: GeneratedOutputUniquenessValidator,
     private val outputWriter: GeneratedOutputWriter,
 ) {
     suspend fun generate(model: MicrosmithModel, finalDir: FileSpace): List<Path> {
@@ -50,7 +51,7 @@ internal class MicrosmithGenerationRunner(
                 val compiledAssembly = artifactCompilationService.compile(assembly)
                 val generatedFiles = artifactRenderingService.render(compiledAssembly)
 
-                GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(generatedFiles)
+                uniquenessValidator.requireUniqueOutputPaths(generatedFiles)
                 outputWriter.write(generatedFiles, tempSpace)
 
                 generatedFiles
@@ -60,9 +61,6 @@ internal class MicrosmithGenerationRunner(
 
         GenerationProgressReporter.reportModelGenerationComplete(finalDir)
 
-        return outputs
-            .map { generatedFile -> finalDir.root.resolve(generatedFile.outputRoot).normalize() }
-            .distinct()
-            .sorted()
+        return outputWriter.outputRoots(outputs, finalDir)
     }
 }

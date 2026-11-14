@@ -14,7 +14,6 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.shouldBe
-import java.nio.file.Path
 
 private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
@@ -87,7 +86,6 @@ class DotnetAspWorkspaceResolverTests :
                 val createUser = requireNotNull(endpoints["CreateUser"])
 
                 workspace.servicesByName shouldContainKey "UserService"
-                service.outputRoot shouldBe Path.of("dotnet", "Platform", "UserService.Api")
                 service.models.keys.toList() shouldContainExactly listOf("User", "Problem")
 
                 getUser.route shouldBe "/users/{id}"
