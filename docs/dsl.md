@@ -128,6 +128,8 @@ microsmith {
 }
 ```
 
+`target(...)` accepts `NET5` through `NET11`. `NET5` through `NET9` are deprecated in favour of `NET10` and will be removed in 3.0; scripts that use them compile with a deprecation warning.
+
 REST DSL contract notes:
 
 - `asp { ... }` is the canonical surface; `aspNet { ... }` is supported as an alias when the longer spelling reads better in a script

@@ -86,7 +86,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
                 microsmith {
                     services {
                         dotnet {
-                            target(NET8)
+                            target(NET10)
                             solutions {
                                 "Platform" {}
                             }
@@ -130,6 +130,29 @@ class MicrosmithGenerateMojoTests : StringSpec() {
                 .file("dotnet/Platform/UserService.Api/Generated/Controllers/" + "UserServiceApiControllerBase.cs")
                 .toFile()
                 .shouldExist()
+        }
+
+        "execute logs deprecated script APIs as warnings" {
+            val fixture = MicrosmithMavenTestProject.create("maven-plugin-deprecated-target")
+            fixture.writeFile(
+                "build.microsmith.kts",
+                """
+                microsmith {
+                    services {
+                        dotnet {
+                            target(NET8)
+                            solutions { "Platform" {} }
+                        }
+                    }
+                }
+                """
+                    .trimIndent(),
+            )
+            val log = RecordingLog()
+
+            fixture.createMojo().apply { setLog(log) }.execute()
+
+            log.warnings.single().shouldContain("'val NET8: DotnetTarget' is deprecated")
         }
 
         "script compilation failures surface as MojoFailureException" {

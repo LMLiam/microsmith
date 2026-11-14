@@ -39,7 +39,7 @@ class DotnetPackageWorkspaceResolverTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
                         solutions {
                             "Platform" {
                                 packages {
@@ -92,7 +92,7 @@ class DotnetPackageWorkspaceResolverTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
                         solutions {
                             "Platform" {
                                 packages {
@@ -131,7 +131,7 @@ class DotnetPackageWorkspaceResolverTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
                         solutions { "Platform" {} }
                     }
 
@@ -170,7 +170,7 @@ class DotnetPackageWorkspaceResolverTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }
@@ -200,7 +200,7 @@ class DotnetPackageWorkspaceResolverTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
                         solutions { "Platform" { packages { "Serilog.AspNetCore" { version("9.0.0") } } } }
                     }
 
@@ -230,7 +230,7 @@ class DotnetPackageWorkspaceResolverTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" { packages { "Serilog.AspNetCore" { version("9.0.0") } } } }
                     }
@@ -271,7 +271,7 @@ class DotnetPackageWorkspaceResolverTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions {
                             "Platform" { packages { "Serilog.AspNetCore" { version("9.0.0") } } }

@@ -20,7 +20,7 @@ private fun resolveQuery(
     val builder = MicrosmithBuilder()
     builder.services {
         dotnet {
-            target(NET8)
+            target(NET10)
             solutions { "Platform" {} }
         }
         "ReportService" {

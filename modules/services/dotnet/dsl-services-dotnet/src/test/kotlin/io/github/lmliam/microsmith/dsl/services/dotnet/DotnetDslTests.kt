@@ -36,14 +36,14 @@ class DotnetDslTests :
             "services-level dotnet blocks merge into defaults extension" {
                 val builder = MicrosmithBuilder()
 
-                builder.services { dotnet { target(NET8) } }
+                builder.services { dotnet { target(NET10) } }
 
                 builder.services { dotnet { solutions { "Platform" {} } } }
 
                 val extension = builder.requireServicesExtension()
                 val defaults = requireNotNull(extension.get<DotnetDefaultsExtension>())
 
-                defaults.target shouldBe DotnetTarget.NET8
+                defaults.target shouldBe DotnetTarget.NET10
                 defaults.solutions.keys.toList() shouldContainExactly listOf("Platform")
             }
 
@@ -83,7 +83,7 @@ class DotnetDslTests :
 
                 builder.services {
                     "UserService" {
-                        dotnet { target(NET9) }
+                        dotnet { target(NET11) }
 
                         dotnet {
                             solution("Platform")
@@ -104,7 +104,7 @@ class DotnetDslTests :
                 val service = extension.require("UserService")
                 val dotnet = requireNotNull(service.model.get<DotnetServiceExtension>())
 
-                dotnet.target shouldBe DotnetTarget.NET9
+                dotnet.target shouldBe DotnetTarget.NET11
                 dotnet.solution shouldBe "Platform"
                 dotnet.project shouldBe "UserService.Api"
                 dotnet.models.keys.toList() shouldContainExactly listOf("User")
@@ -268,7 +268,8 @@ class DotnetDslTests :
             "dotnet target validates supported tfms" {
                 DotnetTarget.of("net11.0") shouldBe DotnetTarget.NET11
                 DotnetTarget.of("net10.0") shouldBe DotnetTarget.NET10
-                DotnetTarget.of("net5.0") shouldBe DotnetTarget.NET5
+                DotnetTarget.of("net5.0").moniker shouldBe "net5.0"
+                DotnetTarget.of("net9.0").moniker shouldBe "net9.0"
 
                 shouldThrow<IllegalArgumentException> { DotnetTarget.of("netstandard2.1") }
 

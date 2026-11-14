@@ -27,7 +27,7 @@ private fun resolveDiagnostics(
     val builder = MicrosmithBuilder()
     builder.services {
         dotnet {
-            target(NET8)
+            target(NET10)
             solutions { "Platform" {} }
         }
         "UserService" {

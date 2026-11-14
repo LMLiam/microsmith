@@ -29,7 +29,7 @@ class DotnetAspRouteResolutionTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }

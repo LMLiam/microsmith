@@ -35,7 +35,7 @@ class DotnetWorkspaceResolverTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
                         solutions { "Platform" {} }
                     }
 
@@ -56,7 +56,7 @@ class DotnetWorkspaceResolverTests :
                 val workspace = DotnetWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
                 val service = requireNotNull(workspace.services["UserService"])
 
-                service.target shouldBe DotnetTarget.NET8
+                service.target shouldBe DotnetTarget.NET10
                 workspace.solutions.keys shouldContainExactly listOf("Platform")
                 service.solution.name shouldBe "Platform"
                 service.project shouldBe "UserService.Api"
@@ -69,7 +69,7 @@ class DotnetWorkspaceResolverTests :
                 val builder = MicrosmithBuilder()
 
                 builder.services {
-                    dotnet { target(NET8) }
+                    dotnet { target(NET10) }
 
                     "UserService" {
                         dotnet {
@@ -93,7 +93,7 @@ class DotnetWorkspaceResolverTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
                         solutions { "Platform" {} }
                     }
 

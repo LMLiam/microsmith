@@ -31,7 +31,7 @@ class DotnetAspBindingResolutionTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }
@@ -75,7 +75,7 @@ class DotnetAspBindingResolutionTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }
@@ -127,7 +127,7 @@ class DotnetAspBindingResolutionTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }
@@ -160,7 +160,7 @@ class DotnetAspBindingResolutionTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }
@@ -203,7 +203,7 @@ class DotnetAspBindingResolutionTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }
@@ -259,7 +259,7 @@ class DotnetAspBindingResolutionTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }

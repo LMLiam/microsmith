@@ -30,7 +30,7 @@ class DotnetAspWorkspaceCollisionResolutionTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }
@@ -67,7 +67,7 @@ class DotnetAspWorkspaceCollisionResolutionTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }
@@ -105,7 +105,7 @@ class DotnetAspWorkspaceCollisionResolutionTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
 
                         solutions { "Platform" {} }
                     }

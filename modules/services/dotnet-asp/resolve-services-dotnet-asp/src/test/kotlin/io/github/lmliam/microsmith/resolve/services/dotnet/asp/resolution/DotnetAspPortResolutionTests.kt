@@ -23,7 +23,7 @@ private fun resolvePorts(vararg services: PortedService): EitherNel<DotnetResolu
     val builder = MicrosmithBuilder()
     builder.services {
         dotnet {
-            target(NET8)
+            target(NET10)
             solutions { "Platform" {} }
         }
         services.forEach { portedService ->

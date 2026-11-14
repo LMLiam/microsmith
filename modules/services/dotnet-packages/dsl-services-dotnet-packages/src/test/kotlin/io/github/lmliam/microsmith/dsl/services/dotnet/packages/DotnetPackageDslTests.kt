@@ -25,7 +25,7 @@ class DotnetPackageDslTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
                         solutions {
                             "Platform" {
                                 packages {
@@ -63,7 +63,7 @@ class DotnetPackageDslTests :
 
                 builder.services {
                     dotnet {
-                        target(NET8)
+                        target(NET10)
                         solutions {
                             "Platform" {
                                 packages {
