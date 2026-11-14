@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet
 
-internal const val DEPRECATED_TARGET_MESSAGE = "Target .NET 10 or later. Scheduled for removal in 3.0."
+internal const val DEPRECATED_TARGET_MESSAGE = "Target .NET 10 or later. Scheduled for removal in 4.0."
 
 /** Validated .NET target framework monikers for the DSL. */
 @JvmInline
