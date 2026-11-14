@@ -15,8 +15,10 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
@@ -82,6 +84,90 @@ class MicrosmithScriptHostTests :
                 }
             }
 
+            "reports script compiler warnings on a compile cache hit" {
+                val tempDir = createTempDirectory("microsmith-script-host-warnings")
+                try {
+                    val script = tempDir.resolve("service.microsmith.kts")
+                    script.writeText(
+                        """
+                        microsmith {
+                            services {
+                                dotnet {
+                                    target(NET8)
+                                    solutions { "Platform" {} }
+                                }
+                            }
+                        }
+                        """
+                            .trimIndent(),
+                    )
+                    val host = MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
+                    val request =
+                        ScriptRunRequest(
+                            script = script,
+                            outputDir = tempDir.resolve("generated"),
+                            variables = emptyMap(),
+                            flags = emptySet(),
+                        )
+
+                    val firstRun = host.run(request).shouldBeTypeOf<ScriptRunSuccess>()
+                    val secondRun = host.run(request).shouldBeTypeOf<ScriptRunSuccess>()
+
+                    firstRun.cacheHit shouldBe false
+                    firstRun.warnings.single().shouldContain("NET8").shouldContain("deprecated")
+                    secondRun.cacheHit shouldBe true
+                    secondRun.warnings shouldContainExactly firstRun.warnings
+                } finally {
+                    runCatching { tempDir.deleteRecursively() }
+                }
+            }
+
+            "recompiles and reports warnings when the cached warnings file is missing or corrupt" {
+                val tempDir = createTempDirectory("microsmith-script-host-warnings-damaged")
+                try {
+                    val script = tempDir.resolve("service.microsmith.kts")
+                    script.writeText(
+                        """
+                        microsmith {
+                            services {
+                                dotnet {
+                                    target(NET8)
+                                    solutions { "Platform" {} }
+                                }
+                            }
+                        }
+                        """
+                            .trimIndent(),
+                    )
+                    val cache = tempDir.resolve("cache")
+                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val request =
+                        ScriptRunRequest(
+                            script = script,
+                            outputDir = tempDir.resolve("generated"),
+                            variables = emptyMap(),
+                            flags = emptySet(),
+                        )
+                    val expectedWarnings = host.run(request).shouldBeTypeOf<ScriptRunSuccess>().warnings
+                    val warningsFile = cache.listDirectoryEntries("*.warnings").single()
+
+                    warningsFile.deleteExisting()
+                    val afterMissing = host.run(request).shouldBeTypeOf<ScriptRunSuccess>()
+                    warningsFile.writeText("not base64 !")
+                    val afterCorrupt = host.run(request).shouldBeTypeOf<ScriptRunSuccess>()
+                    val afterRepair = host.run(request).shouldBeTypeOf<ScriptRunSuccess>()
+
+                    afterMissing.cacheHit shouldBe false
+                    afterMissing.warnings shouldContainExactly expectedWarnings
+                    afterCorrupt.cacheHit shouldBe false
+                    afterCorrupt.warnings shouldContainExactly expectedWarnings
+                    afterRepair.cacheHit shouldBe true
+                    afterRepair.warnings shouldContainExactly expectedWarnings
+                } finally {
+                    runCatching { tempDir.deleteRecursively() }
+                }
+            }
+
             "runs script returning ASP NET service output with bundled .NET DSL imports" {
                 val tempDir = createTempDirectory("microsmith-script-host-dotnet-asp")
                 try {
@@ -94,7 +180,7 @@ class MicrosmithScriptHostTests :
                         microsmith {
                             services {
                                 dotnet {
-                                    target(NET8)
+                                    target(NET10)
                                     solutions {
                                         "Platform" {}
                                     }
@@ -218,7 +304,7 @@ class MicrosmithScriptHostTests :
                         microsmith {
                             services {
                                 dotnet {
-                                    target(NET8)
+                                    target(NET10)
                                     solutions {
                                         "Platform" {}
                                     }

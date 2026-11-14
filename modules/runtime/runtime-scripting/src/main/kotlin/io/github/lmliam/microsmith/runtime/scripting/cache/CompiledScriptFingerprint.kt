@@ -5,7 +5,7 @@ import java.security.MessageDigest
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.SourceCode
 
-private const val COMPILED_SCRIPT_CACHE_VERSION = 2
+private const val COMPILED_SCRIPT_CACHE_VERSION = 3
 
 internal object CompiledScriptFingerprint {
     fun uniqueName(

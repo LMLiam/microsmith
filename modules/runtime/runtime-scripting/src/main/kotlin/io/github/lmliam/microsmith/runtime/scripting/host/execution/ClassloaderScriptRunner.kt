@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.runtime.scripting.host.execution
 import io.github.lmliam.microsmith.runtime.scripting.cache.MicrosmithScriptCache
 import io.github.lmliam.microsmith.runtime.scripting.cache.RuntimeClasspathFingerprint
 import io.github.lmliam.microsmith.runtime.scripting.host.configuration.ScriptHostConfigurationFactory
+import io.github.lmliam.microsmith.runtime.scripting.host.diagnostics.ScriptDiagnosticsFormatter
 import io.github.lmliam.microsmith.runtime.scripting.host.isolation.classloader.PluginClassLoaderScope
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
@@ -10,6 +11,7 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.script.experimental.api.ScriptDiagnostic
 
 internal class ClassloaderScriptRunner(private val cacheDirectory: Path) {
     fun execute(request: ScriptRunRequest, scriptPath: Path, outputPath: Path): ScriptRunResult =
@@ -31,11 +33,17 @@ internal class ClassloaderScriptRunner(private val cacheDirectory: Path) {
                         scriptContext = scriptContext,
                         pluginClasspath = request.pluginClasspath,
                     )
+                cache.recordWarnings(
+                    ScriptDiagnosticsFormatter.format(
+                        result.reports.filter { report -> report.severity == ScriptDiagnostic.Severity.WARNING },
+                    ),
+                )
                 ScriptRunResultMapper.toRunResult(
                     result = result,
                     elapsedMillis = elapsedMillis,
                     scriptContext = scriptContext,
                     cacheHit = cache.retrievedScripts > 0,
+                    replayedWarnings = cache.replayedWarnings,
                 )
             }
                 .getOrElse { exception ->

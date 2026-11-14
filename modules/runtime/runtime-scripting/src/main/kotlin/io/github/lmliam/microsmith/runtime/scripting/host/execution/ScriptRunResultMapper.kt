@@ -16,8 +16,9 @@ internal object ScriptRunResultMapper {
         elapsedMillis: Long,
         scriptContext: MicrosmithScriptContext,
         cacheHit: Boolean,
+        replayedWarnings: List<String>,
     ): ScriptRunResult {
-        val formattedReports = ScriptDiagnosticsFormatter.format(result.reports)
+        val formattedReports = replayedWarnings + ScriptDiagnosticsFormatter.format(result.reports)
         val hasErrors = ScriptDiagnosticsFormatter.containsErrors(formattedReports)
 
         return when (result) {
