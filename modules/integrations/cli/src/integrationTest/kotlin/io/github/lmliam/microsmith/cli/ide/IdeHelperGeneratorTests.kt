@@ -116,7 +116,7 @@ class IdeHelperGeneratorTests :
 
             "escapes dollar signs in generated classpath literals" {
                 val repoRoot = createTempDirectory("microsmith-ide-helper-path-escaping")
-                val runtimeJar = repoRoot.resolve("runtime/dollar\$name.jar")
+                val runtimeJar = repoRoot.resolve($$"runtime/dollar$name.jar")
                 runtimeJar.parent.createDirectories()
                 runtimeJar.writeText("jar-binary-placeholder")
 
@@ -127,7 +127,7 @@ class IdeHelperGeneratorTests :
                     )
 
                     val buildFile = repoRoot.resolve(".microsmith/ide/build.gradle.kts")
-                    buildFile.readText().shouldContain("dollar\\\$name.jar")
+                    buildFile.readText().shouldContain($$"dollar\\$name.jar")
                 } finally {
                     runCatching { repoRoot.deleteRecursively() }
                 }

@@ -16,20 +16,20 @@ import org.apache.maven.plugins.annotations.Parameter
 
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true)
 class MicrosmithGenerateMojo : AbstractMojo() {
-    @Parameter(defaultValue = "\${project.basedir}", readonly = true) var projectBaseDirectory: File = File(".")
+    @Parameter(defaultValue = $$"${project.basedir}", readonly = true) var projectBaseDirectory: File = File(".")
 
-    @Parameter(property = "microsmith.scriptFile", defaultValue = "\${project.basedir}/build.microsmith.kts")
+    @Parameter(property = "microsmith.scriptFile", defaultValue = $$"${project.basedir}/build.microsmith.kts")
     var scriptFile: File = File("build.microsmith.kts")
 
     @Parameter(
         property = "microsmith.outputDirectory",
-        defaultValue = "\${project.build.directory}/generated/microsmith",
+        defaultValue = $$"${project.build.directory}/generated/microsmith",
     )
     var outputDirectory: File = File(".")
 
     @Parameter(
         property = "microsmith.cacheDirectory",
-        defaultValue = "\${project.build.directory}/tmp/microsmith/cache",
+        defaultValue = $$"${project.build.directory}/tmp/microsmith/cache",
     )
     var cacheDirectory: File = File("target/tmp/microsmith/cache")
 
