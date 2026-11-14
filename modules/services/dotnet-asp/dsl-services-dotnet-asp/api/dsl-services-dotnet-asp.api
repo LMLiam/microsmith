@@ -1,0 +1,515 @@
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpoint {
+	public fun <init> (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointBindings;Ljava/util/List;)V
+	public synthetic fun <init> (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointBindings;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointBindings;
+	public final fun component5 ()Ljava/util/List;
+	public final fun copy (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointBindings;Ljava/util/List;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpoint;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpoint;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointBindings;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpoint;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBindings ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointBindings;
+	public final fun getMethod ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getResponses ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointBindings {
+	public fun <init> ()V
+	public fun <init> (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;)V
+	public synthetic fun <init> (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;
+	public final fun component2 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;
+	public final fun component3 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBinding;
+	public final fun component4 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;
+	public final fun copy (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointBindings;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointBindings;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBinding;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointBindings;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBody ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;
+	public final fun getHeaders ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBinding;
+	public final fun getPath ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;
+	public final fun getQuery ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspEndpointScope {
+	public abstract fun body (Ljava/lang/String;)V
+	public abstract fun body (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun headers (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun path (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun query (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun responses (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod : java/lang/Enum {
+	public static final field DELETE Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public static final field GET Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public static final field PATCH Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public static final field POST Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public static final field PUT Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public static fun values ()[Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference {
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference$Inline : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference {
+	public fun <init> (Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;
+	public final fun copy (Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference$Inline;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference$Inline;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference$Inline;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getModel ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference$Shared : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference$Shared;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference$Shared;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference$Shared;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getTarget ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$BooleanValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (Z)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$BooleanValue;
+	public static fun constructor-impl (Z)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ZLjava/lang/Object;)Z
+	public static final fun equals-impl0 (ZZ)Z
+	public final fun getValue ()Z
+	public fun hashCode ()I
+	public static fun hashCode-impl (Z)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Z)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Z
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$CharValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (C)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$CharValue;
+	public static fun constructor-impl (C)C
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (CLjava/lang/Object;)Z
+	public static final fun equals-impl0 (CC)Z
+	public final fun getValue ()C
+	public fun hashCode ()I
+	public static fun hashCode-impl (C)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (C)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()C
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$DurationValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (Ljava/time/Duration;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$DurationValue;
+	public static fun constructor-impl (Ljava/time/Duration;)Ljava/time/Duration;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/time/Duration;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/time/Duration;Ljava/time/Duration;)Z
+	public final fun getValue ()Ljava/time/Duration;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/time/Duration;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/time/Duration;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/time/Duration;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$InstantValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (Ljava/time/Instant;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$InstantValue;
+	public static fun constructor-impl (Ljava/time/Instant;)Ljava/time/Instant;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/time/Instant;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/time/Instant;Ljava/time/Instant;)Z
+	public final fun getValue ()Ljava/time/Instant;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/time/Instant;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/time/Instant;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/time/Instant;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$LocalDateTimeValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (Ljava/time/LocalDateTime;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$LocalDateTimeValue;
+	public static fun constructor-impl (Ljava/time/LocalDateTime;)Ljava/time/LocalDateTime;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/time/LocalDateTime;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/time/LocalDateTime;Ljava/time/LocalDateTime;)Z
+	public final fun getValue ()Ljava/time/LocalDateTime;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/time/LocalDateTime;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/time/LocalDateTime;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/time/LocalDateTime;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$LocalDateValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (Ljava/time/LocalDate;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$LocalDateValue;
+	public static fun constructor-impl (Ljava/time/LocalDate;)Ljava/time/LocalDate;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/time/LocalDate;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/time/LocalDate;Ljava/time/LocalDate;)Z
+	public final fun getValue ()Ljava/time/LocalDate;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/time/LocalDate;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/time/LocalDate;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/time/LocalDate;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$LocalTimeValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (Ljava/time/LocalTime;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$LocalTimeValue;
+	public static fun constructor-impl (Ljava/time/LocalTime;)Ljava/time/LocalTime;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/time/LocalTime;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/time/LocalTime;Ljava/time/LocalTime;)Z
+	public final fun getValue ()Ljava/time/LocalTime;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/time/LocalTime;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/time/LocalTime;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/time/LocalTime;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$NumericValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (Ljava/lang/Number;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$NumericValue;
+	public static fun constructor-impl (Ljava/lang/Number;)Ljava/lang/Number;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/Number;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/Number;Ljava/lang/Number;)Z
+	public final fun getValue ()Ljava/lang/Number;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/Number;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/Number;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/Number;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$OffsetDateTimeValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (Ljava/time/OffsetDateTime;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$OffsetDateTimeValue;
+	public static fun constructor-impl (Ljava/time/OffsetDateTime;)Ljava/time/OffsetDateTime;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/time/OffsetDateTime;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/time/OffsetDateTime;Ljava/time/OffsetDateTime;)Z
+	public final fun getValue ()Ljava/time/OffsetDateTime;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/time/OffsetDateTime;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/time/OffsetDateTime;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/time/OffsetDateTime;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$StringValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$StringValue;
+	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$UuidValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
+	public static final synthetic fun box-impl (Ljava/util/UUID;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$UuidValue;
+	public static fun constructor-impl (Ljava/util/UUID;)Ljava/util/UUID;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/UUID;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/UUID;Ljava/util/UUID;)Z
+	public final fun getValue ()Ljava/util/UUID;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/UUID;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/UUID;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/UUID;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeaderField {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeaderField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeaderField;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeaderField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaderName ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBinding {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBinding;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBinding;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBinding;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaders ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeadersBindingScope {
+	public abstract fun header (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeaderField;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBinding;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFields ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestBindingScope : io/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetConfigurableTypedFieldScope {
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestField {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;ZLio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;ZLio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;
+	public final fun component3 ()Z
+	public final fun component4 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;ZLio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestField;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;ZLio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDefaultValue ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getOptional ()Z
+	public final fun getType ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspRequestFieldScope {
+	public abstract fun default (Ljava/lang/Object;)V
+	public abstract fun optional ()V
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponse {
+	public fun <init> (ILio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;Ljava/util/List;)V
+	public synthetic fun <init> (ILio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun component2 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (ILio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;Ljava/util/List;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponse;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponse;ILio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponse;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaders ()Ljava/util/List;
+	public final fun getModel ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/model/DotnetAspModelReference;
+	public final fun getStatusCode ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponseHeader {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponseHeader;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponseHeader;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponseHeader;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponseHeadersScope {
+	public abstract fun header (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponseHeader;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponseScope {
+	public abstract fun headers (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun model (Lkotlin/jvm/functions/Function1;)V
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope {
+	public fun accepted (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun accepted$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public fun badRequest (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun badRequest$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public fun conflict (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun conflict$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public fun created (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun created$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public fun forbidden (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun forbidden$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public fun internalServerError (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun internalServerError$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public fun noContent (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun noContent$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public fun notFound (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun notFound$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public fun ok (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun ok$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public abstract fun status (ILjava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun status$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;ILjava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public fun unauthorized (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun unauthorized$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope$DefaultImpls {
+	public static fun accepted (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun accepted$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun badRequest (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun badRequest$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun conflict (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun conflict$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun created (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun created$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun forbidden (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun forbidden$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun internalServerError (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun internalServerError$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun noContent (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun noContent$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun notFound (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun notFound$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun ok (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun ok$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun status$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;ILjava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun unauthorized (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun unauthorized$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/response/DotnetAspResponsesScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteGroup {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteGroup;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteGroup;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteGroup;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getGroups ()Ljava/util/List;
+	public final fun getPath ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope {
+	public abstract fun delete (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun delete (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun delete$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun delete$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public abstract fun get (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun get (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun get$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun get$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public abstract fun invoke (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun patch (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun patch (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun patch$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun patch$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public abstract fun post (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun post (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun post$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun post$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public abstract fun put (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun put (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun put$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun put$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope$DefaultImpls {
+	public static synthetic fun delete$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun delete$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun get$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun get$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun patch$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun patch$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun post$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun post$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun put$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun put$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRest {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRest;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRest;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRest;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getGroups ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRestScope : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/route/DotnetAspRouteScope {
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPorts {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Integer;Ljava/lang/Integer;)V
+	public synthetic fun <init> (Ljava/lang/Integer;Ljava/lang/Integer;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Integer;
+	public final fun component2 ()Ljava/lang/Integer;
+	public final fun copy (Ljava/lang/Integer;Ljava/lang/Integer;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPorts;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPorts;Ljava/lang/Integer;Ljava/lang/Integer;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPorts;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHttp ()Ljava/lang/Integer;
+	public final fun getHttps ()Ljava/lang/Integer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPortsScope {
+	public abstract fun http (I)V
+	public abstract fun https (I)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspServiceExtension : io/github/lmliam/microsmith/dsl/MergeableExtension, io/github/lmliam/microsmith/dsl/services/ServiceExtension {
+	public fun <init> ()V
+	public fun <init> (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPorts;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRest;)V
+	public synthetic fun <init> (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPorts;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRest;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPorts;
+	public final fun component2 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRest;
+	public final fun copy (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPorts;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRest;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspServiceExtension;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspServiceExtension;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPorts;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRest;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspServiceExtension;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPorts ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspPorts;
+	public final fun getRest ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/service/DotnetAspRest;
+	public fun hashCode ()I
+	public synthetic fun merge (Lio/github/lmliam/microsmith/dsl/ModelExtension;)Lio/github/lmliam/microsmith/dsl/ModelExtension;
+	public fun merge (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspServiceExtension;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspServiceExtension;
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetAspServiceScope {
+	public abstract fun ports (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun rest (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/service/DotnetServiceAspExtensionsKt {
+	public static final fun asp (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun asp$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static final fun aspNet (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun aspNet$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+

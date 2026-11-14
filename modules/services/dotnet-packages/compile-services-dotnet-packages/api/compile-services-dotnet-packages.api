@@ -1,0 +1,14 @@
+public final class io/github/lmliam/microsmith/compile/services/dotnet/packages/DotnetPackageReferencesArtifactCompiler : io/github/lmliam/microsmith/compile/services/ServicesArtifactCompiler {
+	public fun <init> ()V
+	public synthetic fun compile (Lio/github/lmliam/microsmith/artifact/Artifact;)Ljava/util/List;
+	public fun compile (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact;)Ljava/util/List;
+	public fun getArtifactType ()Lkotlin/reflect/KClass;
+}
+
+public final class io/github/lmliam/microsmith/compile/services/dotnet/packages/DotnetPackageVersionsArtifactCompiler : io/github/lmliam/microsmith/compile/services/ServicesArtifactCompiler {
+	public fun <init> ()V
+	public synthetic fun compile (Lio/github/lmliam/microsmith/artifact/Artifact;)Ljava/util/List;
+	public fun compile (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact;)Ljava/util/List;
+	public fun getArtifactType ()Lkotlin/reflect/KClass;
+}
+

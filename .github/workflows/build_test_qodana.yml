@@ -51,6 +51,8 @@ jobs:
       - uses: ./.github/actions/setup-build
       - name: Run detekt and ktfmt
         run: ./gradlew detektMain detektTest detektIntegrationTest detektE2eTest ktfmtCheck --stacktrace
+      - name: Verify public ABI
+        run: ./gradlew checkKotlinAbi --stacktrace
 
   unit-tests:
     name: Unit tests

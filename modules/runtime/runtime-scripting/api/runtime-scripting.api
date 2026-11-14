@@ -1,0 +1,134 @@
+public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost {
+	public fun <init> ()V
+	public fun <init> (Ljava/nio/file/Path;)V
+	public synthetic fun <init> (Ljava/nio/file/Path;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun run (Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunRequest;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunResult;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/context/MicrosmithScriptContext {
+	public fun <init> (Ljava/nio/file/Path;Ljava/util/Map;Ljava/util/Set;Lkotlin/jvm/functions/Function1;)V
+	public final fun emit (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;)V
+	public final fun generate (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;)V
+	public final fun getFlags ()Ljava/util/Set;
+	public final fun getOutDir ()Ljava/nio/file/Path;
+	public final fun getVars ()Ljava/util/Map;
+	public final fun hasFlag (Ljava/lang/String;)Z
+	public final fun requireVar (Ljava/lang/String;)Ljava/lang/String;
+	public final fun varOrNull (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public abstract class io/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScript {
+	public fun <init> ()V
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScriptCompilationConfiguration : kotlin/script/experimental/api/ScriptCompilationConfiguration {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/runtime/scripting/definition/MicrosmithScriptCompilationConfiguration;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/model/GeneratedOutputRoots {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/runtime/scripting/model/GeneratedOutputRoots;
+	public static final fun describe (Ljava/nio/file/Path;Ljava/util/List;)Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType : java/lang/Enum {
+	public static final field COMPILATION Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;
+	public static final field EVALUATION Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;
+	public static final field HOST Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;
+	public static final field RESOLUTION Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;
+	public static final field VALIDATION Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;
+	public static fun values ()[Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode : java/lang/Enum {
+	public static final field CLASSLOADER Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;
+	public static final field Companion Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode$Companion;
+	public static final field PROCESS Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;
+	public final fun getCliValue ()Ljava/lang/String;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;
+	public static fun values ()[Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode$Companion {
+	public final fun fromCliValue (Ljava/lang/String;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/model/ScriptRunDiagnostic {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunDiagnostic;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunDiagnostic;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunDiagnostic;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCode ()Ljava/lang/String;
+	public final fun getMessage ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/model/ScriptRunFailure : io/github/lmliam/microsmith/runtime/scripting/model/ScriptRunResult {
+	public static final field Companion Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunFailure$Companion;
+	public fun <init> (Ljava/util/List;Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;)V
+	public synthetic fun <init> (Ljava/util/List;Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;
+	public final fun copy (Ljava/util/List;Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunFailure;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunFailure;Ljava/util/List;Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunFailure;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDiagnostics ()Ljava/util/List;
+	public final fun getType ()Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/model/ScriptRunFailure$Companion {
+	public final fun withMessages (Ljava/util/List;Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunFailure;
+	public static synthetic fun withMessages$default (Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunFailure$Companion;Ljava/util/List;Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptFailureType;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunFailure;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/model/ScriptRunRequest {
+	public fun <init> (Ljava/nio/file/Path;Ljava/nio/file/Path;Ljava/util/Map;Ljava/util/Set;Ljava/util/List;Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;)V
+	public synthetic fun <init> (Ljava/nio/file/Path;Ljava/nio/file/Path;Ljava/util/Map;Ljava/util/Set;Ljava/util/List;Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/nio/file/Path;
+	public final fun component2 ()Ljava/nio/file/Path;
+	public final fun component3 ()Ljava/util/Map;
+	public final fun component4 ()Ljava/util/Set;
+	public final fun component5 ()Ljava/util/List;
+	public final fun component6 ()Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;
+	public final fun copy (Ljava/nio/file/Path;Ljava/nio/file/Path;Ljava/util/Map;Ljava/util/Set;Ljava/util/List;Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunRequest;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunRequest;Ljava/nio/file/Path;Ljava/nio/file/Path;Ljava/util/Map;Ljava/util/Set;Ljava/util/List;Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunRequest;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFlags ()Ljava/util/Set;
+	public final fun getIsolationMode ()Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptIsolationMode;
+	public final fun getOutputDir ()Ljava/nio/file/Path;
+	public final fun getPluginClasspath ()Ljava/util/List;
+	public final fun getScript ()Ljava/nio/file/Path;
+	public final fun getVariables ()Ljava/util/Map;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/runtime/scripting/model/ScriptRunResult {
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/model/ScriptRunSuccess : io/github/lmliam/microsmith/runtime/scripting/model/ScriptRunResult {
+	public fun <init> (Ljava/util/List;ZJLjava/util/List;)V
+	public synthetic fun <init> (Ljava/util/List;ZJLjava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Z
+	public final fun component3 ()J
+	public final fun component4 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;ZJLjava/util/List;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunSuccess;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunSuccess;Ljava/util/List;ZJLjava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunSuccess;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCacheHit ()Z
+	public final fun getElapsedMillis ()J
+	public final fun getGeneratedRoots ()Ljava/util/List;
+	public final fun getWarnings ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

@@ -1,0 +1,129 @@
+public abstract interface class io/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee {
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$IntLiteral : io/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$IntLiteral;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$IntLiteral;IILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$IntLiteral;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$Named : io/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$Named;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$Named;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$Named;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$Other : io/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$Other;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$StringLiteral : io/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$StringLiteral;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$StringLiteral;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee$StringLiteral;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/api/ScriptCallSite {
+	public fun <init> (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee;Ljava/util/List;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee;Ljava/util/List;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallSite;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallSite;Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallSite;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getArguments ()Ljava/util/List;
+	public final fun getCallee ()Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallCallee;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral {
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$BooleanValue : io/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral {
+	public fun <init> (Z)V
+	public final fun component1 ()Z
+	public final fun copy (Z)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$BooleanValue;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$BooleanValue;ZILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$BooleanValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$IntValue : io/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$IntValue;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$IntValue;IILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$IntValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$StringValue : io/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$StringValue;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$StringValue;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptLiteral$StringValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolContributor {
+	public abstract fun createValue (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
+	public abstract fun discover (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolDeclarationSite;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolDefinition;
+	public abstract fun getDeclarationCallNames ()Ljava/util/Set;
+	public abstract fun getId ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolDeclarationSite {
+	public fun <init> (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallSite;Ljava/util/List;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallSite;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallSite;Ljava/util/List;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolDeclarationSite;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolDeclarationSite;Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallSite;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolDeclarationSite;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCall ()Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptCallSite;
+	public final fun getEnclosingCalls ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolDefinition {
+	public fun <init> (Ljava/lang/String;Lkotlin/reflect/KClass;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lkotlin/reflect/KClass;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Lkotlin/reflect/KClass;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolDefinition;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolDefinition;Ljava/lang/String;Lkotlin/reflect/KClass;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/api/ScriptSymbolDefinition;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKind ()Ljava/lang/String;
+	public final fun getPropertyName ()Ljava/lang/String;
+	public final fun getValueKey ()Ljava/lang/String;
+	public final fun getValueType ()Lkotlin/reflect/KClass;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

@@ -1,0 +1,7 @@
+public final class io/github/lmliam/microsmith/compile/schemas/protobuf/rpc/ProtobufRpcServiceArtifactCompiler : io/github/lmliam/microsmith/compile/schemas/SchemasArtifactCompiler {
+	public fun <init> ()V
+	public synthetic fun compile (Lio/github/lmliam/microsmith/artifact/Artifact;)Ljava/util/List;
+	public fun compile (Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifact;)Ljava/util/List;
+	public fun getArtifactType ()Lkotlin/reflect/KClass;
+}
+

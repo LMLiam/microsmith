@@ -1,0 +1,1264 @@
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue : io/github/lmliam/microsmith/resolve/ResolutionIssue {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$CircularSchemaImports : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceIssue {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$CircularSchemaImports;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$CircularSchemaImports;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$CircularSchemaImports;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSchemas ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateEnumValueNames : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumIssue {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateEnumValueNames;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateEnumValueNames;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateEnumValueNames;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateEnumValueNumbers : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumIssue {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateEnumValueNumbers;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateEnumValueNumbers;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateEnumValueNumbers;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNumbers ()Ljava/util/List;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateFieldNames : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateFieldNames;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateFieldNames;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateFieldNames;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateFieldNumbers : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateFieldNumbers;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateFieldNumbers;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateFieldNumbers;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNumbers ()Ljava/util/List;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateOneofNames : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateOneofNames;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateOneofNames;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateOneofNames;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateReservedNames : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservationIssue {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateReservedNames;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateReservedNames;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DuplicateReservedNames;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EmptyEnum : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumIssue {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EmptyEnum;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EmptyEnum;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EmptyEnum;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EmptyOneof : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EmptyOneof;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EmptyOneof;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EmptyOneof;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOneofName ()Ljava/lang/String;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumFirstValueMustBeZero : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;I)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()I
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;I)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumFirstValueMustBeZero;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumFirstValueMustBeZero;Ljava/lang/String;Ljava/lang/String;IILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumFirstValueMustBeZero;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFirstValueName ()Ljava/lang/String;
+	public final fun getNumber ()I
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumIssue : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumValueNameCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumIssue {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumValueNameCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumValueNameCollision;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$EnumValueNameCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSchemaName ()Ljava/lang/String;
+	public final fun getValueNames ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldJsonNameCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldJsonNameCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldJsonNameCollision;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldJsonNameCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldNames ()Ljava/util/List;
+	public final fun getJsonName ()Ljava/lang/String;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$Field : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$Field;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$Field;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$Field;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$OneofField : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$OneofField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$OneofField;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$OneofField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getOneofName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$Reservation : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$Reservation;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$Reservation;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation$Reservation;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDescription ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Declaration : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Declaration;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$EnumValue : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$EnumValue;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$EnumValue;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$EnumValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValueName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Field : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Field;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Field;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Field;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Oneof : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Oneof;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Oneof;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Oneof;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOneofName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$OneofField : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$OneofField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$OneofField;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$OneofField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getOneofName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Reservation : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Reservation;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Reservation;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation$Reservation;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidFieldNumber : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation;I)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation;
+	public final fun component3 ()I
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation;I)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidFieldNumber;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidFieldNumber;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation;IILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidFieldNumber;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLocation ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$FieldLocation;
+	public final fun getNumber ()I
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidIdentifier : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidIdentifier;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidIdentifier;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidIdentifier;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLocation ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$IdentifierLocation;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidReferenceName : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceIssue {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidReferenceName;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidReferenceName;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidReferenceName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLocation ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;
+	public final fun getReason ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public final fun getTargetName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidReservationRange : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservationIssue {
+	public fun <init> (Ljava/lang/String;II)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()I
+	public final fun copy (Ljava/lang/String;II)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidReservationRange;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidReservationRange;Ljava/lang/String;IIILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidReservationRange;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEndInclusive ()I
+	public final fun getSchemaName ()Ljava/lang/String;
+	public final fun getStart ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getReason ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason : java/lang/Enum {
+	public static final field BLANK Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public static final field EMPTY_SEGMENT Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public static final field INVALID_IDENTIFIER_SEGMENT Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public static final field LEADING_DOT Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public static final field TRAILING_DOT Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public static final field WHITESPACE Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public static fun values ()[Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$OverlappingReservedNumbers : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservationIssue {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$OverlappingReservedNumbers;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$OverlappingReservedNumbers;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$OverlappingReservedNumbers;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceIssue : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue {
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$Field : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$Field;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$Field;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$Field;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$MapValue : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$MapValue;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$MapValue;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$MapValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$OneofField : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$OneofField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$OneofField;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation$OneofField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getOneofName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservationIssue : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservedNameCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservationIssue {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservedNameCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservedNameCollision;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservedNameCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservedNumberCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservationIssue {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservedNumberCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservedNumberCollision;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReservedNumberCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNumbers ()Ljava/util/List;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SchemaDeclarationNameMismatch : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SchemaDeclarationNameMismatch;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SchemaDeclarationNameMismatch;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SchemaDeclarationNameMismatch;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDeclarationName ()Ljava/lang/String;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$EnumValue : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$EnumValue;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$EnumValue;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$EnumValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSchemaName ()Ljava/lang/String;
+	public final fun getValueName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Field : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Field;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Field;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Field;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$MapEntry : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$MapEntry;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$MapEntry;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$MapEntry;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Oneof : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Oneof;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Oneof;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Oneof;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOneofName ()Ljava/lang/String;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Package : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Package;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Package;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Package;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPackageName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Type : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Type;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Type;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolDeclaration$Type;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSchemaName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolNameCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$DeclarationIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolNameCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolNameCollision;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$SymbolNameCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDeclarations ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getScope ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$UnresolvedReference : io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceIssue {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$UnresolvedReference;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$UnresolvedReference;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$UnresolvedReference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLocation ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;
+	public final fun getSchemaName ()Ljava/lang/String;
+	public final fun getTargetName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufDeclaration {
+	public abstract fun getName-hm_UtbA ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufEnum : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufDeclaration {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufEnum$Companion;
+	public final fun component1-hm_UtbA ()Ljava/lang/String;
+	public final fun component2-1X0FA-Y ()Ljava/util/List;
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReservations;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getName-hm_UtbA ()Ljava/lang/String;
+	public final fun getReservations ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReservations;
+	public final fun getValues-1X0FA-Y ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufEnum$Companion {
+	public final fun of-DeT8jX4 (Ljava/lang/String;Ljava/util/List;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReservations;)Larrow/core/Either;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufEnumValue {
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-hm_UtbA ()Ljava/lang/String;
+	public final fun component2-82qVEIg ()I
+	public final fun copy-mXFofjs (Ljava/lang/String;I)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufEnumValue;
+	public static synthetic fun copy-mXFofjs$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufEnumValue;Ljava/lang/String;IILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufEnumValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName-hm_UtbA ()Ljava/lang/String;
+	public final fun getNumber-82qVEIg ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField {
+	public abstract fun getName-hm_UtbA ()Ljava/lang/String;
+	public abstract fun getNumber-ls1y4Zo ()I
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Map : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField {
+	public synthetic fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-hm_UtbA ()Ljava/lang/String;
+	public final fun component2-ls1y4Zo ()I
+	public final fun component3 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;
+	public final fun component4 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType;
+	public final fun copy-HqDvi3w (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Map;
+	public static synthetic fun copy-HqDvi3w$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Map;Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Map;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKey ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;
+	public fun getName-hm_UtbA ()Ljava/lang/String;
+	public fun getNumber-ls1y4Zo ()I
+	public final fun getValue ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Reference : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField {
+	public synthetic fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-hm_UtbA ()Ljava/lang/String;
+	public final fun component2-ls1y4Zo ()I
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;
+	public final fun component4 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public final fun copy-HqDvi3w (Ljava/lang/String;ILio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Reference;
+	public static synthetic fun copy-HqDvi3w$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Reference;Ljava/lang/String;ILio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Reference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCardinality ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public fun getName-hm_UtbA ()Ljava/lang/String;
+	public fun getNumber-ls1y4Zo ()I
+	public final fun getReference ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Scalar : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField {
+	public synthetic fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-hm_UtbA ()Ljava/lang/String;
+	public final fun component2-ls1y4Zo ()I
+	public final fun component3 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;
+	public final fun component4 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public final fun copy-HqDvi3w (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Scalar;
+	public static synthetic fun copy-HqDvi3w$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Scalar;Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufField$Scalar;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCardinality ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public fun getName-hm_UtbA ()Ljava/lang/String;
+	public fun getNumber-ls1y4Zo ()I
+	public final fun getType ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufMessage : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufDeclaration {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufMessage$Companion;
+	public final fun component1-hm_UtbA ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReservations;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFields ()Ljava/util/List;
+	public fun getName-hm_UtbA ()Ljava/lang/String;
+	public final fun getOneofs ()Ljava/util/List;
+	public final fun getReservations ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReservations;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufMessage$Companion {
+	public final fun of-PLwQnUk (Ljava/lang/String;Ljava/util/List;Ljava/util/List;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReservations;)Larrow/core/Either;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufOneof {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-hm_UtbA ()Ljava/lang/String;
+	public final fun component2-1X0FA-Y ()Ljava/util/List;
+	public final fun copy-9KhusGU (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufOneof;
+	public static synthetic fun copy-9KhusGU$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufOneof;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufOneof;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFields-1X0FA-Y ()Ljava/util/List;
+	public final fun getName-hm_UtbA ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufOneof$Field {
+	public synthetic fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-hm_UtbA ()Ljava/lang/String;
+	public final fun component2-ls1y4Zo ()I
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType;
+	public final fun copy-6yNvwVs (Ljava/lang/String;ILio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufOneof$Field;
+	public static synthetic fun copy-6yNvwVs$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufOneof$Field;Ljava/lang/String;ILio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufOneof$Field;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName-hm_UtbA ()Ljava/lang/String;
+	public final fun getNumber-ls1y4Zo ()I
+	public final fun getType ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKind ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public final fun getTarget ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReferencesKt {
+	public static final fun dependenciesOf (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Ljava/util/List;)Ljava/util/List;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateEnumValueNames : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateEnumValueNames;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateEnumValueNames;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateEnumValueNames;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateEnumValueNumbers : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateEnumValueNumbers;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateEnumValueNumbers;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateEnumValueNumbers;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNumbers ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateFieldNames : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateFieldNames;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateFieldNames;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateFieldNames;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateFieldNumbers : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateFieldNumbers;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateFieldNumbers;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateFieldNumbers;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNumbers ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateOneofNames : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateOneofNames;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateOneofNames;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateOneofNames;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateReservedNames : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateReservedNames;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateReservedNames;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$DuplicateReservedNames;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$EnumFirstValueMustBeZero : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/lang/String;I)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun copy (Ljava/lang/String;I)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$EnumFirstValueMustBeZero;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$EnumFirstValueMustBeZero;Ljava/lang/String;IILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$EnumFirstValueMustBeZero;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFirstValueName ()Ljava/lang/String;
+	public final fun getNumber ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$EnumValueNameCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$EnumValueNameCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$EnumValueNameCollision;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$EnumValueNameCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValueNames ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$FieldJsonNameCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$FieldJsonNameCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$FieldJsonNameCollision;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$FieldJsonNameCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldNames ()Ljava/util/List;
+	public final fun getJsonName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$Field : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$Field;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$Field;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$Field;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$MapEntry : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$MapEntry;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$MapEntry;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$MapEntry;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$Oneof : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$Oneof;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$Oneof;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbol$Oneof;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOneofName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbolCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbolCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbolCollision;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$MessageSymbolCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDeclarations ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$OverlappingReservedNumbers : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$OverlappingReservedNumbers;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedNameCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedNameCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedNameCollision;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedNameCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedNumberCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedNumberCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedNumberCollision;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedNumberCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNumbers ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedSpanDomainMismatch : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
+	public fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;
+	public final fun copy (Ljava/lang/String;ILio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedSpanDomainMismatch;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedSpanDomainMismatch;Ljava/lang/String;ILio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection$ReservedSpanDomainMismatch;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getExpected ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;
+	public final fun getFirst ()I
+	public final fun getNotation ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReservations {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReservations$Companion;
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNames ()Ljava/util/List;
+	public final fun getSpans ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReservations$Companion {
+	public final fun getNONE ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReservations;
+	public final fun of (Ljava/util/List;Ljava/util/List;)Larrow/core/Either;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchema {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchema$Companion;
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufDeclaration;
+	public final fun component3 ()Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDeclaration ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufDeclaration;
+	public final fun getDependencies ()Ljava/util/List;
+	public final fun getIdentity ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchema$Companion {
+	public final fun of (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufDeclaration;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchema;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel : io/github/lmliam/microsmith/resolve/schemas/ResolvedSchemasModel {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Companion;
+	public final fun component1 ()Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSchemas ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Companion {
+	public final fun of (Ljava/util/List;)Larrow/core/Either;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$CircularImports : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$CircularImports;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$CircularImports;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$CircularImports;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSchemas ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$DuplicateSchema : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;I)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun component2 ()I
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;I)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$DuplicateSchema;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$DuplicateSchema;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;IILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$DuplicateSchema;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIdentity ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun getOccurrences ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$PackageSymbolCollision : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$PackageSymbolCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$PackageSymbolCollision;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$PackageSymbolCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDeclarations ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getPackageName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$ReferenceKindMismatch : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun component4 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public final fun component5 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$ReferenceKindMismatch;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$ReferenceKindMismatch;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$ReferenceKindMismatch;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDeclaredAs ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public final fun getLocation ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;
+	public final fun getReferencedAs ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public final fun getSchema ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun getTarget ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$UnresolvedReference : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$UnresolvedReference;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$UnresolvedReference;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufSchemaModel$Rejection$UnresolvedReference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLocation ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$ReferenceLocation;
+	public final fun getSchema ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun getTarget ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType$Primitive : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType {
+	public fun <init> (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;
+	public final fun copy (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType$Primitive;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType$Primitive;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType$Primitive;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getType ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType$Reference : io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType$Reference;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType$Reference;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufValueType$Reference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getReference ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReference;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/diagnostics/ProtobufDiagnosticSupportKt {
+	public static final fun displayName (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;)Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/diagnostics/ProtobufResolutionDiagnosticMapper : io/github/lmliam/microsmith/resolve/diagnostics/ResolutionIssueDiagnosticMapper {
+	public fun <init> ()V
+	public fun getIssueType ()Lkotlin/reflect/KClass;
+	public synthetic fun map (Lio/github/lmliam/microsmith/resolve/ResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+	public fun map (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtoIdentifier {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtoIdentifier$Companion;
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtoIdentifier;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtoIdentifier$Companion {
+	public final fun parse (Ljava/lang/String;)Larrow/core/Either;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtobufNameValidation {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtobufNameValidation;
+	public final fun parseQualifiedName (Ljava/lang/String;)Larrow/core/Either;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName$Companion;
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3-hm_UtbA ()Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFullyQualifiedName ()Ljava/lang/String;
+	public final fun getPackageName ()Ljava/lang/String;
+	public final fun getTypeName-hm_UtbA ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun resolveReference (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;)Larrow/core/Either;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName$Companion {
+	public final fun parse (Ljava/lang/String;)Larrow/core/Either;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/EnumValueNumber {
+	public static final synthetic fun box-impl (I)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/EnumValueNumber;
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getValue ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/FieldNumber {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/FieldNumber$Companion;
+	public static final synthetic fun box-impl (I)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/FieldNumber;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public final fun getValue ()I
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/FieldNumber$Companion {
+	public final fun parse (I)Larrow/core/Either;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Companion;
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDomain ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;
+	public final fun getFirst ()I
+	public final fun getLast ()I
+	public final fun getNotation ()Ljava/lang/String;
+	public final fun getNumbers ()Lkotlin/ranges/IntRange;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Companion {
+	public final fun range (IILio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;)Larrow/core/Either;
+	public final fun single (ILio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;)Larrow/core/Either;
+	public final fun toMax (ILio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;)Larrow/core/Either;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain : java/lang/Enum {
+	public static final field ENUM Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;
+	public static final field MESSAGE Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getMax ()I
+	public final fun getMin ()I
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;
+	public static fun values ()[Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Domain;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection$Descending : io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection {
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection$Descending;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection$Descending;IIILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection$Descending;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFirst ()I
+	public final fun getLast ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection$OutOfDomain : io/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection$OutOfDomain;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection$OutOfDomain;IILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/numbers/ReservedSpan$Rejection$OutOfDomain;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNumber ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind : java/lang/Enum {
+	public static final field ENUM Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public static final field MESSAGE Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public static final field SERVICE Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public static fun values ()[Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKindKt {
+	public static final fun declarationKind (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSchemasResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
+	public fun <init> ()V
+	public fun getAuthoringType ()Lkotlin/reflect/KClass;
+	public fun getResolvedType ()Lkotlin/reflect/KClass;
+	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
+	public fun resolve (Lio/github/lmliam/microsmith/dsl/schemas/SchemasExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable {
+	public fun <init> (Ljava/util/Collection;)V
+	public final fun lookup (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;)Larrow/core/Either;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$InvalidName : io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$InvalidName;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$InvalidName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$InvalidName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIssue ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$Unknown : io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$Unknown;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$Unknown;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$Unknown;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getTarget ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$Symbol {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$Symbol;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$Symbol;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$Symbol;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIdentity ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun getKind ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
