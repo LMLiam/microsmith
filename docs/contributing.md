@@ -52,6 +52,8 @@
 - Metro is internal composition: only `gen` may apply the Metro plugin or depend on the Metro runtime.
 - `./gradlew verifyModuleLayers` enforces both rules and runs as part of `check`.
 
+Read [Architecture principles](architecture-principles.md) before you change a resolver, artifact, or compiler module.
+
 ### Review and PR slicing rules
 
 - Keep quality refactors behavior-preserving. If a change affects user-visible behavior or a public contract, split it into a separate issue and PR.

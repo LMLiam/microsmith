@@ -1,5 +1,7 @@
 # Plugin resolution
 
+This page covers using plugins. To write one, see [Plugin development](plugin-development.md).
+
 ## Plugin resolution and security model
 
 ### Plugin inputs
