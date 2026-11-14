@@ -3,9 +3,9 @@ package io.github.lmliam.microsmith.gen.render
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembly
+import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import io.github.lmliam.microsmith.gen.ArtifactRendererRegistry
 import io.github.lmliam.microsmith.gen.MicrosmithGenerationScope
-import io.github.lmliam.microsmith.gen.files.GeneratedFile
 
 @Inject
 @SingleIn(MicrosmithGenerationScope::class)

@@ -2,9 +2,9 @@ package io.github.lmliam.microsmith.gen.output
 
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import io.github.lmliam.microsmith.gen.MicrosmithGenerationScope
 import io.github.lmliam.microsmith.gen.files.FileSpace
-import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import java.nio.file.Files
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

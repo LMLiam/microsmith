@@ -228,7 +228,7 @@ Microsmith finds a plugin through `ServiceLoader`. The jar must contain one file
 | `io.github.lmliam.microsmith.artifact.ArtifactContributor` | contributors |
 | `io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler` | assemblers |
 | `io.github.lmliam.microsmith.compile.ArtifactCompiler` | compilers |
-| `io.github.lmliam.microsmith.gen.ArtifactRenderer` | renderers |
+| `io.github.lmliam.microsmith.artifact.ArtifactRenderer` | renderers |
 | `io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor` | script symbol contributors |
 
 Each implementation needs a public no-argument constructor.

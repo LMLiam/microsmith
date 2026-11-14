@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.gen.output
 
-import io.github.lmliam.microsmith.gen.files.GeneratedFile
+import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import java.nio.file.Files

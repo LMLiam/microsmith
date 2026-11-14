@@ -3,7 +3,9 @@ package io.github.lmliam.microsmith.cli.provider
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.ArtifactRenderer
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
+import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution.ProtoFileContribution
@@ -16,8 +18,6 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.Do
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
-import io.github.lmliam.microsmith.gen.ArtifactRenderer
-import io.github.lmliam.microsmith.gen.files.GeneratedFile
 import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.DomainResolver

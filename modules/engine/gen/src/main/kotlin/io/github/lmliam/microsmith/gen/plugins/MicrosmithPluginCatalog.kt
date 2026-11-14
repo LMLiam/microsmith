@@ -1,9 +1,9 @@
 package io.github.lmliam.microsmith.gen.plugins
 
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
+import io.github.lmliam.microsmith.artifact.ArtifactRenderer
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
-import io.github.lmliam.microsmith.gen.ArtifactRenderer
 import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionIssueDiagnosticMapper
 import java.util.ServiceLoader

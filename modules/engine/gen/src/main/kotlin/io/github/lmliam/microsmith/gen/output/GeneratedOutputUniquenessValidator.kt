@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.gen.output
 
-import io.github.lmliam.microsmith.gen.files.GeneratedFile
+import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import java.nio.file.Path
 
 internal object GeneratedOutputUniquenessValidator {

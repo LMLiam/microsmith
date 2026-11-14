@@ -97,9 +97,9 @@ def scriptingIdeFallbackServiceProviders = [
         '=io.github.lmliam.microsmith.compile.services.dotnet.packages.DotnetPackageReferencesArtifactCompiler',
     'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
         '=io.github.lmliam.microsmith.compile.services.dotnet.packages.DotnetPackageVersionsArtifactCompiler',
-    'META-INF/services/io.github.lmliam.microsmith.gen.ArtifactRenderer' +
+    'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactRenderer' +
         '=io.github.lmliam.microsmith.gen.files.render.BinaryFileArtifactRenderer',
-    'META-INF/services/io.github.lmliam.microsmith.gen.ArtifactRenderer' +
+    'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactRenderer' +
         '=io.github.lmliam.microsmith.gen.files.render.TextFileArtifactRenderer',
 ]
 
