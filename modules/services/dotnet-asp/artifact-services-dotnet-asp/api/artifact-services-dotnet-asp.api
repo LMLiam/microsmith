@@ -1,0 +1,229 @@
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/DotnetAspArtifactContributor : io/github/lmliam/microsmith/artifact/ArtifactContributor {
+	public fun <init> ()V
+	public synthetic fun contribute (Lio/github/lmliam/microsmith/resolve/ResolvedModel;)Ljava/util/List;
+	public fun contribute (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspace;)Ljava/util/List;
+	public fun getResolvedType ()Lkotlin/reflect/KClass;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointArtifact {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointBindingsArtifact;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointBindingsArtifact;
+	public final fun component5 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointBindingsArtifact;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointArtifact;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointBindingsArtifact;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBindings ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointBindingsArtifact;
+	public final fun getMethod ()Ljava/lang/String;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getResponses ()Ljava/util/List;
+	public final fun getRoute ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointBindingsArtifact {
+	public fun <init> ()V
+	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeadersBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;)V
+	public synthetic fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeadersBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;
+	public final fun component2 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;
+	public final fun component3 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeadersBindingArtifact;
+	public final fun component4 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;
+	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeadersBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointBindingsArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointBindingsArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeadersBindingArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/endpoint/DotnetAspEndpointBindingsArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBody ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;
+	public final fun getHeaders ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeadersBindingArtifact;
+	public final fun getPath ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;
+	public final fun getQuery ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelLocality;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelLocality;
+	public final fun component3 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelLocality;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelLocality;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLocality ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelLocality;
+	public final fun getModel ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;
+	public final fun getTypeName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelLocality : java/lang/Enum {
+	public static final field INLINE Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelLocality;
+	public static final field SHARED Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelLocality;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelLocality;
+	public static fun values ()[Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelLocality;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeaderFieldArtifact {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeaderFieldArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeaderFieldArtifact;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeaderFieldArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaderName ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeadersBindingArtifact {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeadersBindingArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeadersBindingArtifact;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspHeadersBindingArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaders ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getTypeName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestBindingArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFields ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getTypeName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestFieldArtifact {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;ZLjava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;
+	public final fun component3 ()Z
+	public final fun component4 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;ZLjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestFieldArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestFieldArtifact;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;ZLjava/lang/Object;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/request/DotnetAspRequestFieldArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDefaultValue ()Ljava/lang/Object;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getOptional ()Z
+	public final fun getType ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/response/DotnetAspResponseArtifact {
+	public fun <init> (ILio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;Ljava/util/List;)V
+	public final fun component1 ()I
+	public final fun component2 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (ILio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/response/DotnetAspResponseArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/response/DotnetAspResponseArtifact;ILio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/response/DotnetAspResponseArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaders ()Ljava/util/List;
+	public final fun getModel ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/model/DotnetAspModelArtifact;
+	public final fun getStatusCode ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/response/DotnetAspResponseHeaderArtifact {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/response/DotnetAspResponseHeaderArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/response/DotnetAspResponseHeaderArtifact;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/response/DotnetAspResponseHeaderArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact : io/github/lmliam/microsmith/artifact/services/ServicesArtifact {
+	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/nio/file/Path;
+	public final fun component5 ()I
+	public final fun component6 ()I
+	public final fun component7 ()Ljava/util/List;
+	public final fun component8 ()Ljava/util/List;
+	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getContractModels ()Ljava/util/List;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getHttpPort ()I
+	public final fun getHttpsPort ()I
+	public synthetic fun getId ()Lio/github/lmliam/microsmith/artifact/ArtifactId;
+	public fun getId ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;
+	public final fun getOutputRoot ()Ljava/nio/file/Path;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getTargetFrameworkMoniker ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
+	public fun <init> ()V
+	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
+	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;
+	public fun getArtifactType ()Lkotlin/reflect/KClass;
+	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
+	public fun merge (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId : io/github/lmliam/microsmith/artifact/ArtifactId {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getArtifactType ()Lkotlin/reflect/KClass;
+	public final fun getProjectName ()Ljava/lang/String;
+	public final fun getSolutionName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution : io/github/lmliam/microsmith/artifact/ArtifactContribution {
+	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/nio/file/Path;
+	public final fun component5 ()I
+	public final fun component6 ()I
+	public final fun component7 ()Ljava/util/List;
+	public final fun component8 ()Ljava/util/List;
+	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution;Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;IILjava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceContribution;
+	public fun equals (Ljava/lang/Object;)Z
+	public synthetic fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/ArtifactId;
+	public fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifactId;
+	public final fun getContractModels ()Ljava/util/List;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getHttpPort ()I
+	public final fun getHttpsPort ()I
+	public final fun getOutputRoot ()Ljava/nio/file/Path;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getTargetFrameworkMoniker ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

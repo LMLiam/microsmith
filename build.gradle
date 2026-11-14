@@ -191,6 +191,9 @@ subprojects {
 
     kotlin {
         jvmToolchain(25)
+        abiValidation {
+            enabled = true
+        }
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_25)
             progressiveMode.set(true)

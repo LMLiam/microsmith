@@ -1,0 +1,38 @@
+public final class io/github/lmliam/microsmith/dsl/schemas/MicrosmithScopeSchemasExtensionsKt {
+	public static final fun schemas (Lio/github/lmliam/microsmith/dsl/MicrosmithScope;Lkotlin/jvm/functions/Function1;)V
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/Schema {
+	public abstract fun getName ()Ljava/lang/String;
+	public abstract fun getType ()Lio/github/lmliam/microsmith/dsl/schemas/SchemaType;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/SchemaType {
+	public abstract fun getTypeName ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/SchemasBuilder : io/github/lmliam/microsmith/dsl/schemas/SchemasScope {
+	public fun <init> ()V
+	public final fun register (Lio/github/lmliam/microsmith/dsl/schemas/Schema;)V
+	public final fun toExtension ()Lio/github/lmliam/microsmith/dsl/schemas/SchemasExtension;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/SchemasExtension : io/github/lmliam/microsmith/dsl/MergeableExtension, io/github/lmliam/microsmith/dsl/MicrosmithExtension {
+	public fun <init> (Ljava/util/Set;)V
+	public final fun allOf (Lio/github/lmliam/microsmith/dsl/schemas/SchemaType;)Ljava/util/Set;
+	public final fun component1 ()Ljava/util/Set;
+	public final fun copy (Ljava/util/Set;)Lio/github/lmliam/microsmith/dsl/schemas/SchemasExtension;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/SchemasExtension;Ljava/util/Set;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/SchemasExtension;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun find (Lio/github/lmliam/microsmith/dsl/schemas/SchemaType;Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/Schema;
+	public final fun getSchemas ()Ljava/util/Set;
+	public fun hashCode ()I
+	public synthetic fun merge (Lio/github/lmliam/microsmith/dsl/ModelExtension;)Lio/github/lmliam/microsmith/dsl/ModelExtension;
+	public fun merge (Lio/github/lmliam/microsmith/dsl/schemas/SchemasExtension;)Lio/github/lmliam/microsmith/dsl/schemas/SchemasExtension;
+	public final fun require (Lio/github/lmliam/microsmith/dsl/schemas/SchemaType;Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/Schema;
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/SchemasScope {
+}
+

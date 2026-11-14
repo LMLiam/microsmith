@@ -1,0 +1,731 @@
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpoint {
+	public fun <init> (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpointBindings;Ljava/util/List;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpointBindings;
+	public final fun component6 ()Ljava/util/List;
+	public final fun copy (Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpointBindings;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpoint;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpoint;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpointBindings;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpoint;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBindings ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpointBindings;
+	public final fun getMethod ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getResponses ()Ljava/util/List;
+	public final fun getRoute ()Ljava/lang/String;
+	public final fun getRoutePlaceholders ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpointBindings {
+	public fun <init> ()V
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeadersBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;)V
+	public synthetic fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeadersBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeadersBinding;
+	public final fun component4 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeadersBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpointBindings;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpointBindings;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeadersBinding;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspEndpointBindings;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBody ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;
+	public final fun getHeaders ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeadersBinding;
+	public final fun getPath ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;
+	public final fun getQuery ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeaderField {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeaderField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeaderField;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeaderField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaderName ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeadersBinding {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeadersBinding;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeadersBinding;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspHeadersBinding;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaders ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModelLocality;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModelLocality;
+	public final fun component2 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModelLocality;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModelLocality;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLocality ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModelLocality;
+	public final fun getModel ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetModel;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModelLocality : java/lang/Enum {
+	public static final field INLINE Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModelLocality;
+	public static final field SHARED Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModelLocality;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModelLocality;
+	public static fun values ()[Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModelLocality;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspPorts {
+	public fun <init> (II)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun copy (II)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspPorts;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspPorts;IIILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspPorts;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHttp ()I
+	public final fun getHttps ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestBinding;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFields ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestField {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;ZLio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;
+	public final fun component3 ()Z
+	public final fun component4 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;ZLio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestField;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;ZLio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRequestField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDefaultValue ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getOptional ()Z
+	public final fun getType ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspResponse {
+	public fun <init> (ILio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;Ljava/util/List;)V
+	public final fun component1 ()I
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (ILio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspResponse;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspResponse;ILio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspResponse;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaders ()Ljava/util/List;
+	public final fun getModel ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspModel;
+	public final fun getStatusCode ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspResponseHeader {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspResponseHeader;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspResponseHeader;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspResponseHeader;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest$Companion;
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEndpoints ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest$Companion {
+	public final fun empty ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspService {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspPorts;Ljava/util/Map;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/nio/file/Path;
+	public final fun component6 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspPorts;
+	public final fun component7 ()Ljava/util/Map;
+	public final fun component8 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspPorts;Ljava/util/Map;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspService;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspService;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspPorts;Ljava/util/Map;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspService;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getModels ()Ljava/util/Map;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getOutputRoot ()Ljava/nio/file/Path;
+	public final fun getPorts ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspPorts;
+	public final fun getProjectName ()Ljava/lang/String;
+	public final fun getRest ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/ResolvedDotnetAspRest;
+	public final fun getSolutionName ()Ljava/lang/String;
+	public final fun getTargetFrameworkMoniker ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue {
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$DefaultedPathBindingField : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$DefaultedPathBindingField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$DefaultedPathBindingField;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$DefaultedPathBindingField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBindingName ()Ljava/lang/String;
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$IntegerDefaultNotIntegral : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$IntegerDefaultNotIntegral;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$IntegerDefaultNotIntegral;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$IntegerDefaultNotIntegral;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBindingName ()Ljava/lang/String;
+	public final fun getCsharpTypeName ()Ljava/lang/String;
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$IntegerDefaultOutOfRange : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$IntegerDefaultOutOfRange;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$IntegerDefaultOutOfRange;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$IntegerDefaultOutOfRange;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBindingName ()Ljava/lang/String;
+	public final fun getCsharpTypeName ()Ljava/lang/String;
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$MissingPathBinding : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$MissingPathBinding;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$MissingPathBinding;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$MissingPathBinding;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getPlaceholders ()Ljava/util/List;
+	public final fun getRoute ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource {
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource$InlineModelField : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource$InlineModelField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource$InlineModelField;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource$InlineModelField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getModelName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource$RequestBody : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource$RequestBody;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource$Response : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource$Response;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource$Response;IILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource$Response;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getStatusCode ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$OptionalPathBindingField : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$OptionalPathBindingField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$OptionalPathBindingField;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$OptionalPathBindingField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBindingName ()Ljava/lang/String;
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$PathBindingFieldMismatch : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/util/List;
+	public final fun component5 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$PathBindingFieldMismatch;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$PathBindingFieldMismatch;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$PathBindingFieldMismatch;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBindingName ()Ljava/lang/String;
+	public final fun getFields ()Ljava/util/List;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getPlaceholders ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$PathBindingWithoutPlaceholders : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$PathBindingWithoutPlaceholders;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$PathBindingWithoutPlaceholders;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$PathBindingWithoutPlaceholders;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBindingName ()Ljava/lang/String;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getRoute ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$RequestBindingReferenceField : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$RequestBindingReferenceField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$RequestBindingReferenceField;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$RequestBindingReferenceField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBindingName ()Ljava/lang/String;
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getTargetName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$UnknownSharedModelReference : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$UnknownSharedModelReference;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$UnknownSharedModelReference;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$UnknownSharedModelReference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getSource ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspBindingResolutionIssue$ModelReferenceSource;
+	public final fun getTargetName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue {
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ContractTypeCollision : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ContractTypeCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ContractTypeCollision;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ContractTypeCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOwners ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getTypeName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ControllerBaseTypeCollision : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ControllerBaseTypeCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ControllerBaseTypeCollision;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ControllerBaseTypeCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getProjectName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getTypeName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$NoContentResponseWithBody : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$NoContentResponseWithBody;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$NoContentResponseWithBody;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$NoContentResponseWithBody;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getModelName ()Ljava/lang/String;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderCollidesWithBody : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()I
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderCollidesWithBody;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderCollidesWithBody;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderCollidesWithBody;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaderName ()Ljava/lang/String;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getStatusCode ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderPropertyCollision : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;ILjava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()I
+	public final fun component4 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;ILjava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderPropertyCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderPropertyCollision;Ljava/lang/String;Ljava/lang/String;ILjava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderPropertyCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getPropertyNames ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getStatusCode ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderWithoutPropertyName : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()I
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderWithoutPropertyName;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderWithoutPropertyName;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspGenerationResolutionIssue$ResponseHeaderWithoutPropertyName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHeaderName ()Ljava/lang/String;
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getStatusCode ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionDiagnosticMapper : io/github/lmliam/microsmith/resolve/diagnostics/ResolutionIssueDiagnosticMapper {
+	public fun <init> ()V
+	public fun getIssueType ()Lkotlin/reflect/KClass;
+	public synthetic fun map (Lio/github/lmliam/microsmith/resolve/ResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+	public fun map (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue : io/github/lmliam/microsmith/resolve/services/dotnet/DotnetResolutionIssue {
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateOperationName : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateOperationName;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateOperationName;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateOperationName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateRestEndpoint : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateRestEndpoint;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateRestEndpoint;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateRestEndpoint;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMethod ()Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/endpoint/DotnetAspHttpMethod;
+	public final fun getRoute ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateRoutePlaceholders : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateRoutePlaceholders;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateRoutePlaceholders;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$DuplicateRoutePlaceholders;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getPlaceholders ()Ljava/util/List;
+	public final fun getRoute ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$InvalidRouteDeclaration : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteDeclarationKind;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteDeclarationKind;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteDeclarationKind;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$InvalidRouteDeclaration;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$InvalidRouteDeclaration;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteDeclarationKind;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$InvalidRouteDeclaration;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKind ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteDeclarationKind;
+	public final fun getProblem ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem;
+	public final fun getRoute ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$LaunchPortCollision : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue {
+	public fun <init> (ILjava/util/List;)V
+	public final fun component1 ()I
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (ILjava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$LaunchPortCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$LaunchPortCollision;ILjava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$LaunchPortCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPort ()I
+	public final fun getServiceNames ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$NoFreeDefaultPorts : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$NoFreeDefaultPorts;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$NoFreeDefaultPorts;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$NoFreeDefaultPorts;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$OutputRootCollision : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue {
+	public fun <init> (Ljava/nio/file/Path;Ljava/util/List;)V
+	public final fun component1 ()Ljava/nio/file/Path;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/nio/file/Path;Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$OutputRootCollision;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$OutputRootCollision;Ljava/nio/file/Path;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$OutputRootCollision;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOutputRoot ()Ljava/nio/file/Path;
+	public final fun getServiceNames ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortKind : java/lang/Enum {
+	public static final field HTTP Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortKind;
+	public static final field HTTPS Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortKind;
+	public static fun values ()[Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortKind;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortOutOfRange : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortKind;I)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortKind;
+	public final fun component3 ()I
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortKind;I)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortOutOfRange;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortOutOfRange;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortKind;IILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortOutOfRange;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKind ()Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$PortKind;
+	public final fun getPort ()I
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteDeclarationKind : java/lang/Enum {
+	public static final field ENDPOINT Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteDeclarationKind;
+	public static final field GROUP Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteDeclarationKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteDeclarationKind;
+	public static fun values ()[Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteDeclarationKind;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem {
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$Blank : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$Blank;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$BlankOrPaddedPlaceholder : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$BlankOrPaddedPlaceholder;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$BlankOrPaddedPlaceholder;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$BlankOrPaddedPlaceholder;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSegment ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$EmptyPathSegment : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$EmptyPathSegment;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$InvalidPlaceholderIdentifier : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$InvalidPlaceholderIdentifier;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$InvalidPlaceholderIdentifier;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$InvalidPlaceholderIdentifier;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPlaceholder ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$InvalidSegment : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$InvalidSegment;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$InvalidSegment;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$InvalidSegment;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSegment ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$MissingLeadingSlash : io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue$RouteProblem$MissingLeadingSlash;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/naming/DotnetAspGeneratedNamesKt {
+	public static final field HTTP_NO_CONTENT_STATUS_CODE I
+	public static final field MICROSMITH_CONTROLLER_BASE_TYPE_NAME Ljava/lang/String;
+	public static final field RESULT_BODY_PROPERTY_NAME Ljava/lang/String;
+	public static final fun dotnetAspControllerBaseTypeName (Ljava/lang/String;)Ljava/lang/String;
+	public static final fun dotnetAspHeaderPropertyName (Ljava/lang/String;)Ljava/lang/String;
+	public static final fun dotnetAspResultBaseTypeName (Ljava/lang/String;)Ljava/lang/String;
+	public static final fun dotnetAspResultVariantTypeName (Ljava/lang/String;I)Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspace : io/github/lmliam/microsmith/resolve/services/ResolvedServicesModel {
+	public fun <init> (Ljava/util/Map;)V
+	public final fun component1 ()Ljava/util/Map;
+	public final fun copy (Ljava/util/Map;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspace;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspace;Ljava/util/Map;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspace;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getServicesByName ()Ljava/util/Map;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceDomainResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
+	public fun <init> ()V
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceResolver;)V
+	public synthetic fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceResolver;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getAuthoringType ()Lkotlin/reflect/KClass;
+	public fun getResolvedType ()Lkotlin/reflect/KClass;
+	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
+	public fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceResolver {
+	public fun <init> ()V
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;)V
+	public synthetic fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Larrow/core/Either;
+}
+

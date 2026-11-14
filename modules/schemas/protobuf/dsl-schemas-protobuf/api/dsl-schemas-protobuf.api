@@ -1,0 +1,671 @@
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufDeclarationContext : io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufScope {
+	public abstract fun qualifyName (Ljava/lang/String;)Ljava/lang/String;
+	public abstract fun registerDeclaration (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;)V
+	public abstract fun resolveReference (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufDeclarationContext$DefaultImpls {
+	public static fun invoke (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufDeclarationContext;ILkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchema : io/github/lmliam/microsmith/dsl/schemas/Schema {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchema;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchema;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchema;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getName ()Ljava/lang/String;
+	public final fun getSchema ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;
+	public fun getType ()Lio/github/lmliam/microsmith/dsl/schemas/SchemaType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchemaType : java/lang/Enum, io/github/lmliam/microsmith/dsl/schemas/SchemaType {
+	public static final field PROTOBUF Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchemaType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public fun getTypeName ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchemaType;
+	public static fun values ()[Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchemaType;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufScope {
+	public abstract fun enum (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun enum$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public fun invoke (ILkotlin/jvm/functions/Function1;)V
+	public abstract fun invoke (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun message (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun message$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public abstract fun version (ILkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufScope$DefaultImpls {
+	public static synthetic fun enum$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun invoke (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufScope;ILkotlin/jvm/functions/Function1;)V
+	public static synthetic fun message$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/Reservable {
+	public abstract fun reserved (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;)V
+	public abstract fun reserved (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun reserved ([I)V
+	public abstract fun reserved ([Ljava/lang/String;)V
+	public abstract fun reserved ([Lkotlin/ranges/IntRange;)V
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields {
+	public abstract fun bool (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun bool$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun bytes (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun bytes$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun double (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun double$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun fixed32 (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun fixed32$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun fixed64 (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun fixed64$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun float (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun float$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun int32 (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun int32$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun int64 (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun int64$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun sfixed32 (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun sfixed32$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun sfixed64 (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun sfixed64$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun sint32 (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun sint32$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun sint64 (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun sint64$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun string (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun string$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun uint32 (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun uint32$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public abstract fun uint64 (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun uint64$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields$DefaultImpls {
+	public static synthetic fun bool$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun bytes$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun double$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun fixed32$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun fixed64$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun float$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun int32$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun int64$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun sfixed32$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun sfixed64$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun sint32$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun sint64$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun string$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun uint32$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+	public static synthetic fun uint64$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/SchemasScopeProtobufExtensionsKt {
+	public static final fun protobuf (Lio/github/lmliam/microsmith/dsl/schemas/SchemasScope;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality : java/lang/Enum {
+	public static final field OPTIONAL Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public static final field REPEATED Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public static final field SINGULAR Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public static fun values ()[Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/CardinalityField : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MessageField {
+	public abstract fun getCardinality ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field {
+	public abstract fun getIndex ()I
+	public abstract fun getName ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/FieldType {
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapField : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MessageField {
+	public fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapType;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapType;
+	public final fun copy (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapType;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapField;Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapType;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapField;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getIndex ()I
+	public fun getName ()Ljava/lang/String;
+	public final fun getType ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType {
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapType : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/FieldType {
+	public fun <init> (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;
+	public final fun component2 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;
+	public final fun copy (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapType;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapType;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKey ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;
+	public final fun getValue ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MessageField : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field {
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/OneofField : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Field {
+	public fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;
+	public final fun copy (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/OneofField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/OneofField;Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/OneofField;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFieldType ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;
+	public fun getIndex ()I
+	public fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType {
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$BOOL : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$BOOL;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$BYTES : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$BYTES;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$DOUBLE : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$DOUBLE;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FIXED32 : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FIXED32;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FIXED64 : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FIXED64;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FLOAT : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FLOAT;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$INT32 : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$INT32;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$INT64 : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$INT64;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SFIXED32 : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SFIXED32;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SFIXED64 : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SFIXED64;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SINT32 : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SINT32;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SINT64 : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SINT64;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$STRING : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$STRING;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$UINT32 : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$UINT32;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$UINT64 : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$UINT64;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType {
+	public static final field Companion Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Companion;
+	public fun resolveSegments (Ljava/util/List;)Ljava/util/List;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Companion {
+	public final fun parse (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$DefaultImpls {
+	public static fun resolveSegments (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;Ljava/util/List;)Ljava/util/List;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Local : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Local;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Local;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Local;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getTarget ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun resolveSegments (Ljava/util/List;)Ljava/util/List;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Qualified : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Qualified;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Qualified;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Qualified;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getQualifiedName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun resolveSegments (Ljava/util/List;)Ljava/util/List;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Relative : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference {
+	public fun <init> (ILjava/util/List;)V
+	public final fun component1 ()I
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (ILjava/util/List;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Relative;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Relative;ILjava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Relative;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLevelsUp ()I
+	public final fun getPath ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun resolveSegments (Ljava/util/List;)Ljava/util/List;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Symbolic : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference {
+	public fun <init> (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;
+	public final fun copy (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Symbolic;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Symbolic;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference$Symbolic;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getTarget ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;
+	public fun hashCode ()I
+	public fun resolveSegments (Ljava/util/List;)Ljava/util/List;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/ReferenceField : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/CardinalityField {
+	public fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;)V
+	public synthetic fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;
+	public final fun component4 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public final fun copy (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ReferenceField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ReferenceField;Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ReferenceField;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getCardinality ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public fun getIndex ()I
+	public fun getName ()Ljava/lang/String;
+	public final fun getReference ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/ScalarField : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/CardinalityField {
+	public fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;)V
+	public synthetic fun <init> (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun component3 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;
+	public final fun component4 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public final fun copy (Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ScalarField;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ScalarField;Ljava/lang/String;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ScalarField;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getCardinality ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Cardinality;
+	public fun getIndex ()I
+	public fun getName ()Ljava/lang/String;
+	public final fun getPrimitive ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType : io/github/lmliam/microsmith/dsl/schemas/protobuf/field/FieldType {
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/numbers/ProtobufNumberLimits {
+	public static final field ENUM_MAX I
+	public static final field ENUM_MIN I
+	public static final field FIELD_MAX I
+	public static final field FIELD_MIN I
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/numbers/ProtobufNumberLimits;
+	public final fun getFIELD_IMPLEMENTATION_RESERVED ()Lkotlin/ranges/IntRange;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/oneof/Oneof {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/oneof/Oneof;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/oneof/Oneof;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/oneof/Oneof;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFields ()Ljava/util/List;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reference/EnumRef : io/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/EnumRef;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/EnumRef;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/EnumRef;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getQualifiedName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reference/MessageRef : io/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/MessageRef;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/MessageRef;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/MessageRef;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getQualifiedName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef {
+	public abstract fun getQualifiedName ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Max {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Max;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;IILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFrom ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved {
+	public static final field Companion Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved$Companion;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved$Companion {
+	public final fun fromRange (Lkotlin/ranges/IntRange;I)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedIndex : io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedIndex;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedIndex;IILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedIndex;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIndex ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedName : io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedName;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedName;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedRange : io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved {
+	public fun <init> (Lkotlin/ranges/IntRange;)V
+	public final fun component1 ()Lkotlin/ranges/IntRange;
+	public final fun copy (Lkotlin/ranges/IntRange;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedRange;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedRange;Lkotlin/ranges/IntRange;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedRange;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIndexRange ()Lkotlin/ranges/IntRange;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedToMax : io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedToMax;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedToMax;IILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedToMax;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFrom ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/enum/EnumScope : io/github/lmliam/microsmith/dsl/schemas/protobuf/Reservable {
+	public fun unaryPlus (Ljava/lang/String;)V
+	public abstract fun value (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun value$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/enum/EnumScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/enum/EnumScope$DefaultImpls {
+	public static fun unaryPlus (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/enum/EnumScope;Ljava/lang/String;)V
+	public static synthetic fun value$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/enum/EnumScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/enum/EnumValueScope : io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/FieldScope {
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/FieldScope {
+	public abstract fun index (I)V
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope : io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/FieldScope {
+	public fun getBool ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$BOOL;
+	public fun getBytes ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$BYTES;
+	public fun getDouble ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$DOUBLE;
+	public fun getFixed32 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FIXED32;
+	public fun getFixed64 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FIXED64;
+	public fun getFloat ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FLOAT;
+	public fun getInt32 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$INT32;
+	public fun getInt64 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$INT64;
+	public fun getSfixed32 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SFIXED32;
+	public fun getSfixed64 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SFIXED64;
+	public fun getSint32 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SINT32;
+	public fun getSint64 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SINT64;
+	public fun getString ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$STRING;
+	public fun getUint32 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$UINT32;
+	public fun getUint64 ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$UINT64;
+	public abstract fun key (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;)V
+	public abstract fun ref (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;
+	public fun types (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;)V
+	public fun types (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;)V
+	public fun types (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;)V
+	public fun types (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Ljava/lang/String;)V
+	public abstract fun types (Lkotlin/Pair;)V
+	public fun types (Lkotlin/jvm/functions/Function0;)V
+	public fun typesPairRef (Lkotlin/jvm/functions/Function0;)V
+	public fun typesPairStr (Lkotlin/jvm/functions/Function0;)V
+	public fun typesRef (Lkotlin/Pair;)V
+	public fun typesStr (Lkotlin/Pair;)V
+	public fun value (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;)V
+	public abstract fun value (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;)V
+	public fun value (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;)V
+	public fun value (Ljava/lang/String;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope$DefaultImpls {
+	public static fun getBool (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$BOOL;
+	public static fun getBytes (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$BYTES;
+	public static fun getDouble (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$DOUBLE;
+	public static fun getFixed32 (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FIXED32;
+	public static fun getFixed64 (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FIXED64;
+	public static fun getFloat (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$FLOAT;
+	public static fun getInt32 (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$INT32;
+	public static fun getInt64 (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$INT64;
+	public static fun getSfixed32 (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SFIXED32;
+	public static fun getSfixed64 (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SFIXED64;
+	public static fun getSint32 (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SINT32;
+	public static fun getSint64 (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$SINT64;
+	public static fun getString (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$STRING;
+	public static fun getUint32 (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$UINT32;
+	public static fun getUint64 (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/PrimitiveType$UINT64;
+	public static fun types (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;)V
+	public static fun types (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ValueType;)V
+	public static fun types (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;)V
+	public static fun types (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapKeyType;Ljava/lang/String;)V
+	public static fun types (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lkotlin/jvm/functions/Function0;)V
+	public static fun typesPairRef (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lkotlin/jvm/functions/Function0;)V
+	public static fun typesPairStr (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lkotlin/jvm/functions/Function0;)V
+	public static fun typesRef (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lkotlin/Pair;)V
+	public static fun typesStr (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lkotlin/Pair;)V
+	public static fun value (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;)V
+	public static fun value (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;)V
+	public static fun value (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/MapFieldScope;Ljava/lang/String;)V
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/OneofFieldScope : io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/FieldScope {
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/OneofReferenceFieldScope : io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/FieldScope {
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/ReferenceFieldScope : io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/OneofReferenceFieldScope, io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/ScalarFieldScope {
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/ScalarFieldScope : io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/field/FieldScope {
+	public abstract fun optional ()V
+	public abstract fun repeated ()V
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/message/MessageScope : io/github/lmliam/microsmith/dsl/schemas/protobuf/Reservable, io/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields {
+	public fun getMax ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Max;
+	public abstract fun map (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/MapField;
+	public abstract fun oneof (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun optional (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/CardinalityField;)V
+	public abstract fun optional (Lkotlin/jvm/functions/Function1;)V
+	public fun rangeTo (ILio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Max;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;
+	public abstract fun ref (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ReferenceField;
+	public abstract fun ref (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ReferenceField;
+	public static synthetic fun ref$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/message/MessageScope;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ReferenceField;
+	public static synthetic fun ref$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/message/MessageScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ReferenceField;
+	public abstract fun repeated (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/CardinalityField;)V
+	public abstract fun repeated (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/message/MessageScope$DefaultImpls {
+	public static fun getMax (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/message/MessageScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Max;
+	public static fun rangeTo (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/message/MessageScope;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Max;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;
+	public static synthetic fun ref$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/message/MessageScope;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ReferenceField;
+	public static synthetic fun ref$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/message/MessageScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/ReferenceField;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/oneof/OneofScope : io/github/lmliam/microsmith/dsl/schemas/protobuf/ScalarFields {
+	public abstract fun ref (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/OneofField;
+	public abstract fun ref (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/OneofField;
+	public static synthetic fun ref$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/oneof/OneofScope;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/OneofField;
+	public static synthetic fun ref$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/oneof/OneofScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/OneofField;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/oneof/OneofScope$DefaultImpls {
+	public static synthetic fun ref$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/oneof/OneofScope;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reference/ProtobufTypeRef;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/OneofField;
+	public static synthetic fun ref$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/oneof/OneofScope;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/OneofField;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/reserved/ReservedScope {
+	public fun getMax ()Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Max;
+	public abstract fun index (I)V
+	public abstract fun name (Ljava/lang/String;)V
+	public fun range (II)V
+	public abstract fun range (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;)V
+	public abstract fun range (Lkotlin/ranges/IntRange;)V
+	public fun rangeTo (ILio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Max;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;
+	public fun unaryPlus (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;)V
+	public fun unaryPlus (Ljava/lang/String;)V
+	public fun unaryPlus (Lkotlin/ranges/IntRange;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/scope/reserved/ReservedScope$DefaultImpls {
+	public static fun getMax (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/reserved/ReservedScope;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Max;
+	public static fun range (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/reserved/ReservedScope;II)V
+	public static fun rangeTo (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/reserved/ReservedScope;ILio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Max;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;
+	public static fun unaryPlus (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/reserved/ReservedScope;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/MaxRange;)V
+	public static fun unaryPlus (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/reserved/ReservedScope;Ljava/lang/String;)V
+	public static fun unaryPlus (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/scope/reserved/ReservedScope;Lkotlin/ranges/IntRange;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/types/Enum : io/github/lmliam/microsmith/dsl/schemas/protobuf/types/ReservedDeclarationOwner, io/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Enum;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Enum;Ljava/lang/String;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Enum;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getName ()Ljava/lang/String;
+	public fun getReserved ()Ljava/util/List;
+	public final fun getValues ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/types/EnumValue {
+	public fun <init> (Ljava/lang/String;I)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()I
+	public final fun copy (Ljava/lang/String;I)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/EnumValue;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/EnumValue;Ljava/lang/String;IILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/EnumValue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIndex ()I
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/types/Message : io/github/lmliam/microsmith/dsl/schemas/protobuf/types/ReservedDeclarationOwner, io/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4 ()Ljava/util/List;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Message;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Message;Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Message;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFields ()Ljava/util/List;
+	public fun getName ()Ljava/lang/String;
+	public final fun getOneofs ()Ljava/util/List;
+	public fun getReserved ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/types/ReservedDeclarationOwner {
+	public abstract fun getReserved ()Ljava/util/List;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/types/ServiceDeclaration : io/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type {
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type {
+	public abstract fun getName ()Ljava/lang/String;
+}
+

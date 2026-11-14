@@ -1,0 +1,10 @@
+public final class io/github/lmliam/microsmith/compile/ArtifactCompilationService {
+	public fun <init> (Ljava/util/List;Lio/github/lmliam/microsmith/artifact/assembly/ArtifactAssemblyService;)V
+	public final fun compile (Lio/github/lmliam/microsmith/artifact/assembly/ArtifactAssembly;)Lio/github/lmliam/microsmith/artifact/assembly/ArtifactAssembly;
+}
+
+public abstract interface class io/github/lmliam/microsmith/compile/ArtifactCompiler {
+	public abstract fun compile (Lio/github/lmliam/microsmith/artifact/Artifact;)Ljava/util/List;
+	public abstract fun getArtifactType ()Lkotlin/reflect/KClass;
+}
+

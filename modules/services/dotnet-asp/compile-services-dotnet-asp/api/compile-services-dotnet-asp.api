@@ -1,0 +1,7 @@
+public final class io/github/lmliam/microsmith/compile/services/dotnet/asp/DotnetAspServiceArtifactCompiler : io/github/lmliam/microsmith/compile/services/ServicesArtifactCompiler {
+	public fun <init> ()V
+	public synthetic fun compile (Lio/github/lmliam/microsmith/artifact/Artifact;)Ljava/util/List;
+	public fun compile (Lio/github/lmliam/microsmith/artifact/services/dotnet/asp/service/DotnetAspServiceArtifact;)Ljava/util/List;
+	public fun getArtifactType ()Lkotlin/reflect/KClass;
+}
+

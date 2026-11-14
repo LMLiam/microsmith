@@ -1,0 +1,49 @@
+public abstract interface class io/github/lmliam/microsmith/dsl/MergeableExtension : io/github/lmliam/microsmith/dsl/ModelExtension {
+	public abstract fun merge (Lio/github/lmliam/microsmith/dsl/ModelExtension;)Lio/github/lmliam/microsmith/dsl/ModelExtension;
+}
+
+public final class io/github/lmliam/microsmith/dsl/MicrosmithBuilder : io/github/lmliam/microsmith/dsl/MicrosmithScope {
+	public fun <init> ()V
+	public final fun getModel ()Lio/github/lmliam/microsmith/dsl/MicrosmithModel;
+	public final fun put (Lkotlin/reflect/KClass;Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)V
+}
+
+public final class io/github/lmliam/microsmith/dsl/MicrosmithBuilderExtensionsKt {
+	public static final fun put (Lio/github/lmliam/microsmith/dsl/MicrosmithBuilder;Ljava/lang/Class;Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)V
+}
+
+public abstract interface annotation class io/github/lmliam/microsmith/dsl/MicrosmithDsl : java/lang/annotation/Annotation {
+}
+
+public final class io/github/lmliam/microsmith/dsl/MicrosmithDslEntryPointKt {
+	public static final fun microsmith (Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/dsl/MicrosmithModel;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/MicrosmithExtension : io/github/lmliam/microsmith/dsl/ModelExtension {
+}
+
+public final class io/github/lmliam/microsmith/dsl/MicrosmithModel {
+	public static final field Companion Lio/github/lmliam/microsmith/dsl/MicrosmithModel$Companion;
+	public final fun get (Lkotlin/reflect/KClass;)Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;
+	public final fun keys ()Ljava/util/Set;
+}
+
+public final class io/github/lmliam/microsmith/dsl/MicrosmithModel$Companion {
+	public final fun empty ()Lio/github/lmliam/microsmith/dsl/MicrosmithModel;
+}
+
+public final class io/github/lmliam/microsmith/dsl/MicrosmithModelExtensionsKt {
+	public static final fun extensionTypes (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;)Ljava/util/Set;
+	public static final fun extensions (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;)Ljava/util/List;
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/MicrosmithScope {
+}
+
+public abstract interface class io/github/lmliam/microsmith/dsl/ModelExtension {
+}
+
+public final class io/github/lmliam/microsmith/dsl/merge/ModelExtensionMergingKt {
+	public static final fun mergeModelExtension (Lio/github/lmliam/microsmith/dsl/ModelExtension;Lio/github/lmliam/microsmith/dsl/ModelExtension;)Lio/github/lmliam/microsmith/dsl/ModelExtension;
+}
+

@@ -1,0 +1,203 @@
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue : io/github/lmliam/microsmith/resolve/ResolutionIssue {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$DuplicateRpcName : io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$DuplicateRpcName;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$DuplicateRpcName;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$DuplicateRpcName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRpcName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointMustTargetMessage : io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointMustTargetMessage;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointMustTargetMessage;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointMustTargetMessage;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPosition ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;
+	public final fun getRpcName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getTargetName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition : java/lang/Enum {
+	public static final field REQUEST Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;
+	public static final field RESPONSE Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;
+	public static fun values ()[Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointTargetNotFound : io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointTargetNotFound;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointTargetNotFound;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointTargetNotFound;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPosition ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;
+	public final fun getRpcName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getTargetName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$InvalidEndpointTargetName : io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$InvalidEndpointTargetName;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$InvalidEndpointTargetName;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$InvalidEndpointTargetName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPosition ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$EndpointPosition;
+	public final fun getReason ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;
+	public final fun getRpcName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getTargetName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$InvalidRpcName : io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$InvalidRpcName;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$InvalidRpcName;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$InvalidRpcName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRpcName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$SchemaIssue : io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$SchemaIssue;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$SchemaIssue;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue$SchemaIssue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIssue ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpc {
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-hm_UtbA ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;
+	public final fun component3 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;
+	public final fun copy-Cg4QSLg (Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpc;
+	public static synthetic fun copy-Cg4QSLg$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpc;Ljava/lang/String;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpc;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName-hm_UtbA ()Ljava/lang/String;
+	public final fun getRequest ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;
+	public final fun getResponse ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Z)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun component2 ()Z
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Z)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;ZILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcEndpoint;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getStreaming ()Z
+	public final fun getTarget ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchema {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchema$Companion;
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun component2 ()Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDependencies ()Ljava/util/List;
+	public final fun getQualifiedName ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun getRpcs ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchema$Companion {
+	public final fun of (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Ljava/util/List;)Larrow/core/Either;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchema$Rejection {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchema$Rejection$DuplicateRpcName : io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchema$Rejection {
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-hm_UtbA ()Ljava/lang/String;
+	public final fun copy-pqX_FoQ (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchema$Rejection$DuplicateRpcName;
+	public static synthetic fun copy-pqX_FoQ$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchema$Rejection$DuplicateRpcName;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchema$Rejection$DuplicateRpcName;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName-hm_UtbA ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel : io/github/lmliam/microsmith/resolve/schemas/ResolvedSchemasModel {
+	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel$Companion;
+	public final fun component1 ()Ljava/util/List;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSchemas ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel$Companion {
+	public final fun of (Ljava/util/List;)Larrow/core/Either;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel$Rejection {
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel$Rejection$DuplicateService : io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel$Rejection {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;I)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun component2 ()I
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;I)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel$Rejection$DuplicateService;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel$Rejection$DuplicateService;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;IILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel$Rejection$DuplicateService;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIdentity ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
+	public final fun getOccurrences ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/diagnostics/ProtobufRpcResolutionDiagnosticMapper : io/github/lmliam/microsmith/resolve/diagnostics/ResolutionIssueDiagnosticMapper {
+	public fun <init> ()V
+	public fun getIssueType ()Lkotlin/reflect/KClass;
+	public synthetic fun map (Lio/github/lmliam/microsmith/resolve/ResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+	public fun map (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ProtobufRpcResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+}
+
+public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/resolution/ProtobufRpcSchemasResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
+	public fun <init> ()V
+	public fun getAuthoringType ()Lkotlin/reflect/KClass;
+	public fun getResolvedType ()Lkotlin/reflect/KClass;
+	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
+	public fun resolve (Lio/github/lmliam/microsmith/dsl/schemas/SchemasExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
+}
+

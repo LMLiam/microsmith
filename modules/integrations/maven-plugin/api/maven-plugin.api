@@ -1,0 +1,17 @@
+public final class io/github/lmliam/microsmith/maven/MicrosmithGenerateMojo : org/apache/maven/plugin/AbstractMojo {
+	public fun <init> ()V
+	public fun execute ()V
+	public final fun getCacheDirectory ()Ljava/io/File;
+	public final fun getFlags ()Ljava/util/List;
+	public final fun getOutputDirectory ()Ljava/io/File;
+	public final fun getProjectBaseDirectory ()Ljava/io/File;
+	public final fun getScriptFile ()Ljava/io/File;
+	public final fun getVariables ()Ljava/util/Properties;
+	public final fun setCacheDirectory (Ljava/io/File;)V
+	public final fun setFlags (Ljava/util/List;)V
+	public final fun setOutputDirectory (Ljava/io/File;)V
+	public final fun setProjectBaseDirectory (Ljava/io/File;)V
+	public final fun setScriptFile (Ljava/io/File;)V
+	public final fun setVariables (Ljava/util/Properties;)V
+}
+

@@ -1,0 +1,121 @@
+public abstract interface class io/github/lmliam/microsmith/resolve/services/dotnet/DotnetResolutionIssue : io/github/lmliam/microsmith/resolve/ResolutionIssue {
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue : io/github/lmliam/microsmith/resolve/services/dotnet/DotnetResolutionIssue {
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$ProjectNotConfigured : io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$ProjectNotConfigured;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$ProjectNotConfigured;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$ProjectNotConfigured;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$SolutionNotConfigured : io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$SolutionNotConfigured;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$SolutionNotConfigured;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$SolutionNotConfigured;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$SolutionNotDeclared : io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$SolutionNotDeclared;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$SolutionNotDeclared;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$SolutionNotDeclared;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getSolutionName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$TargetNotConfigured : io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$TargetNotConfigured;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$TargetNotConfigured;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$TargetNotConfigured;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$UnknownModelReference : io/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$UnknownModelReference;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$UnknownModelReference;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue$UnknownModelReference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getModelName ()Ljava/lang/String;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getTargetName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/ResolvedDotnetService {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolution;Ljava/lang/String;Ljava/util/Map;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2-Ldr17aY ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolution;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/util/Map;
+	public final fun copy-Ne_UWAk (Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolution;Ljava/lang/String;Ljava/util/Map;)Lio/github/lmliam/microsmith/resolve/services/dotnet/ResolvedDotnetService;
+	public static synthetic fun copy-Ne_UWAk$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/ResolvedDotnetService;Ljava/lang/String;Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolution;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/ResolvedDotnetService;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getModels ()Ljava/util/Map;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getProject ()Ljava/lang/String;
+	public final fun getSolution ()Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolution;
+	public final fun getTarget-Ldr17aY ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/diagnostics/DotnetWorkspaceResolutionDiagnosticMapper : io/github/lmliam/microsmith/resolve/diagnostics/ResolutionIssueDiagnosticMapper {
+	public fun <init> ()V
+	public fun getIssueType ()Lkotlin/reflect/KClass;
+	public synthetic fun map (Lio/github/lmliam/microsmith/resolve/ResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+	public fun map (Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspace : io/github/lmliam/microsmith/resolve/services/ResolvedServicesModel {
+	public fun <init> (Ljava/util/Map;Ljava/util/Map;)V
+	public final fun component1 ()Ljava/util/Map;
+	public final fun component2 ()Ljava/util/Map;
+	public final fun copy (Ljava/util/Map;Ljava/util/Map;)Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspace;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspace;Ljava/util/Map;Ljava/util/Map;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspace;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getServices ()Ljava/util/Map;
+	public final fun getSolutions ()Ljava/util/Map;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceDomainResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
+	public fun <init> ()V
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;)V
+	public synthetic fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getAuthoringType ()Lkotlin/reflect/KClass;
+	public fun getResolvedType ()Lkotlin/reflect/KClass;
+	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
+	public fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
+}
+
+public final class io/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver {
+	public fun <init> ()V
+	public final fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Larrow/core/Either;
+}
+

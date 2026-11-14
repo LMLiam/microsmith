@@ -73,6 +73,14 @@ Read [Architecture principles](architecture-principles.md) before you change a r
   - Kotlin features improve clarity rather than novelty
   - `detekt`, `ktfmtCheck`, and relevant tests remain green
 
+## Public ABI
+
+Every published module keeps a dump of its public binary interface in `api/<module>.api`. `./gradlew checkKotlinAbi` compares the compiled classes with the dump and runs as part of `check` and in the Lint job of CI.
+
+- A failing check means the public ABI changed. Treat an unexpected difference as a breaking change: restore the declaration, or make it `internal` if it was never meant to be public.
+- When the change is intended, run `./gradlew updateKotlinAbi` and commit the changed dumps with the code. Reviewers read the dump diff as the list of API changes.
+- A removed or altered declaration breaks existing plugins and scripts.
+
 ## Build, test, and quality gates
 
 Build the repository:

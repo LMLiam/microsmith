@@ -1,0 +1,3 @@
+public abstract interface class io/github/lmliam/microsmith/artifact/services/ServicesArtifact : io/github/lmliam/microsmith/artifact/Artifact {
+}
+

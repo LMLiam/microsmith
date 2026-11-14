@@ -1,0 +1,100 @@
+public abstract interface class io/github/lmliam/microsmith/resolve/DomainResolution {
+}
+
+public final class io/github/lmliam/microsmith/resolve/DomainResolution$Failure : io/github/lmliam/microsmith/resolve/DomainResolution {
+	public synthetic fun <init> (Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-1X0FA-Y ()Ljava/util/List;
+	public final fun copy-GZgkXh4 (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/DomainResolution$Failure;
+	public static synthetic fun copy-GZgkXh4$default (Lio/github/lmliam/microsmith/resolve/DomainResolution$Failure;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/DomainResolution$Failure;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIssues-1X0FA-Y ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/DomainResolution$NotApplicable : io/github/lmliam/microsmith/resolve/DomainResolution {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/resolve/DomainResolution$NotApplicable;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/DomainResolution$Success : io/github/lmliam/microsmith/resolve/DomainResolution {
+	public fun <init> (Lio/github/lmliam/microsmith/resolve/ResolvedModel;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/ResolvedModel;
+	public final fun copy (Lio/github/lmliam/microsmith/resolve/ResolvedModel;)Lio/github/lmliam/microsmith/resolve/DomainResolution$Success;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/DomainResolution$Success;Lio/github/lmliam/microsmith/resolve/ResolvedModel;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/DomainResolution$Success;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getModel ()Lio/github/lmliam/microsmith/resolve/ResolvedModel;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/DomainResolutionService {
+	public fun <init> (Ljava/util/List;)V
+	public final fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;)Lio/github/lmliam/microsmith/resolve/ResolutionOutcome;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/DomainResolver {
+	public abstract fun getAuthoringType ()Lkotlin/reflect/KClass;
+	public abstract fun getResolvedType ()Lkotlin/reflect/KClass;
+	public abstract fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/ResolutionIssue {
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/ResolutionOutcome {
+}
+
+public final class io/github/lmliam/microsmith/resolve/ResolutionOutcome$Failure : io/github/lmliam/microsmith/resolve/ResolutionOutcome {
+	public synthetic fun <init> (Ljava/util/List;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-1X0FA-Y ()Ljava/util/List;
+	public final fun copy-GZgkXh4 (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/ResolutionOutcome$Failure;
+	public static synthetic fun copy-GZgkXh4$default (Lio/github/lmliam/microsmith/resolve/ResolutionOutcome$Failure;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/ResolutionOutcome$Failure;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIssues-1X0FA-Y ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/ResolutionOutcome$Success : io/github/lmliam/microsmith/resolve/ResolutionOutcome {
+	public fun <init> (Ljava/util/List;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;)Lio/github/lmliam/microsmith/resolve/ResolutionOutcome$Success;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/ResolutionOutcome$Success;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/ResolutionOutcome$Success;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getModels ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/ResolvedModel {
+}
+
+public final class io/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCode ()Ljava/lang/String;
+	public final fun getMessage ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnosticService {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Iterable;)V
+	public synthetic fun <init> (Ljava/lang/Iterable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun describe (Lio/github/lmliam/microsmith/resolve/ResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+	public final fun describe-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
+}
+
+public abstract interface class io/github/lmliam/microsmith/resolve/diagnostics/ResolutionIssueDiagnosticMapper {
+	public abstract fun getIssueType ()Lkotlin/reflect/KClass;
+	public abstract fun map (Lio/github/lmliam/microsmith/resolve/ResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+}
+

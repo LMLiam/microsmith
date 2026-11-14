@@ -1,0 +1,163 @@
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/DotnetPackageArtifactContributor : io/github/lmliam/microsmith/artifact/ArtifactContributor {
+	public fun <init> ()V
+	public synthetic fun contribute (Lio/github/lmliam/microsmith/resolve/ResolvedModel;)Ljava/util/List;
+	public fun contribute (Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspace;)Ljava/util/List;
+	public fun getResolvedType ()Lkotlin/reflect/KClass;
+}
+
+public abstract interface class io/github/lmliam/microsmith/artifact/services/dotnet/packages/DotnetPackagesArtifact : io/github/lmliam/microsmith/artifact/services/dotnet/DotnetArtifact {
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReference {
+	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion;
+	public final fun copy (Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReference;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReference;Ljava/lang/String;Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReference;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getVersion ()Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion {
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion$Central : io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion {
+	public static final field INSTANCE Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion$Central;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion$Explicit : io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion$Explicit;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion$Explicit;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferenceVersion$Explicit;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getVersion ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact : io/github/lmliam/microsmith/artifact/services/dotnet/packages/DotnetPackagesArtifact {
+	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/util/List;
+	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public synthetic fun getId ()Lio/github/lmliam/microsmith/artifact/ArtifactId;
+	public fun getId ()Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;
+	public final fun getPackages ()Ljava/util/List;
+	public final fun getProjectName ()Ljava/lang/String;
+	public final fun getSolutionName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
+	public fun <init> ()V
+	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
+	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact;
+	public fun getArtifactType ()Lkotlin/reflect/KClass;
+	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
+	public fun merge (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId : io/github/lmliam/microsmith/artifact/ArtifactId {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getArtifactType ()Lkotlin/reflect/KClass;
+	public final fun getServiceName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesContribution : io/github/lmliam/microsmith/artifact/ArtifactContribution {
+	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/util/List;
+	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesContribution;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesContribution;Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesContribution;
+	public fun equals (Ljava/lang/Object;)Z
+	public synthetic fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/ArtifactId;
+	public fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId;
+	public final fun getPackages ()Ljava/util/List;
+	public final fun getProjectName ()Ljava/lang/String;
+	public final fun getSolutionName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersion {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersion;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersion;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersion;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getVersion ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact : io/github/lmliam/microsmith/artifact/services/dotnet/packages/DotnetPackagesArtifact {
+	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;Ljava/util/List;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact;Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact;
+	public fun equals (Ljava/lang/Object;)Z
+	public synthetic fun getId ()Lio/github/lmliam/microsmith/artifact/ArtifactId;
+	public fun getId ()Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;
+	public final fun getPackages ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
+	public fun <init> ()V
+	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
+	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact;
+	public fun getArtifactType ()Lkotlin/reflect/KClass;
+	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
+	public fun merge (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId : io/github/lmliam/microsmith/artifact/ArtifactId {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getArtifactType ()Lkotlin/reflect/KClass;
+	public final fun getSolutionName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsContribution : io/github/lmliam/microsmith/artifact/ArtifactContribution {
+	public fun <init> (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;Ljava/util/List;)V
+	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsContribution;
+	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsContribution;Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsContribution;
+	public fun equals (Ljava/lang/Object;)Z
+	public synthetic fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/ArtifactId;
+	public fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId;
+	public final fun getPackages ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
