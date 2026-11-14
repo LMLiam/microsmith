@@ -1,7 +1,7 @@
 microsmith {
     services {
         dotnet {
-            target(NET8)
+            target(NET10)
             solutions {
                 "Platform" {}
             }

@@ -151,7 +151,7 @@ class InitBootstrapTests :
                     buildScript.shouldContain("// for this .NET repository.")
                     buildScript.shouldContain("// microsmith run build.microsmith.kts --out ./Generated")
                     buildScript.shouldContain("services {")
-                    buildScript.shouldContain("target(NET8)")
+                    buildScript.shouldContain("target(NET10)")
                     buildScript.shouldContain("project(\"UserService.Api\")")
                     buildScript.shouldContain("asp {")
                     buildScript.shouldContain("header(\"ETag\")")

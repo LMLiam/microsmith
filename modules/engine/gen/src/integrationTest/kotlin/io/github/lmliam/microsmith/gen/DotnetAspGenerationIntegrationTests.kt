@@ -77,7 +77,7 @@ class DotnetAspGenerationIntegrationTests :
 private fun sampleDotnetAspModel() = microsmith {
     services {
         dotnet {
-            target(NET8)
+            target(NET10)
             solutions { "Platform" {} }
         }
 

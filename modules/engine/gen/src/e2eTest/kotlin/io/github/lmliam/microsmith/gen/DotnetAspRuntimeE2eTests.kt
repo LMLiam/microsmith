@@ -235,7 +235,7 @@ private fun writeUserController(projectRoot: Path) {
 private fun runtimeE2eModel() = microsmith {
     services {
         dotnet {
-            target(NET8)
+            target(NET10)
             solutions { "Platform" {} }
         }
 
@@ -306,9 +306,12 @@ private fun runtimeE2eModel() = microsmith {
 
 private fun availablePort(): Int = ServerSocket(0).use { socket -> socket.localPort }
 
+private const val MIN_DOTNET_SDK_MAJOR = 10
+
 private fun dotnetAvailable(): Boolean = runCatching {
     val process = ProcessBuilder("dotnet", "--version").redirectErrorStream(true).start()
-    process.waitFor() == 0
+    val output = process.inputStream.bufferedReader().readText()
+    process.waitFor() == 0 && output.substringBefore('.').trim().toInt() >= MIN_DOTNET_SDK_MAJOR
 }
     .getOrDefault(false)
 

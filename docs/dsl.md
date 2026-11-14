@@ -51,7 +51,7 @@ An enum gets a generated `USER_STATUS_UNSPECIFIED = 0` value unless one of its v
 microsmith {
     services {
         dotnet {
-            target(NET8)
+            target(NET10)
             solutions {
                 "Platform" {}
             }

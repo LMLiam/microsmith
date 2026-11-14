@@ -18,7 +18,7 @@ class DotnetWorkspaceIssueReportingTests :
                 val model = microsmith {
                     services {
                         dotnet {
-                            target(NET8)
+                            target(NET10)
                             solutions { "Platform" {} }
                         }
 
