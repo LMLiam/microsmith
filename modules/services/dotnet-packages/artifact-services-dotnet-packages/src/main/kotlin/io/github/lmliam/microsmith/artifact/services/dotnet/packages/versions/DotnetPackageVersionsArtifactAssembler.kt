@@ -9,7 +9,7 @@ class DotnetPackageVersionsArtifactAssembler : ArtifactAssembler<DotnetPackageVe
     override val artifactType = DotnetPackageVersionsArtifact::class
 
     override fun create(
-        contribution: ArtifactContribution<DotnetPackageVersionsArtifact>
+        contribution: ArtifactContribution<DotnetPackageVersionsArtifact>,
     ): DotnetPackageVersionsArtifact {
         val versionsContribution = requireContribution(contribution)
         return DotnetPackageVersionsArtifact(
@@ -28,7 +28,7 @@ class DotnetPackageVersionsArtifactAssembler : ArtifactAssembler<DotnetPackageVe
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<DotnetPackageVersionsArtifact>
+        contribution: ArtifactContribution<DotnetPackageVersionsArtifact>,
     ): DotnetPackageVersionsContribution {
         require(contribution is DotnetPackageVersionsContribution) {
             "Unsupported dotnet package versions contribution type: ${contribution::class}"

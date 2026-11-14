@@ -19,8 +19,8 @@ internal fun renderAddMicrosmithExtension(): CSharp.Method =
                         CSharp.member(
                             CSharp.member(CSharp.identifier("builder"), "Services"),
                             "AddControllers",
-                        )
-                    )
+                        ),
+                    ),
                 )
                 returnStatement(CSharp.identifier("builder"))
             },

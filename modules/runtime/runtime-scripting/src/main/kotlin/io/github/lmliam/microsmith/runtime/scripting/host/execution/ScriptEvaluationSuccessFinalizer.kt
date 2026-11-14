@@ -10,7 +10,7 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import kotlin.script.experimental.api.EvaluationResult
 
 internal class ScriptEvaluationSuccessFinalizer(
-    private val modelEmitter: ScriptEvaluationModelEmitter = ScriptEvaluationModelEmitter()
+    private val modelEmitter: ScriptEvaluationModelEmitter = ScriptEvaluationModelEmitter(),
 ) {
     fun complete(
         evaluationResult: EvaluationResult,

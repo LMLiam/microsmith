@@ -20,7 +20,7 @@ internal fun validateDotnetPackageVersion(value: String, label: String): String 
     require(
         normalized.all { character ->
             character.isLetterOrDigit() || character == '.' || character == '-' || character == '+' || character == '_'
-        }
+        },
     ) {
         "$label is not a valid .NET package version: '$value'"
     }

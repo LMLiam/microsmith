@@ -12,29 +12,32 @@ import io.kotest.matchers.shouldBe
 import java.nio.file.Files
 
 class DotnetWorkspaceIssueReportingTests :
-    StringSpec({
-        "a workspace issue is reported once when the packages and ASP.NET modules are present" {
-            val model = microsmith {
-                services {
-                    dotnet {
-                        target(NET8)
-                        solutions { "Platform" {} }
-                    }
-
-                    "UserService" {
+    StringSpec(
+        {
+            "a workspace issue is reported once when the packages and ASP.NET modules are present" {
+                val model = microsmith {
+                    services {
                         dotnet {
-                            solution("Platform")
-                            asp {}
+                            target(NET8)
+                            solutions { "Platform" {} }
+                        }
+
+                        "UserService" {
+                            dotnet {
+                                solution("Platform")
+                                asp {}
+                            }
                         }
                     }
                 }
+
+                val failure =
+                    shouldThrow<GenerationResolutionFailedException> {
+                        model.generateTo(Files.createTempDirectory("microsmith-workspace-issue-"))
+                    }
+
+                failure.issues.toList() shouldBe
+                    listOf(DotnetWorkspaceResolutionIssue.ProjectNotConfigured("UserService"))
             }
-
-            val failure =
-                shouldThrow<GenerationResolutionFailedException> {
-                    model.generateTo(Files.createTempDirectory("microsmith-workspace-issue-"))
-                }
-
-            failure.issues.toList() shouldBe listOf(DotnetWorkspaceResolutionIssue.ProjectNotConfigured("UserService"))
-        }
-    })
+        },
+    )

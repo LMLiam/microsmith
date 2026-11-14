@@ -122,7 +122,7 @@ object CSharp {
     data class BinaryOperation(val left: Expression, val operator: BinaryOperator, val right: Expression) : Expression
 
     enum class BinaryOperator(val keyword: String) {
-        IS_NOT("is not")
+        IS_NOT("is not"),
     }
 
     data class Conditional(val condition: Expression, val whenTrue: Expression, val whenFalse: Expression) : Expression

@@ -62,7 +62,7 @@ class DotnetWorkspaceResolver {
                 modelReferenceIssues(
                     service = service,
                     models = dotnet.models.values.toList(),
-                )
+                ),
             )
         }
         val accumulatedIssues = issues.toNonEmptyListOrNull()
@@ -75,7 +75,7 @@ class DotnetWorkspaceResolver {
                 solution = checkNotNull(solution),
                 project = checkNotNull(project),
                 models = dotnet.models,
-            )
+            ),
         )
     }
 
@@ -96,7 +96,7 @@ class DotnetWorkspaceResolver {
                                 serviceName = service.name,
                                 modelName = model.name,
                                 targetName = reference.target,
-                            )
+                            ),
                         )
                     }
             }

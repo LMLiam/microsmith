@@ -29,6 +29,6 @@ class DotnetPackageVersionsArtifactCompiler : ServicesArtifactCompiler<DotnetPac
                             attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to packageVersion.version),
                         )
                     },
-            )
+            ),
         )
 }

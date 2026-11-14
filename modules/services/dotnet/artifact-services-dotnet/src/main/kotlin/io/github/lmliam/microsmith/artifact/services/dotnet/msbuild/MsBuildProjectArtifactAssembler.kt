@@ -60,7 +60,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<MsBuildProjectArtifact>
+        contribution: ArtifactContribution<MsBuildProjectArtifact>,
     ): MsBuildProjectContribution {
         require(contribution is MsBuildProjectContribution) {
             "Unsupported MSBuild project contribution type: ${contribution::class}"

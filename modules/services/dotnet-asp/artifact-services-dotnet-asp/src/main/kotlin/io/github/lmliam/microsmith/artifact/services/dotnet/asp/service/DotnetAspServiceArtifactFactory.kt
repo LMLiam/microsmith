@@ -81,7 +81,7 @@ internal class DotnetAspServiceArtifactFactory(
         }
 
     private fun ResolvedDotnetAspRequestBinding.toRequestBindingArtifact(
-        endpoint: ResolvedDotnetAspEndpoint
+        endpoint: ResolvedDotnetAspEndpoint,
     ): DotnetAspRequestBindingArtifact =
         DotnetAspRequestBindingArtifact(
             typeName = allocateDotnetAspTypeName(usedTypeNames, name, "${endpoint.operationName}$name"),
@@ -90,7 +90,7 @@ internal class DotnetAspServiceArtifactFactory(
         )
 
     private fun ResolvedDotnetAspHeadersBinding.toHeadersBindingArtifact(
-        endpoint: ResolvedDotnetAspEndpoint
+        endpoint: ResolvedDotnetAspEndpoint,
     ): DotnetAspHeadersBindingArtifact =
         DotnetAspHeadersBindingArtifact(
             typeName = allocateDotnetAspTypeName(usedTypeNames, name, "${endpoint.operationName}$name"),
@@ -124,7 +124,7 @@ internal class DotnetAspServiceArtifactFactory(
         }
 
     private fun ResolvedDotnetAspResponse.toResponseArtifact(
-        endpoint: ResolvedDotnetAspEndpoint
+        endpoint: ResolvedDotnetAspEndpoint,
     ): DotnetAspResponseArtifact {
         val modelArtifact = model.toModelArtifact(endpoint, "responses.$statusCode")
         return DotnetAspResponseArtifact(

@@ -15,7 +15,7 @@ class ServiceModel internal constructor(private val extensions: Map<KClass<out S
 
     internal fun merge(other: ServiceModel): ServiceModel =
         ServiceModel(
-            extensions + other.extensions.mapValues { (type, value) -> mergeModelExtension(extensions[type], value) }
+            extensions + other.extensions.mapValues { (type, value) -> mergeModelExtension(extensions[type], value) },
         )
 
     fun keys() = extensions.keys

@@ -8,7 +8,7 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.references
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufDeclarationKind
 
 internal fun findReferenceRejections(
-    schemas: List<ResolvedProtobufSchema>
+    schemas: List<ResolvedProtobufSchema>,
 ): List<ResolvedProtobufSchemaModel.Rejection> {
     val declaredKinds =
         schemas.groupBy({ it.identity.fullyQualifiedName }, { it.declaration.kind() }).mapValues { it.value.toSet() }

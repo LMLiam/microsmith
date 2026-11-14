@@ -12,7 +12,7 @@ import kotlin.script.experimental.api.makeFailureResult
 import kotlin.script.experimental.api.providedProperties
 
 internal fun refineMicrosmithScriptSymbols(
-    context: ScriptConfigurationRefinementContext
+    context: ScriptConfigurationRefinementContext,
 ): ResultWithDiagnostics<ScriptCompilationConfiguration> = runCatching {
     val registry = ScriptSymbolContributorRegistry.discover()
 
@@ -28,7 +28,7 @@ internal fun refineMicrosmithScriptSymbols(
             providedProperties.append(
                 symbols.associate { symbol ->
                     symbol.definition.propertyName to KotlinType(symbol.definition.valueType)
-                }
+                },
             )
 
             ScriptCompilationConfiguration.microsmithScriptSymbols.put(symbols.map(DiscoveredScriptSymbol::compiled))

@@ -53,121 +53,123 @@ private fun DotnetResolutionIssue.asAspIssue(): DotnetAspResolutionIssue = this 
 private fun List<ResolutionDiagnostic>.codes(): List<String> = map { it.code }
 
 class DotnetAspGenerationResolutionTests :
-    StringSpec({
-        "response header named body collides with the generated result body property" {
-            val diagnostics = resolveDiagnostics {
-                "/users" { get("GetUser") { responses { ok("User") { headers { header("body") } } } } }
-            }
-
-            diagnostics.codes() shouldContainExactly listOf("dotnet.asp.response-header-body-collision")
-            diagnostics.single().message shouldContain "header 'body'"
-        }
-
-        "headers that both derive the body property are reported only as body collisions" {
-            val diagnostics = resolveDiagnostics {
-                "/users" {
-                    get("GetUser") {
-                        responses {
-                            ok("User") {
-                                headers {
-                                    header("body")
-                                    header("-body")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            diagnostics.codes() shouldContainExactly
-                listOf("dotnet.asp.response-header-body-collision", "dotnet.asp.response-header-body-collision")
-        }
-
-        "response headers that derive the same property name are reported together" {
-            val diagnostics = resolveDiagnostics {
-                "/users" {
-                    get("GetUser") {
-                        responses {
-                            ok("User") {
-                                headers {
-                                    header("X-Request-Id")
-                                    header("x_request_id")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            diagnostics.codes() shouldContainExactly listOf("dotnet.asp.response-header-collision")
-            diagnostics.single().message shouldContain "XRequestId"
-        }
-
-        "response header without letters or digits cannot derive a property name" {
-            val diagnostics = resolveDiagnostics {
-                "/users" { get("GetUser") { responses { ok("User") { headers { header("---") } } } } }
-            }
-
-            diagnostics.codes() shouldContainExactly listOf("dotnet.asp.response-header-invalid")
-        }
-
-        "no content response with body fields is reported" {
-            val diagnostics = resolveDiagnostics {
-                "/users" { delete("DeleteUser") { responses { noContent("User") } } }
-            }
-
-            diagnostics.codes() shouldContainExactly listOf("dotnet.asp.no-content-response-body")
-            diagnostics.single().message shouldContain "DeleteUser"
-        }
-
-        "no content response without body fields resolves" {
-            val diagnostics =
-                resolveDiagnostics(models = { "Empty" {} }) {
-                    "/users" { delete("DeleteUser") { responses { noContent("Empty") } } }
+    StringSpec(
+        {
+            "response header named body collides with the generated result body property" {
+                val diagnostics = resolveDiagnostics {
+                    "/users" { get("GetUser") { responses { ok("User") { headers { header("body") } } } } }
                 }
 
-            diagnostics shouldBe emptyList()
-        }
+                diagnostics.codes() shouldContainExactly listOf("dotnet.asp.response-header-body-collision")
+                diagnostics.single().message shouldContain "header 'body'"
+            }
 
-        "project that derives the shared controller base type name is reported" {
-            val diagnostics = resolveDiagnostics(project = "Microsmith") {}
-
-            diagnostics.codes() shouldContainExactly listOf("dotnet.asp.controller-base-type-collision")
-        }
-
-        "shared model named like a generated result type is reported" {
-            val diagnostics =
-                resolveDiagnostics(models = { "GetUserResult" { string("id") } }) {
-                    "/users" { get("GetUser") { responses { ok("GetUserResult") } } }
-                }
-
-            diagnostics.codes() shouldContainExactly listOf("dotnet.asp.contract-type-collision")
-            diagnostics.single().message shouldContain "GetUserResult"
-        }
-
-        "shared model named like a generated result variant is reported" {
-            val diagnostics =
-                resolveDiagnostics(models = { "GetUserOk" { string("id") } }) {
-                    "/users" { get("GetUser") { responses { ok("GetUserOk") } } }
-                }
-
-            diagnostics.codes() shouldContainExactly listOf("dotnet.asp.contract-type-collision")
-        }
-
-        "every generation conflict is reported together" {
-            val diagnostics =
-                resolveDiagnostics(project = "Microsmith") {
+            "headers that both derive the body property are reported only as body collisions" {
+                val diagnostics = resolveDiagnostics {
                     "/users" {
-                        get("GetUser") { responses { ok("User") { headers { header("body") } } } }
-                        delete("DeleteUser") { responses { noContent("User") } }
+                        get("GetUser") {
+                            responses {
+                                ok("User") {
+                                    headers {
+                                        header("body")
+                                        header("-body")
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
-            diagnostics.codes() shouldContainExactlyInAnyOrder
-                listOf(
-                    "dotnet.asp.controller-base-type-collision",
-                    "dotnet.asp.response-header-body-collision",
-                    "dotnet.asp.no-content-response-body",
-                )
-        }
-    })
+                diagnostics.codes() shouldContainExactly
+                    listOf("dotnet.asp.response-header-body-collision", "dotnet.asp.response-header-body-collision")
+            }
+
+            "response headers that derive the same property name are reported together" {
+                val diagnostics = resolveDiagnostics {
+                    "/users" {
+                        get("GetUser") {
+                            responses {
+                                ok("User") {
+                                    headers {
+                                        header("X-Request-Id")
+                                        header("x_request_id")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                diagnostics.codes() shouldContainExactly listOf("dotnet.asp.response-header-collision")
+                diagnostics.single().message shouldContain "XRequestId"
+            }
+
+            "response header without letters or digits cannot derive a property name" {
+                val diagnostics = resolveDiagnostics {
+                    "/users" { get("GetUser") { responses { ok("User") { headers { header("---") } } } } }
+                }
+
+                diagnostics.codes() shouldContainExactly listOf("dotnet.asp.response-header-invalid")
+            }
+
+            "no content response with body fields is reported" {
+                val diagnostics = resolveDiagnostics {
+                    "/users" { delete("DeleteUser") { responses { noContent("User") } } }
+                }
+
+                diagnostics.codes() shouldContainExactly listOf("dotnet.asp.no-content-response-body")
+                diagnostics.single().message shouldContain "DeleteUser"
+            }
+
+            "no content response without body fields resolves" {
+                val diagnostics =
+                    resolveDiagnostics(models = { "Empty" {} }) {
+                        "/users" { delete("DeleteUser") { responses { noContent("Empty") } } }
+                    }
+
+                diagnostics shouldBe emptyList()
+            }
+
+            "project that derives the shared controller base type name is reported" {
+                val diagnostics = resolveDiagnostics(project = "Microsmith") {}
+
+                diagnostics.codes() shouldContainExactly listOf("dotnet.asp.controller-base-type-collision")
+            }
+
+            "shared model named like a generated result type is reported" {
+                val diagnostics =
+                    resolveDiagnostics(models = { "GetUserResult" { string("id") } }) {
+                        "/users" { get("GetUser") { responses { ok("GetUserResult") } } }
+                    }
+
+                diagnostics.codes() shouldContainExactly listOf("dotnet.asp.contract-type-collision")
+                diagnostics.single().message shouldContain "GetUserResult"
+            }
+
+            "shared model named like a generated result variant is reported" {
+                val diagnostics =
+                    resolveDiagnostics(models = { "GetUserOk" { string("id") } }) {
+                        "/users" { get("GetUser") { responses { ok("GetUserOk") } } }
+                    }
+
+                diagnostics.codes() shouldContainExactly listOf("dotnet.asp.contract-type-collision")
+            }
+
+            "every generation conflict is reported together" {
+                val diagnostics =
+                    resolveDiagnostics(project = "Microsmith") {
+                        "/users" {
+                            get("GetUser") { responses { ok("User") { headers { header("body") } } } }
+                            delete("DeleteUser") { responses { noContent("User") } }
+                        }
+                    }
+
+                diagnostics.codes() shouldContainExactlyInAnyOrder
+                    listOf(
+                        "dotnet.asp.controller-base-type-collision",
+                        "dotnet.asp.response-header-body-collision",
+                        "dotnet.asp.no-content-response-body",
+                    )
+            }
+        },
+    )

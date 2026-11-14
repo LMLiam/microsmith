@@ -9,35 +9,37 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 
 class ProtobufFileRendererTests :
-    StringSpec({
-        "render emits imports in order and package when present" {
-            val rendered =
-                ProtobufFileRenderer.render(
-                    ProtoFileArtifact(
-                        id = ProtoFileArtifactId(packageName = "pkg", typeName = "User"),
-                        imports = listOf("alpha/A.proto", "zeta/Z.proto"),
-                        declarations = listOf(ProtoDeclaration("User", "message User {}")),
+    StringSpec(
+        {
+            "render emits imports in order and package when present" {
+                val rendered =
+                    ProtobufFileRenderer.render(
+                        ProtoFileArtifact(
+                            id = ProtoFileArtifactId(packageName = "pkg", typeName = "User"),
+                            imports = listOf("alpha/A.proto", "zeta/Z.proto"),
+                            declarations = listOf(ProtoDeclaration("User", "message User {}")),
+                        ),
                     )
-                )
 
-            rendered.lineSequence().filter { it.startsWith("import") }.toList() shouldContainExactly
-                listOf(
-                    "import \"alpha/A.proto\";",
-                    "import \"zeta/Z.proto\";",
-                )
-            rendered.shouldContain("package pkg;")
-        }
-
-        "render omits package when schema name is unqualified" {
-            val rendered =
-                ProtobufFileRenderer.render(
-                    ProtoFileArtifact(
-                        id = ProtoFileArtifactId(packageName = null, typeName = "User"),
-                        imports = emptyList(),
-                        declarations = listOf(ProtoDeclaration("User", "message User {}")),
+                rendered.lineSequence().filter { it.startsWith("import") }.toList() shouldContainExactly
+                    listOf(
+                        "import \"alpha/A.proto\";",
+                        "import \"zeta/Z.proto\";",
                     )
-                )
+                rendered.shouldContain("package pkg;")
+            }
 
-            rendered.shouldNotContain("package ")
-        }
-    })
+            "render omits package when schema name is unqualified" {
+                val rendered =
+                    ProtobufFileRenderer.render(
+                        ProtoFileArtifact(
+                            id = ProtoFileArtifactId(packageName = null, typeName = "User"),
+                            imports = emptyList(),
+                            declarations = listOf(ProtoDeclaration("User", "message User {}")),
+                        ),
+                    )
+
+                rendered.shouldNotContain("package ")
+            }
+        },
+    )

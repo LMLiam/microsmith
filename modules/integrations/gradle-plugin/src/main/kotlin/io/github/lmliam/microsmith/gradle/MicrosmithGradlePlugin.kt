@@ -42,7 +42,7 @@ class MicrosmithGradlePlugin : Plugin<Project> {
                 )
                 configuration.defaultDependencies { dependencies ->
                     dependencies.add(
-                        project.dependencies.create(MicrosmithRuntimeDependencyNotation.runtimeScripting())
+                        project.dependencies.create(MicrosmithRuntimeDependencyNotation.runtimeScripting()),
                     )
                 }
             }

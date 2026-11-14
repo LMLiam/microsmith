@@ -18,56 +18,60 @@ private fun SchemasScope.fake(type: SchemaType, name: String) {
 }
 
 class SchemasScopeTests :
-    StringSpec({
-        "schemas block attaches SchemasExtension to builder" {
-            val builder = MicrosmithBuilder()
+    StringSpec(
+        {
+            "schemas block attaches SchemasExtension to builder" {
+                val builder = MicrosmithBuilder()
 
-            builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") }
+                builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") }
 
-            val ext = builder.model.get<SchemasExtension>()
-            ext shouldBe SchemasExtension(setOf(ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User")))
-        }
-
-        "schemas block can register multiple schemas" {
-            val builder = MicrosmithBuilder()
-
-            builder.schemas {
-                fake(ScopeTestSchemaTypes.PROTOBUF, "User")
-                fake(ScopeTestSchemaTypes.JSON, "User")
+                val ext = builder.model.get<SchemasExtension>()
+                ext shouldBe SchemasExtension(setOf(ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User")))
             }
 
-            val ext = builder.model.get<SchemasExtension>()
-            ext shouldBe
-                SchemasExtension(
-                    setOf(
-                        ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User"),
-                        ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User"),
+            "schemas block can register multiple schemas" {
+                val builder = MicrosmithBuilder()
+
+                builder.schemas {
+                    fake(ScopeTestSchemaTypes.PROTOBUF, "User")
+                    fake(ScopeTestSchemaTypes.JSON, "User")
+                }
+
+                val ext = builder.model.get<SchemasExtension>()
+                ext shouldBe
+                    SchemasExtension(
+                        setOf(
+                            ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User"),
+                            ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User"),
+                        ),
                     )
-                )
-        }
+            }
 
-        "multiple schemas blocks are merged" {
-            val builder = MicrosmithBuilder()
+            "multiple schemas blocks are merged" {
+                val builder = MicrosmithBuilder()
 
-            builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") }
+                builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") }
 
-            builder.schemas { fake(ScopeTestSchemaTypes.JSON, "User") }
+                builder.schemas { fake(ScopeTestSchemaTypes.JSON, "User") }
 
-            val ext = builder.model.get<SchemasExtension>()
-            ext shouldBe
-                SchemasExtension(
-                    setOf(
-                        ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User"),
-                        ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User"),
+                val ext = builder.model.get<SchemasExtension>()
+                ext shouldBe
+                    SchemasExtension(
+                        setOf(
+                            ScopeFakeSchema(ScopeTestSchemaTypes.PROTOBUF, "User"),
+                            ScopeFakeSchema(ScopeTestSchemaTypes.JSON, "User"),
+                        ),
                     )
-                )
-        }
+            }
 
-        "multiple schemas blocks reject duplicate schema keys" {
-            val builder = MicrosmithBuilder()
+            "multiple schemas blocks reject duplicate schema keys" {
+                val builder = MicrosmithBuilder()
 
-            builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") }
+                builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") }
 
-            shouldThrow<IllegalArgumentException> { builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") } }
-        }
-    })
+                shouldThrow<IllegalArgumentException> {
+                    builder.schemas { fake(ScopeTestSchemaTypes.PROTOBUF, "User") }
+                }
+            }
+        },
+    )

@@ -7,7 +7,7 @@ import kotlin.io.path.isRegularFile
 
 internal object BuiltInOnboardingProfileMatchers {
     fun all(
-        dotnetMarkerFinder: (Path) -> String? = DotnetOnboardingMarkerFinder::find
+        dotnetMarkerFinder: (Path) -> String? = DotnetOnboardingMarkerFinder::find,
     ): List<OnboardingProfileMatcher> =
         listOf(
             rootMarkerMatcher(NodeOnboardingProfile, "package.json"),

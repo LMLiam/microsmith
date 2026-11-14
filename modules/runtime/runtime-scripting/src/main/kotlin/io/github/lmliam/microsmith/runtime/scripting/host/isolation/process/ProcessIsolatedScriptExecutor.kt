@@ -29,7 +29,7 @@ internal class ProcessIsolatedScriptExecutor(
                     ),
             )
             failureFactory.fromOutcome(
-                workerLauncher.execute(createdWorkspace.requestFile, createdWorkspace.resultFile)
+                workerLauncher.execute(createdWorkspace.requestFile, createdWorkspace.resultFile),
             )
         } catch (error: IOException) {
             failureFactory.fromException(error)

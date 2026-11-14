@@ -32,7 +32,7 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
                             MsBuildNames.NULLABLE_PROPERTY to "enable",
                             MsBuildNames.TARGET_FRAMEWORK_PROPERTY to artifact.targetFrameworkMoniker,
                         ),
-                )
+                ),
             )
             add(artifact.textContribution("Program.cs", DotnetAspProjectRenderer.renderProgramFile(artifact)))
             add(artifact.textContribution("appsettings.json", renderDotnetAspAppSettingsFile(artifact)))
@@ -40,43 +40,43 @@ class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServi
                 artifact.textContribution(
                     "Properties/launchSettings.json",
                     renderDotnetAspLaunchSettingsFile(artifact),
-                )
+                ),
             )
             add(
                 artifact.textContribution(
                     "Generated/Hosting/MicrosmithHostingExtensions.cs",
                     DotnetAspProjectRenderer.renderHostingExtensionsFile(artifact),
-                )
+                ),
             )
             add(
                 artifact.textContribution(
                     "Generated/Contracts/ServiceModels.cs",
                     DotnetAspProjectRenderer.renderServiceModelsFile(artifact),
-                )
+                ),
             )
             add(
                 artifact.textContribution(
                     "Generated/Contracts/RequestModels.cs",
                     DotnetAspProjectRenderer.renderRequestModelsFile(artifact),
-                )
+                ),
             )
             add(
                 artifact.textContribution(
                     "Generated/Contracts/ResponseModels.cs",
                     DotnetAspProjectRenderer.renderResponseModelsFile(artifact),
-                )
+                ),
             )
             add(
                 artifact.textContribution(
                     microsmithControllerBaseRelativePath(),
                     DotnetAspProjectRenderer.renderMicrosmithControllerBaseFile(artifact),
-                )
+                ),
             )
             add(
                 artifact.textContribution(
                     controllerBaseRelativePath(artifact),
                     DotnetAspProjectRenderer.renderControllerBaseFile(artifact),
-                )
+                ),
             )
         }
     }

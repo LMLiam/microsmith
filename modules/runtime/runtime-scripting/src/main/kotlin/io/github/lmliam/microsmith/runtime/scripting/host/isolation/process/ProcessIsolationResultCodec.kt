@@ -31,7 +31,7 @@ internal class ProcessIsolationResultCodec {
 
             else ->
                 error(
-                    "Missing or invalid '${ProcessIsolationPropertyNames.RESULT_STATUS}' in process isolation result."
+                    "Missing or invalid '${ProcessIsolationPropertyNames.RESULT_STATUS}' in process isolation result.",
                 )
         }
     }
@@ -93,7 +93,7 @@ internal class ProcessIsolationResultCodec {
                             message = message,
                             code =
                                 properties.getProperty(
-                                    "${ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_CODE_PREFIX}$index"
+                                    "${ProcessIsolationPropertyNames.RESULT_DIAGNOSTIC_CODE_PREFIX}$index",
                                 ),
                         )
                     },

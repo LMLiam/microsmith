@@ -23,7 +23,7 @@ internal class RunCommandHandler(
                     flags = command.flags,
                     pluginClasspath = pluginClasspath,
                     isolationMode = command.isolationMode,
-                )
+                ),
             )
     },
     eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,

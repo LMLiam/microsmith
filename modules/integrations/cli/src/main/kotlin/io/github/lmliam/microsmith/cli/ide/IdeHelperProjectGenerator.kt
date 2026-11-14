@@ -54,7 +54,7 @@ internal fun refreshIdeHelperProject(
 ): IdeHelperRefreshResult = IdeHelperProjectGenerator(command = command, classpathResolver = classpathResolver).run()
 
 internal fun resolveIdeHelperClasspathEntries(
-    javaClasspath: String = System.getProperty("java.class.path").orEmpty()
+    javaClasspath: String = System.getProperty("java.class.path").orEmpty(),
 ): List<Path> {
     if (javaClasspath.isBlank()) {
         return emptyList()

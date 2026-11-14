@@ -63,7 +63,7 @@ internal class InitBootstrapper(
                     projectRoot = projectRoot,
                     diagnosticsFormat = command.diagnosticsFormat,
                     verbose = command.verbose,
-                )
+                ),
             )
         }
             .getOrElse { error ->

@@ -23,7 +23,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWork
 
 /** Resolves the additive .NET package-management DSL into a validation-ready workspace model. */
 class DotnetPackageWorkspaceResolver(
-    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver()
+    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver(),
 ) {
     fun resolve(extension: ServicesExtension): EitherNel<DotnetResolutionIssue, DotnetPackageWorkspace> {
         val defaults = extension.get<DotnetDefaultsExtension>() ?: DotnetDefaultsExtension()
@@ -107,7 +107,7 @@ class DotnetPackageWorkspaceResolver(
                         serviceName = serviceName,
                         solutionName = solutionName,
                         packageName = reference.name,
-                    )
+                    ),
                 )
 
             explicitVersion != null ->
@@ -115,7 +115,7 @@ class DotnetPackageWorkspaceResolver(
                     ResolvedDotnetPackageReference(
                         name = reference.name,
                         version = ResolvedDotnetPackageReferenceVersion.Explicit(explicitVersion),
-                    )
+                    ),
                 )
 
             usesCentralPackageManagement && reference.name !in centrallyManagedPackagesByName ->
@@ -124,7 +124,7 @@ class DotnetPackageWorkspaceResolver(
                         serviceName = serviceName,
                         solutionName = solutionName,
                         packageName = reference.name,
-                    )
+                    ),
                 )
 
             usesCentralPackageManagement ->
@@ -132,7 +132,7 @@ class DotnetPackageWorkspaceResolver(
                     ResolvedDotnetPackageReference(
                         name = reference.name,
                         version = ResolvedDotnetPackageReferenceVersion.Central,
-                    )
+                    ),
                 )
 
             else ->
@@ -140,7 +140,7 @@ class DotnetPackageWorkspaceResolver(
                     DotnetPackageWorkspaceResolutionIssue.PackageVersionRequired(
                         serviceName = serviceName,
                         packageName = reference.name,
-                    )
+                    ),
                 )
         }
     }

@@ -69,7 +69,7 @@ internal class DotnetAspEndpointBindingsResolver {
                 query,
                 headers = endpoint.bindings.headers?.let(bindingResolver::resolveHeadersBinding),
                 body,
-            )
+            ),
         )
     }
 
@@ -89,8 +89,8 @@ internal class DotnetAspEndpointBindingsResolver {
                             context.operationName,
                             route.path,
                             route.placeholders,
-                        )
-                    )
+                        ),
+                    ),
                 )
             }
         }
@@ -103,8 +103,8 @@ internal class DotnetAspEndpointBindingsResolver {
                         context.operationName,
                         binding.name,
                         route.path,
-                    )
-                )
+                    ),
+                ),
             )
         }
 

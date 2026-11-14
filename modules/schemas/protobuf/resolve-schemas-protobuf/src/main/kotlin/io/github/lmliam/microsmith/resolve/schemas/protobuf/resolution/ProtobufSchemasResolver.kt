@@ -55,7 +55,7 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
         issues.addAll(findNameConflicts(protobufSchemas))
         issues.addAll(findSymbolCollisions(protobufSchemas))
         issues.addAll(
-            schemaGraphRejections(drafts.map(SchemaDraft::node)).map(ResolvedProtobufSchemaModel.Rejection::toIssue)
+            schemaGraphRejections(drafts.map(SchemaDraft::node)).map(ResolvedProtobufSchemaModel.Rejection::toIssue),
         )
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()

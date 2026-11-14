@@ -9,55 +9,57 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
 class ProtoFileArtifactAssemblerTests :
-    StringSpec({
-        val assembler = ProtoFileArtifactAssembler()
-        val sharedId = ProtoFileArtifactId(packageName = "acme.user.v1", typeName = "User")
+    StringSpec(
+        {
+            val assembler = ProtoFileArtifactAssembler()
+            val sharedId = ProtoFileArtifactId(packageName = "acme.user.v1", typeName = "User")
 
-        "merges imports and declarations for the same proto artifact" {
-            val assembled =
-                assembler.merge(
+            "merges imports and declarations for the same proto artifact" {
+                val assembled =
+                    assembler.merge(
+                        assembler.create(
+                            ProtoFileContribution(
+                                artifactId = sharedId,
+                                imports = listOf("acme/user/v1/Role.proto"),
+                                declarations = listOf(ProtoDeclaration("User", "message User {}")),
+                            ),
+                        ),
+                        ProtoFileContribution(
+                            artifactId = sharedId,
+                            imports = listOf("acme/user/v1/Profile.proto", "acme/user/v1/Role.proto"),
+                            declarations = listOf(ProtoDeclaration("Profile", "message Profile {}")),
+                        ),
+                    )
+
+                assembled.imports shouldContainExactly
+                    listOf(
+                        "acme/user/v1/Profile.proto",
+                        "acme/user/v1/Role.proto",
+                    )
+                assembled.declarations.map(ProtoDeclaration::name) shouldContainExactly listOf("User", "Profile")
+            }
+
+            "rejects conflicting declarations for the same top-level name" {
+                val current =
                     assembler.create(
                         ProtoFileContribution(
                             artifactId = sharedId,
-                            imports = listOf("acme/user/v1/Role.proto"),
                             declarations = listOf(ProtoDeclaration("User", "message User {}")),
-                        )
-                    ),
-                    ProtoFileContribution(
-                        artifactId = sharedId,
-                        imports = listOf("acme/user/v1/Profile.proto", "acme/user/v1/Role.proto"),
-                        declarations = listOf(ProtoDeclaration("Profile", "message Profile {}")),
-                    ),
-                )
-
-            assembled.imports shouldContainExactly
-                listOf(
-                    "acme/user/v1/Profile.proto",
-                    "acme/user/v1/Role.proto",
-                )
-            assembled.declarations.map(ProtoDeclaration::name) shouldContainExactly listOf("User", "Profile")
-        }
-
-        "rejects conflicting declarations for the same top-level name" {
-            val current =
-                assembler.create(
-                    ProtoFileContribution(
-                        artifactId = sharedId,
-                        declarations = listOf(ProtoDeclaration("User", "message User {}")),
-                    )
-                )
-
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    assembler.merge(
-                        current,
-                        ProtoFileContribution(
-                            artifactId = sharedId,
-                            declarations = listOf(ProtoDeclaration("User", "message User { string id = 1; }")),
                         ),
                     )
-                }
 
-            error.message shouldBe "Conflicting protobuf declaration 'User' for 'acme.user.v1.User'."
-        }
-    })
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        assembler.merge(
+                            current,
+                            ProtoFileContribution(
+                                artifactId = sharedId,
+                                declarations = listOf(ProtoDeclaration("User", "message User { string id = 1; }")),
+                            ),
+                        )
+                    }
+
+                error.message shouldBe "Conflicting protobuf declaration 'User' for 'acme.user.v1.User'."
+            }
+        },
+    )

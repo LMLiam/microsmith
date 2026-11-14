@@ -52,7 +52,7 @@ class MicrosmithGenerateMojo : AbstractMojo() {
                         cacheDirectory = cacheDirectory.toPath(),
                         variables = variables,
                         flags = flags,
-                    )
+                    ),
                 )
             val result = scriptHostRunner.run(request.cacheDirectory, request.scriptRunRequest)
             resultHandler.handle(log, request.outputDirectory, result)

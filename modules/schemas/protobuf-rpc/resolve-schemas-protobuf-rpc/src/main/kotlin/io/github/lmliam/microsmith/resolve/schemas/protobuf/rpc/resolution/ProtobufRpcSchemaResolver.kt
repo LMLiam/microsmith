@@ -40,7 +40,7 @@ internal class ProtobufRpcSchemaResolver {
                     ProtobufResolutionIssue.SchemaDeclarationNameMismatch(
                         schemaName = qualifiedName.fullyQualifiedName,
                         declarationName = service.name,
-                    )
+                    ),
                 )
                 .leftNel()
         }

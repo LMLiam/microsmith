@@ -64,59 +64,63 @@ private class IncorrectIssueTypeMapper : ResolutionIssueDiagnosticMapper<TestIss
 private data object UnmappedIssue : ResolutionIssue
 
 class ResolutionDiagnosticServiceTests :
-    StringSpec({
-        "describe maps subtype issues through a hierarchy mapper" {
-            val service = ResolutionDiagnosticService(listOf(TestIssueMapper()))
+    StringSpec(
+        {
+            "describe maps subtype issues through a hierarchy mapper" {
+                val service = ResolutionDiagnosticService(listOf(TestIssueMapper()))
 
-            service.describe(TestIssue.Alpha) shouldBe
-                ResolutionDiagnostic(
-                    code = "test.alpha",
-                    message = "Alpha failed",
-                )
-        }
-
-        "describe prefers the most specific matching mapper" {
-            val service =
-                ResolutionDiagnosticService(
-                    listOf(
-                        TestIssueMapper(),
-                        AlphaIssueMapper(),
+                service.describe(TestIssue.Alpha) shouldBe
+                    ResolutionDiagnostic(
+                        code = "test.alpha",
+                        message = "Alpha failed",
                     )
-                )
-
-            service.describe(TestIssue.Alpha) shouldBe
-                ResolutionDiagnostic(
-                    code = "test.alpha-specific",
-                    message = "Specific alpha failure",
-                )
-
-            service.describe(TestIssue.Beta) shouldBe
-                ResolutionDiagnostic(
-                    code = "test.beta",
-                    message = "Beta failed",
-                )
-        }
-
-        "describe returns a safe fallback for unmapped issues" {
-            ResolutionDiagnosticService().describe(UnmappedIssue) shouldBe
-                ResolutionDiagnostic(
-                    code = "resolution.unmapped-issue",
-                    message = "Resolution failed with issue type " + "'${UnmappedIssue::class.qualifiedName}'.",
-                )
-        }
-
-        "registry rejects duplicate mapper issue types" {
-            shouldThrow<IllegalArgumentException> {
-                ResolutionDiagnosticService(
-                    listOf(
-                        TestIssueMapper(),
-                        DuplicateTestIssueMapper(),
-                    )
-                )
             }
-        }
 
-        "registry rejects issueType declarations that disagree with the generic contract" {
-            shouldThrow<IllegalArgumentException> { ResolutionDiagnosticService(listOf(IncorrectIssueTypeMapper())) }
-        }
-    })
+            "describe prefers the most specific matching mapper" {
+                val service =
+                    ResolutionDiagnosticService(
+                        listOf(
+                            TestIssueMapper(),
+                            AlphaIssueMapper(),
+                        ),
+                    )
+
+                service.describe(TestIssue.Alpha) shouldBe
+                    ResolutionDiagnostic(
+                        code = "test.alpha-specific",
+                        message = "Specific alpha failure",
+                    )
+
+                service.describe(TestIssue.Beta) shouldBe
+                    ResolutionDiagnostic(
+                        code = "test.beta",
+                        message = "Beta failed",
+                    )
+            }
+
+            "describe returns a safe fallback for unmapped issues" {
+                ResolutionDiagnosticService().describe(UnmappedIssue) shouldBe
+                    ResolutionDiagnostic(
+                        code = "resolution.unmapped-issue",
+                        message = "Resolution failed with issue type " + "'${UnmappedIssue::class.qualifiedName}'.",
+                    )
+            }
+
+            "registry rejects duplicate mapper issue types" {
+                shouldThrow<IllegalArgumentException> {
+                    ResolutionDiagnosticService(
+                        listOf(
+                            TestIssueMapper(),
+                            DuplicateTestIssueMapper(),
+                        ),
+                    )
+                }
+            }
+
+            "registry rejects issueType declarations that disagree with the generic contract" {
+                shouldThrow<IllegalArgumentException> {
+                    ResolutionDiagnosticService(listOf(IncorrectIssueTypeMapper()))
+                }
+            }
+        },
+    )

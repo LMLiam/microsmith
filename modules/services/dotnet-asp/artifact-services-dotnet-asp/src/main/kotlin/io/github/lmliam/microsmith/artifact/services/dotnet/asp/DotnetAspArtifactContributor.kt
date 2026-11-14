@@ -18,7 +18,7 @@ class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {
                 compareBy(
                     { (_, artifactId) -> artifactId.solutionName },
                     { (_, artifactId) -> artifactId.projectName },
-                )
+                ),
             )
             .map { (service, artifactId) -> DotnetAspServiceArtifactFactory(service, artifactId).createContribution() }
 }

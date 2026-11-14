@@ -17,7 +17,7 @@ internal constructor(private val extensions: Map<KClass<out MicrosmithExtension>
 
     internal fun merge(other: DotnetSolutionModel): DotnetSolutionModel =
         DotnetSolutionModel(
-            extensions + other.extensions.mapValues { (type, value) -> mergeModelExtension(extensions[type], value) }
+            extensions + other.extensions.mapValues { (type, value) -> mergeModelExtension(extensions[type], value) },
         )
 
     fun keys() = extensions.keys

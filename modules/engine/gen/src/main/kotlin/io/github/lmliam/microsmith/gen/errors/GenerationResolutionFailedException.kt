@@ -13,5 +13,5 @@ class GenerationResolutionFailedException(
             append("Microsmith model resolution failed with ${issues.size} semantic issue(s): ")
 
             append(diagnostics.joinToString("; ") { "[${it.code}] ${it.message}" })
-        }
+        },
     )

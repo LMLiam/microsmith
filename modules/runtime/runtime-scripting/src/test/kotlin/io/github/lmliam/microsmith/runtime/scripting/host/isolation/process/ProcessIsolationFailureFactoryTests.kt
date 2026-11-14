@@ -9,62 +9,64 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 
 class ProcessIsolationFailureFactoryTests :
-    StringSpec({
-        val factory = ProcessIsolationFailureFactory()
+    StringSpec(
+        {
+            val factory = ProcessIsolationFailureFactory()
 
-        "returns parsed success when worker exits cleanly" {
-            val success = ScriptRunSuccess(warnings = listOf("warning"), cacheHit = true, elapsedMillis = 42)
+            "returns parsed success when worker exits cleanly" {
+                val success = ScriptRunSuccess(warnings = listOf("warning"), cacheHit = true, elapsedMillis = 42)
 
-            factory.fromOutcome(
-                ProcessIsolationExecutionOutcome(
-                    exitCode = 0,
-                    processOutput = "",
-                    parsedResult = success,
-                )
-            ) shouldBe success
-        }
+                factory.fromOutcome(
+                    ProcessIsolationExecutionOutcome(
+                        exitCode = 0,
+                        processOutput = "",
+                        parsedResult = success,
+                    ),
+                ) shouldBe success
+            }
 
-        "appends process output to parsed worker failures" {
-            val failure = ScriptRunFailure.withMessages(listOf("worker failure"), ScriptFailureType.COMPILATION)
+            "appends process output to parsed worker failures" {
+                val failure = ScriptRunFailure.withMessages(listOf("worker failure"), ScriptFailureType.COMPILATION)
 
-            val result =
-                factory
-                    .fromOutcome(
-                        ProcessIsolationExecutionOutcome(
-                            exitCode = 1,
-                            processOutput = "stacktrace",
-                            parsedResult = failure,
+                val result =
+                    factory
+                        .fromOutcome(
+                            ProcessIsolationExecutionOutcome(
+                                exitCode = 1,
+                                processOutput = "stacktrace",
+                                parsedResult = failure,
+                            ),
                         )
+                        .shouldBeTypeOf<ScriptRunFailure>()
+
+                result.diagnostics
+                    .map { it.message }
+                    .shouldContainExactly(
+                        "worker failure",
+                        "Process stderr/stdout: stacktrace",
                     )
-                    .shouldBeTypeOf<ScriptRunFailure>()
+                result.type shouldBe ScriptFailureType.COMPILATION
+            }
 
-            result.diagnostics
-                .map { it.message }
-                .shouldContainExactly(
-                    "worker failure",
-                    "Process stderr/stdout: stacktrace",
-                )
-            result.type shouldBe ScriptFailureType.COMPILATION
-        }
-
-        "creates host failures when worker exits without a parseable result" {
-            val result =
-                factory
-                    .fromOutcome(
-                        ProcessIsolationExecutionOutcome(
-                            exitCode = 2,
-                            processOutput = "could not start",
-                            parsedResult = null,
+            "creates host failures when worker exits without a parseable result" {
+                val result =
+                    factory
+                        .fromOutcome(
+                            ProcessIsolationExecutionOutcome(
+                                exitCode = 2,
+                                processOutput = "could not start",
+                                parsedResult = null,
+                            ),
                         )
-                    )
-                    .shouldBeTypeOf<ScriptRunFailure>()
+                        .shouldBeTypeOf<ScriptRunFailure>()
 
-            result.diagnostics
-                .map { it.message }
-                .shouldContainExactly(
-                    "Process isolation execution failed with exit code 2.",
-                    "Process stderr/stdout: could not start",
-                )
-            result.type shouldBe ScriptFailureType.HOST
-        }
-    })
+                result.diagnostics
+                    .map { it.message }
+                    .shouldContainExactly(
+                        "Process isolation execution failed with exit code 2.",
+                        "Process stderr/stdout: could not start",
+                    )
+                result.type shouldBe ScriptFailureType.HOST
+            }
+        },
+    )

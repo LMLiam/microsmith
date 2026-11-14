@@ -23,135 +23,137 @@ private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
 
 class DotnetAspDslTests :
-    StringSpec({
-        "asp blocks capture grouped routes, bindings, and responses" {
-            val builder = MicrosmithBuilder()
+    StringSpec(
+        {
+            "asp blocks capture grouped routes, bindings, and responses" {
+                val builder = MicrosmithBuilder()
 
-            builder.services {
-                "UserService" {
-                    dotnet {
-                        project("UserService.Api")
-                        asp {
-                            rest {
-                                "/users" {
-                                    get("/{id}", "GetUser") {
-                                        path("GetUserPath") { string("id") }
-                                        responses { ok("User") }
-                                    }
+                builder.services {
+                    "UserService" {
+                        dotnet {
+                            project("UserService.Api")
+                            asp {
+                                rest {
+                                    "/users" {
+                                        get("/{id}", "GetUser") {
+                                            path("GetUserPath") { string("id") }
+                                            responses { ok("User") }
+                                        }
 
-                                    post("CreateUser") {
-                                        body("CreateUserRequest") { string("email") }
-                                        responses { created("User") }
+                                        post("CreateUser") {
+                                            body("CreateUserRequest") { string("email") }
+                                            responses { created("User") }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            val services = builder.requireServicesExtension()
-            val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
-            val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
-            val rest = requireNotNull(asp.rest)
-            val usersGroup = rest.groups.single()
-            val getUser = usersGroup.endpoints.single { it.operationName == "GetUser" }
-            val createUser = usersGroup.endpoints.single { it.operationName == "CreateUser" }
+                val services = builder.requireServicesExtension()
+                val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
+                val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+                val rest = requireNotNull(asp.rest)
+                val usersGroup = rest.groups.single()
+                val getUser = usersGroup.endpoints.single { it.operationName == "GetUser" }
+                val createUser = usersGroup.endpoints.single { it.operationName == "CreateUser" }
 
-            usersGroup.path shouldBe "/users"
-            getUser.path shouldBe "/{id}"
-            requireNotNull(getUser.bindings.path).fields.map { it.name } shouldContainExactly listOf("id")
-            createUser.bindings.body shouldBe
-                DotnetAspModelReference.Inline(
-                    DotnetModel(
-                        name = "CreateUserRequest",
-                        fields =
-                            listOf(
-                                DotnetField(
-                                    name = "email",
-                                    type = DotnetFieldType.String,
-                                )
-                            ),
+                usersGroup.path shouldBe "/users"
+                getUser.path shouldBe "/{id}"
+                requireNotNull(getUser.bindings.path).fields.map { it.name } shouldContainExactly listOf("id")
+                createUser.bindings.body shouldBe
+                    DotnetAspModelReference.Inline(
+                        DotnetModel(
+                            name = "CreateUserRequest",
+                            fields =
+                                listOf(
+                                    DotnetField(
+                                        name = "email",
+                                        type = DotnetFieldType.String,
+                                    ),
+                                ),
+                        ),
                     )
-                )
-        }
+            }
 
-        "multiple asp blocks merge declared rest groups" {
-            val builder = MicrosmithBuilder()
+            "multiple asp blocks merge declared rest groups" {
+                val builder = MicrosmithBuilder()
 
-            builder.services {
-                "UserService" {
-                    dotnet {
-                        asp { rest { "/users" { get("ListUsers") { responses { ok("User") } } } } }
+                builder.services {
+                    "UserService" {
+                        dotnet {
+                            asp { rest { "/users" { get("ListUsers") { responses { ok("User") } } } } }
 
-                        asp { rest { "/health" { get("GetHealth") { responses { ok("Problem") } } } } }
+                            asp { rest { "/health" { get("GetHealth") { responses { ok("Problem") } } } } }
+                        }
                     }
                 }
+
+                val services = builder.requireServicesExtension()
+                val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
+                val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+
+                requireNotNull(asp.rest).groups.map { it.path } shouldContainExactly listOf("/users", "/health")
             }
 
-            val services = builder.requireServicesExtension()
-            val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
-            val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+            "aspNet alias composes with the existing asp surface" {
+                val builder = MicrosmithBuilder()
 
-            requireNotNull(asp.rest).groups.map { it.path } shouldContainExactly listOf("/users", "/health")
-        }
-
-        "aspNet alias composes with the existing asp surface" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                "UserService" {
-                    dotnet { aspNet { rest { "/health" { get("GetHealth") { responses { ok("Status") } } } } } }
+                builder.services {
+                    "UserService" {
+                        dotnet { aspNet { rest { "/health" { get("GetHealth") { responses { ok("Status") } } } } } }
+                    }
                 }
+
+                val services = builder.requireServicesExtension()
+                val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
+                val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+
+                requireNotNull(asp.rest).groups.single().endpoints.single().operationName shouldBe "GetHealth"
             }
 
-            val services = builder.requireServicesExtension()
-            val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
-            val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+            "asp blocks capture explicit launch ports" {
+                val builder = MicrosmithBuilder()
 
-            requireNotNull(asp.rest).groups.single().endpoints.single().operationName shouldBe "GetHealth"
-        }
-
-        "asp blocks capture explicit launch ports" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                "UserService" {
-                    dotnet {
-                        asp {
-                            ports {
-                                http(7000)
-                                https(7443)
+                builder.services {
+                    "UserService" {
+                        dotnet {
+                            asp {
+                                ports {
+                                    http(7000)
+                                    https(7443)
+                                }
                             }
                         }
                     }
                 }
+
+                val services = builder.requireServicesExtension()
+                val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
+                val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+
+                requireNotNull(asp.ports) shouldBe DotnetAspPorts(http = 7000, https = 7443)
             }
 
-            val services = builder.requireServicesExtension()
-            val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
-            val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+            "headers bindings reject colliding derived field names" {
+                val builder = MicrosmithBuilder()
 
-            requireNotNull(asp.ports) shouldBe DotnetAspPorts(http = 7000, https = 7443)
-        }
-
-        "headers bindings reject colliding derived field names" {
-            val builder = MicrosmithBuilder()
-
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    builder.services {
-                        "UserService" {
-                            dotnet {
-                                asp {
-                                    rest {
-                                        "/users" {
-                                            get("ListUsers") {
-                                                headers("RequestHeaders") {
-                                                    header("X-Trace-Id")
-                                                    header("X_Trace_Id")
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        builder.services {
+                            "UserService" {
+                                dotnet {
+                                    asp {
+                                        rest {
+                                            "/users" {
+                                                get("ListUsers") {
+                                                    headers("RequestHeaders") {
+                                                        header("X-Trace-Id")
+                                                        header("X_Trace_Id")
+                                                    }
+                                                    responses { ok("User") }
                                                 }
-                                                responses { ok("User") }
                                             }
                                         }
                                     }
@@ -159,56 +161,23 @@ class DotnetAspDslTests :
                             }
                         }
                     }
-                }
 
-            error.message.shouldContain("declares headers with colliding field names: xTraceId")
-        }
-
-        "responses support named helpers and custom status codes outside the standard range" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                "UserService" {
-                    dotnet {
-                        asp {
-                            rest {
-                                "/health" {
-                                    get("GetHealth") {
-                                        responses {
-                                            accepted("AcceptedStatus")
-                                            status(799, "ProbeStatus")
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                error.message.shouldContain("declares headers with colliding field names: xTraceId")
             }
 
-            val services = builder.requireServicesExtension()
-            val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
-            val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
-            val responses = requireNotNull(asp.rest).groups.single().endpoints.single().responses
+            "responses support named helpers and custom status codes outside the standard range" {
+                val builder = MicrosmithBuilder()
 
-            responses.map { it.statusCode } shouldContainExactly listOf(202, 799)
-        }
-
-        "duplicate path bindings are rejected during DSL authoring" {
-            val builder = MicrosmithBuilder()
-
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    builder.services {
-                        "UserService" {
-                            dotnet {
-                                asp {
-                                    rest {
-                                        "/users/{id}" {
-                                            get("GetUser") {
-                                                path("GetUserPath") { string("id") }
-                                                path("DuplicatePath") { string("id") }
-                                                responses { ok("User") }
+                builder.services {
+                    "UserService" {
+                        dotnet {
+                            asp {
+                                rest {
+                                    "/health" {
+                                        get("GetHealth") {
+                                            responses {
+                                                accepted("AcceptedStatus")
+                                                status(799, "ProbeStatus")
                                             }
                                         }
                                     }
@@ -218,24 +187,30 @@ class DotnetAspDslTests :
                     }
                 }
 
-            error.message.shouldContain("already declares a path binding")
-        }
+                val services = builder.requireServicesExtension()
+                val dotnet = requireNotNull(services.require("UserService").model.get<DotnetServiceExtension>())
+                val asp = requireNotNull(dotnet.get<DotnetAspServiceExtension>())
+                val responses = requireNotNull(asp.rest).groups.single().endpoints.single().responses
 
-        "duplicate query bindings are rejected during DSL authoring" {
-            val builder = MicrosmithBuilder()
+                responses.map { it.statusCode } shouldContainExactly listOf(202, 799)
+            }
 
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    builder.services {
-                        "UserService" {
-                            dotnet {
-                                asp {
-                                    rest {
-                                        "/users" {
-                                            get("ListUsers") {
-                                                query("ListUsersQuery") { string("search") }
-                                                query("DuplicateQuery") { string("page") }
-                                                responses { ok("User") }
+            "duplicate path bindings are rejected during DSL authoring" {
+                val builder = MicrosmithBuilder()
+
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        builder.services {
+                            "UserService" {
+                                dotnet {
+                                    asp {
+                                        rest {
+                                            "/users/{id}" {
+                                                get("GetUser") {
+                                                    path("GetUserPath") { string("id") }
+                                                    path("DuplicatePath") { string("id") }
+                                                    responses { ok("User") }
+                                                }
                                             }
                                         }
                                     }
@@ -243,26 +218,26 @@ class DotnetAspDslTests :
                             }
                         }
                     }
-                }
 
-            error.message.shouldContain("already declares a query binding")
-        }
+                error.message.shouldContain("already declares a path binding")
+            }
 
-        "duplicate body bindings are rejected during DSL authoring" {
-            val builder = MicrosmithBuilder()
+            "duplicate query bindings are rejected during DSL authoring" {
+                val builder = MicrosmithBuilder()
 
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    builder.services {
-                        "UserService" {
-                            dotnet {
-                                asp {
-                                    rest {
-                                        "/users" {
-                                            post("CreateUser") {
-                                                body("CreateUserBody")
-                                                body("InlineBody") { string("email") }
-                                                responses { created("User") }
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        builder.services {
+                            "UserService" {
+                                dotnet {
+                                    asp {
+                                        rest {
+                                            "/users" {
+                                                get("ListUsers") {
+                                                    query("ListUsersQuery") { string("search") }
+                                                    query("DuplicateQuery") { string("page") }
+                                                    responses { ok("User") }
+                                                }
                                             }
                                         }
                                     }
@@ -270,25 +245,26 @@ class DotnetAspDslTests :
                             }
                         }
                     }
-                }
 
-            error.message.shouldContain("already declares a body binding")
-        }
+                error.message.shouldContain("already declares a query binding")
+            }
 
-        "duplicate responses blocks are rejected during DSL authoring" {
-            val builder = MicrosmithBuilder()
+            "duplicate body bindings are rejected during DSL authoring" {
+                val builder = MicrosmithBuilder()
 
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    builder.services {
-                        "UserService" {
-                            dotnet {
-                                asp {
-                                    rest {
-                                        "/health" {
-                                            get("GetHealth") {
-                                                responses { ok("Status") }
-                                                responses { accepted("AcceptedStatus") }
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        builder.services {
+                            "UserService" {
+                                dotnet {
+                                    asp {
+                                        rest {
+                                            "/users" {
+                                                post("CreateUser") {
+                                                    body("CreateUserBody")
+                                                    body("InlineBody") { string("email") }
+                                                    responses { created("User") }
+                                                }
                                             }
                                         }
                                     }
@@ -296,25 +272,25 @@ class DotnetAspDslTests :
                             }
                         }
                     }
-                }
 
-            error.message.shouldContain("already declares responses")
-        }
+                error.message.shouldContain("already declares a body binding")
+            }
 
-        "request bindings reject reference-typed transport fields during DSL authoring" {
-            val builder = MicrosmithBuilder()
+            "duplicate responses blocks are rejected during DSL authoring" {
+                val builder = MicrosmithBuilder()
 
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    builder.services {
-                        "UserService" {
-                            dotnet {
-                                asp {
-                                    rest {
-                                        "/users/{id}" {
-                                            get("GetUser") {
-                                                query("GetUserQuery") { "user" ref "User" }
-                                                responses { ok("User") }
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        builder.services {
+                            "UserService" {
+                                dotnet {
+                                    asp {
+                                        rest {
+                                            "/health" {
+                                                get("GetHealth") {
+                                                    responses { ok("Status") }
+                                                    responses { accepted("AcceptedStatus") }
+                                                }
                                             }
                                         }
                                     }
@@ -322,8 +298,34 @@ class DotnetAspDslTests :
                             }
                         }
                     }
-                }
 
-            error.message.shouldContain("ASP.NET request bindings cannot declare reference field 'user' to 'User'")
-        }
-    })
+                error.message.shouldContain("already declares responses")
+            }
+
+            "request bindings reject reference-typed transport fields during DSL authoring" {
+                val builder = MicrosmithBuilder()
+
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        builder.services {
+                            "UserService" {
+                                dotnet {
+                                    asp {
+                                        rest {
+                                            "/users/{id}" {
+                                                get("GetUser") {
+                                                    query("GetUserQuery") { "user" ref "User" }
+                                                    responses { ok("User") }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                error.message.shouldContain("ASP.NET request bindings cannot declare reference field 'user' to 'User'")
+            }
+        },
+    )

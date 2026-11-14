@@ -36,7 +36,7 @@ internal fun renderResultMapper(endpoint: DotnetAspEndpointArtifact): CSharp.Met
                                 }
                                 add(renderUnsupportedResultArm(endpoint))
                             },
-                    )
+                    ),
                 )
             },
     )
@@ -56,7 +56,7 @@ private fun responseArguments(response: DotnetAspResponseArtifact): List<CSharp.
             CSharp.nullLiteral()
         } else {
             CSharp.member(CSharp.identifier("response"), RESULT_BODY_PROPERTY_NAME)
-        }
+        },
     )
     add(CSharp.intLiteral(response.statusCode))
     response.headers.forEach { header ->
@@ -67,7 +67,7 @@ private fun responseArguments(response: DotnetAspResponseArtifact): List<CSharp.
                     CSharp.identifier("response"),
                     dotnetAspHeaderPropertyName(header.name),
                 ),
-            )
+            ),
         )
     }
 }
@@ -83,9 +83,9 @@ private fun renderUnsupportedResultArm(endpoint: DotnetAspEndpointArtifact): CSh
                         listOf(
                             CSharp.rawExpression(
                                 """$"Unsupported ${endpoint.operationName} result type """ +
-                                    "'{result.GetType().FullName}'.\""
-                            )
+                                    "'{result.GetType().FullName}'.\"",
+                            ),
                         ),
-                )
+                ),
             ),
     )

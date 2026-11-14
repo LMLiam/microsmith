@@ -23,124 +23,126 @@ private fun DotnetAspWorkspaceResolver.resolveIssues(extension: ServicesExtensio
         )
 
 class DotnetAspWorkspaceCollisionResolutionTests :
-    StringSpec({
-        "resolve rejects duplicate operation names across grouped routes" {
-            val builder = MicrosmithBuilder()
+    StringSpec(
+        {
+            "resolve rejects duplicate operation names across grouped routes" {
+                val builder = MicrosmithBuilder()
 
-            builder.services {
-                dotnet {
-                    target(NET8)
-
-                    solutions { "Platform" {} }
-                }
-
-                "UserService" {
+                builder.services {
                     dotnet {
-                        solution("Platform")
-                        project("UserService.Api")
+                        target(NET8)
 
-                        models { "User" { string("id") } }
+                        solutions { "Platform" {} }
+                    }
 
-                        asp {
-                            rest {
-                                "/users" { get("GetUser") { responses { ok("User") } } }
+                    "UserService" {
+                        dotnet {
+                            solution("Platform")
+                            project("UserService.Api")
 
-                                "/admins" { get("GetUser") { responses { ok("User") } } }
+                            models { "User" { string("id") } }
+
+                            asp {
+                                rest {
+                                    "/users" { get("GetUser") { responses { ok("User") } } }
+
+                                    "/admins" { get("GetUser") { responses { ok("User") } } }
+                                }
                             }
                         }
                     }
                 }
+
+                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                    listOf(
+                        DotnetAspResolutionIssue.DuplicateOperationName(
+                            serviceName = "UserService",
+                            operationName = "GetUser",
+                        ),
+                    )
             }
 
-            DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
-                listOf(
-                    DotnetAspResolutionIssue.DuplicateOperationName(
-                        serviceName = "UserService",
-                        operationName = "GetUser",
-                    )
-                )
-        }
+            "resolve rejects duplicate method and route mappings across endpoints" {
+                val builder = MicrosmithBuilder()
 
-        "resolve rejects duplicate method and route mappings across endpoints" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                dotnet {
-                    target(NET8)
-
-                    solutions { "Platform" {} }
-                }
-
-                "UserService" {
+                builder.services {
                     dotnet {
-                        solution("Platform")
-                        project("UserService.Api")
+                        target(NET8)
 
-                        models { "User" { string("id") } }
+                        solutions { "Platform" {} }
+                    }
 
-                        asp {
-                            rest {
-                                "/users" { get("ListUsers") { responses { ok("User") } } }
+                    "UserService" {
+                        dotnet {
+                            solution("Platform")
+                            project("UserService.Api")
 
-                                "/users" { get("GetUsersDuplicate") { responses { ok("User") } } }
+                            models { "User" { string("id") } }
+
+                            asp {
+                                rest {
+                                    "/users" { get("ListUsers") { responses { ok("User") } } }
+
+                                    "/users" { get("GetUsersDuplicate") { responses { ok("User") } } }
+                                }
                             }
                         }
                     }
                 }
+
+                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                    listOf(
+                        DotnetAspResolutionIssue.DuplicateRestEndpoint(
+                            serviceName = "UserService",
+                            method = DotnetAspHttpMethod.GET,
+                            route = "/users",
+                        ),
+                    )
             }
 
-            DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
-                listOf(
-                    DotnetAspResolutionIssue.DuplicateRestEndpoint(
-                        serviceName = "UserService",
-                        method = DotnetAspHttpMethod.GET,
-                        route = "/users",
-                    )
-                )
-        }
+            "resolve rejects colliding output roots across asp services" {
+                val builder = MicrosmithBuilder()
 
-        "resolve rejects colliding output roots across asp services" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                dotnet {
-                    target(NET8)
-
-                    solutions { "Platform" {} }
-                }
-
-                "UserService" {
+                builder.services {
                     dotnet {
-                        solution("Platform")
-                        project("Shared.Api")
-                        asp {}
+                        target(NET8)
+
+                        solutions { "Platform" {} }
+                    }
+
+                    "UserService" {
+                        dotnet {
+                            solution("Platform")
+                            project("Shared.Api")
+                            asp {}
+                        }
+                    }
+
+                    "AdminService" {
+                        dotnet {
+                            solution("Platform")
+                            project("Shared.Api")
+                            asp {}
+                        }
                     }
                 }
 
-                "AdminService" {
-                    dotnet {
-                        solution("Platform")
-                        project("Shared.Api")
-                        asp {}
-                    }
-                }
-            }
-
-            DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
-                listOf(
-                    DotnetAspResolutionIssue.OutputRootCollision(
-                        outputRoot =
-                            Path.of(
-                                "dotnet",
-                                "Platform",
-                                "Shared.Api",
-                            ),
-                        serviceNames =
-                            listOf(
-                                "AdminService",
-                                "UserService",
-                            ),
+                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                    listOf(
+                        DotnetAspResolutionIssue.OutputRootCollision(
+                            outputRoot =
+                                Path.of(
+                                    "dotnet",
+                                    "Platform",
+                                    "Shared.Api",
+                                ),
+                            serviceNames =
+                                listOf(
+                                    "AdminService",
+                                    "UserService",
+                                ),
+                        ),
                     )
-                )
-        }
-    })
+            }
+        },
+    )

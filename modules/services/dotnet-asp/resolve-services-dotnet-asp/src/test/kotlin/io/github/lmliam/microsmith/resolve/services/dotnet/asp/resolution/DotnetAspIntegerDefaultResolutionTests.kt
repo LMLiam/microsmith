@@ -15,7 +15,7 @@ import io.kotest.matchers.shouldBe
 import java.math.BigInteger
 
 private fun resolveQuery(
-    query: DotnetAspRequestBindingScope.() -> Unit
+    query: DotnetAspRequestBindingScope.() -> Unit,
 ): arrow.core.EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> {
     val builder = MicrosmithBuilder()
     builder.services {
@@ -62,60 +62,62 @@ private fun resolvedDefault(query: DotnetAspRequestBindingScope.() -> Unit): Dot
         .defaultValue
 
 class DotnetAspIntegerDefaultResolutionTests :
-    StringSpec({
-        "integer default beyond the range of its type is reported" {
-            resolveQueryIssues { int("limit") { default(99_999_999_999L) } } shouldContainExactly
-                listOf(
-                    DotnetAspBindingResolutionIssue.IntegerDefaultOutOfRange(
-                        serviceName = "ReportService",
-                        operationName = "GetReport",
-                        bindingName = "GetReportQuery",
-                        fieldName = "limit",
-                        csharpTypeName = "int",
-                        value = "99999999999",
+    StringSpec(
+        {
+            "integer default beyond the range of its type is reported" {
+                resolveQueryIssues { int("limit") { default(99_999_999_999L) } } shouldContainExactly
+                    listOf(
+                        DotnetAspBindingResolutionIssue.IntegerDefaultOutOfRange(
+                            serviceName = "ReportService",
+                            operationName = "GetReport",
+                            bindingName = "GetReportQuery",
+                            fieldName = "limit",
+                            csharpTypeName = "int",
+                            value = "99999999999",
+                        ),
                     )
-                )
-        }
+            }
 
-        "negative default for an unsigned field is reported" {
-            resolveQueryIssues { uint("limit") { default(-1) } } shouldContainExactly
-                listOf(
-                    DotnetAspBindingResolutionIssue.IntegerDefaultOutOfRange(
-                        serviceName = "ReportService",
-                        operationName = "GetReport",
-                        bindingName = "GetReportQuery",
-                        fieldName = "limit",
-                        csharpTypeName = "uint",
-                        value = "-1",
+            "negative default for an unsigned field is reported" {
+                resolveQueryIssues { uint("limit") { default(-1) } } shouldContainExactly
+                    listOf(
+                        DotnetAspBindingResolutionIssue.IntegerDefaultOutOfRange(
+                            serviceName = "ReportService",
+                            operationName = "GetReport",
+                            bindingName = "GetReportQuery",
+                            fieldName = "limit",
+                            csharpTypeName = "uint",
+                            value = "-1",
+                        ),
                     )
-                )
-        }
+            }
 
-        "fractional default for an integer field is reported" {
-            resolveQueryIssues { int("limit") { default(1.5) } } shouldContainExactly
-                listOf(
-                    DotnetAspBindingResolutionIssue.IntegerDefaultNotIntegral(
-                        serviceName = "ReportService",
-                        operationName = "GetReport",
-                        bindingName = "GetReportQuery",
-                        fieldName = "limit",
-                        csharpTypeName = "int",
-                        value = "1.5",
+            "fractional default for an integer field is reported" {
+                resolveQueryIssues { int("limit") { default(1.5) } } shouldContainExactly
+                    listOf(
+                        DotnetAspBindingResolutionIssue.IntegerDefaultNotIntegral(
+                            serviceName = "ReportService",
+                            operationName = "GetReport",
+                            bindingName = "GetReportQuery",
+                            fieldName = "limit",
+                            csharpTypeName = "int",
+                            value = "1.5",
+                        ),
                     )
-                )
-        }
+            }
 
-        "whole floating point default for an integer field resolves to an exact integer" {
-            resolvedDefault { int("limit") { default(5.0) } } shouldBe
-                DotnetAspDefaultValue.NumericValue(BigInteger.valueOf(5))
-        }
+            "whole floating point default for an integer field resolves to an exact integer" {
+                resolvedDefault { int("limit") { default(5.0) } } shouldBe
+                    DotnetAspDefaultValue.NumericValue(BigInteger.valueOf(5))
+            }
 
-        "default at the upper bound of a native unsigned integer resolves" {
-            resolvedDefault { nuint("limit") { default(BigInteger("18446744073709551615")) } } shouldBe
-                DotnetAspDefaultValue.NumericValue(BigInteger("18446744073709551615"))
-        }
+            "default at the upper bound of a native unsigned integer resolves" {
+                resolvedDefault { nuint("limit") { default(BigInteger("18446744073709551615")) } } shouldBe
+                    DotnetAspDefaultValue.NumericValue(BigInteger("18446744073709551615"))
+            }
 
-        "floating point field keeps its fractional default" {
-            resolvedDefault { double("ratio") { default(1.5) } } shouldBe DotnetAspDefaultValue.NumericValue(1.5)
-        }
-    })
+            "floating point field keeps its fractional default" {
+                resolvedDefault { double("ratio") { default(1.5) } } shouldBe DotnetAspDefaultValue.NumericValue(1.5)
+            }
+        },
+    )

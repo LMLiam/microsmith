@@ -48,9 +48,9 @@ internal class DotnetAspRestResolver {
                     compareBy(
                         ResolvedDotnetAspEndpoint::route,
                         ResolvedDotnetAspEndpoint::operationName,
-                    )
-                )
-            )
+                    ),
+                ),
+            ),
         )
     }
 
@@ -75,7 +75,7 @@ internal class DotnetAspRestResolver {
                 compareBy(
                     { it.first.name },
                     { it.second },
-                )
+                ),
             )
             .forEach { (method, route) ->
                 add(DotnetAspResolutionIssue.DuplicateRestEndpoint(serviceName, method, route))

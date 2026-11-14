@@ -6,14 +6,16 @@ import io.kotest.matchers.shouldBe
 import java.nio.file.Files
 
 class MicrosmithModelGenerationExtensionsTests :
-    StringSpec({
-        "generateTo creates output directory when it does not exist" {
-            val workspaceRoot = Files.createTempDirectory("microsmith-generate-to-root-")
-            val outputDir = workspaceRoot.resolve("generated/proto")
-            val model = microsmith {}
+    StringSpec(
+        {
+            "generateTo creates output directory when it does not exist" {
+                val workspaceRoot = Files.createTempDirectory("microsmith-generate-to-root-")
+                val outputDir = workspaceRoot.resolve("generated/proto")
+                val model = microsmith {}
 
-            model.generateTo(outputDir)
+                model.generateTo(outputDir)
 
-            Files.exists(outputDir) shouldBe true
-        }
-    })
+                Files.exists(outputDir) shouldBe true
+            }
+        },
+    )

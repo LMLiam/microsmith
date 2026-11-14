@@ -10,17 +10,19 @@ internal class MicrosmithScriptCache(
     private val cacheDirectory: Path,
     private val additionalFingerprints: () -> List<String> = { emptyList() },
 ) :
-    CompiledScriptJarsCache({ script, scriptCompilationConfiguration ->
-        cacheDirectory
-            .resolve(
-                CompiledScriptFingerprint.uniqueName(
-                    script = script,
-                    scriptCompilationConfiguration = scriptCompilationConfiguration,
-                    additionalFingerprints = additionalFingerprints(),
-                ) + ".jar"
-            )
-            .toFile()
-    }) {
+    CompiledScriptJarsCache(
+        { script, scriptCompilationConfiguration ->
+            cacheDirectory
+                .resolve(
+                    CompiledScriptFingerprint.uniqueName(
+                        script = script,
+                        scriptCompilationConfiguration = scriptCompilationConfiguration,
+                        additionalFingerprints = additionalFingerprints(),
+                    ) + ".jar",
+                )
+                .toFile()
+        },
+    ) {
     var storedScripts: Int = 0
         private set
 

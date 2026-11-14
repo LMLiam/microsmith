@@ -9,7 +9,7 @@ class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackage
     override val artifactType = DotnetPackageReferencesArtifact::class
 
     override fun create(
-        contribution: ArtifactContribution<DotnetPackageReferencesArtifact>
+        contribution: ArtifactContribution<DotnetPackageReferencesArtifact>,
     ): DotnetPackageReferencesArtifact {
         val referencesContribution = requireContribution(contribution)
         return DotnetPackageReferencesArtifact(
@@ -40,7 +40,7 @@ class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackage
     }
 
     private fun requireContribution(
-        contribution: ArtifactContribution<DotnetPackageReferencesArtifact>
+        contribution: ArtifactContribution<DotnetPackageReferencesArtifact>,
     ): DotnetPackageReferencesContribution {
         require(contribution is DotnetPackageReferencesContribution) {
             "Unsupported dotnet package references contribution type: ${contribution::class}"

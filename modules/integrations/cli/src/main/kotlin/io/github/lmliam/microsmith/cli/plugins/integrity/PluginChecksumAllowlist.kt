@@ -32,7 +32,7 @@ internal data class PluginChecksumAllowlist(val entries: Map<LockKey, String>) {
 }
 
 internal fun loadPluginChecksumAllowlistFromEnvironment(
-    allowlistPath: String? = System.getenv(CHECKSUM_ALLOWLIST_PATH_ENV)
+    allowlistPath: String? = System.getenv(CHECKSUM_ALLOWLIST_PATH_ENV),
 ): PluginChecksumAllowlist? {
     val resolvedPath = allowlistPath?.trim()?.takeIf { it.isNotEmpty() }?.let(Path::of) ?: return null
     return loadPluginChecksumAllowlistFromPath(resolvedPath)

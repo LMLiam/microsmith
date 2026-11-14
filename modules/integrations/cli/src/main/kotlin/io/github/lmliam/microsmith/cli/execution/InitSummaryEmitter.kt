@@ -21,7 +21,7 @@ internal object InitSummaryEmitter {
         emitNativeJvmGuidance(emitter, result)
         result.repositoryDetection.profile.recommendedOutputDirectory?.let { outputDirectory ->
             emitter.info(
-                "Optional repository-native output path: microsmith run build.microsmith.kts --out $outputDirectory"
+                "Optional repository-native output path: microsmith run build.microsmith.kts --out $outputDirectory",
             )
         }
     }
@@ -47,7 +47,7 @@ internal object InitSummaryEmitter {
             emitter.info("$message: ${result.preservedFiles.formatForDisplay(result.projectRoot)}")
             if (!command.force) {
                 emitter.info(
-                    "Re-run with --force to replace existing regular bootstrap files with the managed templates."
+                    "Re-run with --force to replace existing regular bootstrap files with the managed templates.",
                 )
             }
         }
@@ -60,7 +60,7 @@ internal object InitSummaryEmitter {
         val ideHelperResult = result.ideHelperResult
         if (ideHelperResult == null) {
             emitter.info(
-                "JetBrains IDE helper generation was skipped. Run 'microsmith ide refresh' when you want IDE indexing."
+                "JetBrains IDE helper generation was skipped. Run 'microsmith ide refresh' when you want IDE indexing.",
             )
             return
         }
@@ -78,14 +78,14 @@ internal object InitSummaryEmitter {
                 emitter.info(
                     "Gradle repository detected. Prefer the native Gradle plugin path when you want imported-project " +
                         "IDE support: apply plugin id '$GRADLE_PLUGIN_ID', configure 'microsmith { ... }', " +
-                        "and run './gradlew microsmithGenerate'."
+                        "and run './gradlew microsmithGenerate'.",
                 )
 
             JvmNativeBuildSystem.MAVEN ->
                 emitter.info(
                     "Maven repository detected. Prefer the native Maven plugin path when you want imported-project " +
                         "IDE support: add '$MICROSMITH_RUNTIME_SCRIPTING_COORDINATE' as a provided dependency, " +
-                        "configure '$MICROSMITH_MAVEN_PLUGIN_COORDINATE', and run 'mvn microsmith:generate'."
+                        "configure '$MICROSMITH_MAVEN_PLUGIN_COORDINATE', and run 'mvn microsmith:generate'.",
                 )
         }
     }

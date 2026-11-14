@@ -40,7 +40,7 @@ internal object DotnetAspInfrastructureFileRenderer {
                     addMember(renderAddMicrosmithExtension())
                     addMember(renderMapMicrosmithExtension())
                 }
-            }
+            },
         )
 
     fun renderMicrosmithControllerBaseFile(artifact: DotnetAspServiceArtifact): String =
@@ -55,7 +55,7 @@ internal object DotnetAspInfrastructureFileRenderer {
                     addMember(renderRespondHelper())
                     addMember(renderReadHeaderHelper())
                 }
-            }
+            },
         )
 }
 

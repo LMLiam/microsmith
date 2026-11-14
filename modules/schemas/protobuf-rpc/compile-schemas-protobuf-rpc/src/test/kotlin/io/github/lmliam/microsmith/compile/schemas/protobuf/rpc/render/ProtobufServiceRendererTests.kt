@@ -8,46 +8,48 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.string.shouldContain
 
 class ProtobufServiceRendererTests :
-    StringSpec({
-        "renders unary and streaming routes" {
-            val rendered =
-                ProtobufServiceRenderer.render(
-                    ProtobufRpcServiceArtifact(
-                        id = ProtobufRpcServiceArtifactId(packageName = "pkg", serviceName = "UserService"),
-                        imports = emptyList(),
-                        operations =
-                            listOf(
-                                ProtobufRpcOperation(
-                                    name = "GetUser",
-                                    request =
-                                        ProtobufRpcEndpoint(
-                                            typeName = "pkg.GetUserRequest",
-                                            streaming = false,
-                                        ),
-                                    response =
-                                        ProtobufRpcEndpoint(
-                                            typeName = "pkg.GetUserResponse",
-                                            streaming = false,
-                                        ),
+    StringSpec(
+        {
+            "renders unary and streaming routes" {
+                val rendered =
+                    ProtobufServiceRenderer.render(
+                        ProtobufRpcServiceArtifact(
+                            id = ProtobufRpcServiceArtifactId(packageName = "pkg", serviceName = "UserService"),
+                            imports = emptyList(),
+                            operations =
+                                listOf(
+                                    ProtobufRpcOperation(
+                                        name = "GetUser",
+                                        request =
+                                            ProtobufRpcEndpoint(
+                                                typeName = "pkg.GetUserRequest",
+                                                streaming = false,
+                                            ),
+                                        response =
+                                            ProtobufRpcEndpoint(
+                                                typeName = "pkg.GetUserResponse",
+                                                streaming = false,
+                                            ),
+                                    ),
+                                    ProtobufRpcOperation(
+                                        name = "ChatUsers",
+                                        request =
+                                            ProtobufRpcEndpoint(
+                                                typeName = "pkg.ChatRequest",
+                                                streaming = true,
+                                            ),
+                                        response =
+                                            ProtobufRpcEndpoint(
+                                                typeName = "pkg.ChatResponse",
+                                                streaming = true,
+                                            ),
+                                    ),
                                 ),
-                                ProtobufRpcOperation(
-                                    name = "ChatUsers",
-                                    request =
-                                        ProtobufRpcEndpoint(
-                                            typeName = "pkg.ChatRequest",
-                                            streaming = true,
-                                        ),
-                                    response =
-                                        ProtobufRpcEndpoint(
-                                            typeName = "pkg.ChatResponse",
-                                            streaming = true,
-                                        ),
-                                ),
-                            ),
+                        ),
                     )
-                )
 
-            rendered.shouldContain("rpc GetUser (pkg.GetUserRequest) returns (pkg.GetUserResponse);")
-            rendered.shouldContain("rpc ChatUsers (stream pkg.ChatRequest) returns (stream pkg.ChatResponse);")
-        }
-    })
+                rendered.shouldContain("rpc GetUser (pkg.GetUserRequest) returns (pkg.GetUserResponse);")
+                rendered.shouldContain("rpc ChatUsers (stream pkg.ChatRequest) returns (stream pkg.ChatResponse);")
+            }
+        },
+    )

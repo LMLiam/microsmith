@@ -16,59 +16,61 @@ data class MergeableFooExtension(val values: List<String>) :
 }
 
 class MicrosmithModelTests :
-    StringSpec({
-        "empty model has no extensions" {
-            val model = MicrosmithModel.empty()
-            model.keys().isEmpty() shouldBe true
-            model.get<FooExtension>().shouldBeNull()
-        }
+    StringSpec(
+        {
+            "empty model has no extensions" {
+                val model = MicrosmithModel.empty()
+                model.keys().isEmpty() shouldBe true
+                model.get<FooExtension>().shouldBeNull()
+            }
 
-        "with attaches a new extension" {
-            val model = MicrosmithModel.empty().with(FooExtension("hello"))
+            "with attaches a new extension" {
+                val model = MicrosmithModel.empty().with(FooExtension("hello"))
 
-            model.get<FooExtension>()?.foo shouldBe "hello"
-            model.get<BarExtension>().shouldBeNull()
-        }
+                model.get<FooExtension>()?.foo shouldBe "hello"
+                model.get<BarExtension>().shouldBeNull()
+            }
 
-        "with replaces an existing extension of the same type" {
-            val model1 = MicrosmithModel.empty().with(FooExtension("first"))
-            val model2 = model1.with(FooExtension("second"))
+            "with replaces an existing extension of the same type" {
+                val model1 = MicrosmithModel.empty().with(FooExtension("first"))
+                val model2 = model1.with(FooExtension("second"))
 
-            model2 shouldNotBe model1
-            model1.get<FooExtension>()?.foo shouldBe "first"
-            model2.get<FooExtension>()?.foo shouldBe "second"
-        }
+                model2 shouldNotBe model1
+                model1.get<FooExtension>()?.foo shouldBe "first"
+                model2.get<FooExtension>()?.foo shouldBe "second"
+            }
 
-        "with can attach multiple different extensions" {
-            val model = MicrosmithModel.empty().with(FooExtension("first")).with(BarExtension(1))
+            "with can attach multiple different extensions" {
+                val model = MicrosmithModel.empty().with(FooExtension("first")).with(BarExtension(1))
 
-            model.get<FooExtension>()?.foo shouldBe "first"
-            model.get<BarExtension>()?.bar shouldBe 1
+                model.get<FooExtension>()?.foo shouldBe "first"
+                model.get<BarExtension>()?.bar shouldBe 1
 
-            model.keys().map { it.simpleName }.toSet() shouldContainExactly
-                setOf(
-                    FooExtension::class.simpleName,
-                    BarExtension::class.simpleName,
-                )
-        }
+                model.keys().map { it.simpleName }.toSet() shouldContainExactly
+                    setOf(
+                        FooExtension::class.simpleName,
+                        BarExtension::class.simpleName,
+                    )
+            }
 
-        "get by KClass works the same as reified get" {
-            val model = MicrosmithModel.empty().with(FooExtension("first"))
+            "get by KClass works the same as reified get" {
+                val model = MicrosmithModel.empty().with(FooExtension("first"))
 
-            model.get(FooExtension::class)?.foo shouldBe "first"
-            model.get<FooExtension>()?.foo shouldBe "first"
-        }
+                model.get(FooExtension::class)?.foo shouldBe "first"
+                model.get<FooExtension>()?.foo shouldBe "first"
+            }
 
-        "with merges mergeable root extensions of the same type" {
-            val model =
-                MicrosmithModel.empty()
-                    .with(MergeableFooExtension(listOf("first")))
-                    .with(MergeableFooExtension(listOf("second")))
+            "with merges mergeable root extensions of the same type" {
+                val model =
+                    MicrosmithModel.empty()
+                        .with(MergeableFooExtension(listOf("first")))
+                        .with(MergeableFooExtension(listOf("second")))
 
-            model.get<MergeableFooExtension>()?.values shouldContainExactly
-                listOf(
-                    "first",
-                    "second",
-                )
-        }
-    })
+                model.get<MergeableFooExtension>()?.values shouldContainExactly
+                    listOf(
+                        "first",
+                        "second",
+                    )
+            }
+        },
+    )

@@ -16,67 +16,69 @@ import io.kotest.matchers.shouldBe
 import java.nio.file.Path
 
 class ArtifactCompilationServiceTests :
-    StringSpec({
-        "recursively compiles artifacts until only terminal artifacts remain" {
-            val assemblyService =
-                ArtifactAssemblyService(
-                    listOf(
-                        StageOneArtifactAssembler(),
-                        StageTwoArtifactAssembler(),
-                        TextFileArtifactAssembler(),
+    StringSpec(
+        {
+            "recursively compiles artifacts until only terminal artifacts remain" {
+                val assemblyService =
+                    ArtifactAssemblyService(
+                        listOf(
+                            StageOneArtifactAssembler(),
+                            StageTwoArtifactAssembler(),
+                            TextFileArtifactAssembler(),
+                        ),
                     )
-                )
-            val compilationService =
-                ArtifactCompilationService(
-                    compilers = listOf(StageOneCompiler(), StageTwoCompiler()),
-                    assemblyService = assemblyService,
-                )
-            val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
-
-            val compiled = compilationService.compile(initial)
-
-            compiled.artifacts().map { it.id.artifactType } shouldContainExactly listOf(TextFileArtifact::class)
-        }
-
-        "rejects immediate self-cycles from compilers" {
-            val assemblyService = ArtifactAssemblyService(listOf(StageOneArtifactAssembler()))
-            val compilationService =
-                ArtifactCompilationService(
-                    compilers = listOf(SelfCyclingCompiler()),
-                    assemblyService = assemblyService,
-                )
-            val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
-
-            val error = shouldThrow<IllegalArgumentException> { compilationService.compile(initial) }
-
-            error.message shouldBe
-                "'io.github.lmliam.microsmith.compile.SelfCyclingCompiler' compiled " +
-                    "'io.github.lmliam.microsmith.compile.StageOneArtifact' into the same artifact type, " +
-                    "creating an immediate compilation cycle."
-        }
-
-        "rejects indirect cycles across compiler stages" {
-            val assemblyService =
-                ArtifactAssemblyService(
-                    listOf(
-                        StageOneArtifactAssembler(),
-                        StageTwoArtifactAssembler(),
+                val compilationService =
+                    ArtifactCompilationService(
+                        compilers = listOf(StageOneCompiler(), StageTwoCompiler()),
+                        assemblyService = assemblyService,
                     )
-                )
-            val compilationService =
-                ArtifactCompilationService(
-                    compilers = listOf(StageOneToStageTwoCompiler(), StageTwoToStageOneCompiler()),
-                    assemblyService = assemblyService,
-                )
-            val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
+                val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
 
-            val error = shouldThrow<IllegalArgumentException> { compilationService.compile(initial) }
+                val compiled = compilationService.compile(initial)
 
-            error.message shouldBe
-                "Artifact compilation cycle detected for assembly: " +
-                    "'io.github.lmliam.microsmith.compile.StageOneArtifact:StageOneId(name=start)'."
-        }
-    })
+                compiled.artifacts().map { it.id.artifactType } shouldContainExactly listOf(TextFileArtifact::class)
+            }
+
+            "rejects immediate self-cycles from compilers" {
+                val assemblyService = ArtifactAssemblyService(listOf(StageOneArtifactAssembler()))
+                val compilationService =
+                    ArtifactCompilationService(
+                        compilers = listOf(SelfCyclingCompiler()),
+                        assemblyService = assemblyService,
+                    )
+                val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
+
+                val error = shouldThrow<IllegalArgumentException> { compilationService.compile(initial) }
+
+                error.message shouldBe
+                    "'io.github.lmliam.microsmith.compile.SelfCyclingCompiler' compiled " +
+                        "'io.github.lmliam.microsmith.compile.StageOneArtifact' into the same artifact type, " +
+                        "creating an immediate compilation cycle."
+            }
+
+            "rejects indirect cycles across compiler stages" {
+                val assemblyService =
+                    ArtifactAssemblyService(
+                        listOf(
+                            StageOneArtifactAssembler(),
+                            StageTwoArtifactAssembler(),
+                        ),
+                    )
+                val compilationService =
+                    ArtifactCompilationService(
+                        compilers = listOf(StageOneToStageTwoCompiler(), StageTwoToStageOneCompiler()),
+                        assemblyService = assemblyService,
+                    )
+                val initial = assemblyService.assemble(listOf(StageOneContribution(StageOneId("start"), "start")))
+
+                val error = shouldThrow<IllegalArgumentException> { compilationService.compile(initial) }
+
+                error.message shouldBe
+                    "Artifact compilation cycle detected for assembly: " +
+                        "'io.github.lmliam.microsmith.compile.StageOneArtifact:StageOneId(name=start)'."
+            }
+        },
+    )
 
 private data class StageOneArtifact(
     override val id: StageOneId,

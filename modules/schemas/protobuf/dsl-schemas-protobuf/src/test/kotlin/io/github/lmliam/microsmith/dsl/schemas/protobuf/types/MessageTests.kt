@@ -10,35 +10,37 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
 class MessageTests :
-    StringSpec({
-        "message fields contain only legal message field types" {
-            val fields =
-                listOf(
-                    ScalarField(
-                        name = "id",
-                        index = 1,
-                        primitive = PrimitiveType.INT64,
-                    ),
-                    ReferenceField(
-                        name = "owner",
-                        index = 2,
-                        reference = Reference.Qualified("Owner"),
-                    ),
-                    MapField(
-                        name = "metadata",
-                        index = 3,
-                        type =
-                            MapType(
-                                key = PrimitiveType.STRING,
-                                value = PrimitiveType.STRING,
-                            ),
-                    ),
-                )
+    StringSpec(
+        {
+            "message fields contain only legal message field types" {
+                val fields =
+                    listOf(
+                        ScalarField(
+                            name = "id",
+                            index = 1,
+                            primitive = PrimitiveType.INT64,
+                        ),
+                        ReferenceField(
+                            name = "owner",
+                            index = 2,
+                            reference = Reference.Qualified("Owner"),
+                        ),
+                        MapField(
+                            name = "metadata",
+                            index = 3,
+                            type =
+                                MapType(
+                                    key = PrimitiveType.STRING,
+                                    value = PrimitiveType.STRING,
+                                ),
+                        ),
+                    )
 
-            Message(
-                    name = "Thing",
-                    fields = fields,
-                )
-                .fields shouldContainExactly fields
-        }
-    })
+                Message(
+                        name = "Thing",
+                        fields = fields,
+                    )
+                    .fields shouldContainExactly fields
+            }
+        },
+    )

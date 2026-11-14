@@ -23,7 +23,7 @@ private class AlphaContributor : ArtifactContributor<AlphaResolved> {
             TextFileArtifactContribution(
                 artifactId = TextFileArtifactId(Path.of("alpha.txt")),
                 contents = model.name,
-            )
+            ),
         )
 }
 
@@ -35,7 +35,7 @@ private class BetaContributor : ArtifactContributor<BetaResolved> {
             TextFileArtifactContribution(
                 artifactId = TextFileArtifactId(Path.of("beta.txt")),
                 contents = model.name,
-            )
+            ),
         )
 }
 
@@ -46,64 +46,68 @@ private class MisdeclaredContributor : ArtifactContributor<AlphaResolved> {
 }
 
 class ArtifactContributionServiceTests :
-    StringSpec({
-        "routes models to matching contributors in model-type name order" {
-            val service =
-                ArtifactContributionService(
-                    listOf(
-                        BetaContributor(),
-                        AlphaContributor(),
-                    )
-                )
-
-            val contributions = service.contribute(listOf(BetaResolved("second"), AlphaResolved("first")))
-
-            contributions shouldContainExactly
-                listOf(
-                    TextFileArtifactContribution(
-                        artifactId = TextFileArtifactId(Path.of("alpha.txt")),
-                        contents = "first",
-                    ),
-                    TextFileArtifactContribution(
-                        artifactId = TextFileArtifactId(Path.of("beta.txt")),
-                        contents = "second",
-                    ),
-                )
-        }
-
-        "rejects contributor registrations whose declared resolvedType does not match generic type argument" {
-            val error =
-                shouldThrow<IllegalArgumentException> { ArtifactContributorRegistry(listOf(MisdeclaredContributor())) }
-
-            error.message shouldBe
-                "'io.github.lmliam.microsmith.artifact.MisdeclaredContributor' declares " +
-                    "resolvedType 'io.github.lmliam.microsmith.artifact.BetaResolved', but implements " +
-                    "ArtifactContributor<io.github.lmliam.microsmith.artifact.AlphaResolved>. " +
-                    "Ensure resolvedType matches the ArtifactContributor generic type argument."
-        }
-
-        "rejects duplicate contributors registered for the same resolved type" {
-            val error =
-                shouldThrow<IllegalArgumentException> {
-                    ArtifactContributorRegistry(
+    StringSpec(
+        {
+            "routes models to matching contributors in model-type name order" {
+                val service =
+                    ArtifactContributionService(
                         listOf(
+                            BetaContributor(),
                             AlphaContributor(),
-                            AlphaContributor(),
-                        )
+                        ),
                     )
-                }
 
-            error.message shouldBe
-                "Duplicate artifact contributors registered for resolved type " +
-                    "'io.github.lmliam.microsmith.artifact.AlphaResolved': " +
-                    "io.github.lmliam.microsmith.artifact.AlphaContributor"
-        }
+                val contributions = service.contribute(listOf(BetaResolved("second"), AlphaResolved("first")))
 
-        "returns empty contributions when no contributors match the model" {
-            val service = ArtifactContributionService(listOf(AlphaContributor()))
+                contributions shouldContainExactly
+                    listOf(
+                        TextFileArtifactContribution(
+                            artifactId = TextFileArtifactId(Path.of("alpha.txt")),
+                            contents = "first",
+                        ),
+                        TextFileArtifactContribution(
+                            artifactId = TextFileArtifactId(Path.of("beta.txt")),
+                            contents = "second",
+                        ),
+                    )
+            }
 
-            val contributions = service.contribute(listOf(BetaResolved("unhandled")))
+            "rejects contributor registrations whose declared resolvedType does not match generic type argument" {
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        ArtifactContributorRegistry(listOf(MisdeclaredContributor()))
+                    }
 
-            contributions.shouldBeEmpty()
-        }
-    })
+                error.message shouldBe
+                    "'io.github.lmliam.microsmith.artifact.MisdeclaredContributor' declares " +
+                        "resolvedType 'io.github.lmliam.microsmith.artifact.BetaResolved', but implements " +
+                        "ArtifactContributor<io.github.lmliam.microsmith.artifact.AlphaResolved>. " +
+                        "Ensure resolvedType matches the ArtifactContributor generic type argument."
+            }
+
+            "rejects duplicate contributors registered for the same resolved type" {
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        ArtifactContributorRegistry(
+                            listOf(
+                                AlphaContributor(),
+                                AlphaContributor(),
+                            ),
+                        )
+                    }
+
+                error.message shouldBe
+                    "Duplicate artifact contributors registered for resolved type " +
+                        "'io.github.lmliam.microsmith.artifact.AlphaResolved': " +
+                        "io.github.lmliam.microsmith.artifact.AlphaContributor"
+            }
+
+            "returns empty contributions when no contributors match the model" {
+                val service = ArtifactContributionService(listOf(AlphaContributor()))
+
+                val contributions = service.contribute(listOf(BetaResolved("unhandled")))
+
+                contributions.shouldBeEmpty()
+            }
+        },
+    )

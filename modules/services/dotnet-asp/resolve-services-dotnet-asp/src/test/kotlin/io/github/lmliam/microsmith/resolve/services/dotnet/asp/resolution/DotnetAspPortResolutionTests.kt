@@ -56,66 +56,68 @@ private fun DotnetAspWorkspace.portsOf(name: String): ResolvedDotnetAspPorts =
     requireNotNull(servicesByName[name]).ports
 
 class DotnetAspPortResolutionTests :
-    StringSpec({
-        "explicit https port derives the http port one below it" {
-            val workspace = resolvePorts(PortedService("UserService", https = 7443)).workspace()
+    StringSpec(
+        {
+            "explicit https port derives the http port one below it" {
+                val workspace = resolvePorts(PortedService("UserService", https = 7443)).workspace()
 
-            workspace.portsOf("UserService") shouldBe ResolvedDotnetAspPorts(http = 7442, https = 7443)
-        }
+                workspace.portsOf("UserService") shouldBe ResolvedDotnetAspPorts(http = 7442, https = 7443)
+            }
 
-        "explicit http port derives the https port one above it" {
-            val workspace = resolvePorts(PortedService("UserService", http = 7000)).workspace()
+            "explicit http port derives the https port one above it" {
+                val workspace = resolvePorts(PortedService("UserService", http = 7000)).workspace()
 
-            workspace.portsOf("UserService") shouldBe ResolvedDotnetAspPorts(http = 7000, https = 7001)
-        }
+                workspace.portsOf("UserService") shouldBe ResolvedDotnetAspPorts(http = 7000, https = 7001)
+            }
 
-        "explicit http port 65535 reports the derived https port out of range" {
-            resolvePorts(PortedService("UserService", http = 65_535)).issues() shouldContainExactly
-                listOf(DotnetAspResolutionIssue.PortOutOfRange("UserService", PortKind.HTTPS, 65_536))
-        }
+            "explicit http port 65535 reports the derived https port out of range" {
+                resolvePorts(PortedService("UserService", http = 65_535)).issues() shouldContainExactly
+                    listOf(DotnetAspResolutionIssue.PortOutOfRange("UserService", PortKind.HTTPS, 65_536))
+            }
 
-        "explicit https port 1 reports the derived http port out of range" {
-            resolvePorts(PortedService("UserService", https = 1)).issues() shouldContainExactly
-                listOf(DotnetAspResolutionIssue.PortOutOfRange("UserService", PortKind.HTTP, 0))
-        }
+            "explicit https port 1 reports the derived http port out of range" {
+                resolvePorts(PortedService("UserService", https = 1)).issues() shouldContainExactly
+                    listOf(DotnetAspResolutionIssue.PortOutOfRange("UserService", PortKind.HTTP, 0))
+            }
 
-        "explicit ports shared by two services are reported with their owners" {
-            resolvePorts(
-                    PortedService("AdminService", http = 7000, https = 7443),
-                    PortedService("UserService", http = 7000, https = 7444),
-                )
-                .issues() shouldContainExactly
-                listOf(DotnetAspResolutionIssue.LaunchPortCollision(7000, listOf("AdminService", "UserService")))
-        }
+            "explicit ports shared by two services are reported with their owners" {
+                resolvePorts(
+                        PortedService("AdminService", http = 7000, https = 7443),
+                        PortedService("UserService", http = 7000, https = 7444),
+                    )
+                    .issues() shouldContainExactly
+                    listOf(DotnetAspResolutionIssue.LaunchPortCollision(7000, listOf("AdminService", "UserService")))
+            }
 
-        "every explicit collision and out-of-range port is reported together" {
-            resolvePorts(
-                    PortedService("AdminService", http = 7000, https = 7443),
-                    PortedService("UserService", http = 7000, https = 7443),
-                    PortedService("BillingService", http = 65_535),
-                )
-                .issues() shouldContainExactlyInAnyOrder
-                listOf(
-                    DotnetAspResolutionIssue.LaunchPortCollision(7000, listOf("AdminService", "UserService")),
-                    DotnetAspResolutionIssue.LaunchPortCollision(7443, listOf("AdminService", "UserService")),
-                    DotnetAspResolutionIssue.PortOutOfRange("BillingService", PortKind.HTTPS, 65_536),
-                )
-        }
+            "every explicit collision and out-of-range port is reported together" {
+                resolvePorts(
+                        PortedService("AdminService", http = 7000, https = 7443),
+                        PortedService("UserService", http = 7000, https = 7443),
+                        PortedService("BillingService", http = 65_535),
+                    )
+                    .issues() shouldContainExactlyInAnyOrder
+                    listOf(
+                        DotnetAspResolutionIssue.LaunchPortCollision(7000, listOf("AdminService", "UserService")),
+                        DotnetAspResolutionIssue.LaunchPortCollision(7443, listOf("AdminService", "UserService")),
+                        DotnetAspResolutionIssue.PortOutOfRange("BillingService", PortKind.HTTPS, 65_536),
+                    )
+            }
 
-        "a derived port colliding with another explicit port is reported" {
-            resolvePorts(
-                    PortedService("AdminService", http = 7000),
-                    PortedService("UserService", http = 7001, https = 7443),
-                )
-                .issues() shouldContainExactly
-                listOf(DotnetAspResolutionIssue.LaunchPortCollision(7001, listOf("AdminService", "UserService")))
-        }
+            "a derived port colliding with another explicit port is reported" {
+                resolvePorts(
+                        PortedService("AdminService", http = 7000),
+                        PortedService("UserService", http = 7001, https = 7443),
+                    )
+                    .issues() shouldContainExactly
+                    listOf(DotnetAspResolutionIssue.LaunchPortCollision(7001, listOf("AdminService", "UserService")))
+            }
 
-        "default ports of many services are all distinct" {
-            val services = (1..400).map { PortedService("Service$it") }.toTypedArray()
+            "default ports of many services are all distinct" {
+                val services = (1..400).map { PortedService("Service$it") }.toTypedArray()
 
-            val ports = resolvePorts(*services).workspace().servicesByName.values.map { it.ports }
+                val ports = resolvePorts(*services).workspace().servicesByName.values.map { it.ports }
 
-            ports.flatMap { listOf(it.http, it.https) }.toSet().size shouldBe 800
-        }
-    })
+                ports.flatMap { listOf(it.http, it.https) }.toSet().size shouldBe 800
+            }
+        },
+    )

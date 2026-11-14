@@ -28,7 +28,7 @@ internal fun renderRespondHelper(): CSharp.Method =
                                     csharpNullableType(DotnetCSharpTypes.Primitives.String),
                                     "Value",
                                 ),
-                            )
+                            ),
                         ),
                     name = "headers",
                     modifiers = listOf(CSharp.Modifier.PARAMS),
@@ -42,7 +42,7 @@ internal fun renderRespondHelper(): CSharp.Method =
                             CSharp.identifier("value"),
                             CSharp.BinaryOperator.IS_NOT,
                             CSharp.nullLiteral(),
-                        )
+                        ),
                     ) {
                         expression(
                             CSharp.assignment(
@@ -51,7 +51,7 @@ internal fun renderRespondHelper(): CSharp.Method =
                                     CSharp.identifier("name"),
                                 ),
                                 CSharp.identifier("value"),
-                            )
+                            ),
                         )
                     }
                 }
@@ -61,7 +61,7 @@ internal fun renderRespondHelper(): CSharp.Method =
                         CSharp.call(
                             CSharp.identifier("StatusCode"),
                             CSharp.identifier("statusCode"),
-                        )
+                        ),
                     )
                 }
                 blankLine()
@@ -70,7 +70,7 @@ internal fun renderRespondHelper(): CSharp.Method =
                         type = csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ObjectResult),
                         arguments = listOf(CSharp.identifier("body")),
                         initializers = listOf(CSharp.init("StatusCode", CSharp.identifier("statusCode"))),
-                    )
+                    ),
                 )
             },
     )
@@ -100,7 +100,7 @@ internal fun renderReadHeaderHelper(): CSharp.Method =
                             ),
                         whenTrue = CSharp.call(CSharp.member(CSharp.identifier("values"), "ToString")),
                         whenFalse = CSharp.nullLiteral(),
-                    )
+                    ),
                 )
             },
     )

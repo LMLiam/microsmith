@@ -33,7 +33,7 @@ object ProtobufNameValidation {
                 ProtoIdentifier.parse(segment).getOrElse {
                     return invalid(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.INVALID_IDENTIFIER_SEGMENT)
                 }
-            }
+            },
         )
     }
 

@@ -23,47 +23,49 @@ import kotlin.io.path.writeText
 
 @OptIn(ExperimentalPathApi::class)
 class PluginResolverHttpResolutionTests :
-    StringSpec({
-        "resolves plugin coordinate and transitive dependency from an http repository" {
-            val tempDir = createTempDirectory("microsmith-plugin-resolver-http")
-            val server = serveDirectory(tempDir.resolve("repo"))
-            try {
-                val repositoryRoot = tempDir.resolve("repo")
-                val rootCoordinate = "com.acme:plugin-root:1.0.0"
-                val transitiveCoordinate = "com.acme:plugin-shared:2.1.0"
-                publishMavenArtifact(repositoryRoot, transitiveCoordinate)
-                publishMavenArtifact(repositoryRoot, rootCoordinate, dependencies = listOf(transitiveCoordinate))
-                val script = tempDir.resolve("schema.microsmith.kts")
-                script.writeText("// test script")
-                val repositoryUrl = "http://127.0.0.1:${server.address.port}/"
+    StringSpec(
+        {
+            "resolves plugin coordinate and transitive dependency from an http repository" {
+                val tempDir = createTempDirectory("microsmith-plugin-resolver-http")
+                val server = serveDirectory(tempDir.resolve("repo"))
+                try {
+                    val repositoryRoot = tempDir.resolve("repo")
+                    val rootCoordinate = "com.acme:plugin-root:1.0.0"
+                    val transitiveCoordinate = "com.acme:plugin-shared:2.1.0"
+                    publishMavenArtifact(repositoryRoot, transitiveCoordinate)
+                    publishMavenArtifact(repositoryRoot, rootCoordinate, dependencies = listOf(transitiveCoordinate))
+                    val script = tempDir.resolve("schema.microsmith.kts")
+                    script.writeText("// test script")
+                    val repositoryUrl = "http://127.0.0.1:${server.address.port}/"
 
-                val result =
-                    resolvePlugins(
-                        command =
-                            RunCommand(
-                                script = script,
-                                outputDir = tempDir.resolve("generated"),
-                                plugins = setOf(rootCoordinate),
-                                repositoryOverride = repositoryUrl,
-                            ),
-                        settings =
-                            PluginResolverSettings(
-                                cacheDirectory = tempDir.resolve("cache"),
-                                repositoryPolicy = fileRepositoryAllowedPolicy(repositoryUrl),
-                            ),
-                    )
+                    val result =
+                        resolvePlugins(
+                            command =
+                                RunCommand(
+                                    script = script,
+                                    outputDir = tempDir.resolve("generated"),
+                                    plugins = setOf(rootCoordinate),
+                                    repositoryOverride = repositoryUrl,
+                                ),
+                            settings =
+                                PluginResolverSettings(
+                                    cacheDirectory = tempDir.resolve("cache"),
+                                    repositoryPolicy = fileRepositoryAllowedPolicy(repositoryUrl),
+                                ),
+                        )
 
-                val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
-                success.classpath.shouldHaveSize(2)
-                success.classpath.all { path -> path.exists() } shouldBe true
-                success.classpath.map { path -> path.fileName.toString() }.toSet() shouldBe
-                    setOf("plugin-root-1.0.0.jar", "plugin-shared-2.1.0.jar")
-            } finally {
-                server.stop(0)
-                runCatching { tempDir.deleteRecursively() }
+                    val success = result.shouldBeTypeOf<PluginResolutionResult.Success>()
+                    success.classpath.shouldHaveSize(2)
+                    success.classpath.all { path -> path.exists() } shouldBe true
+                    success.classpath.map { path -> path.fileName.toString() }.toSet() shouldBe
+                        setOf("plugin-root-1.0.0.jar", "plugin-shared-2.1.0.jar")
+                } finally {
+                    server.stop(0)
+                    runCatching { tempDir.deleteRecursively() }
+                }
             }
-        }
-    })
+        },
+    )
 
 private fun serveDirectory(root: Path): HttpServer {
     Files.createDirectories(root)

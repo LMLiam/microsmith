@@ -24,7 +24,7 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
                         outputRoot = artifact.outputRoot(),
                     ),
                 contents = MsBuildProjectXmlRenderer.render(artifact),
-            )
+            ),
         )
 
     private fun MsBuildProjectArtifact.outputRoot(): Path =

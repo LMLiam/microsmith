@@ -22,6 +22,6 @@ internal fun ResolvedProtobufRpcSchemaModel.Rejection.toIssue(): ProtobufRpcReso
                         List(occurrences) {
                             ProtobufResolutionIssue.SymbolDeclaration.Type(identity.fullyQualifiedName)
                         },
-                )
+                ),
             )
     }
