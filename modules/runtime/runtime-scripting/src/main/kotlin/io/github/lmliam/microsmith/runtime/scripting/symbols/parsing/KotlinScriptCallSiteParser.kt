@@ -16,7 +16,7 @@ internal object KotlinScriptCallSiteParser {
         val enclosingBlocks = mutableListOf<ScriptCallSite?>()
         val declarations = mutableListOf<ScriptSymbolDeclarationSite>()
 
-        tokens.indices.forEach { index ->
+        for (index in tokens.indices) {
             when (tokens[index].type) {
                 KtTokens.LBRACE -> enclosingBlocks += callsByOpeningBrace[index]
 
@@ -26,7 +26,7 @@ internal object KotlinScriptCallSiteParser {
                     }
 
                 else -> {
-                    val parsedCall = KotlinScriptCallParser.parse(tokens, index) ?: return@forEach
+                    val parsedCall = KotlinScriptCallParser.parse(tokens, index) ?: continue
 
                     parsedCall.openingBraceIndex?.let { braceIndex ->
                         callsByOpeningBrace[braceIndex] = parsedCall.call

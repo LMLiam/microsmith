@@ -148,9 +148,9 @@ class DotnetPackageWorkspaceResolver(
     private fun resolveSolutionsByName(defaults: DotnetDefaultsExtension): Map<String, ResolvedDotnetPackageSolution> {
         val solutionsByName = linkedMapOf<String, ResolvedDotnetPackageSolution>()
 
-        defaults.allSolutions().forEach { solution ->
+        for (solution in defaults.allSolutions()) {
             val packageVersions = solution.get<DotnetPackageVersionsExtension>()?.packages.orEmpty()
-            if (packageVersions.isEmpty()) return@forEach
+            if (packageVersions.isEmpty()) continue
 
             solutionsByName[solution.name] =
                 ResolvedDotnetPackageSolution(
