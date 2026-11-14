@@ -53,6 +53,7 @@ def moduleDirectories = [
     'resolve': 'engine/resolve',
     'artifact': 'engine/artifact',
     'compile': 'engine/compile',
+    'plugin-api': 'engine/plugin-api',
     'gen': 'engine/gen',
     'dsl-schemas': 'schemas/base/dsl-schemas',
     'resolve-schemas': 'schemas/base/resolve-schemas',

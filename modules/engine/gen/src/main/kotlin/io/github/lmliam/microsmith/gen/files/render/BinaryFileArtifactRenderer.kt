@@ -1,9 +1,9 @@
 package io.github.lmliam.microsmith.gen.files.render
 
 import com.github.eventhorizonlab.spi.ServiceProvider
+import io.github.lmliam.microsmith.artifact.ArtifactRenderer
 import io.github.lmliam.microsmith.artifact.files.BinaryFileArtifact
-import io.github.lmliam.microsmith.gen.ArtifactRenderer
-import io.github.lmliam.microsmith.gen.files.GeneratedFile
+import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 
 @ServiceProvider(ArtifactRenderer::class)
 class BinaryFileArtifactRenderer : ArtifactRenderer<BinaryFileArtifact> {

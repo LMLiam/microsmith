@@ -64,11 +64,11 @@ Poor fit:
 
 ## Metro is internal
 
-Metro wires the generation pipeline together. It stays inside `gen`:
+Metro wires the generation pipeline together. It stays out of every published API:
 
 - `MicrosmithGenerationGraph` is an `internal` graph. It builds the services from a `MicrosmithPluginCatalog`.
 - No public plugin API mentions Metro. Plugin contracts are plain interfaces such as `DomainResolver` and `ArtifactCompiler`.
-- Only `gen` may apply the Metro plugin or depend on the Metro runtime. `verifyModuleLayers` enforces this.
+- Any module may use Metro internally, but a published API module must not mention a Metro type in its ABI dump. `verifyModuleLayers` enforces this.
 
 ## ServiceLoader boundary
 

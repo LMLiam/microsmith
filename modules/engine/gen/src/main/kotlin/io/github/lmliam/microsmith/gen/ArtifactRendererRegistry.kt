@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.gen
 
 import io.github.lmliam.microsmith.artifact.Artifact
+import io.github.lmliam.microsmith.artifact.ArtifactRenderer
 import kotlin.reflect.KClass
 
 internal class ArtifactRendererRegistry(renderers: List<ArtifactRenderer<*>>) {

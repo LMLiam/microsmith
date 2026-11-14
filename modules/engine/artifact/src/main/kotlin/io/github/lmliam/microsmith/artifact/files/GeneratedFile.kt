@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.gen.files
+package io.github.lmliam.microsmith.artifact.files
 
 import java.nio.file.Path
 

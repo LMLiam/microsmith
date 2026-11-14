@@ -1,8 +1,7 @@
-package io.github.lmliam.microsmith.gen
+package io.github.lmliam.microsmith.artifact
 
 import com.github.eventhorizonlab.spi.ServiceContract
-import io.github.lmliam.microsmith.artifact.Artifact
-import io.github.lmliam.microsmith.gen.files.GeneratedFile
+import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import kotlin.reflect.KClass
 
 @ServiceContract

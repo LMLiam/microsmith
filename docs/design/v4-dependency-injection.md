@@ -361,7 +361,7 @@ There is one built-in plugin per module family: protobuf, protobuf RPC, .NET, AS
 
 #### Where the plugin API lives
 
-`PluginServices` names `ArtifactRenderer`, which is in `gen` today. A plugin should not need the engine on its compile classpath. So `ArtifactRenderer` and `GeneratedFile` move down to a layer below `gen`, in the same way that `DomainResolver` lives in `resolve`. `gen` keeps the implementations. The target module must be able to see the relative-path type in `artifact` (see [Paths in pipeline models](#paths-in-pipeline-models)). Slice 0 picks it.
+`PluginServices` names `ArtifactRenderer`, and a plugin should not need the engine on its compile classpath. So `ArtifactRenderer` and `GeneratedFile` sit below `gen`, in the same way that `DomainResolver` lives in `resolve`, and `gen` keeps the implementations. They now live in `artifact`, so they sit where the relative-path type will be (see [Paths in pipeline models](#paths-in-pipeline-models)).
 
 ```mermaid
 flowchart BT
@@ -680,7 +680,7 @@ Pipeline models hold `java.nio.file.Path` in six types today. The first three al
 |---|---|---|
 | `TextFileArtifactId` | `artifact` | `relativePath`, `outputRoot` |
 | `BinaryFileArtifactId` | `artifact` | `relativePath`, `outputRoot` |
-| `GeneratedFile` | `gen` | `relativePath`, `outputRoot` (default `Path.of(".")`) |
+| `GeneratedFile` | `artifact` | `relativePath`, `outputRoot` (default `Path.of(".")`) |
 | `ResolvedDotnetAspService` | `resolve-services-dotnet-asp` | `outputRoot` |
 | `DotnetAspServiceArtifact` | `artifact-services-dotnet-asp` | `outputRoot` |
 | `DotnetAspServiceContribution` | `artifact-services-dotnet-asp` | `outputRoot` |
