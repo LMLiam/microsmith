@@ -786,7 +786,7 @@ Slice 0 adds a test that shuffles the discovery order and expects byte-identical
 
 #### Conflicts
 
-When two plugins collide, the generation run fails with an error that names both plugin ids. The host records which plugin supplied each service, so it can do this.
+When two plugins claim one artifact type, or have the same `id`, the generation run fails with an error that names both plugin ids. The host knows which plugin supplied each service, so it can do this. A conflicting contribution or a duplicate output path is reported as today, without plugin ids.
 
 | Situation | What happens |
 |---|---|
@@ -1180,7 +1180,7 @@ Slice 0 automates these scenarios as integration tests. Each one composes severa
 | Scenario | What it protects |
 |---|---|
 | Two separately compiled plugins loaded together | The plugin boundary works across jars with no shared compile classpath. |
-| Two plugins with a conflicting contribution | The conflict rules in [Conflicts](#conflicts): merge identical content, fail on differing content, and name both plugin ids. |
+| Two plugins with a conflicting contribution | The conflict rules in [Conflicts](#conflicts): merge identical content and fail on differing content. |
 | Duplicate plugin id | The generation run fails before the pipeline starts, and the error names the id. |
 | A plugin whose `services` throws | One failing plugin fails the whole generation run, with a diagnostic that names it. No partial loading. |
 | Two concurrent `generate` calls in one JVM | App-scoped seams are thread-safe. Diagnostics and progress do not leak between runs. |
@@ -1189,9 +1189,9 @@ Slice 0 automates these scenarios as integration tests. Each one composes severa
 | The pipeline fails midway | Every plugin's `PluginServices` is still closed, in reverse order. |
 | Shuffled discovery order | Output is byte-identical whatever the `ServiceLoader` order. |
 | Parallel rendering with a plugin that holds no state | The host calls one plugin's services concurrently within a generation run, and the output is byte-identical to a sequential run. |
-| A Metro-using plugin built against another Metro version | Follows the [Metro policy](#metro-across-the-plugin-boundary). A relocated plugin works. An unrelocated plugin built against an incompatible version is reported as an incompatible plugin. |
+| A Metro-using plugin built against another Metro version | Not tested. The [relocation spike](#spike-relocated-metro-runtime) verified the [Metro policy](#metro-across-the-plugin-boundary), and [Plugin development](../plugin-development.md) tells authors to relocate. The host's part, reporting a `LinkageError` as an incompatible plugin, is covered by the `linkage` fixture. |
 
-All of these are ordinary tests, written with the foundation slice. Nothing needs a spike first. The [relocation spike](#spike-relocated-metro-runtime) and the [collectability spike](#spike-class-loader-collectability) set the expected results of the Metro row and the class loader row.
+All of these are ordinary tests, written with the foundation slice. Nothing needs a spike first. The [relocation spike](#spike-relocated-metro-runtime) and the [collectability spike](#spike-class-loader-collectability) set the expected result of the class loader row, and the Metro row is verified by the relocation spike alone.
 
 ## Settled questions
 
