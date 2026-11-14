@@ -111,7 +111,7 @@ internal fun renderResultVariantType(
                             type = csharpNullableType(DotnetCSharpTypes.Primitives.String),
                             name = dotnetAspHeaderPropertyName(header.name),
                             defaultValue = NULL_LITERAL,
-                        )
+                        ),
                     )
                 }
             },

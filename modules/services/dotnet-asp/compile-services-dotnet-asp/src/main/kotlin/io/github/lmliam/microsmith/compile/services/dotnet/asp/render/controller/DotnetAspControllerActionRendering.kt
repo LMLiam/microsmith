@@ -45,14 +45,14 @@ internal fun renderActionMethod(endpoint: DotnetAspEndpointArtifact): CSharp.Met
                             CSharp.callValues(
                                 CSharp.identifier("On${endpoint.operationName}Async"),
                                 handlerArguments(endpoint),
-                            )
+                            ),
                         ),
                 )
                 returnStatement(
                     CSharp.call(
                         CSharp.identifier("Map${endpoint.operationName}Result"),
                         CSharp.identifier("result"),
-                    )
+                    ),
                 )
             },
     )
@@ -105,7 +105,7 @@ private fun actionParameters(endpoint: DotnetAspEndpointArtifact): List<CSharp.P
                 type = it.typeName,
                 name = "path",
                 attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.FromRoute),
-            )
+            ),
         )
     }
     endpoint.bindings.query?.let {
@@ -114,7 +114,7 @@ private fun actionParameters(endpoint: DotnetAspEndpointArtifact): List<CSharp.P
                 type = it.typeName,
                 name = "query",
                 attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.FromQuery),
-            )
+            ),
         )
     }
     endpoint.bindings.body?.let {
@@ -123,7 +123,7 @@ private fun actionParameters(endpoint: DotnetAspEndpointArtifact): List<CSharp.P
                 type = it.typeName,
                 name = "body",
                 attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.FromBody),
-            )
+            ),
         )
     }
     add(csharpParameter(DotnetCSharpTypes.Threading.CancellationToken, "cancellationToken"))

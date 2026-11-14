@@ -24,7 +24,7 @@ data class DotnetServiceExtension(
 
     fun models() = models.values
 
-    @Suppress("UNCHECKED_CAST") fun <T : ServiceExtension> get(type: KClass<T>) = model.get(type) as? T?
+    fun <T : ServiceExtension> get(type: KClass<T>) = model.get(type)
 
     inline fun <reified T : ServiceExtension> get(): T? = get(T::class)
 

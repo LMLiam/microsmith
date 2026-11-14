@@ -20,7 +20,7 @@ internal data class DotnetAspPortRequest(
 
 internal object DotnetAspPortAllocator {
     fun allocate(
-        requests: List<DotnetAspPortRequest>
+        requests: List<DotnetAspPortRequest>,
     ): EitherNel<DotnetAspResolutionIssue, Map<String, ResolvedDotnetAspPorts>> {
         val (configuredRequests, defaultedRequests) = requests.partition(DotnetAspPortRequest::isConfigured)
         val configured = configuredRequests.associate { it.serviceName to it.deriveConfiguredPorts() }

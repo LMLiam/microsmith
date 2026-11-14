@@ -19,65 +19,67 @@ import kotlin.io.path.deleteRecursively
 
 @OptIn(ExperimentalPathApi::class)
 class MicrosmithCliInitNativeJvmGuidanceTests :
-    StringSpec({
-        "init command steers Maven-based Java repositories to the native Maven plugin path" {
-            assertNativeJvmGuidance(
-                profile = JavaOnboardingProfile,
-                matchedMarkers = listOf("pom.xml", "src/main/java"),
-                expectedOutput =
-                    listOf(
-                        "Detected repository profile: Java",
-                        "Next: microsmith run build.microsmith.kts",
-                        "Prefer the native Maven plugin path",
-                        "mvn microsmith:generate",
-                    ),
-                unexpectedOutput = listOf("Optional repository-native output path"),
-                tempDirectoryPrefix = "microsmith-cli-init-java-maven",
-            )
-        }
+    StringSpec(
+        {
+            "init command steers Maven-based Java repositories to the native Maven plugin path" {
+                assertNativeJvmGuidance(
+                    profile = JavaOnboardingProfile,
+                    matchedMarkers = listOf("pom.xml", "src/main/java"),
+                    expectedOutput =
+                        listOf(
+                            "Detected repository profile: Java",
+                            "Next: microsmith run build.microsmith.kts",
+                            "Prefer the native Maven plugin path",
+                            "mvn microsmith:generate",
+                        ),
+                    unexpectedOutput = listOf("Optional repository-native output path"),
+                    tempDirectoryPrefix = "microsmith-cli-init-java-maven",
+                )
+            }
 
-        "init command points Maven-based Kotlin repositories toward the native Maven plugin path" {
-            assertNativeJvmGuidance(
-                profile = KotlinOnboardingProfile,
-                matchedMarkers = listOf("pom.xml", "src/main/kotlin"),
-                expectedOutput =
-                    listOf(
-                        "Detected repository profile: Kotlin",
-                        "Prefer the native Maven plugin path",
-                        "mvn microsmith:generate",
-                    ),
-                tempDirectoryPrefix = "microsmith-cli-init-kotlin-maven",
-            )
-        }
+            "init command points Maven-based Kotlin repositories toward the native Maven plugin path" {
+                assertNativeJvmGuidance(
+                    profile = KotlinOnboardingProfile,
+                    matchedMarkers = listOf("pom.xml", "src/main/kotlin"),
+                    expectedOutput =
+                        listOf(
+                            "Detected repository profile: Kotlin",
+                            "Prefer the native Maven plugin path",
+                            "mvn microsmith:generate",
+                        ),
+                    tempDirectoryPrefix = "microsmith-cli-init-kotlin-maven",
+                )
+            }
 
-        "init command points Gradle-based Kotlin repositories toward the native Gradle plugin path" {
-            assertNativeJvmGuidance(
-                profile = KotlinOnboardingProfile,
-                matchedMarkers = listOf("build.gradle.kts", "src/main/kotlin"),
-                expectedOutput =
-                    listOf(
-                        "Detected repository profile: Kotlin",
-                        "Next: microsmith run build.microsmith.kts",
-                        "Prefer the native Gradle plugin path",
-                    ),
-                unexpectedOutput = listOf("Optional repository-native output path"),
-                tempDirectoryPrefix = "microsmith-cli-init-kotlin-gradle",
-            )
-        }
+            "init command points Gradle-based Kotlin repositories toward the native Gradle plugin path" {
+                assertNativeJvmGuidance(
+                    profile = KotlinOnboardingProfile,
+                    matchedMarkers = listOf("build.gradle.kts", "src/main/kotlin"),
+                    expectedOutput =
+                        listOf(
+                            "Detected repository profile: Kotlin",
+                            "Next: microsmith run build.microsmith.kts",
+                            "Prefer the native Gradle plugin path",
+                        ),
+                    unexpectedOutput = listOf("Optional repository-native output path"),
+                    tempDirectoryPrefix = "microsmith-cli-init-kotlin-gradle",
+                )
+            }
 
-        "init command points Gradle-based Java repositories toward the native Gradle plugin path" {
-            assertNativeJvmGuidance(
-                profile = JavaOnboardingProfile,
-                matchedMarkers = listOf("build.gradle.kts", "src/main/java"),
-                expectedOutput =
-                    listOf(
-                        "Detected repository profile: Java",
-                        "Prefer the native Gradle plugin path",
-                    ),
-                tempDirectoryPrefix = "microsmith-cli-init-java-gradle",
-            )
-        }
-    })
+            "init command points Gradle-based Java repositories toward the native Gradle plugin path" {
+                assertNativeJvmGuidance(
+                    profile = JavaOnboardingProfile,
+                    matchedMarkers = listOf("build.gradle.kts", "src/main/java"),
+                    expectedOutput =
+                        listOf(
+                            "Detected repository profile: Java",
+                            "Prefer the native Gradle plugin path",
+                        ),
+                    tempDirectoryPrefix = "microsmith-cli-init-java-gradle",
+                )
+            }
+        },
+    )
 
 @OptIn(ExperimentalPathApi::class)
 private fun assertNativeJvmGuidance(

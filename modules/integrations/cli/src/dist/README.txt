@@ -8,7 +8,7 @@ Contents:
 - bundled-plugins.lock : bundled plugin profile (pinned to this CLI release version)
 
 Runtime requirements:
-- Java 24+ (Temurin 24 recommended)
+- Java 25+ (Temurin 25 recommended)
 
 Quick checks:
 - bin/microsmith --help

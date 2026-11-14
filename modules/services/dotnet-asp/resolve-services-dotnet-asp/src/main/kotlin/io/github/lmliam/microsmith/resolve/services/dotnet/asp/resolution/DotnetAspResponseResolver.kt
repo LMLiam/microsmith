@@ -69,7 +69,7 @@ internal class DotnetAspResponseResolver {
                     context.serviceName,
                     context.operationName,
                     model.model.name,
-                )
+                ),
             )
         }
         addAll(headerIssues(context, response))
@@ -91,7 +91,7 @@ internal class DotnetAspResponseResolver {
                                 context.operationName,
                                 response.statusCode,
                                 header.name,
-                            )
+                            ),
                         )
 
                     RESULT_BODY_PROPERTY_NAME ->
@@ -101,7 +101,7 @@ internal class DotnetAspResponseResolver {
                                 context.operationName,
                                 response.statusCode,
                                 header.name,
-                            )
+                            ),
                         )
 
                     else -> Unit
@@ -124,7 +124,7 @@ internal class DotnetAspResponseResolver {
                         context.operationName,
                         response.statusCode,
                         collidingPropertyNames,
-                    )
+                    ),
                 )
             }
         }

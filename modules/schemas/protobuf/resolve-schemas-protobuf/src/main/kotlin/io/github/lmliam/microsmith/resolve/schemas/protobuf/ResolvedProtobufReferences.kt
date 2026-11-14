@@ -13,7 +13,10 @@ internal fun referencesOf(
 
             is ResolvedProtobufField.Reference ->
                 listOf(
-                    LocatedReference(ProtobufResolutionIssue.ReferenceLocation.Field(field.name.value), field.reference)
+                    LocatedReference(
+                        ProtobufResolutionIssue.ReferenceLocation.Field(field.name.value),
+                        field.reference,
+                    ),
                 )
 
             is ResolvedProtobufField.Map ->

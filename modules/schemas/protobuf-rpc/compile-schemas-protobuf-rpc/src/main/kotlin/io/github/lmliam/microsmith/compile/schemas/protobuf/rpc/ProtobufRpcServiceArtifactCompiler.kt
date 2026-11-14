@@ -24,8 +24,8 @@ class ProtobufRpcServiceArtifactCompiler : SchemasArtifactCompiler<ProtobufRpcSe
                         ProtoDeclaration(
                             name = artifact.id.serviceName,
                             contents = ProtobufServiceRenderer.render(artifact),
-                        )
+                        ),
                     ),
-            )
+            ),
         )
 }

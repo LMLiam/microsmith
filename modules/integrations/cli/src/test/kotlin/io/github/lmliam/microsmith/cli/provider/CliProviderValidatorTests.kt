@@ -33,127 +33,134 @@ import io.kotest.matchers.shouldBe
 import kotlin.reflect.KClass
 
 class CliProviderValidatorTests :
-    StringSpec({
-        "reports missing built-in providers when none are present" {
-            val errors = verifyBuiltinProviders(MicrosmithPluginCatalog())
+    StringSpec(
+        {
+            "reports missing built-in providers when none are present" {
+                val errors = verifyBuiltinProviders(MicrosmithPluginCatalog())
 
-            errors.shouldHaveSize(22)
-            errors.shouldContain(
-                "Missing built-in DomainResolver for SchemasExtension -> " +
-                    "ResolvedProtobufSchemaModel. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in DomainResolver for SchemasExtension -> " +
-                    "ResolvedProtobufRpcSchemaModel. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in DomainResolver for ServicesExtension -> " +
-                    "DotnetAspWorkspace. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in DomainResolver for ServicesExtension -> " +
-                    "DotnetPackageWorkspace. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactContributor for ResolvedProtobufSchemaModel. " +
-                    "Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactContributor for ResolvedProtobufRpcSchemaModel. " +
-                    "Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactContributor for DotnetAspWorkspace. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactContributor for DotnetPackageWorkspace. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactAssembler for ProtoFileArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactAssembler for ProtobufRpcServiceArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactAssembler for DotnetAspServiceArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactAssembler for DotnetPackageVersionsArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactAssembler for DotnetPackageReferencesArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactAssembler for MsBuildProjectArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactAssembler for TextFileArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactCompiler for ProtoFileArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactCompiler for ProtobufRpcServiceArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactCompiler for DotnetAspServiceArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactCompiler for DotnetPackageVersionsArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactCompiler for DotnetPackageReferencesArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain(
-                "Missing built-in ArtifactCompiler for MsBuildProjectArtifact. Check CLI runtime packaging."
-            )
-            errors.shouldContain("Missing built-in ArtifactRenderer for TextFileArtifact. Check CLI runtime packaging.")
-        }
-
-        "returns no errors when required providers are present" {
-            val errors =
-                verifyBuiltinProviders(
-                    MicrosmithPluginCatalog(
-                        domainResolvers =
-                            listOf(
-                                ProtobufResolverStub(),
-                                ProtobufRpcResolverStub(),
-                                DotnetAspResolverStub(),
-                                DotnetPackageResolverStub(),
-                            ),
-                        artifactContributors =
-                            listOf(
-                                ProtobufContributorStub(),
-                                ProtobufRpcContributorStub(),
-                                ContributorStub(DotnetAspWorkspace::class),
-                                ContributorStub(DotnetPackageWorkspace::class),
-                            ),
-                        artifactAssemblers =
-                            listOf(
-                                ProtoFileAssemblerStub(),
-                                ProtobufRpcAssemblerStub(),
-                                AssemblerStub(DotnetAspServiceArtifact::class),
-                                AssemblerStub(DotnetPackageVersionsArtifact::class),
-                                AssemblerStub(DotnetPackageReferencesArtifact::class),
-                                AssemblerStub(MsBuildProjectArtifact::class),
-                                TextFileAssemblerStub(),
-                            ),
-                        artifactCompilers =
-                            listOf(
-                                CompilerStub(ProtoFileArtifact::class),
-                                CompilerStub(ProtobufRpcServiceArtifact::class),
-                                CompilerStub(DotnetAspServiceArtifact::class),
-                                CompilerStub(DotnetPackageVersionsArtifact::class),
-                                CompilerStub(DotnetPackageReferencesArtifact::class),
-                                CompilerStub(MsBuildProjectArtifact::class),
-                            ),
-                        artifactRenderers = listOf(TextFileRendererStub()),
-                    )
+                errors.shouldHaveSize(22)
+                errors.shouldContain(
+                    "Missing built-in DomainResolver for SchemasExtension -> " +
+                        "ResolvedProtobufSchemaModel. Check CLI runtime packaging.",
                 )
+                errors.shouldContain(
+                    "Missing built-in DomainResolver for SchemasExtension -> " +
+                        "ResolvedProtobufRpcSchemaModel. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in DomainResolver for ServicesExtension -> " +
+                        "DotnetAspWorkspace. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in DomainResolver for ServicesExtension -> " +
+                        "DotnetPackageWorkspace. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactContributor for ResolvedProtobufSchemaModel. " +
+                        "Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactContributor for ResolvedProtobufRpcSchemaModel. " +
+                        "Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactContributor for DotnetAspWorkspace. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactContributor for DotnetPackageWorkspace. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactAssembler for ProtoFileArtifact. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactAssembler for ProtobufRpcServiceArtifact. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactAssembler for DotnetAspServiceArtifact. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactAssembler for DotnetPackageVersionsArtifact. " +
+                        "Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactAssembler for DotnetPackageReferencesArtifact. " +
+                        "Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactAssembler for MsBuildProjectArtifact. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactAssembler for TextFileArtifact. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactCompiler for ProtoFileArtifact. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactCompiler for ProtobufRpcServiceArtifact. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactCompiler for DotnetAspServiceArtifact. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactCompiler for DotnetPackageVersionsArtifact. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactCompiler for DotnetPackageReferencesArtifact. " +
+                        "Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactCompiler for MsBuildProjectArtifact. Check CLI runtime packaging.",
+                )
+                errors.shouldContain(
+                    "Missing built-in ArtifactRenderer for TextFileArtifact. Check CLI runtime packaging.",
+                )
+            }
 
-            errors shouldBe emptyList()
-        }
-    })
+            "returns no errors when required providers are present" {
+                val errors =
+                    verifyBuiltinProviders(
+                        MicrosmithPluginCatalog(
+                            domainResolvers =
+                                listOf(
+                                    ProtobufResolverStub(),
+                                    ProtobufRpcResolverStub(),
+                                    DotnetAspResolverStub(),
+                                    DotnetPackageResolverStub(),
+                                ),
+                            artifactContributors =
+                                listOf(
+                                    ProtobufContributorStub(),
+                                    ProtobufRpcContributorStub(),
+                                    ContributorStub(DotnetAspWorkspace::class),
+                                    ContributorStub(DotnetPackageWorkspace::class),
+                                ),
+                            artifactAssemblers =
+                                listOf(
+                                    ProtoFileAssemblerStub(),
+                                    ProtobufRpcAssemblerStub(),
+                                    AssemblerStub(DotnetAspServiceArtifact::class),
+                                    AssemblerStub(DotnetPackageVersionsArtifact::class),
+                                    AssemblerStub(DotnetPackageReferencesArtifact::class),
+                                    AssemblerStub(MsBuildProjectArtifact::class),
+                                    TextFileAssemblerStub(),
+                                ),
+                            artifactCompilers =
+                                listOf(
+                                    CompilerStub(ProtoFileArtifact::class),
+                                    CompilerStub(ProtobufRpcServiceArtifact::class),
+                                    CompilerStub(DotnetAspServiceArtifact::class),
+                                    CompilerStub(DotnetPackageVersionsArtifact::class),
+                                    CompilerStub(DotnetPackageReferencesArtifact::class),
+                                    CompilerStub(MsBuildProjectArtifact::class),
+                                ),
+                            artifactRenderers = listOf(TextFileRendererStub()),
+                        ),
+                    )
+
+                errors shouldBe emptyList()
+            }
+        },
+    )
 
 private class ProtobufResolverStub : DomainResolver<SchemasExtension, ResolvedProtobufSchemaModel> {
     override val authoringType = SchemasExtension::class
@@ -202,7 +209,7 @@ private class DotnetPackageResolverStub : DomainResolver<ServicesExtension, Dotn
             DotnetPackageWorkspace(
                 solutionsByName = emptyMap(),
                 servicesByName = emptyMap(),
-            )
+            ),
         )
 }
 

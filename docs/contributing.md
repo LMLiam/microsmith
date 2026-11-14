@@ -109,7 +109,7 @@ Format Kotlin sources:
 
 Useful notes:
 
-- the Gradle build is configured for Java 24
+- the Gradle build is configured for Java 25
 - `./gradlew build` includes the root `check` lifecycle and therefore runs `detekt` and `ktfmtCheck`
 - if `ktfmtCheck` fails, run `./gradlew ktfmtFormat` and rerun checks
 - if `detekt` fails, inspect the generated report under `build/reports/detekt/`

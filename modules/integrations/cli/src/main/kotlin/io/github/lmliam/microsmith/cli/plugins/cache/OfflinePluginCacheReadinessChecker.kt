@@ -34,7 +34,7 @@ internal class OfflinePluginCacheReadinessChecker {
         if (lockfile == null) {
             return offlineCacheMiss(
                 "Offline mode requires a plugin lockfile. " +
-                    "Generate '$lockfilePath' by running once without --offline."
+                    "Generate '$lockfilePath' by running once without --offline.",
             )
         }
 
@@ -42,7 +42,7 @@ internal class OfflinePluginCacheReadinessChecker {
         if (remoteArtifactEntries.isEmpty()) {
             return offlineCacheMiss(
                 "Offline mode requires locked remote dependency graph entries in '$lockfilePath'. " +
-                    "Regenerate the lockfile by running once without --offline."
+                    "Regenerate the lockfile by running once without --offline.",
             )
         }
 
@@ -54,7 +54,7 @@ internal class OfflinePluginCacheReadinessChecker {
         return offlineCacheMiss(
             "Offline mode is enabled but plugin cache is missing locked dependency graph artifacts: " +
                 missingArtifacts.sorted().joinToString(", ") +
-                ". Run once without --offline to restore the cache."
+                ". Run once without --offline to restore the cache.",
         )
     }
 

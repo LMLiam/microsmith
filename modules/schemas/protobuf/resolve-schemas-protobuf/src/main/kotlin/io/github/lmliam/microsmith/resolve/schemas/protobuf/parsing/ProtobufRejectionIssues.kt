@@ -63,7 +63,7 @@ internal fun ResolvedProtobufRejection.toIssue(schemaName: String): ProtobufReso
     }
 
 internal fun ResolvedProtobufRejection.MessageSymbol.declaredIn(
-    schemaName: String
+    schemaName: String,
 ): ProtobufResolutionIssue.SymbolDeclaration =
     when (this) {
         is ResolvedProtobufRejection.MessageSymbol.Field ->

@@ -11,7 +11,7 @@ import kotlin.script.experimental.api.makeFailureResult
 import kotlin.script.experimental.api.providedProperties
 
 internal fun refineMicrosmithScriptSymbolValues(
-    context: ScriptEvaluationConfigurationRefinementContext
+    context: ScriptEvaluationConfigurationRefinementContext,
 ): ResultWithDiagnostics<ScriptEvaluationConfiguration> {
     val compilationConfiguration =
         context.evaluationConfiguration[ScriptEvaluationConfiguration.compilationConfiguration]

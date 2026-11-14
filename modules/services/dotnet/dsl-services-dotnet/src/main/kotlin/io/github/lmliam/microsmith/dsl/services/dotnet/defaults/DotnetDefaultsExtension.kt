@@ -22,7 +22,7 @@ data class DotnetDefaultsExtension(
 
     fun allSolutions() = solutions.values
 
-    @Suppress("UNCHECKED_CAST") fun <T : MicrosmithExtension> get(type: KClass<T>) = model.get(type) as? T?
+    fun <T : MicrosmithExtension> get(type: KClass<T>) = model.get(type)
 
     inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
 

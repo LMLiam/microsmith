@@ -42,8 +42,8 @@ internal class DotnetAspModelResolver {
                         context.operationName,
                         source,
                         target,
-                    )
-                )
+                    ),
+                ),
             )
         }
     }

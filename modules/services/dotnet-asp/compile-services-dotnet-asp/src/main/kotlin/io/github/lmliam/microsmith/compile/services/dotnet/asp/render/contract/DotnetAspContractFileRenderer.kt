@@ -82,6 +82,6 @@ internal object DotnetAspContractFileRenderer {
             CSharp.file(contractsNamespace(artifact)) {
                 usings.forEach(::using)
                 build()
-            }
+            },
         )
 }

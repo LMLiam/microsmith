@@ -34,7 +34,7 @@ internal object DotnetBootstrapScriptTemplateRenderer {
 
     private fun StringBuilder.appendDotnetDefaults() {
         appendLine("        dotnet {")
-        appendLine("            target(NET8)")
+        appendLine("            target(NET10)")
         appendLine("            solutions {")
         appendLine("                \"Platform\" { }")
         appendLine("            }")

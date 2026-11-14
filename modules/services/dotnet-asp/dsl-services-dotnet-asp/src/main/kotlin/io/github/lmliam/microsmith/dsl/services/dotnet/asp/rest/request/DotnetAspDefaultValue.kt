@@ -59,7 +59,7 @@ internal fun dotnetAspDefaultValue(value: Any): DotnetAspDefaultValue =
 
         else ->
             error(
-                "Unsupported ASP.NET request default value type " + "'${value::class.qualifiedName ?: value::class}'."
+                "Unsupported ASP.NET request default value type " + "'${value::class.qualifiedName ?: value::class}'.",
             )
     }
 

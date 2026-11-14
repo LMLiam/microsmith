@@ -12,22 +12,24 @@ private data class MergeableTestSharedExtension(val values: List<String>) :
 }
 
 class ServicesModelTests :
-    StringSpec({
-        "merge combines mergeable services-level extensions by type" {
-            val left =
-                ServicesModel.empty()
-                    .with(
-                        MergeableTestSharedExtension::class,
-                        MergeableTestSharedExtension(listOf("left")),
-                    )
-            val right =
-                ServicesModel.empty()
-                    .with(
-                        MergeableTestSharedExtension::class,
-                        MergeableTestSharedExtension(listOf("right")),
-                    )
+    StringSpec(
+        {
+            "merge combines mergeable services-level extensions by type" {
+                val left =
+                    ServicesModel.empty()
+                        .with(
+                            MergeableTestSharedExtension::class,
+                            MergeableTestSharedExtension(listOf("left")),
+                        )
+                val right =
+                    ServicesModel.empty()
+                        .with(
+                            MergeableTestSharedExtension::class,
+                            MergeableTestSharedExtension(listOf("right")),
+                        )
 
-            left.merge(right).require<MergeableTestSharedExtension>().values shouldContainExactly
-                listOf("left", "right")
-        }
-    })
+                left.merge(right).require<MergeableTestSharedExtension>().values shouldContainExactly
+                    listOf("left", "right")
+            }
+        },
+    )

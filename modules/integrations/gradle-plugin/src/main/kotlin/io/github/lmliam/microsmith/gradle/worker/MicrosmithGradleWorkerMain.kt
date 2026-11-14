@@ -39,7 +39,7 @@ internal object MicrosmithGradleWorkerMain {
                     variables = request.variables,
                     flags = request.flags,
                     pluginClasspath = request.pluginClasspath,
-                )
+                ),
             )
             .toWorkerResult()
     }

@@ -31,244 +31,249 @@ private fun DotnetSolutionScope.marker(value: String) {
 }
 
 class DotnetDslTests :
-    StringSpec({
-        "services-level dotnet blocks merge into defaults extension" {
-            val builder = MicrosmithBuilder()
+    StringSpec(
+        {
+            "services-level dotnet blocks merge into defaults extension" {
+                val builder = MicrosmithBuilder()
 
-            builder.services { dotnet { target(NET8) } }
+                builder.services { dotnet { target(NET10) } }
 
-            builder.services { dotnet { solutions { "Platform" {} } } }
+                builder.services { dotnet { solutions { "Platform" {} } } }
 
-            val extension = builder.requireServicesExtension()
-            val defaults = requireNotNull(extension.get<DotnetDefaultsExtension>())
+                val extension = builder.requireServicesExtension()
+                val defaults = requireNotNull(extension.get<DotnetDefaultsExtension>())
 
-            defaults.target shouldBe DotnetTarget.NET8
-            defaults.solutions.keys.toList() shouldContainExactly listOf("Platform")
-        }
-
-        "services-level dotnet solutions support both string-invoke and solution helpers" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                dotnet {
-                    solutions {
-                        "Platform" {}
-                        solution("Operations") {}
-                    }
-                }
+                defaults.target shouldBe DotnetTarget.NET10
+                defaults.solutions.keys.toList() shouldContainExactly listOf("Platform")
             }
 
-            val defaults = requireNotNull(builder.requireServicesExtension().get<DotnetDefaultsExtension>())
+            "services-level dotnet solutions support both string-invoke and solution helpers" {
+                val builder = MicrosmithBuilder()
 
-            defaults.solutions.keys.toList() shouldContainExactly listOf("Platform", "Operations")
-        }
-
-        "services-level dotnet blocks merge matching solution declarations by name" {
-            val builder = MicrosmithBuilder()
-
-            builder.services { dotnet { solutions { "Platform" { marker("left") } } } }
-
-            builder.services { dotnet { solutions { "Platform" { marker("right") } } } }
-
-            val extension = builder.requireServicesExtension()
-            val solution = requireNotNull(extension.get<DotnetDefaultsExtension>()).requireSolution("Platform")
-
-            requireNotNull(solution.get<TestSolutionExtension>()).values shouldContainExactly listOf("left", "right")
-        }
-
-        "service dotnet blocks merge into a single service extension" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                "UserService" {
-                    dotnet { target(NET9) }
-
+                builder.services {
                     dotnet {
-                        solution("Platform")
-                        project("UserService.Api")
-                        models {
-                            "User" {
-                                string("id")
-                                int("age")
-                                "manager" ref "User"
-                                "owner" references "User"
+                        solutions {
+                            "Platform" {}
+                            solution("Operations") {}
+                        }
+                    }
+                }
+
+                val defaults = requireNotNull(builder.requireServicesExtension().get<DotnetDefaultsExtension>())
+
+                defaults.solutions.keys.toList() shouldContainExactly listOf("Platform", "Operations")
+            }
+
+            "services-level dotnet blocks merge matching solution declarations by name" {
+                val builder = MicrosmithBuilder()
+
+                builder.services { dotnet { solutions { "Platform" { marker("left") } } } }
+
+                builder.services { dotnet { solutions { "Platform" { marker("right") } } } }
+
+                val extension = builder.requireServicesExtension()
+                val solution = requireNotNull(extension.get<DotnetDefaultsExtension>()).requireSolution("Platform")
+
+                requireNotNull(solution.get<TestSolutionExtension>()).values shouldContainExactly
+                    listOf("left", "right")
+            }
+
+            "service dotnet blocks merge into a single service extension" {
+                val builder = MicrosmithBuilder()
+
+                builder.services {
+                    "UserService" {
+                        dotnet { target(NET11) }
+
+                        dotnet {
+                            solution("Platform")
+                            project("UserService.Api")
+                            models {
+                                "User" {
+                                    string("id")
+                                    int("age")
+                                    "manager" ref "User"
+                                    "owner" references "User"
+                                }
                             }
                         }
                     }
                 }
+
+                val extension = builder.requireServicesExtension()
+                val service = extension.require("UserService")
+                val dotnet = requireNotNull(service.model.get<DotnetServiceExtension>())
+
+                dotnet.target shouldBe DotnetTarget.NET11
+                dotnet.solution shouldBe "Platform"
+                dotnet.project shouldBe "UserService.Api"
+                dotnet.models.keys.toList() shouldContainExactly listOf("User")
+                val userModel = requireNotNull(dotnet.models["User"])
+                userModel.fields.map(DotnetField::name) shouldContainExactly listOf("id", "age", "manager", "owner")
+                userModel.fields.drop(2).map(DotnetField::type) shouldContainExactly
+                    listOf(
+                        DotnetFieldType.Reference("User"),
+                        DotnetFieldType.Reference("User"),
+                    )
             }
 
-            val extension = builder.requireServicesExtension()
-            val service = extension.require("UserService")
-            val dotnet = requireNotNull(service.model.get<DotnetServiceExtension>())
+            "dotnet models support both string-invoke and model helpers" {
+                val builder = MicrosmithBuilder()
 
-            dotnet.target shouldBe DotnetTarget.NET9
-            dotnet.solution shouldBe "Platform"
-            dotnet.project shouldBe "UserService.Api"
-            dotnet.models.keys.toList() shouldContainExactly listOf("User")
-            val userModel = requireNotNull(dotnet.models["User"])
-            userModel.fields.map(DotnetField::name) shouldContainExactly listOf("id", "age", "manager", "owner")
-            userModel.fields.drop(2).map(DotnetField::type) shouldContainExactly
-                listOf(
-                    DotnetFieldType.Reference("User"),
-                    DotnetFieldType.Reference("User"),
-                )
-        }
-
-        "dotnet models support both string-invoke and model helpers" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                "UserService" {
-                    dotnet {
-                        project("UserService.Api")
-                        models {
-                            "User" { string("id") }
-
-                            model("Address") { string("line1") }
-                        }
-                    }
-                }
-            }
-
-            val models =
-                builder
-                    .requireServicesExtension()
-                    .require("UserService")
-                    .model
-                    .let { requireNotNull(it.get<DotnetServiceExtension>()) }
-                    .models
-
-            models.keys.toList() shouldContainExactly listOf("User", "Address")
-            requireNotNull(models["User"]).fields.map(DotnetField::name) shouldContainExactly listOf("id")
-            requireNotNull(models["Address"]).fields.map(DotnetField::name) shouldContainExactly listOf("line1")
-        }
-
-        "dotnet models support the csharp scalar set" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                "UserService" {
-                    dotnet {
-                        project("UserService.Api")
-                        models {
-                            "Example" {
-                                string("name")
-                                char("initial")
-                                byte("level")
-                                sbyte("delta")
-                                short("rank")
-                                ushort("maxRank")
-                                int("count")
-                                uint("capacity")
-                                long("total")
-                                ulong("lifetimeTotal")
-                                nint("offset")
-                                nuint("pageSize")
-                                float("ratio")
-                                double("average")
-                                decimal("amount")
-                                bool("active")
-                                guid("id")
-                                dateOnly("startDate")
-                                timeOnly("startTime")
-                                dateTime("createdAt")
-                                dateTimeOffset("publishedAt")
-                                timeSpan("duration")
-                            }
-                        }
-                    }
-                }
-            }
-
-            val exampleModel =
-                builder
-                    .requireServicesExtension()
-                    .require("UserService")
-                    .model
-                    .let { requireNotNull(it.get<DotnetServiceExtension>()) }
-                    .requireModel("Example")
-
-            exampleModel.fields.map(DotnetField::type) shouldContainExactly
-                listOf(
-                    DotnetFieldType.String,
-                    DotnetFieldType.Char,
-                    DotnetFieldType.Byte,
-                    DotnetFieldType.SignedByte,
-                    DotnetFieldType.Short,
-                    DotnetFieldType.UnsignedShort,
-                    DotnetFieldType.Int,
-                    DotnetFieldType.UnsignedInt,
-                    DotnetFieldType.Long,
-                    DotnetFieldType.UnsignedLong,
-                    DotnetFieldType.NativeInt,
-                    DotnetFieldType.UnsignedNativeInt,
-                    DotnetFieldType.Float,
-                    DotnetFieldType.Double,
-                    DotnetFieldType.Decimal,
-                    DotnetFieldType.Bool,
-                    DotnetFieldType.Guid,
-                    DotnetFieldType.DateOnly,
-                    DotnetFieldType.TimeOnly,
-                    DotnetFieldType.DateTime,
-                    DotnetFieldType.DateTimeOffset,
-                    DotnetFieldType.TimeSpan,
-                )
-        }
-
-        "dotnet validators accept unicode and verbatim identifiers" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                dotnet { solutions { "Acme.Δelta" {} } }
-
-                "UserService" {
-                    dotnet {
-                        solution("Acme.Δelta")
-                        project("Acme.@class")
-                        models {
-                            "@class" { string("Δelta") }
-
-                            "Owner" { "Δelta" ref "@class" }
-                        }
-                    }
-                }
-            }
-
-            val dotnet =
-                builder.requireServicesExtension().require("UserService").model.let {
-                    requireNotNull(it.get<DotnetServiceExtension>())
-                }
-
-            dotnet.solution shouldBe "Acme.Δelta"
-            dotnet.project shouldBe "Acme.@class"
-            dotnet.requireModel("@class").fields.map(DotnetField::name) shouldContainExactly listOf("Δelta")
-            dotnet.requireModel("Owner").fields.single().type shouldBe DotnetFieldType.Reference("@class")
-        }
-
-        "duplicate service dotnet model names are rejected" {
-            val builder = MicrosmithBuilder()
-
-            shouldThrow<IllegalArgumentException> {
                 builder.services {
                     "UserService" {
                         dotnet {
                             project("UserService.Api")
-                            models { "User" { string("id") } }
-                        }
+                            models {
+                                "User" { string("id") }
 
-                        dotnet { models { "User" { string("name") } } }
+                                model("Address") { string("line1") }
+                            }
+                        }
+                    }
+                }
+
+                val models =
+                    builder
+                        .requireServicesExtension()
+                        .require("UserService")
+                        .model
+                        .let { requireNotNull(it.get<DotnetServiceExtension>()) }
+                        .models
+
+                models.keys.toList() shouldContainExactly listOf("User", "Address")
+                requireNotNull(models["User"]).fields.map(DotnetField::name) shouldContainExactly listOf("id")
+                requireNotNull(models["Address"]).fields.map(DotnetField::name) shouldContainExactly listOf("line1")
+            }
+
+            "dotnet models support the csharp scalar set" {
+                val builder = MicrosmithBuilder()
+
+                builder.services {
+                    "UserService" {
+                        dotnet {
+                            project("UserService.Api")
+                            models {
+                                "Example" {
+                                    string("name")
+                                    char("initial")
+                                    byte("level")
+                                    sbyte("delta")
+                                    short("rank")
+                                    ushort("maxRank")
+                                    int("count")
+                                    uint("capacity")
+                                    long("total")
+                                    ulong("lifetimeTotal")
+                                    nint("offset")
+                                    nuint("pageSize")
+                                    float("ratio")
+                                    double("average")
+                                    decimal("amount")
+                                    bool("active")
+                                    guid("id")
+                                    dateOnly("startDate")
+                                    timeOnly("startTime")
+                                    dateTime("createdAt")
+                                    dateTimeOffset("publishedAt")
+                                    timeSpan("duration")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                val exampleModel =
+                    builder
+                        .requireServicesExtension()
+                        .require("UserService")
+                        .model
+                        .let { requireNotNull(it.get<DotnetServiceExtension>()) }
+                        .requireModel("Example")
+
+                exampleModel.fields.map(DotnetField::type) shouldContainExactly
+                    listOf(
+                        DotnetFieldType.String,
+                        DotnetFieldType.Char,
+                        DotnetFieldType.Byte,
+                        DotnetFieldType.SignedByte,
+                        DotnetFieldType.Short,
+                        DotnetFieldType.UnsignedShort,
+                        DotnetFieldType.Int,
+                        DotnetFieldType.UnsignedInt,
+                        DotnetFieldType.Long,
+                        DotnetFieldType.UnsignedLong,
+                        DotnetFieldType.NativeInt,
+                        DotnetFieldType.UnsignedNativeInt,
+                        DotnetFieldType.Float,
+                        DotnetFieldType.Double,
+                        DotnetFieldType.Decimal,
+                        DotnetFieldType.Bool,
+                        DotnetFieldType.Guid,
+                        DotnetFieldType.DateOnly,
+                        DotnetFieldType.TimeOnly,
+                        DotnetFieldType.DateTime,
+                        DotnetFieldType.DateTimeOffset,
+                        DotnetFieldType.TimeSpan,
+                    )
+            }
+
+            "dotnet validators accept unicode and verbatim identifiers" {
+                val builder = MicrosmithBuilder()
+
+                builder.services {
+                    dotnet { solutions { "Acme.Δelta" {} } }
+
+                    "UserService" {
+                        dotnet {
+                            solution("Acme.Δelta")
+                            project("Acme.@class")
+                            models {
+                                "@class" { string("Δelta") }
+
+                                "Owner" { "Δelta" ref "@class" }
+                            }
+                        }
+                    }
+                }
+
+                val dotnet =
+                    builder.requireServicesExtension().require("UserService").model.let {
+                        requireNotNull(it.get<DotnetServiceExtension>())
+                    }
+
+                dotnet.solution shouldBe "Acme.Δelta"
+                dotnet.project shouldBe "Acme.@class"
+                dotnet.requireModel("@class").fields.map(DotnetField::name) shouldContainExactly listOf("Δelta")
+                dotnet.requireModel("Owner").fields.single().type shouldBe DotnetFieldType.Reference("@class")
+            }
+
+            "duplicate service dotnet model names are rejected" {
+                val builder = MicrosmithBuilder()
+
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                project("UserService.Api")
+                                models { "User" { string("id") } }
+                            }
+
+                            dotnet { models { "User" { string("name") } } }
+                        }
                     }
                 }
             }
-        }
 
-        "dotnet target validates supported tfms" {
-            DotnetTarget.of("net10.0") shouldBe DotnetTarget.NET10
-            DotnetTarget.of("net5.0") shouldBe DotnetTarget.NET5
+            "dotnet target validates supported tfms" {
+                DotnetTarget.of("net11.0") shouldBe DotnetTarget.NET11
+                DotnetTarget.of("net10.0") shouldBe DotnetTarget.NET10
+                DotnetTarget.of("net5.0").moniker shouldBe "net5.0"
+                DotnetTarget.of("net9.0").moniker shouldBe "net9.0"
 
-            shouldThrow<IllegalArgumentException> { DotnetTarget.of("netstandard2.1") }
+                shouldThrow<IllegalArgumentException> { DotnetTarget.of("netstandard2.1") }
 
-            shouldThrow<IllegalArgumentException> { DotnetTarget.of("netcoreapp3.1") }
-        }
-    })
+                shouldThrow<IllegalArgumentException> { DotnetTarget.of("netcoreapp3.1") }
+            }
+        },
+    )

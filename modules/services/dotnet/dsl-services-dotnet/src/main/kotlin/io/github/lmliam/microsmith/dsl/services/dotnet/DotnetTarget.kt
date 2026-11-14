@@ -1,5 +1,7 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet
 
+internal const val DEPRECATED_TARGET_MESSAGE = "Target .NET 10 or later. Scheduled for removal in 3.0."
+
 /** Validated .NET target framework monikers for the DSL. */
 @JvmInline
 value class DotnetTarget(val moniker: String) {
@@ -18,14 +20,41 @@ value class DotnetTarget(val moniker: String) {
                 "net8.0",
                 "net9.0",
                 "net10.0",
+                "net11.0",
             )
 
+        @Deprecated(
+            DEPRECATED_TARGET_MESSAGE,
+            ReplaceWith("DotnetTarget.NET10", "io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget"),
+        )
         val NET5 = DotnetTarget("net5.0")
+
+        @Deprecated(
+            DEPRECATED_TARGET_MESSAGE,
+            ReplaceWith("DotnetTarget.NET10", "io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget"),
+        )
         val NET6 = DotnetTarget("net6.0")
+
+        @Deprecated(
+            DEPRECATED_TARGET_MESSAGE,
+            ReplaceWith("DotnetTarget.NET10", "io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget"),
+        )
         val NET7 = DotnetTarget("net7.0")
+
+        @Deprecated(
+            DEPRECATED_TARGET_MESSAGE,
+            ReplaceWith("DotnetTarget.NET10", "io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget"),
+        )
         val NET8 = DotnetTarget("net8.0")
+
+        @Deprecated(
+            DEPRECATED_TARGET_MESSAGE,
+            ReplaceWith("DotnetTarget.NET10", "io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget"),
+        )
         val NET9 = DotnetTarget("net9.0")
+
         val NET10 = DotnetTarget("net10.0")
+        val NET11 = DotnetTarget("net11.0")
 
         fun of(moniker: String): DotnetTarget = DotnetTarget(moniker)
     }

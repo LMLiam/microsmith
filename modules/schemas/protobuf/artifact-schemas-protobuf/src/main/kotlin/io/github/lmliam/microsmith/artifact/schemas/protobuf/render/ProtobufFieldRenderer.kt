@@ -58,7 +58,7 @@ internal object ProtobufFieldRenderer {
                     Cardinality.SINGULAR -> ""
                     Cardinality.OPTIONAL -> "optional "
                     Cardinality.REPEATED -> "repeated "
-                }
+                },
             )
 
             append(type)

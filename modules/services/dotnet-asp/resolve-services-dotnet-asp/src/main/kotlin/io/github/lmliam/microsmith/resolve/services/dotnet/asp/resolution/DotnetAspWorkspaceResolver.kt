@@ -22,7 +22,7 @@ import java.nio.file.Path
 
 /** Finalises the ASP.NET subset of the .NET workspace into a scaffold-ready model. */
 class DotnetAspWorkspaceResolver(
-    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver()
+    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver(),
 ) {
     private val restResolver = DotnetAspRestResolver()
 
@@ -66,7 +66,7 @@ class DotnetAspWorkspaceResolver(
                         http = declaredPorts?.http,
                         https = declaredPorts?.https,
                     )
-                }
+                },
             )
 
         val rests = services.mapOrAccumulate { service ->
@@ -100,7 +100,7 @@ class DotnetAspWorkspaceResolver(
     }
 
     private fun controllerBaseTypeCollisions(
-        services: List<ResolvedDotnetService>
+        services: List<ResolvedDotnetService>,
     ): EitherNel<DotnetResolutionIssue, Unit> {
         val issues = services.mapNotNull { service ->
             val typeName = dotnetAspControllerBaseTypeName(service.project)
@@ -120,11 +120,11 @@ class DotnetAspWorkspaceResolver(
 
     private fun aspExtensionOf(extension: ServicesExtension, serviceName: String): DotnetAspServiceExtension =
         checkNotNull(
-            extension.require(serviceName).model.get<DotnetServiceExtension>()?.get<DotnetAspServiceExtension>()
+            extension.require(serviceName).model.get<DotnetServiceExtension>()?.get<DotnetAspServiceExtension>(),
         )
 
     private fun createWorkspace(
-        services: List<ResolvedDotnetAspService>
+        services: List<ResolvedDotnetAspService>,
     ): EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> {
         val issues =
             services

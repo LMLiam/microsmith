@@ -22,47 +22,49 @@ private fun DotnetAspWorkspaceResolver.resolveRouteIssues(extension: ServicesExt
         )
 
 class DotnetAspRouteResolutionTests :
-    StringSpec({
-        "resolution accumulates independent malformed route declarations" {
-            val builder = MicrosmithBuilder()
+    StringSpec(
+        {
+            "resolution accumulates independent malformed route declarations" {
+                val builder = MicrosmithBuilder()
 
-            builder.services {
-                dotnet {
-                    target(NET8)
-
-                    solutions { "Platform" {} }
-                }
-
-                "UserService" {
+                builder.services {
                     dotnet {
-                        solution("Platform")
-                        project("UserService.Api")
+                        target(NET10)
 
-                        models { "User" { string("id") } }
+                        solutions { "Platform" {} }
+                    }
 
-                        asp {
-                            rest {
-                                "/users/user-{id}" { get("GetUser") { responses { ok("User") } } }
+                    "UserService" {
+                        dotnet {
+                            solution("Platform")
+                            project("UserService.Api")
 
-                                "admins" { get("GetAdmin") { responses { ok("User") } } }
+                            models { "User" { string("id") } }
+
+                            asp {
+                                rest {
+                                    "/users/user-{id}" { get("GetUser") { responses { ok("User") } } }
+
+                                    "admins" { get("GetAdmin") { responses { ok("User") } } }
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            DotnetAspWorkspaceResolver().resolveRouteIssues(builder.requireServicesExtension()) shouldContainExactly
-                listOf(
-                    DotnetAspResolutionIssue.InvalidRouteDeclaration(
-                        kind = DotnetAspResolutionIssue.RouteDeclarationKind.GROUP,
-                        route = "/users/user-{id}",
-                        problem = DotnetAspResolutionIssue.RouteProblem.InvalidSegment("user-{id}"),
-                    ),
-                    DotnetAspResolutionIssue.InvalidRouteDeclaration(
-                        kind = DotnetAspResolutionIssue.RouteDeclarationKind.GROUP,
-                        route = "admins",
-                        problem = DotnetAspResolutionIssue.RouteProblem.MissingLeadingSlash,
-                    ),
-                )
-        }
-    })
+                DotnetAspWorkspaceResolver().resolveRouteIssues(builder.requireServicesExtension()) shouldContainExactly
+                    listOf(
+                        DotnetAspResolutionIssue.InvalidRouteDeclaration(
+                            kind = DotnetAspResolutionIssue.RouteDeclarationKind.GROUP,
+                            route = "/users/user-{id}",
+                            problem = DotnetAspResolutionIssue.RouteProblem.InvalidSegment("user-{id}"),
+                        ),
+                        DotnetAspResolutionIssue.InvalidRouteDeclaration(
+                            kind = DotnetAspResolutionIssue.RouteDeclarationKind.GROUP,
+                            route = "admins",
+                            problem = DotnetAspResolutionIssue.RouteProblem.MissingLeadingSlash,
+                        ),
+                    )
+            }
+        },
+    )

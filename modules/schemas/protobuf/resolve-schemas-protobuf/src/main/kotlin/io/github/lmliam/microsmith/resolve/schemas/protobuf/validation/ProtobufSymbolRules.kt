@@ -18,7 +18,7 @@ internal fun findMessageSymbolCollisions(
     }
 
 internal fun findPackageSymbolCollisions(
-    schemas: List<ResolvedProtobufSchema>
+    schemas: List<ResolvedProtobufSchema>,
 ): List<ResolvedProtobufSchemaModel.Rejection> =
     findSymbolClashes(
             schemas.flatMap { schema ->
@@ -29,7 +29,7 @@ internal fun findPackageSymbolCollisions(
                         is ResolvedProtobufMessage -> emptyList()
                     },
                 )
-            }
+            },
         )
         .map { ResolvedProtobufSchemaModel.Rejection.PackageSymbolCollision(it.scope, it.name, it.declarations) }
 
@@ -68,7 +68,7 @@ internal fun messageSymbols(
         mapFieldNames.map { ScopedSymbol(Unit, mapEntryName(it), ResolvedProtobufRejection.MessageSymbol.MapEntry(it)) }
 
 internal fun <Scope, Declaration> findSymbolClashes(
-    symbols: List<ScopedSymbol<Scope, Declaration>>
+    symbols: List<ScopedSymbol<Scope, Declaration>>,
 ): List<SymbolClash<Scope, Declaration>> =
     symbols
         .distinct()

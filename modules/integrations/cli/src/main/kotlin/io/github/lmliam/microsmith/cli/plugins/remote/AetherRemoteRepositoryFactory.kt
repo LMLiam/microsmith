@@ -27,6 +27,6 @@ private fun RemoteRepository.Builder.applyAuthentication(credentials: Repository
      * the builder setter remains the only accessible API from this module.
      */
     setAuthentication(
-        AuthenticationBuilder().addUsername(credentials.username).addPassword(credentials.password).build()
+        AuthenticationBuilder().addUsername(credentials.username).addPassword(credentials.password).build(),
     )
 }

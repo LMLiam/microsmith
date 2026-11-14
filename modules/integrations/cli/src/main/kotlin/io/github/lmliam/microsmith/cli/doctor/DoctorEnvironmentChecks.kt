@@ -96,4 +96,4 @@ internal object DoctorEnvironmentChecks {
         }
 }
 
-private const val MIN_SUPPORTED_JAVA_FEATURE = 24
+private const val MIN_SUPPORTED_JAVA_FEATURE = 25

@@ -30,7 +30,7 @@ internal object DotnetAspControllerFileRenderer {
                     artifact.endpoints.forEach { endpoint -> addMember(renderAbstractHandler(endpoint)) }
                     artifact.endpoints.forEach { endpoint -> addMember(renderResultMapper(endpoint)) }
                 }
-            }
+            },
         )
 }
 

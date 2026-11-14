@@ -8,7 +8,7 @@ internal fun findImportCycles(nodes: List<SchemaNode>): List<List<String>> {
             nodes.associate { node ->
                 node.identity.fullyQualifiedName to
                     node.dependencies.map(QualifiedSchemaName::fullyQualifiedName).sorted()
-            }
+            },
         )
 
     return graph.files

@@ -13,111 +13,115 @@ import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.XMLStreamConstants
 
 class MsBuildProjectArtifactCompilerTests :
-    StringSpec({
-        "compile emits deterministic xml with escaped values" {
-            val artifact =
-                MsBuildProjectArtifact(
-                    id = MsBuildProjectArtifactId.DirectoryPackagesProps("Platform"),
-                    properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
-                    items =
-                        listOf(
-                            MsBuildItem(
-                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                                include = "Serilog.AspNetCore",
-                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0 & preview"),
-                            )
-                        ),
+    StringSpec(
+        {
+            "compile emits deterministic xml with escaped values" {
+                val artifact =
+                    MsBuildProjectArtifact(
+                        id = MsBuildProjectArtifactId.DirectoryPackagesProps("Platform"),
+                        properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
+                        items =
+                            listOf(
+                                MsBuildItem(
+                                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                                    include = "Serilog.AspNetCore",
+                                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0 & preview"),
+                                ),
+                            ),
+                    )
+
+                val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
+                val textContribution = contribution as TextFileArtifactContribution
+                val contents = textContribution.contents
+
+                textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("Directory.Packages.props")
+                textContribution.artifactId.outputRoot shouldBe java.nio.file.Path.of("dotnet", "Platform")
+                contents.shouldContain("<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>")
+                contents.shouldContain(
+                    "<PackageVersion Include=\"Serilog.AspNetCore\" Version=\"9.0.0 &amp; preview\"/>",
                 )
+            }
 
-            val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
-            val textContribution = contribution as TextFileArtifactContribution
-            val contents = textContribution.contents
+            "compile writes project package references into auto-imported Directory.Build.props" {
+                val artifact =
+                    MsBuildProjectArtifact(
+                        id =
+                            MsBuildProjectArtifactId.DirectoryBuildProps(
+                                solutionName = "Platform",
+                                projectName = "UserService.Api",
+                            ),
+                        properties = emptyMap(),
+                        items =
+                            listOf(
+                                MsBuildItem(
+                                    itemName = MsBuildNames.PACKAGE_REFERENCE_ITEM,
+                                    include = "Serilog.AspNetCore",
+                                    attributes = emptyMap(),
+                                ),
+                            ),
+                    )
 
-            textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("Directory.Packages.props")
-            textContribution.artifactId.outputRoot shouldBe java.nio.file.Path.of("dotnet", "Platform")
-            contents.shouldContain("<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>")
-            contents.shouldContain("<PackageVersion Include=\"Serilog.AspNetCore\" Version=\"9.0.0 &amp; preview\"/>")
-        }
+                val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
+                val textContribution = contribution as TextFileArtifactContribution
 
-        "compile writes project package references into auto-imported Directory.Build.props" {
-            val artifact =
-                MsBuildProjectArtifact(
-                    id =
-                        MsBuildProjectArtifactId.DirectoryBuildProps(
-                            solutionName = "Platform",
-                            projectName = "UserService.Api",
-                        ),
-                    properties = emptyMap(),
-                    items =
-                        listOf(
-                            MsBuildItem(
-                                itemName = MsBuildNames.PACKAGE_REFERENCE_ITEM,
-                                include = "Serilog.AspNetCore",
-                                attributes = emptyMap(),
-                            )
-                        ),
+                textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("Directory.Build.props")
+                textContribution.artifactId.outputRoot shouldBe
+                    java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
+                textContribution.contents.shouldContain("<PackageReference Include=\"Serilog.AspNetCore\"/>")
+            }
+
+            "compile writes sdk-style project files into the project root" {
+                val artifact =
+                    MsBuildProjectArtifact(
+                        id =
+                            MsBuildProjectArtifactId.Project(
+                                solutionName = "Platform",
+                                projectName = "UserService.Api",
+                            ),
+                        projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
+                        properties = mapOf(MsBuildNames.TARGET_FRAMEWORK_PROPERTY to "net8.0"),
+                        items = emptyList(),
+                    )
+
+                val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
+                val textContribution = contribution as TextFileArtifactContribution
+
+                textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("UserService.Api.csproj")
+                textContribution.artifactId.outputRoot shouldBe
+                    java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
+                textContribution.contents.shouldContain("""<Project Sdk="Microsoft.NET.Sdk.Web">""")
+                textContribution.contents.shouldContain("<TargetFramework>net8.0</TargetFramework>")
+            }
+
+            "compile emits well-formed xml for escaped property and attribute values" {
+                val artifact =
+                    MsBuildProjectArtifact(
+                        id = MsBuildProjectArtifactId.DirectoryPackagesProps("Platform"),
+                        properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "A&B<true>"),
+                        items =
+                            listOf(
+                                MsBuildItem(
+                                    itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
+                                    include = "Serilog.\"AspNetCore\"",
+                                    attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0 & preview"),
+                                ),
+                            ),
+                    )
+
+                val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
+                val textContribution = contribution as TextFileArtifactContribution
+                val contents = textContribution.contents
+
+                contents.shouldContain(
+                    "<ManagePackageVersionsCentrally>A&amp;B&lt;true&gt;</ManagePackageVersionsCentrally>",
                 )
-
-            val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
-            val textContribution = contribution as TextFileArtifactContribution
-
-            textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("Directory.Build.props")
-            textContribution.artifactId.outputRoot shouldBe
-                java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
-            textContribution.contents.shouldContain("<PackageReference Include=\"Serilog.AspNetCore\"/>")
-        }
-
-        "compile writes sdk-style project files into the project root" {
-            val artifact =
-                MsBuildProjectArtifact(
-                    id =
-                        MsBuildProjectArtifactId.Project(
-                            solutionName = "Platform",
-                            projectName = "UserService.Api",
-                        ),
-                    projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
-                    properties = mapOf(MsBuildNames.TARGET_FRAMEWORK_PROPERTY to "net8.0"),
-                    items = emptyList(),
+                contents.shouldContain(
+                    """<PackageVersion Include="Serilog.&quot;AspNetCore&quot;" Version="9.0.0 &amp; preview"/>""",
                 )
-
-            val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
-            val textContribution = contribution as TextFileArtifactContribution
-
-            textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("UserService.Api.csproj")
-            textContribution.artifactId.outputRoot shouldBe
-                java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
-            textContribution.contents.shouldContain("""<Project Sdk="Microsoft.NET.Sdk.Web">""")
-            textContribution.contents.shouldContain("<TargetFramework>net8.0</TargetFramework>")
-        }
-
-        "compile emits well-formed xml for escaped property and attribute values" {
-            val artifact =
-                MsBuildProjectArtifact(
-                    id = MsBuildProjectArtifactId.DirectoryPackagesProps("Platform"),
-                    properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "A&B<true>"),
-                    items =
-                        listOf(
-                            MsBuildItem(
-                                itemName = MsBuildNames.PACKAGE_VERSION_ITEM,
-                                include = "Serilog.\"AspNetCore\"",
-                                attributes = mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0 & preview"),
-                            )
-                        ),
-                )
-
-            val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
-            val textContribution = contribution as TextFileArtifactContribution
-            val contents = textContribution.contents
-
-            contents.shouldContain(
-                "<ManagePackageVersionsCentrally>A&amp;B&lt;true&gt;</ManagePackageVersionsCentrally>"
-            )
-            contents.shouldContain(
-                """<PackageVersion Include="Serilog.&quot;AspNetCore&quot;" Version="9.0.0 &amp; preview"/>"""
-            )
-            parseXml(contents) shouldBe "Project"
-        }
-    })
+                parseXml(contents) shouldBe "Project"
+            }
+        },
+    )
 
 private fun parseXml(contents: String): String {
     val reader = XMLInputFactory.newFactory().createXMLStreamReader(StringReader(contents))

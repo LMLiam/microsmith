@@ -74,7 +74,7 @@ Installer diagnostics explicitly cover:
 - checksum mismatch for CLI or runtime archives
 - unsupported operating systems or architectures
 - runtime provisioning failures
-- missing Java 24+ when runtime provisioning is disabled
+- missing Java 25+ when runtime provisioning is disabled
 
 ## Manual channels
 
@@ -84,6 +84,6 @@ The canonical onboarding path is the installer, but manual channels remain suppo
 - unpacked Unix distribution: `./microsmith-cli-<version>/bin/microsmith --help`
 - unpacked Windows distribution: `.\microsmith-cli-<version>\bin\microsmith.bat --help`
 
-Manual channels require Java 24 or newer.
+Manual channels require Java 25 or newer.
 
 [Back to the README](../README.md)

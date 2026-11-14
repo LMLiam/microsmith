@@ -11,36 +11,38 @@ import io.kotest.matchers.shouldBe
 import java.nio.file.Path
 
 class ArtifactAssemblyServiceTests :
-    StringSpec({
-        val service = ArtifactAssemblyService(listOf(TextFileArtifactAssembler()))
+    StringSpec(
+        {
+            val service = ArtifactAssemblyService(listOf(TextFileArtifactAssembler()))
 
-        "merges identical text contributions into a single artifact" {
-            val sharedId = TextFileArtifactId(Path.of("shared.txt"))
+            "merges identical text contributions into a single artifact" {
+                val sharedId = TextFileArtifactId(Path.of("shared.txt"))
 
-            val assembly =
-                service.assemble(
-                    listOf(
-                        TextFileArtifactContribution(sharedId, "same"),
-                        TextFileArtifactContribution(sharedId, "same"),
-                    )
-                )
-
-            assembly.artifacts() shouldContainExactly listOf(TextFileArtifact(sharedId, "same"))
-        }
-
-        "rejects conflicting text contributions for the same artifact ID" {
-            val sharedId = TextFileArtifactId(Path.of("shared.txt"))
-
-            val error =
-                shouldThrow<IllegalArgumentException> {
+                val assembly =
                     service.assemble(
                         listOf(
-                            TextFileArtifactContribution(sharedId, "left"),
-                            TextFileArtifactContribution(sharedId, "right"),
-                        )
+                            TextFileArtifactContribution(sharedId, "same"),
+                            TextFileArtifactContribution(sharedId, "same"),
+                        ),
                     )
-                }
 
-            error.message shouldBe "Conflicting text artifact contributions for 'shared.txt' under '.'."
-        }
-    })
+                assembly.artifacts() shouldContainExactly listOf(TextFileArtifact(sharedId, "same"))
+            }
+
+            "rejects conflicting text contributions for the same artifact ID" {
+                val sharedId = TextFileArtifactId(Path.of("shared.txt"))
+
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        service.assemble(
+                            listOf(
+                                TextFileArtifactContribution(sharedId, "left"),
+                                TextFileArtifactContribution(sharedId, "right"),
+                            ),
+                        )
+                    }
+
+                error.message shouldBe "Conflicting text artifact contributions for 'shared.txt' under '.'."
+            }
+        },
+    )

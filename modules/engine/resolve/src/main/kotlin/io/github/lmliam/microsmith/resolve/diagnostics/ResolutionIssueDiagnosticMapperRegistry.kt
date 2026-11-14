@@ -12,7 +12,7 @@ internal class ResolutionIssueDiagnosticMapperRegistry(mappers: List<ResolutionI
                 compareBy(
                     { it.issueType.displayName() },
                     { it::class.displayName() },
-                )
+                ),
             )
 
     fun resolve(issue: ResolutionIssue): ResolutionIssueDiagnosticMapper<ResolutionIssue>? {

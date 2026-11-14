@@ -32,7 +32,7 @@ class ArtifactAssemblyService internal constructor(private val assemblerRegistry
     }
 
     private fun <T : Artifact> MutableMap<ArtifactId<Artifact>, Artifact>.applyContribution(
-        contribution: ArtifactContribution<T>
+        contribution: ArtifactContribution<T>,
     ) {
         val artifactId = contribution.artifactId
         val assembler = assemblerRegistry.resolve(artifactId)

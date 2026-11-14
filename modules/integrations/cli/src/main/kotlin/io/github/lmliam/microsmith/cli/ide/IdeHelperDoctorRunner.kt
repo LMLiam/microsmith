@@ -39,7 +39,7 @@ internal class IdeHelperDoctorRunner(
                             id = "repo-root",
                             passed = false,
                             message = "Repository root '$projectRoot' does not exist.",
-                        )
+                        ),
                     ),
             )
         }
@@ -54,7 +54,7 @@ internal class IdeHelperDoctorRunner(
                             id = "repo-root",
                             passed = false,
                             message = "Repository root '$projectRoot' is not a directory.",
-                        )
+                        ),
                     ),
             )
         }

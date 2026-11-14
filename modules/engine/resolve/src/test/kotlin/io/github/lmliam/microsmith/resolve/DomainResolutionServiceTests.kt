@@ -70,83 +70,85 @@ private class ThrowingResolver : DomainResolver<AlphaExtension, AlphaResolvedMod
 }
 
 class DomainResolutionServiceTests :
-    StringSpec({
-        "resolve returns resolved models for successful matching resolvers" {
-            val builder =
-                MicrosmithBuilder().apply {
-                    put(BetaExtension::class, BetaExtension)
-                    put(AlphaExtension::class, AlphaExtension)
-                }
+    StringSpec(
+        {
+            "resolve returns resolved models for successful matching resolvers" {
+                val builder =
+                    MicrosmithBuilder().apply {
+                        put(BetaExtension::class, BetaExtension)
+                        put(AlphaExtension::class, AlphaExtension)
+                    }
 
-            val service =
-                DomainResolutionService(
-                    listOf(
-                        BetaResolver(),
-                        AlphaNotApplicableResolver(),
-                        AlphaFirstResolver(),
+                val service =
+                    DomainResolutionService(
+                        listOf(
+                            BetaResolver(),
+                            AlphaNotApplicableResolver(),
+                            AlphaFirstResolver(),
+                        ),
                     )
-                )
 
-            val result = service.resolve(builder.model).shouldBeTypeOf<ResolutionOutcome.Success>()
+                val result = service.resolve(builder.model).shouldBeTypeOf<ResolutionOutcome.Success>()
 
-            result.models shouldContainExactly
-                listOf(
-                    AlphaResolvedModel("alpha"),
-                    BetaResolvedModel("beta"),
-                )
-        }
-
-        "resolve accumulates semantic issues across matching resolvers" {
-            val builder =
-                MicrosmithBuilder().apply {
-                    put(BetaExtension::class, BetaExtension)
-                    put(AlphaExtension::class, AlphaExtension)
-                }
-
-            val service =
-                DomainResolutionService(
+                result.models shouldContainExactly
                     listOf(
-                        BetaFailureResolver(),
-                        AlphaFailureResolver(),
+                        AlphaResolvedModel("alpha"),
+                        BetaResolvedModel("beta"),
                     )
-                )
+            }
 
-            val result = service.resolve(builder.model).shouldBeTypeOf<ResolutionOutcome.Failure>()
+            "resolve accumulates semantic issues across matching resolvers" {
+                val builder =
+                    MicrosmithBuilder().apply {
+                        put(BetaExtension::class, BetaExtension)
+                        put(AlphaExtension::class, AlphaExtension)
+                    }
 
-            result.issues.toList() shouldContainExactly
-                listOf(
-                    AlphaIssue,
-                    BetaIssue,
-                )
-        }
+                val service =
+                    DomainResolutionService(
+                        listOf(
+                            BetaFailureResolver(),
+                            AlphaFailureResolver(),
+                        ),
+                    )
 
-        "resolve does not convert unexpected exceptions into semantic issues" {
-            val builder = MicrosmithBuilder().apply { put(AlphaExtension::class, AlphaExtension) }
+                val result = service.resolve(builder.model).shouldBeTypeOf<ResolutionOutcome.Failure>()
 
-            val service = DomainResolutionService(listOf(ThrowingResolver()))
-
-            shouldThrow<IllegalStateException> { service.resolve(builder.model) }.message shouldBe
-                "infrastructure exploded"
-        }
-
-        "registry sorts resolvers for an authoring type deterministically by resolved type then implementation" {
-            val registry =
-                DomainResolverRegistry(
+                result.issues.toList() shouldContainExactly
                     listOf(
-                        BetaResolver(),
-                        AlphaFirstResolver(),
-                        AlphaNotApplicableResolver(),
+                        AlphaIssue,
+                        BetaIssue,
                     )
-                )
+            }
 
-            val resolvers = registry.resolve(AlphaExtension)
+            "resolve does not convert unexpected exceptions into semantic issues" {
+                val builder = MicrosmithBuilder().apply { put(AlphaExtension::class, AlphaExtension) }
 
-            resolvers.map { it.resolvedType } shouldContainExactly
-                listOf(
-                    AlphaResolvedModel::class,
-                    BetaResolvedModel::class,
-                )
+                val service = DomainResolutionService(listOf(ThrowingResolver()))
 
-            resolvers.first().authoringType shouldBe AlphaExtension::class
-        }
-    })
+                shouldThrow<IllegalStateException> { service.resolve(builder.model) }.message shouldBe
+                    "infrastructure exploded"
+            }
+
+            "registry sorts resolvers for an authoring type deterministically by resolved type then implementation" {
+                val registry =
+                    DomainResolverRegistry(
+                        listOf(
+                            BetaResolver(),
+                            AlphaFirstResolver(),
+                            AlphaNotApplicableResolver(),
+                        ),
+                    )
+
+                val resolvers = registry.resolve(AlphaExtension)
+
+                resolvers.map { it.resolvedType } shouldContainExactly
+                    listOf(
+                        AlphaResolvedModel::class,
+                        BetaResolvedModel::class,
+                    )
+
+                resolvers.first().authoringType shouldBe AlphaExtension::class
+            }
+        },
+    )

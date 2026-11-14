@@ -17,10 +17,7 @@ internal constructor(private val extensions: Map<KClass<out ServiceExtension>, S
 
     internal fun merge(other: DotnetServiceModel): DotnetServiceModel =
         DotnetServiceModel(
-            extensions +
-                other.extensions.mapValues { (type, value) ->
-                    mergeServiceExtension(extensions[type] as ServiceExtension?, value)
-                }
+            extensions + other.extensions.mapValues { (type, value) -> mergeServiceExtension(extensions[type], value) },
         )
 
     fun keys() = extensions.keys

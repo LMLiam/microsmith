@@ -28,89 +28,92 @@ private fun DotnetWorkspaceResolver.resolveIssues(extension: ServicesExtension):
         )
 
 class DotnetWorkspaceResolverTests :
-    StringSpec({
-        "resolve materializes inherited target and validated service models" {
-            val builder = MicrosmithBuilder()
+    StringSpec(
+        {
+            "resolve materializes inherited target and validated service models" {
+                val builder = MicrosmithBuilder()
 
-            builder.services {
-                dotnet {
-                    target(NET8)
-                    solutions { "Platform" {} }
-                }
-
-                "UserService" {
+                builder.services {
                     dotnet {
-                        solution("Platform")
-                        project("UserService.Api")
-                        models {
-                            model("User") {
-                                string("id")
-                                "manager" references "User"
+                        target(NET10)
+                        solutions { "Platform" {} }
+                    }
+
+                    "UserService" {
+                        dotnet {
+                            solution("Platform")
+                            project("UserService.Api")
+                            models {
+                                model("User") {
+                                    string("id")
+                                    "manager" references "User"
+                                }
                             }
                         }
                     }
                 }
+
+                val workspace = DotnetWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
+                val service = requireNotNull(workspace.services["UserService"])
+
+                service.target shouldBe DotnetTarget.NET10
+                workspace.solutions.keys shouldContainExactly listOf("Platform")
+                service.solution.name shouldBe "Platform"
+                service.project shouldBe "UserService.Api"
+                service.models.keys shouldContainExactly listOf("User")
+                requireNotNull(service.models["User"]).fields.map { it.name } shouldContainExactly
+                    listOf("id", "manager")
             }
 
-            val workspace = DotnetWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
-            val service = requireNotNull(workspace.services["UserService"])
+            "resolve rejects services that target undeclared solutions" {
+                val builder = MicrosmithBuilder()
 
-            service.target shouldBe DotnetTarget.NET8
-            workspace.solutions.keys shouldContainExactly listOf("Platform")
-            service.solution.name shouldBe "Platform"
-            service.project shouldBe "UserService.Api"
-            service.models.keys shouldContainExactly listOf("User")
-            requireNotNull(service.models["User"]).fields.map { it.name } shouldContainExactly listOf("id", "manager")
-        }
+                builder.services {
+                    dotnet { target(NET10) }
 
-        "resolve rejects services that target undeclared solutions" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                dotnet { target(NET8) }
-
-                "UserService" {
-                    dotnet {
-                        solution("Platform")
-                        project("UserService.Api")
+                    "UserService" {
+                        dotnet {
+                            solution("Platform")
+                            project("UserService.Api")
+                        }
                     }
                 }
+
+                DotnetWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                    listOf(
+                        DotnetWorkspaceResolutionIssue.SolutionNotDeclared(
+                            serviceName = "UserService",
+                            solutionName = "Platform",
+                        ),
+                    )
             }
 
-            DotnetWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
-                listOf(
-                    DotnetWorkspaceResolutionIssue.SolutionNotDeclared(
-                        serviceName = "UserService",
-                        solutionName = "Platform",
-                    )
-                )
-        }
+            "resolve rejects model references to unknown service-local models" {
+                val builder = MicrosmithBuilder()
 
-        "resolve rejects model references to unknown service-local models" {
-            val builder = MicrosmithBuilder()
-
-            builder.services {
-                dotnet {
-                    target(NET8)
-                    solutions { "Platform" {} }
-                }
-
-                "UserService" {
+                builder.services {
                     dotnet {
-                        solution("Platform")
-                        project("UserService.Api")
-                        models { model("User") { "manager" ref "MissingUser" } }
+                        target(NET10)
+                        solutions { "Platform" {} }
+                    }
+
+                    "UserService" {
+                        dotnet {
+                            solution("Platform")
+                            project("UserService.Api")
+                            models { model("User") { "manager" ref "MissingUser" } }
+                        }
                     }
                 }
-            }
 
-            DotnetWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
-                listOf(
-                    DotnetWorkspaceResolutionIssue.UnknownModelReference(
-                        serviceName = "UserService",
-                        modelName = "User",
-                        targetName = "MissingUser",
+                DotnetWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                    listOf(
+                        DotnetWorkspaceResolutionIssue.UnknownModelReference(
+                            serviceName = "UserService",
+                            modelName = "User",
+                            targetName = "MissingUser",
+                        ),
                     )
-                )
-        }
-    })
+            }
+        },
+    )

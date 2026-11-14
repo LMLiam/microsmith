@@ -29,138 +29,142 @@ import io.kotest.matchers.string.shouldNotContain
 import java.nio.file.Path
 
 class DotnetAspServiceArtifactCompilerTests :
-    StringSpec({
-        "compile emits the abstract ASP.NET extension surface" {
-            val artifact = sampleArtifact()
+    StringSpec(
+        {
+            "compile emits the abstract ASP.NET extension surface" {
+                val artifact = sampleArtifact()
 
-            val contributions = DotnetAspServiceArtifactCompiler().compile(artifact)
-            val msbuild = contributions.filterIsInstance<MsBuildProjectContribution>().single()
-            val textFiles = contributions.filterIsInstance<TextFileArtifactContribution>()
-            val byPath = textFiles.associateBy { it.artifactId.relativePath.toString() }
+                val contributions = DotnetAspServiceArtifactCompiler().compile(artifact)
+                val msbuild = contributions.filterIsInstance<MsBuildProjectContribution>().single()
+                val textFiles = contributions.filterIsInstance<TextFileArtifactContribution>()
+                val byPath = textFiles.associateBy { it.artifactId.relativePath.toString() }
 
-            msbuild.artifactId shouldBe
-                MsBuildProjectArtifactId.Project(solutionName = "Platform", projectName = "UserService.Api")
-            msbuild.projectAttributes shouldBe mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web")
-            msbuild.properties shouldBe
-                mapOf(
-                    MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
-                    MsBuildNames.NULLABLE_PROPERTY to "enable",
-                    MsBuildNames.TARGET_FRAMEWORK_PROPERTY to "net8.0",
-                )
+                msbuild.artifactId shouldBe
+                    MsBuildProjectArtifactId.Project(solutionName = "Platform", projectName = "UserService.Api")
+                msbuild.projectAttributes shouldBe mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web")
+                msbuild.properties shouldBe
+                    mapOf(
+                        MsBuildNames.IMPLICIT_USINGS_PROPERTY to "enable",
+                        MsBuildNames.NULLABLE_PROPERTY to "enable",
+                        MsBuildNames.TARGET_FRAMEWORK_PROPERTY to "net8.0",
+                    )
 
-            textFiles.map { it.artifactId.relativePath.toString() } shouldContainExactlyInAnyOrder
-                listOf(
-                    "Program.cs",
-                    "appsettings.json",
-                    "Properties/launchSettings.json",
-                    "Generated/Hosting/MicrosmithHostingExtensions.cs",
-                    "Generated/Contracts/ServiceModels.cs",
-                    "Generated/Contracts/RequestModels.cs",
-                    "Generated/Contracts/ResponseModels.cs",
-                    "Generated/Controllers/MicrosmithControllerBase.cs",
-                    "Generated/Controllers/UserServiceApiControllerBase.cs",
-                )
-            textFiles.forEach { it.artifactId.outputRoot shouldBe Path.of("dotnet", "Platform", "UserService.Api") }
+                textFiles.map { it.artifactId.relativePath.toString() } shouldContainExactlyInAnyOrder
+                    listOf(
+                        "Program.cs",
+                        "appsettings.json",
+                        "Properties/launchSettings.json",
+                        "Generated/Hosting/MicrosmithHostingExtensions.cs",
+                        "Generated/Contracts/ServiceModels.cs",
+                        "Generated/Contracts/RequestModels.cs",
+                        "Generated/Contracts/ResponseModels.cs",
+                        "Generated/Controllers/MicrosmithControllerBase.cs",
+                        "Generated/Controllers/UserServiceApiControllerBase.cs",
+                    )
+                textFiles.forEach { it.artifactId.outputRoot shouldBe Path.of("dotnet", "Platform", "UserService.Api") }
 
-            byPath.getValue("Program.cs").contents.shouldContain("builder.AddMicrosmith();")
-            byPath.getValue("Program.cs").contents.shouldContain("app.MapMicrosmith();")
-            byPath
-                .getValue("Generated/Hosting/MicrosmithHostingExtensions.cs")
-                .contents
-                .shouldContain("builder.Services.AddControllers();")
-
-            val controller = byPath.getValue("Generated/Controllers/UserServiceApiControllerBase.cs")
-            controller.contents.shouldContain("""[HttpGet("/users/{id}", Name = "GetUser")]""")
-            controller.contents.shouldContain("""[ProducesResponseType(typeof(User), 200)]""")
-            controller.contents.shouldContain("""[ProducesResponseType(typeof(Problem), 404)]""")
-            controller.contents.shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync")
-            controller.contents.shouldContain(
-                "CreateUserCreated response => Respond(" + "response.Body, 201, (\"Location\", response.Location))"
-            )
-            controller.contents.shouldContain(
-                """_ => throw new InvalidOperationException($"Unsupported GetUser result type """ +
-                    """'{result.GetType().FullName}'.")"""
-            )
-            controller.contents.shouldNotContain("X-Microsmith-Response-Status")
-            controller.contents.shouldNotContain("sample-location")
-
-            val controllerBase = byPath.getValue("Generated/Controllers/MicrosmithControllerBase.cs")
-            controllerBase.contents.shouldContain(
-                "protected ActionResult Respond(" +
-                    "object? body, int statusCode, params (string Name, string? Value)[] headers)"
-            )
-            controllerBase.contents.shouldContain("protected string? ReadHeader(string headerName)")
-
-            byPath
-                .getValue("Generated/Contracts/RequestModels.cs")
-                .contents
-                .shouldContain("public bool IncludeDetails { get; set; } = false;")
-            byPath.getValue("Generated/Contracts/RequestModels.cs").contents.shouldContain("[BindRequired]")
-            byPath.getValue("Generated/Contracts/RequestModels.cs").contents.shouldContain("using System;")
-            byPath
-                .getValue("Generated/Contracts/ResponseModels.cs")
-                .contents
-                .shouldContain(
-                    "public sealed record CreateUserCreated(" +
-                        "User Body, string? Location = null) : CreateUserResult;"
-                )
-        }
-
-        "compile emits nuint defaults with a 64-bit-safe literal" {
-            val requestModels =
-                DotnetAspServiceArtifactCompiler()
-                    .compile(integerDefaultArtifact(DotnetFieldType.UnsignedNativeInt, 4294967296L))
-                    .filterIsInstance<TextFileArtifactContribution>()
-                    .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
+                byPath.getValue("Program.cs").contents.shouldContain("builder.AddMicrosmith();")
+                byPath.getValue("Program.cs").contents.shouldContain("app.MapMicrosmith();")
+                byPath
+                    .getValue("Generated/Hosting/MicrosmithHostingExtensions.cs")
                     .contents
+                    .shouldContain("builder.Services.AddControllers();")
 
-            requestModels.shouldContain("public nuint MaxValue { get; set; } = (nuint)4294967296UL;")
-        }
-
-        "compile renders a long default with a 64-bit-safe literal" {
-            val requestModels =
-                DotnetAspServiceArtifactCompiler()
-                    .compile(integerDefaultArtifact(DotnetFieldType.Long, 99_999_999_999L))
-                    .filterIsInstance<TextFileArtifactContribution>()
-                    .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
-                    .contents
-
-            requestModels.shouldContain("public long MaxValue { get; set; } = 99999999999L;")
-        }
-
-        "compile emits sorted usings before the contract namespace when request bindings use system types" {
-            val requestModels =
-                DotnetAspServiceArtifactCompiler()
-                    .compile(requestBindingTypesArtifact())
-                    .filterIsInstance<TextFileArtifactContribution>()
-                    .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
-                    .contents
-
-            requestModels.lines().take(4) shouldContainExactly
-                listOf(
-                    "using Microsoft.AspNetCore.Mvc.ModelBinding;",
-                    "using System;",
-                    "",
-                    "namespace UserService.Api.Generated.Contracts;",
+                val controller = byPath.getValue("Generated/Controllers/UserServiceApiControllerBase.cs")
+                controller.contents.shouldContain("""[HttpGet("/users/{id}", Name = "GetUser")]""")
+                controller.contents.shouldContain("""[ProducesResponseType(typeof(User), 200)]""")
+                controller.contents.shouldContain("""[ProducesResponseType(typeof(Problem), 404)]""")
+                controller.contents.shouldContain("protected abstract Task<GetUserResult> OnGetUserAsync")
+                controller.contents.shouldContain(
+                    "CreateUserCreated response => Respond(" + "response.Body, 201, (\"Location\", response.Location))",
                 )
-            requestModels.shouldContain("public Guid ReportId { get; set; } = Guid.Empty;")
-            requestModels.shouldContain("public DateOnly Since { get; set; } = DateOnly.MinValue;")
-            requestModels.shouldContain("public DateTimeOffset RequestedAt { get; set; } = DateTimeOffset.UnixEpoch;")
-            requestModels.shouldContain("public TimeSpan? Window { get; set; } = null;")
-        }
+                controller.contents.shouldContain(
+                    """_ => throw new InvalidOperationException($"Unsupported GetUser result type """ +
+                        """'{result.GetType().FullName}'.")""",
+                )
+                controller.contents.shouldNotContain("X-Microsmith-Response-Status")
+                controller.contents.shouldNotContain("sample-location")
 
-        "compile escapes service names before embedding them in appsettings json" {
-            val appSettings =
-                DotnetAspServiceArtifactCompiler()
-                    .compile(sampleArtifact(serviceName = "User\"Service\\Api"))
-                    .filterIsInstance<TextFileArtifactContribution>()
-                    .single { it.artifactId.relativePath.toString() == "appsettings.json" }
+                val controllerBase = byPath.getValue("Generated/Controllers/MicrosmithControllerBase.cs")
+                controllerBase.contents.shouldContain(
+                    "protected ActionResult Respond(" +
+                        "object? body, int statusCode, params (string Name, string? Value)[] headers)",
+                )
+                controllerBase.contents.shouldContain("protected string? ReadHeader(string headerName)")
+
+                byPath
+                    .getValue("Generated/Contracts/RequestModels.cs")
                     .contents
+                    .shouldContain("public bool IncludeDetails { get; set; } = false;")
+                byPath.getValue("Generated/Contracts/RequestModels.cs").contents.shouldContain("[BindRequired]")
+                byPath.getValue("Generated/Contracts/RequestModels.cs").contents.shouldContain("using System;")
+                byPath
+                    .getValue("Generated/Contracts/ResponseModels.cs")
+                    .contents
+                    .shouldContain(
+                        "public sealed record CreateUserCreated(" +
+                            "User Body, string? Location = null) : CreateUserResult;",
+                    )
+            }
 
-            appSettings.shouldContain("\"ServiceName\": \"User\\\"Service\\\\Api\"")
-            appSettings.shouldNotContain("\"ServiceName\": \"User\"Service\\Api\"")
-        }
-    })
+            "compile emits nuint defaults with a 64-bit-safe literal" {
+                val requestModels =
+                    DotnetAspServiceArtifactCompiler()
+                        .compile(integerDefaultArtifact(DotnetFieldType.UnsignedNativeInt, 4294967296L))
+                        .filterIsInstance<TextFileArtifactContribution>()
+                        .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
+                        .contents
+
+                requestModels.shouldContain("public nuint MaxValue { get; set; } = (nuint)4294967296UL;")
+            }
+
+            "compile renders a long default with a 64-bit-safe literal" {
+                val requestModels =
+                    DotnetAspServiceArtifactCompiler()
+                        .compile(integerDefaultArtifact(DotnetFieldType.Long, 99_999_999_999L))
+                        .filterIsInstance<TextFileArtifactContribution>()
+                        .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
+                        .contents
+
+                requestModels.shouldContain("public long MaxValue { get; set; } = 99999999999L;")
+            }
+
+            "compile emits sorted usings before the contract namespace when request bindings use system types" {
+                val requestModels =
+                    DotnetAspServiceArtifactCompiler()
+                        .compile(requestBindingTypesArtifact())
+                        .filterIsInstance<TextFileArtifactContribution>()
+                        .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
+                        .contents
+
+                requestModels.lines().take(4) shouldContainExactly
+                    listOf(
+                        "using Microsoft.AspNetCore.Mvc.ModelBinding;",
+                        "using System;",
+                        "",
+                        "namespace UserService.Api.Generated.Contracts;",
+                    )
+                requestModels.shouldContain("public Guid ReportId { get; set; } = Guid.Empty;")
+                requestModels.shouldContain("public DateOnly Since { get; set; } = DateOnly.MinValue;")
+                requestModels.shouldContain(
+                    "public DateTimeOffset RequestedAt { get; set; } = DateTimeOffset.UnixEpoch;",
+                )
+                requestModels.shouldContain("public TimeSpan? Window { get; set; } = null;")
+            }
+
+            "compile escapes service names before embedding them in appsettings json" {
+                val appSettings =
+                    DotnetAspServiceArtifactCompiler()
+                        .compile(sampleArtifact(serviceName = "User\"Service\\Api"))
+                        .filterIsInstance<TextFileArtifactContribution>()
+                        .single { it.artifactId.relativePath.toString() == "appsettings.json" }
+                        .contents
+
+                appSettings.shouldContain("\"ServiceName\": \"User\\\"Service\\\\Api\"")
+                appSettings.shouldNotContain("\"ServiceName\": \"User\"Service\\Api\"")
+            }
+        },
+    )
 
 private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServiceArtifact {
     val userModel =
@@ -198,7 +202,7 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
                                                 type = DotnetFieldType.String,
                                                 optional = false,
                                                 defaultValue = null,
-                                            )
+                                            ),
                                         ),
                                 ),
                             query =
@@ -212,7 +216,7 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
                                                 type = DotnetFieldType.Bool,
                                                 optional = true,
                                                 defaultValue = false,
-                                            )
+                                            ),
                                         ),
                                 ),
                             headers =
@@ -224,7 +228,7 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
                                             DotnetAspHeaderFieldArtifact(
                                                 name = "xCorrelationId",
                                                 headerName = "X-Correlation-Id",
-                                            )
+                                            ),
                                         ),
                                 ),
                         ),
@@ -293,9 +297,9 @@ private fun integerDefaultArtifact(type: DotnetFieldType, value: Number): Dotnet
                                                 type = type,
                                                 optional = false,
                                                 defaultValue = value,
-                                            )
+                                            ),
                                         ),
-                                )
+                                ),
                         ),
                     responses =
                         listOf(
@@ -303,9 +307,9 @@ private fun integerDefaultArtifact(type: DotnetFieldType, value: Number): Dotnet
                                 statusCode = 200,
                                 model = inlineModel("EmptyReport") {},
                                 headers = emptyList(),
-                            )
+                            ),
                         ),
-                )
+                ),
             ),
     )
 
@@ -337,7 +341,7 @@ private fun requestBindingTypesArtifact(): DotnetAspServiceArtifact =
                                                 type = DotnetFieldType.Guid,
                                                 optional = false,
                                                 defaultValue = null,
-                                            )
+                                            ),
                                         ),
                                 ),
                             query =
@@ -373,9 +377,9 @@ private fun requestBindingTypesArtifact(): DotnetAspServiceArtifact =
                                 statusCode = 200,
                                 model = inlineModel("Report") {},
                                 headers = emptyList(),
-                            )
+                            ),
                         ),
-                )
+                ),
             ),
     )
 

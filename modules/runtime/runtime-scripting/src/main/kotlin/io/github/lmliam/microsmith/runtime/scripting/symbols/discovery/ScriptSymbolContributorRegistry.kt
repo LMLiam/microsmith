@@ -15,7 +15,7 @@ internal class ScriptSymbolContributorRegistry private constructor(val contribut
                 buildList {
                     add(ProtobufScriptSymbolContributor)
                     addAll(ServiceLoader.load(ScriptSymbolContributor::class.java, classLoader))
-                }
+                },
             )
 
         fun of(contributors: Iterable<ScriptSymbolContributor>): ScriptSymbolContributorRegistry {

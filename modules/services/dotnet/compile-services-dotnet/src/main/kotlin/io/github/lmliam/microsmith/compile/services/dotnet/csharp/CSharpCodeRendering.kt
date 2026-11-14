@@ -13,7 +13,7 @@ internal fun renderCodeBlock(block: CSharp.CodeBlock): String =
                 }
                 append(renderStatement(statement))
             }
-        }
+        },
     )
 
 private fun renderStatement(statement: CSharp.Statement): String =
@@ -34,7 +34,7 @@ private fun renderStatement(statement: CSharp.Statement): String =
         is CSharp.StructuredForeachStatement ->
             buildString {
                 appendLine(
-                    "foreach (${renderForeachTarget(statement.target)} in ${renderExpression(statement.source)})"
+                    "foreach (${renderForeachTarget(statement.target)} in ${renderExpression(statement.source)})",
                 )
                 appendLine("{")
                 append(renderCodeBlock(statement.body))
@@ -123,8 +123,8 @@ private fun renderObjectCreation(expression: CSharp.ObjectCreation): String = bu
             indent(
                 expression.initializers.joinToString(",\n") { initializer ->
                     "${initializer.memberName} = ${renderExpression(initializer.value)}"
-                }
-            )
+                },
+            ),
         )
         appendLine()
         append("}")
@@ -136,7 +136,7 @@ private fun renderSwitchExpression(expression: CSharp.SwitchExpression): String 
     appendLine(" switch")
     appendLine("{")
     append(
-        indent(expression.arms.joinToString(",\n") { arm -> "${arm.pattern} => ${renderExpression(arm.expression)}" })
+        indent(expression.arms.joinToString(",\n") { arm -> "${arm.pattern} => ${renderExpression(arm.expression)}" }),
     )
     appendLine()
     append("}")

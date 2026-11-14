@@ -38,6 +38,6 @@ class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetP
                                 },
                         )
                     },
-            )
+            ),
         )
 }

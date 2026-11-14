@@ -49,7 +49,7 @@ internal class MicrosmithCli(
                     flags = command.flags,
                     pluginClasspath = pluginClasspath,
                     isolationMode = command.isolationMode,
-                )
+                ),
             )
     },
     doctorRunner: () -> DoctorResult = { runDoctorChecks(providerValidator = providerValidator) },

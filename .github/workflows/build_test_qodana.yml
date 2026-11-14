@@ -23,7 +23,7 @@ jobs:
     outputs:
       code: ${{ steps.filter.outputs.code != 'false' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Filter changed paths
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-build
@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-build
@@ -67,7 +67,7 @@ jobs:
         run: ./gradlew kotest :build-logic:test --stacktrace
       - name: Upload test results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results-unit
           path: '**/build/test-results/**/*.xml'
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-build
@@ -89,7 +89,7 @@ jobs:
         run: ./gradlew integrationTest --stacktrace
       - name: Upload test results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results-integration
           path: '**/build/test-results/**/*.xml'
@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-build
@@ -111,7 +111,7 @@ jobs:
         run: ./gradlew e2eTest --stacktrace
       - name: Upload test results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results-e2e
           path: '**/build/test-results/**/*.xml'
@@ -125,7 +125,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-build
@@ -166,12 +166,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-build
       - name: Cache Maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.m2/repository
@@ -218,7 +218,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-build
@@ -231,7 +231,7 @@ jobs:
       - name: Archive CLI distribution
         run: tar -czf cli-dist.tgz modules/integrations/cli/build/microsmith-cli-dist modules/integrations/cli/build/release-assets
       - name: Upload CLI distribution
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cli-dist
           path: cli-dist.tgz
@@ -251,16 +251,16 @@ jobs:
           - macos-latest
           - windows-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Setup JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: 24
+          java-version: 25
       - name: Download CLI distribution
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: cli-dist
       - name: Extract CLI distribution
@@ -547,16 +547,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Setup JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: 24
+          java-version: 25
       - name: Download CLI distribution
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: cli-dist
       - name: Extract CLI distribution
@@ -632,14 +632,14 @@ jobs:
       checks: write
       security-events: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - name: Qodana Scan
         if: ${{ env.QODANA_TOKEN != '' }}
-        uses: JetBrains/qodana-action@v2025.2
+        uses: JetBrains/qodana-action@v2026.2
         with:
           pr-mode: ${{ github.event_name == 'pull_request' }}
           use-caches: true
@@ -647,7 +647,7 @@ jobs:
           use-annotations: true
           upload-result: false
           push-fixes: 'none'
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@v4
         name: Upload SARIF
         if: ${{ always() && env.QODANA_TOKEN != '' }}
         with:
@@ -666,18 +666,18 @@ jobs:
       contents: read
       checks: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Download test results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: test-results-*
           merge-multiple: true
       - name: Publish Test Report
         if: ${{ hashFiles('**/build/test-results/**/*.xml') != '' }}
         continue-on-error: true
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         with:
           name: JVM Test Results
           path: '**/build/test-results/**/*.xml'

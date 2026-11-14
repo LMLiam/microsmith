@@ -108,7 +108,7 @@ One RPC uses either `request`/`response` or the `to` shorthand, not both.
 microsmith {
     services {
         dotnet {
-            target(NET8)
+            target(NET10)
             solutions {
                 "Platform" {}
             }
@@ -184,6 +184,8 @@ microsmith {
     }
 }
 ```
+
+`target(...)` accepts `NET5` through `NET11`. `NET5` through `NET9` are deprecated in favour of `NET10` and will be removed in 3.0; scripts that use them compile with a deprecation warning.
 
 REST DSL contract notes:
 

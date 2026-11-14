@@ -17,7 +17,7 @@ internal object KotlinScriptTokenizer {
                         KotlinScriptToken(
                             type = tokenType,
                             text = sourceText.substring(lexer.tokenStart, lexer.tokenEnd),
-                        )
+                        ),
                     )
                 }
 

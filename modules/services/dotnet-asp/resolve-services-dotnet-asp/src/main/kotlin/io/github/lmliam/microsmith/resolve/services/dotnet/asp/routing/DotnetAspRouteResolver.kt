@@ -91,8 +91,8 @@ internal class DotnetAspRouteResolver {
                         context.operationName,
                         path,
                         duplicates,
-                    )
-                )
+                    ),
+                ),
             )
         }
     }

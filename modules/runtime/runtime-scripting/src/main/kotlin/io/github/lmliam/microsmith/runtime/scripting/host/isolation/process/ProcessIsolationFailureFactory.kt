@@ -29,7 +29,7 @@ internal class ProcessIsolationFailureFactory {
             return failure
         }
         return failure.copy(
-            diagnostics = failure.diagnostics + ScriptRunDiagnostic("Process stderr/stdout: $processOutput")
+            diagnostics = failure.diagnostics + ScriptRunDiagnostic("Process stderr/stdout: $processOutput"),
         )
     }
 

@@ -23,7 +23,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 
 @DisableCachingByDefault(
-    because = "Microsmith maintains its own compilation cache and task-level caching needs deeper normalization."
+    because = "Microsmith maintains its own compilation cache and task-level caching needs deeper normalization.",
 )
 abstract class MicrosmithGenerateTask : DefaultTask() {
     @get:InputFile @get:PathSensitive(PathSensitivity.RELATIVE) abstract val scriptFile: RegularFileProperty
@@ -73,7 +73,7 @@ abstract class MicrosmithGenerateTask : DefaultTask() {
             describeGeneratedOutputRoots(outputDirectory.get().asFile.toPath(), result.generatedRoots)
         logger.lifecycle(
             "Generated Microsmith outputs into '$generatedOutputRoot'. " +
-                "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)"
+                "(compile-cache=${if (result.cacheHit) "hit" else "miss"}, elapsed=${result.elapsedMillis}ms)",
         )
     }
 

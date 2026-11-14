@@ -186,13 +186,13 @@ subprojects {
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
-        options.release.set(24)
+        options.release.set(25)
     }
 
     kotlin {
-        jvmToolchain(24)
+        jvmToolchain(25)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_24)
+            jvmTarget.set(JvmTarget.JVM_25)
             progressiveMode.set(true)
             freeCompilerArgs.addAll([
                 '-Xjsr305=strict',

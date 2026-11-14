@@ -11,7 +11,7 @@ internal class DomainResolverRegistry(resolvers: List<DomainResolver<*, *>>) {
         resolversByAuthoringType[extension::class]?.map { it.cast() }.orEmpty()
 
     private fun indexResolvers(
-        resolvers: List<DomainResolver<*, *>>
+        resolvers: List<DomainResolver<*, *>>,
     ): Map<KClass<out MicrosmithExtension>, List<DomainResolver<*, *>>> {
         val byAuthoringType = resolvers.groupBy(DomainResolver<*, *>::authoringType)
 
@@ -35,7 +35,7 @@ internal class DomainResolverRegistry(resolvers: List<DomainResolver<*, *>>) {
                 compareBy(
                     { it.resolvedType.qualifiedName ?: it.resolvedType.toString() },
                     { it::class.qualifiedName ?: it::class.toString() },
-                )
+                ),
             )
         }
     }

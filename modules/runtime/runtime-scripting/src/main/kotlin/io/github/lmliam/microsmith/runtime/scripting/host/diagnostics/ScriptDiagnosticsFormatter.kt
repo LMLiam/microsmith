@@ -11,7 +11,7 @@ internal object ScriptDiagnosticsFormatter {
                     .thenBy { it.sourcePath.orEmpty() }
                     .thenBy { it.location?.start?.line ?: Int.MAX_VALUE }
                     .thenBy { it.location?.start?.col ?: Int.MAX_VALUE }
-                    .thenBy { it.message }
+                    .thenBy { it.message },
             )
             .map { report ->
                 val severity = report.severity.name.lowercase()

@@ -34,7 +34,7 @@ internal class DotnetAspBindingResolver {
                                 context.operationName,
                                 binding.name,
                                 field.name,
-                            )
+                            ),
                         )
                     }
 
@@ -47,7 +47,7 @@ internal class DotnetAspBindingResolver {
                                 context.operationName,
                                 binding.name,
                                 field.name,
-                            )
+                            ),
                         )
                     }
 
@@ -61,7 +61,7 @@ internal class DotnetAspBindingResolver {
                             binding.name,
                             placeholders,
                             fields,
-                        )
+                        ),
                     )
                 }
             }
@@ -121,7 +121,7 @@ internal class DotnetAspBindingResolver {
                             default.getOrNull(),
                         )
                     },
-            )
+            ),
         )
     }
 

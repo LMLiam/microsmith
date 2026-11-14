@@ -16,98 +16,100 @@ import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
 class DotnetPackageArtifactCompilerTests :
-    StringSpec({
-        "compile emits central package versions into Directory.Packages.props" {
-            val artifact =
-                DotnetPackageVersionsArtifact(
-                    id = DotnetPackageVersionsArtifactId(solutionName = "Platform"),
-                    packages =
-                        listOf(
-                            DotnetPackageVersion(name = "Serilog.AspNetCore", version = "9.0.0"),
-                            DotnetPackageVersion(name = "Serilog.Settings.Configuration", version = "9.0.1"),
-                        ),
-                )
-
-            val contribution =
-                DotnetPackageVersionsArtifactCompiler().compile(artifact).single() as MsBuildProjectContribution
-
-            contribution.artifactId shouldBe MsBuildProjectArtifactId.DirectoryPackagesProps("Platform")
-            contribution.properties shouldContainExactly
-                mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true")
-            contribution.items.map { it.include to it.attributes } shouldContainExactly
-                listOf(
-                    "Serilog.AspNetCore" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
-                    "Serilog.Settings.Configuration" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.1"),
-                )
-        }
-
-        "compile emits per-project package references into Directory.Build.props" {
-            val artifact =
-                DotnetPackageReferencesArtifact(
-                    id = DotnetPackageReferencesArtifactId(serviceName = "UserService"),
-                    solutionName = "Platform",
-                    projectName = "UserService.Api",
-                    packages =
-                        listOf(
-                            DotnetPackageReference(
-                                name = "Serilog.Settings.Configuration",
-                                version = DotnetPackageReferenceVersion.Central,
+    StringSpec(
+        {
+            "compile emits central package versions into Directory.Packages.props" {
+                val artifact =
+                    DotnetPackageVersionsArtifact(
+                        id = DotnetPackageVersionsArtifactId(solutionName = "Platform"),
+                        packages =
+                            listOf(
+                                DotnetPackageVersion(name = "Serilog.AspNetCore", version = "9.0.0"),
+                                DotnetPackageVersion(name = "Serilog.Settings.Configuration", version = "9.0.1"),
                             ),
-                            DotnetPackageReference(
-                                name = "Serilog.AspNetCore",
-                                version = DotnetPackageReferenceVersion.Central,
+                    )
+
+                val contribution =
+                    DotnetPackageVersionsArtifactCompiler().compile(artifact).single() as MsBuildProjectContribution
+
+                contribution.artifactId shouldBe MsBuildProjectArtifactId.DirectoryPackagesProps("Platform")
+                contribution.properties shouldContainExactly
+                    mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true")
+                contribution.items.map { it.include to it.attributes } shouldContainExactly
+                    listOf(
+                        "Serilog.AspNetCore" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
+                        "Serilog.Settings.Configuration" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.1"),
+                    )
+            }
+
+            "compile emits per-project package references into Directory.Build.props" {
+                val artifact =
+                    DotnetPackageReferencesArtifact(
+                        id = DotnetPackageReferencesArtifactId(serviceName = "UserService"),
+                        solutionName = "Platform",
+                        projectName = "UserService.Api",
+                        packages =
+                            listOf(
+                                DotnetPackageReference(
+                                    name = "Serilog.Settings.Configuration",
+                                    version = DotnetPackageReferenceVersion.Central,
+                                ),
+                                DotnetPackageReference(
+                                    name = "Serilog.AspNetCore",
+                                    version = DotnetPackageReferenceVersion.Central,
+                                ),
                             ),
-                        ),
-                )
+                    )
 
-            val contribution =
-                DotnetPackageReferencesArtifactCompiler().compile(artifact).single() as MsBuildProjectContribution
+                val contribution =
+                    DotnetPackageReferencesArtifactCompiler().compile(artifact).single() as MsBuildProjectContribution
 
-            contribution.artifactId shouldBe
-                MsBuildProjectArtifactId.DirectoryBuildProps(
-                    solutionName = "Platform",
-                    projectName = "UserService.Api",
-                )
-            contribution.properties shouldBe emptyMap()
-            contribution.items.map { it.include to it.attributes } shouldContainExactly
-                listOf(
-                    "Serilog.AspNetCore" to emptyMap(),
-                    "Serilog.Settings.Configuration" to emptyMap(),
-                )
-        }
+                contribution.artifactId shouldBe
+                    MsBuildProjectArtifactId.DirectoryBuildProps(
+                        solutionName = "Platform",
+                        projectName = "UserService.Api",
+                    )
+                contribution.properties shouldBe emptyMap()
+                contribution.items.map { it.include to it.attributes } shouldContainExactly
+                    listOf(
+                        "Serilog.AspNetCore" to emptyMap(),
+                        "Serilog.Settings.Configuration" to emptyMap(),
+                    )
+            }
 
-        "compile emits direct per-project package versions into Directory.Build.props" {
-            val artifact =
-                DotnetPackageReferencesArtifact(
-                    id = DotnetPackageReferencesArtifactId(serviceName = "UserService"),
-                    solutionName = "Platform",
-                    projectName = "UserService.Api",
-                    packages =
-                        listOf(
-                            DotnetPackageReference(
-                                name = "Serilog.Settings.Configuration",
-                                version = DotnetPackageReferenceVersion.Explicit("9.0.1"),
+            "compile emits direct per-project package versions into Directory.Build.props" {
+                val artifact =
+                    DotnetPackageReferencesArtifact(
+                        id = DotnetPackageReferencesArtifactId(serviceName = "UserService"),
+                        solutionName = "Platform",
+                        projectName = "UserService.Api",
+                        packages =
+                            listOf(
+                                DotnetPackageReference(
+                                    name = "Serilog.Settings.Configuration",
+                                    version = DotnetPackageReferenceVersion.Explicit("9.0.1"),
+                                ),
+                                DotnetPackageReference(
+                                    name = "Serilog.AspNetCore",
+                                    version = DotnetPackageReferenceVersion.Explicit("9.0.0"),
+                                ),
                             ),
-                            DotnetPackageReference(
-                                name = "Serilog.AspNetCore",
-                                version = DotnetPackageReferenceVersion.Explicit("9.0.0"),
-                            ),
-                        ),
-                )
+                    )
 
-            val contribution =
-                DotnetPackageReferencesArtifactCompiler().compile(artifact).single() as MsBuildProjectContribution
+                val contribution =
+                    DotnetPackageReferencesArtifactCompiler().compile(artifact).single() as MsBuildProjectContribution
 
-            contribution.artifactId shouldBe
-                MsBuildProjectArtifactId.DirectoryBuildProps(
-                    solutionName = "Platform",
-                    projectName = "UserService.Api",
-                )
-            contribution.properties shouldBe emptyMap()
-            contribution.items.map { it.include to it.attributes } shouldContainExactly
-                listOf(
-                    "Serilog.AspNetCore" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
-                    "Serilog.Settings.Configuration" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.1"),
-                )
-        }
-    })
+                contribution.artifactId shouldBe
+                    MsBuildProjectArtifactId.DirectoryBuildProps(
+                        solutionName = "Platform",
+                        projectName = "UserService.Api",
+                    )
+                contribution.properties shouldBe emptyMap()
+                contribution.items.map { it.include to it.attributes } shouldContainExactly
+                    listOf(
+                        "Serilog.AspNetCore" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.0"),
+                        "Serilog.Settings.Configuration" to mapOf(MsBuildNames.VERSION_ATTRIBUTE to "9.0.1"),
+                    )
+            }
+        },
+    )

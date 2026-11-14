@@ -37,5 +37,5 @@ class DomainResolutionService(resolvers: List<DomainResolver<*, *>>) {
 }
 
 private fun DomainResolver<MicrosmithExtension, ResolvedModel>.resolveUnchecked(
-    extension: MicrosmithExtension
+    extension: MicrosmithExtension,
 ): DomainResolution<ResolvedModel> = resolve(extension)

@@ -32,7 +32,7 @@ private fun nameConflictsOf(schema: ProtobufSchema): List<ProtobufResolutionIssu
 
 private fun fieldJsonNameCollisions(schemaName: String, message: Message): List<ProtobufResolutionIssue> =
     findJsonNameCollisions(
-            (message.fields + message.oneofs.flatMap(Oneof::fields)).map(Field::name).filter(::isIdentifier)
+            (message.fields + message.oneofs.flatMap(Oneof::fields)).map(Field::name).filter(::isIdentifier),
         )
         .map { it.toIssue(schemaName) }
 
