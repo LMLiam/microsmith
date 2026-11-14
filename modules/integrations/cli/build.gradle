@@ -70,9 +70,6 @@ dependencies {
     implementation libs.maven.resolver.util
     implementation libs.maven.resolver.impl
     implementation libs.maven.resolver.supplier
-    implementation libs.maven.resolver.connector.basic
-    implementation libs.maven.resolver.transport.file
-    implementation libs.maven.resolver.transport.apache
 }
 
 sourceSets.main.resources.srcDir(cliCatalogDirectory)
