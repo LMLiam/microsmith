@@ -8,6 +8,9 @@ dependencies {
     implementation project(":compile")
     testImplementation project(":dsl-services-dotnet-asp")
     testImplementation project(":compile-services-dotnet-asp")
+    testImplementation project(":dsl-services-dotnet-packages")
+    testImplementation project(":compile-services-dotnet-packages")
+    testImplementation project(":resolve-services-dotnet")
     implementation libs.coroutines.core
     implementation libs.spi.tooling.annotations
     kapt libs.spi.tooling.processor
