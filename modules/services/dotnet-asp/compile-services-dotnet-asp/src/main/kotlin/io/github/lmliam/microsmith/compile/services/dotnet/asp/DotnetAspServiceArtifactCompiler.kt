@@ -16,15 +16,12 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.ms
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.renderDotnetAspAppSettingsFile
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.renderDotnetAspLaunchSettingsFile
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.textContribution
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.validation.validateEndpointGenerationInputs
 
 @ServiceProvider(ArtifactCompiler::class)
 class DotnetAspServiceArtifactCompiler : ServicesArtifactCompiler<DotnetAspServiceArtifact> {
     override val artifactType = DotnetAspServiceArtifact::class
 
     override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> {
-        validateEndpointGenerationInputs(artifact)
-
         return buildList {
             add(
                 MsBuildProjectContribution(

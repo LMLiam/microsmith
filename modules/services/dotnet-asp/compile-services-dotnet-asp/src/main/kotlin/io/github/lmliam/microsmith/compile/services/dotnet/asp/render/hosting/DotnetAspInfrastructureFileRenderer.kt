@@ -4,13 +4,13 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAs
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpNamespaces
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpTypes
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.using
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllersNamespace
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.hostingNamespace
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controller.renderReadHeaderHelper
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controller.renderRespondHelper
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
 
 internal object DotnetAspInfrastructureFileRenderer {
     fun renderProgramFile(artifact: DotnetAspServiceArtifact): String =

@@ -9,7 +9,10 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRest
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspGenerationResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspResultBaseTypeName
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspResultVariantTypeName
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRestTreeResolver
 
 internal class DotnetAspRestResolver {
@@ -23,15 +26,17 @@ internal class DotnetAspRestResolver {
         if (rest == null) return Either.Right(ResolvedDotnetAspRest.empty())
 
         return treeResolver.resolve(serviceName, models, rest).flatMap { endpoints ->
-            resolveEndpointSet(serviceName, endpoints)
+            resolveEndpointSet(serviceName, models, endpoints)
         }
     }
 
     private fun resolveEndpointSet(
         serviceName: String,
+        models: Map<String, DotnetModel>,
         endpoints: List<ResolvedDotnetAspEndpoint>,
     ): EitherNel<DotnetResolutionIssue, ResolvedDotnetAspRest> {
-        val issues = collisionIssues(serviceName, endpoints)
+        val issues =
+            collisionIssues(serviceName, endpoints) + contractTypeCollisionIssues(serviceName, models, endpoints)
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 
@@ -74,6 +79,34 @@ internal class DotnetAspRestResolver {
             )
             .forEach { (method, route) ->
                 add(DotnetAspResolutionIssue.DuplicateRestEndpoint(serviceName, method, route))
+            }
+    }
+
+    private fun contractTypeCollisionIssues(
+        serviceName: String,
+        models: Map<String, DotnetModel>,
+        endpoints: List<ResolvedDotnetAspEndpoint>,
+    ): List<DotnetAspResolutionIssue> {
+        val owners = mutableListOf<Pair<String, String>>()
+
+        models.keys.forEach { name -> owners += name to "shared model '$name'" }
+        endpoints.distinctBy(ResolvedDotnetAspEndpoint::operationName).forEach { endpoint ->
+            owners +=
+                dotnetAspResultBaseTypeName(endpoint.operationName) to
+                    "result base for operation '${endpoint.operationName}'"
+            endpoint.responses.forEach { response ->
+                owners +=
+                    dotnetAspResultVariantTypeName(endpoint.operationName, response.statusCode) to
+                        "response result for operation '${endpoint.operationName}' status ${response.statusCode}"
+            }
+        }
+
+        return owners
+            .groupBy({ (typeName, _) -> typeName }, { (_, owner) -> owner })
+            .filterValues { it.size > 1 }
+            .toSortedMap()
+            .map { (typeName, typeOwners) ->
+                DotnetAspGenerationResolutionIssue.ContractTypeCollision(serviceName, typeName, typeOwners.sorted())
             }
     }
 }

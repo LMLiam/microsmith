@@ -3,7 +3,6 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.defaults
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestFieldArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.escapeDotnetAspCsharpCharLiteral
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.escapeDotnetAspCsharpStringLiteral
-import io.github.lmliam.microsmith.compile.services.dotnet.csharp.requireDotnetRepresentableInteger
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 import java.util.Locale
 
@@ -54,11 +53,7 @@ private fun renderNumericDefaultExpression(type: DotnetFieldType, defaultValue: 
     }
 
 private fun renderIntegerDefaultExpression(type: DotnetFieldType, defaultValue: Any): String {
-    val number =
-        requireNotNull(defaultValue as? Number) {
-            "ASP.NET request default '$defaultValue' is not numeric for type '$type'."
-        }
-    val integer = requireDotnetRepresentableInteger(type, number, "ASP.NET request default")
+    val integer = defaultValue.toString()
 
     return when (type) {
         DotnetFieldType.UnsignedInt -> "${integer}U"
@@ -71,7 +66,7 @@ private fun renderIntegerDefaultExpression(type: DotnetFieldType, defaultValue: 
         DotnetFieldType.SignedByte,
         DotnetFieldType.Short,
         DotnetFieldType.UnsignedShort,
-        DotnetFieldType.Int -> integer.toString()
+        DotnetFieldType.Int -> integer
 
         DotnetFieldType.Float,
         DotnetFieldType.Double,

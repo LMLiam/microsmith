@@ -52,6 +52,22 @@ internal fun DotnetAspBindingResolutionIssue.toDiagnostic(): ResolutionDiagnosti
                         "cannot reference shared model '$targetName'. Transport bindings must declare scalar fields.",
             )
 
+        is DotnetAspBindingResolutionIssue.IntegerDefaultNotIntegral ->
+            ResolutionDiagnostic(
+                code = "dotnet.asp.request-binding-default-not-integral",
+                message =
+                    "ASP.NET request binding '$bindingName' field '$fieldName' in operation '$operationName' " +
+                        "declares default '$value', which is not representable as integer type '$csharpTypeName'.",
+            )
+
+        is DotnetAspBindingResolutionIssue.IntegerDefaultOutOfRange ->
+            ResolutionDiagnostic(
+                code = "dotnet.asp.request-binding-default-out-of-range",
+                message =
+                    "ASP.NET request binding '$bindingName' field '$fieldName' in operation '$operationName' " +
+                        "declares default '$value', which is out of range for integer type '$csharpTypeName'.",
+            )
+
         is DotnetAspBindingResolutionIssue.UnknownSharedModelReference ->
             ResolutionDiagnostic(
                 code = "dotnet.asp.unknown-shared-model-reference",

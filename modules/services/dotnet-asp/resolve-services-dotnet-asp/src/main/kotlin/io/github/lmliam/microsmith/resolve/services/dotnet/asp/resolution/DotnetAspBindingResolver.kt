@@ -3,8 +3,10 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.toNonEmptyListOrNull
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.request.DotnetAspDefaultValue
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.request.DotnetAspHeadersBinding
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.request.DotnetAspRequestBinding
+import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.request.DotnetAspRequestField
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspHeaderField
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspHeadersBinding
@@ -64,14 +66,14 @@ internal class DotnetAspBindingResolver {
                 }
             }
 
-        return resolveOrIssues(binding, issues)
+        return resolveOrIssues(context, binding, issues)
     }
 
     fun resolveRequestBinding(
         context: DotnetAspOperationContext,
         binding: DotnetAspRequestBinding,
     ): EitherNel<DotnetAspResolutionIssue, ResolvedDotnetAspRequestBinding> =
-        resolveOrIssues(binding, issues = requestBindingIssues(context, binding))
+        resolveOrIssues(context, binding, issues = requestBindingIssues(context, binding))
 
     fun resolveHeadersBinding(binding: DotnetAspHeadersBinding): ResolvedDotnetAspHeadersBinding =
         ResolvedDotnetAspHeadersBinding(
@@ -96,10 +98,12 @@ internal class DotnetAspBindingResolver {
         }
 
     private fun resolveOrIssues(
+        context: DotnetAspOperationContext,
         binding: DotnetAspRequestBinding,
         issues: List<DotnetAspResolutionIssue>,
     ): EitherNel<DotnetAspResolutionIssue, ResolvedDotnetAspRequestBinding> {
-        val accumulatedIssues = issues.toNonEmptyListOrNull()
+        val defaults = binding.fields.map { field -> resolveDefault(context, binding, field) }
+        val accumulatedIssues = (issues + defaults.mapNotNull { it.leftOrNull() }).toNonEmptyListOrNull()
 
         if (accumulatedIssues != null) {
             return Either.Left(accumulatedIssues)
@@ -109,15 +113,49 @@ internal class DotnetAspBindingResolver {
             ResolvedDotnetAspRequestBinding(
                 binding.name,
                 fields =
-                    binding.fields.map { field ->
+                    binding.fields.zip(defaults) { field, default ->
                         ResolvedDotnetAspRequestField(
                             field.name,
                             field.type,
                             optional = field.optional || field.defaultValue != null,
-                            field.defaultValue,
+                            default.getOrNull(),
                         )
                     },
             )
         )
+    }
+
+    private fun resolveDefault(
+        context: DotnetAspOperationContext,
+        binding: DotnetAspRequestBinding,
+        field: DotnetAspRequestField,
+    ): Either<DotnetAspBindingResolutionIssue, DotnetAspDefaultValue?> {
+        val defaultValue = field.defaultValue ?: return Either.Right(null)
+        val integerType = field.type.integerType() ?: return Either.Right(defaultValue)
+        val number = (defaultValue as DotnetAspDefaultValue.NumericValue).value
+
+        return number.toIntegerDefault(integerType).map(DotnetAspDefaultValue::NumericValue).mapLeft { problem ->
+            when (problem) {
+                IntegerDefaultProblem.NOT_INTEGRAL ->
+                    DotnetAspBindingResolutionIssue.IntegerDefaultNotIntegral(
+                        context.serviceName,
+                        context.operationName,
+                        binding.name,
+                        field.name,
+                        integerType.csharpName,
+                        number.toString(),
+                    )
+
+                IntegerDefaultProblem.OUT_OF_RANGE ->
+                    DotnetAspBindingResolutionIssue.IntegerDefaultOutOfRange(
+                        context.serviceName,
+                        context.operationName,
+                        binding.name,
+                        field.name,
+                        integerType.csharpName,
+                        number.toString(),
+                    )
+            }
+        }
     }
 }
