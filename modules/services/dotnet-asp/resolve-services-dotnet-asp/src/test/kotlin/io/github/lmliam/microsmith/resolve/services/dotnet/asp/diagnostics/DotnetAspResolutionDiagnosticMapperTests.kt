@@ -34,6 +34,16 @@ class DotnetAspResolutionDiagnosticMapperTests :
                                 "UserService",
                             ),
                     ),
+                    DotnetAspResolutionIssue.PortOutOfRange(
+                        serviceName = "UserService",
+                        kind = DotnetAspResolutionIssue.PortKind.HTTPS,
+                        port = 65_536,
+                    ),
+                    DotnetAspResolutionIssue.LaunchPortCollision(
+                        port = 7000,
+                        serviceNames = listOf("AdminService", "UserService"),
+                    ),
+                    DotnetAspResolutionIssue.NoFreeDefaultPorts(serviceName = "UserService"),
                 )
                 .map(mapper::map) shouldContainExactly
                 listOf(
@@ -54,6 +64,20 @@ class DotnetAspResolutionDiagnosticMapperTests :
                                 "UserService resolve to colliding " +
                                 "output root " +
                                 "'dotnet/Platform/Shared.Api'.",
+                    ),
+                    ResolutionDiagnostic(
+                        code = "dotnet.asp.port-out-of-range",
+                        message =
+                            "ASP.NET service 'UserService' resolves its HTTPS port to 65536, " +
+                                "which must be between 1 and 65535.",
+                    ),
+                    ResolutionDiagnostic(
+                        code = "dotnet.asp.launch-port-collision",
+                        message = "ASP.NET services AdminService, UserService share launch port 7000.",
+                    ),
+                    ResolutionDiagnostic(
+                        code = "dotnet.asp.no-free-default-ports",
+                        message = "ASP.NET service 'UserService' has no free default launch ports left.",
                     ),
                 )
         }

@@ -10,7 +10,6 @@ import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.service.DotnetAspServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExtension
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspPorts
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspService
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspace
@@ -48,48 +47,55 @@ class DotnetAspWorkspaceResolver(
         extension: ServicesExtension,
         dotnetWorkspace: DotnetWorkspace,
         aspServiceNames: Set<String>,
-    ): EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> =
-        dotnetWorkspace.services
-            .filterKeys(aspServiceNames::contains)
-            .values
-            .sortedBy { it.name }
-            .mapOrAccumulate { resolvedService ->
-                val aspExtension =
-                    checkNotNull(
-                        extension
-                            .require(resolvedService.name)
-                            .model
-                            .get<DotnetServiceExtension>()
-                            ?.get<DotnetAspServiceExtension>()
+    ): EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> {
+        val services = dotnetWorkspace.services.filterKeys(aspServiceNames::contains).values.sortedBy { it.name }
+        val aspExtensions = services.associate { it.name to aspExtensionOf(extension, it.name) }
+
+        val ports =
+            DotnetAspPortAllocator.allocate(
+                services.map { service ->
+                    val declaredPorts = aspExtensions.getValue(service.name).ports
+                    DotnetAspPortRequest(
+                        serviceName = service.name,
+                        solutionName = service.solution.name,
+                        projectName = service.project,
+                        http = declaredPorts?.http,
+                        https = declaredPorts?.https,
                     )
+                }
+            )
 
-                val rest =
-                    restResolver
-                        .resolve(
-                            serviceName = resolvedService.name,
-                            models = resolvedService.models,
-                            rest = aspExtension.rest,
-                        )
-                        .bindNel()
-
-                ResolvedDotnetAspService(
-                    name = resolvedService.name,
-                    solutionName = resolvedService.solution.name,
-                    projectName = resolvedService.project,
-                    targetFrameworkMoniker = resolvedService.target.moniker,
-                    outputRoot = Path.of("dotnet", resolvedService.solution.name, resolvedService.project),
-                    ports =
-                        aspExtension.ports?.let {
-                            ResolvedDotnetAspPorts(
-                                http = it.http,
-                                https = it.https,
-                            )
-                        },
-                    models = resolvedService.models,
-                    rest = rest,
+        val rests = services.mapOrAccumulate { service ->
+            restResolver
+                .resolve(
+                    serviceName = service.name,
+                    models = service.models,
+                    rest = aspExtensions.getValue(service.name).rest,
                 )
+                .bindNel()
+        }
+
+        return Either.zipOrAccumulate(ports, rests) { allocatedPorts, resolvedRests ->
+                services.zip(resolvedRests) { service, rest ->
+                    ResolvedDotnetAspService(
+                        name = service.name,
+                        solutionName = service.solution.name,
+                        projectName = service.project,
+                        targetFrameworkMoniker = service.target.moniker,
+                        outputRoot = Path.of("dotnet", service.solution.name, service.project),
+                        ports = allocatedPorts.getValue(service.name),
+                        models = service.models,
+                        rest = rest,
+                    )
+                }
             }
             .flatMap(::createWorkspace)
+    }
+
+    private fun aspExtensionOf(extension: ServicesExtension, serviceName: String): DotnetAspServiceExtension =
+        checkNotNull(
+            extension.require(serviceName).model.get<DotnetServiceExtension>()?.get<DotnetAspServiceExtension>()
+        )
 
     private fun createWorkspace(
         services: List<ResolvedDotnetAspService>

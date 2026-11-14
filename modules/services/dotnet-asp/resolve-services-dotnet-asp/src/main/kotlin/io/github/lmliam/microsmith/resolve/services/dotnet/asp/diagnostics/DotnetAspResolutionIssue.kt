@@ -10,6 +10,11 @@ sealed interface DotnetAspResolutionIssue : DotnetResolutionIssue {
         ENDPOINT,
     }
 
+    enum class PortKind {
+        HTTP,
+        HTTPS,
+    }
+
     sealed interface RouteProblem {
         data object Blank : RouteProblem
 
@@ -40,4 +45,10 @@ sealed interface DotnetAspResolutionIssue : DotnetResolutionIssue {
         DotnetAspResolutionIssue
 
     data class OutputRootCollision(val outputRoot: Path, val serviceNames: List<String>) : DotnetAspResolutionIssue
+
+    data class PortOutOfRange(val serviceName: String, val kind: PortKind, val port: Int) : DotnetAspResolutionIssue
+
+    data class LaunchPortCollision(val port: Int, val serviceNames: List<String>) : DotnetAspResolutionIssue
+
+    data class NoFreeDefaultPorts(val serviceName: String) : DotnetAspResolutionIssue
 }

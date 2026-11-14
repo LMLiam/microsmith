@@ -34,6 +34,27 @@ class DotnetAspResolutionDiagnosticMapper : ResolutionIssueDiagnosticMapper<Dotn
                             "to colliding output root '${issue.outputRoot}'.",
                 )
 
+            is DotnetAspResolutionIssue.PortOutOfRange ->
+                ResolutionDiagnostic(
+                    code = "dotnet.asp.port-out-of-range",
+                    message =
+                        "ASP.NET service '${issue.serviceName}' resolves its ${issue.kind} port to ${issue.port}, " +
+                            "which must be between 1 and 65535.",
+                )
+
+            is DotnetAspResolutionIssue.LaunchPortCollision ->
+                ResolutionDiagnostic(
+                    code = "dotnet.asp.launch-port-collision",
+                    message =
+                        "ASP.NET services ${issue.serviceNames.joinToString(", ")} share launch port ${issue.port}.",
+                )
+
+            is DotnetAspResolutionIssue.NoFreeDefaultPorts ->
+                ResolutionDiagnostic(
+                    code = "dotnet.asp.no-free-default-ports",
+                    message = "ASP.NET service '${issue.serviceName}' has no free default launch ports left.",
+                )
+
             is DotnetAspResolutionIssue.InvalidRouteDeclaration -> mapInvalidRoute(issue)
 
             is DotnetAspResolutionIssue.DuplicateRoutePlaceholders ->

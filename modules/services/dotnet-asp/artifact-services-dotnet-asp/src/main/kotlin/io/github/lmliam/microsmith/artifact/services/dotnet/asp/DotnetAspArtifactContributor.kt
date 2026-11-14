@@ -3,8 +3,6 @@ package io.github.lmliam.microsmith.artifact.services.dotnet.asp
 import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.ports.allocateDotnetAspPorts
-import io.github.lmliam.microsmith.artifact.services.dotnet.asp.ports.validateUniqueDotnetAspPorts
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactFactory
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactId
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
@@ -22,14 +20,5 @@ class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {
                     { (_, artifactId) -> artifactId.projectName },
                 )
             )
-            .let { serviceArtifacts ->
-                val allocatedPorts = serviceArtifacts.associate { (service, artifactId) ->
-                    artifactId to allocateDotnetAspPorts(artifactId, service.ports)
-                }
-                validateUniqueDotnetAspPorts(allocatedPorts.toList())
-                serviceArtifacts.map { (service, artifactId) ->
-                    val ports = requireNotNull(allocatedPorts[artifactId])
-                    DotnetAspServiceArtifactFactory(service, artifactId, ports).createContribution()
-                }
-            }
+            .map { (service, artifactId) -> DotnetAspServiceArtifactFactory(service, artifactId).createContribution() }
 }
