@@ -32,8 +32,18 @@ abstract class VerifyModuleLayers : DefaultTask() {
             )
         if (violations.isNotEmpty()) {
             throw GradleException(
-                "Module layering violations:\n" + violations.joinToString("\n") { "  $it" },
+                "Module layering violations:\n" + violations.joinToString("\n") { "  ${it.describe()}" },
             )
         }
     }
 }
+
+private fun ModuleLayerViolation.describe(): String =
+    when (this) {
+        is ModuleLayerViolation.UpwardDependency ->
+            "$module (${moduleLayer.moduleName}) depends upward on $dependency (${dependencyLayer.moduleName})"
+        is ModuleLayerViolation.PluginApiDependsOnRuntimeScripting ->
+            "$module must not depend on the runtime scripting module $dependency"
+        is ModuleLayerViolation.MetroTypeInPublishedApi ->
+            "$module exposes the Metro type ${type.internalName} in its published API"
+    }
