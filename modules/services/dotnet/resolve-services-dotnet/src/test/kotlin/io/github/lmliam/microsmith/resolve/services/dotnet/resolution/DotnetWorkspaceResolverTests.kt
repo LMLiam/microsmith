@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.resolution
 
 import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
+import io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget
 import io.github.lmliam.microsmith.dsl.services.dotnet.dotnet
 import io.github.lmliam.microsmith.dsl.services.services
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetWorkspaceResolutionIssue
@@ -54,7 +55,7 @@ class DotnetWorkspaceResolverTests :
             val workspace = DotnetWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
             val service = requireNotNull(workspace.services["UserService"])
 
-            workspace.target shouldBe io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget.NET8
+            service.target shouldBe DotnetTarget.NET8
             workspace.solutions.keys shouldContainExactly listOf("Platform")
             service.solution.name shouldBe "Platform"
             service.project shouldBe "UserService.Api"

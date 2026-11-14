@@ -4,17 +4,12 @@ import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import java.nio.file.Path
 
 private const val FIRST_NON_PRINTABLE_ASCII_CODE_POINT = 0x20
 
-internal fun DotnetAspServiceArtifact.msBuildProjectArtifactId(kind: MsBuildProjectKind): MsBuildProjectArtifactId =
-    MsBuildProjectArtifactId(
-        solutionName = id.solutionName,
-        projectName = id.projectName,
-        kind = kind,
-    )
+internal fun DotnetAspServiceArtifact.msBuildProjectArtifactId(): MsBuildProjectArtifactId.Project =
+    MsBuildProjectArtifactId.Project(solutionName = id.solutionName, projectName = id.projectName)
 
 internal fun DotnetAspServiceArtifact.textContribution(
     relativePath: String,

@@ -27,8 +27,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
         next.projectAttributes.forEach { (name, value) ->
             val existing = mergedProjectAttributes[name]
             require(existing == null || existing == value) {
-                "Conflicting MSBuild project attribute '$name' for '${current.id.kind}' in solution " +
-                    "'${current.id.solutionName}'${current.id.projectName?.let { " project '$it'" }.orEmpty()}."
+                "Conflicting MSBuild project attribute '$name' for ${current.id.description()}."
             }
             mergedProjectAttributes[name] = value
         }
@@ -37,8 +36,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
         next.properties.forEach { (name, value) ->
             val existing = mergedProperties[name]
             require(existing == null || existing == value) {
-                "Conflicting MSBuild property '$name' for '${current.id.kind}' in solution " +
-                    "'${current.id.solutionName}'${current.id.projectName?.let { " project '$it'" }.orEmpty()}."
+                "Conflicting MSBuild property '$name' for ${current.id.description()}."
             }
             mergedProperties[name] = value
         }
@@ -49,10 +47,7 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
             val key = MsBuildItemIdentity(item.itemName, item.include)
             val existing = mergedItems[key]
             require(existing == null || existing == item) {
-                "Conflicting MSBuild item '${item.itemName}:${item.include}' for " +
-                    "'${current.id.kind}' in solution '${current.id.solutionName}'" +
-                    current.id.projectName?.let { " project '$it'" }.orEmpty() +
-                    "."
+                "Conflicting MSBuild item '${item.itemName}:${item.include}' for ${current.id.description()}."
             }
             mergedItems[key] = item
         }
@@ -75,3 +70,11 @@ class MsBuildProjectArtifactAssembler : ArtifactAssembler<MsBuildProjectArtifact
 }
 
 private data class MsBuildItemIdentity(val itemName: String, val include: String)
+
+private fun MsBuildProjectArtifactId.description(): String =
+    when (this) {
+        is MsBuildProjectArtifactId.DirectoryPackagesProps -> "'DirectoryPackagesProps' in solution '$solutionName'"
+        is MsBuildProjectArtifactId.DirectoryBuildProps ->
+            "'DirectoryBuildProps' in solution '$solutionName' project '$projectName'"
+        is MsBuildProjectArtifactId.Project -> "'Project' in solution '$solutionName' project '$projectName'"
+    }

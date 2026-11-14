@@ -52,13 +52,9 @@ def scriptingPomScopes = scriptingApiProjectPaths.collect { path ->
 
 def scriptingIdeFallbackServiceProviders = [
     'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
-        '=io.github.lmliam.microsmith.resolve.schemas.SchemasResolver',
-    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
         '=io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufSchemasResolver',
     'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
         '=io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.resolution.ProtobufRpcSchemasResolver',
-    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
-        '=io.github.lmliam.microsmith.resolve.services.ServicesResolver',
     'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
         '=io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceDomainResolver',
     'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +

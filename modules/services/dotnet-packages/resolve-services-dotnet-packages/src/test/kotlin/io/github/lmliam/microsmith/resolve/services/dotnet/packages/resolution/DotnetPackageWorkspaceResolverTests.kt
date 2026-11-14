@@ -8,6 +8,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.packages.solution.package
 import io.github.lmliam.microsmith.dsl.services.services
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageReference
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageReferenceVersion
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageVersion
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.diagnostics.DotnetPackageWorkspaceResolutionIssue
 import io.kotest.core.spec.style.StringSpec
@@ -74,8 +75,14 @@ class DotnetPackageWorkspaceResolverTests :
                 )
             workspace.requireService("UserService").packages shouldContainExactly
                 listOf(
-                    ResolvedDotnetPackageReference(name = "Serilog.AspNetCore", version = null),
-                    ResolvedDotnetPackageReference(name = "Serilog.Settings.Configuration", version = null),
+                    ResolvedDotnetPackageReference(
+                        name = "Serilog.AspNetCore",
+                        version = ResolvedDotnetPackageReferenceVersion.Central,
+                    ),
+                    ResolvedDotnetPackageReference(
+                        name = "Serilog.Settings.Configuration",
+                        version = ResolvedDotnetPackageReferenceVersion.Central,
+                    ),
                 )
         }
 
@@ -146,8 +153,14 @@ class DotnetPackageWorkspaceResolverTests :
 
             workspace.requireService("UserService").packages shouldContainExactly
                 listOf(
-                    ResolvedDotnetPackageReference(name = "Serilog.AspNetCore", version = "9.0.0"),
-                    ResolvedDotnetPackageReference(name = "Serilog.Settings.Configuration", version = "9.0.1"),
+                    ResolvedDotnetPackageReference(
+                        name = "Serilog.AspNetCore",
+                        version = ResolvedDotnetPackageReferenceVersion.Explicit("9.0.0"),
+                    ),
+                    ResolvedDotnetPackageReference(
+                        name = "Serilog.Settings.Configuration",
+                        version = ResolvedDotnetPackageReferenceVersion.Explicit("9.0.1"),
+                    ),
                 )
         }
 

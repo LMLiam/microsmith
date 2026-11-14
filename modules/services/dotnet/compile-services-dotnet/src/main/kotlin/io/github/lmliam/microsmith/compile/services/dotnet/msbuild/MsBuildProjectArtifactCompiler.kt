@@ -7,7 +7,6 @@ import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
 import java.nio.file.Path
@@ -29,21 +28,18 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
         )
 
     private fun MsBuildProjectArtifact.outputRoot(): Path =
-        when (id.kind) {
-            MsBuildProjectKind.DirectoryPackagesProps -> dotnetOutputRoot.resolve(id.solutionName)
-
-            MsBuildProjectKind.DirectoryBuildProps ->
-                dotnetOutputRoot.resolve(id.solutionName).resolve(requireNotNull(id.projectName))
-
-            MsBuildProjectKind.Project ->
-                dotnetOutputRoot.resolve(id.solutionName).resolve(requireNotNull(id.projectName))
+        when (val id = id) {
+            is MsBuildProjectArtifactId.DirectoryPackagesProps -> dotnetOutputRoot.resolve(id.solutionName)
+            is MsBuildProjectArtifactId.DirectoryBuildProps ->
+                dotnetOutputRoot.resolve(id.solutionName).resolve(id.projectName)
+            is MsBuildProjectArtifactId.Project -> dotnetOutputRoot.resolve(id.solutionName).resolve(id.projectName)
         }
 
     private fun projectRelativePath(artifact: MsBuildProjectArtifact): Path =
-        when (artifact.id.kind) {
-            MsBuildProjectKind.DirectoryPackagesProps -> Path.of("Directory.Packages.props")
-            MsBuildProjectKind.DirectoryBuildProps -> Path.of("Directory.Build.props")
-            MsBuildProjectKind.Project -> Path.of("${requireNotNull(artifact.id.projectName)}.csproj")
+        when (val id = artifact.id) {
+            is MsBuildProjectArtifactId.DirectoryPackagesProps -> Path.of("Directory.Packages.props")
+            is MsBuildProjectArtifactId.DirectoryBuildProps -> Path.of("Directory.Build.props")
+            is MsBuildProjectArtifactId.Project -> Path.of("${id.projectName}.csproj")
         }
 
     private companion object {

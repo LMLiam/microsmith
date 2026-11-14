@@ -9,11 +9,7 @@ import io.kotest.matchers.shouldBe
 class MsBuildProjectArtifactAssemblerTests :
     StringSpec({
         val assembler = MsBuildProjectArtifactAssembler()
-        val artifactId =
-            MsBuildProjectArtifactId(
-                solutionName = "Platform",
-                kind = MsBuildProjectKind.DirectoryPackagesProps,
-            )
+        val artifactId = MsBuildProjectArtifactId.DirectoryPackagesProps("Platform")
 
         "merge combines compatible properties and items" {
             val initial =

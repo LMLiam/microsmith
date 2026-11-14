@@ -5,7 +5,6 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectKind
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -18,11 +17,7 @@ class MsBuildProjectArtifactCompilerTests :
         "compile emits deterministic xml with escaped values" {
             val artifact =
                 MsBuildProjectArtifact(
-                    id =
-                        MsBuildProjectArtifactId(
-                            solutionName = "Platform",
-                            kind = MsBuildProjectKind.DirectoryPackagesProps,
-                        ),
+                    id = MsBuildProjectArtifactId.DirectoryPackagesProps("Platform"),
                     properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "true"),
                     items =
                         listOf(
@@ -48,10 +43,9 @@ class MsBuildProjectArtifactCompilerTests :
             val artifact =
                 MsBuildProjectArtifact(
                     id =
-                        MsBuildProjectArtifactId(
+                        MsBuildProjectArtifactId.DirectoryBuildProps(
                             solutionName = "Platform",
                             projectName = "UserService.Api",
-                            kind = MsBuildProjectKind.DirectoryBuildProps,
                         ),
                     properties = emptyMap(),
                     items =
@@ -77,10 +71,9 @@ class MsBuildProjectArtifactCompilerTests :
             val artifact =
                 MsBuildProjectArtifact(
                     id =
-                        MsBuildProjectArtifactId(
+                        MsBuildProjectArtifactId.Project(
                             solutionName = "Platform",
                             projectName = "UserService.Api",
-                            kind = MsBuildProjectKind.Project,
                         ),
                     projectAttributes = mapOf(MsBuildNames.SDK_ATTRIBUTE to "Microsoft.NET.Sdk.Web"),
                     properties = mapOf(MsBuildNames.TARGET_FRAMEWORK_PROPERTY to "net8.0"),
@@ -100,11 +93,7 @@ class MsBuildProjectArtifactCompilerTests :
         "compile emits well-formed xml for escaped property and attribute values" {
             val artifact =
                 MsBuildProjectArtifact(
-                    id =
-                        MsBuildProjectArtifactId(
-                            solutionName = "Platform",
-                            kind = MsBuildProjectKind.DirectoryPackagesProps,
-                        ),
+                    id = MsBuildProjectArtifactId.DirectoryPackagesProps("Platform"),
                     properties = mapOf(MsBuildNames.MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY to "A&B<true>"),
                     items =
                         listOf(

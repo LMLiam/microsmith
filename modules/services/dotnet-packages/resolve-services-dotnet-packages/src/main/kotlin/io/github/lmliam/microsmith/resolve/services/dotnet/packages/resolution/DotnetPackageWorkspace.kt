@@ -1,13 +1,13 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution
 
-import io.github.lmliam.microsmith.resolve.ResolvedModel
+import io.github.lmliam.microsmith.resolve.services.ResolvedServicesModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageService
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageSolution
 
 data class DotnetPackageWorkspace(
     val solutionsByName: Map<String, ResolvedDotnetPackageSolution>,
     val servicesByName: Map<String, ResolvedDotnetPackageService>,
-) : ResolvedModel {
+) : ResolvedServicesModel {
     fun findSolution(name: String): ResolvedDotnetPackageSolution? = solutionsByName[name]
 
     fun requireSolution(name: String): ResolvedDotnetPackageSolution =
