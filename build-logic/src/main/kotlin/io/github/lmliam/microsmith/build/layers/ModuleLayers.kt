@@ -15,10 +15,19 @@ internal enum class PipelineLayer(
 
 internal fun pipelineLayerOf(module: String): PipelineLayer? = PipelineLayer.entries.firstOrNull { it.owns(module) }
 
+private val publishedApiModules = setOf("plugin-api", "runtime-scripting-api")
+
+private val metroType = Regex("dev[/.]zacsweers[/.]metro")
+
+internal fun isPublishedApiModule(module: String): Boolean {
+    val layer = pipelineLayerOf(module)
+    return (layer != null && layer != PipelineLayer.GEN) || module in publishedApiModules
+}
+
 internal fun findModuleLayerViolations(
     projectDependencies: Map<String, Collection<String>>,
-    metroModules: Collection<String>,
-): List<String> = layerDirectionViolations(projectDependencies) + metroViolations(metroModules)
+    abiDumps: Map<String, List<String>>,
+): List<String> = layerDirectionViolations(projectDependencies) + metroAbiViolations(abiDumps)
 
 private fun layerDirectionViolations(projectDependencies: Map<String, Collection<String>>): List<String> =
     projectDependencies.toSortedMap().flatMap { (module, dependencies) ->
@@ -33,5 +42,8 @@ private fun layerDirectionViolations(projectDependencies: Map<String, Collection
         }
     }
 
-private fun metroViolations(metroModules: Collection<String>): List<String> =
-    metroModules.filter { it != PipelineLayer.GEN.moduleName }.sorted().map { "$it applies Metro; only ${PipelineLayer.GEN.moduleName} may" }
+private fun metroAbiViolations(abiDumps: Map<String, List<String>>): List<String> =
+    abiDumps.toSortedMap().flatMap { (module, dump) ->
+        if (!isPublishedApiModule(module)) return@flatMap emptyList()
+        dump.filter(metroType::containsMatchIn).map { "$module exposes a Metro type: ${it.trim()}" }
+    }

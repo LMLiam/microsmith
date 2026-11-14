@@ -51,7 +51,6 @@ allprojects {
 }
 
 def mainDependencyConfigurations = ['api', 'implementation', 'compileOnly', 'runtimeOnly']
-def metroId = 'dev.zacsweers.metro'
 
 def mainDependencies = { Project module ->
     mainDependencyConfigurations
@@ -65,10 +64,8 @@ def verifyModuleLayersTask = tasks.register('verifyModuleLayers', VerifyModuleLa
             [module.name, mainDependencies(module).findAll { it instanceof ProjectDependency }*.name.unique()]
         }
     })
-    metroModules.set(provider {
-        subprojects.findAll { module ->
-            module.plugins.hasPlugin(metroId) || mainDependencies(module).any { it.group == metroId }
-        }*.name
+    abiDumps.from(provider {
+        subprojects.collect { it.file("api/${it.name}.api") }.findAll { it.exists() }
     })
 }
 

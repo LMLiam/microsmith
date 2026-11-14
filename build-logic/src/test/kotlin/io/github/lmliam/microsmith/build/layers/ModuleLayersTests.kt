@@ -14,7 +14,7 @@ class ModuleLayersTests :
                         "artifact-schemas-protobuf" to listOf("artifact-schemas", "resolve-schemas-protobuf", "dsl"),
                         "gen" to listOf("dsl", "resolve", "artifact", "compile"),
                     ),
-                    metroModules = emptyList(),
+                    abiDumps = emptyMap(),
                 )
 
             violations.shouldBeEmpty()
@@ -24,7 +24,7 @@ class ModuleLayersTests :
             val violations =
                 findModuleLayerViolations(
                     mapOf("dsl-schemas" to listOf("resolve")),
-                    metroModules = emptyList(),
+                    abiDumps = emptyMap(),
                 )
 
             violations.shouldContainExactly("dsl-schemas (dsl) -> resolve (resolve)")
@@ -34,7 +34,7 @@ class ModuleLayersTests :
             val violations =
                 findModuleLayerViolations(
                     mapOf("resolve" to listOf("artifact-schemas")),
-                    metroModules = emptyList(),
+                    abiDumps = emptyMap(),
                 )
 
             violations.shouldContainExactly("resolve (resolve) -> artifact-schemas (artifact)")
@@ -44,7 +44,7 @@ class ModuleLayersTests :
             val violations =
                 findModuleLayerViolations(
                     mapOf("artifact-services" to listOf("compile-services")),
-                    metroModules = emptyList(),
+                    abiDumps = emptyMap(),
                 )
 
             violations.shouldContainExactly("artifact-services (artifact) -> compile-services (compile)")
@@ -54,7 +54,7 @@ class ModuleLayersTests :
             val violations =
                 findModuleLayerViolations(
                     mapOf("compile" to listOf("gen")),
-                    metroModules = emptyList(),
+                    abiDumps = emptyMap(),
                 )
 
             violations.shouldContainExactly("compile (compile) -> gen (gen)")
@@ -67,7 +67,7 @@ class ModuleLayersTests :
                         "artifact-schemas-protobuf" to listOf("dsl-schemas-protobuf"),
                         "compile-schemas-protobuf" to listOf("dsl-schemas-protobuf"),
                     ),
-                    metroModules = emptyList(),
+                    abiDumps = emptyMap(),
                 )
 
             violations.shouldBeEmpty()
@@ -81,7 +81,7 @@ class ModuleLayersTests :
                         "runtime-scripting" to listOf("compile"),
                         "dsl" to listOf("runtime-scripting-api"),
                     ),
-                    metroModules = emptyList(),
+                    abiDumps = emptyMap(),
                 )
 
             violations.shouldBeEmpty()
@@ -94,7 +94,7 @@ class ModuleLayersTests :
                         "resolve" to listOf("gen", "artifact"),
                         "dsl" to listOf("compile"),
                     ),
-                    metroModules = emptyList(),
+                    abiDumps = emptyMap(),
                 )
 
             violations.shouldContainExactly(
@@ -108,19 +108,59 @@ class ModuleLayersTests :
             val violations =
                 findModuleLayerViolations(
                     mapOf("dsl" to listOf("generator", "compiler-tools", "resolver")),
-                    metroModules = emptyList(),
+                    abiDumps = emptyMap(),
                 )
 
             violations.shouldBeEmpty()
         }
 
-        "accepts Metro in gen" {
-            findModuleLayerViolations(emptyMap(), metroModules = listOf("gen")).shouldBeEmpty()
+        "accepts a published API dump without a Metro type" {
+            val dump = listOf("public final class io/github/lmliam/microsmith/dsl/Foo {", "}")
+
+            findModuleLayerViolations(emptyMap(), abiDumps = mapOf("dsl" to dump)).shouldBeEmpty()
         }
 
-        "rejects Metro outside gen" {
-            val violations = findModuleLayerViolations(emptyMap(), metroModules = listOf("compile", "gen"))
+        "rejects a published API dump that mentions a Metro type" {
+            val dump =
+                listOf(
+                    "public abstract interface class io/github/lmliam/microsmith/plugin/Host {",
+                    "\tpublic abstract fun graph ()Ldev/zacsweers/metro/Provider;",
+                    "}",
+                )
 
-            violations.shouldContainExactly("compile applies Metro; only gen may")
+            val violations = findModuleLayerViolations(emptyMap(), abiDumps = mapOf("plugin-api" to dump))
+
+            violations.shouldContainExactly(
+                "plugin-api exposes a Metro type: public abstract fun graph ()Ldev/zacsweers/metro/Provider;",
+            )
+        }
+
+        "rejects a Metro type in the dump of a layer submodule" {
+            val leaky = listOf("public final fun f (Ldev/zacsweers/metro/Provider;)V")
+
+            val violations =
+                findModuleLayerViolations(emptyMap(), abiDumps = mapOf("compile-services-dotnet" to leaky))
+
+            violations.shouldContainExactly(
+                "compile-services-dotnet exposes a Metro type: public final fun f (Ldev/zacsweers/metro/Provider;)V",
+            )
+        }
+
+        "rejects a Metro type in the dump of runtime-scripting-api" {
+            val leaky = listOf("public final fun f (Ldev/zacsweers/metro/Provider;)V")
+
+            val violations = findModuleLayerViolations(emptyMap(), abiDumps = mapOf("runtime-scripting-api" to leaky))
+
+            violations.shouldContainExactly(
+                "runtime-scripting-api exposes a Metro type: public final fun f (Ldev/zacsweers/metro/Provider;)V",
+            )
+        }
+
+        "allows Metro in the dump of gen and of unpublished modules" {
+            val leaky = listOf("public final fun f (Ldev/zacsweers/metro/Provider;)V")
+
+            val dumps = mapOf("gen" to leaky, "cli" to leaky, "runtime-scripting" to leaky)
+
+            findModuleLayerViolations(emptyMap(), abiDumps = dumps).shouldBeEmpty()
         }
     })
