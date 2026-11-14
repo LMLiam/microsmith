@@ -94,7 +94,9 @@ A script can also call `emit(model)` or `generate(model)` to control the output 
 | [Maven plugin](docs/maven.md) | Goal wiring, generated sources, IDE behaviour |
 | [JetBrains IDE helper](docs/ide.md) | Helper project, fallback jar, when to use each |
 | [Plugin resolution](docs/plugins.md) | Resolution, checksums, credentials, cache |
+| [Plugin development](docs/plugin-development.md) | Write a third-party plugin: DSL, resolver, artifacts, compiler, registration, tests |
 | [Architecture](docs/architecture.md) | Pipeline stages, modules, boundaries |
+| [Architecture principles](docs/architecture-principles.md) | Layer rules, typed failures, context parameters, Metro, Mappie |
 | [Contributing](docs/contributing.md) | Kotlin standards, build and quality gates |
 | [Releases](docs/release.md) | Fixtures, validation matrix, distribution |
 | [Troubleshooting](docs/troubleshooting.md) | Common failures and their causes |
