@@ -98,6 +98,21 @@ public final class io/github/lmliam/microsmith/artifact/files/GeneratedFileKt {
 	public static final fun to (Ljava/nio/file/Path;[B)Lio/github/lmliam/microsmith/artifact/files/GeneratedFile;
 }
 
+public final class io/github/lmliam/microsmith/artifact/files/RelativePath {
+	public static final field Companion Lio/github/lmliam/microsmith/artifact/files/RelativePath$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSegments ()Ljava/util/List;
+	public fun hashCode ()I
+	public final fun isRoot ()Z
+	public final fun resolve ([Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/files/RelativePath;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/artifact/files/RelativePath$Companion {
+	public final fun getROOT ()Lio/github/lmliam/microsmith/artifact/files/RelativePath;
+	public final fun of ([Ljava/lang/String;)Lio/github/lmliam/microsmith/artifact/files/RelativePath;
+}
+
 public final class io/github/lmliam/microsmith/artifact/files/TextFileArtifact : io/github/lmliam/microsmith/artifact/Artifact {
 	public fun <init> (Lio/github/lmliam/microsmith/artifact/files/TextFileArtifactId;Ljava/lang/String;)V
 	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/files/TextFileArtifactId;
