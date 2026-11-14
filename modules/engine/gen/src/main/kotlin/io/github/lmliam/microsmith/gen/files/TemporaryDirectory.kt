@@ -1,14 +1,15 @@
 package io.github.lmliam.microsmith.gen.files
 
+import io.github.lmliam.microsmith.plugin.Diagnostic
+import io.github.lmliam.microsmith.plugin.DiagnosticSeverity
+import io.github.lmliam.microsmith.plugin.DiagnosticSink
 import java.io.Closeable
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Comparator
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
-class TemporaryDirectory private constructor(override val root: Path) : FileSpace, Closeable {
+internal class TemporaryDirectory(override val root: Path, private val diagnostics: DiagnosticSink) :
+    FileSpace, Closeable {
     override fun close() {
         runCatching {
             Files.walk(root).use { paths ->
@@ -16,17 +17,13 @@ class TemporaryDirectory private constructor(override val root: Path) : FileSpac
             }
         }
             .onFailure { error ->
-                System.err.println("Failed to cleanup temporary directory '$root': ${error.message}")
-            }
-    }
-
-    companion object {
-        suspend fun create(
-            prefix: String = ".microsmith-gen-temp-",
-            ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-        ) =
-            withContext(ioDispatcher) {
-                TemporaryDirectory(Files.createTempDirectory(prefix + System.currentTimeMillis()))
+                diagnostics.report(
+                    Diagnostic(
+                        severity = DiagnosticSeverity.WARNING,
+                        code = "gen.temporary-directory-cleanup-failed",
+                        message = "Failed to cleanup temporary directory '$root': ${error.message}",
+                    ),
+                )
             }
     }
 }

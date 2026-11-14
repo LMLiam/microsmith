@@ -491,6 +491,7 @@ flowchart TB
 ```
 
 - **`AppGraph`** replaces `MicrosmithGenerationGraph`. The composition roots create it: `Cli.main`, `MicrosmithGradleWorkerMain`, `ProcessIsolatedScriptMain` and `MicrosmithGenerateMojo.execute`. It holds only immutable, class-loader-independent state.
+  - `AppGraph` and `RunGraph` are `internal` to `gen`. A caller that does not apply Metro builds the app graph through `createMicrosmithGenerator`, which takes the seam implementations and returns the `MicrosmithGenerator` entry point. `generate(model, finalDir, pluginClassLoader)` creates one `RunGraph` for each call.
 - **The script run** is built in `runtime-scripting`, from the services that the app graph exposes. It owns the plugin class loader. It exists before compilation, so the script compile cache is available to the compiler.
 - **`RunGraph`** is a `@GraphExtension(RunScope::class)` of `AppGraph`. Its factory takes the plugin class loader. It discovers `MicrosmithPlugin` implementations, sorts them by id, calls `services(host)` on each, and merges the results into the catalog.
 - **A generation run does not need a script run.** `gen` must stay usable without scripting. A programmatic `generate` call with no script uses the caller's class loader.

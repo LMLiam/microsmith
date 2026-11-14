@@ -1,10 +1,8 @@
 package io.github.lmliam.microsmith.artifact.files
 
-import com.github.eventhorizonlab.spi.ServiceProvider
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 
-@ServiceProvider(ArtifactAssembler::class)
 class BinaryFileArtifactAssembler : ArtifactAssembler<BinaryFileArtifact> {
     override val artifactType = BinaryFileArtifact::class
 

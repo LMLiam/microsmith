@@ -1,7 +1,17 @@
+public abstract interface class io/github/lmliam/microsmith/gen/MicrosmithGenerator {
+	public abstract fun generate (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;Lio/github/lmliam/microsmith/gen/files/FileSpace;Ljava/lang/ClassLoader;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun generateTo (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;Ljava/nio/file/Path;Ljava/lang/ClassLoader;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class io/github/lmliam/microsmith/gen/MicrosmithModelGenerationExtensionsKt {
-	public static final fun generate (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;Lio/github/lmliam/microsmith/gen/files/FileSpace;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun generateTo (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;Ljava/nio/file/Path;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun generateTo$default (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;Ljava/nio/file/Path;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun generate (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;Lio/github/lmliam/microsmith/gen/files/FileSpace;Ljava/lang/ClassLoader;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun generate$default (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;Lio/github/lmliam/microsmith/gen/files/FileSpace;Ljava/lang/ClassLoader;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun generateTo (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;Ljava/nio/file/Path;Ljava/lang/ClassLoader;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun generateTo$default (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;Ljava/nio/file/Path;Ljava/lang/ClassLoader;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/lmliam/microsmith/gen/composition/MicrosmithGeneratorFactoryKt {
+	public static final fun createMicrosmithGenerator (Ljava/nio/file/FileSystem;Lkotlin/time/Clock;Lio/github/lmliam/microsmith/plugin/Environment;Lio/github/lmliam/microsmith/plugin/Console;Lio/github/lmliam/microsmith/plugin/DiagnosticSink;Lkotlinx/coroutines/CoroutineDispatcher;)Lio/github/lmliam/microsmith/gen/MicrosmithGenerator;
 }
 
 public final class io/github/lmliam/microsmith/gen/errors/GenerationResolutionFailedException : java/lang/RuntimeException {
@@ -11,41 +21,12 @@ public final class io/github/lmliam/microsmith/gen/errors/GenerationResolutionFa
 }
 
 public final class io/github/lmliam/microsmith/gen/files/DirectorySpace : io/github/lmliam/microsmith/gen/files/FileSpace {
-	public static final field Companion Lio/github/lmliam/microsmith/gen/files/DirectorySpace$Companion;
+	public fun <init> (Ljava/nio/file/Path;)V
 	public fun getRoot ()Ljava/nio/file/Path;
-}
-
-public final class io/github/lmliam/microsmith/gen/files/DirectorySpace$Companion {
-	public final fun from (Ljava/nio/file/Path;)Lio/github/lmliam/microsmith/gen/files/DirectorySpace;
 }
 
 public abstract interface class io/github/lmliam/microsmith/gen/files/FileSpace {
 	public abstract fun getRoot ()Ljava/nio/file/Path;
-}
-
-public final class io/github/lmliam/microsmith/gen/files/TemporaryDirectory : io/github/lmliam/microsmith/gen/files/FileSpace, java/io/Closeable {
-	public static final field Companion Lio/github/lmliam/microsmith/gen/files/TemporaryDirectory$Companion;
-	public fun close ()V
-	public fun getRoot ()Ljava/nio/file/Path;
-}
-
-public final class io/github/lmliam/microsmith/gen/files/TemporaryDirectory$Companion {
-	public final fun create (Ljava/lang/String;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun create$default (Lio/github/lmliam/microsmith/gen/files/TemporaryDirectory$Companion;Ljava/lang/String;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-}
-
-public final class io/github/lmliam/microsmith/gen/files/render/BinaryFileArtifactRenderer : io/github/lmliam/microsmith/artifact/ArtifactRenderer {
-	public fun <init> ()V
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
-	public synthetic fun render (Lio/github/lmliam/microsmith/artifact/Artifact;)Lio/github/lmliam/microsmith/artifact/files/GeneratedFile;
-	public fun render (Lio/github/lmliam/microsmith/artifact/files/BinaryFileArtifact;)Lio/github/lmliam/microsmith/artifact/files/GeneratedFile;
-}
-
-public final class io/github/lmliam/microsmith/gen/files/render/TextFileArtifactRenderer : io/github/lmliam/microsmith/artifact/ArtifactRenderer {
-	public fun <init> ()V
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
-	public synthetic fun render (Lio/github/lmliam/microsmith/artifact/Artifact;)Lio/github/lmliam/microsmith/artifact/files/GeneratedFile;
-	public fun render (Lio/github/lmliam/microsmith/artifact/files/TextFileArtifact;)Lio/github/lmliam/microsmith/artifact/files/GeneratedFile;
 }
 
 public final class io/github/lmliam/microsmith/gen/plugins/MicrosmithPluginCatalog {
@@ -62,6 +43,22 @@ public final class io/github/lmliam/microsmith/gen/plugins/MicrosmithPluginCatal
 
 public final class io/github/lmliam/microsmith/gen/plugins/MicrosmithPluginCatalogKt {
 	public static final fun discoverMicrosmithPlugins (Ljava/lang/ClassLoader;)Lio/github/lmliam/microsmith/gen/plugins/MicrosmithPluginCatalog;
-	public static synthetic fun discoverMicrosmithPlugins$default (Ljava/lang/ClassLoader;ILjava/lang/Object;)Lio/github/lmliam/microsmith/gen/plugins/MicrosmithPluginCatalog;
+}
+
+public final class io/github/lmliam/microsmith/gen/system/ConsoleDiagnosticSink : io/github/lmliam/microsmith/plugin/DiagnosticSink {
+	public fun <init> (Lio/github/lmliam/microsmith/plugin/Console;)V
+	public fun report (Lio/github/lmliam/microsmith/plugin/Diagnostic;)V
+}
+
+public final class io/github/lmliam/microsmith/gen/system/SystemConsole : io/github/lmliam/microsmith/plugin/Console {
+	public fun <init> ()V
+	public fun err (Ljava/lang/String;)V
+	public fun out (Ljava/lang/String;)V
+}
+
+public final class io/github/lmliam/microsmith/gen/system/SystemEnvironment : io/github/lmliam/microsmith/plugin/Environment {
+	public fun <init> ()V
+	public fun property (Ljava/lang/String;)Ljava/lang/String;
+	public fun variable (Ljava/lang/String;)Ljava/lang/String;
 }
 

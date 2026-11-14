@@ -268,13 +268,13 @@ class ChangelogResolverTests :
     })
 ```
 
-Whole pipeline, with real discovery. Put the plugin and the `gen` module on the test classpath, then call the suspend function `MicrosmithModel.generateTo(outputDir)` on a temporary directory and read the files. `ServiceLoader` finds your registrations on the context class loader.
+Whole pipeline, with real discovery. Put the plugin and the `gen` module on the test classpath, then call the suspend function `MicrosmithModel.generateTo(outputDir)` on a temporary directory and read the files. `ServiceLoader` finds your registrations on the class loader that you pass as the optional `pluginClassLoader` argument. It defaults to the class loader of `MicrosmithModel`, which is the test class loader when the plugin is on the test classpath.
 
 Script to file, as a user runs it. `MicrosmithScriptHost().run(ScriptRunRequest(script, outputDir, variables, flags, pluginClasspath = listOf(pluginJar)))` returns a `ScriptRunSuccess`, or a `ScriptRunFailure` whose `type` is `ScriptFailureType.RESOLUTION` and whose `diagnostics` carry your codes. `MicrosmithScriptHostTests` in `runtime-scripting` does this for the built-in plugins.
 
 ## What a plugin does not need to know
 
-- Metro and `MicrosmithGenerationGraph`. Composition is internal to `gen`, and no plugin contract mentions it.
+- Metro and the `AppGraph` and `RunGraph` graphs. Composition is internal to `gen`, and no plugin contract mentions it.
 - Isolation modes. The host runs a script in a class loader or a separate JVM. Your plugin is loaded the same way in both.
 - CLI internals: argument parsing, diagnostics formatting, exit codes, and the plugin cache.
 - Gradle and Maven wiring. They only put your jar on the plugin classpath.

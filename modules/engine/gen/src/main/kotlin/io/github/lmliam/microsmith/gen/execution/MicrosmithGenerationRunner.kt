@@ -2,37 +2,32 @@ package io.github.lmliam.microsmith.gen.execution
 
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
-import io.github.lmliam.microsmith.artifact.ArtifactContributionService
-import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssemblyService
-import io.github.lmliam.microsmith.compile.ArtifactCompilationService
 import io.github.lmliam.microsmith.dsl.MicrosmithModel
-import io.github.lmliam.microsmith.gen.MicrosmithGenerationScope
+import io.github.lmliam.microsmith.gen.RunScope
 import io.github.lmliam.microsmith.gen.errors.GenerationResolutionFailedException
 import io.github.lmliam.microsmith.gen.files.FileSpace
-import io.github.lmliam.microsmith.gen.files.TemporaryDirectory
+import io.github.lmliam.microsmith.gen.files.TemporaryDirectories
 import io.github.lmliam.microsmith.gen.output.GeneratedOutputUniquenessValidator
 import io.github.lmliam.microsmith.gen.output.GeneratedOutputWriter
-import io.github.lmliam.microsmith.gen.render.ArtifactRenderingService
 import io.github.lmliam.microsmith.resolve.DomainResolutionService
 import io.github.lmliam.microsmith.resolve.ResolutionOutcome
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnosticService
 import java.nio.file.Path
 
 @Inject
-@SingleIn(MicrosmithGenerationScope::class)
+@SingleIn(RunScope::class)
 internal class MicrosmithGenerationRunner(
     private val domainResolutionService: DomainResolutionService,
     private val resolutionDiagnosticService: ResolutionDiagnosticService,
-    private val artifactContributionService: ArtifactContributionService,
-    private val artifactAssemblyService: ArtifactAssemblyService,
-    private val artifactCompilationService: ArtifactCompilationService,
-    private val artifactRenderingService: ArtifactRenderingService,
+    private val artifactPipeline: ArtifactGenerationPipeline,
     private val uniquenessValidator: GeneratedOutputUniquenessValidator,
     private val outputWriter: GeneratedOutputWriter,
+    private val temporaryDirectories: TemporaryDirectories,
+    private val progressReporter: GenerationProgressReporter,
 ) {
     suspend fun generate(model: MicrosmithModel, finalDir: FileSpace): List<Path> {
         val outputs =
-            TemporaryDirectory.create().use { tempSpace ->
+            temporaryDirectories.create().use { tempSpace ->
                 val resolvedModels =
                     when (val resolution = domainResolutionService.resolve(model)) {
                         is ResolutionOutcome.Success -> resolution.models
@@ -46,10 +41,7 @@ internal class MicrosmithGenerationRunner(
                         }
                     }
 
-                val contributions = artifactContributionService.contribute(resolvedModels)
-                val assembly = artifactAssemblyService.assemble(contributions)
-                val compiledAssembly = artifactCompilationService.compile(assembly)
-                val generatedFiles = artifactRenderingService.render(compiledAssembly)
+                val generatedFiles = artifactPipeline.generate(resolvedModels)
 
                 uniquenessValidator.requireUniqueOutputPaths(generatedFiles)
                 outputWriter.write(generatedFiles, tempSpace)
@@ -59,7 +51,7 @@ internal class MicrosmithGenerationRunner(
 
         outputWriter.write(outputs, finalDir)
 
-        GenerationProgressReporter.reportModelGenerationComplete(finalDir)
+        progressReporter.reportModelGenerationComplete(finalDir)
 
         return outputWriter.outputRoots(outputs, finalDir)
     }

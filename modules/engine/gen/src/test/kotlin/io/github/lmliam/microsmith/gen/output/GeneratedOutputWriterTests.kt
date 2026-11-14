@@ -8,6 +8,7 @@ import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.nio.file.Files
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 class GeneratedOutputWriterTests :
     StringSpec(
@@ -19,7 +20,7 @@ class GeneratedOutputWriterTests :
                     Files.createDirectories(existingProtoFile.parent)
                     Files.writeString(existingProtoFile, "stale")
 
-                    GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem))
+                    GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
                         .write(
                             outputs =
                                 listOf(
@@ -29,7 +30,7 @@ class GeneratedOutputWriterTests :
                                         outputRoot = RelativePath.of("services", "UserService"),
                                     ),
                                 ),
-                            space = DirectorySpace.from(outputRoot),
+                            space = DirectorySpace(outputRoot),
                         )
 
                     Files.readString(existingProtoFile) shouldBe "fresh"
@@ -40,7 +41,7 @@ class GeneratedOutputWriterTests :
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
                     val outputRoot = fileSystem.getPath("/repo-root")
 
-                    GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem))
+                    GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
                         .write(
                             outputs =
                                 listOf(
@@ -50,7 +51,7 @@ class GeneratedOutputWriterTests :
                                         outputRoot = RelativePath.of("dotnet", "Platform"),
                                     ),
                                 ),
-                            space = DirectorySpace.from(outputRoot),
+                            space = DirectorySpace(outputRoot),
                         )
 
                     Files.readString(outputRoot.resolve("dotnet/Platform/Generated/Contracts/Models.cs")) shouldBe
@@ -63,19 +64,30 @@ class GeneratedOutputWriterTests :
                     val outputRoot = fileSystem.getPath("/repo-root")
                     val bytes = byteArrayOf(0, 1, 2, -1, -128, 127)
 
-                    GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem))
+                    GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
                         .write(
                             outputs = listOf(GeneratedFile(RelativePath.of("blob.bin"), bytes)),
-                            space = DirectorySpace.from(outputRoot),
+                            space = DirectorySpace(outputRoot),
                         )
 
                     Files.readAllBytes(outputRoot.resolve("blob.bin")).toList() shouldBe bytes.toList()
                 }
             }
 
+            "write creates the output directory when there are no outputs" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    val outputRoot = fileSystem.getPath("/repo-root")
+
+                    GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
+                        .write(outputs = emptyList(), space = DirectorySpace(outputRoot))
+
+                    Files.isDirectory(outputRoot) shouldBe true
+                }
+            }
+
             "outputRoots lists each distinct output root once in sorted order" {
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
-                    val space = DirectorySpace.from(fileSystem.getPath("/repo-root"))
+                    val space = DirectorySpace(fileSystem.getPath("/repo-root"))
                     val outputs =
                         listOf(
                             GeneratedFile(RelativePath.of("B.cs"), byteArrayOf(), RelativePath.of("services", "B")),
@@ -84,7 +96,8 @@ class GeneratedOutputWriterTests :
                             GeneratedFile(RelativePath.of("root.txt"), byteArrayOf()),
                         )
 
-                    GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem)).outputRoots(outputs, space) shouldBe
+                    GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
+                        .outputRoots(outputs, space) shouldBe
                         listOf(
                             fileSystem.getPath("/repo-root"),
                             fileSystem.getPath("/repo-root/services/A"),

@@ -66,7 +66,9 @@ Poor fit:
 
 Metro wires the generation pipeline together. It stays out of every published API:
 
-- `MicrosmithGenerationGraph` is an `internal` graph. It builds the services from a `MicrosmithPluginCatalog`.
+- `AppGraph` is an `internal` graph that lives for the JVM. It holds the injected seams (file system, clock, environment, console, diagnostic sink, dispatcher) and nothing that depends on the plugin class loader. `createMicrosmithGenerator` builds it from the seam implementations that the caller passes in.
+- `RunGraph` is an `internal` graph extension that `MicrosmithGenerator.generate` creates for each call. It takes the plugin class loader explicitly, discovers the plugins with it, binds the built-in text and binary renderers and assemblers, and builds the pipeline services. Two concurrent calls share no run state.
+- `gen` has no `object` that holds behaviour. Progress and warnings go to the injected `DiagnosticSink`. `gen` reads the process environment and system properties only in `SystemEnvironment`, and writes to the standard streams only in `SystemConsole`. detekt bans the other calls that reach them.
 - No public plugin API mentions Metro. Plugin contracts are plain interfaces such as `DomainResolver` and `ArtifactCompiler`.
 - Any module may use Metro internally, but a published API module must not mention a Metro type in its ABI dump. `verifyModuleLayers` enforces this.
 
@@ -74,10 +76,11 @@ Metro wires the generation pipeline together. It stays out of every published AP
 
 Plugins join the pipeline through `java.util.ServiceLoader`, nothing else.
 
-- `discoverMicrosmithPlugins` fills a `MicrosmithPluginCatalog` with every `DomainResolver`, `ArtifactContributor`, `ArtifactAssembler`, `ArtifactCompiler`, `ArtifactRenderer`, and `ResolutionIssueDiagnosticMapper` it finds.
+- `discoverMicrosmithPlugins(classLoader)` fills a `MicrosmithPluginCatalog` with every `DomainResolver`, `ArtifactContributor`, `ArtifactAssembler`, `ArtifactCompiler`, `ArtifactRenderer`, and `ResolutionIssueDiagnosticMapper` it finds.
 - `ScriptSymbolContributorRegistry` does the same for `ScriptSymbolContributor`.
-- Both read the thread context class loader and fall back to their own.
-- The CLI resolves `--plugin` and `--plugin-jar` into a plugin classpath. The script host wraps it in a `URLClassLoader` and sets it as the context class loader for the run. See [Plugin resolution](plugins.md).
+- `discoverMicrosmithPlugins` reads the class loader that the run graph gives it. `ScriptSymbolContributorRegistry` reads the thread context class loader and falls back to its own.
+- `TextFileArtifact` and `BinaryFileArtifact` are not discovered. The run graph binds their assemblers and renderers.
+- The CLI resolves `--plugin` and `--plugin-jar` into a plugin classpath. The script host wraps it in a `URLClassLoader` and sets it as the context class loader for the run, and passes it to `generate`. See [Plugin resolution](plugins.md).
 - The Gradle plugin passes the `microsmithPlugins` configuration as that classpath to its worker JVM. See [Gradle plugin](gradle.md).
 - The Maven plugin loads the `<dependencies>` of its `<plugin>` entry. See [Maven plugin](maven.md).
 
