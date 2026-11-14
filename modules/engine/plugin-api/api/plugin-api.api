@@ -3,9 +3,23 @@ public abstract interface class io/github/lmliam/microsmith/plugin/Console {
 	public abstract fun out (Ljava/lang/String;)V
 }
 
+public final class io/github/lmliam/microsmith/plugin/Diagnostic {
+	public fun <init> (Lio/github/lmliam/microsmith/plugin/DiagnosticSeverity;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun getCode ()Ljava/lang/String;
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getSeverity ()Lio/github/lmliam/microsmith/plugin/DiagnosticSeverity;
+}
+
+public final class io/github/lmliam/microsmith/plugin/DiagnosticSeverity : java/lang/Enum {
+	public static final field INFO Lio/github/lmliam/microsmith/plugin/DiagnosticSeverity;
+	public static final field WARNING Lio/github/lmliam/microsmith/plugin/DiagnosticSeverity;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/plugin/DiagnosticSeverity;
+	public static fun values ()[Lio/github/lmliam/microsmith/plugin/DiagnosticSeverity;
+}
+
 public abstract interface class io/github/lmliam/microsmith/plugin/DiagnosticSink {
-	public abstract fun info (Ljava/lang/String;)V
-	public abstract fun warn (Ljava/lang/String;)V
+	public abstract fun report (Lio/github/lmliam/microsmith/plugin/Diagnostic;)V
 }
 
 public abstract interface class io/github/lmliam/microsmith/plugin/Environment {
