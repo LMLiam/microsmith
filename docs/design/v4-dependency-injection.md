@@ -1,6 +1,6 @@
 # Dependency injection in 4.0
 
-**Status:** Proposed
+**Status:** Accepted
 
 **Milestone:** v4.0.0, together with #203 (explicit API mode)
 
@@ -14,8 +14,11 @@ In 4.0:
 - The host has three nested lifetimes: the app (one per JVM), the script run (one per script) and the generation run (one per `generate` call, with its own Metro graph).
 - Plugins join through two contracts: `MicrosmithPlugin`, which is required, and `MicrosmithScriptingPlugin`, which is only for plugins that add script symbols.
 - Each plugin has a stable id, builds its own graph from the host services it is given, and is closed when its generation run ends. No Metro type crosses the plugin boundary.
+- A plugin declares only its `id`. Compatibility follows the semver of the plugin API module.
+- Third-party plugins that use Metro relocate their Metro runtime, if a slice 0 spike shows that this works. If not, hand-wiring is the recommended route, and Metro is supported for built-ins only.
 - I/O, time and processes sit behind injected seams, so unit tests can replace them. Plugins receive five of them through `HostServices`.
-- The host API is `suspend` from each composition root down, so cancellation reaches generation and child processes.
+- The host API is `suspend` from each composition root down, so cancellation reaches generation and child processes. The plugin API stays non-`suspend`.
+- The host may call one plugin's services concurrently within a generation run. Plugin services must be stateless or thread-safe.
 - The change ships with #203 and moves one module family at a time.
 
 ## The design at a glance
@@ -290,6 +293,8 @@ public interface PluginServices : AutoCloseable {
 }
 ```
 
+**Concurrency rule.** The host may call one plugin's services from several threads at once within a generation run, for example when it renders in parallel. Plugin services must be stateless or thread-safe within a generation run. A plugin author must not assume that calls are sequential.
+
 The optional contract lives in `runtime-scripting-api`. Its name and shape here are illustrative.
 
 ```kotlin
@@ -346,6 +351,7 @@ public class ProtobufScriptingPlugin : MicrosmithScriptingPlugin {
 
 - A plugin cannot replace a host service.
 - Plugins cannot inject each other's services. They meet only through pipeline models: resolved models, artifacts and contributions.
+- Plugin services must be stateless or thread-safe, because the host may call them concurrently within a generation run. A plugin that needs state must synchronise it. Option a, never calling a plugin concurrently, was rejected: it would make rendering sequential, and tightening the contract after 4.0 would break plugins.
 
 #### Built-in plugins
 
@@ -402,10 +408,17 @@ No Metro type crosses the boundary, so a plugin may use Metro or not. But a plug
 | Plugin kind | Which Metro runtime runs | What follows |
 |---|---|---|
 | Built-in | The host's. It is compiled with the host. | Always matches. |
-| Third-party, uses Metro | The host's. Plugin class loaders are parent-first, so a Metro runtime bundled unrelocated in the plugin jar is ignored. | Works only against the exact Metro version the host ships. |
+| Third-party, uses Metro, unrelocated | The host's. Plugin class loaders are parent-first, so a Metro runtime bundled unrelocated in the plugin jar is ignored. | Works only against the exact Metro version the host ships. |
+| Third-party, uses Metro, relocated | Its own, under a relocated package name. | No coupling, if the slice 0 spike shows that relocation works. |
 | Third-party, hand-wired | None. | No coupling. |
 
-Metro does not guarantee that generated code is compatible with a runtime version other than the one it was compiled against (see [Metro's stability page](https://zacsweers.github.io/metro/latest/stability)). So a microsmith release that bumps Metro can break a third-party Metro plugin without any change to the microsmith plugin API. A mismatch shows up as a `LinkageError` inside `services(host)`. The host reports it as described in [Plugin identity, ordering, conflicts and failure](#plugin-identity-ordering-conflicts-and-failure). The policy for third-party plugins is [open question 14](#14-metro-policy-for-third-party-plugins).
+Metro does not guarantee that generated code is compatible with a runtime version other than the one it was compiled against (see [Metro's stability page](https://zacsweers.github.io/metro/latest/stability)). So a microsmith release that bumps Metro can break a third-party Metro plugin without any change to the microsmith plugin API. A mismatch shows up as a `LinkageError` inside `services(host)`. The host reports it as described in [Plugin identity, ordering, conflicts and failure](#plugin-identity-ordering-conflicts-and-failure).
+**Policy for third-party plugins.** A third-party plugin that uses Metro relocates (shades) its own Metro runtime, so it is self-contained. This is safe by design, because no Metro type crosses the boundary. Slice 0 runs a spike to prove it: a plugin with a relocated Metro runtime must load and run against a host that ships a different Metro version.
+
+- If the spike succeeds, relocation is the policy, and the plugin documentation shows how to do it.
+- If it fails, hand-wiring is the recommended route for third-party plugins, and Metro is supported for built-ins only. The plugin documentation then says so.
+
+Asking authors to compile against the exact Metro version of each release was rejected. It breaks plugins on a minor release, and it needs release notes that flag every Metro bump.
 
 ### Host composition
 
@@ -722,6 +735,8 @@ Changes to `AGENTS.md`:
 
 `MicrosmithPlugin` has a `public val id: String`. The id is stable, unique and reverse-DNS style, such as `io.github.lmliam.microsmith.protobuf`. The host uses it to sort plugins and to name them in diagnostics.
 
+A plugin declares only its `id`. It does not declare a `version` or an `apiVersion`. Compatibility is defined by the semver of the plugin API module (see [Compatibility expectation](#compatibility-expectation)). A declared `apiVersion` was not added, because the host reads it by instantiating the class, and that is the step that fails when the API is incompatible. So it could not give the clear error it promises. A check that works would have to read jar metadata without loading classes. It can be added later without breaking plugins.
+
 #### Order
 
 The host sorts discovered plugins by `id` before it calls `services`. Generated output must never depend on `ServiceLoader` order, class path order or `Set` iteration order.
@@ -773,7 +788,7 @@ Today `loadServices` does not catch anything. A broken plugin surfaces as a `Ser
 
 #### Compatibility expectation
 
-The plugin API follows semver, and the ABI dumps from #207 check it. A plugin built against 4.x runs on any later 4.y. A `LinkageError` at the boundary is reported as an incompatible plugin, not as a raw stack trace. A plugin that uses Metro has a stricter limit: see [Metro across the plugin boundary](#metro-across-the-plugin-boundary).
+The plugin API follows semver, and the ABI dumps from #207 check it. A plugin built against 4.x runs on any later 4.y. This is the whole compatibility contract: there is no declared `apiVersion`. A `LinkageError` at the boundary is reported as an incompatible plugin, not as a raw stack trace. A plugin that uses Metro has a stricter limit: see [Metro across the plugin boundary](#metro-across-the-plugin-boundary).
 
 ### Coroutines and `suspend`
 
@@ -853,7 +868,7 @@ What this shows:
    ```
 4. **The plugin API stays non-`suspend` in 4.0.** Every service interface is a pure CPU transform, and `services(host)` only builds objects. `suspend` would colour every plugin and add nothing. The host checks for cancellation between units of work: between domains, between artifacts and between files.
 5. **The dispatcher is a host binding** (settled question 8). Choosing a dispatcher is separate from being `suspend`. Code is `suspend` where it awaits something or must be cancellable. It is not `suspend` merely to reach `Dispatchers.IO`.
-6. **Parallelism is used only where items are independent.** The order of results is fixed by collecting them in input order. Writing files comes first, because it is I/O bound and `GeneratedOutputUniquenessValidator` has already guaranteed that no two outputs share a path. Rendering runs in parallel in slice 0 if [open question 12](#12-concurrent-calls-into-one-plugins-services) is answered b, so that the contract is tested from the start. Compiling follows only if a benchmark on a large model shows a gain. There is no `Flow`: the pipeline is a batch transform, not a stream.
+6. **Parallelism is used only where items are independent.** The order of results is fixed by collecting them in input order. Writing files comes first, because it is I/O bound and `GeneratedOutputUniquenessValidator` has already guaranteed that no two outputs share a path. Rendering runs in parallel in slice 0, so that the [concurrency rule for plugin services](#plugin-api) is tested from the start. Compiling follows only if a benchmark on a large model shows a gain. There is no `Flow`: the pipeline is a batch transform, not a stream.
 7. **`FileSystem` stays the blocking `java.nio` API.** Host code that does file I/O wraps it on the I/O dispatcher.
 
 #### Coroutines in 4.0
@@ -882,7 +897,7 @@ flowchart TB
 
 #### What this costs
 
-- **Thread-safety obligations.** The host runs file writes in parallel and Maven runs generations in parallel. Whether plugin services may also be called concurrently is [open question 12](#12-concurrent-calls-into-one-plugins-services).
+- **Thread-safety obligations.** The host runs file writes in parallel and Maven runs generations in parallel. Plugin services may also be called concurrently within a generation run, so plugin authors take on the [concurrency rule](#plugin-api) too.
 - **Tests.** Tests of `suspend` code need `runTest` with a test dispatcher bound in place of the host's dispatcher.
 - **The class loader.** Today `defaultPluginClassLoader()` reads the thread context class loader, which belongs to one thread. Work that moves to another dispatcher can see a different one. The generation run takes the plugin class loader explicitly, as [Host composition](#host-composition) says.
 
@@ -931,7 +946,7 @@ internal class IndexedPluginServices(private val index: OpenIndex) : PluginServi
 | A failing `close` does not stop the others | The remaining plugins still close. |
 | Class loader last | The script run closes the plugin class loader after all its generation runs have closed. |
 
-**Guidance for plugin authors.** Plugin services should be stateless transforms. They should not hold executors, watchers or connections. Nothing a plugin creates may outlive its generation run. That is also what keeps the plugin class loader collectable.
+**Guidance for plugin authors.** Plugin services should be stateless transforms, and they must be thread-safe (see the [concurrency rule](#plugin-api)). They should not hold executors, watchers or connections. Nothing a plugin creates may outlive its generation run. That is also what keeps the plugin class loader collectable.
 
 **The app graph has nothing to close.** It holds no resources, by the rule in [Lifetimes](#lifetimes).
 
@@ -972,10 +987,10 @@ A real sandbox would need process isolation and an RPC boundary. That is out of 
 | Risk | Detail |
 |---|---|
 | Compiler-plugin coupling | Metro is a Kotlin compiler plugin, and each Metro release supports a narrow range of Kotlin versions. Today only `gen` is coupled. After this change, every module that uses Metro, and every third-party plugin that chooses to, must upgrade Kotlin and Metro together. A hand-wired plugin has no such coupling. |
-| Metro runtime across the plugin boundary | A third-party plugin that uses Metro works only against the exact Metro version the host ships, so a microsmith release that bumps Metro can break it with no change to the plugin API. A hand-wired plugin has no such coupling. See [Metro across the plugin boundary](#metro-across-the-plugin-boundary) and [open question 14](#14-metro-policy-for-third-party-plugins). |
+| Metro runtime across the plugin boundary | A third-party plugin that uses Metro works only against the exact Metro version the host ships, so a microsmith release that bumps Metro can break it with no change to the plugin API. A hand-wired plugin has no such coupling. The policy is relocation if the slice 0 spike proves it, and hand-wiring otherwise. See [Metro across the plugin boundary](#metro-across-the-plugin-boundary). |
 | Every third-party plugin must migrate | The seven `META-INF/services` registrations become one `MicrosmithPlugin`, plus a `MicrosmithScriptingPlugin` if the plugin adds script symbols, and every plugin gains an `id`. This is a 4.0 breaking change. The release notes need a migration section, and [Plugin development](../plugin-development.md) needs a rewrite. |
 | Two kinds of checking | Metro checks a plugin's graph when the plugin compiles. The boundary between host and plugin is checked at run time: a missing or failing `MicrosmithPlugin` shows up only when a generation run discovers it. The boundary is deliberately small: two entry interfaces that each carry an `id` and one member that hands over plugin content, plus `HostServices` and `PluginServices`. |
-| Concurrency obligations | Parallel Maven builds and parallel file writes need thread-safe seams. If [open question 12](#12-concurrent-calls-into-one-plugins-services) is answered b, every plugin author also takes on that obligation. |
+| Concurrency obligations | Parallel Maven builds and parallel file writes need thread-safe seams. Every plugin author also takes on the obligation that plugin services are stateless or thread-safe, because the host calls them concurrently within a generation run. |
 | Size | About 724 main files across 38 published modules, plus #203's 1,391 explicit-API warnings. Splitting by module family keeps each pull request reviewable. |
 | Host API becomes `suspend` | The script host, the CLI, the Gradle worker and the Maven mojo all change signature. Slices 4 and 5 carry this. |
 
@@ -1008,7 +1023,7 @@ What each slice adds beyond injection and visibility:
 
 | # | Added work |
 |---|---|
-| 0 | Plugin `id`, sort by id, duplicate and conflict errors that name both plugin ids, and the failure rules. `PluginServices` as `AutoCloseable`, and the generation-run lifecycle. The per-plugin `HostServices` view with its tagged `DiagnosticSink`. The file-system-independent path type and the moves of `ArtifactRenderer` and `GeneratedFile`. `kotlin.time.Clock`. The `suspend` `ProcessLauncher` interface and the dispatcher as a host binding. The `suspend` generation API with parallel file writing, and parallel rendering if [open question 12](#12-concurrent-calls-into-one-plugins-services) is answered b. The [acceptance tests](#acceptance-tests-for-slice-0). |
+| 0 | Plugin `id`, sort by id, duplicate and conflict errors that name both plugin ids, and the failure rules. `PluginServices` as `AutoCloseable`, and the generation-run lifecycle. The per-plugin `HostServices` view with its tagged `DiagnosticSink`. The file-system-independent path type and the moves of `ArtifactRenderer` and `GeneratedFile`. `kotlin.time.Clock`. The `suspend` `ProcessLauncher` interface and the dispatcher as a host binding. The `suspend` generation API with parallel file writing, and parallel rendering, which exercises the plugin concurrency rule. A spike that relocates the Metro runtime of a plugin. The [acceptance tests](#acceptance-tests-for-slice-0). |
 | 4 | `MicrosmithScriptingPlugin` and the script run graph. The `ScriptingHostConfiguration` key for the symbol registry. The `suspend` `MicrosmithScriptHost.run` chain, the cancellable bridge and `TimeSource` in `ScriptEvaluator`. Land #204 before this slice. |
 | 5 | One `runBlocking` in each composition root. `ProcessLauncher` implementations that cancel and destroy processes. Thread-safe `Console` and diagnostic emitters. Land #205 with this slice. |
 
@@ -1073,16 +1088,17 @@ Slice 0 automates these scenarios as integration tests. Each one composes severa
 | Repeated script runs with different plugin class loaders | No stale instances survive a script run. The class loader becomes collectable. |
 | The pipeline fails midway | Every plugin's `PluginServices` is still closed, in reverse order. |
 | Shuffled discovery order | Output is byte-identical whatever the `ServiceLoader` order. |
-| A Metro-using plugin against a different Metro runtime | Behaviour matches the outcome of [open question 14](#14-metro-policy-for-third-party-plugins): a clear incompatibility report, or a working relocated plugin. |
+| Parallel rendering with a plugin that holds no state | The host calls one plugin's services concurrently within a generation run, and the output is byte-identical to a sequential run. |
+| A Metro-using plugin against a different Metro runtime | Follows the [Metro policy](#metro-across-the-plugin-boundary). A relocated plugin works, or, if the spike fails, an unrelocated plugin is reported as incompatible. |
 
 Most of these are plain host behaviour. They are ordinary tests, written with the foundation slice. Two carry a real unknown and need a spike first:
 
-- **The Metro version case.** It is not yet known whether relocating a plugin's Metro runtime works.
+- **The Metro version case.** It is not yet known whether relocating a plugin's Metro runtime works. The spike decides the [Metro policy](#metro-across-the-plugin-boundary).
 - **Class loader collectability.** It is not yet known what keeps a plugin class loader reachable after a script run, such as thread locals, shutdown hooks or cached reflection data.
 
 ## Settled questions
 
-The ten questions that were open on the first draft now have outcomes. The numbers are kept so that earlier discussion still maps.
+The fourteen questions that were open during review now have outcomes. The numbers are kept so that earlier discussion still maps.
 
 | # | Question | Outcome | Where |
 |---|---|---|---|
@@ -1096,55 +1112,9 @@ The ten questions that were open on the first draft now have outcomes. The numbe
 | 8 | Coroutine dispatcher | A host binding, not exposed to plugins. | [I/O seams](#io-seams), [Coroutines and `suspend`](#coroutines-and-suspend) |
 | 9 | Clock type | `kotlin.time.Clock`, which is stable since Kotlin 2.3. A separate `TimeSource` measures durations. | [Time: two seams](#time-two-seams) |
 | 10 | Overlap with #204 and #205 | Land #204 before slice 4, and #205 with slice 5. | [Migration plan](#migration-plan) |
-
-## Open questions
-
-Answer by number.
-
-### 11. Coroutine direction
-
-**Problem.** The host is `suspend` in `gen` only, with one `runBlocking` buried in the script host. Processes cannot be cancelled and nothing runs concurrently. [Coroutines and `suspend`](#coroutines-and-suspend) describes the three directions.
-
-**Options.**
-
-- a. Keep as is, and only move the dispatcher to a host binding.
-- b. Structured concurrency in the host. Plugin contracts stay blocking.
-- c. `suspend` everywhere, including the plugin contracts.
-
-**Recommendation.** b. It gives cancellation, timeouts and safe parallel writes, and it costs plugin authors nothing. Option a keeps today's gaps. Option c colours every plugin for no gain, because every service interface is a pure CPU transform. The Decision section already assumes b.
-
-### 12. Concurrent calls into one plugin's services
-
-**Problem.** May the host call one plugin's services from several threads within a generation run? Parallel rendering needs it. The answer becomes part of the plugin contract, and it cannot be tightened later without breaking plugins.
-
-**Options.**
-
-- a. Never. Plugin calls stay sequential, and only host I/O is parallel.
-- b. Yes. The contract says that plugin services must be stateless or thread-safe within a generation run.
-
-**Recommendation.** b. Declare it in 4.0, and exercise it with parallel rendering in slice 0, so the contract is tested from the start. Adding it after 4.0 would be a breaking change. The cost is real: every plugin author takes on the obligation.
-
-### 13. A plugin descriptor beyond `id`
-
-**Problem.** Should a plugin declare more about itself than an `id`?
-
-**Options.**
-
-- a. `id` only. Compatibility is defined by the semver of the plugin API module, and by `LinkageError` reporting.
-- b. Also a self-declared `version` and `apiVersion`.
-
-**Recommendation.** a. A declared `apiVersion` is read by instantiating the class. That is exactly what fails when the API is incompatible, so it cannot give the clear error it promises. A check that works would have to read jar metadata without loading classes. That can be added later without breaking plugins.
-
-### 14. Metro policy for third-party plugins
-
-**Problem.** A third-party plugin that uses Metro works only against the Metro version the host ships. See [Metro across the plugin boundary](#metro-across-the-plugin-boundary). What do we ask of plugin authors?
-
-**Options.**
-
-- a. Third-party plugins compile against the exact Metro version that microsmith publishes for each release. Release notes flag every Metro bump as "rebuild Metro-based plugins".
-- b. Third-party plugins that use Metro relocate (shade) their own Metro runtime, so they are self-contained. This is safe by design, because no Metro type crosses the boundary.
-- c. Document hand-wiring as the recommended route for third-party plugins, and support Metro for built-ins only.
-
-**Recommendation.** b if a slice 0 spike proves that relocation works. Otherwise c. Option a alone is weak: it breaks plugins on a minor release.
+| 11 | Coroutine direction | Structured concurrency in the host. The plugin API stays non-`suspend`. Option a kept today's gaps, and option c would colour every plugin for no gain. | [Coroutines and `suspend`](#coroutines-and-suspend) |
+| 12 | Concurrent calls into one plugin's services | The host may call them concurrently within a generation run. Plugin services must be stateless or thread-safe. Parallel rendering in slice 0 exercises it. | [Plugin API](#plugin-api) |
+| 13 | A plugin descriptor beyond `id` | `id` only. Compatibility follows the semver of the plugin API module, and a `LinkageError` at the boundary is reported as an incompatible plugin. | [Identity](#identity) |
+| 14 | Metro policy for third-party plugins | Relocate the Metro runtime, if a slice 0 spike proves that it works. Otherwise hand-wiring is the recommended route, and Metro is supported for built-ins only. | [Metro across the plugin boundary](#metro-across-the-plugin-boundary) |
 
 [Back to the README](../../README.md)
