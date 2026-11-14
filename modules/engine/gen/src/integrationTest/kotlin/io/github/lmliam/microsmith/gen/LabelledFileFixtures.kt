@@ -31,7 +31,7 @@ object ResolutionRendezvous {
     private const val RENDEZVOUS_TIMEOUT_SECONDS = 30L
 }
 
-abstract class LabelResolver(private val label: String) : DomainResolver<LabelExtension, LabelledModel> {
+open class LabelResolver(private val label: String) : DomainResolver<LabelExtension, LabelledModel> {
     override val authoringType = LabelExtension::class
     override val resolvedType = LabelledModel::class
 

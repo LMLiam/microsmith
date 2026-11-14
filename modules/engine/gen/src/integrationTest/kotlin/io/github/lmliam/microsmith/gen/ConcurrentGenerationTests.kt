@@ -1,20 +1,14 @@
 package io.github.lmliam.microsmith.gen
 
-import io.github.lmliam.microsmith.gen.composition.createMicrosmithGenerator
-import io.github.lmliam.microsmith.gen.files.DirectorySpace
-import io.github.lmliam.microsmith.gen.system.SystemConsole
-import io.github.lmliam.microsmith.gen.system.SystemEnvironment
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
-import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.CyclicBarrier
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
-import kotlin.time.Clock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -25,15 +19,7 @@ private class ConcurrentRuns(val firstOutput: Path, val secondOutput: Path, val 
 
 private suspend fun runTwoGenerationsAtOnce(dispatcher: CoroutineDispatcher = Dispatchers.IO): ConcurrentRuns {
     val diagnostics = RecordingDiagnosticSink()
-    val generator =
-        createMicrosmithGenerator(
-            fileSystem = FileSystems.getDefault(),
-            clock = Clock.System,
-            environment = SystemEnvironment(),
-            console = SystemConsole(),
-            diagnostics = diagnostics,
-            ioDispatcher = dispatcher,
-        )
+    val generator = testGenerator(diagnostics, dispatcher)
     val firstOutput = Files.createTempDirectory("microsmith-concurrent-first-")
     val secondOutput = Files.createTempDirectory("microsmith-concurrent-second-")
     ResolutionRendezvous.barrier = CyclicBarrier(2)
@@ -42,16 +28,16 @@ private suspend fun runTwoGenerationsAtOnce(dispatcher: CoroutineDispatcher = Di
         coroutineScope {
             listOf(
                     async(dispatcher) {
-                        generator.generate(
+                        generator.generateTo(
                             labelledModel(),
-                            DirectorySpace(firstOutput),
+                            firstOutput,
                             labelClassLoader(FirstLabelResolver::class),
                         )
                     },
                     async(dispatcher) {
-                        generator.generate(
+                        generator.generateTo(
                             labelledModel(),
-                            DirectorySpace(secondOutput),
+                            secondOutput,
                             labelClassLoader(SecondLabelResolver::class),
                         )
                     },
