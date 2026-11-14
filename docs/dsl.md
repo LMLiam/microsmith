@@ -16,19 +16,74 @@ val typedExtensions = model.extensions().filterIsInstance<YourExtensionType>()
 
 ### Protobuf schema DSL
 
+Declare messages and enums, then refer to them by name as typed values. A literal `message("Name")` or `enum("Name")` inside `protobuf { }` gives the script a value called `Name`, of type `MessageRef` or `EnumRef`.
+
 ```kotlin
 microsmith {
     schemas {
         protobuf {
-            message("UserCreated") {
-                int32("id") { index(1) }
-                string("email") { index(2) }
+            service("UserService") {
+                "GetUser" {
+                    request(GetUserRequest)
+                    response(GetUserResponse)
+                }
+                "WatchUsers" {
+                    request(WatchUsersRequest)
+                    response(WatchUsersResponse) { stream() }
+                }
             }
+
+            message("GetUserRequest") {
+                int32("id") { index(1) }
+            }
+
+            message("GetUserResponse") {
+                string("email") { index(1) }
+                ref("status", UserStatus) { index(2) }
+            }
+
+            message("WatchUsersRequest")
+            message("WatchUsersResponse")
 
             enum("UserStatus") {
                 +"ACTIVE"
                 +"DISABLED"
             }
+        }
+    }
+}
+```
+
+An enum gets a generated `USER_STATUS_UNSPECIFIED = 0` value unless one of its values claims index 0, as in `value("OK") { index(0) }`. Values without an index are numbered from 1.
+
+Typed references behave like this:
+
+- symbols exist in `.microsmith.kts` scripts. In ordinary Kotlin code, use string references or `MessageRef("...")`
+- a declaration can be used before it appears in the script
+- a declaration inside a namespace or `version(...)` block gets its qualified name automatically
+- a `MessageRef` is required where a message is expected. Passing an `EnumRef` to `request(...)` fails script compilation
+- `request(...)`, `response(...)`, `stream(...)`, and the `to` shorthand accept a `MessageRef`. `ref(...)` accepts a `MessageRef` or an `EnumRef`
+- one script cannot declare the same message or enum name in two namespaces or versions. Script compilation fails with an ambiguity error, even if no reference uses the name
+- a name built at run time, such as `message(name)` with a variable, gives no symbol. Refer to it with the string form. Declaring one of two same-named messages this way avoids the ambiguity error
+
+#### String references
+
+Every typed form has a string form. Use it for names that are built at run time and for short pair declarations.
+
+```kotlin
+microsmith {
+    schemas {
+        protobuf {
+            message("GetUserRequest") {
+                int32("id") { index(1) }
+            }
+
+            message("GetUserResponse") {
+                string("email") { index(1) }
+            }
+
+            message("WatchUsersRequest")
+            message("WatchUsersResponse")
 
             service("UserService") {
                 "GetUser" {
@@ -43,7 +98,9 @@ microsmith {
 }
 ```
 
-An enum gets a generated `USER_STATUS_UNSPECIFIED = 0` value unless one of its values claims index 0, as in `value("OK") { index(0) }`. Values without an index are numbered from 1.
+A plain name such as `"GetUserResponse"` resolves in the enclosing namespace. A dotted name such as `"acme.shared.PageInfo"` is a full name. Each leading dot goes up one namespace level, so `".v2.UserReply"` inside `acme.user.v1` means `acme.user.v2.UserReply`. A full name can also be typed: `response(MessageRef("acme.shared.PageInfo"))`. A script must import `io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef` to write that.
+
+One RPC uses either `request`/`response` or the `to` shorthand, not both.
 
 ### ASP.NET service generation DSL
 
@@ -132,6 +189,7 @@ REST DSL contract notes:
 
 - `asp { ... }` is the canonical surface; `aspNet { ... }` is supported as an alias when the longer spelling reads better in a script
 - route groups can be nested, verb helpers are lower-case, and every endpoint requires an explicit operation name
+- models are referred to by name, as in `ok("User")`; the .NET DSL has no typed model references yet
 - request bindings are modeled explicitly through `path(...)`, `query(...)`, `headers(...)`, and `body(...)`
 - inline body and response models stay endpoint-local in the normalized model; shared service models must be declared under `models { ... }`
 - route placeholders are validated against `path(...)` bindings, response/header declarations are normalized, and invalid REST declarations fail during resolution before any ASP.NET source files are emitted

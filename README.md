@@ -66,20 +66,26 @@ mvn microsmith:generate
 microsmith {
     schemas {
         protobuf {
-            message("UserCreated") {
+            message("GetUserRequest") {
                 int32("id") { index(1) }
-                string("email") { index(2) }
+            }
+
+            message("GetUserResponse") {
+                string("email") { index(1) }
             }
 
             service("UserService") {
                 "GetUser" {
-                    "GetUserRequest" to "GetUserResponse"
+                    request(GetUserRequest)
+                    response(GetUserResponse)
                 }
             }
         }
     }
 }
 ```
+
+`GetUserRequest` and `GetUserResponse` are typed references to the messages declared above. Strings also work: `"GetUserRequest" to "GetUserResponse"`. See the [DSL reference](docs/dsl.md).
 
 A script can also call `emit(model)` or `generate(model)` to control the output root.
 
