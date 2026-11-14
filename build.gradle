@@ -1,8 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
+import io.github.lmliam.microsmith.build.layers.VerifyModuleLayers
 import io.kotest.framework.gradle.tasks.KotestJvmTask
 import javax.inject.Inject
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.compile.JavaCompile
@@ -47,8 +50,31 @@ allprojects {
     version = rootProject.version
 }
 
+def mainDependencyConfigurations = ['api', 'implementation', 'compileOnly', 'runtimeOnly']
+def metroId = 'dev.zacsweers.metro'
+
+def mainDependencies = { Project module ->
+    mainDependencyConfigurations
+        .findResults { module.configurations.findByName(it) }
+        .collectMany { it.dependencies as List<Dependency> }
+}
+
+def verifyModuleLayersTask = tasks.register('verifyModuleLayers', VerifyModuleLayers) {
+    projectDependencies.set(provider {
+        subprojects.collectEntries { module ->
+            [module.name, mainDependencies(module).findAll { it instanceof ProjectDependency }*.name.unique()]
+        }
+    })
+    metroModules.set(provider {
+        subprojects.findAll { module ->
+            module.plugins.hasPlugin(metroId) || mainDependencies(module).any { it.group == metroId }
+        }*.name
+    })
+}
+
 tasks.named("check") {
     dependsOn(gradle.includedBuild("build-logic").task(":test"))
+    dependsOn(verifyModuleLayersTask)
 }
 
 def testLibraries = libs
