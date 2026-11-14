@@ -1,8 +1,8 @@
 [versions]
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 arrow = "2.2.3"
-metro = "1.4.4"
-mappie = "2.4.20-2.4.5"
+metro = "1.5.2"
+mappie = "2.4.21-2.4.5"
 kotest = "6.2.5"
 detekt = "2.0.0-alpha.6"
 ktfmtGradle = "0.27.0"
