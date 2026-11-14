@@ -6,13 +6,16 @@ import io.github.lmliam.microsmith.gen.composition.MicrosmithGenerationGraph
 import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.github.lmliam.microsmith.gen.files.FileSpace
 import io.github.lmliam.microsmith.gen.plugins.discoverMicrosmithPlugins
+import java.nio.file.FileSystems
 import java.nio.file.Path
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 suspend fun MicrosmithModel.generate(finalDir: FileSpace): List<Path> {
-    val generationGraph = createGraphFactory<MicrosmithGenerationGraph.Factory>().create(discoverMicrosmithPlugins())
+    val generationGraph =
+        createGraphFactory<MicrosmithGenerationGraph.Factory>()
+            .create(discoverMicrosmithPlugins(), FileSystems.getDefault())
 
     return generationGraph.runner.generate(model = this, finalDir = finalDir)
 }

@@ -1,10 +1,10 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project
 
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactId
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
-import java.nio.file.Path
 
 private const val FIRST_NON_PRINTABLE_ASCII_CODE_POINT = 0x20
 
@@ -18,7 +18,7 @@ internal fun DotnetAspServiceArtifact.textContribution(
     TextFileArtifactContribution(
         artifactId =
             TextFileArtifactId(
-                relativePath = Path.of(relativePath),
+                relativePath = RelativePath.of(relativePath),
                 outputRoot = outputRoot,
             ),
         contents = contents,

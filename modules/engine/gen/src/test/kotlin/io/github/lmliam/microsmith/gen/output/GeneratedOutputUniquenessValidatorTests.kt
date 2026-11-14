@@ -1,107 +1,80 @@
 package io.github.lmliam.microsmith.gen.output
 
+import com.google.common.jimfs.Configuration
+import com.google.common.jimfs.Jimfs
 import io.github.lmliam.microsmith.artifact.files.GeneratedFile
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
-import java.nio.file.Files
-import kotlin.io.path.Path
+
+private fun generated(relativePath: String, outputRoot: String = ".", contents: Byte = 1): GeneratedFile =
+    GeneratedFile(
+        relativePath = RelativePath.of(relativePath),
+        contents = byteArrayOf(contents),
+        outputRoot = RelativePath.of(outputRoot),
+    )
 
 class GeneratedOutputUniquenessValidatorTests :
     StringSpec(
         {
-            "requireUniqueOutputPaths rejects absolute output roots" {
-                shouldThrow<IllegalArgumentException> {
-                    GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(
-                        listOf(
-                            GeneratedFile(
-                                relativePath = Path("User.proto"),
-                                contents = byteArrayOf(1),
-                                outputRoot = Path("/tmp/proto"),
-                            ),
-                        ),
-                    )
-                }
-            }
-
-            "requireUniqueOutputPaths rejects output roots that traverse outside the root" {
-                shouldThrow<IllegalArgumentException> {
-                    GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(
-                        listOf(
-                            GeneratedFile(
-                                relativePath = Path("User.proto"),
-                                contents = byteArrayOf(1),
-                                outputRoot = Path("../proto"),
-                            ),
-                        ),
-                    )
-                }
-            }
-
             "requireUniqueOutputPaths rejects duplicate normalized output paths" {
-                shouldThrow<IllegalArgumentException> {
-                    GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(
-                        listOf(
-                            GeneratedFile(
-                                relativePath = Path("User.proto"),
-                                contents = byteArrayOf(1),
-                                outputRoot = Path("proto"),
-                            ),
-                            GeneratedFile(
-                                relativePath = Path("./User.proto"),
-                                contents = byteArrayOf(2),
-                                outputRoot = Path("proto"),
-                            ),
-                        ),
-                    )
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    shouldThrow<IllegalArgumentException> {
+                        GeneratedOutputUniquenessValidator(fileSystem)
+                            .requireUniqueOutputPaths(
+                                listOf(
+                                    generated("User.proto", outputRoot = "proto"),
+                                    generated("./User.proto", outputRoot = "proto", contents = 2),
+                                ),
+                            )
+                    }
                 }
             }
 
-            "requireUniqueOutputPaths rejects absolute generated file paths" {
-                val absolutePath =
-                    Files.createTempDirectory("microsmith-uniqueness-").resolve("User.proto").toAbsolutePath()
-
-                shouldThrow<IllegalArgumentException> {
-                    GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(
-                        listOf(
-                            GeneratedFile(
-                                relativePath = absolutePath,
-                                contents = byteArrayOf(1),
-                                outputRoot = Path("proto"),
-                            ),
-                        ),
-                    )
-                }
-            }
-
-            "requireUniqueOutputPaths rejects generated file paths that traverse outside the root" {
-                shouldThrow<IllegalArgumentException> {
-                    GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(
-                        listOf(
-                            GeneratedFile(
-                                relativePath = Path("../outside.proto"),
-                                contents = byteArrayOf(1),
-                                outputRoot = Path("proto"),
-                            ),
-                        ),
-                    )
+            "requireUniqueOutputPaths rejects a file that reaches the same path through a different output root" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    shouldThrow<IllegalArgumentException> {
+                        GeneratedOutputUniquenessValidator(fileSystem)
+                            .requireUniqueOutputPaths(
+                                listOf(
+                                    generated("User.proto", outputRoot = "proto"),
+                                    generated("proto/User.proto", contents = 2),
+                                ),
+                            )
+                    }
                 }
             }
 
             "requireUniqueOutputPaths allows the same relative file under distinct output roots" {
-                GeneratedOutputUniquenessValidator.requireUniqueOutputPaths(
-                    listOf(
-                        GeneratedFile(
-                            relativePath = Path("User.proto"),
-                            contents = byteArrayOf(1),
-                            outputRoot = Path("proto"),
-                        ),
-                        GeneratedFile(
-                            relativePath = Path("User.proto"),
-                            contents = byteArrayOf(2),
-                            outputRoot = Path("services/UserService"),
-                        ),
-                    ),
-                )
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    GeneratedOutputUniquenessValidator(fileSystem)
+                        .requireUniqueOutputPaths(
+                            listOf(
+                                generated("User.proto", outputRoot = "proto"),
+                                generated("User.proto", outputRoot = "services/UserService", contents = 2),
+                            ),
+                        )
+                }
+            }
+
+            "requireUniqueOutputPaths rejects names that differ only in case on a case-insensitive file system" {
+                Jimfs.newFileSystem(Configuration.windows()).use { fileSystem ->
+                    shouldThrow<IllegalArgumentException> {
+                        GeneratedOutputUniquenessValidator(fileSystem)
+                            .requireUniqueOutputPaths(
+                                listOf(generated("User.proto"), generated("user.proto", contents = 2)),
+                            )
+                    }
+                }
+            }
+
+            "requireUniqueOutputPaths allows names that differ only in case on a case-sensitive file system" {
+                Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
+                    GeneratedOutputUniquenessValidator(fileSystem)
+                        .requireUniqueOutputPaths(
+                            listOf(generated("User.proto"), generated("user.proto", contents = 2)),
+                        )
+                }
             }
         },
     )

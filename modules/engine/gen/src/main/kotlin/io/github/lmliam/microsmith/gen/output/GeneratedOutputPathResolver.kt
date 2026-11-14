@@ -1,13 +1,17 @@
 package io.github.lmliam.microsmith.gen.output
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.artifact.files.GeneratedFile
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.github.lmliam.microsmith.gen.files.FileSpace
+import java.nio.file.FileSystem
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
 
-internal object GeneratedOutputPathResolver {
+@Inject
+internal class GeneratedOutputPathResolver(private val fileSystem: FileSystem) {
     fun resolve(space: FileSpace, output: GeneratedFile): Path {
         val normalizedRoot = space.root.toAbsolutePath().normalize()
         ensureOutputRootIsSafe(normalizedRoot)
@@ -23,38 +27,22 @@ internal object GeneratedOutputPathResolver {
         return resolve(routedSpace, output.relativePath)
     }
 
-    fun resolve(space: FileSpace, relativePath: Path): Path {
-        require(!relativePath.isAbsolute) { "Generated output path must be relative, but was '$relativePath'." }
-
+    fun resolve(space: FileSpace, relativePath: RelativePath): Path {
         val normalizedRoot = space.root.toAbsolutePath().normalize()
         ensureOutputRootIsSafe(normalizedRoot)
-        val normalizedRelativePath = relativePath.normalize()
-        val target = normalizedRoot.resolve(normalizedRelativePath).normalize()
 
-        require(target.startsWith(normalizedRoot)) {
-            "Generated output path '$relativePath' escapes output root '$normalizedRoot'."
-        }
+        requireNoSymlinkTraversal(normalizedRoot, relativePath)
 
-        requireNoSymlinkTraversal(normalizedRoot, normalizedRelativePath)
-
-        return target
+        return normalizedRoot.resolve(fileSystem.pathOf(relativePath))
     }
 
-    fun resolveRoot(root: Path, outputRoot: Path): Path {
-        require(!outputRoot.isAbsolute) { "Generated output root must be relative, but was '$outputRoot'." }
-
+    fun resolveRoot(root: Path, outputRoot: RelativePath): Path {
         val normalizedRoot = root.toAbsolutePath().normalize()
         ensureOutputRootIsSafe(normalizedRoot)
-        val normalizedOutputRoot = outputRoot.normalize()
-        val targetRoot = normalizedRoot.resolve(normalizedOutputRoot).normalize()
 
-        require(targetRoot.startsWith(normalizedRoot)) {
-            "Generated output root '$outputRoot' escapes output root '$normalizedRoot'."
-        }
+        requireNoSymlinkTraversal(normalizedRoot, outputRoot)
 
-        requireNoSymlinkTraversal(normalizedRoot, normalizedOutputRoot)
-
-        return targetRoot
+        return normalizedRoot.resolve(fileSystem.pathOf(outputRoot))
     }
 
     private fun ensureOutputRootIsSafe(root: Path) {
@@ -67,11 +55,11 @@ internal object GeneratedOutputPathResolver {
         Files.createDirectories(root)
     }
 
-    private fun requireNoSymlinkTraversal(root: Path, relativePath: Path) {
+    private fun requireNoSymlinkTraversal(root: Path, relativePath: RelativePath) {
         var current = root
-        val segments = relativePath.toList()
+        val segments = relativePath.segments
         for ((index, segment) in segments.withIndex()) {
-            current = current.resolve(segment.toString())
+            current = current.resolve(segment)
 
             if (!Files.exists(current, LinkOption.NOFOLLOW_LINKS)) {
                 continue

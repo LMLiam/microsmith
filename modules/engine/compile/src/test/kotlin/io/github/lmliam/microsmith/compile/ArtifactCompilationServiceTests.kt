@@ -5,6 +5,7 @@ import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactId
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssemblyService
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactAssembler
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
@@ -13,7 +14,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import java.nio.file.Path
 
 class ArtifactCompilationServiceTests :
     StringSpec(
@@ -165,7 +165,7 @@ private class StageTwoCompiler : ArtifactCompiler<StageTwoArtifact> {
     override val artifactType = StageTwoArtifact::class
 
     override fun compile(artifact: StageTwoArtifact): List<ArtifactContribution<Artifact>> =
-        listOf(TextFileArtifactContribution(TextFileArtifactId(Path.of("result.txt")), artifact.contents))
+        listOf(TextFileArtifactContribution(TextFileArtifactId(RelativePath.of("result.txt")), artifact.contents))
 }
 
 private class SelfCyclingCompiler : ArtifactCompiler<StageOneArtifact> {

@@ -1,16 +1,11 @@
 package io.github.lmliam.microsmith.artifact.files
 
 import io.github.lmliam.microsmith.artifact.ArtifactId
-import java.nio.file.Path
 
-private val DEFAULT_OUTPUT_ROOT: Path = Path.of(".")
-
-data class TextFileArtifactId(
-    val relativePath: Path,
-    val outputRoot: Path = DEFAULT_OUTPUT_ROOT,
-) : ArtifactId<TextFileArtifact> {
+data class TextFileArtifactId(val relativePath: RelativePath, val outputRoot: RelativePath = RelativePath.ROOT) :
+    ArtifactId<TextFileArtifact> {
     init {
-        require(!relativePath.isAbsolute) { "Relative path '$relativePath' must not be absolute." }
+        require(!relativePath.isRoot) { "Relative path must name a file." }
     }
 
     override val artifactType = TextFileArtifact::class

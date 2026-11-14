@@ -206,12 +206,14 @@ class ChangelogArtifactCompiler : ArtifactCompiler<ChangelogArtifact> {
     override fun compile(artifact: ChangelogArtifact): List<ArtifactContribution<Artifact>> =
         listOf(
             TextFileArtifactContribution(
-                artifactId = TextFileArtifactId(relativePath = Path.of("CHANGELOG.md")),
+                artifactId = TextFileArtifactId(relativePath = RelativePath.of("CHANGELOG.md")),
                 contents = artifact.entries.joinToString("\n") { "- $it" },
             )
         )
 }
 ```
+
+`RelativePath` is independent of the file system. It accepts `/` and `\` as separators, drops `.` segments, and rejects absolute paths and `..` segments. A file id may also carry an `outputRoot` of the same type, which defaults to `RelativePath.ROOT`. Microsmith turns both into real paths only when it writes the files.
 
 `TextFileArtifact` and `BinaryFileArtifact` have built-in assemblers and renderers, so a plugin does not write an `ArtifactRenderer`. Write one only for a new kind of final file artifact.
 

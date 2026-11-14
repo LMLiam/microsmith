@@ -11,6 +11,7 @@ dependencies {
     testImplementation project(":dsl-services-dotnet-packages")
     testImplementation project(":compile-services-dotnet-packages")
     testImplementation project(":resolve-services-dotnet")
+    testImplementation libs.jimfs
     implementation libs.coroutines.core
     implementation libs.spi.tooling.annotations
     kapt libs.spi.tooling.processor

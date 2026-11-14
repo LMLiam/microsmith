@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
 
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildNames
@@ -34,8 +35,8 @@ class MsBuildProjectArtifactCompilerTests :
                 val textContribution = contribution as TextFileArtifactContribution
                 val contents = textContribution.contents
 
-                textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("Directory.Packages.props")
-                textContribution.artifactId.outputRoot shouldBe java.nio.file.Path.of("dotnet", "Platform")
+                textContribution.artifactId.relativePath shouldBe RelativePath.of("Directory.Packages.props")
+                textContribution.artifactId.outputRoot shouldBe RelativePath.of("dotnet", "Platform")
                 contents.shouldContain("<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>")
                 contents.shouldContain(
                     "<PackageVersion Include=\"Serilog.AspNetCore\" Version=\"9.0.0 &amp; preview\"/>",
@@ -64,9 +65,8 @@ class MsBuildProjectArtifactCompilerTests :
                 val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
                 val textContribution = contribution as TextFileArtifactContribution
 
-                textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("Directory.Build.props")
-                textContribution.artifactId.outputRoot shouldBe
-                    java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
+                textContribution.artifactId.relativePath shouldBe RelativePath.of("Directory.Build.props")
+                textContribution.artifactId.outputRoot shouldBe RelativePath.of("dotnet", "Platform", "UserService.Api")
                 textContribution.contents.shouldContain("<PackageReference Include=\"Serilog.AspNetCore\"/>")
             }
 
@@ -86,9 +86,8 @@ class MsBuildProjectArtifactCompilerTests :
                 val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
                 val textContribution = contribution as TextFileArtifactContribution
 
-                textContribution.artifactId.relativePath shouldBe java.nio.file.Path.of("UserService.Api.csproj")
-                textContribution.artifactId.outputRoot shouldBe
-                    java.nio.file.Path.of("dotnet", "Platform", "UserService.Api")
+                textContribution.artifactId.relativePath shouldBe RelativePath.of("UserService.Api.csproj")
+                textContribution.artifactId.outputRoot shouldBe RelativePath.of("dotnet", "Platform", "UserService.Api")
                 textContribution.contents.shouldContain("""<Project Sdk="Microsoft.NET.Sdk.Web">""")
                 textContribution.contents.shouldContain("<TargetFramework>net8.0</TargetFramework>")
             }

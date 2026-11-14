@@ -81,7 +81,7 @@ public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/model/P
 	public final fun getFullyQualifiedName ()Ljava/lang/String;
 	public final fun getImportPath ()Ljava/lang/String;
 	public final fun getPackageName ()Ljava/lang/String;
-	public final fun getRelativePath ()Ljava/nio/file/Path;
+	public final fun getRelativePath ()Lio/github/lmliam/microsmith/artifact/files/RelativePath;
 	public final fun getTypeName ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

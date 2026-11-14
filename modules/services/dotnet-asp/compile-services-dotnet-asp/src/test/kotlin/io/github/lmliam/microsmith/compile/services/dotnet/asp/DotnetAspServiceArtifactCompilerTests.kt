@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointBindingsArtifact
@@ -26,7 +27,6 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
-import java.nio.file.Path
 
 class DotnetAspServiceArtifactCompilerTests :
     StringSpec(
@@ -61,7 +61,9 @@ class DotnetAspServiceArtifactCompilerTests :
                         "Generated/Controllers/MicrosmithControllerBase.cs",
                         "Generated/Controllers/UserServiceApiControllerBase.cs",
                     )
-                textFiles.forEach { it.artifactId.outputRoot shouldBe Path.of("dotnet", "Platform", "UserService.Api") }
+                textFiles.forEach {
+                    it.artifactId.outputRoot shouldBe RelativePath.of("dotnet", "Platform", "UserService.Api")
+                }
 
                 byPath.getValue("Program.cs").contents.shouldContain("builder.AddMicrosmith();")
                 byPath.getValue("Program.cs").contents.shouldContain("app.MapMicrosmith();")
@@ -179,7 +181,7 @@ private fun sampleArtifact(serviceName: String = "UserService"): DotnetAspServic
         id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "UserService.Api"),
         serviceName = serviceName,
         targetFrameworkMoniker = "net8.0",
-        outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),
+        outputRoot = RelativePath.of("dotnet", "Platform", "UserService.Api"),
         httpPort = 5000,
         httpsPort = 5001,
         contractModels = listOf(userModel, problemModel, createUserBody),
@@ -274,7 +276,7 @@ private fun integerDefaultArtifact(type: DotnetFieldType, value: Number): Dotnet
         id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "ReportService.Api"),
         serviceName = "ReportService",
         targetFrameworkMoniker = "net8.0",
-        outputRoot = Path.of("dotnet", "Platform", "ReportService.Api"),
+        outputRoot = RelativePath.of("dotnet", "Platform", "ReportService.Api"),
         httpPort = 5002,
         httpsPort = 5003,
         contractModels = emptyList(),
@@ -318,7 +320,7 @@ private fun requestBindingTypesArtifact(): DotnetAspServiceArtifact =
         id = DotnetAspServiceArtifactId(solutionName = "Platform", projectName = "UserService.Api"),
         serviceName = "UserService",
         targetFrameworkMoniker = "net8.0",
-        outputRoot = Path.of("dotnet", "Platform", "UserService.Api"),
+        outputRoot = RelativePath.of("dotnet", "Platform", "UserService.Api"),
         httpPort = 5000,
         httpsPort = 5001,
         contractModels = emptyList(),

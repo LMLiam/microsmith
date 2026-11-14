@@ -681,7 +681,7 @@ Pipeline models hold `java.nio.file.Path` in six types today. The first three al
 | `TextFileArtifactId` | `artifact` | `relativePath`, `outputRoot` |
 | `BinaryFileArtifactId` | `artifact` | `relativePath`, `outputRoot` |
 | `GeneratedFile` | `artifact` | `relativePath`, `outputRoot` (default `Path.of(".")`) |
-| `ResolvedDotnetAspService` | `resolve-services-dotnet-asp` | `outputRoot` |
+| `ResolvedDotnetAspService` | `resolve-services-dotnet-asp` | `outputRoot` (removed, see below) |
 | `DotnetAspServiceArtifact` | `artifact-services-dotnet-asp` | `outputRoot` |
 | `DotnetAspServiceContribution` | `artifact-services-dotnet-asp` | `outputRoot` |
 
@@ -699,11 +699,15 @@ flowchart LR
 // Before
 TextFileArtifactId(Path.of("schemas", "orders.proto"))
 
-// After (the type name is illustrative)
+// After
 TextFileArtifactId(RelativePath.of("schemas", "orders.proto"))
 ```
 
-This is a 4.0 breaking change to the six types above. The infix `Path.to(contents)` helper in `GeneratedFile.kt` changes its receiver with them. 4.0 already breaks the plugin API, and pipeline models should not depend on a file system.
+`resolve` modules cannot depend on `artifact`, so `ResolvedDotnetAspService` stops carrying an output root. The artifact layer builds `dotnet/<solution>/<project>` from the solution and project names, and the output root collision check keys on that pair.
+
+The type is `RelativePath` in `artifact`. It holds normalised segments, accepts `/` and `\` as separators, drops `.` segments, and rejects absolute paths and `..` segments at construction. `RelativePath.ROOT` is the empty path and replaces `Path.of(".")` as the default output root. The three file types reject the root as a file path.
+
+This is a 4.0 breaking change to the types above. The infix `Path.to(contents)` helper in `GeneratedFile.kt` changes its receiver with them. 4.0 already breaks the plugin API, and pipeline models should not depend on a file system.
 
 ### Factories
 

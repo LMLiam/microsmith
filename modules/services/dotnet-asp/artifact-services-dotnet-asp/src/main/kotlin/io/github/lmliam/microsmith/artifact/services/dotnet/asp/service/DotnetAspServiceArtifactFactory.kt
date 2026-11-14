@@ -10,6 +10,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAs
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspRequestFieldArtifactMapper
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseHeaderArtifactMapper
+import io.github.lmliam.microsmith.artifact.services.dotnet.dotnetProjectOutputRoot
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspHeadersBinding
@@ -55,7 +56,7 @@ internal class DotnetAspServiceArtifactFactory(
             artifactId = artifactId,
             serviceName = service.name,
             targetFrameworkMoniker = service.targetFrameworkMoniker,
-            outputRoot = service.outputRoot,
+            outputRoot = dotnetProjectOutputRoot(service.solutionName, service.projectName),
             httpPort = service.ports.http,
             httpsPort = service.ports.https,
             contractModels = contractModels.toList(),

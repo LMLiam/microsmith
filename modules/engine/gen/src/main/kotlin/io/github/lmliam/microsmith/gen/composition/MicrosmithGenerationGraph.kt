@@ -12,6 +12,7 @@ import io.github.lmliam.microsmith.gen.execution.MicrosmithGenerationRunner
 import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
 import io.github.lmliam.microsmith.resolve.DomainResolutionService
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnosticService
+import java.nio.file.FileSystem
 
 @DependencyGraph(scope = MicrosmithGenerationScope::class)
 internal interface MicrosmithGenerationGraph {
@@ -19,7 +20,10 @@ internal interface MicrosmithGenerationGraph {
 
     @DependencyGraph.Factory
     fun interface Factory {
-        fun create(@Provides pluginCatalog: MicrosmithPluginCatalog): MicrosmithGenerationGraph
+        fun create(
+            @Provides pluginCatalog: MicrosmithPluginCatalog,
+            @Provides fileSystem: FileSystem,
+        ): MicrosmithGenerationGraph
     }
 
     @Provides

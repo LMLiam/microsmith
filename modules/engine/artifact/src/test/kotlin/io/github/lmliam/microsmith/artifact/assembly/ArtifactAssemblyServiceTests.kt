@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.artifact.assembly
 
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactAssembler
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
@@ -8,7 +9,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import java.nio.file.Path
 
 class ArtifactAssemblyServiceTests :
     StringSpec(
@@ -16,7 +16,7 @@ class ArtifactAssemblyServiceTests :
             val service = ArtifactAssemblyService(listOf(TextFileArtifactAssembler()))
 
             "merges identical text contributions into a single artifact" {
-                val sharedId = TextFileArtifactId(Path.of("shared.txt"))
+                val sharedId = TextFileArtifactId(RelativePath.of("shared.txt"))
 
                 val assembly =
                     service.assemble(
@@ -30,7 +30,7 @@ class ArtifactAssemblyServiceTests :
             }
 
             "rejects conflicting text contributions for the same artifact ID" {
-                val sharedId = TextFileArtifactId(Path.of("shared.txt"))
+                val sharedId = TextFileArtifactId(RelativePath.of("shared.txt"))
 
                 val error =
                     shouldThrow<IllegalArgumentException> {

@@ -4,7 +4,6 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetA
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
-import java.nio.file.Path
 
 class DotnetAspResolutionDiagnosticMapperTests :
     StringSpec(
@@ -23,12 +22,8 @@ class DotnetAspResolutionDiagnosticMapperTests :
                             route = "/users",
                         ),
                         DotnetAspResolutionIssue.OutputRootCollision(
-                            outputRoot =
-                                Path.of(
-                                    "dotnet",
-                                    "Platform",
-                                    "Shared.Api",
-                                ),
+                            solutionName = "Platform",
+                            projectName = "Shared.Api",
                             serviceNames =
                                 listOf(
                                     "AdminService",

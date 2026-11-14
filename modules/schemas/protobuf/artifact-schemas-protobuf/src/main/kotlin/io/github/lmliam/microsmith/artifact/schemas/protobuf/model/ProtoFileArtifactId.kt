@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.model
 
 import io.github.lmliam.microsmith.artifact.ArtifactId
+import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
-import java.nio.file.Path
 
 data class ProtoFileArtifactId(val packageName: String?, val typeName: String) : ArtifactId<ProtoFileArtifact> {
     override val artifactType = ProtoFileArtifact::class
@@ -11,7 +11,7 @@ data class ProtoFileArtifactId(val packageName: String?, val typeName: String) :
 
     val importPath: String = fullyQualifiedName.replace('.', '/') + ".proto"
 
-    val relativePath: Path = Path.of(PROTO_ROOT, importPath)
+    val relativePath: RelativePath = RelativePath.of(PROTO_ROOT, importPath)
 
     companion object {
         private const val PROTO_ROOT = "proto"

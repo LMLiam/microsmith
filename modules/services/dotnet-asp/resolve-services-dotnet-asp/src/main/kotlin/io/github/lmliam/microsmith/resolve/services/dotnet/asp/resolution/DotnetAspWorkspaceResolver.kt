@@ -18,7 +18,6 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspControllerBaseTypeName
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspace
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceResolver
-import java.nio.file.Path
 
 /** Finalises the ASP.NET subset of the .NET workspace into a scaffold-ready model. */
 class DotnetAspWorkspaceResolver(
@@ -89,7 +88,6 @@ class DotnetAspWorkspaceResolver(
                         solutionName = service.solution.name,
                         projectName = service.project,
                         targetFrameworkMoniker = service.target.moniker,
-                        outputRoot = Path.of("dotnet", service.solution.name, service.project),
                         ports = allocatedPorts.getValue(service.name),
                         models = service.models,
                         rest = rest,
@@ -128,15 +126,16 @@ class DotnetAspWorkspaceResolver(
     ): EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> {
         val issues =
             services
-                .groupBy { it.outputRoot.normalize() }
+                .groupBy { it.solutionName to it.projectName }
                 .filterValues { it.size > 1 }
-                .map { (outputRoot, collidingServices) ->
+                .map { (project, collidingServices) ->
                     DotnetAspResolutionIssue.OutputRootCollision(
-                        outputRoot = outputRoot,
+                        solutionName = project.first,
+                        projectName = project.second,
                         serviceNames = collidingServices.map(ResolvedDotnetAspService::name).sorted(),
                     )
                 }
-                .sortedBy { it.outputRoot.toString() }
+                .sortedBy { it.outputRoot }
 
         val accumulatedIssues = issues.toNonEmptyListOrNull()
 
