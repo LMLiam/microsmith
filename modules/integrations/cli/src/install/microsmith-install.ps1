@@ -15,7 +15,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$MinimumJavaFeature = 24
+$MinimumJavaFeature = 25
 $stagedInstallDir = $null
 $backupInstallDir = $null
 
@@ -276,7 +276,7 @@ try {
         $runtimeChecksum = $RuntimeSha256
         if (-not $runtimeSourceUrl -and -not $runtimeSourceFile) {
             $arch = Detect-Arch
-            $metadata = Invoke-RestMethod -Uri "https://api.adoptium.net/v3/assets/latest/24/hotspot?architecture=$arch&heap_size=normal&image_type=jre&jvm_impl=hotspot&os=windows&vendor=eclipse"
+            $metadata = Invoke-RestMethod -Uri "https://api.adoptium.net/v3/assets/latest/25/hotspot?architecture=$arch&heap_size=normal&image_type=jre&jvm_impl=hotspot&os=windows&vendor=eclipse"
             if (-not $metadata -or -not $metadata[0].binary.package.link) {
                 Fail "Unable to resolve runtime metadata from Adoptium API."
             }

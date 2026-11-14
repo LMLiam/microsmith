@@ -3,9 +3,9 @@
 ## Standalone CLI for consumer repositories
 
 The CLI is the recommended entrypoint for Go, .NET, Node, Python, Ruby, Rust, build-tool-light JVM repositories, and any repository where you want self-contained Microsmith execution without depending on a local Gradle or Maven install.
-The official installer scripts are self-contained and provision a Java 24 runtime automatically when the machine does not already provide one.
+The official installer scripts are self-contained and provision a Java 25 runtime automatically when the machine does not already provide one.
 
-Manual channels remain available, but they require Java 24 or newer.
+Manual channels remain available, but they require Java 25 or newer.
 
 ### Recommended bootstrap flow
 

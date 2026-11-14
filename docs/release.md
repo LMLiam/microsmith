@@ -164,7 +164,7 @@ https://maven.pkg.github.com/lmliam/microsmith
 
 Microsmith ships with:
 
-- installer scripts that provision Java 24 automatically when needed
+- installer scripts that provision Java 25 automatically when needed
 - manual fat jar and unpacked distribution channels for teams that want explicit runtime management
 - checksum sidecars for release verification
 - no requirement for Gradle or Maven in consuming repositories

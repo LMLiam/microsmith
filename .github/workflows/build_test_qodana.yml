@@ -258,7 +258,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 24
+          java-version: 25
       - name: Download CLI distribution
         uses: actions/download-artifact@v4
         with:
@@ -554,7 +554,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 24
+          java-version: 25
       - name: Download CLI distribution
         uses: actions/download-artifact@v4
         with:

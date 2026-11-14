@@ -9,8 +9,8 @@ Symptoms:
 
 What to do:
 
-- use the canonical installer path so Java 24 is provisioned automatically when needed
-- if you are using a manual channel, install Java 24+ and set `JAVA_HOME`
+- use the canonical installer path so Java 25 is provisioned automatically when needed
+- if you are using a manual channel, install Java 25+ and set `JAVA_HOME`
 - rerun `microsmith --version` and `microsmith --help`
 
 ## Installer failures

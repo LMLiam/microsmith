@@ -35,7 +35,7 @@ if not defined JAVA_CMD (
 if /I "%JAVA_CMD%"=="java" (
   where java >nul 2>nul
   if errorlevel 1 (
-    echo Microsmith CLI could not find a Java runtime ^(Java 24+ required^). 1>&2
+    echo Microsmith CLI could not find a Java runtime ^(Java 25+ required^). 1>&2
     echo Install via the official installer or set JAVA_HOME/MICROSMITH_JAVA_CMD. 1>&2
     exit /b 127
   )

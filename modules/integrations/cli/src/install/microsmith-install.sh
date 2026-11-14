@@ -4,7 +4,7 @@ set -eu
 SCRIPT_NAME="microsmith-install.sh"
 DEFAULT_INSTALL_ROOT="${HOME}/.microsmith"
 DEFAULT_REPOSITORY="LMLiam/microsmith"
-MINIMUM_JAVA_FEATURE=24
+MINIMUM_JAVA_FEATURE=25
 
 info() {
   printf '[microsmith-install] %s\n' "$*"
@@ -223,7 +223,7 @@ resolve_system_java_cmd() {
 runtime_metadata_from_api() {
   runtime_os="$1"
   runtime_arch="$2"
-  metadata_url="https://api.adoptium.net/v3/assets/latest/24/hotspot?architecture=${runtime_arch}&heap_size=normal&image_type=jre&jvm_impl=hotspot&os=${runtime_os}&vendor=eclipse"
+  metadata_url="https://api.adoptium.net/v3/assets/latest/25/hotspot?architecture=${runtime_arch}&heap_size=normal&image_type=jre&jvm_impl=hotspot&os=${runtime_os}&vendor=eclipse"
   source_text "$metadata_url"
 }
 

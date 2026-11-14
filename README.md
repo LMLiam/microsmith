@@ -15,7 +15,7 @@ The pipeline is a set of interfaces, so a new output family is a module on the c
 
 ## Quick start
 
-Manual installs require Java 24 or newer. The installers provision a runtime when the machine has none.
+Manual installs require Java 25 or newer. The installers provision a runtime when the machine has none.
 
 ### Standalone CLI
 
