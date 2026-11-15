@@ -1,25 +1,55 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 language: en-GB
-tone_instructions: "Be direct and specific. Flag real defects, overengineering and policy breaches; skip praise and style nits that ktfmt or detekt already enforce."
-early_access: false
+tone_instructions: "Be direct, concise and specific. No praise or filler. State the problem, why it matters and the fix."
+early_access: true
 inheritance: false
 
 reviews:
   profile: assertive
-  request_changes_workflow: false
+  auto_approvals:
+    enabled: false
   high_level_summary: true
   high_level_summary_in_walkthrough: true
   review_status: true
   commit_status: true
   collapse_walkthrough: true
   changed_files_summary: true
-  sequence_diagrams: false
+  sequence_diagrams: true
+  estimate_code_review_effort: true
   poem: false
+  in_progress_fortune: false
+  suggested_reviewers: false
+  enable_prompt_for_ai_agents: true
   assess_linked_issues: true
   related_issues: true
   related_prs: true
   suggested_labels: true
-  auto_apply_labels: false
+  auto_apply_labels: true
+  labeling_instructions:
+    - label: bug
+      instructions: "Fixes incorrect behaviour (fix: commits)."
+    - label: enhancement
+      instructions: "Adds or changes behaviour (feat: or refactor: commits that change what users see)."
+    - label: documentation
+      instructions: "Changes only docs, READMEs or design documents."
+    - label: "area:cli"
+      instructions: "Touches modules/integrations/cli."
+    - label: "area:generator"
+      instructions: "Touches the generation engine or generators: modules/engine, modules/schemas or modules/services."
+    - label: "area:scripting"
+      instructions: "Touches script hosting: modules/runtime."
+    - label: "area:resolver"
+      instructions: "Touches model resolution: modules/engine/resolve."
+    - label: "area:release"
+      instructions: "Touches release or publishing workflows, versioning or release notes."
+    - label: "area:security"
+      instructions: "Changes secrets handling, permissions, sandboxing or dependency security."
+    - label: "area:docs"
+      instructions: "Touches docs/ or user-facing documentation."
+    - label: "area:quality"
+      instructions: "Changes linting, static analysis, test infrastructure or CI checks."
+    - label: "area:ide"
+      instructions: "Touches IDE integration or script definitions for IDE support."
   abort_on_close: true
   auto_review:
     enabled: true
@@ -38,27 +68,51 @@ reviews:
   path_instructions:
     - path: "**/*.kt"
       instructions: |
-        Follow AGENTS.md. In particular:
-        - No commentary comments or KDoc that repeat a name; a comment is allowed only for a constraint or side effect the code cannot express, in one line.
-        - Prefer the simplest design that meets the linked issue. Flag speculative abstractions, extra public API, and machinery that exists only to improve error messages.
-        - One top-level type per file.
-        - Production code must not read the system directly (environment, properties, clock, console, exit); those go through injected collaborators, except in `gen/system`.
-        - Coroutines: check cancellation correctly, keep plugin APIs non-suspend, and inject dispatchers rather than hard-coding `Dispatchers.*`.
+        The project conventions are in AGENTS.md. Point out clear departures from them, such as:
+        - comments that narrate the code or a change, or KDoc that only repeats a name;
+        - designs more complex than the linked issue needs: speculative abstractions, extra public API, or machinery that only improves error messages;
+        - more than one top-level type in a file;
+        - production code reading the environment, system properties, the clock or the console directly instead of through an injected collaborator (`gen/system` is the exception);
+        - coroutine misuse: blocking calls on the wrong dispatcher, hard-coded `Dispatchers.*`, swallowed `CancellationException`, cancellation checks that can never run.
+        Also check correctness, thread safety of anything the host may call concurrently, and resource clean-up on failure and cancellation.
     - path: "**/src/{test,integrationTest,e2eTest}/**/*.kt"
       instructions: |
-        Apply the AGENTS.md testing policy:
-        - Use the lowest layer that can observe the behaviour (unit, then integration, then end-to-end).
-        - One behaviour per test, named after the scenario and expected outcome. Assert state or output, not call order.
-        - Use real collaborators; test doubles only at boundaries (network, file system, clock). Prefer a temporary directory to a fake file system.
-        - Flag tests of removed behaviour, of libraries, data classes or constants, and tests that could pass by luck (timing, thread scheduling).
+        Review tests against the AGENTS.md testing policy:
+        - Each test must protect behaviour that can regress. Flag low-value tests that cannot fail for a useful reason: tests of libraries, generated accessors, data classes, constants or removed behaviour.
+        - Flag duplicate tests: two tests that assert the same behaviour, and lower-layer tests that only repeat an end-to-end check (or the reverse).
+        - Use the lowest layer that can observe the behaviour: unit, then integration, then end-to-end.
+        - One behaviour per test, named after the scenario and the expected outcome. Assert state or output, not call order.
+        - Real collaborators; test doubles only at boundaries (network, file system, clock). A temporary directory, not a fake file system.
+        - Flag tests that can pass by luck (timing, thread scheduling, fixed sleeps) or that depend on the operating system without saying so.
     - path: "**/api/*.api"
-      instructions: "These are generated ABI dumps. Review them only for unintended public API changes and flag anything that looks internal or accidental."
+      instructions: |
+        These are generated ABI dumps from the Kotlin binary-compatibility validator. Review them only as a record of public API change:
+        - flag anything that looks internal or accidental (implementation classes, synthetic accessors, `Companion` members, data-class `copy`/`componentN` on types that should not be data classes);
+        - flag removed or changed signatures when the PR title has no `!` breaking-change marker.
     - path: "**/*.gradle*"
-      instructions: "Keep build logic configuration-cache friendly and avoid hand-maintained lists that can be derived from the file tree."
+      instructions: |
+        - Keep build logic compatible with the configuration cache: no `project` access at execution time, lazy task registration.
+        - Derive lists from the file tree instead of maintaining them by hand.
+        - Shared logic belongs in build-logic convention plugins, not copied between modules.
+        - Declare task inputs and outputs so up-to-date checks and the build cache work.
+        - Dependency versions come from the version catalogue.
+    - path: "build-logic/**"
+      instructions: "Convention plugins: keep them small and focused, configuration-cache compatible, and covered by the tests in build-logic/src/test when they contain logic."
     - path: ".github/workflows/**"
-      instructions: "Pin actions to a version, keep permissions minimal, and name end-to-end steps `Verify <target>`, never `Smoke test <target>`."
+      instructions: |
+        - Pin third-party actions to a full commit SHA or an exact version, and keep `permissions` minimal per job.
+        - Do not interpolate untrusted input (`github.event.*`, branch names, PR titles) directly into `run:` scripts; pass it through `env:`.
+        - Name end-to-end steps `Verify <target>`, never `Smoke test <target>`.
+        - Keep job names stable: rulesets and required checks refer to them.
+        - Prefer the shared `.github/actions/setup-build` action over repeating setup steps.
     - path: "docs/**/*.md"
-      instructions: "Check the prose is accurate against the code in the same PR, plain and concise, in British English."
+      instructions: |
+        - Check every statement against the code in the same PR: names, commands, options, paths and behaviour must match.
+        - Plain, concise British English; short sentences; no marketing language.
+        - Do not copy text that has a single source elsewhere, such as the CLI usage text from `microsmith --help`.
+        - Design documents record decisions and their reasons; flag a decision that changed in code but not in the document.
+    - path: "examples/**"
+      instructions: "Examples must work as written with the current release and stay minimal; flag anything an example needs that is not documented."
   pre_merge_checks:
     title:
       mode: warning
@@ -67,14 +121,37 @@ reviews:
       mode: warning
     issue_assessment:
       mode: warning
+    docstrings:
+      mode: "off"
+    custom_checks:
+      - name: "No agent attribution"
+        mode: error
+        instructions: "Fail if any commit message, the PR description or a code comment attributes the work to an AI agent: a Co-Authored-By trailer for an agent, a 'Generated with' line, or an agent named as author."
+      - name: "Breaking changes marked"
+        mode: warning
+        instructions: "If the PR removes or changes a signature in an `api/*.api` dump or changes documented behaviour incompatibly, the title must carry `!` and the description must have a 'Breaking changes' section."
+      - name: "Tests match the change"
+        mode: warning
+        instructions: "Behaviour added or fixed in production code has a test at the lowest layer that observes it, and a fix has a test that fails without it. Tests for removed behaviour are deleted, not kept."
+      - name: "Docs match the change"
+        mode: warning
+        instructions: "If the PR changes user-visible behaviour, CLI options, the plugin API or the script DSL, the matching file under docs/ is updated in the same PR."
   finishing_touches:
     unit_tests:
       enabled: false
+    simplify:
+      enabled: true
+    autofix:
+      enabled: true
+    fix_ci:
+      enabled: true
   tools:
     detekt:
       enabled: true
       config_file: detekt.yml
     actionlint:
+      enabled: true
+    zizmor:
       enabled: true
     yamllint:
       enabled: true
