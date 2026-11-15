@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.cli.init
 
 import io.github.lmliam.microsmith.cli.command.InitCommand
+import io.github.lmliam.microsmith.cli.copyTestResource
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
 import io.github.lmliam.microsmith.cli.init.profile.GenericOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.profile.JavaOnboardingProfile
@@ -25,20 +26,10 @@ class JavaOnboardingProfileTests :
                 val repoRoot = createTempDirectory("microsmith-init-bootstrap-java")
                 repoRoot.resolve("pom.xml").writeText("<project />\n")
                 repoRoot.resolve("src/main/java/example").createDirectories()
-                repoRoot
-                    .resolve("src/main/java/example/App.java")
-                    .writeText(
-                        """
-                        package example;
-
-                        public final class App {
-                            public String message() {
-                                return "Microsmith Java fixture";
-                            }
-                        }
-                        """
-                            .trimIndent() + "\n",
-                    )
+                copyTestResource(
+                    "/init/java/App.java",
+                    repoRoot.resolve("src/main/java/example/App.java"),
+                )
                 try {
                     val helperRoot = repoRoot.resolve(".microsmith/ide")
                     val result =
