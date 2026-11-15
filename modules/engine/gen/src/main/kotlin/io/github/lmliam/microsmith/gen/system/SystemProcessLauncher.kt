@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.gen.system
 
 import io.github.lmliam.microsmith.gen.process.ProcessLauncher
 import io.github.lmliam.microsmith.gen.process.ProcessResult
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -28,17 +29,18 @@ class SystemProcessLauncher(private val ioDispatcher: CoroutineDispatcher) : Pro
     private fun Process.destroyWithDescendants() {
         val handles = listOf(toHandle()) + toHandle().descendants().toList()
         handles.forEach(ProcessHandle::destroy)
-        val deadline = System.nanoTime() + DESTROY_GRACE_NANOS
-        handles.forEach { handle ->
-            try {
-                handle.onExit().get(maxOf(0L, deadline - System.nanoTime()), TimeUnit.NANOSECONDS)
-            } catch (_: TimeoutException) {
-                handle.destroyForcibly()
-            }
+        try {
+            handles
+                .map { it.onExit() }
+                .toTypedArray()
+                .let(CompletableFuture<*>::allOf)
+                .get(DESTROY_GRACE_SECONDS, TimeUnit.SECONDS)
+        } catch (_: TimeoutException) {
+            handles.forEach(ProcessHandle::destroyForcibly)
         }
     }
 
     private companion object {
-        val DESTROY_GRACE_NANOS = TimeUnit.SECONDS.toNanos(1)
+        const val DESTROY_GRACE_SECONDS = 1L
     }
 }
