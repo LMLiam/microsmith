@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.execution
 
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
+import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScriptCompilationConfiguration
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScriptEvaluationConfiguration
 import java.nio.file.Path
@@ -14,6 +15,7 @@ import kotlin.script.experimental.host.FileScriptSource
 import kotlin.script.experimental.host.ScriptingHostConfiguration
 import kotlin.script.experimental.jvm.jvm
 import kotlin.script.experimental.jvm.updateClasspath
+import kotlin.script.experimental.jvm.util.scriptCompilationClasspathFromContext
 import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost
 
 internal object ScriptEvaluator {
@@ -24,10 +26,15 @@ internal object ScriptEvaluator {
         pluginClasspath: List<Path>,
     ): Pair<ResultWithDiagnostics<EvaluationResult>, Long> {
         val host = BasicJvmScriptingHost(runtimeHostConfiguration)
+        val hostClasspath =
+            scriptCompilationClasspathFromContext(
+                classLoader = MicrosmithScript::class.java.classLoader,
+                wholeClasspath = true,
+            )
         val compilationConfiguration =
             ScriptCompilationConfiguration(MicrosmithScriptCompilationConfiguration) {
                 hostConfiguration.update { runtimeHostConfiguration }
-                jvm { updateClasspath(pluginClasspath.map(Path::toFile)) }
+                jvm { updateClasspath(hostClasspath + pluginClasspath.map(Path::toFile)) }
             }
         val evaluationConfiguration =
             ScriptEvaluationConfiguration(MicrosmithScriptEvaluationConfiguration) {

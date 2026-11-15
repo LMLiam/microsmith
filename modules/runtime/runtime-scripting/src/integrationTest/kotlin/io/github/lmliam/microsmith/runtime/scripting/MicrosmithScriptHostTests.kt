@@ -497,7 +497,7 @@ class MicrosmithScriptHostTests :
         },
     )
 
-private const val HOST_SCRIPT_RESOURCES = "/scripting/host"
+internal const val HOST_SCRIPT_RESOURCES = "/scripting/host"
 
 private fun runScriptResource(tempDir: Path, scriptName: String): ScriptRunResult {
     val script = tempDir.resolve("script.microsmith.kts")
@@ -514,7 +514,7 @@ private fun runScriptResource(tempDir: Path, scriptName: String): ScriptRunResul
         )
 }
 
-private fun copyResource(scriptName: String, target: Path) {
+internal fun copyResource(scriptName: String, target: Path) {
     val resource = "$HOST_SCRIPT_RESOURCES/$scriptName"
 
     val source =

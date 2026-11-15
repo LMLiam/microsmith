@@ -4,6 +4,8 @@ import io.github.lmliam.microsmith.build.archive.VerifyJarEntries
 import io.github.lmliam.microsmith.build.archive.VerifyServiceProviders
 import io.github.lmliam.microsmith.build.runtime.VerifyPublishedPomScopes
 
+apply from: rootProject.file('gradle/plugin-fixtures.gradle')
+
 def scriptingVersionValue = version.toString()
 def scriptingScriptTemplateFqcn = 'io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript'
 def scriptingCompilationConfigurationFqcn =
@@ -95,6 +97,7 @@ dependencies {
     implementation libs.kotlin.scripting.jvm
     implementation libs.kotlin.scripting.jvm.host
     implementation libs.kotlin.compiler.embeddable
+    fixturePluginsCompileOnly project(':runtime-scripting-api')
 }
 
 def scriptingShadowJarTask = tasks.named('shadowJar', ShadowJar)
