@@ -1,11 +1,11 @@
 package io.github.lmliam.microsmith.runtime.scripting.api
 
-sealed interface ScriptCallCallee {
-    data class Named(val name: String) : ScriptCallCallee
+public sealed interface ScriptCallCallee {
+    public data class Named(public val name: String) : ScriptCallCallee
 
-    data class StringLiteral(val value: String) : ScriptCallCallee
+    public data class StringLiteral(public val value: String) : ScriptCallCallee
 
-    data class IntLiteral(val value: Int) : ScriptCallCallee
+    public data class IntLiteral(public val value: Int) : ScriptCallCallee
 
-    data object Other : ScriptCallCallee
+    public data object Other : ScriptCallCallee
 }
