@@ -8,7 +8,7 @@ import io.github.lmliam.microsmith.dsl.ModelExtension
  * value.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T : ModelExtension> mergeModelExtension(existing: T?, incoming: T): T =
+public fun <T : ModelExtension> mergeModelExtension(existing: T?, incoming: T): T =
     when {
         existing == null -> incoming
 

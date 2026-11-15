@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.resolve.diagnostics
 
-data class ResolutionDiagnostic(val code: String, val message: String)
+public data class ResolutionDiagnostic(public val code: String, public val message: String)

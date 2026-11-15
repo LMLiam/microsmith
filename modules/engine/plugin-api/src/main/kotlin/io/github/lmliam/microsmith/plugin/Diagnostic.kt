@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.plugin
 
-class Diagnostic(
-    val severity: DiagnosticSeverity,
-    val code: String,
-    val message: String,
-    val pluginId: String? = null,
+public class Diagnostic(
+    public val severity: DiagnosticSeverity,
+    public val code: String,
+    public val message: String,
+    public val pluginId: String? = null,
 )

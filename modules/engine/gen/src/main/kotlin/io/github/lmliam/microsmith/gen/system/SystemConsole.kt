@@ -2,7 +2,7 @@ package io.github.lmliam.microsmith.gen.system
 
 import io.github.lmliam.microsmith.plugin.Console
 
-class SystemConsole : Console {
+internal class SystemConsole : Console {
     override fun out(line: String) {
         System.out.println(line)
     }

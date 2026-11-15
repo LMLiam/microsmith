@@ -13,24 +13,24 @@ import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionIssueDiagnostic
  * The host may call these services from several threads at once within the run, so they must be stateless or
  * thread-safe. The host calls [close] when the generation run ends.
  */
-interface PluginServices : AutoCloseable {
-    val domainResolvers: Set<DomainResolver<*, *>>
+public interface PluginServices : AutoCloseable {
+    public val domainResolvers: Set<DomainResolver<*, *>>
         get() = emptySet()
 
-    val resolutionIssueDiagnosticMappers: Set<ResolutionIssueDiagnosticMapper<*>>
+    public val resolutionIssueDiagnosticMappers: Set<ResolutionIssueDiagnosticMapper<*>>
         get() = emptySet()
 
-    val artifactContributors: Set<ArtifactContributor<*>>
+    public val artifactContributors: Set<ArtifactContributor<*>>
         get() = emptySet()
 
-    val artifactAssemblers: Set<ArtifactAssembler<*>>
+    public val artifactAssemblers: Set<ArtifactAssembler<*>>
         get() = emptySet()
 
-    val artifactCompilers: Set<ArtifactCompiler<*>>
+    public val artifactCompilers: Set<ArtifactCompiler<*>>
         get() = emptySet()
 
-    val artifactRenderers: Set<ArtifactRenderer<*>>
+    public val artifactRenderers: Set<ArtifactRenderer<*>>
         get() = emptySet()
 
-    override fun close() {}
+    public override fun close() {}
 }

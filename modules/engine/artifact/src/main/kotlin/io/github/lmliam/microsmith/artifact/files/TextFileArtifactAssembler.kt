@@ -1,10 +1,13 @@
 package io.github.lmliam.microsmith.artifact.files
 
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
+import kotlin.reflect.KClass
 
-class TextFileArtifactAssembler : ArtifactAssembler<TextFileArtifact> {
-    override val artifactType = TextFileArtifact::class
+@InternalMicrosmithApi
+public class TextFileArtifactAssembler : ArtifactAssembler<TextFileArtifact> {
+    override val artifactType: KClass<TextFileArtifact> = TextFileArtifact::class
 
     override fun create(contribution: ArtifactContribution<TextFileArtifact>): TextFileArtifact {
         val textContribution = contribution.requireTextContribution()

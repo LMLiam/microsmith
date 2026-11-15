@@ -5,8 +5,8 @@ import io.github.lmliam.microsmith.resolve.ResolvedModel
 import kotlin.reflect.KClass
 
 @ServiceContract
-interface ArtifactContributor<R : ResolvedModel> {
-    val resolvedType: KClass<R>
+public interface ArtifactContributor<R : ResolvedModel> {
+    public val resolvedType: KClass<R>
 
-    fun contribute(model: R): List<ArtifactContribution<Artifact>>
+    public fun contribute(model: R): List<ArtifactContribution<Artifact>>
 }

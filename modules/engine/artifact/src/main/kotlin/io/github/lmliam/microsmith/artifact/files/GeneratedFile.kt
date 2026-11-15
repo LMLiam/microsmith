@@ -1,9 +1,9 @@
 package io.github.lmliam.microsmith.artifact.files
 
-class GeneratedFile(
-    val relativePath: RelativePath,
+public class GeneratedFile(
+    public val relativePath: RelativePath,
     contents: ByteArray,
-    val outputRoot: RelativePath = RelativePath.ROOT,
+    public val outputRoot: RelativePath = RelativePath.ROOT,
 ) {
     init {
         require(!relativePath.isRoot) { "Relative path must name a file." }
@@ -11,8 +11,6 @@ class GeneratedFile(
 
     private val bytes = contents.copyOf()
 
-    val contents: ByteArray
+    public val contents: ByteArray
         get() = bytes.copyOf()
 }
-
-infix fun RelativePath.to(contents: ByteArray): GeneratedFile = GeneratedFile(this, contents)

@@ -9,17 +9,17 @@ import kotlin.reflect.KClass
  * - End-users never construct this directly; they use [microsmith] DSL entrypoint.
  * - Plugin authors consume this to read extensions they care about.
  */
-class MicrosmithModel
+public class MicrosmithModel
 internal constructor(private val extensions: Map<KClass<out MicrosmithExtension>, MicrosmithExtension>) {
     /**
      * Retrieve the extension registered for the given type.
      *
      * @return the extension, or `null` when the type is not present.
      */
-    @Suppress("UNCHECKED_CAST") fun <T : MicrosmithExtension> get(type: KClass<T>) = extensions[type] as? T?
+    @Suppress("UNCHECKED_CAST") public fun <T : MicrosmithExtension> get(type: KClass<T>): T? = extensions[type] as? T
 
     /** Inline reified overload of [get] for convenience. */
-    inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
+    public inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
 
     /** Internal: return a new model with the given extension attached. */
     @Suppress("UNCHECKED_CAST")
@@ -30,10 +30,10 @@ internal constructor(private val extensions: Map<KClass<out MicrosmithExtension>
     internal inline fun <reified T : MicrosmithExtension> with(value: T) = with(T::class, value)
 
     /** Return the set of extension keys currently attached to this model. */
-    fun keys() = extensions.keys
+    public fun keys(): Set<KClass<out MicrosmithExtension>> = extensions.keys
 
-    companion object {
+    public companion object {
         /** Create an empty model with no extensions. */
-        fun empty() = MicrosmithModel(emptyMap())
+        public fun empty(): MicrosmithModel = MicrosmithModel(emptyMap())
     }
 }

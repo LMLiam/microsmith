@@ -1,5 +1,12 @@
 dependencies {
-    implementation project(":dsl")
+    api project(":dsl")
     api libs.arrow.core
     api libs.spi.tooling.annotations
+}
+
+kotlin {
+    explicitApi()
+    compilerOptions {
+        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+    }
 }

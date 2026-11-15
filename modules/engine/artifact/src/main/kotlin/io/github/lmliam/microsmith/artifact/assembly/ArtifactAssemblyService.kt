@@ -1,19 +1,21 @@
 package io.github.lmliam.microsmith.artifact.assembly
 
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactId
 
-class ArtifactAssemblyService internal constructor(private val assemblerRegistry: ArtifactAssemblerRegistry) {
-    constructor(assemblers: List<ArtifactAssembler<*>>) : this(ArtifactAssemblerRegistry(assemblers))
+@InternalMicrosmithApi
+public class ArtifactAssemblyService internal constructor(private val assemblerRegistry: ArtifactAssemblerRegistry) {
+    public constructor(assemblers: List<ArtifactAssembler<*>>) : this(ArtifactAssemblerRegistry(assemblers))
 
-    fun assemble(contributions: List<ArtifactContribution<Artifact>>): ArtifactAssembly =
+    public fun assemble(contributions: List<ArtifactContribution<Artifact>>): ArtifactAssembly =
         assembleRetaining(
             retainedArtifacts = emptyList(),
             contributions = contributions,
         )
 
-    fun assembleRetaining(
+    public fun assembleRetaining(
         retainedArtifacts: List<Artifact>,
         contributions: List<ArtifactContribution<Artifact>>,
     ): ArtifactAssembly {

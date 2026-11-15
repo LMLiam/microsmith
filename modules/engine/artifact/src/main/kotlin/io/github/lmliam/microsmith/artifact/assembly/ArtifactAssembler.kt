@@ -6,12 +6,12 @@ import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import kotlin.reflect.KClass
 
 @ServiceContract
-interface ArtifactAssembler<A : Artifact> {
-    val artifactType: KClass<A>
+public interface ArtifactAssembler<A : Artifact> {
+    public val artifactType: KClass<A>
 
-    fun create(contribution: ArtifactContribution<A>): A
+    public fun create(contribution: ArtifactContribution<A>): A
 
-    fun merge(
+    public fun merge(
         current: A,
         contribution: ArtifactContribution<A>,
     ): A

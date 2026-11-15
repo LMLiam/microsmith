@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.gen.plugins
 
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
 import io.github.lmliam.microsmith.artifact.ArtifactRenderer
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
@@ -9,7 +10,8 @@ import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionIssueDiagnostic
 import java.util.ServiceLoader
 import kotlin.reflect.KClass
 
-class MicrosmithPluginCatalog(
+@InternalMicrosmithApi
+public class MicrosmithPluginCatalog(
     domainResolvers: Iterable<DomainResolver<*, *>> = emptyList(),
     artifactContributors: Iterable<ArtifactContributor<*>> = emptyList(),
     artifactAssemblers: Iterable<ArtifactAssembler<*>> = emptyList(),
@@ -17,12 +19,12 @@ class MicrosmithPluginCatalog(
     artifactRenderers: Iterable<ArtifactRenderer<*>> = emptyList(),
     resolutionIssueDiagnosticMappers: Iterable<ResolutionIssueDiagnosticMapper<*>> = emptyList(),
 ) {
-    val domainResolvers: List<DomainResolver<*, *>> = domainResolvers.toList()
-    val artifactContributors: List<ArtifactContributor<*>> = artifactContributors.toList()
-    val artifactAssemblers: List<ArtifactAssembler<*>> = artifactAssemblers.toList()
-    val artifactCompilers: List<ArtifactCompiler<*>> = artifactCompilers.toList()
-    val artifactRenderers: List<ArtifactRenderer<*>> = artifactRenderers.toList()
-    val resolutionIssueDiagnosticMappers: List<ResolutionIssueDiagnosticMapper<*>> =
+    public val domainResolvers: List<DomainResolver<*, *>> = domainResolvers.toList()
+    public val artifactContributors: List<ArtifactContributor<*>> = artifactContributors.toList()
+    public val artifactAssemblers: List<ArtifactAssembler<*>> = artifactAssemblers.toList()
+    public val artifactCompilers: List<ArtifactCompiler<*>> = artifactCompilers.toList()
+    public val artifactRenderers: List<ArtifactRenderer<*>> = artifactRenderers.toList()
+    public val resolutionIssueDiagnosticMappers: List<ResolutionIssueDiagnosticMapper<*>> =
         resolutionIssueDiagnosticMappers.toList()
 
     internal operator fun plus(other: MicrosmithPluginCatalog): MicrosmithPluginCatalog =
@@ -37,7 +39,8 @@ class MicrosmithPluginCatalog(
         )
 }
 
-fun discoverMicrosmithPlugins(classLoader: ClassLoader): MicrosmithPluginCatalog =
+@InternalMicrosmithApi
+public fun discoverMicrosmithPlugins(classLoader: ClassLoader): MicrosmithPluginCatalog =
     MicrosmithPluginCatalog(
         domainResolvers = loadServices(DomainResolver::class, classLoader),
         artifactContributors = loadServices(ArtifactContributor::class, classLoader),

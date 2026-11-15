@@ -190,6 +190,12 @@ subprojects {
         jvmToolchain(25)
         abiValidation {
             enabled = true
+            filters {
+                exclude {
+                    annotatedWith.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+                    byNames.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+                }
+            }
         }
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_25)

@@ -5,4 +5,4 @@ package io.github.lmliam.microsmith.dsl
  *
  * Apply this to all DSL scope interfaces (e.g. [MicrosmithScope], service scopes, etc.).
  */
-@DslMarker annotation class MicrosmithDsl
+@DslMarker public annotation class MicrosmithDsl
