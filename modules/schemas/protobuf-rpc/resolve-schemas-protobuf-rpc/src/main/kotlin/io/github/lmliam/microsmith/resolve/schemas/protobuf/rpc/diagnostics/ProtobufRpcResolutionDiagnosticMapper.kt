@@ -8,8 +8,12 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.diagnostics.displayN
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 
 @ServiceProvider(ResolutionIssueDiagnosticMapper::class)
-class ProtobufRpcResolutionDiagnosticMapper : ResolutionIssueDiagnosticMapper<ProtobufRpcResolutionIssue> {
-    private val schemaIssueMapper = ProtobufResolutionDiagnosticMapper()
+class ProtobufRpcResolutionDiagnosticMapper
+private constructor(
+    private val schemaIssueMapper: ProtobufResolutionDiagnosticMapper,
+) : ResolutionIssueDiagnosticMapper<ProtobufRpcResolutionIssue> {
+    constructor() : this(ProtobufResolutionDiagnosticMapper())
+
     override val issueType = ProtobufRpcResolutionIssue::class
 
     override fun map(issue: ProtobufRpcResolutionIssue): ResolutionDiagnostic =

@@ -10,9 +10,11 @@ import io.kotest.matchers.string.shouldContain
 class ProtobufServiceRendererTests :
     StringSpec(
         {
+            val renderer = ProtobufServiceRenderer()
+
             "renders unary and streaming routes" {
                 val rendered =
-                    ProtobufServiceRenderer.render(
+                    renderer.render(
                         ProtobufRpcServiceArtifact(
                             id = ProtobufRpcServiceArtifactId(packageName = "pkg", serviceName = "UserService"),
                             imports = emptyList(),

@@ -13,8 +13,12 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.declarati
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 
 @ServiceProvider(DomainResolver::class)
-class ProtobufRpcSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
-    private val schemaResolver = ProtobufRpcSchemaResolver()
+class ProtobufRpcSchemasResolver
+private constructor(
+    private val schemaResolver: ProtobufRpcSchemaResolver,
+) : DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
+    constructor() : this(ProtobufRpcSchemaResolver())
+
     override val authoringType = SchemasExtension::class
     override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 

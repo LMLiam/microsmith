@@ -11,7 +11,10 @@ import io.github.lmliam.microsmith.compile.schemas.SchemasArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.render.ProtobufServiceRenderer
 
 @ServiceProvider(ArtifactCompiler::class)
-class ProtobufRpcServiceArtifactCompiler : SchemasArtifactCompiler<ProtobufRpcServiceArtifact> {
+class ProtobufRpcServiceArtifactCompiler private constructor(private val renderer: ProtobufServiceRenderer) :
+    SchemasArtifactCompiler<ProtobufRpcServiceArtifact> {
+    constructor() : this(ProtobufServiceRenderer())
+
     override val artifactType = ProtobufRpcServiceArtifact::class
 
     override fun compile(artifact: ProtobufRpcServiceArtifact): List<ArtifactContribution<out Artifact>> =
@@ -23,7 +26,7 @@ class ProtobufRpcServiceArtifactCompiler : SchemasArtifactCompiler<ProtobufRpcSe
                     listOf(
                         ProtoDeclaration(
                             name = artifact.id.serviceName,
-                            contents = ProtobufServiceRenderer.render(artifact),
+                            contents = renderer.render(artifact),
                         ),
                     ),
             ),
