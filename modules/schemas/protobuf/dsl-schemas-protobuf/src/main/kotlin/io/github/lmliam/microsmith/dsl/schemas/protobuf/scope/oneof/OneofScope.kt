@@ -9,8 +9,8 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.OneofFieldSc
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.field.OneofReferenceFieldScope
 
 @MicrosmithDsl
-interface OneofScope : ScalarFields<OneofFieldScope, OneofField> {
-    fun ref(name: String, target: String, block: OneofReferenceFieldScope.() -> Unit = {}): OneofField
+public interface OneofScope : ScalarFields<OneofFieldScope, OneofField> {
+    public fun ref(name: String, target: String, block: OneofReferenceFieldScope.() -> Unit = {}): OneofField
 
-    fun ref(name: String, target: ProtobufTypeRef, block: OneofReferenceFieldScope.() -> Unit = {}): OneofField
+    public fun ref(name: String, target: ProtobufTypeRef, block: OneofReferenceFieldScope.() -> Unit = {}): OneofField
 }

@@ -1,28 +1,42 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 
+import dev.zacsweers.metro.Inject
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufDeclaration
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 
 private const val INDENT = "  "
 
-internal fun renderDeclaration(message: ResolvedProtobufMessage): String = buildString {
-    appendLine("message ${message.name} {")
+@Inject
+internal class ProtobufDeclarationRenderer(
+    private val reservedSections: ProtobufReservedSectionRenderer,
+    private val fields: ProtobufFieldRenderer,
+) {
+    fun render(declaration: ResolvedProtobufDeclaration): String =
+        when (declaration) {
+            is ResolvedProtobufMessage -> render(declaration)
+            is ResolvedProtobufEnum -> render(declaration)
+        }
 
-    ProtobufReservedSectionRenderer.render(message.reservations)?.let { appendIndentedLine(it) }
+    fun render(message: ResolvedProtobufMessage): String = buildString {
+        appendLine("message ${message.name} {")
 
-    message.fields.forEach { appendIndentedLine(ProtobufFieldRenderer.render(it)) }
-    message.oneofs.forEach { appendIndentedLine(ProtobufFieldRenderer.render(it)) }
+        reservedSections.render(message.reservations)?.let { appendIndentedLine(it) }
 
-    append("}")
-}
+        message.fields.forEach { appendIndentedLine(fields.render(it)) }
+        message.oneofs.forEach { appendIndentedLine(fields.render(it)) }
 
-internal fun renderDeclaration(enum: ResolvedProtobufEnum): String = buildString {
-    appendLine("enum ${enum.name} {")
+        append("}")
+    }
 
-    ProtobufReservedSectionRenderer.render(enum.reservations)?.let { appendLine(it.prependIndent(INDENT)) }
-    enum.values.forEach { appendLine(ProtobufFieldRenderer.render(it).prependIndent(INDENT)) }
+    fun render(enum: ResolvedProtobufEnum): String = buildString {
+        appendLine("enum ${enum.name} {")
 
-    append("}")
+        reservedSections.render(enum.reservations)?.let { appendLine(it.prependIndent(INDENT)) }
+        enum.values.forEach { appendLine(fields.render(it).prependIndent(INDENT)) }
+
+        append("}")
+    }
 }
 
 private fun StringBuilder.appendIndentedLine(value: String) {

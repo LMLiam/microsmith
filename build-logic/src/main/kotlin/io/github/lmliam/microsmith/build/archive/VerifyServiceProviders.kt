@@ -1,13 +1,15 @@
 package io.github.lmliam.microsmith.build.archive
 
+import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -18,8 +20,9 @@ abstract class VerifyServiceProviders : DefaultTask() {
     @get:PathSensitive(PathSensitivity.NAME_ONLY)
     abstract val archive: RegularFileProperty
 
-    @get:Input
-    abstract val expectedProviders: ListProperty<String>
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val bundledClasspath: ConfigurableFileCollection
 
     @get:Input
     @get:Optional
@@ -39,8 +42,7 @@ abstract class VerifyServiceProviders : DefaultTask() {
             throw GradleException("$description '${archiveFile.path}' was not created.")
         }
 
-        val parsedExpectations = expectedProviders.get().map { parseDeclaration(it, description) }
-        val providersByService = parsedExpectations.groupBy({ it.first }, { it.second })
+        val providersByService = expectedProvidersByService()
 
         JarFile(archiveFile).use { jar ->
             providersByService.forEach { (servicePath, expected) ->
@@ -61,19 +63,29 @@ abstract class VerifyServiceProviders : DefaultTask() {
         }
     }
 
-    private fun parseDeclaration(
-        declaration: String,
-        description: String,
-    ): Pair<String, String> {
-        val parts = declaration.split('=', limit = 2)
-        if (parts.size != 2 || parts[0].isBlank() || parts[1].isBlank()) {
-            throw GradleException(
-                "Invalid expected provider '$declaration' for $description. " +
-                    "Expected '<service-descriptor>=<provider-class>'.",
-            )
+    private fun expectedProvidersByService(): Map<String, Set<String>> {
+        val providers = sortedMapOf<String, MutableSet<String>>()
+        bundledClasspath.files.filter { it.isFile }.forEach { file ->
+            JarFile(file).use { jar ->
+                jar.entries().asSequence()
+                    .filter { !it.isDirectory && it.name.startsWith(SERVICES_DIRECTORY) }
+                    .filter { it.name.length > SERVICES_DIRECTORY.length }
+                    .forEach { entry ->
+                        providers.getOrPut(entry.name) { sortedSetOf() }.addAll(jar.readProviders(entry))
+                    }
+            }
         }
-        return parts[0].trim() to parts[1].trim()
+        return providers
     }
+
+    private fun JarFile.readProviders(entry: JarEntry): Set<String> =
+        getInputStream(entry).bufferedReader(Charsets.UTF_8).use { reader ->
+            reader
+                .lineSequence()
+                .map { it.substringBefore('#').trim() }
+                .filter { it.isNotEmpty() }
+                .toSet()
+        }
 
     private fun JarFile.readServiceProviders(servicePath: String): Set<String>? {
         val entry = getJarEntry(servicePath) ?: return null
@@ -86,3 +98,5 @@ abstract class VerifyServiceProviders : DefaultTask() {
         }
     }
 }
+
+private const val SERVICES_DIRECTORY = "META-INF/services/"

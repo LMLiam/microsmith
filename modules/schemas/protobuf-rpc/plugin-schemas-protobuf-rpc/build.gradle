@@ -1,0 +1,21 @@
+apply plugin: 'dev.zacsweers.metro'
+
+metro {
+    generateContributionProviders = true
+}
+
+dependencies {
+    api project(":plugin-api")
+    implementation project(":resolve")
+    implementation project(":artifact")
+    implementation project(":compile")
+    implementation project(":resolve-schemas-protobuf")
+    implementation project(":artifact-schemas-protobuf")
+    implementation project(":resolve-schemas-protobuf-rpc")
+    implementation project(":artifact-schemas-protobuf-rpc")
+    implementation project(":compile-schemas-protobuf-rpc")
+}
+
+kotlin {
+    explicitApi()
+}

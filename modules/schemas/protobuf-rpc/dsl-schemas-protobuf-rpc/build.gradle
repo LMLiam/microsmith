@@ -3,3 +3,7 @@ dependencies {
     implementation project(":dsl-schemas")
     api project(":dsl-schemas-protobuf")
 }
+
+kotlin {
+    explicitApi()
+}

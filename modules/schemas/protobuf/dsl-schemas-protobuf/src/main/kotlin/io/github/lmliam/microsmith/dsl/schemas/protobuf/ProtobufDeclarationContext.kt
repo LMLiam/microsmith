@@ -1,13 +1,15 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf
 
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Type
 
 @MicrosmithDsl
-interface ProtobufDeclarationContext : ProtobufScope {
-    fun qualifyName(name: String): String
+@InternalMicrosmithApi
+public interface ProtobufDeclarationContext : ProtobufScope {
+    public fun qualifyName(name: String): String
 
-    fun resolveReference(target: String): String
+    public fun resolveReference(target: String): String
 
-    fun registerDeclaration(name: String, declaration: Type)
+    public fun registerDeclaration(name: String, declaration: Type)
 }

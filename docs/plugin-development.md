@@ -235,7 +235,7 @@ Microsmith finds a plugin through `ServiceLoader`. The jar must contain one file
 
 Each implementation needs a public no-argument constructor.
 
-This repository generates those files with `@ServiceProvider` from `com.github.eventhorizonlab.spi`. Its modules add `io.github.eventhorizonlab:spi-tooling-annotations` as a dependency and `io.github.eventhorizonlab:spi-tooling-processor` to `kapt`. The version is `spiTooling` in `gradle/libs.versions.toml`.
+The services modules in this repository generate those files with `@ServiceProvider` from `com.github.eventhorizonlab.spi`. Those modules add `io.github.eventhorizonlab:spi-tooling-annotations` as a dependency and `io.github.eventhorizonlab:spi-tooling-processor` to `kapt`. The version is `spiTooling` in `gradle/libs.versions.toml`.
 
 ```kotlin
 @ServiceProvider(DomainResolver::class)

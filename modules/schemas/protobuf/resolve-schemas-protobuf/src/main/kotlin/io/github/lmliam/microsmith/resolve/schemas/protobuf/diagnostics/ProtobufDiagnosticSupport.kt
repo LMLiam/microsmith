@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.diagnostics
 
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 
@@ -9,7 +10,8 @@ internal fun protobufDiagnostic(code: String, message: String): ResolutionDiagno
         message = message,
     )
 
-fun ProtobufResolutionIssue.InvalidSchemaName.Reason.displayName(): String =
+@InternalMicrosmithApi
+public fun ProtobufResolutionIssue.InvalidSchemaName.Reason.displayName(): String =
     when (this) {
         ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK -> "is blank"
 

@@ -4,8 +4,8 @@ import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 
 @MicrosmithDsl
-interface ScalarFieldScope : FieldScope {
-    fun optional()
+public interface ScalarFieldScope : FieldScope {
+    public fun optional()
 
-    fun repeated()
+    public fun repeated()
 }

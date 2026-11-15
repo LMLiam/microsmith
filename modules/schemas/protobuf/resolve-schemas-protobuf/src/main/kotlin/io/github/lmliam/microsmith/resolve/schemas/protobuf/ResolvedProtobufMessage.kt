@@ -16,15 +16,15 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findMessa
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.rejectAll
 
 @ConsistentCopyVisibility
-data class ResolvedProtobufMessage
+public data class ResolvedProtobufMessage
 private constructor(
     override val name: ProtoIdentifier,
-    val fields: List<ResolvedProtobufField>,
-    val oneofs: List<ResolvedProtobufOneof>,
-    val reservations: ResolvedProtobufReservations,
+    public val fields: List<ResolvedProtobufField>,
+    public val oneofs: List<ResolvedProtobufOneof>,
+    public val reservations: ResolvedProtobufReservations,
 ) : ResolvedProtobufDeclaration {
-    companion object {
-        fun of(
+    public companion object {
+        public fun of(
             name: ProtoIdentifier,
             fields: List<ResolvedProtobufField>,
             oneofs: List<ResolvedProtobufOneof>,

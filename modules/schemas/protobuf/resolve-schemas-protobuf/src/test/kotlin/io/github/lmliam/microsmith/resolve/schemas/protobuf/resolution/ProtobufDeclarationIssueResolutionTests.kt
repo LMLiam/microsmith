@@ -27,7 +27,7 @@ import io.kotest.matchers.types.shouldBeTypeOf
 class ProtobufDeclarationIssueResolutionTests :
     StringSpec(
         {
-            val resolver = ProtobufSchemasResolver()
+            val resolver = protobufSchemasResolver()
 
             fun issuesOf(schemaName: String, declaration: Type) =
                 resolver

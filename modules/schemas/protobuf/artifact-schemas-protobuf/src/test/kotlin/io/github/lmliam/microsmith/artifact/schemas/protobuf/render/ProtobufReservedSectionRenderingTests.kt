@@ -5,7 +5,6 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.enumDeclar
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.messageDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.protoIdentifier
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.rangeSpan
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.renderProtobufDeclaration
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.reservations
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.singleSpan
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.emission.toMaxSpan
@@ -19,11 +18,17 @@ import io.kotest.matchers.shouldBe
 class ProtobufReservedSectionRenderingTests :
     StringSpec(
         {
+            val renderer =
+                ProtobufDeclarationRenderer(
+                    ProtobufReservedSectionRenderer(),
+                    ProtobufFieldRenderer(ProtobufValueTypeRenderer()),
+                )
+
             fun renderMessage(reservations: ResolvedProtobufReservations = ResolvedProtobufReservations.NONE) =
-                renderProtobufDeclaration(messageDeclaration(name = "Contact", reservations = reservations))
+                renderer.render(messageDeclaration(name = "Contact", reservations = reservations))
 
             fun renderEnum(reservations: ResolvedProtobufReservations) =
-                renderProtobufDeclaration(
+                renderer.render(
                     enumDeclaration(
                         name = "Status",
                         values =

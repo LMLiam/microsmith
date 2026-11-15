@@ -13,6 +13,11 @@ internal sealed interface ModuleLayerViolation {
         val dependency: String,
     ) : ModuleLayerViolation
 
+    data class PluginDependsOnGen(
+        val module: String,
+        val dependency: String,
+    ) : ModuleLayerViolation
+
     data class MetroTypeInPublishedApi(
         val module: String,
         val type: JvmClassName,

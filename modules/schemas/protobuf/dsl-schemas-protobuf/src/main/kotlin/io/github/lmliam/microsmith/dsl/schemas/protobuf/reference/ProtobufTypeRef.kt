@@ -1,5 +1,5 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.reference
 
-sealed interface ProtobufTypeRef {
-    val qualifiedName: String
+public sealed interface ProtobufTypeRef {
+    public val qualifiedName: String
 }

@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
 
-enum class Cardinality {
+public enum class Cardinality {
     SINGULAR,
     OPTIONAL,
     REPEATED,

@@ -11,9 +11,11 @@ import io.kotest.matchers.string.shouldNotContain
 class ProtobufFileRendererTests :
     StringSpec(
         {
+            val renderer = ProtobufFileRenderer()
+
             "render emits imports in order and package when present" {
                 val rendered =
-                    ProtobufFileRenderer.render(
+                    renderer.render(
                         ProtoFileArtifact(
                             id = ProtoFileArtifactId(packageName = "pkg", typeName = "User"),
                             imports = listOf("alpha/A.proto", "zeta/Z.proto"),
@@ -31,7 +33,7 @@ class ProtobufFileRendererTests :
 
             "render omits package when schema name is unqualified" {
                 val rendered =
-                    ProtobufFileRenderer.render(
+                    renderer.render(
                         ProtoFileArtifact(
                             id = ProtoFileArtifactId(packageName = null, typeName = "User"),
                             imports = emptyList(),

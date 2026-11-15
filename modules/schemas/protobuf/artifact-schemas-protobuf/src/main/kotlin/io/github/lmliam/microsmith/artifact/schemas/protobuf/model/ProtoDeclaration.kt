@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.model
 
-data class ProtoDeclaration(val name: String, val contents: String)
+public data class ProtoDeclaration(public val name: String, public val contents: String)

@@ -7,6 +7,6 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.reserved.Reserved
  *
  * In protobuf, `reserved` blocks are supported by messages and enums.
  */
-interface ReservedDeclarationOwner {
-    val reserved: List<Reserved>
+public interface ReservedDeclarationOwner {
+    public val reserved: List<Reserved>
 }

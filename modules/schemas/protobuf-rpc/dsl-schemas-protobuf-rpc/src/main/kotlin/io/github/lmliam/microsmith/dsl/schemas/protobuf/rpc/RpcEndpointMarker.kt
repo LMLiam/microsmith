@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc
 
-class RpcEndpointMarker(val target: String, val streaming: Boolean = false)
+public class RpcEndpointMarker(public val target: String, public val streaming: Boolean = false)

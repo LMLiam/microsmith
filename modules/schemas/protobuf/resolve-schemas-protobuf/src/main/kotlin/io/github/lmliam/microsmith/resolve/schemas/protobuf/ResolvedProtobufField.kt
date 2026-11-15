@@ -6,28 +6,28 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.FieldNumber
 
-sealed interface ResolvedProtobufField {
-    val name: ProtoIdentifier
-    val number: FieldNumber
+public sealed interface ResolvedProtobufField {
+    public val name: ProtoIdentifier
+    public val number: FieldNumber
 
-    data class Scalar(
+    public data class Scalar(
         override val name: ProtoIdentifier,
         override val number: FieldNumber,
-        val type: PrimitiveType,
-        val cardinality: Cardinality,
+        public val type: PrimitiveType,
+        public val cardinality: Cardinality,
     ) : ResolvedProtobufField
 
-    data class Reference(
+    public data class Reference(
         override val name: ProtoIdentifier,
         override val number: FieldNumber,
-        val reference: ResolvedProtobufReference,
-        val cardinality: Cardinality,
+        public val reference: ResolvedProtobufReference,
+        public val cardinality: Cardinality,
     ) : ResolvedProtobufField
 
-    data class Map(
+    public data class Map(
         override val name: ProtoIdentifier,
         override val number: FieldNumber,
-        val key: MapKeyType,
-        val value: ResolvedProtobufValueType,
+        public val key: MapKeyType,
+        public val value: ResolvedProtobufValueType,
     ) : ResolvedProtobufField
 }

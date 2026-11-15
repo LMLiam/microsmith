@@ -19,6 +19,8 @@ private fun dependencyViolation(
             ModuleLayerViolation.UpwardDependency(module, moduleLayer, dependency, dependencyLayer)
         moduleLayer == PipelineLayer.PLUGIN_API && isModuleOrSubmodule(dependency, RUNTIME_SCRIPTING) ->
             ModuleLayerViolation.PluginApiDependsOnRuntimeScripting(module, dependency)
+        moduleLayer == PipelineLayer.PLUGIN && dependencyLayer == PipelineLayer.GEN ->
+            ModuleLayerViolation.PluginDependsOnGen(module, dependency)
         else -> null
     }
 }

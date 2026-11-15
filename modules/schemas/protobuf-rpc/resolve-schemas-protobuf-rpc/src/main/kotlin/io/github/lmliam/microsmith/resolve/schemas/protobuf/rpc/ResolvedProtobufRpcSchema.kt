@@ -8,17 +8,17 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifie
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 @ConsistentCopyVisibility
-data class ResolvedProtobufRpcSchema
+public data class ResolvedProtobufRpcSchema
 private constructor(val qualifiedName: QualifiedSchemaName, val rpcs: List<ResolvedProtobufRpc>) {
-    val dependencies: List<QualifiedSchemaName> =
+    public val dependencies: List<QualifiedSchemaName> =
         dependenciesOf(qualifiedName, rpcs.flatMap { rpc -> listOf(rpc.request.target, rpc.response.target) })
 
-    sealed interface Rejection {
-        data class DuplicateRpcName(val name: ProtoIdentifier) : Rejection
+    public sealed interface Rejection {
+        public data class DuplicateRpcName(public val name: ProtoIdentifier) : Rejection
     }
 
-    companion object {
-        fun of(
+    public companion object {
+        public fun of(
             qualifiedName: QualifiedSchemaName,
             rpcs: List<ResolvedProtobufRpc>,
         ): EitherNel<Rejection, ResolvedProtobufRpcSchema> {

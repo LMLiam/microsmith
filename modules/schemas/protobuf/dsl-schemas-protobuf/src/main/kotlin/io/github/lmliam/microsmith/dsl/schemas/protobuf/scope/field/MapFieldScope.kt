@@ -10,81 +10,109 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.ProtobufTypeRe
 
 @Suppress("INAPPLICABLE_JVM_NAME")
 @MicrosmithDsl
-interface MapFieldScope : FieldScope {
-    fun key(keyType: MapKeyType)
+public interface MapFieldScope : FieldScope {
+    public fun key(keyType: MapKeyType)
 
-    fun value(valueType: ValueType)
+    public fun value(valueType: ValueType)
 
-    fun value(targetRef: String) = value(target = ref(targetRef))
+    public fun value(targetRef: String) {
+        value(target = ref(targetRef))
+    }
 
-    fun value(target: Reference) = value(valueType = target)
+    public fun value(target: Reference) {
+        value(valueType = target)
+    }
 
-    fun value(target: ProtobufTypeRef) = value(Reference.Symbolic(target))
+    public fun value(target: ProtobufTypeRef) {
+        value(Reference.Symbolic(target))
+    }
 
-    fun types(blockValue: () -> Pair<MapKeyType, ValueType>) = types(kvpValue = blockValue())
+    public fun types(blockValue: () -> Pair<MapKeyType, ValueType>) {
+        types(kvpValue = blockValue())
+    }
 
-    fun types(kvpValue: Pair<MapKeyType, ValueType>)
+    public fun types(kvpValue: Pair<MapKeyType, ValueType>)
 
-    fun types(keyType: MapKeyType, valueType: ValueType) = types(kvpValue = keyType to valueType)
+    public fun types(keyType: MapKeyType, valueType: ValueType) {
+        types(kvpValue = keyType to valueType)
+    }
 
-    fun types(keyType: MapKeyType, target: String) = types(kvpRef = keyType to target)
+    public fun types(keyType: MapKeyType, target: String) {
+        types(kvpRef = keyType to target)
+    }
 
-    fun types(keyType: MapKeyType, target: Reference) = types(kvpValue = keyType to target)
+    public fun types(keyType: MapKeyType, target: Reference) {
+        types(kvpValue = keyType to target)
+    }
 
-    fun types(keyType: MapKeyType, target: ProtobufTypeRef) = types(keyType, Reference.Symbolic(target))
+    public fun types(keyType: MapKeyType, target: ProtobufTypeRef) {
+        types(keyType, Reference.Symbolic(target))
+    }
 
-    @JvmName("typesStr") fun types(kvpRef: Pair<MapKeyType, String>) = types(kvp = kvpRef.first to ref(kvpRef.second))
+    @JvmName("typesStr")
+    public fun types(kvpRef: Pair<MapKeyType, String>) {
+        types(kvp = kvpRef.first to ref(kvpRef.second))
+    }
 
-    @JvmName("typesRef") fun types(kvp: Pair<MapKeyType, Reference>) = types(kvpValue = kvp)
+    @JvmName("typesRef")
+    public fun types(kvp: Pair<MapKeyType, Reference>) {
+        types(kvpValue = kvp)
+    }
 
-    @JvmName("typesPairRef") fun types(block: () -> Pair<MapKeyType, Reference>) = types(kvpValue = block())
+    @JvmName("typesPairRef")
+    public fun types(block: () -> Pair<MapKeyType, Reference>) {
+        types(kvpValue = block())
+    }
 
-    @JvmName("typesPairStr") fun types(blockRef: () -> Pair<MapKeyType, String>) = types(kvpRef = blockRef())
+    @JvmName("typesPairStr")
+    public fun types(blockRef: () -> Pair<MapKeyType, String>) {
+        types(kvpRef = blockRef())
+    }
 
-    fun ref(target: String): Reference
+    public fun ref(target: String): Reference
 
-    val int32
+    public val int32: PrimitiveType.INT32
         get() = PrimitiveType.INT32
 
-    val int64
+    public val int64: PrimitiveType.INT64
         get() = PrimitiveType.INT64
 
-    val uint32
+    public val uint32: PrimitiveType.UINT32
         get() = PrimitiveType.UINT32
 
-    val uint64
+    public val uint64: PrimitiveType.UINT64
         get() = PrimitiveType.UINT64
 
-    val sint32
+    public val sint32: PrimitiveType.SINT32
         get() = PrimitiveType.SINT32
 
-    val sint64
+    public val sint64: PrimitiveType.SINT64
         get() = PrimitiveType.SINT64
 
-    val fixed32
+    public val fixed32: PrimitiveType.FIXED32
         get() = PrimitiveType.FIXED32
 
-    val fixed64
+    public val fixed64: PrimitiveType.FIXED64
         get() = PrimitiveType.FIXED64
 
-    val sfixed32
+    public val sfixed32: PrimitiveType.SFIXED32
         get() = PrimitiveType.SFIXED32
 
-    val sfixed64
+    public val sfixed64: PrimitiveType.SFIXED64
         get() = PrimitiveType.SFIXED64
 
-    val float
+    public val float: PrimitiveType.FLOAT
         get() = PrimitiveType.FLOAT
 
-    val double
+    public val double: PrimitiveType.DOUBLE
         get() = PrimitiveType.DOUBLE
 
-    val bytes
+    public val bytes: PrimitiveType.BYTES
         get() = PrimitiveType.BYTES
 
-    val bool
+    public val bool: PrimitiveType.BOOL
         get() = PrimitiveType.BOOL
 
-    val string
+    public val string: PrimitiveType.STRING
         get() = PrimitiveType.STRING
 }

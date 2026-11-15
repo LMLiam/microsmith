@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
 
-data class ReferenceField(
+public data class ReferenceField(
     override val name: String,
     override val index: Int,
-    val reference: Reference,
+    public val reference: Reference,
     override val cardinality: Cardinality = Cardinality.SINGULAR,
 ) : CardinalityField

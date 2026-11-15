@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc
 
-data class ProtobufRpcEndpoint(val typeName: String, val streaming: Boolean)
+public data class ProtobufRpcEndpoint(public val typeName: String, public val streaming: Boolean)

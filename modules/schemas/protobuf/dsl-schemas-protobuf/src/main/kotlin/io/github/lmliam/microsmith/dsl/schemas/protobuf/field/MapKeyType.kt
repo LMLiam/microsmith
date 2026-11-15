@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
 
-sealed interface MapKeyType : PrimitiveType
+public sealed interface MapKeyType : PrimitiveType

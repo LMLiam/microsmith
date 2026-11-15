@@ -10,8 +10,9 @@ import arrow.core.toEitherNel
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.numbers.ProtobufNumberLimits
 
 @ConsistentCopyVisibility
-data class ReservedSpan private constructor(val first: Int, val last: Int, val domain: Domain, private val form: Form) {
-    val notation: String
+public data class ReservedSpan
+private constructor(public val first: Int, public val last: Int, public val domain: Domain, private val form: Form) {
+    public val notation: String
         get() =
             when (form) {
                 Form.SINGLE -> "$first"
@@ -19,18 +20,18 @@ data class ReservedSpan private constructor(val first: Int, val last: Int, val d
                 Form.TO_MAX -> "$first to max"
             }
 
-    val numbers: IntRange
+    public val numbers: IntRange
         get() = first..last
 
-    enum class Domain(val min: Int, val max: Int) {
+    public enum class Domain(public val min: Int, public val max: Int) {
         MESSAGE(ProtobufNumberLimits.FIELD_MIN, ProtobufNumberLimits.FIELD_MAX),
         ENUM(ProtobufNumberLimits.ENUM_MIN, ProtobufNumberLimits.ENUM_MAX),
     }
 
-    sealed interface Rejection {
-        data class Descending(val first: Int, val last: Int) : Rejection
+    public sealed interface Rejection {
+        public data class Descending(public val first: Int, public val last: Int) : Rejection
 
-        data class OutOfDomain(val number: Int) : Rejection
+        public data class OutOfDomain(public val number: Int) : Rejection
     }
 
     private enum class Form {
@@ -39,11 +40,11 @@ data class ReservedSpan private constructor(val first: Int, val last: Int, val d
         TO_MAX,
     }
 
-    companion object {
-        fun single(number: Int, domain: Domain): EitherNel<Rejection, ReservedSpan> =
+    public companion object {
+        public fun single(number: Int, domain: Domain): EitherNel<Rejection, ReservedSpan> =
             inDomain(number, domain).map { ReservedSpan(number, number, domain, Form.SINGLE) }.toEitherNel()
 
-        fun range(first: Int, last: Int, domain: Domain): EitherNel<Rejection, ReservedSpan> =
+        public fun range(first: Int, last: Int, domain: Domain): EitherNel<Rejection, ReservedSpan> =
             if (first > last) {
                 Rejection.Descending(first, last).leftNel()
             } else {
@@ -54,7 +55,7 @@ data class ReservedSpan private constructor(val first: Int, val last: Int, val d
                 }
             }
 
-        fun toMax(first: Int, domain: Domain): EitherNel<Rejection, ReservedSpan> =
+        public fun toMax(first: Int, domain: Domain): EitherNel<Rejection, ReservedSpan> =
             inDomain(first, domain).map { ReservedSpan(first, domain.max, domain, Form.TO_MAX) }.toEitherNel()
 
         private fun inDomain(number: Int, domain: Domain): Either<Rejection, Int> =

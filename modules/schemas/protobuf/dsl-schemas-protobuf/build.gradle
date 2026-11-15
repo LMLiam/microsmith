@@ -2,3 +2,7 @@ dependencies {
     api project(":dsl")
     implementation project(":dsl-schemas")
 }
+
+kotlin {
+    explicitApi()
+}

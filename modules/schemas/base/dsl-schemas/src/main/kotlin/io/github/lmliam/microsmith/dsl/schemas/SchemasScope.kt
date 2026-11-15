@@ -8,4 +8,4 @@ import io.github.lmliam.microsmith.dsl.MicrosmithDsl
  * This scope is intentionally empty: dialect modules contribute extension functions on [SchemasScope], such as
  * `protobuf { ... }`.
  */
-@MicrosmithDsl interface SchemasScope
+@MicrosmithDsl public interface SchemasScope

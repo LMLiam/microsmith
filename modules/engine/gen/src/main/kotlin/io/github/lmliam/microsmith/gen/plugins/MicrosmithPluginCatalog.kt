@@ -50,5 +50,9 @@ public fun discoverMicrosmithPlugins(classLoader: ClassLoader): MicrosmithPlugin
         resolutionIssueDiagnosticMappers = loadServices(ResolutionIssueDiagnosticMapper::class, classLoader),
     )
 
+@InternalMicrosmithApi
+public fun discoverMicrosmithPluginIds(classLoader: ClassLoader): Set<String> =
+    discoverPlugins(classLoader).mapTo(sortedSetOf()) { it.id }
+
 private fun <T : Any> loadServices(type: KClass<T>, classLoader: ClassLoader): List<T> =
     ServiceLoader.load(type.java, classLoader).iterator().asSequence().toList()

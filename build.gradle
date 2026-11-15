@@ -194,6 +194,8 @@ subprojects {
                 exclude {
                     annotatedWith.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
                     byNames.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+                    byNames.add('**Contributions?To*')
+                    byNames.add('**Contributions?To*?**')
                 }
             }
         }
@@ -203,6 +205,9 @@ subprojects {
             freeCompilerArgs.addAll([
                 '-Xjsr305=strict',
             ])
+            if (project.path != ':runtime-scripting-api') {
+                optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+            }
         }
     }
 

@@ -1,11 +1,7 @@
 public abstract interface class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcArtifact : io/github/lmliam/microsmith/artifact/schemas/protobuf/ProtobufArtifact {
 }
 
-public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcArtifactContributor : io/github/lmliam/microsmith/artifact/ArtifactContributor {
-	public fun <init> ()V
-	public synthetic fun contribute (Lio/github/lmliam/microsmith/resolve/ResolvedModel;)Ljava/util/List;
-	public fun contribute (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel;)Ljava/util/List;
-	public fun getResolvedType ()Lkotlin/reflect/KClass;
+public abstract class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcArtifactContributorContributions {
 }
 
 public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcEndpoint {
@@ -52,13 +48,7 @@ public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/Pro
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
-	public fun <init> ()V
-	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifact;
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
-	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun merge (Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifact;
+public abstract class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactAssemblerContributions {
 }
 
 public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactId : io/github/lmliam/microsmith/artifact/ArtifactId {
@@ -72,23 +62,6 @@ public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/Pro
 	public final fun getPackageName ()Ljava/lang/String;
 	public final fun getProtoFile ()Lio/github/lmliam/microsmith/artifact/schemas/protobuf/model/ProtoFileArtifactId;
 	public final fun getServiceName ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceContribution : io/github/lmliam/microsmith/artifact/ArtifactContribution {
-	public fun <init> (Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactId;Ljava/util/List;Ljava/util/List;)V
-	public synthetic fun <init> (Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactId;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1 ()Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactId;
-	public final fun component2 ()Ljava/util/List;
-	public final fun component3 ()Ljava/util/List;
-	public final fun copy (Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactId;Ljava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceContribution;
-	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceContribution;Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactId;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceContribution;
-	public fun equals (Ljava/lang/Object;)Z
-	public synthetic fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/ArtifactId;
-	public fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactId;
-	public final fun getImports ()Ljava/util/List;
-	public final fun getOperations ()Ljava/util/List;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

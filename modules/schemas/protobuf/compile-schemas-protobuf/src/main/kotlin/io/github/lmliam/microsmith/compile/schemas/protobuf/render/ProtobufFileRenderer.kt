@@ -1,10 +1,12 @@
 package io.github.lmliam.microsmith.compile.schemas.protobuf.render
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 
-internal object ProtobufFileRenderer {
-    private const val PROTO3_SYNTAX_LINE = "syntax = \"proto3\";"
+private const val PROTO3_SYNTAX_LINE = "syntax = \"proto3\";"
 
+@Inject
+internal class ProtobufFileRenderer {
     fun render(artifact: ProtoFileArtifact): String = buildString {
         appendLine(PROTO3_SYNTAX_LINE)
         val packageName = artifact.id.packageName

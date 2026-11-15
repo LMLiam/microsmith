@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc
 
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly.ProtoFileMerge
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -8,7 +9,7 @@ import io.kotest.matchers.shouldBe
 class ProtobufRpcServiceArtifactAssemblerTests :
     StringSpec(
         {
-            val assembler = ProtobufRpcServiceArtifactAssembler()
+            val assembler = ProtobufRpcServiceArtifactAssembler(ProtoFileMerge())
             val sharedId = ProtobufRpcServiceArtifactId(packageName = "acme.user.v1", serviceName = "UserService")
 
             fun operation(name: String, request: String = "acme.user.v1.GetUserRequest") =

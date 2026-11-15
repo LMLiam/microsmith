@@ -1,12 +1,18 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly.ProtoFileMemberKind
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly.ProtoFileMerge
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcPluginScope
 
-@ServiceProvider(ArtifactAssembler::class)
-class ProtobufRpcServiceArtifactAssembler : ArtifactAssembler<ProtobufRpcServiceArtifact> {
+@Inject
+@ContributesIntoSet(ProtobufRpcPluginScope::class, binding = binding<ArtifactAssembler<*>>())
+internal class ProtobufRpcServiceArtifactAssembler(private val merge: ProtoFileMerge) :
+    ArtifactAssembler<ProtobufRpcServiceArtifact> {
     override val artifactType = ProtobufRpcServiceArtifact::class
 
     override fun create(contribution: ArtifactContribution<ProtobufRpcServiceArtifact>): ProtobufRpcServiceArtifact {
@@ -26,8 +32,8 @@ class ProtobufRpcServiceArtifactAssembler : ArtifactAssembler<ProtobufRpcService
         val owner = current.id.protoFile.fullyQualifiedName
 
         return current.copy(
-            imports = ProtoFileMerge.imports(current.imports, next.imports),
-            operations = ProtoFileMerge.members(current.operations, next.operations, "RPC", owner) { it.name },
+            imports = merge.imports(current.imports, next.imports),
+            operations = merge.members(current.operations, next.operations, ProtoFileMemberKind.RPC, owner) { it.name },
         )
     }
 

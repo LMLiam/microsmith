@@ -1,0 +1,6 @@
+public final class io/github/lmliam/microsmith/plugin/schemas/protobuf/rpc/ProtobufRpcPlugin : io/github/lmliam/microsmith/plugin/MicrosmithPlugin {
+	public fun <init> ()V
+	public fun getId ()Ljava/lang/String;
+	public fun services (Lio/github/lmliam/microsmith/plugin/HostServices;)Lio/github/lmliam/microsmith/plugin/PluginServices;
+}
+

@@ -31,7 +31,7 @@ import io.kotest.matchers.types.shouldBeTypeOf
 class ProtobufSchemasResolverTests :
     StringSpec(
         {
-            val resolver = ProtobufSchemasResolver()
+            val resolver = protobufSchemasResolver()
 
             "resolves schemas whose references exist" {
                 val schemas = microsmith {

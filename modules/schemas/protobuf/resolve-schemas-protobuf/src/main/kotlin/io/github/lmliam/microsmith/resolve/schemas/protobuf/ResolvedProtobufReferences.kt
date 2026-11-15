@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf
 
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufDeclarationKind
 
@@ -44,8 +45,11 @@ internal fun ResolvedProtobufDeclaration.kind(): ProtobufDeclarationKind =
         is ResolvedProtobufEnum -> ProtobufDeclarationKind.ENUM
     }
 
-fun dependenciesOf(identity: QualifiedSchemaName, targets: List<QualifiedSchemaName>): List<QualifiedSchemaName> =
-    targets.filter { it != identity }.distinct().sortedBy { it.fullyQualifiedName }
+@InternalMicrosmithApi
+public fun dependenciesOf(
+    identity: QualifiedSchemaName,
+    targets: List<QualifiedSchemaName>,
+): List<QualifiedSchemaName> = targets.filter { it != identity }.distinct().sortedBy { it.fullyQualifiedName }
 
 internal fun List<LocatedReference>.targets(): List<QualifiedSchemaName> = map { it.reference.target }
 

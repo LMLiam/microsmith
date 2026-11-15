@@ -2,10 +2,10 @@ package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.ProtobufTypeRef
 
-sealed interface Reference : ValueType {
-    data class Local(val target: String) : Reference
+public sealed interface Reference : ValueType {
+    public data class Local(val target: String) : Reference
 
-    data class Relative(val levelsUp: Int, val path: List<String>) : Reference {
+    public data class Relative(val levelsUp: Int, val path: List<String>) : Reference {
         init {
             require(levelsUp > 0) { "Relative reference must go up at least one level: $levelsUp" }
             require(path.isNotEmpty() && path.none(String::isBlank)) {
@@ -14,11 +14,11 @@ sealed interface Reference : ValueType {
         }
     }
 
-    data class Qualified(val qualifiedName: String) : Reference
+    public data class Qualified(val qualifiedName: String) : Reference
 
-    data class Symbolic(val target: ProtobufTypeRef) : Reference
+    public data class Symbolic(val target: ProtobufTypeRef) : Reference
 
-    fun resolveSegments(scope: List<String>): List<String> =
+    public fun resolveSegments(scope: List<String>): List<String> =
         when (this) {
             is Local -> scope + target
             is Relative -> scope.dropLast(levelsUp.coerceAtMost(scope.size)) + path
@@ -26,8 +26,8 @@ sealed interface Reference : ValueType {
             is Symbolic -> target.qualifiedName.split('.')
         }
 
-    companion object {
-        fun parse(target: String): Reference {
+    public companion object {
+        public fun parse(target: String): Reference {
             require(target.isNotBlank()) { "Reference target cannot be blank." }
 
             val levelsUp = target.takeWhile { it == '.' }.length

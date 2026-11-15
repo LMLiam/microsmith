@@ -22,7 +22,7 @@ import io.kotest.matchers.types.shouldBeTypeOf
 class ProtobufNameConflictResolutionTests :
     StringSpec(
         {
-            val resolver = ProtobufSchemasResolver()
+            val resolver = protobufSchemasResolver()
 
             fun resolve(vararg schemas: ProtobufSchema) = resolver.resolve(SchemasExtension(schemas.toSet()))
 

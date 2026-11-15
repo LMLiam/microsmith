@@ -18,25 +18,25 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.scope.oneof.OneofScope
 
 @Suppress("INAPPLICABLE_JVM_NAME")
 @MicrosmithDsl
-interface MessageScope : ScalarFields<ScalarFieldScope, ScalarField>, Reservable {
-    fun optional(field: CardinalityField)
+public interface MessageScope : ScalarFields<ScalarFieldScope, ScalarField>, Reservable {
+    public fun optional(field: CardinalityField)
 
-    fun optional(block: MessageScope.() -> CardinalityField)
+    public fun optional(block: MessageScope.() -> CardinalityField)
 
-    fun repeated(field: CardinalityField)
+    public fun repeated(field: CardinalityField)
 
-    fun repeated(block: MessageScope.() -> CardinalityField)
+    public fun repeated(block: MessageScope.() -> CardinalityField)
 
-    fun oneof(name: String, block: OneofScope.() -> Unit)
+    public fun oneof(name: String, block: OneofScope.() -> Unit)
 
-    fun map(name: String, block: MapFieldScope.() -> Unit): MapField
+    public fun map(name: String, block: MapFieldScope.() -> Unit): MapField
 
-    fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit = {}): ReferenceField
+    public fun ref(name: String, target: String, block: ReferenceFieldScope.() -> Unit = {}): ReferenceField
 
-    fun ref(name: String, target: ProtobufTypeRef, block: ReferenceFieldScope.() -> Unit = {}): ReferenceField
+    public fun ref(name: String, target: ProtobufTypeRef, block: ReferenceFieldScope.() -> Unit = {}): ReferenceField
 
-    val max
+    public val max: Max
         get() = Max
 
-    operator fun Int.rangeTo(max: Max) = MaxRange(this)
+    public operator fun Int.rangeTo(max: Max): MaxRange = MaxRange(this)
 }

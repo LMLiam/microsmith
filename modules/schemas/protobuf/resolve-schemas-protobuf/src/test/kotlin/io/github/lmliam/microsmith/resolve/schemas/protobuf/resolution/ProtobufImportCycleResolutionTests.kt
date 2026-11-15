@@ -22,7 +22,7 @@ import io.kotest.matchers.types.shouldBeTypeOf
 class ProtobufImportCycleResolutionTests :
     StringSpec(
         {
-            val resolver = ProtobufSchemasResolver()
+            val resolver = protobufSchemasResolver()
 
             fun resolve(schemas: List<ProtobufSchema>) = resolver.resolve(SchemasExtension(schemas.toSet()))
 

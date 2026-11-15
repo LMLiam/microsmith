@@ -3,36 +3,38 @@ package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc
 import io.github.lmliam.microsmith.resolve.ResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 
-sealed interface ProtobufRpcResolutionIssue : ResolutionIssue {
-    data class SchemaIssue(val issue: ProtobufResolutionIssue) : ProtobufRpcResolutionIssue
+public sealed interface ProtobufRpcResolutionIssue : ResolutionIssue {
+    public data class SchemaIssue(public val issue: ProtobufResolutionIssue) : ProtobufRpcResolutionIssue
 
-    data class InvalidEndpointTargetName(
-        val serviceName: String,
-        val rpcName: String,
-        val position: EndpointPosition,
-        val targetName: String,
-        val reason: ProtobufResolutionIssue.InvalidSchemaName.Reason,
+    public data class InvalidEndpointTargetName(
+        public val serviceName: String,
+        public val rpcName: String,
+        public val position: EndpointPosition,
+        public val targetName: String,
+        public val reason: ProtobufResolutionIssue.InvalidSchemaName.Reason,
     ) : ProtobufRpcResolutionIssue
 
-    data class EndpointMustTargetMessage(
-        val serviceName: String,
-        val rpcName: String,
-        val position: EndpointPosition,
-        val targetName: String,
+    public data class EndpointMustTargetMessage(
+        public val serviceName: String,
+        public val rpcName: String,
+        public val position: EndpointPosition,
+        public val targetName: String,
     ) : ProtobufRpcResolutionIssue
 
-    data class EndpointTargetNotFound(
-        val serviceName: String,
-        val rpcName: String,
-        val position: EndpointPosition,
-        val targetName: String,
+    public data class EndpointTargetNotFound(
+        public val serviceName: String,
+        public val rpcName: String,
+        public val position: EndpointPosition,
+        public val targetName: String,
     ) : ProtobufRpcResolutionIssue
 
-    data class InvalidRpcName(val serviceName: String, val rpcName: String) : ProtobufRpcResolutionIssue
+    public data class InvalidRpcName(public val serviceName: String, public val rpcName: String) :
+        ProtobufRpcResolutionIssue
 
-    data class DuplicateRpcName(val serviceName: String, val rpcName: String) : ProtobufRpcResolutionIssue
+    public data class DuplicateRpcName(public val serviceName: String, public val rpcName: String) :
+        ProtobufRpcResolutionIssue
 
-    enum class EndpointPosition {
+    public enum class EndpointPosition {
         REQUEST,
         RESPONSE,
     }

@@ -4,7 +4,8 @@ import io.github.lmliam.microsmith.dsl.MergeableExtension
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 
 /** Root extension that holds all declared schemas. */
-data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension, MergeableExtension<SchemasExtension> {
+public data class SchemasExtension(public val schemas: Set<Schema>) :
+    MicrosmithExtension, MergeableExtension<SchemasExtension> {
     init {
         val duplicateKeys =
             schemas
@@ -27,18 +28,18 @@ data class SchemasExtension(val schemas: Set<Schema>) : MicrosmithExtension, Mer
      *
      * @return the matching [Schema], or `null` if not found.
      */
-    fun find(type: SchemaType, name: String) = index[schemaKey(type, name)]
+    public fun find(type: SchemaType, name: String): Schema? = index[schemaKey(type, name)]
 
     /**
      * Require a schema by [type] and [name].
      *
      * @throws IllegalStateException if no schema with the given type and name exists.
      */
-    fun require(type: SchemaType, name: String) =
+    public fun require(type: SchemaType, name: String): Schema =
         find(type, name) ?: error("Schema not found: ${schemaDisplayKey(type, name)}")
 
     /** Convenience: return all schemas of a given [type]. */
-    fun allOf(type: SchemaType) = schemas.filter { it.type == type }.toSet()
+    public fun allOf(type: SchemaType): Set<Schema> = schemas.filter { it.type == type }.toSet()
 
     override fun merge(other: SchemasExtension): SchemasExtension {
         val existingKeys = schemas.mapTo(mutableSetOf(), Schema::schemaKey)

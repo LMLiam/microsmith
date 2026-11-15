@@ -706,10 +706,6 @@ public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/Resolved
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufReferencesKt {
-	public static final fun dependenciesOf (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Ljava/util/List;)Ljava/util/List;
-}
-
 public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ResolvedProtobufRejection {
 }
 
@@ -1056,17 +1052,6 @@ public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/Resolved
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/diagnostics/ProtobufDiagnosticSupportKt {
-	public static final fun displayName (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName$Reason;)Ljava/lang/String;
-}
-
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/diagnostics/ProtobufResolutionDiagnosticMapper : io/github/lmliam/microsmith/resolve/diagnostics/ResolutionIssueDiagnosticMapper {
-	public fun <init> ()V
-	public fun getIssueType ()Lkotlin/reflect/KClass;
-	public synthetic fun map (Lio/github/lmliam/microsmith/resolve/ResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
-	public fun map (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
-}
-
 public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtoIdentifier {
 	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtoIdentifier$Companion;
 	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtoIdentifier;
@@ -1083,11 +1068,6 @@ public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/Pr
 
 public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtoIdentifier$Companion {
 	public final fun parse (Ljava/lang/String;)Larrow/core/Either;
-}
-
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtobufNameValidation {
-	public static final field INSTANCE Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtobufNameValidation;
-	public final fun parseQualifiedName (Ljava/lang/String;)Larrow/core/Either;
 }
 
 public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName {
@@ -1207,58 +1187,6 @@ public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resoluti
 	public static fun values ()[Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
 }
 
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKindKt {
-	public static final fun declarationKind (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
-}
-
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSchemasResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
-	public fun <init> ()V
-	public fun getAuthoringType ()Lkotlin/reflect/KClass;
-	public fun getResolvedType ()Lkotlin/reflect/KClass;
-	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
-	public fun resolve (Lio/github/lmliam/microsmith/dsl/schemas/SchemasExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
-}
-
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable {
-	public fun <init> (Ljava/util/Collection;)V
-	public final fun lookup (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/field/Reference;)Larrow/core/Either;
-}
-
-public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure {
-}
-
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$InvalidName : io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure {
-	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;)V
-	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;
-	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$InvalidName;
-	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$InvalidName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$InvalidName;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getIssue ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue$InvalidSchemaName;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$Unknown : io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure {
-	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;)V
-	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
-	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$Unknown;
-	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$Unknown;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$LookupFailure$Unknown;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getTarget ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$Symbol {
-	public fun <init> (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;)V
-	public final fun component1 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
-	public final fun component2 ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
-	public final fun copy (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$Symbol;
-	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$Symbol;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable$Symbol;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getIdentity ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName;
-	public final fun getKind ()Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
+public abstract class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSchemasResolverContributions {
 }
 
