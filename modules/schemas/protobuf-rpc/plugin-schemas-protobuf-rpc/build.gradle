@@ -14,12 +14,6 @@ dependencies {
     implementation project(":resolve-schemas-protobuf-rpc")
     implementation project(":artifact-schemas-protobuf-rpc")
     implementation project(":compile-schemas-protobuf-rpc")
-
-    testImplementation project(":dsl")
-    testImplementation project(":dsl-schemas")
-    testImplementation project(":dsl-schemas-protobuf")
-    testImplementation project(":dsl-schemas-protobuf-rpc")
-    testImplementation project(":gen")
 }
 
 kotlin {

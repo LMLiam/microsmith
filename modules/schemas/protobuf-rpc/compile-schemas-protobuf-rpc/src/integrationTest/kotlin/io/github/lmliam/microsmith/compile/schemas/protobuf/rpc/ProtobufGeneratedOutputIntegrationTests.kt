@@ -14,12 +14,13 @@ import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readBytes
 import kotlin.io.path.relativeTo
+import kotlin.io.path.toPath
 import kotlin.io.path.walk
 
-class GoldenOutputIntegrationTests :
+class ProtobufGeneratedOutputIntegrationTests :
     StringSpec(
         {
-            "generateTo protobuf and rpc models writes files byte-identical to the golden files" {
+            "generateTo protobuf and rpc models writes files byte-identical to the expected output files" {
                 val model = microsmith {
                     schemas {
                         protobuf {
@@ -113,16 +114,18 @@ class GoldenOutputIntegrationTests :
                     }
                 }
 
-                val outputRoot = tempdir("golden-output-").toPath()
+                val outputRoot = tempdir("generated-output-").toPath()
                 model.generateTo(outputRoot)
 
                 val generated = outputRoot.regularFilesByRelativePath()
-                val golden =
-                    Path.of(checkNotNull(javaClass.getResource("/golden/protobuf")).toURI())
+                val expected =
+                    checkNotNull(javaClass.getResource("/expected-output/protobuf"))
+                        .toURI()
+                        .toPath()
                         .regularFilesByRelativePath()
 
-                generated.keys shouldBe golden.keys
-                generated.filter { (path, bytes) -> !bytes.contentEquals(golden.getValue(path)) }.keys shouldBe
+                generated.keys shouldBe expected.keys
+                generated.filter { (path, bytes) -> !bytes.contentEquals(expected.getValue(path)) }.keys shouldBe
                     emptySet()
             }
         },
