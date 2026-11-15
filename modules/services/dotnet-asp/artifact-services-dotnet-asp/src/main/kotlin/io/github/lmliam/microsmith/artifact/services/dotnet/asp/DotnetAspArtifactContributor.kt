@@ -12,7 +12,9 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.Dotnet
 
 @Inject
 @ContributesIntoSet(DotnetAspPluginScope::class, binding = binding<ArtifactContributor<*>>())
-internal class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorkspace> {
+internal class DotnetAspArtifactContributor(
+    private val artifactFactories: DotnetAspServiceArtifactFactory.Factory,
+) : ArtifactContributor<DotnetAspWorkspace> {
     override val resolvedType = DotnetAspWorkspace::class
 
     override fun contribute(model: DotnetAspWorkspace): List<ArtifactContribution<*>> =
@@ -24,5 +26,5 @@ internal class DotnetAspArtifactContributor : ArtifactContributor<DotnetAspWorks
                     { (_, artifactId) -> artifactId.projectName },
                 ),
             )
-            .map { (service, artifactId) -> DotnetAspServiceArtifactFactory(service, artifactId).createContribution() }
+            .map { (service, artifactId) -> artifactFactories.create(service, artifactId).createContribution() }
 }

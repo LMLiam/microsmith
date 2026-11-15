@@ -15,8 +15,8 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.ResolvedDotnetService
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspService
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspGenerationResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.DotnetAspNamingPolicy
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspControllerBaseTypeName
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRestTreeResolver
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRouteResolver
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRouteSegmentParser
@@ -29,6 +29,7 @@ internal class DotnetAspWorkspaceResolver(
     private val dotnetWorkspaceResolver: DotnetWorkspaceResolver,
     private val restResolver: DotnetAspRestResolver,
     private val portAllocator: DotnetAspPortAllocator,
+    private val namingPolicy: DotnetAspNamingPolicy,
 ) {
     fun resolve(extension: ServicesExtension): EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> {
         val aspServiceNames =
@@ -106,7 +107,7 @@ internal class DotnetAspWorkspaceResolver(
         services: List<ResolvedDotnetService>,
     ): EitherNel<DotnetResolutionIssue, Unit> {
         val issues = services.mapNotNull { service ->
-            val typeName = dotnetAspControllerBaseTypeName(service.project)
+            val typeName = namingPolicy.controllerBaseTypeName(service.project)
             if (typeName == MICROSMITH_CONTROLLER_BASE_TYPE_NAME) {
                 DotnetAspGenerationResolutionIssue.ControllerBaseTypeCollision(
                     service.name,

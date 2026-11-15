@@ -692,10 +692,6 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/namin
 	public static final field HTTP_NO_CONTENT_STATUS_CODE I
 	public static final field MICROSMITH_CONTROLLER_BASE_TYPE_NAME Ljava/lang/String;
 	public static final field RESULT_BODY_PROPERTY_NAME Ljava/lang/String;
-	public static final fun dotnetAspControllerBaseTypeName (Ljava/lang/String;)Ljava/lang/String;
-	public static final fun dotnetAspHeaderPropertyName (Ljava/lang/String;)Ljava/lang/String;
-	public static final fun dotnetAspResultBaseTypeName (Ljava/lang/String;)Ljava/lang/String;
-	public static final fun dotnetAspResultVariantTypeName (Ljava/lang/String;I)Ljava/lang/String;
 }
 
 public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspace : io/github/lmliam/microsmith/resolve/services/ResolvedServicesModel {

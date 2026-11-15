@@ -1,5 +1,8 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp.service
 
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointBindingsArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
@@ -19,13 +22,23 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRequestBinding
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspService
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspResultBaseTypeName
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspResultVariantTypeName
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.DotnetAspNamingPolicy
 
-internal class DotnetAspServiceArtifactFactory(
-    private val service: ResolvedDotnetAspService,
-    private val artifactId: DotnetAspServiceArtifactId,
+internal class DotnetAspServiceArtifactFactory
+@AssistedInject
+constructor(
+    @Assisted private val service: ResolvedDotnetAspService,
+    @Assisted private val artifactId: DotnetAspServiceArtifactId,
+    private val namingPolicy: DotnetAspNamingPolicy,
 ) {
+    @AssistedFactory
+    fun interface Factory {
+        fun create(
+            service: ResolvedDotnetAspService,
+            artifactId: DotnetAspServiceArtifactId,
+        ): DotnetAspServiceArtifactFactory
+    }
+
     private val usedTypeNames = linkedSetOf<String>()
 
     private val sharedModelsByName =
@@ -41,9 +54,9 @@ internal class DotnetAspServiceArtifactFactory(
 
     init {
         service.rest.endpoints.forEach { endpoint ->
-            usedTypeNames += dotnetAspResultBaseTypeName(endpoint.operationName)
+            usedTypeNames += namingPolicy.resultBaseTypeName(endpoint.operationName)
             endpoint.responses.forEach { response ->
-                usedTypeNames += dotnetAspResultVariantTypeName(endpoint.operationName, response.statusCode)
+                usedTypeNames += namingPolicy.resultVariantTypeName(endpoint.operationName, response.statusCode)
             }
         }
     }

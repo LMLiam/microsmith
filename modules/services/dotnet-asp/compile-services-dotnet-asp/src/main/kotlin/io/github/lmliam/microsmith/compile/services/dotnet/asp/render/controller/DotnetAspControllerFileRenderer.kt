@@ -6,16 +6,21 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspC
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpNamespaces
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.using
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.contractsNamespace
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllerBaseTypeName
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllersNamespace
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpRenderer
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.file
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.DotnetAspNamingPolicy
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
 
 @Inject
-internal class DotnetAspControllerFileRenderer(private val csharpRenderer: CSharpRenderer) {
+internal class DotnetAspControllerFileRenderer(
+    private val csharpRenderer: CSharpRenderer,
+    private val namingPolicy: DotnetAspNamingPolicy,
+    private val actionRendering: DotnetAspControllerActionRendering,
+    private val resultRendering: DotnetAspControllerResultRendering,
+) {
     fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): String =
         csharpRenderer.render(
             file(controllersNamespace(artifact)) {
@@ -25,14 +30,16 @@ internal class DotnetAspControllerFileRenderer(private val csharpRenderer: CShar
                 using(DotnetAspCSharpNamespaces.SystemThreading.Root)
                 using(DotnetAspCSharpNamespaces.SystemThreading.Tasks)
                 classType(
-                    name = controllerBaseTypeName(artifact),
+                    name = namingPolicy.controllerBaseTypeName(artifact.id.projectName),
                     modifiers = listOf(CSharp.Modifier.PUBLIC, CSharp.Modifier.ABSTRACT),
                     baseTypes = listOf(csharpType(MICROSMITH_CONTROLLER_BASE_TYPE_NAME)),
                     attributes = listOf(DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.ApiController),
                 ) {
-                    artifact.endpoints.forEach { endpoint -> addMember(renderActionMethod(endpoint)) }
-                    artifact.endpoints.forEach { endpoint -> addMember(renderAbstractHandler(endpoint)) }
-                    artifact.endpoints.forEach { endpoint -> addMember(renderResultMapper(endpoint)) }
+                    artifact.endpoints.forEach { endpoint -> addMember(actionRendering.renderActionMethod(endpoint)) }
+                    artifact.endpoints.forEach { endpoint ->
+                        addMember(actionRendering.renderAbstractHandler(endpoint))
+                    }
+                    artifact.endpoints.forEach { endpoint -> addMember(resultRendering.renderResultMapper(endpoint)) }
                 }
             },
         )

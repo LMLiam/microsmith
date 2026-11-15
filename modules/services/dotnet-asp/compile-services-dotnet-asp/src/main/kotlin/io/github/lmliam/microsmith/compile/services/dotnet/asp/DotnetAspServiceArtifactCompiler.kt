@@ -11,8 +11,7 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpAttributes
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllerBaseRelativePath
-import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.microsmithControllerBaseRelativePath
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllerRelativePath
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.contract.DotnetAspContractFileRenderer
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controller.DotnetAspControllerFileRenderer
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.hosting.DotnetAspInfrastructureFileRenderer
@@ -21,6 +20,8 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.re
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.renderDotnetAspLaunchSettingsFile
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.textContribution
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspPluginScope
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.DotnetAspNamingPolicy
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
 
 @Inject
 @ContributesIntoSet(DotnetAspPluginScope::class, binding = binding<ArtifactCompiler<*>>())
@@ -28,6 +29,7 @@ internal class DotnetAspServiceArtifactCompiler(
     private val infrastructureRenderer: DotnetAspInfrastructureFileRenderer,
     private val contractRenderer: DotnetAspContractFileRenderer,
     private val controllerRenderer: DotnetAspControllerFileRenderer,
+    private val namingPolicy: DotnetAspNamingPolicy,
 ) : ServicesArtifactCompiler<DotnetAspServiceArtifact> {
     override val artifactType = DotnetAspServiceArtifact::class
 
@@ -79,13 +81,13 @@ internal class DotnetAspServiceArtifactCompiler(
             )
             add(
                 artifact.textContribution(
-                    microsmithControllerBaseRelativePath(),
+                    controllerRelativePath(MICROSMITH_CONTROLLER_BASE_TYPE_NAME),
                     infrastructureRenderer.renderMicrosmithControllerBaseFile(artifact),
                 ),
             )
             add(
                 artifact.textContribution(
-                    controllerBaseRelativePath(artifact),
+                    controllerRelativePath(namingPolicy.controllerBaseTypeName(artifact.id.projectName)),
                     controllerRenderer.renderControllerBaseFile(artifact),
                 ),
             )
