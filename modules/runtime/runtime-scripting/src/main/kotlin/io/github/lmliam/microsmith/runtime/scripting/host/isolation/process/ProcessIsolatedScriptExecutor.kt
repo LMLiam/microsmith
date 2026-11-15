@@ -1,16 +1,18 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.io.IOException
 import java.nio.file.Path
 
+@Inject
 internal class ProcessIsolatedScriptExecutor(
     private val cacheDirectory: Path,
-    private val workspaceFactory: ProcessIsolationWorkspaceFactory = ProcessIsolationWorkspaceFactory(),
-    private val requestCodec: ProcessIsolationRequestCodec = ProcessIsolationRequestCodec(),
-    private val workerLauncher: ProcessIsolationWorkerLauncher = JvmProcessIsolationWorkerLauncher(),
-    private val failureFactory: ProcessIsolationFailureFactory = ProcessIsolationFailureFactory(),
+    private val workspaceFactory: ProcessIsolationWorkspaceFactory,
+    private val requestCodec: ProcessIsolationRequestCodec,
+    private val workerLauncher: ProcessIsolationWorkerLauncher,
+    private val failureFactory: ProcessIsolationFailureFactory,
 ) {
     fun execute(request: ScriptRunRequest, scriptPath: Path, outputPath: Path): ScriptRunResult {
         var workspace: ProcessIsolationWorkspace? = null

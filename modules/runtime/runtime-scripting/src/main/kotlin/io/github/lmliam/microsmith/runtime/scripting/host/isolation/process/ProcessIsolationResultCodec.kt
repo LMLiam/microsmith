@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
@@ -11,6 +12,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
+@Inject
 internal class ProcessIsolationResultCodec {
     fun write(path: Path, result: ScriptRunResult) {
         val properties = Properties()

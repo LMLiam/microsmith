@@ -18,7 +18,7 @@ class ScriptPluginClasspathTests :
                     val script = tempDir.resolve("schema.microsmith.kts")
                     copyResource("protobuf-user.microsmith.kts", script)
 
-                    MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
+                    testScriptHost(cacheDirectory = tempDir.resolve("cache"))
                         .run(
                             ScriptRunRequest(
                                 script = script,

@@ -1,8 +1,24 @@
 public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost {
-	public fun <init> ()V
-	public fun <init> (Ljava/nio/file/Path;)V
-	public synthetic fun <init> (Ljava/nio/file/Path;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun run (Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunRequest;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunResult;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory : dev/zacsweers/metro/internal/Factory {
+	public static final field Companion Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory$Companion;
+	public synthetic fun <init> (Ldev/zacsweers/metro/Provider;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ldev/zacsweers/metro/Provider;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory;
+	public final fun invoke ()Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost;
+	public synthetic fun invoke ()Ljava/lang/Object;
+	public static final fun newInstance (Lio/github/lmliam/microsmith/runtime/scripting/host/execution/ScriptRunExecutor;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory$Companion {
+	public final fun create (Ldev/zacsweers/metro/Provider;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory;
+	public final fun newInstance (Lio/github/lmliam/microsmith/runtime/scripting/host/execution/ScriptRunExecutor;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost;
+}
+
+public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHostFactoryKt {
+	public static final fun createMicrosmithScriptHost (Lio/github/lmliam/microsmith/gen/MicrosmithGenerator;Ljava/nio/file/FileSystem;Lio/github/lmliam/microsmith/plugin/Environment;Lio/github/lmliam/microsmith/plugin/DiagnosticSink;Lkotlin/time/TimeSource;Ljava/nio/file/Path;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost;
+	public static synthetic fun createMicrosmithScriptHost$default (Lio/github/lmliam/microsmith/gen/MicrosmithGenerator;Ljava/nio/file/FileSystem;Lio/github/lmliam/microsmith/plugin/Environment;Lio/github/lmliam/microsmith/plugin/DiagnosticSink;Lkotlin/time/TimeSource;Ljava/nio/file/Path;ILjava/lang/Object;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost;
 }
 
 public final class io/github/lmliam/microsmith/runtime/scripting/context/MicrosmithScriptContext {

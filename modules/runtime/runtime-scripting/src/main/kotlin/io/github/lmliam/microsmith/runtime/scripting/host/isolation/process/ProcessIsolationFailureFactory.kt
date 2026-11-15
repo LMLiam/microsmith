@@ -1,10 +1,12 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 
+@Inject
 internal class ProcessIsolationFailureFactory {
     fun fromOutcome(outcome: ProcessIsolationExecutionOutcome): ScriptRunResult {
         if (outcome.exitCode == 0 && outcome.parsedResult != null) {

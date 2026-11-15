@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.execution
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScriptCompilationConfiguration
@@ -17,8 +18,10 @@ import kotlin.script.experimental.jvm.jvm
 import kotlin.script.experimental.jvm.updateClasspath
 import kotlin.script.experimental.jvm.util.scriptCompilationClasspathFromContext
 import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost
+import kotlin.time.TimeSource
 
-internal object ScriptEvaluator {
+@Inject
+internal class ScriptEvaluator(private val timeSource: TimeSource) {
     fun evaluate(
         scriptPath: Path,
         runtimeHostConfiguration: ScriptingHostConfiguration,
@@ -42,16 +45,13 @@ internal object ScriptEvaluator {
 
                 implicitReceivers(scriptContext)
             }
-        val startNanos = System.nanoTime()
+        val startMark = timeSource.markNow()
         val result =
             host.eval(
                 script = FileScriptSource(scriptPath.toFile()),
                 compilationConfiguration = compilationConfiguration,
                 evaluationConfiguration = evaluationConfiguration,
             )
-        val elapsedMillis = (System.nanoTime() - startNanos) / NANOS_PER_MILLISECOND
-        return result to elapsedMillis
+        return result to startMark.elapsedNow().inWholeMilliseconds
     }
 }
-
-private const val NANOS_PER_MILLISECOND = 1_000_000L

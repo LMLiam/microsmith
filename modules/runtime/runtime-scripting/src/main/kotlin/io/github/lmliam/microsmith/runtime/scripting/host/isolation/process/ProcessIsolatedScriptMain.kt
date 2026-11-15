@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
-import io.github.lmliam.microsmith.runtime.scripting.host.execution.ScriptRunExecutor
+import io.github.lmliam.microsmith.runtime.scripting.createSystemMicrosmithScriptHost
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
@@ -20,11 +20,13 @@ internal object ProcessIsolatedScriptMain {
 
         val result = runCatching {
             val request = ProcessIsolationProtocol.readRequest(requestFile)
-            ScriptRunExecutor(request.cacheDirectory)
-                .execute(
-                    request = request.request.copy(isolationMode = ScriptIsolationMode.CLASSLOADER),
-                    scriptPath = request.scriptPath,
-                    outputPath = request.outputPath,
+            createSystemMicrosmithScriptHost(request.cacheDirectory)
+                .run(
+                    request.request.copy(
+                        script = request.scriptPath,
+                        outputDir = request.outputPath,
+                        isolationMode = ScriptIsolationMode.CLASSLOADER,
+                    ),
                 )
         }
             .getOrElse { error ->

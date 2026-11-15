@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.execution
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.gen.errors.GenerationResolutionFailedException
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
@@ -9,9 +10,8 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import kotlin.script.experimental.api.EvaluationResult
 
-internal class ScriptEvaluationSuccessFinalizer(
-    private val modelEmitter: ScriptEvaluationModelEmitter = ScriptEvaluationModelEmitter(),
-) {
+@Inject
+internal class ScriptEvaluationSuccessFinalizer(private val modelEmitter: ScriptEvaluationModelEmitter) {
     fun complete(
         evaluationResult: EvaluationResult,
         scriptContext: MicrosmithScriptContext,

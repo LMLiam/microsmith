@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.execution
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import io.github.lmliam.microsmith.runtime.scripting.host.diagnostics.ScriptDiagnosticsFormatter
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
@@ -8,9 +9,8 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import kotlin.script.experimental.api.EvaluationResult
 import kotlin.script.experimental.api.ResultWithDiagnostics
 
-internal object ScriptRunResultMapper {
-    private val successFinalizer = ScriptEvaluationSuccessFinalizer()
-
+@Inject
+internal class ScriptRunResultMapper(private val successFinalizer: ScriptEvaluationSuccessFinalizer) {
     fun toRunResult(
         result: ResultWithDiagnostics<EvaluationResult>,
         elapsedMillis: Long,

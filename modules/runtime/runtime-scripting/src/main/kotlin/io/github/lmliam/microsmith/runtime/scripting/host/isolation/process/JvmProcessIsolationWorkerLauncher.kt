@@ -1,12 +1,13 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
+import dev.zacsweers.metro.Inject
 import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.isRegularFile
 
-internal class JvmProcessIsolationWorkerLauncher(
-    private val resultCodec: ProcessIsolationResultCodec = ProcessIsolationResultCodec(),
-) : ProcessIsolationWorkerLauncher {
+@Inject
+internal class JvmProcessIsolationWorkerLauncher(private val resultCodec: ProcessIsolationResultCodec) :
+    ProcessIsolationWorkerLauncher {
     override fun execute(requestFile: Path, resultFile: Path): ProcessIsolationExecutionOutcome {
         val process = ProcessBuilder(buildCommand(requestFile, resultFile)).redirectErrorStream(true).start()
         val processOutput = process.inputStream.bufferedReader().use { reader -> reader.readText().trim() }

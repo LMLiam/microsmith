@@ -27,7 +27,7 @@ class ScriptingPluginSymbolsTests :
                     val script = tempDir.resolve("symbols.microsmith.kts")
                     copyResource("scripting-plugin-symbols.microsmith.kts", script)
 
-                    MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
+                    testScriptHost(cacheDirectory = tempDir.resolve("cache"))
                         .run(
                             ScriptRunRequest(
                                 script = script,
