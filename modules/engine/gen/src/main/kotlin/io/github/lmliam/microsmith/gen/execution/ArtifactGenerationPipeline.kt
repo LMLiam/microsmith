@@ -9,6 +9,8 @@ import io.github.lmliam.microsmith.compile.ArtifactCompilationService
 import io.github.lmliam.microsmith.gen.RunScope
 import io.github.lmliam.microsmith.gen.render.ArtifactRenderingService
 import io.github.lmliam.microsmith.resolve.ResolvedModel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 @Inject
 @SingleIn(RunScope::class)
@@ -18,9 +20,14 @@ internal class ArtifactGenerationPipeline(
     private val artifactCompilationService: ArtifactCompilationService,
     private val artifactRenderingService: ArtifactRenderingService,
 ) {
-    fun generate(resolvedModels: List<ResolvedModel>): List<GeneratedFile> {
+    suspend fun generate(resolvedModels: List<ResolvedModel>): List<GeneratedFile> {
+        currentCoroutineContext().ensureActive()
         val contributions = artifactContributionService.contribute(resolvedModels)
+
+        currentCoroutineContext().ensureActive()
         val assembly = artifactAssemblyService.assemble(contributions)
+
+        currentCoroutineContext().ensureActive()
         val compiledAssembly = artifactCompilationService.compile(assembly)
 
         return artifactRenderingService.render(compiledAssembly)

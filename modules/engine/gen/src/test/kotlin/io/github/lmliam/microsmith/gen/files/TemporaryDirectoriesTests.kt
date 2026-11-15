@@ -12,7 +12,6 @@ import java.nio.file.FileSystem
 import java.nio.file.Files
 import kotlin.time.Clock
 import kotlin.time.Instant
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 private class FixedClock(private val instant: Instant) : Clock {
     override fun now(): Instant = instant
@@ -33,7 +32,6 @@ class TemporaryDirectoriesTests :
                     clock = FixedClock(Instant.fromEpochMilliseconds(1_234)),
                     environment = FixedEnvironment(mapOf("java.io.tmpdir" to "/tmp")),
                     diagnostics = diagnostics,
-                    ioDispatcher = UnconfinedTestDispatcher(),
                 )
 
             "create makes a directory under the temporary directory named from the clock" {
