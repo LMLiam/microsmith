@@ -378,6 +378,52 @@ class MicrosmithScriptHostTests :
                 }
             }
 
+            "resolves same-named messages in different namespaces by their qualified symbols" {
+                val tempDir = createTempDirectory("microsmith-script-host-qualified-symbols")
+                try {
+                    val result = runScriptResource(tempDir, "/scripting/host/qualified-symbols.microsmith.kts")
+
+                    result.shouldBeTypeOf<ScriptRunSuccess>()
+
+                    tempDir
+                        .resolve("generated/proto/Users.proto")
+                        .readText()
+                        .shouldContain("rpc Get (one.User) returns (two.User);")
+                } finally {
+                    runCatching { tempDir.deleteRecursively() }
+                }
+            }
+
+            "replays the ambiguous plain symbol warning on a compile cache hit" {
+                val tempDir = createTempDirectory("microsmith-script-host-symbol-warning-cache")
+                try {
+                    val resource = "/scripting/host/qualified-symbols.microsmith.kts"
+
+                    val firstRun = runScriptResource(tempDir, resource).shouldBeTypeOf<ScriptRunSuccess>()
+                    val secondRun = runScriptResource(tempDir, resource).shouldBeTypeOf<ScriptRunSuccess>()
+
+                    firstRun.warnings.size shouldBe 1
+                    secondRun.cacheHit shouldBe true
+                    secondRun.warnings shouldContainExactly firstRun.warnings
+                } finally {
+                    runCatching { tempDir.deleteRecursively() }
+                }
+            }
+
+            "fails compilation and reports a warning when a script uses an ambiguous plain symbol" {
+                val tempDir = createTempDirectory("microsmith-script-host-ambiguous-symbol")
+                try {
+                    val result = runScriptResource(tempDir, "/scripting/host/ambiguous-plain-symbol.microsmith.kts")
+
+                    val failure = result.shouldBeTypeOf<ScriptRunFailure>()
+
+                    failure.type shouldBe ScriptFailureType.COMPILATION
+                    failure.diagnostics.count { it.message.contains("[warning]") } shouldBe 1
+                } finally {
+                    runCatching { tempDir.deleteRecursively() }
+                }
+            }
+
             "rejects enum symbols where rpc message symbols are required" {
                 val tempDir = createTempDirectory("microsmith-script-host-symbol-types")
                 try {
@@ -450,6 +496,21 @@ class MicrosmithScriptHostTests :
             }
         },
     )
+
+private fun runScriptResource(tempDir: Path, resource: String): ScriptRunResult {
+    val script = tempDir.resolve("script.microsmith.kts")
+    copyResource(resource, script)
+
+    return MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
+        .run(
+            ScriptRunRequest(
+                script = script,
+                outputDir = tempDir.resolve("generated"),
+                variables = emptyMap(),
+                flags = emptySet(),
+            ),
+        )
+}
 
 private fun copyResource(resource: String, target: Path) {
     val source =

@@ -80,7 +80,7 @@ class AcmeScriptSymbolContributor : ScriptSymbolContributor {
 
 - `id` must be unique across contributors. A duplicate fails the run.
 - A call whose name is not a string literal, or not a Kotlin identifier, produces no symbol.
-- Two declarations with the same property name and different values fail script compilation with an ambiguity error, even if no reference uses the name.
+- `qualifiedPath` defaults to `listOf(propertyName)`. The host exposes every definition as its `qualifiedPath` joined with `_`, and as `propertyName` only when no other definition uses that name. Two different definitions that join to the same qualified name fail script compilation.
 - `valueType` should be a type your DSL overloads accept, such as `MessageRef`.
 
 Depend on `runtime-scripting-api` only.
