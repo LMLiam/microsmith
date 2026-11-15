@@ -9,9 +9,17 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.dotnetAspPa
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultBaseTypeName
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.await
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.call
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.callValues
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.codeBlock
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpGenericType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.identifier
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.init
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.new
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.stringLiteral
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.HTTP_NO_CONTENT_STATUS_CODE
 
 internal fun renderActionMethod(endpoint: DotnetAspEndpointArtifact): CSharp.Method =
@@ -33,7 +41,7 @@ internal fun renderActionMethod(endpoint: DotnetAspEndpointArtifact): CSharp.Met
             },
         parameters = actionParameters(endpoint),
         body =
-            CSharp.codeBlock {
+            codeBlock {
                 endpoint.bindings.headers?.let { binding ->
                     local(name = "headers", initializer = renderHeadersInitializer(binding))
                     blankLine()
@@ -41,17 +49,17 @@ internal fun renderActionMethod(endpoint: DotnetAspEndpointArtifact): CSharp.Met
                 local(
                     name = "result",
                     initializer =
-                        CSharp.await(
-                            CSharp.callValues(
-                                CSharp.identifier("On${endpoint.operationName}Async"),
+                        await(
+                            callValues(
+                                identifier("On${endpoint.operationName}Async"),
                                 handlerArguments(endpoint),
                             ),
                         ),
                 )
                 returnStatement(
-                    CSharp.call(
-                        CSharp.identifier("Map${endpoint.operationName}Result"),
-                        CSharp.identifier("result"),
+                    call(
+                        identifier("Map${endpoint.operationName}Result"),
+                        identifier("result"),
                     ),
                 )
             },
@@ -70,16 +78,16 @@ internal fun renderAbstractHandler(endpoint: DotnetAspEndpointArtifact): CSharp.
     )
 
 private fun renderHeadersInitializer(binding: DotnetAspHeadersBindingArtifact): CSharp.Expression =
-    CSharp.new(
+    new(
         type = csharpType(binding.typeName),
         initializers =
             binding.headers.map { header ->
-                CSharp.init(
+                init(
                     memberName = dotnetAspPascalIdentifier(header.name),
                     value =
-                        CSharp.call(
-                            CSharp.identifier("ReadHeader"),
-                            CSharp.stringLiteral(header.headerName),
+                        call(
+                            identifier("ReadHeader"),
+                            stringLiteral(header.headerName),
                         ),
                 )
             },
@@ -138,11 +146,11 @@ private fun handlerParameters(endpoint: DotnetAspEndpointArtifact): List<CSharp.
 }
 
 private fun handlerArguments(endpoint: DotnetAspEndpointArtifact): List<CSharp.Expression> = buildList {
-    endpoint.bindings.path?.let { add(CSharp.identifier("path")) }
-    endpoint.bindings.query?.let { add(CSharp.identifier("query")) }
-    endpoint.bindings.headers?.let { add(CSharp.identifier("headers")) }
-    endpoint.bindings.body?.let { add(CSharp.identifier("body")) }
-    add(CSharp.identifier("cancellationToken"))
+    endpoint.bindings.path?.let { add(identifier("path")) }
+    endpoint.bindings.query?.let { add(identifier("query")) }
+    endpoint.bindings.headers?.let { add(identifier("headers")) }
+    endpoint.bindings.body?.let { add(identifier("body")) }
+    add(identifier("cancellationToken"))
 }
 
 private fun responseAttributeType(response: DotnetAspResponseArtifact): String =

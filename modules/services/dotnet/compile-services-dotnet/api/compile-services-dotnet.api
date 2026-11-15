@@ -1,44 +1,5 @@
 public final class io/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp {
 	public static final field INSTANCE Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp;
-	public final fun argument (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$CallArgument;
-	public final fun array (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;
-	public final fun assignment (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun attribute (Ljava/lang/String;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$AttributeArgument;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Attribute;
-	public final fun await (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun binary (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$BinaryOperator;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun call (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun call (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Ljava/util/List;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun call (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$CallArgument;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun call (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun callValues (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Ljava/util/List;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun codeBlock (Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$CodeBlock;
-	public final fun conditional (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun file (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$File;
-	public final fun genericType (Ljava/lang/String;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;
-	public final fun identifier (Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun index (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun init (Ljava/lang/String;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$MemberInitializer;
-	public final fun intLiteral (I)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun member (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun namedArgument (Ljava/lang/String;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$AttributeArgument;
-	public final fun new (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;Ljava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public static synthetic fun new$default (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun nullLiteral ()Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun nullable (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;
-	public final fun outVariable (Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$CallArgument;
-	public final fun positionalArgument (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$AttributeArgument;
-	public final fun rawExpression (Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun render (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$File;)Ljava/lang/String;
-	public final fun stringLiteral (Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun switch (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Ljava/util/List;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun switch (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$SwitchArm;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun switchArm (Ljava/lang/String;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$SwitchArm;
-	public final fun throwExpression (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun tuple ([Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TupleElement;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;
-	public final fun tupleElement (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TupleElement;
-	public static synthetic fun tupleElement$default (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TupleElement;
-	public final fun tupleLiteral ([Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
-	public final fun type (Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;
 }
 
 public final class io/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$ArrayType : io/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef {
@@ -723,6 +684,45 @@ public final class io/github/lmliam/microsmith/compile/services/dotnet/csharp/CS
 	public final fun using (Ljava/lang/String;)V
 }
 
+public final class io/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharpRenderer {
+	public fun <init> ()V
+	public final fun render (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$File;)Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharpSyntaxKt {
+	public static final fun argument (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$CallArgument;
+	public static final fun assignment (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun attribute (Ljava/lang/String;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$AttributeArgument;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Attribute;
+	public static final fun await (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun binary (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$BinaryOperator;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun call (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun call (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Ljava/util/List;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun call (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$CallArgument;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun call (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun callValues (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Ljava/util/List;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun codeBlock (Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$CodeBlock;
+	public static final fun conditional (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun file (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$File;
+	public static final fun identifier (Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun index (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun init (Ljava/lang/String;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$MemberInitializer;
+	public static final fun intLiteral (I)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun member (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun namedArgument (Ljava/lang/String;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$AttributeArgument;
+	public static final fun new (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;Ljava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static synthetic fun new$default (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun nullLiteral ()Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun outVariable (Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$CallArgument;
+	public static final fun positionalArgument (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$AttributeArgument;
+	public static final fun rawExpression (Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun stringLiteral (Ljava/lang/String;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun switch (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;Ljava/util/List;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun switch (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;[Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$SwitchArm;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun switchArm (Ljava/lang/String;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$SwitchArm;
+	public static final fun throwExpression (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+	public static final fun tupleLiteral ([Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;)Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Expression;
+}
+
 public final class io/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharpTypeBuilder {
 	public final fun addMember (Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$Member;)V
 	public final fun method (Ljava/lang/String;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$TypeRef;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lio/github/lmliam/microsmith/compile/services/dotnet/csharp/CSharp$CodeBlock;)V
@@ -831,10 +831,6 @@ public final class io/github/lmliam/microsmith/compile/services/dotnet/csharp/Do
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/compile/services/dotnet/msbuild/MsBuildProjectArtifactCompiler : io/github/lmliam/microsmith/compile/services/ServicesArtifactCompiler {
-	public fun <init> ()V
-	public synthetic fun compile (Lio/github/lmliam/microsmith/artifact/Artifact;)Ljava/util/List;
-	public fun compile (Lio/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact;)Ljava/util/List;
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
+public abstract class io/github/lmliam/microsmith/compile/services/dotnet/msbuild/MsBuildProjectArtifactCompilerContributions {
 }
 

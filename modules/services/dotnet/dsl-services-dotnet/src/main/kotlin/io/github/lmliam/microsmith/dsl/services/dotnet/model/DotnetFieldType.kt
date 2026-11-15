@@ -3,52 +3,52 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.model
 import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnetIdentifier
 
 /** Supported field types for service-local .NET models. */
-sealed class DotnetFieldType(val csharpType: kotlin.String) {
-    data object String : DotnetFieldType("string")
+public sealed class DotnetFieldType(public val csharpType: kotlin.String) {
+    public data object String : DotnetFieldType("string")
 
-    data object Char : DotnetFieldType("char")
+    public data object Char : DotnetFieldType("char")
 
-    data object Byte : DotnetFieldType("byte")
+    public data object Byte : DotnetFieldType("byte")
 
-    data object SignedByte : DotnetFieldType("sbyte")
+    public data object SignedByte : DotnetFieldType("sbyte")
 
-    data object Short : DotnetFieldType("short")
+    public data object Short : DotnetFieldType("short")
 
-    data object UnsignedShort : DotnetFieldType("ushort")
+    public data object UnsignedShort : DotnetFieldType("ushort")
 
-    data object Int : DotnetFieldType("int")
+    public data object Int : DotnetFieldType("int")
 
-    data object UnsignedInt : DotnetFieldType("uint")
+    public data object UnsignedInt : DotnetFieldType("uint")
 
-    data object Long : DotnetFieldType("long")
+    public data object Long : DotnetFieldType("long")
 
-    data object UnsignedLong : DotnetFieldType("ulong")
+    public data object UnsignedLong : DotnetFieldType("ulong")
 
-    data object NativeInt : DotnetFieldType("nint")
+    public data object NativeInt : DotnetFieldType("nint")
 
-    data object UnsignedNativeInt : DotnetFieldType("nuint")
+    public data object UnsignedNativeInt : DotnetFieldType("nuint")
 
-    data object Float : DotnetFieldType("float")
+    public data object Float : DotnetFieldType("float")
 
-    data object Double : DotnetFieldType("double")
+    public data object Double : DotnetFieldType("double")
 
-    data object Decimal : DotnetFieldType("decimal")
+    public data object Decimal : DotnetFieldType("decimal")
 
-    data object Bool : DotnetFieldType("bool")
+    public data object Bool : DotnetFieldType("bool")
 
-    data object Guid : DotnetFieldType("Guid")
+    public data object Guid : DotnetFieldType("Guid")
 
-    data object DateOnly : DotnetFieldType("DateOnly")
+    public data object DateOnly : DotnetFieldType("DateOnly")
 
-    data object TimeOnly : DotnetFieldType("TimeOnly")
+    public data object TimeOnly : DotnetFieldType("TimeOnly")
 
-    data object DateTime : DotnetFieldType("DateTime")
+    public data object DateTime : DotnetFieldType("DateTime")
 
-    data object DateTimeOffset : DotnetFieldType("DateTimeOffset")
+    public data object DateTimeOffset : DotnetFieldType("DateTimeOffset")
 
-    data object TimeSpan : DotnetFieldType("TimeSpan")
+    public data object TimeSpan : DotnetFieldType("TimeSpan")
 
-    data class Reference(val target: kotlin.String) : DotnetFieldType(target) {
+    public data class Reference(public val target: kotlin.String) : DotnetFieldType(target) {
         init {
             validateDotnetIdentifier(target, "Reference target")
         }

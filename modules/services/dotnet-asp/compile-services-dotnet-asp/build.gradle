@@ -7,4 +7,14 @@ dependencies {
     implementation project(":resolve-services-dotnet-asp")
     api libs.spi.tooling.annotations
     kapt libs.spi.tooling.processor
+    testImplementation project(":dsl")
+    testImplementation project(":dsl-services")
+    testImplementation project(":dsl-services-dotnet")
+    testImplementation project(":dsl-services-dotnet-asp")
+    testImplementation project(":dsl-services-dotnet-packages")
+    testImplementation project(":gen")
+    testRuntimeOnly project(":plugin-services-dotnet")
+    testRuntimeOnly project(":plugin-services-dotnet-packages")
+    testRuntimeOnly project(":compile-services-dotnet-packages")
+    testRuntimeOnly project(":resolve-services-dotnet-packages")
 }

@@ -5,7 +5,7 @@ import io.github.lmliam.microsmith.dsl.MicrosmithScope
 import io.github.lmliam.microsmith.dsl.put
 
 /** Start a `services { ... }` block in the Microsmith DSL. */
-fun MicrosmithScope.services(block: ServicesScope.() -> Unit) {
+public fun MicrosmithScope.services(block: ServicesScope.() -> Unit) {
     val extension = ServicesBuilder().apply(block).toExtension()
 
     val builder =

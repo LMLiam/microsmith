@@ -8,9 +8,22 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultBaseT
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultVariantTypeName
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.callValues
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.codeBlock
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpGenericType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.identifier
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.intLiteral
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.member
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.new
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.nullLiteral
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.rawExpression
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.stringLiteral
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.switch
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.switchArm
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.throwExpression
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.tupleLiteral
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.HTTP_NO_CONTENT_STATUS_CODE
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.RESULT_BODY_PROPERTY_NAME
 
@@ -25,10 +38,10 @@ internal fun renderResultMapper(endpoint: DotnetAspEndpointArtifact): CSharp.Met
             ),
         parameters = listOf(csharpParameter(resultBaseTypeName(endpoint), "result")),
         body =
-            CSharp.codeBlock {
+            codeBlock {
                 returnStatement(
-                    CSharp.switch(
-                        subject = CSharp.identifier("result"),
+                    switch(
+                        subject = identifier("result"),
                         arms =
                             buildList {
                                 endpoint.responses.forEach { response ->
@@ -45,26 +58,26 @@ private fun renderResultSwitchArm(
     endpoint: DotnetAspEndpointArtifact,
     response: DotnetAspResponseArtifact,
 ): CSharp.SwitchArm =
-    CSharp.switchArm(
+    switchArm(
         pattern = "${resultVariantTypeName(endpoint, response)} response",
-        expression = CSharp.callValues(CSharp.identifier("Respond"), responseArguments(response)),
+        expression = callValues(identifier("Respond"), responseArguments(response)),
     )
 
 private fun responseArguments(response: DotnetAspResponseArtifact): List<CSharp.Expression> = buildList {
     add(
         if (response.statusCode == HTTP_NO_CONTENT_STATUS_CODE) {
-            CSharp.nullLiteral()
+            nullLiteral()
         } else {
-            CSharp.member(CSharp.identifier("response"), RESULT_BODY_PROPERTY_NAME)
+            member(identifier("response"), RESULT_BODY_PROPERTY_NAME)
         },
     )
-    add(CSharp.intLiteral(response.statusCode))
+    add(intLiteral(response.statusCode))
     response.headers.forEach { header ->
         add(
-            CSharp.tupleLiteral(
-                CSharp.stringLiteral(header.name),
-                CSharp.member(
-                    CSharp.identifier("response"),
+            tupleLiteral(
+                stringLiteral(header.name),
+                member(
+                    identifier("response"),
                     dotnetAspHeaderPropertyName(header.name),
                 ),
             ),
@@ -73,15 +86,15 @@ private fun responseArguments(response: DotnetAspResponseArtifact): List<CSharp.
 }
 
 private fun renderUnsupportedResultArm(endpoint: DotnetAspEndpointArtifact): CSharp.SwitchArm =
-    CSharp.switchArm(
+    switchArm(
         pattern = "_",
         expression =
-            CSharp.throwExpression(
-                CSharp.new(
+            throwExpression(
+                new(
                     type = csharpType(DotnetCSharpTypes.System.InvalidOperationException),
                     arguments =
                         listOf(
-                            CSharp.rawExpression(
+                            rawExpression(
                                 """$"Unsupported ${endpoint.operationName} result type """ +
                                     "'{result.GetType().FullName}'.\"",
                             ),

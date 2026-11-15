@@ -4,8 +4,9 @@ import io.github.lmliam.microsmith.dsl.MergeableExtension
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 
 /** Central package versions declared under `solutions { "Name" { packages { ... } } }`. */
-data class DotnetPackageVersionsExtension(val packages: List<DotnetPackageVersionDeclaration> = emptyList()) :
-    MicrosmithExtension, MergeableExtension<DotnetPackageVersionsExtension> {
+public data class DotnetPackageVersionsExtension(
+    public val packages: List<DotnetPackageVersionDeclaration> = emptyList(),
+) : MicrosmithExtension, MergeableExtension<DotnetPackageVersionsExtension> {
     override fun merge(other: DotnetPackageVersionsExtension): DotnetPackageVersionsExtension {
         val existingNames = packages.map(DotnetPackageVersionDeclaration::name).toSet()
         val collisions =

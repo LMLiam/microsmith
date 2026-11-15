@@ -8,13 +8,17 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.contractsNa
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllerBaseTypeName
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.controllersNamespace
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpRenderer
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.file
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
 
 internal object DotnetAspControllerFileRenderer {
+    private val csharpRenderer = CSharpRenderer()
+
     fun renderControllerBaseFile(artifact: DotnetAspServiceArtifact): String =
-        CSharp.render(
-            CSharp.file(controllersNamespace(artifact)) {
+        csharpRenderer.render(
+            file(controllersNamespace(artifact)) {
                 using(contractsNamespace(artifact))
                 using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Mvc)
                 using(DotnetAspCSharpNamespaces.System)

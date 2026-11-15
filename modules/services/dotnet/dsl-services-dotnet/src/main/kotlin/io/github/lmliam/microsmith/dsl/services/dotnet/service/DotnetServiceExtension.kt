@@ -8,25 +8,25 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnet
 import kotlin.reflect.KClass
 
 /** Per-service .NET configuration declared under `"ServiceName" { dotnet { ... } }`. */
-data class DotnetServiceExtension(
-    val target: DotnetTarget? = null,
-    val solution: String? = null,
-    val project: String? = null,
-    val models: Map<String, DotnetModel> = emptyMap(),
-    val model: DotnetServiceModel = DotnetServiceModel.empty(),
+public data class DotnetServiceExtension(
+    public val target: DotnetTarget? = null,
+    public val solution: String? = null,
+    public val project: String? = null,
+    public val models: Map<String, DotnetModel> = emptyMap(),
+    public val model: DotnetServiceModel = DotnetServiceModel.empty(),
 ) : ServiceExtension, MergeableExtension<DotnetServiceExtension> {
-    fun findModel(name: String) = models[name]
+    public fun findModel(name: String): DotnetModel? = models[name]
 
-    fun requireModel(name: String): DotnetModel {
+    public fun requireModel(name: String): DotnetModel {
         val normalized = validateDotnetIdentifier(name, "Model name")
         return findModel(normalized) ?: error("Dotnet model not found: $normalized")
     }
 
-    fun models() = models.values
+    public fun models(): Collection<DotnetModel> = models.values
 
-    fun <T : ServiceExtension> get(type: KClass<T>) = model.get(type)
+    public fun <T : ServiceExtension> get(type: KClass<T>): T? = model.get(type)
 
-    inline fun <reified T : ServiceExtension> get(): T? = get(T::class)
+    public inline fun <reified T : ServiceExtension> get(): T? = get(T::class)
 
     internal fun <T : ServiceExtension> with(type: KClass<T>, ext: T) = copy(model = model.with(type, ext))
 

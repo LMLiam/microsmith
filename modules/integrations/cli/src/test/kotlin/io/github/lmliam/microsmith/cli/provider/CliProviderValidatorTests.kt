@@ -5,9 +5,6 @@ import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
@@ -16,7 +13,6 @@ import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.ResolvedModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
-import io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
@@ -29,47 +25,19 @@ class CliProviderValidatorTests :
             "reports missing built-in providers when none are present" {
                 val errors = verifyBuiltinProviders(MicrosmithPluginCatalog(), requiredPluginIds = emptyList())
 
-                errors.shouldHaveSize(12)
+                errors.shouldHaveSize(4)
                 errors.shouldContain(
                     "Missing built-in DomainResolver for ServicesExtension -> " +
                         "DotnetAspWorkspace. Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
-                    "Missing built-in DomainResolver for ServicesExtension -> " +
-                        "DotnetPackageWorkspace. Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
                     "Missing built-in ArtifactContributor for DotnetAspWorkspace. Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
-                    "Missing built-in ArtifactContributor for DotnetPackageWorkspace. Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
                     "Missing built-in ArtifactAssembler for DotnetAspServiceArtifact. Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
-                    "Missing built-in ArtifactAssembler for DotnetPackageVersionsArtifact. " +
-                        "Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
-                    "Missing built-in ArtifactAssembler for DotnetPackageReferencesArtifact. " +
-                        "Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
-                    "Missing built-in ArtifactAssembler for MsBuildProjectArtifact. Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
                     "Missing built-in ArtifactCompiler for DotnetAspServiceArtifact. Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
-                    "Missing built-in ArtifactCompiler for DotnetPackageVersionsArtifact. Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
-                    "Missing built-in ArtifactCompiler for DotnetPackageReferencesArtifact. " +
-                        "Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
-                    "Missing built-in ArtifactCompiler for MsBuildProjectArtifact. Check CLI runtime packaging.",
                 )
             }
 
@@ -80,26 +48,18 @@ class CliProviderValidatorTests :
                             domainResolvers =
                                 listOf(
                                     DotnetAspResolverStub(),
-                                    DotnetPackageResolverStub(),
                                 ),
                             artifactContributors =
                                 listOf(
                                     ContributorStub(DotnetAspWorkspace::class),
-                                    ContributorStub(DotnetPackageWorkspace::class),
                                 ),
                             artifactAssemblers =
                                 listOf(
                                     AssemblerStub(DotnetAspServiceArtifact::class),
-                                    AssemblerStub(DotnetPackageVersionsArtifact::class),
-                                    AssemblerStub(DotnetPackageReferencesArtifact::class),
-                                    AssemblerStub(MsBuildProjectArtifact::class),
                                 ),
                             artifactCompilers =
                                 listOf(
                                     CompilerStub(DotnetAspServiceArtifact::class),
-                                    CompilerStub(DotnetPackageVersionsArtifact::class),
-                                    CompilerStub(DotnetPackageReferencesArtifact::class),
-                                    CompilerStub(MsBuildProjectArtifact::class),
                                 ),
                         ),
                         requiredPluginIds = emptyList(),
@@ -139,19 +99,6 @@ private class DotnetAspResolverStub : DomainResolver<ServicesExtension, DotnetAs
 
     override fun resolve(authoring: ServicesExtension): DomainResolution<DotnetAspWorkspace> =
         DomainResolution.Success(DotnetAspWorkspace(emptyMap()))
-}
-
-private class DotnetPackageResolverStub : DomainResolver<ServicesExtension, DotnetPackageWorkspace> {
-    override val authoringType = ServicesExtension::class
-    override val resolvedType = DotnetPackageWorkspace::class
-
-    override fun resolve(authoring: ServicesExtension): DomainResolution<DotnetPackageWorkspace> =
-        DomainResolution.Success(
-            DotnetPackageWorkspace(
-                solutionsByName = emptyMap(),
-                servicesByName = emptyMap(),
-            ),
-        )
 }
 
 private class ContributorStub<T : ResolvedModel>(override val resolvedType: KClass<T>) : ArtifactContributor<T> {

@@ -5,11 +5,11 @@ import io.github.lmliam.microsmith.dsl.services.ServiceExtension
 import kotlin.reflect.KClass
 
 /** Immutable snapshot of service-scoped .NET-specific extensions. */
-class DotnetServiceModel
+public class DotnetServiceModel
 internal constructor(private val extensions: Map<KClass<out ServiceExtension>, ServiceExtension>) {
-    @Suppress("UNCHECKED_CAST") fun <T : ServiceExtension> get(type: KClass<T>) = extensions[type] as? T?
+    @Suppress("UNCHECKED_CAST") public fun <T : ServiceExtension> get(type: KClass<T>): T? = extensions[type] as? T
 
-    inline fun <reified T : ServiceExtension> get(): T? = get(T::class)
+    public inline fun <reified T : ServiceExtension> get(): T? = get(T::class)
 
     @Suppress("UNCHECKED_CAST")
     internal fun <T : ServiceExtension> with(type: KClass<T>, value: T) =
@@ -20,14 +20,14 @@ internal constructor(private val extensions: Map<KClass<out ServiceExtension>, S
             extensions + other.extensions.mapValues { (type, value) -> mergeServiceExtension(extensions[type], value) },
         )
 
-    fun keys() = extensions.keys
+    internal fun keys() = extensions.keys
 
     override fun equals(other: Any?): Boolean = other is DotnetServiceModel && extensions == other.extensions
 
     override fun hashCode(): Int = extensions.hashCode()
 
-    companion object {
-        fun empty() = DotnetServiceModel(emptyMap())
+    public companion object {
+        public fun empty(): DotnetServiceModel = DotnetServiceModel(emptyMap())
     }
 }
 

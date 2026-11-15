@@ -6,12 +6,12 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTargetAliases
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModelsScope
 
 @MicrosmithDsl
-interface DotnetServiceScope : DotnetTargetAliases {
-    fun target(target: DotnetTarget)
+public interface DotnetServiceScope : DotnetTargetAliases {
+    public fun target(target: DotnetTarget)
 
-    fun solution(name: String)
+    public fun solution(name: String)
 
-    fun project(name: String)
+    public fun project(name: String)
 
-    fun models(block: DotnetModelsScope.() -> Unit)
+    public fun models(block: DotnetModelsScope.() -> Unit)
 }

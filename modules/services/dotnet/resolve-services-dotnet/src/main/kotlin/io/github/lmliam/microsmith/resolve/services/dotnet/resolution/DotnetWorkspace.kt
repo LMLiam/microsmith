@@ -5,7 +5,7 @@ import io.github.lmliam.microsmith.resolve.services.ResolvedServicesModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.ResolvedDotnetService
 
 /** Resolved .NET workspace state after DSL normalisation. */
-data class DotnetWorkspace(
-    val solutions: Map<String, DotnetSolution>,
-    val services: Map<String, ResolvedDotnetService>,
+public data class DotnetWorkspace(
+    public val solutions: Map<String, DotnetSolution>,
+    public val services: Map<String, ResolvedDotnetService>,
 ) : ResolvedServicesModel

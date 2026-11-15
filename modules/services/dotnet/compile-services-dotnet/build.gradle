@@ -1,9 +1,16 @@
-apply plugin: 'org.jetbrains.kotlin.kapt'
+apply plugin: 'dev.zacsweers.metro'
+
+metro {
+    generateContributionProviders = true
+}
 
 dependencies {
     api project(":compile-services")
     api project(":artifact-services-dotnet")
     api project(":dsl-services-dotnet")
-    api libs.spi.tooling.annotations
-    kapt libs.spi.tooling.processor
+    implementation project(":resolve-services-dotnet")
+}
+
+kotlin {
+    explicitApi()
 }

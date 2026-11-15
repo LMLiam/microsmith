@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.packages
 
-data class ResolvedDotnetPackageService(
-    val name: String,
-    val solution: String,
-    val project: String,
-    val packages: List<ResolvedDotnetPackageReference>,
+public data class ResolvedDotnetPackageService(
+    public val name: String,
+    public val solution: String,
+    public val project: String,
+    public val packages: List<ResolvedDotnetPackageReference>,
 )

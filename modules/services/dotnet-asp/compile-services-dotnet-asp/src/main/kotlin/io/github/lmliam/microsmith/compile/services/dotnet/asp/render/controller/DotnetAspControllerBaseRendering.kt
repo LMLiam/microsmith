@@ -3,12 +3,25 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controlle
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpTypes
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.argument
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.assignment
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.binary
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.call
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.codeBlock
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.conditional
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpArrayType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpNullableType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpTupleElement
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpTupleType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.identifier
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.index
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.init
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.member
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.new
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.nullLiteral
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.outVariable
 
 internal fun renderRespondHelper(): CSharp.Method =
     CSharp.Method(
@@ -35,22 +48,22 @@ internal fun renderRespondHelper(): CSharp.Method =
                 ),
             ),
         body =
-            CSharp.codeBlock {
-                foreachDeconstruction("name", "value", source = CSharp.identifier("headers")) {
+            codeBlock {
+                foreachDeconstruction("name", "value", source = identifier("headers")) {
                     ifStatement(
-                        CSharp.binary(
-                            CSharp.identifier("value"),
+                        binary(
+                            identifier("value"),
                             CSharp.BinaryOperator.IS_NOT,
-                            CSharp.nullLiteral(),
+                            nullLiteral(),
                         ),
                     ) {
                         expression(
-                            CSharp.assignment(
-                                CSharp.index(
-                                    CSharp.member(CSharp.identifier("Response"), "Headers"),
-                                    CSharp.identifier("name"),
+                            assignment(
+                                index(
+                                    member(identifier("Response"), "Headers"),
+                                    identifier("name"),
                                 ),
-                                CSharp.identifier("value"),
+                                identifier("value"),
                             ),
                         )
                     }
@@ -58,18 +71,18 @@ internal fun renderRespondHelper(): CSharp.Method =
                 blankLine()
                 ifStatement("statusCode == 204") {
                     returnStatement(
-                        CSharp.call(
-                            CSharp.identifier("StatusCode"),
-                            CSharp.identifier("statusCode"),
+                        call(
+                            identifier("StatusCode"),
+                            identifier("statusCode"),
                         ),
                     )
                 }
                 blankLine()
                 returnStatement(
-                    CSharp.new(
+                    new(
                         type = csharpType(DotnetAspCSharpTypes.AspNetCore.Mvc.ObjectResult),
-                        arguments = listOf(CSharp.identifier("body")),
-                        initializers = listOf(CSharp.init("StatusCode", CSharp.identifier("statusCode"))),
+                        arguments = listOf(identifier("body")),
+                        initializers = listOf(init("StatusCode", identifier("statusCode"))),
                     ),
                 )
             },
@@ -82,24 +95,24 @@ internal fun renderReadHeaderHelper(): CSharp.Method =
         returnType = csharpNullableType(DotnetCSharpTypes.Primitives.String),
         parameters = listOf(csharpParameter(DotnetCSharpTypes.Primitives.String, "headerName")),
         body =
-            CSharp.codeBlock {
+            codeBlock {
                 returnStatement(
-                    CSharp.conditional(
+                    conditional(
                         condition =
-                            CSharp.call(
+                            call(
                                 callee =
-                                    CSharp.member(
-                                        CSharp.member(CSharp.identifier("Request"), "Headers"),
+                                    member(
+                                        member(identifier("Request"), "Headers"),
                                         "TryGetValue",
                                     ),
                                 arguments =
                                     listOf(
-                                        CSharp.argument(CSharp.identifier("headerName")),
-                                        CSharp.outVariable("values"),
+                                        argument(identifier("headerName")),
+                                        outVariable("values"),
                                     ),
                             ),
-                        whenTrue = CSharp.call(CSharp.member(CSharp.identifier("values"), "ToString")),
-                        whenFalse = CSharp.nullLiteral(),
+                        whenTrue = call(member(identifier("values"), "ToString")),
+                        whenFalse = nullLiteral(),
                     ),
                 )
             },

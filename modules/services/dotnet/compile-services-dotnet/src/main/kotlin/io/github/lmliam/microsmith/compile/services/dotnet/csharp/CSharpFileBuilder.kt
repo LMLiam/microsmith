@@ -1,19 +1,19 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 
 @CSharp.Dsl
-class CSharpFileBuilder internal constructor(private val namespace: String) {
+public class CSharpFileBuilder internal constructor(private val namespace: String) {
     private val usings = linkedSetOf<String>()
     private val types = mutableListOf<CSharp.Type>()
 
-    fun using(namespace: String) {
+    public fun using(namespace: String) {
         usings += namespace
     }
 
-    fun addType(type: CSharp.Type) {
+    public fun addType(type: CSharp.Type) {
         types += type
     }
 
-    fun classType(
+    public fun classType(
         name: String,
         modifiers: List<CSharp.Modifier>,
         baseTypes: List<CSharp.TypeRef> = emptyList(),
@@ -32,7 +32,7 @@ class CSharpFileBuilder internal constructor(private val namespace: String) {
                 .build()
     }
 
-    fun recordType(
+    public fun recordType(
         name: String,
         modifiers: List<CSharp.Modifier>,
         primaryConstructorParameters: List<CSharp.Parameter> = emptyList(),

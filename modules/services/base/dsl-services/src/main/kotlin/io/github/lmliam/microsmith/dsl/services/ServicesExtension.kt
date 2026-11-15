@@ -5,8 +5,10 @@ import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import kotlin.reflect.KClass
 
 /** Root extension that holds all declared services and shared services-scoped extensions. */
-data class ServicesExtension(val services: Set<Service>, val model: ServicesModel = ServicesModel.empty()) :
-    MicrosmithExtension, MergeableExtension<ServicesExtension> {
+public data class ServicesExtension(
+    public val services: Set<Service>,
+    public val model: ServicesModel = ServicesModel.empty(),
+) : MicrosmithExtension, MergeableExtension<ServicesExtension> {
     init {
         val duplicateKeys = services.groupBy(Service::serviceKey).filterValues { it.size > 1 }.keys.sorted()
 
@@ -17,18 +19,18 @@ data class ServicesExtension(val services: Set<Service>, val model: ServicesMode
 
     private val index = services.associateBy(Service::serviceKey)
 
-    fun find(name: String) = index[serviceKey(name)]
+    internal fun find(name: String): Service? = index[serviceKey(name)]
 
-    fun require(name: String): Service {
+    public fun require(name: String): Service {
         val serviceKey = serviceKey(name)
         return index[serviceKey] ?: error("Service not found: $serviceKey")
     }
 
-    fun all() = services
+    internal fun all(): Set<Service> = services
 
-    fun <T : MicrosmithExtension> get(type: KClass<T>) = model.get(type)
+    public fun <T : MicrosmithExtension> get(type: KClass<T>): T? = model.get(type)
 
-    inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
+    public inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
 
     internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = copy(model = model.with(type, value))
 

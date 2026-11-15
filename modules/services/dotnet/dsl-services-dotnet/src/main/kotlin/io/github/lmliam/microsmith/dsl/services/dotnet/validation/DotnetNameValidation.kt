@@ -1,6 +1,9 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.validation
 
-fun validateDotnetIdentifier(value: String, label: String): String {
+import io.github.lmliam.microsmith.InternalMicrosmithApi
+
+@InternalMicrosmithApi
+public fun validateDotnetIdentifier(value: String, label: String): String {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }
     require(isDotnetIdentifier(normalized)) { "$label is not a valid .NET identifier: '$value'" }
@@ -8,7 +11,7 @@ fun validateDotnetIdentifier(value: String, label: String): String {
     return normalized
 }
 
-fun validateDotnetQualifiedIdentifier(value: String, label: String): String {
+internal fun validateDotnetQualifiedIdentifier(value: String, label: String): String {
     val normalized = value.trim()
     require(normalized.isNotBlank()) { "$label cannot be blank." }
     require(isDotnetQualifiedIdentifier(normalized)) { "$label is not a valid .NET qualified identifier: '$value'" }
@@ -18,7 +21,8 @@ fun validateDotnetQualifiedIdentifier(value: String, label: String): String {
 
 private fun isDotnetQualifiedIdentifier(value: String): Boolean = value.split('.').all(::isDotnetIdentifier)
 
-fun isDotnetIdentifier(value: String): Boolean {
+@InternalMicrosmithApi
+public fun isDotnetIdentifier(value: String): Boolean {
     val candidate = value.removePrefix("@")
     if (candidate.isEmpty()) {
         return false

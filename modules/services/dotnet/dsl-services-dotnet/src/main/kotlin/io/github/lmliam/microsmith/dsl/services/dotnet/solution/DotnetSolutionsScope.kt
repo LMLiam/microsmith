@@ -3,8 +3,8 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.solution
 import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 
 @MicrosmithDsl
-interface DotnetSolutionsScope {
-    operator fun String.invoke(block: DotnetSolutionScope.() -> Unit = {})
+public interface DotnetSolutionsScope {
+    public operator fun String.invoke(block: DotnetSolutionScope.() -> Unit = {})
 
-    fun solution(name: String, block: DotnetSolutionScope.() -> Unit = {})
+    public fun solution(name: String, block: DotnetSolutionScope.() -> Unit = {})
 }

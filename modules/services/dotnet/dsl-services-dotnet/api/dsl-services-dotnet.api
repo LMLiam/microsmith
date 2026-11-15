@@ -21,46 +21,17 @@ public final class io/github/lmliam/microsmith/dsl/services/dotnet/DotnetTarget 
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/DotnetTarget$Companion {
 	public final fun getNET10-Ldr17aY ()Ljava/lang/String;
 	public final fun getNET11-Ldr17aY ()Ljava/lang/String;
-	public final fun getNET5-Ldr17aY ()Ljava/lang/String;
-	public final fun getNET6-Ldr17aY ()Ljava/lang/String;
-	public final fun getNET7-Ldr17aY ()Ljava/lang/String;
-	public final fun getNET8-Ldr17aY ()Ljava/lang/String;
-	public final fun getNET9-Ldr17aY ()Ljava/lang/String;
 	public final fun of-QVQpfBk (Ljava/lang/String;)Ljava/lang/String;
 }
 
 public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/DotnetTargetAliases {
 	public fun getNET10-Ldr17aY ()Ljava/lang/String;
 	public fun getNET11-Ldr17aY ()Ljava/lang/String;
-	public fun getNET5-Ldr17aY ()Ljava/lang/String;
-	public fun getNET6-Ldr17aY ()Ljava/lang/String;
-	public fun getNET7-Ldr17aY ()Ljava/lang/String;
-	public fun getNET8-Ldr17aY ()Ljava/lang/String;
-	public fun getNET9-Ldr17aY ()Ljava/lang/String;
 }
 
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/DotnetTargetAliases$DefaultImpls {
 	public static fun getNET10-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/DotnetTargetAliases;)Ljava/lang/String;
 	public static fun getNET11-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/DotnetTargetAliases;)Ljava/lang/String;
-	public static fun getNET5-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/DotnetTargetAliases;)Ljava/lang/String;
-	public static fun getNET6-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/DotnetTargetAliases;)Ljava/lang/String;
-	public static fun getNET7-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/DotnetTargetAliases;)Ljava/lang/String;
-	public static fun getNET8-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/DotnetTargetAliases;)Ljava/lang/String;
-	public static fun getNET9-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/DotnetTargetAliases;)Ljava/lang/String;
-}
-
-public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsContext : io/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsScope {
-	public abstract fun put (Lkotlin/reflect/KClass;Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)V
-}
-
-public final class io/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsContext$DefaultImpls {
-	public static fun getNET10-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsContext;)Ljava/lang/String;
-	public static fun getNET11-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsContext;)Ljava/lang/String;
-	public static fun getNET5-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsContext;)Ljava/lang/String;
-	public static fun getNET6-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsContext;)Ljava/lang/String;
-	public static fun getNET7-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsContext;)Ljava/lang/String;
-	public static fun getNET8-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsContext;)Ljava/lang/String;
-	public static fun getNET9-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsContext;)Ljava/lang/String;
 }
 
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsExtension : io/github/lmliam/microsmith/dsl/MergeableExtension, io/github/lmliam/microsmith/dsl/MicrosmithExtension {
@@ -86,17 +57,11 @@ public final class io/github/lmliam/microsmith/dsl/services/dotnet/defaults/Dotn
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsExtensionHelpersKt {
-	public static final fun extensionTypes (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsExtension;)Ljava/util/Set;
-	public static final fun extensions (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsExtension;)Ljava/util/List;
-}
-
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsModel {
 	public static final field Companion Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsModel$Companion;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun get (Lkotlin/reflect/KClass;)Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;
 	public fun hashCode ()I
-	public final fun keys ()Ljava/util/Set;
 }
 
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsModel$Companion {
@@ -111,11 +76,6 @@ public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsScope$DefaultImpls {
 	public static fun getNET10-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsScope;)Ljava/lang/String;
 	public static fun getNET11-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsScope;)Ljava/lang/String;
-	public static fun getNET5-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsScope;)Ljava/lang/String;
-	public static fun getNET6-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsScope;)Ljava/lang/String;
-	public static fun getNET7-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsScope;)Ljava/lang/String;
-	public static fun getNET8-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsScope;)Ljava/lang/String;
-	public static fun getNET9-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/defaults/DotnetDefaultsScope;)Ljava/lang/String;
 }
 
 public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetConfigurableTypedFieldScope {
@@ -203,63 +163,6 @@ public final class io/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetF
 	public final fun getType ()Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-}
-
-public class io/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldSetBuilder : io/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetTypedFieldScope {
-	public fun <init> ()V
-	public fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
-	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	protected final fun addField (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	protected final fun addReference (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public fun bool (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun bool (Ljava/lang/String;)Ljava/lang/Object;
-	protected final fun buildFields ()Ljava/util/List;
-	public fun byte (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun byte (Ljava/lang/String;)Ljava/lang/Object;
-	public fun char (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun char (Ljava/lang/String;)Ljava/lang/Object;
-	public fun dateOnly (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun dateOnly (Ljava/lang/String;)Ljava/lang/Object;
-	public fun dateTime (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun dateTime (Ljava/lang/String;)Ljava/lang/Object;
-	public fun dateTimeOffset (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun dateTimeOffset (Ljava/lang/String;)Ljava/lang/Object;
-	public fun decimal (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun decimal (Ljava/lang/String;)Ljava/lang/Object;
-	public fun double (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun double (Ljava/lang/String;)Ljava/lang/Object;
-	public fun float (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun float (Ljava/lang/String;)Ljava/lang/Object;
-	public fun guid (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun guid (Ljava/lang/String;)Ljava/lang/Object;
-	public fun int (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun int (Ljava/lang/String;)Ljava/lang/Object;
-	public fun long (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun long (Ljava/lang/String;)Ljava/lang/Object;
-	public fun nint (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun nint (Ljava/lang/String;)Ljava/lang/Object;
-	public fun nuint (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun nuint (Ljava/lang/String;)Ljava/lang/Object;
-	public fun ref (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun ref (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
-	public fun references (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun references (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
-	public fun sbyte (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun sbyte (Ljava/lang/String;)Ljava/lang/Object;
-	public fun short (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun short (Ljava/lang/String;)Ljava/lang/Object;
-	public fun string (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun string (Ljava/lang/String;)Ljava/lang/Object;
-	public fun timeOnly (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun timeOnly (Ljava/lang/String;)Ljava/lang/Object;
-	public fun timeSpan (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun timeSpan (Ljava/lang/String;)Ljava/lang/Object;
-	public fun uint (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun uint (Ljava/lang/String;)Ljava/lang/Object;
-	public fun ulong (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun ulong (Ljava/lang/String;)Ljava/lang/Object;
-	public fun ushort (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetField;
-	public synthetic fun ushort (Ljava/lang/String;)Ljava/lang/Object;
 }
 
 public abstract class io/github/lmliam/microsmith/dsl/services/dotnet/model/DotnetFieldType {
@@ -488,20 +391,6 @@ public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/
 	public abstract fun ushort (Ljava/lang/String;)Ljava/lang/Object;
 }
 
-public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceContext : io/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope {
-	public abstract fun put (Lkotlin/reflect/KClass;Lio/github/lmliam/microsmith/dsl/services/ServiceExtension;)V
-}
-
-public final class io/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceContext$DefaultImpls {
-	public static fun getNET10-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceContext;)Ljava/lang/String;
-	public static fun getNET11-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceContext;)Ljava/lang/String;
-	public static fun getNET5-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceContext;)Ljava/lang/String;
-	public static fun getNET6-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceContext;)Ljava/lang/String;
-	public static fun getNET7-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceContext;)Ljava/lang/String;
-	public static fun getNET8-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceContext;)Ljava/lang/String;
-	public static fun getNET9-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceContext;)Ljava/lang/String;
-}
-
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceExtension : io/github/lmliam/microsmith/dsl/MergeableExtension, io/github/lmliam/microsmith/dsl/services/ServiceExtension {
 	public fun <init> ()V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceModel;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -529,17 +418,11 @@ public final class io/github/lmliam/microsmith/dsl/services/dotnet/service/Dotne
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceExtensionHelpersKt {
-	public static final fun extensionTypes (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceExtension;)Ljava/util/Set;
-	public static final fun extensions (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceExtension;)Ljava/util/List;
-}
-
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceModel {
 	public static final field Companion Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceModel$Companion;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun get (Lkotlin/reflect/KClass;)Lio/github/lmliam/microsmith/dsl/services/ServiceExtension;
 	public fun hashCode ()I
-	public final fun keys ()Ljava/util/Set;
 }
 
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceModel$Companion {
@@ -556,11 +439,6 @@ public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope$DefaultImpls {
 	public static fun getNET10-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;)Ljava/lang/String;
 	public static fun getNET11-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;)Ljava/lang/String;
-	public static fun getNET5-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;)Ljava/lang/String;
-	public static fun getNET6-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;)Ljava/lang/String;
-	public static fun getNET7-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;)Ljava/lang/String;
-	public static fun getNET8-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;)Ljava/lang/String;
-	public static fun getNET9-Ldr17aY (Lio/github/lmliam/microsmith/dsl/services/dotnet/service/DotnetServiceScope;)Ljava/lang/String;
 }
 
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolution {
@@ -578,25 +456,15 @@ public final class io/github/lmliam/microsmith/dsl/services/dotnet/solution/Dotn
 	public fun toString ()Ljava/lang/String;
 }
 
-public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionContext : io/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionScope {
-	public abstract fun put (Lkotlin/reflect/KClass;Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)V
-}
-
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionModel {
 	public static final field Companion Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionModel$Companion;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun get (Lkotlin/reflect/KClass;)Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;
 	public fun hashCode ()I
-	public final fun keys ()Ljava/util/Set;
 }
 
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionModel$Companion {
 	public final fun empty ()Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionModel;
-}
-
-public final class io/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionModelExtensionsKt {
-	public static final fun extensionTypes (Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionModel;)Ljava/util/Set;
-	public static final fun extensions (Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionModel;)Ljava/util/List;
 }
 
 public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionScope {
@@ -612,11 +480,5 @@ public abstract interface class io/github/lmliam/microsmith/dsl/services/dotnet/
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionsScope$DefaultImpls {
 	public static synthetic fun invoke$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionsScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
 	public static synthetic fun solution$default (Lio/github/lmliam/microsmith/dsl/services/dotnet/solution/DotnetSolutionsScope;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
-}
-
-public final class io/github/lmliam/microsmith/dsl/services/dotnet/validation/DotnetNameValidationKt {
-	public static final fun isDotnetIdentifier (Ljava/lang/String;)Z
-	public static final fun validateDotnetIdentifier (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-	public static final fun validateDotnetQualifiedIdentifier (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 }
 

@@ -1,33 +1,33 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 
-object DotnetCSharpTypes {
-    object System {
-        data object InvalidOperationException : DotnetCSharpTypeName {
-            override val value = "InvalidOperationException"
+public object DotnetCSharpTypes {
+    public object System {
+        public data object InvalidOperationException : DotnetCSharpTypeName {
+            override val value: String = "InvalidOperationException"
         }
     }
 
-    object Primitives {
-        data object String : DotnetCSharpTypeName {
-            override val value = "string"
+    public object Primitives {
+        public data object String : DotnetCSharpTypeName {
+            override val value: kotlin.String = "string"
         }
 
-        data object Int : DotnetCSharpTypeName {
-            override val value = "int"
+        public data object Int : DotnetCSharpTypeName {
+            override val value: kotlin.String = "int"
         }
 
-        data object Object : DotnetCSharpTypeName {
-            override val value = "object"
+        public data object Object : DotnetCSharpTypeName {
+            override val value: kotlin.String = "object"
         }
     }
 
-    object Threading {
-        data object CancellationToken : DotnetCSharpTypeName {
-            override val value = "CancellationToken"
+    public object Threading {
+        public data object CancellationToken : DotnetCSharpTypeName {
+            override val value: String = "CancellationToken"
         }
 
-        data object Task : DotnetCSharpTypeName {
-            override val value = "Task"
+        public data object Task : DotnetCSharpTypeName {
+            override val value: String = "Task"
         }
     }
 }

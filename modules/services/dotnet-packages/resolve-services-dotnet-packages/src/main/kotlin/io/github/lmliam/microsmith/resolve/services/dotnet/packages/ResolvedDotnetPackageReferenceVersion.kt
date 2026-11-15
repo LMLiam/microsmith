@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.packages
 
-sealed interface ResolvedDotnetPackageReferenceVersion {
-    data object Central : ResolvedDotnetPackageReferenceVersion
+public sealed interface ResolvedDotnetPackageReferenceVersion {
+    public data object Central : ResolvedDotnetPackageReferenceVersion
 
-    data class Explicit(val version: String) : ResolvedDotnetPackageReferenceVersion
+    public data class Explicit(public val version: String) : ResolvedDotnetPackageReferenceVersion
 }

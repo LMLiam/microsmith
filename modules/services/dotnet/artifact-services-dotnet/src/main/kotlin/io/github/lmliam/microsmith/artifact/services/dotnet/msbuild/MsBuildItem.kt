@@ -1,11 +1,15 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
 
-class MsBuildItem(val itemName: String, val include: String, attributes: Map<String, String> = emptyMap()) {
-    val attributes: Map<String, String> = attributes.toMap()
+public class MsBuildItem(
+    public val itemName: String,
+    public val include: String,
+    attributes: Map<String, String> = emptyMap(),
+) {
+    public val attributes: Map<String, String> = attributes.toMap()
 
     init {
-        MsBuildNames.requireItemName(itemName)
-        this.attributes.keys.forEach(MsBuildNames::requireAttributeName)
+        requireItemName(itemName)
+        this.attributes.keys.forEach(::requireAttributeName)
     }
 
     override fun equals(other: Any?): Boolean =

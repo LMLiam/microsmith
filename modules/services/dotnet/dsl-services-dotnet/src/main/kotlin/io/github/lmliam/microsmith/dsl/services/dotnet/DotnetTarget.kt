@@ -1,61 +1,24 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet
 
-internal const val DEPRECATED_TARGET_MESSAGE = "Target .NET 10 or later. Scheduled for removal in 4.0."
-
 /** Validated .NET target framework monikers for the DSL. */
 @JvmInline
-value class DotnetTarget(val moniker: String) {
+public value class DotnetTarget(public val moniker: String) {
     init {
         require(moniker in supportedMonikers) { "Unsupported .NET target framework moniker: '$moniker'." }
     }
 
     override fun toString(): String = moniker
 
-    companion object {
+    public companion object {
         private val supportedMonikers =
             setOf(
-                "net5.0",
-                "net6.0",
-                "net7.0",
-                "net8.0",
-                "net9.0",
                 "net10.0",
                 "net11.0",
             )
 
-        @Deprecated(
-            DEPRECATED_TARGET_MESSAGE,
-            ReplaceWith("DotnetTarget.NET10", "io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget"),
-        )
-        val NET5 = DotnetTarget("net5.0")
+        public val NET10: DotnetTarget = DotnetTarget("net10.0")
+        public val NET11: DotnetTarget = DotnetTarget("net11.0")
 
-        @Deprecated(
-            DEPRECATED_TARGET_MESSAGE,
-            ReplaceWith("DotnetTarget.NET10", "io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget"),
-        )
-        val NET6 = DotnetTarget("net6.0")
-
-        @Deprecated(
-            DEPRECATED_TARGET_MESSAGE,
-            ReplaceWith("DotnetTarget.NET10", "io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget"),
-        )
-        val NET7 = DotnetTarget("net7.0")
-
-        @Deprecated(
-            DEPRECATED_TARGET_MESSAGE,
-            ReplaceWith("DotnetTarget.NET10", "io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget"),
-        )
-        val NET8 = DotnetTarget("net8.0")
-
-        @Deprecated(
-            DEPRECATED_TARGET_MESSAGE,
-            ReplaceWith("DotnetTarget.NET10", "io.github.lmliam.microsmith.dsl.services.dotnet.DotnetTarget"),
-        )
-        val NET9 = DotnetTarget("net9.0")
-
-        val NET10 = DotnetTarget("net10.0")
-        val NET11 = DotnetTarget("net11.0")
-
-        fun of(moniker: String): DotnetTarget = DotnetTarget(moniker)
+        public fun of(moniker: String): DotnetTarget = DotnetTarget(moniker)
     }
 }

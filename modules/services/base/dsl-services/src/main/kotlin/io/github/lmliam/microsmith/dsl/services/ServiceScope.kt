@@ -7,4 +7,4 @@ import io.github.lmliam.microsmith.dsl.MicrosmithDsl
  *
  * Feature modules add their own service-scoped entrypoints here (for example, `fun ServiceScope.dotnet { ... }`).
  */
-@MicrosmithDsl interface ServiceScope
+@MicrosmithDsl public interface ServiceScope

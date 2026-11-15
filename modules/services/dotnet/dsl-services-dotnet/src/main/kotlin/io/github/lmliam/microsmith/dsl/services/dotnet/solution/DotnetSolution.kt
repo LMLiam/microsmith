@@ -5,14 +5,17 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnet
 import kotlin.reflect.KClass
 
 /** A named .NET solution declared in the services-level dotnet defaults scope. */
-data class DotnetSolution(val name: String, val model: DotnetSolutionModel = DotnetSolutionModel.empty()) {
+public data class DotnetSolution(
+    public val name: String,
+    public val model: DotnetSolutionModel = DotnetSolutionModel.empty(),
+) {
     init {
         validateDotnetQualifiedIdentifier(name, "Solution name")
     }
 
-    fun <T : MicrosmithExtension> get(type: KClass<T>) = model.get(type)
+    public fun <T : MicrosmithExtension> get(type: KClass<T>): T? = model.get(type)
 
-    inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
+    public inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
 
     internal fun <T : MicrosmithExtension> with(type: KClass<T>, value: T) = copy(model = model.with(type, value))
 

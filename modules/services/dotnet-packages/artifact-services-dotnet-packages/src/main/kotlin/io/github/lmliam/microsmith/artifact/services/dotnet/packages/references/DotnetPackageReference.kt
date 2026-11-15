@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.packages.references
 
-data class DotnetPackageReference(val name: String, val version: DotnetPackageReferenceVersion)
+public data class DotnetPackageReference(public val name: String, public val version: DotnetPackageReferenceVersion)

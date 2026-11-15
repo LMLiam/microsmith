@@ -14,6 +14,7 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.defaults.r
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.defaults.renderDotnetAspInitializer
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.attribute
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpAutoProperty
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpNullableType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpParameter
@@ -54,7 +55,7 @@ private fun renderRequestBindingProperty(field: DotnetAspRequestFieldArtifact): 
         attributes =
             buildList {
                 if (!field.optional && field.defaultValue == null) {
-                    add(CSharp.attribute(BIND_REQUIRED_ATTRIBUTE))
+                    add(attribute(BIND_REQUIRED_ATTRIBUTE))
                 }
             },
         initializer = renderDotnetAspBindingInitializer(field).asInitializerExpression(),

@@ -9,10 +9,14 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.hostingName
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controller.renderReadHeaderHelper
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.controller.renderRespondHelper
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpRenderer
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.file
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
 
 internal object DotnetAspInfrastructureFileRenderer {
+    private val csharpRenderer = CSharpRenderer()
+
     fun renderProgramFile(artifact: DotnetAspServiceArtifact): String =
         """
         using ${hostingNamespace(artifact)};
@@ -29,8 +33,8 @@ internal object DotnetAspInfrastructureFileRenderer {
             .trimIndent()
 
     fun renderHostingExtensionsFile(artifact: DotnetAspServiceArtifact): String =
-        CSharp.render(
-            CSharp.file(hostingNamespace(artifact)) {
+        csharpRenderer.render(
+            file(hostingNamespace(artifact)) {
                 using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Builder)
                 using(DotnetAspCSharpNamespaces.Microsoft.Extensions.DependencyInjection)
                 classType(
@@ -44,8 +48,8 @@ internal object DotnetAspInfrastructureFileRenderer {
         )
 
     fun renderMicrosmithControllerBaseFile(artifact: DotnetAspServiceArtifact): String =
-        CSharp.render(
-            CSharp.file(controllersNamespace(artifact)) {
+        csharpRenderer.render(
+            file(controllersNamespace(artifact)) {
                 using(DotnetAspCSharpNamespaces.Microsoft.AspNetCore.Mvc)
                 classType(
                     name = MICROSMITH_CONTROLLER_BASE_TYPE_NAME,

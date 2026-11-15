@@ -56,14 +56,14 @@ class MicrosmithGenerateMojoTests : StringSpec() {
                 .shouldExist()
         }
 
-        "execute logs deprecated script APIs as warnings" {
-            val fixture = MicrosmithMavenTestProject.create("maven-plugin-deprecated-target")
-            fixture.writeResource("build.microsmith.kts", "/maven/generate/deprecated-net8-target.microsmith.kts")
+        "execute logs script compiler warnings" {
+            val fixture = MicrosmithMavenTestProject.create("maven-plugin-script-warning")
+            fixture.writeResource("build.microsmith.kts", "/maven/generate/redundant-cast.microsmith.kts")
             val log = RecordingLog()
 
             fixture.createMojo().apply { setLog(log) }.execute()
 
-            log.warnings.single().shouldContain("'val NET8: DotnetTarget' is deprecated")
+            log.warnings.single().shouldContain("Cast is redundant")
         }
 
         "script compilation failures surface as MojoFailureException" {

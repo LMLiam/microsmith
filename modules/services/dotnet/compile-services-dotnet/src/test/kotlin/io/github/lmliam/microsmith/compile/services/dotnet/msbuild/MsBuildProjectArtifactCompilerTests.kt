@@ -31,7 +31,8 @@ class MsBuildProjectArtifactCompilerTests :
                             ),
                     )
 
-                val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
+                val contribution =
+                    MsBuildProjectArtifactCompiler(MsBuildProjectXmlRenderer()).compile(artifact).single()
                 val textContribution = contribution as TextFileArtifactContribution
                 val contents = textContribution.contents
 
@@ -62,7 +63,8 @@ class MsBuildProjectArtifactCompilerTests :
                             ),
                     )
 
-                val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
+                val contribution =
+                    MsBuildProjectArtifactCompiler(MsBuildProjectXmlRenderer()).compile(artifact).single()
                 val textContribution = contribution as TextFileArtifactContribution
 
                 textContribution.artifactId.relativePath shouldBe RelativePath.of("Directory.Build.props")
@@ -83,7 +85,8 @@ class MsBuildProjectArtifactCompilerTests :
                         items = emptyList(),
                     )
 
-                val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
+                val contribution =
+                    MsBuildProjectArtifactCompiler(MsBuildProjectXmlRenderer()).compile(artifact).single()
                 val textContribution = contribution as TextFileArtifactContribution
 
                 textContribution.artifactId.relativePath shouldBe RelativePath.of("UserService.Api.csproj")
@@ -107,7 +110,8 @@ class MsBuildProjectArtifactCompilerTests :
                             ),
                     )
 
-                val contribution = MsBuildProjectArtifactCompiler().compile(artifact).single()
+                val contribution =
+                    MsBuildProjectArtifactCompiler(MsBuildProjectXmlRenderer()).compile(artifact).single()
                 val textContribution = contribution as TextFileArtifactContribution
                 val contents = textContribution.contents
 

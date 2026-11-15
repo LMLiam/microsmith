@@ -72,7 +72,7 @@ class MicrosmithScriptHostTests :
                 val tempDir = createTempDirectory("microsmith-script-host-warnings")
                 try {
                     val script = tempDir.resolve("service.microsmith.kts")
-                    copyResource("/scripting/host/deprecated-net8-target.microsmith.kts", script)
+                    copyResource("/scripting/host/redundant-cast.microsmith.kts", script)
                     val host = MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
                     val request =
                         ScriptRunRequest(
@@ -86,7 +86,7 @@ class MicrosmithScriptHostTests :
                     val secondRun = host.run(request).shouldBeTypeOf<ScriptRunSuccess>()
 
                     firstRun.cacheHit shouldBe false
-                    firstRun.warnings.single().shouldContain("NET8").shouldContain("deprecated")
+                    firstRun.warnings.single().shouldContain("Cast is redundant")
                     secondRun.cacheHit shouldBe true
                     secondRun.warnings shouldContainExactly firstRun.warnings
                 } finally {
@@ -98,7 +98,7 @@ class MicrosmithScriptHostTests :
                 val tempDir = createTempDirectory("microsmith-script-host-warnings-damaged")
                 try {
                     val script = tempDir.resolve("service.microsmith.kts")
-                    copyResource("/scripting/host/deprecated-net8-target.microsmith.kts", script)
+                    copyResource("/scripting/host/redundant-cast.microsmith.kts", script)
                     val cache = tempDir.resolve("cache")
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val request =

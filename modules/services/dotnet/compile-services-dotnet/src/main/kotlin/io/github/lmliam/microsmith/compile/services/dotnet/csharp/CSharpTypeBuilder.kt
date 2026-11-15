@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 
 @CSharp.Dsl
-class CSharpTypeBuilder
+public class CSharpTypeBuilder
 internal constructor(
     private val kind: CSharp.TypeKind,
     private val name: String,
@@ -12,11 +12,11 @@ internal constructor(
 ) {
     private val members = mutableListOf<CSharp.Member>()
 
-    fun addMember(member: CSharp.Member) {
+    public fun addMember(member: CSharp.Member) {
         members += member
     }
 
-    fun property(
+    public fun property(
         type: CSharp.TypeRef,
         name: String,
         modifiers: List<CSharp.Modifier>,
@@ -35,7 +35,7 @@ internal constructor(
             )
     }
 
-    fun method(
+    public fun method(
         name: String,
         returnType: CSharp.TypeRef,
         modifiers: List<CSharp.Modifier>,
@@ -65,7 +65,7 @@ internal constructor(
             members = members,
         )
 
-    fun property(
+    public fun property(
         type: String,
         name: String,
         modifiers: List<CSharp.Modifier>,
@@ -74,7 +74,7 @@ internal constructor(
         initializer: String? = null,
     ) {
         property(
-            type = CSharp.type(type),
+            type = csharpType(type),
             name = name,
             modifiers = modifiers,
             attributes = attributes,
@@ -83,7 +83,7 @@ internal constructor(
         )
     }
 
-    fun method(
+    public fun method(
         name: String,
         returnType: String,
         modifiers: List<CSharp.Modifier>,
@@ -93,7 +93,7 @@ internal constructor(
     ) {
         method(
             name = name,
-            returnType = CSharp.type(returnType),
+            returnType = csharpType(returnType),
             modifiers = modifiers,
             attributes = attributes,
             parameters = parameters,

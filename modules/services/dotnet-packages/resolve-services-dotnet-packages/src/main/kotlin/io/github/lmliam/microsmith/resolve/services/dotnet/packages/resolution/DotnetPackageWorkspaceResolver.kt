@@ -5,6 +5,7 @@ import arrow.core.EitherNel
 import arrow.core.mapOrAccumulate
 import arrow.core.raise.context.bind
 import arrow.core.raise.context.bindNel
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.defaults.DotnetDefaultsExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.packages.service.DotnetPackageReferenceDeclaration
@@ -22,8 +23,9 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWork
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceResolver
 
 /** Resolves the additive .NET package-management DSL into a validation-ready workspace model. */
-class DotnetPackageWorkspaceResolver(
-    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver(),
+@Inject
+internal class DotnetPackageWorkspaceResolver(
+    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver,
 ) {
     fun resolve(extension: ServicesExtension): EitherNel<DotnetResolutionIssue, DotnetPackageWorkspace> {
         val defaults = extension.get<DotnetDefaultsExtension>() ?: DotnetDefaultsExtension()

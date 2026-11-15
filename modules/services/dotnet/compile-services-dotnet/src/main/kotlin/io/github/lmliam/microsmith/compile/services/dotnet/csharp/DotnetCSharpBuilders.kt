@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 
-fun csharpParameter(
+public fun csharpParameter(
     type: CSharp.TypeRef,
     name: String,
     modifiers: List<CSharp.Modifier> = emptyList(),
@@ -15,7 +15,7 @@ fun csharpParameter(
         defaultValue = defaultValue,
     )
 
-fun csharpParameter(
+public fun csharpParameter(
     type: DotnetCSharpTypeName,
     name: String,
     modifiers: List<CSharp.Modifier> = emptyList(),
@@ -30,7 +30,7 @@ fun csharpParameter(
         defaultValue = defaultValue,
     )
 
-fun csharpParameter(
+public fun csharpParameter(
     type: String,
     name: String,
     modifiers: List<CSharp.Modifier> = emptyList(),
@@ -45,7 +45,7 @@ fun csharpParameter(
         defaultValue = defaultValue,
     )
 
-fun csharpAutoProperty(
+public fun csharpAutoProperty(
     type: CSharp.TypeRef,
     name: String,
     modifiers: List<CSharp.Modifier>,
@@ -62,35 +62,35 @@ fun csharpAutoProperty(
         initializer = initializer,
     )
 
-fun csharpType(name: DotnetCSharpTypeName): CSharp.TypeRef = csharpType(name.value)
+public fun csharpType(name: DotnetCSharpTypeName): CSharp.TypeRef = csharpType(name.value)
 
-fun csharpType(name: String): CSharp.TypeRef = CSharp.type(name)
+public fun csharpType(name: String): CSharp.TypeRef = CSharp.NamedType(name)
 
-fun csharpNullableType(name: DotnetCSharpTypeName): CSharp.TypeRef = csharpNullableType(name.value)
+public fun csharpNullableType(name: DotnetCSharpTypeName): CSharp.TypeRef = csharpNullableType(name.value)
 
-fun csharpNullableType(name: String): CSharp.TypeRef = CSharp.nullable(csharpType(name))
+public fun csharpNullableType(name: String): CSharp.TypeRef = CSharp.NullableType(csharpType(name))
 
-fun csharpGenericType(name: DotnetCSharpTypeName, vararg arguments: CSharp.TypeRef): CSharp.TypeRef =
+public fun csharpGenericType(name: DotnetCSharpTypeName, vararg arguments: CSharp.TypeRef): CSharp.TypeRef =
     csharpGenericType(name.value, *arguments)
 
-fun csharpGenericType(name: String, vararg arguments: CSharp.TypeRef): CSharp.TypeRef =
-    CSharp.genericType(name, *arguments)
+public fun csharpGenericType(name: String, vararg arguments: CSharp.TypeRef): CSharp.TypeRef =
+    CSharp.GenericType(name, arguments.toList())
 
-fun csharpArrayType(elementType: CSharp.TypeRef): CSharp.TypeRef = CSharp.array(elementType)
+public fun csharpArrayType(elementType: CSharp.TypeRef): CSharp.TypeRef = CSharp.ArrayType(elementType)
 
-fun csharpTupleType(vararg elements: CSharp.TupleElement): CSharp.TypeRef = CSharp.tuple(*elements)
+public fun csharpTupleType(vararg elements: CSharp.TupleElement): CSharp.TypeRef = CSharp.TupleType(elements.toList())
 
-fun csharpTupleElement(type: CSharp.TypeRef, name: String? = null): CSharp.TupleElement =
-    CSharp.tupleElement(type, name)
+public fun csharpTupleElement(type: CSharp.TypeRef, name: String? = null): CSharp.TupleElement =
+    CSharp.TupleElement(type, name)
 
-fun CSharpFileBuilder.using(namespace: DotnetCSharpNamespace) {
+public fun CSharpFileBuilder.using(namespace: DotnetCSharpNamespace) {
     using(namespace.value)
 }
 
-fun extensionParameter(type: DotnetCSharpTypeName, name: String): CSharp.Parameter =
+public fun extensionParameter(type: DotnetCSharpTypeName, name: String): CSharp.Parameter =
     extensionParameter(type.value, name)
 
-fun extensionParameter(type: String, name: String): CSharp.Parameter =
+public fun extensionParameter(type: String, name: String): CSharp.Parameter =
     csharpParameter(
         type = type,
         name = name,

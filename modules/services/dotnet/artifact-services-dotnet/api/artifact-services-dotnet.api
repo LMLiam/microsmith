@@ -27,9 +27,6 @@ public final class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/
 	public static final field SDK_ATTRIBUTE Ljava/lang/String;
 	public static final field TARGET_FRAMEWORK_PROPERTY Ljava/lang/String;
 	public static final field VERSION_ATTRIBUTE Ljava/lang/String;
-	public final fun requireAttributeName (Ljava/lang/String;)Ljava/lang/String;
-	public final fun requireItemName (Ljava/lang/String;)Ljava/lang/String;
-	public final fun requirePropertyName (Ljava/lang/String;)Ljava/lang/String;
 }
 
 public final class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact : io/github/lmliam/microsmith/artifact/services/dotnet/DotnetArtifact {
@@ -51,13 +48,7 @@ public final class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
-	public fun <init> ()V
-	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact;
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
-	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun merge (Lio/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact;
+public abstract class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifactAssemblerContributions {
 }
 
 public abstract interface class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifactId : io/github/lmliam/microsmith/artifact/ArtifactId {

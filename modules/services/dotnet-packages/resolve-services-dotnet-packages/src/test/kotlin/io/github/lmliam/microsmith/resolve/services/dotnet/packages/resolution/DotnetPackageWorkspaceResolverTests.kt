@@ -11,6 +11,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotn
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageReferenceVersion
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.ResolvedDotnetPackageVersion
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.diagnostics.DotnetPackageWorkspaceResolutionIssue
+import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceResolver
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
@@ -67,7 +68,9 @@ class DotnetPackageWorkspaceResolverTests :
                     }
                 }
 
-                val workspace = DotnetPackageWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
+                val workspace =
+                    DotnetPackageWorkspaceResolver(DotnetWorkspaceResolver())
+                        .resolveSuccessfully(builder.requireServicesExtension())
 
                 workspace.requireSolution("Platform").packages shouldContainExactly
                     listOf(
@@ -114,7 +117,9 @@ class DotnetPackageWorkspaceResolverTests :
                     }
                 }
 
-                val issues = DotnetPackageWorkspaceResolver().resolveIssues(builder.requireServicesExtension())
+                val issues =
+                    DotnetPackageWorkspaceResolver(DotnetWorkspaceResolver())
+                        .resolveIssues(builder.requireServicesExtension())
 
                 issues shouldContainExactly
                     listOf(
@@ -150,7 +155,9 @@ class DotnetPackageWorkspaceResolverTests :
                     }
                 }
 
-                val workspace = DotnetPackageWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
+                val workspace =
+                    DotnetPackageWorkspaceResolver(DotnetWorkspaceResolver())
+                        .resolveSuccessfully(builder.requireServicesExtension())
 
                 workspace.requireService("UserService").packages shouldContainExactly
                     listOf(
@@ -184,7 +191,9 @@ class DotnetPackageWorkspaceResolverTests :
                     }
                 }
 
-                val issues = DotnetPackageWorkspaceResolver().resolveIssues(builder.requireServicesExtension())
+                val issues =
+                    DotnetPackageWorkspaceResolver(DotnetWorkspaceResolver())
+                        .resolveIssues(builder.requireServicesExtension())
 
                 issues shouldContainExactly
                     listOf(
@@ -213,7 +222,9 @@ class DotnetPackageWorkspaceResolverTests :
                     }
                 }
 
-                val issues = DotnetPackageWorkspaceResolver().resolveIssues(builder.requireServicesExtension())
+                val issues =
+                    DotnetPackageWorkspaceResolver(DotnetWorkspaceResolver())
+                        .resolveIssues(builder.requireServicesExtension())
 
                 issues shouldContainExactly
                     listOf(
@@ -249,7 +260,9 @@ class DotnetPackageWorkspaceResolverTests :
                     }
                 }
 
-                val issues = DotnetPackageWorkspaceResolver().resolveIssues(builder.requireServicesExtension())
+                val issues =
+                    DotnetPackageWorkspaceResolver(DotnetWorkspaceResolver())
+                        .resolveIssues(builder.requireServicesExtension())
 
                 issues shouldContainExactly
                     listOf(
@@ -281,7 +294,9 @@ class DotnetPackageWorkspaceResolverTests :
                     }
                 }
 
-                val workspace = DotnetPackageWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
+                val workspace =
+                    DotnetPackageWorkspaceResolver(DotnetWorkspaceResolver())
+                        .resolveSuccessfully(builder.requireServicesExtension())
 
                 workspace.solutionsByName.keys.sorted() shouldContainExactly
                     listOf(
