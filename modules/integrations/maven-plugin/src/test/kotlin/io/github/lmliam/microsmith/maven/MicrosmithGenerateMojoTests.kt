@@ -17,21 +17,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
     init {
         "execute generates outputs from the configured script" {
             val fixture = MicrosmithMavenTestProject.create("maven-plugin-generate")
-            fixture.writeFile(
-                "build.microsmith.kts",
-                """
-                microsmith {
-                    schemas {
-                        protobuf {
-                            message("MavenUserCreated") {
-                                int32("id") { index(1) }
-                            }
-                        }
-                    }
-                }
-                """
-                    .trimIndent(),
-            )
+            fixture.writeResource("build.microsmith.kts", "/maven/generate/protobuf-user.microsmith.kts")
 
             val mojo = fixture.createMojo()
 
@@ -42,28 +28,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
 
         "execute forwards vars and flags to the script" {
             val fixture = MicrosmithMavenTestProject.create("maven-plugin-vars-flags")
-            fixture.writeFile(
-                "build.microsmith.kts",
-                """
-                val entityName = requireVar("entityName")
-                if (!hasFlag("emit")) {
-                    error("Expected emit flag")
-                }
-
-                emit(
-                    microsmith {
-                        schemas {
-                            protobuf {
-                                message(entityName) {
-                                    int32("id") { index(1) }
-                                }
-                            }
-                        }
-                    },
-                )
-                """
-                    .trimIndent(),
-            )
+            fixture.writeResource("build.microsmith.kts", "/maven/generate/vars-and-flags.microsmith.kts")
             val properties = Properties().apply { setProperty("entityName", "MavenConfiguredUserCreated") }
 
             val mojo =
@@ -80,48 +45,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
 
         "execute supports ASP.NET service generation" {
             val fixture = MicrosmithMavenTestProject.create("maven-plugin-dotnet-asp")
-            fixture.writeFile(
-                "build.microsmith.kts",
-                """
-                microsmith {
-                    services {
-                        dotnet {
-                            target(NET10)
-                            solutions {
-                                "Platform" {}
-                            }
-                        }
-
-                        "UserService" {
-                            dotnet {
-                                solution("Platform")
-                                project("UserService.Api")
-                                models {
-                                    "User" {
-                                        string("id")
-                                    }
-                                }
-                                asp {
-                                    rest {
-                                        "/users" {
-                                            get("/{id}", "GetUser") {
-                                                path("GetUserPath") {
-                                                    string("id")
-                                                }
-                                                responses {
-                                                    ok("User")
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                """
-                    .trimIndent(),
-            )
+            fixture.writeResource("build.microsmith.kts", "/maven/generate/asp-user-service.microsmith.kts")
 
             fixture.createMojo().execute()
 
@@ -134,20 +58,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
 
         "execute logs deprecated script APIs as warnings" {
             val fixture = MicrosmithMavenTestProject.create("maven-plugin-deprecated-target")
-            fixture.writeFile(
-                "build.microsmith.kts",
-                """
-                microsmith {
-                    services {
-                        dotnet {
-                            target(NET8)
-                            solutions { "Platform" {} }
-                        }
-                    }
-                }
-                """
-                    .trimIndent(),
-            )
+            fixture.writeResource("build.microsmith.kts", "/maven/generate/deprecated-net8-target.microsmith.kts")
             val log = RecordingLog()
 
             fixture.createMojo().apply { setLog(log) }.execute()
@@ -157,19 +68,7 @@ class MicrosmithGenerateMojoTests : StringSpec() {
 
         "script compilation failures surface as MojoFailureException" {
             val fixture = MicrosmithMavenTestProject.create("maven-plugin-compilation-failure")
-            fixture.writeFile(
-                "build.microsmith.kts",
-                """
-                microsmith {
-                    schemas {
-                        protobuf {
-                            unknownCall()
-                        }
-                    }
-                }
-                """
-                    .trimIndent(),
-            )
+            fixture.writeResource("build.microsmith.kts", "/maven/generate/unknown-call.microsmith.kts")
 
             val mojo = fixture.createMojo()
 

@@ -12,6 +12,17 @@ internal class MicrosmithMavenTestProject private constructor(private val rootDi
         file.writeText("$contents\n")
     }
 
+    fun writeResource(relativePath: String, resource: String) {
+        val file = file(relativePath)
+        checkNotNull(file.parent).createDirectories()
+        file.writeText(
+            checkNotNull(MicrosmithMavenTestProject::class.java.getResource(resource)) {
+                    "Missing test resource $resource"
+                }
+                .readText(),
+        )
+    }
+
     fun createMojo(): MicrosmithGenerateMojo =
         MicrosmithGenerateMojo().apply {
             projectBaseDirectory = rootDirectory.toFile()
