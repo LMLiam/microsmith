@@ -27,7 +27,7 @@ internal object ProtobufScriptSymbolContributor : ScriptSymbolContributor {
 
         if (protobufIndex < 0) return null
 
-        val target = buildList {
+        val path = buildList {
             site.enclosingCalls.drop(protobufIndex + 1).forEach {
                 addNamespaceSegments(
                     call = it,
@@ -37,7 +37,6 @@ internal object ProtobufScriptSymbolContributor : ScriptSymbolContributor {
 
             add(declarationName)
         }
-            .joinToString(".")
 
         return when (declarationCall.name) {
             MESSAGE_CALL ->
@@ -45,7 +44,8 @@ internal object ProtobufScriptSymbolContributor : ScriptSymbolContributor {
                     propertyName = declarationName,
                     valueType = MessageRef::class,
                     kind = MESSAGE_CALL,
-                    valueKey = target,
+                    valueKey = path.joinToString("."),
+                    qualifiedPath = path,
                 )
 
             ENUM_CALL ->
@@ -53,7 +53,8 @@ internal object ProtobufScriptSymbolContributor : ScriptSymbolContributor {
                     propertyName = declarationName,
                     valueType = EnumRef::class,
                     kind = ENUM_CALL,
-                    valueKey = target,
+                    valueKey = path.joinToString("."),
+                    qualifiedPath = path,
                 )
 
             else -> null

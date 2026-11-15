@@ -7,4 +7,5 @@ data class ScriptSymbolDefinition(
     val valueType: KClass<*>,
     val kind: String,
     val valueKey: String,
+    val qualifiedPath: List<String> = listOf(propertyName),
 )
