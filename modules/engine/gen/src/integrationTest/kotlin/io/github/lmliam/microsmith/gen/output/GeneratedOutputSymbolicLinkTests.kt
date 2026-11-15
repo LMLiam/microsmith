@@ -8,6 +8,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.nio.file.FileSystems
 import java.nio.file.Files
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 class GeneratedOutputSymbolicLinkTests :
     StringSpec(
@@ -19,7 +20,7 @@ class GeneratedOutputSymbolicLinkTests :
                 val outside = Files.createTempDirectory("microsmith-paths-outside-")
                 val linked = runCatching { Files.createSymbolicLink(root.resolve("link"), outside) }.isSuccess
                 if (linked) {
-                    val space = DirectorySpace.from(root)
+                    val space = DirectorySpace(root)
 
                     shouldThrow<IllegalArgumentException> {
                         GeneratedOutputPathResolver(fileSystem).resolve(space, RelativePath.of("link", "secret.proto"))
@@ -32,7 +33,7 @@ class GeneratedOutputSymbolicLinkTests :
                 val outside = Files.createTempDirectory("microsmith-paths-outside-")
                 val linked = runCatching { Files.createSymbolicLink(root.resolve("link"), outside) }.isSuccess
                 if (linked) {
-                    val space = DirectorySpace.from(root)
+                    val space = DirectorySpace(root)
                     val output =
                         GeneratedFile(
                             relativePath = RelativePath.of("secret.proto"),
@@ -52,10 +53,10 @@ class GeneratedOutputSymbolicLinkTests :
                 val linked = runCatching { Files.createSymbolicLink(root.resolve("link"), outside) }.isSuccess
                 if (linked) {
                     shouldThrow<IllegalArgumentException> {
-                        GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem))
+                        GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
                             .write(
                                 listOf(GeneratedFile(RelativePath.of("link", "secret.proto"), byteArrayOf(1))),
-                                DirectorySpace.from(root),
+                                DirectorySpace(root),
                             )
                     }
 

@@ -15,7 +15,7 @@ class GeneratedOutputPathResolverTests :
         {
             "resolve places a relative output path under the root" {
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
-                    val space = DirectorySpace.from(fileSystem.getPath("/out"))
+                    val space = DirectorySpace(fileSystem.getPath("/out"))
 
                     val resolved =
                         GeneratedOutputPathResolver(fileSystem)
@@ -27,7 +27,7 @@ class GeneratedOutputPathResolverTests :
 
             "resolve does not create the output file" {
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
-                    val space = DirectorySpace.from(fileSystem.getPath("/out"))
+                    val space = DirectorySpace(fileSystem.getPath("/out"))
 
                     val resolved = GeneratedOutputPathResolver(fileSystem).resolve(space, RelativePath.of("User.proto"))
 
@@ -37,7 +37,7 @@ class GeneratedOutputPathResolverTests :
 
             "resolve routes an output into its nested output root" {
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
-                    val space = DirectorySpace.from(fileSystem.getPath("/out"))
+                    val space = DirectorySpace(fileSystem.getPath("/out"))
                     val output =
                         GeneratedFile(
                             relativePath = RelativePath.of("UserService.cs"),
@@ -52,7 +52,7 @@ class GeneratedOutputPathResolverTests :
 
             "resolve places an output with the root output root directly under the space" {
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
-                    val space = DirectorySpace.from(fileSystem.getPath("/out"))
+                    val space = DirectorySpace(fileSystem.getPath("/out"))
                     val output = GeneratedFile(RelativePath.of("User.proto"), byteArrayOf())
 
                     GeneratedOutputPathResolver(fileSystem).resolve(space, output) shouldBe
@@ -83,8 +83,7 @@ class GeneratedOutputPathResolverTests :
             "resolve rejects an output root that is a regular file" {
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
                     val outputRoot = fileSystem.getPath("/out")
-                    val space = DirectorySpace.from(outputRoot)
-                    Files.delete(outputRoot)
+                    val space = DirectorySpace(outputRoot)
                     Files.writeString(outputRoot, "not a directory")
 
                     shouldThrow<IllegalArgumentException> {
@@ -95,7 +94,8 @@ class GeneratedOutputPathResolverTests :
 
             "resolve rejects a path that passes through a regular file" {
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
-                    val space = DirectorySpace.from(fileSystem.getPath("/out"))
+                    val space = DirectorySpace(fileSystem.getPath("/out"))
+                    Files.createDirectories(fileSystem.getPath("/out"))
                     Files.writeString(fileSystem.getPath("/out/proto"), "not a directory")
 
                     shouldThrow<IllegalArgumentException> {

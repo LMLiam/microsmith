@@ -24,9 +24,22 @@ class MicrosmithPluginCatalog(
     val artifactRenderers: List<ArtifactRenderer<*>> = artifactRenderers.toList()
     val resolutionIssueDiagnosticMappers: List<ResolutionIssueDiagnosticMapper<*>> =
         resolutionIssueDiagnosticMappers.toList()
+
+    internal fun including(
+        artifactAssemblers: Iterable<ArtifactAssembler<*>>,
+        artifactRenderers: Iterable<ArtifactRenderer<*>>,
+    ): MicrosmithPluginCatalog =
+        MicrosmithPluginCatalog(
+            domainResolvers = domainResolvers,
+            artifactContributors = artifactContributors,
+            artifactAssemblers = artifactAssemblers + this.artifactAssemblers,
+            artifactCompilers = artifactCompilers,
+            artifactRenderers = artifactRenderers + this.artifactRenderers,
+            resolutionIssueDiagnosticMappers = resolutionIssueDiagnosticMappers,
+        )
 }
 
-fun discoverMicrosmithPlugins(classLoader: ClassLoader = defaultPluginClassLoader()): MicrosmithPluginCatalog =
+fun discoverMicrosmithPlugins(classLoader: ClassLoader): MicrosmithPluginCatalog =
     MicrosmithPluginCatalog(
         domainResolvers = loadServices(DomainResolver::class, classLoader),
         artifactContributors = loadServices(ArtifactContributor::class, classLoader),
@@ -35,9 +48,6 @@ fun discoverMicrosmithPlugins(classLoader: ClassLoader = defaultPluginClassLoade
         artifactRenderers = loadServices(ArtifactRenderer::class, classLoader),
         resolutionIssueDiagnosticMappers = loadServices(ResolutionIssueDiagnosticMapper::class, classLoader),
     )
-
-private fun defaultPluginClassLoader(): ClassLoader =
-    Thread.currentThread().contextClassLoader ?: MicrosmithPluginCatalog::class.java.classLoader
 
 private fun <T : Any> loadServices(type: KClass<T>, classLoader: ClassLoader): List<T> =
     ServiceLoader.load(type.java, classLoader).iterator().asSequence().toList()

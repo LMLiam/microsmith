@@ -3,13 +3,12 @@ package io.github.lmliam.microsmith.compile.schemas.protobuf
 import io.github.lmliam.microsmith.dsl.microsmith
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 import io.github.lmliam.microsmith.dsl.schemas.schemas
-import io.github.lmliam.microsmith.gen.files.TemporaryDirectory
 import io.github.lmliam.microsmith.gen.generateTo
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import java.nio.file.Files
-import kotlin.io.use
 
 class ProtobufGenerationIntegrationTests :
     StringSpec(
@@ -17,9 +16,9 @@ class ProtobufGenerationIntegrationTests :
             "generateTo emits protobuf messages through the resolved artifact pipeline" {
                 val model = microsmith { schemas { protobuf { "acme.user.v1" { message("User") { string("id") } } } } }
 
-                TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
-                    model.generateTo(outputSpace.root)
-                    val generatedFile = outputSpace.root.resolve("proto/acme/user/v1/User.proto")
+                tempdir("protobuf-generation-").toPath().let { outputRoot ->
+                    model.generateTo(outputRoot)
+                    val generatedFile = outputRoot.resolve("proto/acme/user/v1/User.proto")
                     val contents = Files.readString(generatedFile)
 
                     Files.exists(generatedFile) shouldBe true
@@ -40,9 +39,9 @@ class ProtobufGenerationIntegrationTests :
                     }
                 }
 
-                TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
-                    model.generateTo(outputSpace.root)
-                    Files.readString(outputSpace.root.resolve("proto/acme/user/v1/User.proto"))
+                tempdir("protobuf-generation-").toPath().let { outputRoot ->
+                    model.generateTo(outputRoot)
+                    Files.readString(outputRoot.resolve("proto/acme/user/v1/User.proto"))
                         .shouldContain("import \"acme/shared/v1/Address.proto\";")
                 }
             }
@@ -62,9 +61,9 @@ class ProtobufGenerationIntegrationTests :
                     }
                 }
 
-                TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
-                    model.generateTo(outputSpace.root)
-                    Files.readString(outputSpace.root.resolve("proto/acme/user/v1/Level.proto"))
+                tempdir("protobuf-generation-").toPath().let { outputRoot ->
+                    model.generateTo(outputRoot)
+                    Files.readString(outputRoot.resolve("proto/acme/user/v1/Level.proto"))
                         .shouldContain(
                             "LEVEL_UNSPECIFIED = 0;\n  LOWEST = -2147483648;\n  DEBT = -5;\n  HIGHEST = 2147483647;",
                         )
@@ -76,9 +75,9 @@ class ProtobufGenerationIntegrationTests :
                     schemas { protobuf { "acme.user.v1" { enum("Level") { reserved(-20..-10) } } } }
                 }
 
-                TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
-                    model.generateTo(outputSpace.root)
-                    Files.readString(outputSpace.root.resolve("proto/acme/user/v1/Level.proto"))
+                tempdir("protobuf-generation-").toPath().let { outputRoot ->
+                    model.generateTo(outputRoot)
+                    Files.readString(outputRoot.resolve("proto/acme/user/v1/Level.proto"))
                         .shouldContain("reserved -20 to -10;")
                 }
             }
@@ -88,9 +87,9 @@ class ProtobufGenerationIntegrationTests :
                     schemas { protobuf { "acme.user.v1" { enum("Level") { reserved(5..Int.MAX_VALUE) } } } }
                 }
 
-                TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
-                    model.generateTo(outputSpace.root)
-                    Files.readString(outputSpace.root.resolve("proto/acme/user/v1/Level.proto"))
+                tempdir("protobuf-generation-").toPath().let { outputRoot ->
+                    model.generateTo(outputRoot)
+                    Files.readString(outputRoot.resolve("proto/acme/user/v1/Level.proto"))
                         .shouldContain("reserved 5 to max;")
                 }
             }
@@ -100,9 +99,9 @@ class ProtobufGenerationIntegrationTests :
                     schemas { protobuf { "acme.user.v1" { enum("Level") { reserved(5..536_870_911) } } } }
                 }
 
-                TemporaryDirectory.create(prefix = "protobuf-generation-").use { outputSpace ->
-                    model.generateTo(outputSpace.root)
-                    Files.readString(outputSpace.root.resolve("proto/acme/user/v1/Level.proto"))
+                tempdir("protobuf-generation-").toPath().let { outputRoot ->
+                    model.generateTo(outputRoot)
+                    Files.readString(outputRoot.resolve("proto/acme/user/v1/Level.proto"))
                         .shouldContain("reserved 5 to 536870911;")
                 }
             }

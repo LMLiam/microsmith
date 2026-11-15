@@ -1,6 +1,5 @@
 package io.github.lmliam.microsmith.cli.provider
 
-import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
@@ -37,14 +36,12 @@ private val builtinProviderRequirements =
         artifactAssemblerRequirement(DotnetPackageVersionsArtifact::class),
         artifactAssemblerRequirement(DotnetPackageReferencesArtifact::class),
         artifactAssemblerRequirement(MsBuildProjectArtifact::class),
-        artifactAssemblerRequirement(TextFileArtifact::class),
         artifactCompilerRequirement(ProtoFileArtifact::class),
         artifactCompilerRequirement(ProtobufRpcServiceArtifact::class),
         artifactCompilerRequirement(DotnetAspServiceArtifact::class),
         artifactCompilerRequirement(DotnetPackageVersionsArtifact::class),
         artifactCompilerRequirement(DotnetPackageReferencesArtifact::class),
         artifactCompilerRequirement(MsBuildProjectArtifact::class),
-        artifactRendererRequirement(TextFileArtifact::class),
     )
 
 private data class BuiltinProviderRequirement(
@@ -90,14 +87,6 @@ private fun artifactCompilerRequirement(artifactType: KClass<*>): BuiltinProvide
         description = "ArtifactCompiler for ${artifactType.displayName()}",
         isPresent = { pluginCatalog ->
             pluginCatalog.artifactCompilers.any { compiler -> compiler.artifactType == artifactType }
-        },
-    )
-
-private fun artifactRendererRequirement(artifactType: KClass<*>): BuiltinProviderRequirement =
-    BuiltinProviderRequirement(
-        description = "ArtifactRenderer for ${artifactType.displayName()}",
-        isPresent = { pluginCatalog ->
-            pluginCatalog.artifactRenderers.any { renderer -> renderer.artifactType == artifactType }
         },
     )
 

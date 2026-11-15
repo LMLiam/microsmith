@@ -1,7 +1,7 @@
-apply plugin: 'org.jetbrains.kotlin.kapt'
 apply plugin: 'dev.zacsweers.metro'
 
 dependencies {
+    api project(":plugin-api")
     implementation project(":dsl")
     implementation project(":resolve")
     implementation project(":artifact")
@@ -12,9 +12,8 @@ dependencies {
     testImplementation project(":compile-services-dotnet-packages")
     testImplementation project(":resolve-services-dotnet")
     testImplementation libs.jimfs
-    implementation libs.coroutines.core
-    implementation libs.spi.tooling.annotations
-    kapt libs.spi.tooling.processor
+    testImplementation libs.coroutines.test
+    api libs.coroutines.core
 }
 
 def windows = org.gradle.internal.os.OperatingSystem.current().isWindows()

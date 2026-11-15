@@ -1,12 +1,12 @@
 package io.github.lmliam.microsmith.gen.files.render
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.artifact.ArtifactRenderer
 import io.github.lmliam.microsmith.artifact.files.BinaryFileArtifact
 import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 
-@ServiceProvider(ArtifactRenderer::class)
-class BinaryFileArtifactRenderer : ArtifactRenderer<BinaryFileArtifact> {
+@Inject
+internal class BinaryFileArtifactRenderer : ArtifactRenderer<BinaryFileArtifact> {
     override val artifactType = BinaryFileArtifact::class
 
     override fun render(artifact: BinaryFileArtifact): GeneratedFile =

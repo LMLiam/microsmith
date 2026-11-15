@@ -1,13 +1,11 @@
 package io.github.lmliam.microsmith.gen.errors
 
 import arrow.core.nonEmptyListOf
-import dev.zacsweers.metro.createGraphFactory
 import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
-import io.github.lmliam.microsmith.gen.composition.MicrosmithGenerationGraph
-import io.github.lmliam.microsmith.gen.errors.GenerationResolutionFailedException
+import io.github.lmliam.microsmith.gen.ServiceProviderClassLoader
 import io.github.lmliam.microsmith.gen.files.DirectorySpace
-import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
+import io.github.lmliam.microsmith.gen.generate
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.ResolutionIssue
@@ -18,27 +16,26 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import java.nio.file.FileSystems
 import java.nio.file.Files
 
-private data object TestExtension : MicrosmithExtension
+data object FailureTestExtension : MicrosmithExtension
 
-private data object TestResolvedModel : ResolvedModel
+data object FailureTestResolvedModel : ResolvedModel
 
-private data object TestIssue : ResolutionIssue
+data object FailureTestIssue : ResolutionIssue
 
-private class FailingTestResolver : DomainResolver<TestExtension, TestResolvedModel> {
-    override val authoringType = TestExtension::class
-    override val resolvedType = TestResolvedModel::class
+class FailingTestResolver : DomainResolver<FailureTestExtension, FailureTestResolvedModel> {
+    override val authoringType = FailureTestExtension::class
+    override val resolvedType = FailureTestResolvedModel::class
 
-    override fun resolve(authoring: TestExtension): DomainResolution<TestResolvedModel> =
-        DomainResolution.Failure(nonEmptyListOf(TestIssue))
+    override fun resolve(authoring: FailureTestExtension): DomainResolution<FailureTestResolvedModel> =
+        DomainResolution.Failure(nonEmptyListOf(FailureTestIssue))
 }
 
-private class TestIssueDiagnosticMapper : ResolutionIssueDiagnosticMapper<TestIssue> {
-    override val issueType = TestIssue::class
+class FailureTestIssueDiagnosticMapper : ResolutionIssueDiagnosticMapper<FailureTestIssue> {
+    override val issueType = FailureTestIssue::class
 
-    override fun map(issue: TestIssue): ResolutionDiagnostic =
+    override fun map(issue: FailureTestIssue): ResolutionDiagnostic =
         ResolutionDiagnostic(
             code = "test.resolution-failure",
             message = "Test resolution failed.",
@@ -49,23 +46,25 @@ class GenerationResolutionFailureTests :
     StringSpec(
         {
             "generation maps semantic issues before exposing resolution failure" {
-                val pluginCatalog =
-                    MicrosmithPluginCatalog(
-                        domainResolvers = listOf(FailingTestResolver()),
-                        resolutionIssueDiagnosticMappers = listOf(TestIssueDiagnosticMapper()),
+                val pluginClassLoader =
+                    ServiceProviderClassLoader(
+                        parent = GenerationResolutionFailureTests::class.java.classLoader,
+                        registrations =
+                            mapOf(
+                                DomainResolver::class to listOf(FailingTestResolver::class),
+                                ResolutionIssueDiagnosticMapper::class to
+                                    listOf(FailureTestIssueDiagnosticMapper::class),
+                            ),
                     )
 
-                val graph =
-                    createGraphFactory<MicrosmithGenerationGraph.Factory>()
-                        .create(pluginCatalog, FileSystems.getDefault())
+                val model = MicrosmithBuilder().apply { put(FailureTestExtension::class, FailureTestExtension) }.model
 
-                val model = MicrosmithBuilder().apply { put(TestExtension::class, TestExtension) }.model
+                val output = DirectorySpace(Files.createTempDirectory("microsmith-resolution-failure"))
 
-                val output = DirectorySpace.from(Files.createTempDirectory("microsmith-resolution-failure"))
+                val failure =
+                    shouldThrow<GenerationResolutionFailedException> { model.generate(output, pluginClassLoader) }
 
-                val failure = shouldThrow<GenerationResolutionFailedException> { graph.runner.generate(model, output) }
-
-                failure.issues.toList() shouldContainExactly listOf(TestIssue)
+                failure.issues.toList() shouldContainExactly listOf(FailureTestIssue)
 
                 failure.diagnostics.toList() shouldContainExactly
                     listOf(

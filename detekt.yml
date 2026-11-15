@@ -115,7 +115,7 @@ style:
   active: true
   ForbiddenMethodCall:
     active: true
-    # Each allowlisted module is unmigrated; delete its exclude line when it moves to RelativePath or the injected FileSystem.
+    # Each allowlisted module is unmigrated; delete its exclude line when it moves to RelativePath or the injected seams. The system package of gen implements the seams.
     methods:
       - value: 'java.nio.file.Path.of'
         reason: 'Use RelativePath, or the injected FileSystem.'
@@ -123,6 +123,26 @@ style:
         reason: 'Use RelativePath, or the injected FileSystem.'
       - value: 'kotlin.io.path.Path'
         reason: 'Use RelativePath, or the injected FileSystem.'
+      - value: 'kotlin.io.println'
+        reason: 'Report through the injected DiagnosticSink or Console.'
+      - value: 'java.lang.System.getenv'
+        reason: 'Read through the injected Environment.'
+      - value: 'java.lang.System.getProperty'
+        reason: 'Read through the injected Environment.'
+      - value: 'java.time.Instant.now'
+        reason: 'Read the injected Clock.'
+      - value: 'java.lang.System.currentTimeMillis'
+        reason: 'Read the injected Clock.'
+      - value: 'java.lang.System.nanoTime'
+        reason: 'Measure through an injected TimeSource.'
+      - value: 'java.io.PrintStream.println'
+        reason: 'Report through the injected DiagnosticSink or Console.'
+      - value: 'java.io.PrintStream.print'
+        reason: 'Report through the injected DiagnosticSink or Console.'
+      - value: 'java.lang.System.exit'
+        reason: 'Return a result to the host instead of ending the JVM.'
+      - value: 'java.lang.System.lineSeparator'
+        reason: 'Use a fixed line separator, so output does not depend on the host.'
     excludes:
       - '**/src/test/**'
       - '**/src/integrationTest/**'
@@ -131,6 +151,7 @@ style:
       - '**/modules/integrations/cli/**'
       - '**/modules/runtime/runtime-scripting/**'
       - '**/modules/integrations/gradle-plugin/**'
+      - '**/modules/engine/gen/src/main/kotlin/io/github/lmliam/microsmith/gen/system/**'
   MagicNumber:
     active: true
     ignoreNumbers:

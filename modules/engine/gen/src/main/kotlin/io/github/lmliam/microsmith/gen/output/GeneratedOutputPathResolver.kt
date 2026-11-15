@@ -21,7 +21,7 @@ internal class GeneratedOutputPathResolver(private val fileSystem: FileSystem) {
             if (routedRoot == normalizedRoot) {
                 space
             } else {
-                DirectorySpace.from(routedRoot)
+                DirectorySpace(routedRoot)
             }
 
         return resolve(routedSpace, output.relativePath)

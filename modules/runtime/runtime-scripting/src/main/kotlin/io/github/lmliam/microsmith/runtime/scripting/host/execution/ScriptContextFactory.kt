@@ -7,12 +7,12 @@ import java.nio.file.Path
 import kotlinx.coroutines.runBlocking
 
 internal object ScriptContextFactory {
-    fun create(outputPath: Path, request: ScriptRunRequest): MicrosmithScriptContext =
+    fun create(outputPath: Path, request: ScriptRunRequest, pluginClassLoader: ClassLoader): MicrosmithScriptContext =
         MicrosmithScriptContext(
             outDir = outputPath,
             vars = request.variables,
             flags = request.flags,
         ) { model ->
-            runBlocking { model.generateTo(outputPath) }
+            runBlocking { model.generateTo(outputPath, pluginClassLoader) }
         }
 }

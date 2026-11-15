@@ -3,11 +3,7 @@ package io.github.lmliam.microsmith.cli.provider
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
-import io.github.lmliam.microsmith.artifact.ArtifactRenderer
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
-import io.github.lmliam.microsmith.artifact.files.GeneratedFile
-import io.github.lmliam.microsmith.artifact.files.TextFileArtifact
-import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution.ProtoFileContribution
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
@@ -38,7 +34,7 @@ class CliProviderValidatorTests :
             "reports missing built-in providers when none are present" {
                 val errors = verifyBuiltinProviders(MicrosmithPluginCatalog())
 
-                errors.shouldHaveSize(22)
+                errors.shouldHaveSize(20)
                 errors.shouldContain(
                     "Missing built-in DomainResolver for SchemasExtension -> " +
                         "ResolvedProtobufSchemaModel. Check CLI runtime packaging.",
@@ -90,9 +86,6 @@ class CliProviderValidatorTests :
                     "Missing built-in ArtifactAssembler for MsBuildProjectArtifact. Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
-                    "Missing built-in ArtifactAssembler for TextFileArtifact. Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
                     "Missing built-in ArtifactCompiler for ProtoFileArtifact. Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
@@ -110,9 +103,6 @@ class CliProviderValidatorTests :
                 )
                 errors.shouldContain(
                     "Missing built-in ArtifactCompiler for MsBuildProjectArtifact. Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
-                    "Missing built-in ArtifactRenderer for TextFileArtifact. Check CLI runtime packaging.",
                 )
             }
 
@@ -142,7 +132,6 @@ class CliProviderValidatorTests :
                                     AssemblerStub(DotnetPackageVersionsArtifact::class),
                                     AssemblerStub(DotnetPackageReferencesArtifact::class),
                                     AssemblerStub(MsBuildProjectArtifact::class),
-                                    TextFileAssemblerStub(),
                                 ),
                             artifactCompilers =
                                 listOf(
@@ -153,7 +142,6 @@ class CliProviderValidatorTests :
                                     CompilerStub(DotnetPackageReferencesArtifact::class),
                                     CompilerStub(MsBuildProjectArtifact::class),
                                 ),
-                            artifactRenderers = listOf(TextFileRendererStub()),
                         ),
                     )
 
@@ -256,34 +244,6 @@ private class AssemblerStub<T : Artifact>(override val artifactType: KClass<T>) 
     override fun merge(current: T, contribution: ArtifactContribution<T>): T = current
 }
 
-private class TextFileAssemblerStub : ArtifactAssembler<TextFileArtifact> {
-    override val artifactType = TextFileArtifact::class
-
-    override fun create(contribution: ArtifactContribution<TextFileArtifact>): TextFileArtifact {
-        val textContribution = contribution as TextFileArtifactContribution
-        return TextFileArtifact(
-            id = textContribution.artifactId,
-            contents = textContribution.contents,
-        )
-    }
-
-    override fun merge(
-        current: TextFileArtifact,
-        contribution: ArtifactContribution<TextFileArtifact>,
-    ): TextFileArtifact = current
-}
-
 private class CompilerStub<T : Artifact>(override val artifactType: KClass<T>) : ArtifactCompiler<T> {
     override fun compile(artifact: T): List<ArtifactContribution<out Artifact>> = emptyList()
-}
-
-private class TextFileRendererStub : ArtifactRenderer<TextFileArtifact> {
-    override val artifactType = TextFileArtifact::class
-
-    override fun render(artifact: TextFileArtifact): GeneratedFile =
-        GeneratedFile(
-            relativePath = artifact.id.relativePath,
-            contents = artifact.contents.toByteArray(),
-            outputRoot = artifact.id.outputRoot,
-        )
 }

@@ -7,7 +7,7 @@ class MicrosmithPluginCatalogTests :
     StringSpec(
         {
             "plugin discovery loads resolution diagnostic mappers" {
-                val catalog = discoverMicrosmithPlugins()
+                val catalog = discoverMicrosmithPlugins(MicrosmithPluginCatalog::class.java.classLoader)
 
                 catalog.resolutionIssueDiagnosticMappers.mapNotNull { it::class.qualifiedName } shouldContain
                     "io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionDiagnosticMapper"

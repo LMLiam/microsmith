@@ -1,30 +1,36 @@
 package io.github.lmliam.microsmith.gen
 
-import dev.zacsweers.metro.createGraphFactory
 import io.github.lmliam.microsmith.dsl.MicrosmithModel
-import io.github.lmliam.microsmith.gen.composition.MicrosmithGenerationGraph
-import io.github.lmliam.microsmith.gen.files.DirectorySpace
+import io.github.lmliam.microsmith.gen.composition.createMicrosmithGenerator
 import io.github.lmliam.microsmith.gen.files.FileSpace
-import io.github.lmliam.microsmith.gen.plugins.discoverMicrosmithPlugins
+import io.github.lmliam.microsmith.gen.system.ConsoleDiagnosticSink
+import io.github.lmliam.microsmith.gen.system.SystemConsole
+import io.github.lmliam.microsmith.gen.system.SystemEnvironment
 import java.nio.file.FileSystems
 import java.nio.file.Path
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.time.Clock
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
-suspend fun MicrosmithModel.generate(finalDir: FileSpace): List<Path> {
-    val generationGraph =
-        createGraphFactory<MicrosmithGenerationGraph.Factory>()
-            .create(discoverMicrosmithPlugins(), FileSystems.getDefault())
+@Suppress("InjectDispatcher")
+private val systemGenerator: MicrosmithGenerator by lazy {
+    val console = SystemConsole()
 
-    return generationGraph.runner.generate(model = this, finalDir = finalDir)
+    createMicrosmithGenerator(
+        fileSystem = FileSystems.getDefault(),
+        clock = Clock.System,
+        environment = SystemEnvironment(),
+        console = console,
+        diagnostics = ConsoleDiagnosticSink(console),
+        ioDispatcher = Dispatchers.IO,
+    )
 }
+
+suspend fun MicrosmithModel.generate(
+    finalDir: FileSpace,
+    pluginClassLoader: ClassLoader = MicrosmithModel::class.java.classLoader,
+): List<Path> = systemGenerator.generate(this, finalDir, pluginClassLoader)
 
 suspend fun MicrosmithModel.generateTo(
     outputDir: Path,
-    ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-): List<Path> {
-    val directorySpace = withContext(ioDispatcher) { DirectorySpace.from(outputDir) }
-
-    return generate(directorySpace)
-}
+    pluginClassLoader: ClassLoader = MicrosmithModel::class.java.classLoader,
+): List<Path> = systemGenerator.generateTo(this, outputDir, pluginClassLoader)

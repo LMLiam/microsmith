@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets
 class TextFileArtifactRendererTests :
     StringSpec(
         {
-            val renderer = TextFileArtifactRenderer()
+            val renderer = TextFileArtifactRenderer(GeneratedByMicrosmithBanner())
 
             "render prepends generated banner for proto files" {
                 val rendered =

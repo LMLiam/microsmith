@@ -4,13 +4,12 @@ import io.github.lmliam.microsmith.dsl.microsmith
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.protobuf
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.service
 import io.github.lmliam.microsmith.dsl.schemas.schemas
-import io.github.lmliam.microsmith.gen.files.TemporaryDirectory
 import io.github.lmliam.microsmith.gen.generateTo
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import java.nio.file.Files
-import kotlin.io.use
 
 class ProtobufRpcGenerationIntegrationTests :
     StringSpec(
@@ -26,9 +25,9 @@ class ProtobufRpcGenerationIntegrationTests :
                     }
                 }
 
-                TemporaryDirectory.create(prefix = "protobuf-rpc-generation-").use { outputSpace ->
-                    model.generateTo(outputSpace.root)
-                    val generatedFile = outputSpace.root.resolve("proto/UserService.proto")
+                tempdir("protobuf-rpc-generation-").toPath().let { outputRoot ->
+                    model.generateTo(outputRoot)
+                    val generatedFile = outputRoot.resolve("proto/UserService.proto")
                     val contents = Files.readString(generatedFile)
 
                     Files.exists(generatedFile) shouldBe true
@@ -53,9 +52,9 @@ class ProtobufRpcGenerationIntegrationTests :
                     }
                 }
 
-                TemporaryDirectory.create(prefix = "protobuf-rpc-generation-").use { outputSpace ->
-                    model.generateTo(outputSpace.root)
-                    val generatedFile = outputSpace.root.resolve("proto/acme/user/v1/UserService.proto")
+                tempdir("protobuf-rpc-generation-").toPath().let { outputRoot ->
+                    model.generateTo(outputRoot)
+                    val generatedFile = outputRoot.resolve("proto/acme/user/v1/UserService.proto")
                     val contents = Files.readString(generatedFile)
 
                     Files.exists(generatedFile) shouldBe true
@@ -72,9 +71,9 @@ class ProtobufRpcGenerationIntegrationTests :
             "generateTo emits a service without rpcs" {
                 val model = microsmith { schemas { protobuf { service("EmptyService") {} } } }
 
-                TemporaryDirectory.create(prefix = "protobuf-rpc-generation-").use { outputSpace ->
-                    model.generateTo(outputSpace.root)
-                    val contents = Files.readString(outputSpace.root.resolve("proto/EmptyService.proto"))
+                tempdir("protobuf-rpc-generation-").toPath().let { outputRoot ->
+                    model.generateTo(outputRoot)
+                    val contents = Files.readString(outputRoot.resolve("proto/EmptyService.proto"))
 
                     contents.shouldContain("service EmptyService {}")
                 }

@@ -5,10 +5,10 @@ import dev.zacsweers.metro.SingleIn
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembly
 import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import io.github.lmliam.microsmith.gen.ArtifactRendererRegistry
-import io.github.lmliam.microsmith.gen.MicrosmithGenerationScope
+import io.github.lmliam.microsmith.gen.RunScope
 
 @Inject
-@SingleIn(MicrosmithGenerationScope::class)
+@SingleIn(RunScope::class)
 internal class ArtifactRenderingService(private val rendererRegistry: ArtifactRendererRegistry) {
     fun render(assembly: ArtifactAssembly): List<GeneratedFile> =
         assembly.artifacts().map { artifact -> rendererRegistry.resolve(artifact).run { render(artifact) } }

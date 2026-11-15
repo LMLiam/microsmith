@@ -25,7 +25,7 @@ internal class ClassloaderScriptRunner(private val cacheDirectory: Path) {
                         cache = cache,
                         runtimeClassLoader = runtimeClassLoader,
                     )
-                val scriptContext = ScriptContextFactory.create(outputPath, request)
+                val scriptContext = ScriptContextFactory.create(outputPath, request, runtimeClassLoader)
                 val (result, elapsedMillis) =
                     ScriptEvaluator.evaluate(
                         scriptPath = scriptPath,
