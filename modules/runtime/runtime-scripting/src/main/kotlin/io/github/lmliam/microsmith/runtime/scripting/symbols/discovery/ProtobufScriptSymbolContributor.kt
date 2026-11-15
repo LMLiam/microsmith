@@ -27,7 +27,7 @@ internal object ProtobufScriptSymbolContributor : ScriptSymbolContributor {
 
         if (protobufIndex < 0) return null
 
-        val target = buildList {
+        val path = buildList {
             site.enclosingCalls.drop(protobufIndex + 1).forEach {
                 addNamespaceSegments(
                     call = it,
@@ -37,27 +37,21 @@ internal object ProtobufScriptSymbolContributor : ScriptSymbolContributor {
 
             add(declarationName)
         }
-            .joinToString(".")
 
-        return when (declarationCall.name) {
-            MESSAGE_CALL ->
-                ScriptSymbolDefinition(
-                    propertyName = declarationName,
-                    valueType = MessageRef::class,
-                    kind = MESSAGE_CALL,
-                    valueKey = target,
-                )
+        val valueType =
+            when (declarationCall.name) {
+                MESSAGE_CALL -> MessageRef::class
+                ENUM_CALL -> EnumRef::class
+                else -> return null
+            }
 
-            ENUM_CALL ->
-                ScriptSymbolDefinition(
-                    propertyName = declarationName,
-                    valueType = EnumRef::class,
-                    kind = ENUM_CALL,
-                    valueKey = target,
-                )
-
-            else -> null
-        }
+        return ScriptSymbolDefinition(
+            propertyName = declarationName,
+            valueType = valueType,
+            kind = declarationCall.name,
+            valueKey = path.joinToString("."),
+            qualifiedPath = path,
+        )
     }
 
     override fun createValue(kind: String, valueKey: String): Any =

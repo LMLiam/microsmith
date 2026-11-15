@@ -6,13 +6,14 @@ import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDefinition
 internal data class DiscoveredScriptSymbol(
     val contributor: ScriptSymbolContributor,
     val definition: ScriptSymbolDefinition,
+    val propertyName: String,
 ) {
     fun compiled(): CompiledScriptSymbol =
         CompiledScriptSymbol(
-            propertyName = definition.propertyName,
+            propertyName = propertyName,
             typeName =
                 requireNotNull(definition.valueType.qualifiedName) {
-                    "Script symbol '${definition.propertyName}' uses a local or anonymous value type"
+                    "Script symbol '$propertyName' uses a local or anonymous value type"
                 },
             contributorId = contributor.id,
             kind = definition.kind,
