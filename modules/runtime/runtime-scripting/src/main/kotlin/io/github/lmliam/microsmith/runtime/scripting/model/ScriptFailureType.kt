@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.model
 
-enum class ScriptFailureType {
+public enum class ScriptFailureType {
     VALIDATION,
     COMPILATION,
     EVALUATION,

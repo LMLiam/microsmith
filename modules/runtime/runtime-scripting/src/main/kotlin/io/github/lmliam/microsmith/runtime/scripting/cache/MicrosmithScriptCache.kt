@@ -1,5 +1,9 @@
 package io.github.lmliam.microsmith.runtime.scripting.cache
 
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
+import io.github.lmliam.microsmith.runtime.scripting.composition.ScriptRunScope
+import io.github.lmliam.microsmith.runtime.scripting.host.diagnostics.ScriptDiagnosticsFormatter
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -10,16 +14,27 @@ import kotlin.io.path.moveTo
 import kotlin.io.path.writeLines
 import kotlin.script.experimental.api.CompiledScript
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
+import kotlin.script.experimental.api.ScriptDiagnostic
 import kotlin.script.experimental.api.SourceCode
 import kotlin.script.experimental.jvmhost.CompiledScriptJarsCache
 
+@Inject
+@SingleIn(ScriptRunScope::class)
 internal class MicrosmithScriptCache(
     private val cacheDirectory: Path,
-    private val additionalFingerprints: () -> List<String> = { emptyList() },
+    private val pluginClasspathFingerprint: PluginClasspathFingerprint,
+    private val compiledScriptFingerprint: CompiledScriptFingerprint,
+    private val diagnosticsFormatter: ScriptDiagnosticsFormatter,
 ) :
     CompiledScriptJarsCache(
         { script, scriptCompilationConfiguration ->
-            compiledJar(cacheDirectory, script, scriptCompilationConfiguration, additionalFingerprints())
+            compiledJar(
+                cacheDirectory,
+                compiledScriptFingerprint,
+                script,
+                scriptCompilationConfiguration,
+                listOf(pluginClasspathFingerprint.value),
+            )
         },
     ) {
     var storedScripts: Int = 0
@@ -56,12 +71,22 @@ internal class MicrosmithScriptCache(
         storedJar = jar
     }
 
-    fun recordWarnings(warnings: List<String>) {
+    fun recordWarnings(reports: List<ScriptDiagnostic>) {
+        val warnings =
+            diagnosticsFormatter.format(
+                reports.filter { report -> report.severity == ScriptDiagnostic.Severity.WARNING },
+            )
         storedJar?.let { jar -> writeWarnings(jar.warningsFile(), warnings) }
     }
 
     private fun jarOf(script: SourceCode, scriptCompilationConfiguration: ScriptCompilationConfiguration): File =
-        compiledJar(cacheDirectory, script, scriptCompilationConfiguration, additionalFingerprints())
+        compiledJar(
+            cacheDirectory,
+            compiledScriptFingerprint,
+            script,
+            scriptCompilationConfiguration,
+            listOf(pluginClasspathFingerprint.value),
+        )
 
     private fun File.warningsFile(): File = resolveSibling("$nameWithoutExtension.warnings")
 
@@ -83,13 +108,14 @@ internal class MicrosmithScriptCache(
 
 private fun compiledJar(
     cacheDirectory: Path,
+    compiledScriptFingerprint: CompiledScriptFingerprint,
     script: SourceCode,
     scriptCompilationConfiguration: ScriptCompilationConfiguration,
     additionalFingerprints: List<String>,
 ): File =
     cacheDirectory
         .resolve(
-            CompiledScriptFingerprint.uniqueName(
+            compiledScriptFingerprint.uniqueName(
                 script = script,
                 scriptCompilationConfiguration = scriptCompilationConfiguration,
                 additionalFingerprints = additionalFingerprints,

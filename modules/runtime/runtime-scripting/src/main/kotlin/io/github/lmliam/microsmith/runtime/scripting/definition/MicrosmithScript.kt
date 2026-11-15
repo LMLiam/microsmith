@@ -7,4 +7,4 @@ import kotlin.script.experimental.annotations.KotlinScript
     compilationConfiguration = MicrosmithScriptCompilationConfiguration::class,
 )
 @Suppress("AbstractClassCanBeInterface") // Kotlin script templates must be classes.
-abstract class MicrosmithScript
+public abstract class MicrosmithScript

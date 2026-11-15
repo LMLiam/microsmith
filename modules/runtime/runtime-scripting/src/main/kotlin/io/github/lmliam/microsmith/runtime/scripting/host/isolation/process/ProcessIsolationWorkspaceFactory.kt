@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
+import dev.zacsweers.metro.Inject
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.PathWalkOption
@@ -9,6 +10,7 @@ import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.walk
 
+@Inject
 internal class ProcessIsolationWorkspaceFactory {
     fun create(cacheDirectory: Path): ProcessIsolationWorkspace {
         cacheDirectory.createDirectories()

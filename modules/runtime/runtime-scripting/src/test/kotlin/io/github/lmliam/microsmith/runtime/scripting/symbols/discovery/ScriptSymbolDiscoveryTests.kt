@@ -2,6 +2,8 @@ package io.github.lmliam.microsmith.runtime.scripting.symbols.discovery
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.EnumRef
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef
+import io.github.lmliam.microsmith.plugin.schemas.protobuf.ProtobufScriptingPlugin
+import io.github.lmliam.microsmith.runtime.scripting.TestResources
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptCallCallee
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptLiteral
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor
@@ -88,11 +90,12 @@ class ScriptSymbolDiscoveryTests :
 
             "exposes definitions that differ only by qualified path when they share a value key" {
                 val result =
-                    ScriptSymbolDiscovery.discover(
-                        sourceName = "schema.microsmith.kts",
-                        sourceText = "a { declare(\"User\") } b { declare(\"User\") }",
-                        registry = ScriptSymbolContributorRegistry.of(listOf(SharedValueKeyContributor)),
-                    )
+                    createScriptSymbolDiscovery()
+                        .discover(
+                            sourceName = "schema.microsmith.kts",
+                            sourceText = "a { declare(\"User\") } b { declare(\"User\") }",
+                            registry = ScriptSymbolContributorRegistry.of(listOf(SharedValueKeyContributor)),
+                        )
 
                 result.symbols.map { it.propertyName } shouldContainExactly listOf("a_User", "b_User")
             }
@@ -131,15 +134,12 @@ private object SharedValueKeyContributor : ScriptSymbolContributor {
     override fun createValue(kind: String, valueKey: String): Any = MessageRef(valueKey)
 }
 
-private fun discover(resource: String): ScriptSymbolDiscoveryResult = discoverText(scriptResource(resource))
+private fun discover(resource: String): ScriptSymbolDiscoveryResult = discoverText(TestResources.read(resource))
 
 private fun discoverText(sourceText: String): ScriptSymbolDiscoveryResult =
-    ScriptSymbolDiscovery.discover(
-        sourceName = "schema.microsmith.kts",
-        sourceText = sourceText,
-        registry = ScriptSymbolContributorRegistry.of(listOf(ProtobufScriptSymbolContributor)),
-    )
-
-private fun scriptResource(resource: String): String =
-    checkNotNull(ScriptSymbolDiscoveryTests::class.java.getResource(resource)) { "Missing test resource $resource" }
-        .readText()
+    createScriptSymbolDiscovery()
+        .discover(
+            sourceName = "schema.microsmith.kts",
+            sourceText = sourceText,
+            registry = ScriptSymbolContributorRegistry.of(ProtobufScriptingPlugin().scriptSymbolContributors),
+        )

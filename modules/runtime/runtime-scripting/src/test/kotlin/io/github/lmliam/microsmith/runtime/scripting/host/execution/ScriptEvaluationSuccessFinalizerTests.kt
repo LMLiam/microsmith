@@ -52,7 +52,7 @@ class ScriptEvaluationSuccessFinalizerTests :
                     )
 
                 val result =
-                    ScriptEvaluationSuccessFinalizer()
+                    ScriptEvaluationSuccessFinalizer(ScriptEvaluationModelEmitter())
                         .complete(
                             evaluationResult = evaluationResult,
                             scriptContext = scriptContext,
@@ -89,7 +89,7 @@ class ScriptEvaluationSuccessFinalizerTests :
                     )
 
                 val result =
-                    ScriptEvaluationSuccessFinalizer()
+                    ScriptEvaluationSuccessFinalizer(ScriptEvaluationModelEmitter())
                         .complete(
                             evaluationResult = evaluationResult,
                             scriptContext = scriptContext,
@@ -117,7 +117,7 @@ class ScriptEvaluationSuccessFinalizerTests :
                     )
 
                 val result =
-                    ScriptEvaluationSuccessFinalizer()
+                    ScriptEvaluationSuccessFinalizer(ScriptEvaluationModelEmitter())
                         .complete(
                             evaluationResult = evaluationResult,
                             scriptContext = scriptContext,
@@ -164,7 +164,7 @@ class ScriptEvaluationSuccessFinalizerTests :
                     )
 
                 val result =
-                    ScriptEvaluationSuccessFinalizer()
+                    ScriptEvaluationSuccessFinalizer(ScriptEvaluationModelEmitter())
                         .complete(
                             evaluationResult = evaluationResult,
                             scriptContext = scriptContext,

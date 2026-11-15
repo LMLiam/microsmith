@@ -2,9 +2,9 @@ package io.github.lmliam.microsmith.runtime.scripting.model
 
 import java.nio.file.Path
 
-object GeneratedOutputRoots {
+public object GeneratedOutputRoots {
     @JvmStatic
-    fun describe(outputDirectory: Path, roots: List<Path>): String {
+    public fun describe(outputDirectory: Path, roots: List<Path>): String {
         val normalizedOutputDirectory = outputDirectory.toAbsolutePath().normalize()
         val normalizedRoots = roots.map { root -> root.toAbsolutePath().normalize() }.distinct().sorted()
         return when (normalizedRoots.size) {

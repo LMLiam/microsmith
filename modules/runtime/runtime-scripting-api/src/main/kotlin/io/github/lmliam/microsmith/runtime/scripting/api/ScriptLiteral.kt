@@ -1,9 +1,9 @@
 package io.github.lmliam.microsmith.runtime.scripting.api
 
-sealed interface ScriptLiteral {
-    data class StringValue(val value: String) : ScriptLiteral
+public sealed interface ScriptLiteral {
+    public data class StringValue(public val value: String) : ScriptLiteral
 
-    data class IntValue(val value: Int) : ScriptLiteral
+    public data class IntValue(public val value: Int) : ScriptLiteral
 
-    data class BooleanValue(val value: Boolean) : ScriptLiteral
+    public data class BooleanValue(public val value: Boolean) : ScriptLiteral
 }

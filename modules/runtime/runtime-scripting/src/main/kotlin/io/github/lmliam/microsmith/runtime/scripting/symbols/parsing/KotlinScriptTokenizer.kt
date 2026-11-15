@@ -3,7 +3,7 @@ package io.github.lmliam.microsmith.runtime.scripting.symbols.parsing
 import org.jetbrains.kotlin.lexer.KotlinLexer
 import org.jetbrains.kotlin.lexer.KtTokens
 
-internal object KotlinScriptTokenizer {
+internal class KotlinScriptTokenizer {
     fun tokenize(sourceText: String): List<KotlinScriptToken> {
         val lexer = KotlinLexer()
         lexer.start(sourceText)
@@ -25,13 +25,13 @@ internal object KotlinScriptTokenizer {
             }
         }
     }
-
-    private val ignoredTokenTypes =
-        setOf(
-            KtTokens.WHITE_SPACE,
-            KtTokens.BLOCK_COMMENT,
-            KtTokens.EOL_COMMENT,
-            KtTokens.SHEBANG_COMMENT,
-            KtTokens.DOC_COMMENT,
-        )
 }
+
+private val ignoredTokenTypes =
+    setOf(
+        KtTokens.WHITE_SPACE,
+        KtTokens.BLOCK_COMMENT,
+        KtTokens.EOL_COMMENT,
+        KtTokens.SHEBANG_COMMENT,
+        KtTokens.DOC_COMMENT,
+    )

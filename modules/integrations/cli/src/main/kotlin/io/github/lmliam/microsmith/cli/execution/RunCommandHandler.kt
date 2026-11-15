@@ -4,27 +4,30 @@ import io.github.lmliam.microsmith.cli.command.RunCommand
 import io.github.lmliam.microsmith.cli.eventlog.EventLogWriter
 import io.github.lmliam.microsmith.cli.eventlog.RunEventLogEntry
 import io.github.lmliam.microsmith.cli.plugins.PluginResolutionResult
-import io.github.lmliam.microsmith.runtime.scripting.MicrosmithScriptHost
+import io.github.lmliam.microsmith.runtime.scripting.createSystemMicrosmithScriptHost
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.nio.file.Path
+import kotlinx.coroutines.runBlocking
 
 internal class RunCommandHandler(
     private val emitterFactory: CliDiagnosticEmitterFactory,
     providerValidator: () -> List<String>,
     pluginResolver: (RunCommand) -> PluginResolutionResult,
     scriptRunner: (RunCommand, List<Path>) -> ScriptRunResult = { command, pluginClasspath ->
-        MicrosmithScriptHost()
-            .run(
-                ScriptRunRequest(
-                    script = command.script,
-                    outputDir = command.outputDir,
-                    variables = command.variables,
-                    flags = command.flags,
-                    pluginClasspath = pluginClasspath,
-                    isolationMode = command.isolationMode,
-                ),
-            )
+        runBlocking {
+            createSystemMicrosmithScriptHost()
+                .run(
+                    ScriptRunRequest(
+                        script = command.script,
+                        outputDir = command.outputDir,
+                        variables = command.variables,
+                        flags = command.flags,
+                        pluginClasspath = pluginClasspath,
+                        isolationMode = command.isolationMode,
+                    ),
+                )
+        }
     },
     eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,
 ) {

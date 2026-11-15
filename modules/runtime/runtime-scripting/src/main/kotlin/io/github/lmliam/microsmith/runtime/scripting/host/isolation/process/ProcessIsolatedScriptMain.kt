@@ -1,31 +1,45 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
-import io.github.lmliam.microsmith.runtime.scripting.host.execution.ScriptRunExecutor
+import io.github.lmliam.microsmith.gen.system.SystemConsole
+import io.github.lmliam.microsmith.runtime.scripting.createSystemMicrosmithScriptHost
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
-import java.nio.file.Path
+import java.nio.file.FileSystems
 import kotlin.system.exitProcess
+import kotlinx.coroutines.runBlocking
 
 internal object ProcessIsolatedScriptMain {
     @JvmStatic
     fun main(args: Array<String>) {
+        val console = SystemConsole()
+        val fileSystem = FileSystems.getDefault()
+        val protocol =
+            ProcessIsolationProtocol(
+                requestCodec = ProcessIsolationRequestCodec(fileSystem),
+                resultCodec = ProcessIsolationResultCodec(fileSystem),
+            )
+
         if (args.size != EXPECTED_ARGS) {
-            System.err.println("Expected 2 arguments: <request.properties> <result.properties>.")
+            console.err("Expected 2 arguments: <request.properties> <result.properties>.")
             exitProcess(2)
         }
 
-        val requestFile = Path.of(args[0])
-        val resultFile = Path.of(args[1])
+        val requestFile = fileSystem.getPath(args[0])
+        val resultFile = fileSystem.getPath(args[1])
 
         val result = runCatching {
-            val request = ProcessIsolationProtocol.readRequest(requestFile)
-            ScriptRunExecutor(request.cacheDirectory)
-                .execute(
-                    request = request.request.copy(isolationMode = ScriptIsolationMode.CLASSLOADER),
-                    scriptPath = request.scriptPath,
-                    outputPath = request.outputPath,
-                )
+            val request = protocol.readRequest(requestFile)
+            runBlocking {
+                createSystemMicrosmithScriptHost(request.cacheDirectory)
+                    .run(
+                        request.request.copy(
+                            script = request.scriptPath,
+                            outputDir = request.outputPath,
+                            isolationMode = ScriptIsolationMode.CLASSLOADER,
+                        ),
+                    )
+            }
         }
             .getOrElse { error ->
                 val message = error.message ?: error::class.simpleName ?: "unknown process worker error"
@@ -36,11 +50,11 @@ internal object ProcessIsolatedScriptMain {
             }
 
         runCatching {
-            ProcessIsolationProtocol.writeResult(resultFile, result)
+            protocol.writeResult(resultFile, result)
         }
             .onFailure { error ->
                 val message = error.message ?: error::class.simpleName ?: "unknown result-write error"
-                System.err.println("Failed to write process isolation result: $message")
+                console.err("Failed to write process isolation result: $message")
                 exitProcess(2)
             }
 

@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.execution
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import io.github.lmliam.microsmith.runtime.scripting.host.diagnostics.ScriptDiagnosticsFormatter
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
@@ -8,9 +9,11 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import kotlin.script.experimental.api.EvaluationResult
 import kotlin.script.experimental.api.ResultWithDiagnostics
 
-internal object ScriptRunResultMapper {
-    private val successFinalizer = ScriptEvaluationSuccessFinalizer()
-
+@Inject
+internal class ScriptRunResultMapper(
+    private val successFinalizer: ScriptEvaluationSuccessFinalizer,
+    private val diagnosticsFormatter: ScriptDiagnosticsFormatter,
+) {
     fun toRunResult(
         result: ResultWithDiagnostics<EvaluationResult>,
         elapsedMillis: Long,
@@ -18,8 +21,8 @@ internal object ScriptRunResultMapper {
         cacheHit: Boolean,
         replayedWarnings: List<String>,
     ): ScriptRunResult {
-        val formattedReports = replayedWarnings + ScriptDiagnosticsFormatter.format(result.reports)
-        val hasErrors = ScriptDiagnosticsFormatter.containsErrors(formattedReports)
+        val formattedReports = replayedWarnings + diagnosticsFormatter.format(result.reports)
+        val hasErrors = diagnosticsFormatter.containsErrors(formattedReports)
 
         return when (result) {
             is ResultWithDiagnostics.Failure ->
