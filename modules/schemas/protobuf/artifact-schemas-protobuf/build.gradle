@@ -12,3 +12,9 @@ dependencies {
     implementation project(":resolve")
     implementation project(":resolve-schemas-protobuf")
 }
+
+kotlin {
+    compilerOptions {
+        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+    }
+}

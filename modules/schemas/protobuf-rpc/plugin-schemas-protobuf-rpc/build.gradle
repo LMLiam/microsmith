@@ -21,3 +21,9 @@ dependencies {
     testImplementation project(":dsl-schemas-protobuf-rpc")
     testImplementation project(":gen")
 }
+
+kotlin {
+    compilerOptions {
+        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+    }
+}

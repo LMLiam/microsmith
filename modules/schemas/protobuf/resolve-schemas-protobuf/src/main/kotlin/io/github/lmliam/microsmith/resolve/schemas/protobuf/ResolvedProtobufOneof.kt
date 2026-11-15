@@ -4,6 +4,10 @@ import arrow.core.NonEmptyList
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.ProtoIdentifier
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.numbers.FieldNumber
 
-data class ResolvedProtobufOneof(val name: ProtoIdentifier, val fields: NonEmptyList<Field>) {
-    data class Field(val name: ProtoIdentifier, val number: FieldNumber, val type: ResolvedProtobufValueType)
+public data class ResolvedProtobufOneof(public val name: ProtoIdentifier, public val fields: NonEmptyList<Field>) {
+    public data class Field(
+        public val name: ProtoIdentifier,
+        public val number: FieldNumber,
+        public val type: ResolvedProtobufValueType,
+    )
 }

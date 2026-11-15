@@ -9,12 +9,12 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkNoOv
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.checkUniqueReservedNames
 
 @ConsistentCopyVisibility
-data class ResolvedProtobufReservations
+public data class ResolvedProtobufReservations
 private constructor(val names: List<ProtoIdentifier>, val spans: List<ReservedSpan>) {
-    companion object {
-        val NONE = ResolvedProtobufReservations(emptyList(), emptyList())
+    public companion object {
+        public val NONE: ResolvedProtobufReservations = ResolvedProtobufReservations(emptyList(), emptyList())
 
-        fun of(
+        public fun of(
             names: List<ProtoIdentifier>,
             spans: List<ReservedSpan>,
         ): EitherNel<ResolvedProtobufRejection, ResolvedProtobufReservations> = either {

@@ -3,14 +3,17 @@ package io.github.lmliam.microsmith.resolve.schemas.protobuf
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 @ConsistentCopyVisibility
-data class ResolvedProtobufSchema
+public data class ResolvedProtobufSchema
 private constructor(
-    val identity: QualifiedSchemaName,
-    val declaration: ResolvedProtobufDeclaration,
-    val dependencies: List<QualifiedSchemaName>,
+    public val identity: QualifiedSchemaName,
+    public val declaration: ResolvedProtobufDeclaration,
+    public val dependencies: List<QualifiedSchemaName>,
 ) {
-    companion object {
-        fun of(declaration: ResolvedProtobufDeclaration, packageOf: QualifiedSchemaName): ResolvedProtobufSchema {
+    public companion object {
+        public fun of(
+            declaration: ResolvedProtobufDeclaration,
+            packageOf: QualifiedSchemaName,
+        ): ResolvedProtobufSchema {
             val identity = packageOf.withTypeName(declaration.name)
 
             return ResolvedProtobufSchema(

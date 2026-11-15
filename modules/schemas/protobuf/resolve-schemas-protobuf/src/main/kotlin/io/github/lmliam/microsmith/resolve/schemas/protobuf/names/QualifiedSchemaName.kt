@@ -6,13 +6,15 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Reference
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 
 @ConsistentCopyVisibility
-data class QualifiedSchemaName
+public data class QualifiedSchemaName
 private constructor(
-    val fullyQualifiedName: String,
-    val packageName: String?,
-    val typeName: ProtoIdentifier,
+    public val fullyQualifiedName: String,
+    public val packageName: String?,
+    public val typeName: ProtoIdentifier,
 ) {
-    fun resolveReference(reference: Reference): Either<ProtobufResolutionIssue.InvalidSchemaName, QualifiedSchemaName> =
+    public fun resolveReference(
+        reference: Reference,
+    ): Either<ProtobufResolutionIssue.InvalidSchemaName, QualifiedSchemaName> =
         parse(reference.resolveSegments(packageName?.split('.').orEmpty()).joinToString("."))
 
     internal fun withTypeName(typeName: ProtoIdentifier): QualifiedSchemaName =
@@ -22,8 +24,8 @@ private constructor(
             typeName = typeName,
         )
 
-    companion object {
-        fun parse(rawName: String): Either<ProtobufResolutionIssue.InvalidSchemaName, QualifiedSchemaName> =
+    public companion object {
+        public fun parse(rawName: String): Either<ProtobufResolutionIssue.InvalidSchemaName, QualifiedSchemaName> =
             parseQualifiedName(rawName).map { segments ->
                 QualifiedSchemaName(
                     fullyQualifiedName = segments.joinToString("."),

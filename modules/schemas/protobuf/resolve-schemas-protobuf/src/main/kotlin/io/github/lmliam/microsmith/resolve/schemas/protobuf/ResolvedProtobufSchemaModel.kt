@@ -12,36 +12,37 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findRefer
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.schemaGraphRejections
 
 @ConsistentCopyVisibility
-data class ResolvedProtobufSchemaModel private constructor(val schemas: List<ResolvedProtobufSchema>) :
+public data class ResolvedProtobufSchemaModel private constructor(public val schemas: List<ResolvedProtobufSchema>) :
     ResolvedSchemasModel {
-    sealed interface Rejection {
-        data class DuplicateSchema(val identity: QualifiedSchemaName, val occurrences: Int) : Rejection
+    public sealed interface Rejection {
+        public data class DuplicateSchema(public val identity: QualifiedSchemaName, public val occurrences: Int) :
+            Rejection
 
-        data class CircularImports(val schemas: List<String>) : Rejection
+        public data class CircularImports(public val schemas: List<String>) : Rejection
 
-        data class UnresolvedReference(
-            val schema: QualifiedSchemaName,
-            val location: ProtobufResolutionIssue.ReferenceLocation,
-            val target: QualifiedSchemaName,
+        public data class UnresolvedReference(
+            public val schema: QualifiedSchemaName,
+            public val location: ProtobufResolutionIssue.ReferenceLocation,
+            public val target: QualifiedSchemaName,
         ) : Rejection
 
-        data class ReferenceKindMismatch(
-            val schema: QualifiedSchemaName,
-            val location: ProtobufResolutionIssue.ReferenceLocation,
-            val target: QualifiedSchemaName,
-            val referencedAs: ProtobufDeclarationKind,
-            val declaredAs: ProtobufDeclarationKind,
+        public data class ReferenceKindMismatch(
+            public val schema: QualifiedSchemaName,
+            public val location: ProtobufResolutionIssue.ReferenceLocation,
+            public val target: QualifiedSchemaName,
+            public val referencedAs: ProtobufDeclarationKind,
+            public val declaredAs: ProtobufDeclarationKind,
         ) : Rejection
 
-        data class PackageSymbolCollision(
-            val packageName: String,
-            val name: String,
-            val declarations: List<ProtobufResolutionIssue.SymbolDeclaration>,
+        public data class PackageSymbolCollision(
+            public val packageName: String,
+            public val name: String,
+            public val declarations: List<ProtobufResolutionIssue.SymbolDeclaration>,
         ) : Rejection
     }
 
-    companion object {
-        fun of(schemas: List<ResolvedProtobufSchema>): EitherNel<Rejection, ResolvedProtobufSchemaModel> {
+    public companion object {
+        public fun of(schemas: List<ResolvedProtobufSchema>): EitherNel<Rejection, ResolvedProtobufSchemaModel> {
             val ownSchemas = schemas.toList()
             val rejections =
                 findReferenceRejections(ownSchemas) +

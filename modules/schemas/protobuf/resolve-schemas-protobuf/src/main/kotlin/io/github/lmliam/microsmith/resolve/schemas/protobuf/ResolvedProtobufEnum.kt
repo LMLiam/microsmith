@@ -16,14 +16,14 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.findEnumV
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.rejectAll
 
 @ConsistentCopyVisibility
-data class ResolvedProtobufEnum
+public data class ResolvedProtobufEnum
 private constructor(
     override val name: ProtoIdentifier,
-    val values: NonEmptyList<ResolvedProtobufEnumValue>,
-    val reservations: ResolvedProtobufReservations,
+    public val values: NonEmptyList<ResolvedProtobufEnumValue>,
+    public val reservations: ResolvedProtobufReservations,
 ) : ResolvedProtobufDeclaration {
-    companion object {
-        fun of(
+    public companion object {
+        public fun of(
             name: ProtoIdentifier,
             values: NonEmptyList<ResolvedProtobufEnumValue>,
             reservations: ResolvedProtobufReservations,

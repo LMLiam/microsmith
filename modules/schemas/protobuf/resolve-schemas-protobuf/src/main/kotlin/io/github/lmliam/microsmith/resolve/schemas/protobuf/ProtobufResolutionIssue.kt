@@ -2,31 +2,35 @@ package io.github.lmliam.microsmith.resolve.schemas.protobuf
 
 import io.github.lmliam.microsmith.resolve.ResolutionIssue
 
-sealed interface ProtobufResolutionIssue : ResolutionIssue {
-    sealed interface ReferenceIssue : ProtobufResolutionIssue
+public sealed interface ProtobufResolutionIssue : ResolutionIssue {
+    public sealed interface ReferenceIssue : ProtobufResolutionIssue
 
-    sealed interface DeclarationIssue : ProtobufResolutionIssue
+    public sealed interface DeclarationIssue : ProtobufResolutionIssue
 
-    sealed interface EnumIssue : ProtobufResolutionIssue
+    public sealed interface EnumIssue : ProtobufResolutionIssue
 
-    sealed interface ReservationIssue : ProtobufResolutionIssue
+    public sealed interface ReservationIssue : ProtobufResolutionIssue
 
-    data class UnresolvedReference(val schemaName: String, val location: ReferenceLocation, val targetName: String) :
-        ReferenceIssue
-
-    data class CircularSchemaImports(val schemas: List<String>) : ReferenceIssue
-
-    data class InvalidReferenceName(
-        val schemaName: String,
-        val location: ReferenceLocation,
-        val targetName: String,
-        val reason: InvalidSchemaName.Reason,
+    public data class UnresolvedReference(
+        public val schemaName: String,
+        public val location: ReferenceLocation,
+        public val targetName: String,
     ) : ReferenceIssue
 
-    data class SchemaDeclarationNameMismatch(val schemaName: String, val declarationName: String) : DeclarationIssue
+    public data class CircularSchemaImports(public val schemas: List<String>) : ReferenceIssue
 
-    data class InvalidSchemaName(val schemaName: String, val reason: Reason) : DeclarationIssue {
-        enum class Reason {
+    public data class InvalidReferenceName(
+        public val schemaName: String,
+        public val location: ReferenceLocation,
+        public val targetName: String,
+        public val reason: InvalidSchemaName.Reason,
+    ) : ReferenceIssue
+
+    public data class SchemaDeclarationNameMismatch(public val schemaName: String, public val declarationName: String) :
+        DeclarationIssue
+
+    public data class InvalidSchemaName(public val schemaName: String, public val reason: Reason) : DeclarationIssue {
+        public enum class Reason {
             BLANK,
             LEADING_DOT,
             TRAILING_DOT,
@@ -36,87 +40,115 @@ sealed interface ProtobufResolutionIssue : ResolutionIssue {
         }
     }
 
-    data class InvalidIdentifier(val schemaName: String, val location: IdentifierLocation, val value: String) :
+    public data class InvalidIdentifier(
+        public val schemaName: String,
+        public val location: IdentifierLocation,
+        public val value: String,
+    ) : DeclarationIssue
+
+    public data class InvalidFieldNumber(
+        public val schemaName: String,
+        public val location: FieldLocation,
+        public val number: Int,
+    ) : DeclarationIssue
+
+    public data class DuplicateFieldNames(public val schemaName: String, public val names: List<String>) :
         DeclarationIssue
 
-    data class InvalidFieldNumber(val schemaName: String, val location: FieldLocation, val number: Int) :
+    public data class DuplicateFieldNumbers(public val schemaName: String, public val numbers: List<Int>) :
         DeclarationIssue
 
-    data class DuplicateFieldNames(val schemaName: String, val names: List<String>) : DeclarationIssue
-
-    data class DuplicateFieldNumbers(val schemaName: String, val numbers: List<Int>) : DeclarationIssue
-
-    data class DuplicateOneofNames(val schemaName: String, val names: List<String>) : DeclarationIssue
-
-    data class EmptyOneof(val schemaName: String, val oneofName: String) : DeclarationIssue
-
-    data class SymbolNameCollision(val scope: String, val name: String, val declarations: List<SymbolDeclaration>) :
+    public data class DuplicateOneofNames(public val schemaName: String, public val names: List<String>) :
         DeclarationIssue
 
-    data class FieldJsonNameCollision(val schemaName: String, val jsonName: String, val fieldNames: List<String>) :
-        DeclarationIssue
+    public data class EmptyOneof(public val schemaName: String, public val oneofName: String) : DeclarationIssue
 
-    data class EmptyEnum(val schemaName: String) : EnumIssue
+    public data class SymbolNameCollision(
+        public val scope: String,
+        public val name: String,
+        public val declarations: List<SymbolDeclaration>,
+    ) : DeclarationIssue
 
-    data class EnumFirstValueMustBeZero(val schemaName: String, val firstValueName: String, val number: Int) : EnumIssue
+    public data class FieldJsonNameCollision(
+        public val schemaName: String,
+        public val jsonName: String,
+        public val fieldNames: List<String>,
+    ) : DeclarationIssue
 
-    data class DuplicateEnumValueNames(val schemaName: String, val names: List<String>) : EnumIssue
+    public data class EmptyEnum(public val schemaName: String) : EnumIssue
 
-    data class DuplicateEnumValueNumbers(val schemaName: String, val numbers: List<Int>) : EnumIssue
+    public data class EnumFirstValueMustBeZero(
+        public val schemaName: String,
+        public val firstValueName: String,
+        public val number: Int,
+    ) : EnumIssue
 
-    data class EnumValueNameCollision(val schemaName: String, val valueNames: List<String>) : EnumIssue
+    public data class DuplicateEnumValueNames(public val schemaName: String, public val names: List<String>) : EnumIssue
 
-    data class InvalidReservationRange(val schemaName: String, val start: Int, val endInclusive: Int) : ReservationIssue
+    public data class DuplicateEnumValueNumbers(public val schemaName: String, public val numbers: List<Int>) :
+        EnumIssue
 
-    data class DuplicateReservedNames(val schemaName: String, val names: List<String>) : ReservationIssue
+    public data class EnumValueNameCollision(public val schemaName: String, public val valueNames: List<String>) :
+        EnumIssue
 
-    data class ReservedNameCollision(val schemaName: String, val names: List<String>) : ReservationIssue
+    public data class InvalidReservationRange(
+        public val schemaName: String,
+        public val start: Int,
+        public val endInclusive: Int,
+    ) : ReservationIssue
 
-    data class OverlappingReservedNumbers(val schemaName: String) : ReservationIssue
+    public data class DuplicateReservedNames(public val schemaName: String, public val names: List<String>) :
+        ReservationIssue
 
-    data class ReservedNumberCollision(val schemaName: String, val numbers: List<Int>) : ReservationIssue
+    public data class ReservedNameCollision(public val schemaName: String, public val names: List<String>) :
+        ReservationIssue
 
-    sealed interface IdentifierLocation {
-        data object Declaration : IdentifierLocation
+    public data class OverlappingReservedNumbers(public val schemaName: String) : ReservationIssue
 
-        data class Field(val fieldName: String) : IdentifierLocation
+    public data class ReservedNumberCollision(public val schemaName: String, public val numbers: List<Int>) :
+        ReservationIssue
 
-        data class Oneof(val oneofName: String) : IdentifierLocation
+    public sealed interface IdentifierLocation {
+        public data object Declaration : IdentifierLocation
 
-        data class OneofField(val oneofName: String, val fieldName: String) : IdentifierLocation
+        public data class Field(public val fieldName: String) : IdentifierLocation
 
-        data class EnumValue(val valueName: String) : IdentifierLocation
+        public data class Oneof(public val oneofName: String) : IdentifierLocation
 
-        data class Reservation(val name: String) : IdentifierLocation
+        public data class OneofField(public val oneofName: String, public val fieldName: String) : IdentifierLocation
+
+        public data class EnumValue(public val valueName: String) : IdentifierLocation
+
+        public data class Reservation(public val name: String) : IdentifierLocation
     }
 
-    sealed interface SymbolDeclaration {
-        data class Package(val packageName: String) : SymbolDeclaration
+    public sealed interface SymbolDeclaration {
+        public data class Package(public val packageName: String) : SymbolDeclaration
 
-        data class Type(val schemaName: String) : SymbolDeclaration
+        public data class Type(public val schemaName: String) : SymbolDeclaration
 
-        data class EnumValue(val schemaName: String, val valueName: String) : SymbolDeclaration
+        public data class EnumValue(public val schemaName: String, public val valueName: String) : SymbolDeclaration
 
-        data class Field(val schemaName: String, val fieldName: String) : SymbolDeclaration
+        public data class Field(public val schemaName: String, public val fieldName: String) : SymbolDeclaration
 
-        data class Oneof(val schemaName: String, val oneofName: String) : SymbolDeclaration
+        public data class Oneof(public val schemaName: String, public val oneofName: String) : SymbolDeclaration
 
-        data class MapEntry(val schemaName: String, val fieldName: String) : SymbolDeclaration
+        public data class MapEntry(public val schemaName: String, public val fieldName: String) : SymbolDeclaration
     }
 
-    sealed interface FieldLocation {
-        data class Field(val fieldName: String) : FieldLocation
+    public sealed interface FieldLocation {
+        public data class Field(public val fieldName: String) : FieldLocation
 
-        data class OneofField(val oneofName: String, val fieldName: String) : FieldLocation
+        public data class OneofField(public val oneofName: String, public val fieldName: String) : FieldLocation
 
-        data class Reservation(val description: String) : FieldLocation
+        public data class Reservation(public val description: String) : FieldLocation
     }
 
-    sealed interface ReferenceLocation {
-        data class Field(val fieldName: String) : ReferenceLocation
+    public sealed interface ReferenceLocation {
+        public data class Field(public val fieldName: String) : ReferenceLocation
 
-        data class MapValue(val fieldName: String) : ReferenceLocation
+        public data class MapValue(public val fieldName: String) : ReferenceLocation
 
-        data class OneofField(val oneofName: String, val fieldName: String) : ReferenceLocation
+        public data class OneofField(public val oneofName: String, public val fieldName: String) : ReferenceLocation
     }
 }
