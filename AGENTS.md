@@ -12,6 +12,25 @@ Run `opencode-rag index` after large changes if results look stale.
 Quirks are optional project-local notes. Use `recall_quirks` and `add_quirk` when they help this project. Durable memory belongs in supermemory.
 <!-- END opencode-rag -->
 
+## Code
+
+### One source of truth
+
+Define each value once and refer to it everywhere else.
+
+- Do not copy an id, a name, a path, a message, or a list that another declaration already defines. Use that declaration: a constant, a property, `Type::class`, or a value read from where it is declared.
+- Do not keep a hand-written copy of something the build can derive, such as service registrations, module lists, or file lists.
+- A literal is fine where it is the definition itself, or where it is used once and means nothing elsewhere.
+
+### Idiomatic Kotlin
+
+Write the idiomatic form the first time. A reviewer should not have to ask for it.
+
+- Use `when` for three or more branches, or for a chain of `if` checks that each return.
+- Use an enum or a sealed type instead of a string that names a kind or a state.
+- Use `kotlin.io.path` extensions instead of `java.nio.file` statics, for example `uri.toPath()` instead of `Path.of(uri)`.
+- Use a standard-library or existing project function instead of hand-written code that does the same thing.
+
 ## Comments
 
 Do not add commentary to code.
@@ -80,6 +99,7 @@ Answer these questions for every test. Rewrite the test if an answer is "no".
 - In unit tests, use an in-memory file system through the injected `FileSystem`. In integration and end-to-end tests, use a real temporary directory.
 - Assert one behaviour in each test. Name the test after the scenario and the expected outcome.
 - Do not test a library, a generated accessor, a data class, or a constant.
+- Do not write a tautological test. A test is tautological when it cannot fail unless the test itself changes: it asserts a constant against the same literal, restates the implementation, or checks wiring that a higher-level test already exercises. Delete it instead of keeping it for coverage.
 - Keep a test input that is a whole file in another language (a script, source file, configuration, or expected output) under `src/<sourceSet>/resources`, and load it from there. Keep one-line snippets inline.
 - For a defect, add the failing test first. Confirm that it fails for the expected reason.
 
