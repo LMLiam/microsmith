@@ -5,10 +5,10 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoDeclarat
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifactId
 
-data class ProtoFileContribution(
-    override val artifactId: ProtoFileArtifactId,
-    val imports: List<String> = emptyList(),
-    val declarations: List<ProtoDeclaration>,
+public data class ProtoFileContribution(
+    public override val artifactId: ProtoFileArtifactId,
+    public val imports: List<String> = emptyList(),
+    public val declarations: List<ProtoDeclaration>,
 ) : ArtifactContribution<ProtoFileArtifact> {
     init {
         require(declarations.isNotEmpty()) {

@@ -2,8 +2,8 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf.model
 
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.ProtobufArtifact
 
-data class ProtoFileArtifact(
-    override val id: ProtoFileArtifactId,
-    val imports: List<String>,
-    val declarations: List<ProtoDeclaration>,
+public data class ProtoFileArtifact(
+    public override val id: ProtoFileArtifactId,
+    public val imports: List<String>,
+    public val declarations: List<ProtoDeclaration>,
 ) : ProtobufArtifact

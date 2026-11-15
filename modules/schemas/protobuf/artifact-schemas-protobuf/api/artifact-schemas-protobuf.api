@@ -4,12 +4,6 @@ public abstract interface class io/github/lmliam/microsmith/artifact/schemas/pro
 public abstract class io/github/lmliam/microsmith/artifact/schemas/protobuf/assembly/ProtoFileArtifactAssemblerContributions {
 }
 
-public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/assembly/ProtoFileMerge {
-	public fun <init> ()V
-	public final fun imports ([Ljava/util/List;)Ljava/util/List;
-	public final fun members (Ljava/util/List;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
-}
-
 public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/contribution/ProtoFileContribution : io/github/lmliam/microsmith/artifact/ArtifactContribution {
 	public fun <init> (Lio/github/lmliam/microsmith/artifact/schemas/protobuf/model/ProtoFileArtifactId;Ljava/util/List;Ljava/util/List;)V
 	public synthetic fun <init> (Lio/github/lmliam/microsmith/artifact/schemas/protobuf/model/ProtoFileArtifactId;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V

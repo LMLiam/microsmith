@@ -1,9 +1,12 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly
 
-class ProtoFileMerge {
-    fun imports(vararg parts: List<String>): List<String> = parts.flatMap { it }.distinct().sorted()
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 
-    fun <T> members(
+@InternalMicrosmithApi
+public class ProtoFileMerge {
+    public fun imports(vararg parts: List<String>): List<String> = parts.flatMap { it }.distinct().sorted()
+
+    public fun <T> members(
         current: List<T>,
         next: List<T>,
         kind: String,
