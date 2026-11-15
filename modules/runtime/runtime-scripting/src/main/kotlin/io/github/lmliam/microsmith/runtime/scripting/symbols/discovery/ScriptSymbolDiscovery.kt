@@ -6,12 +6,6 @@ import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDefinition
 import io.github.lmliam.microsmith.runtime.scripting.symbols.model.DiscoveredScriptSymbol
 import io.github.lmliam.microsmith.runtime.scripting.symbols.parsing.KotlinScriptCallSiteParser
-import kotlin.reflect.KClass
-
-internal data class ScriptSymbolDiscoveryResult(
-    val symbols: List<DiscoveredScriptSymbol>,
-    val omittedPlainNames: Map<String, List<String>>,
-)
 
 internal object ScriptSymbolDiscovery {
     fun discover(
@@ -42,7 +36,7 @@ internal object ScriptSymbolDiscovery {
             }
         }
 
-        return resolveSymbols(declarations.distinctBy(Declaration::target))
+        return resolveSymbols(declarations.distinctBy { it.contributor.id to it.definition })
     }
 
     private fun resolveSymbols(declarations: List<Declaration>): ScriptSymbolDiscoveryResult {
@@ -61,30 +55,23 @@ internal object ScriptSymbolDiscovery {
                 .filter { it.definition.propertyName.isAutomaticSymbolIdentifier() }
                 .groupBy { it.definition.propertyName }
 
+        val availablePlain = plain.filterKeys { it !in qualified }
+
         val symbols =
             qualified.values.map { (declaration) -> declaration.symbol(declaration.qualifiedName) } +
-                plain
-                    .filter { (name, group) -> group.size == 1 && name !in qualified }
-                    .map { (name, group) -> group.single().symbol(name) }
+                availablePlain.filterValues { it.size == 1 }.map { (name, group) -> group.single().symbol(name) }
 
         return ScriptSymbolDiscoveryResult(
             symbols = symbols.sortedBy(DiscoveredScriptSymbol::propertyName),
             omittedPlainNames =
-                plain.filterValues { it.size > 1 }.mapValues { (_, group) -> group.map { it.qualifiedName }.sorted() },
+                availablePlain
+                    .filterValues { it.size > 1 }
+                    .mapValues { (_, group) -> group.map { it.qualifiedName }.sorted() },
         )
     }
 
-    private data class Target(
-        val contributorId: String,
-        val valueType: KClass<*>,
-        val kind: String,
-        val valueKey: String,
-    )
-
     private class Declaration(val contributor: ScriptSymbolContributor, val definition: ScriptSymbolDefinition) {
         val qualifiedName: String = definition.qualifiedPath.joinToString(QUALIFIED_NAME_SEPARATOR)
-
-        val target = Target(contributor.id, definition.valueType, definition.kind, definition.valueKey)
 
         fun symbol(propertyName: String) = DiscoveredScriptSymbol(contributor, definition, propertyName)
     }

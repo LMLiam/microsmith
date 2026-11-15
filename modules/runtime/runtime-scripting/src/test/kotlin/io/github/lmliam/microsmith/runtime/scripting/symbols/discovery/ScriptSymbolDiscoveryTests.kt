@@ -2,6 +2,11 @@ package io.github.lmliam.microsmith.runtime.scripting.symbols.discovery
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.EnumRef
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef
+import io.github.lmliam.microsmith.runtime.scripting.api.ScriptCallCallee
+import io.github.lmliam.microsmith.runtime.scripting.api.ScriptLiteral
+import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor
+import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDeclarationSite
+import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDefinition
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -72,6 +77,26 @@ class ScriptSymbolDiscoveryTests :
                 }
             }
 
+            "keeps a declaration outside any namespace under its plain name when a nested one shares it" {
+                val result = discover("/scripting/symbols/discovery/root-and-nested.microsmith.kts")
+
+                result.symbols.associate { it.propertyName to it.definition.valueKey } shouldBe
+                    mapOf("User" to "User", "one_User" to "one.User")
+
+                result.omittedPlainNames shouldBe emptyMap()
+            }
+
+            "exposes definitions that differ only by qualified path when they share a value key" {
+                val result =
+                    ScriptSymbolDiscovery.discover(
+                        sourceName = "schema.microsmith.kts",
+                        sourceText = "a { declare(\"User\") } b { declare(\"User\") }",
+                        registry = ScriptSymbolContributorRegistry.of(listOf(SharedValueKeyContributor)),
+                    )
+
+                result.symbols.map { it.propertyName } shouldContainExactly listOf("a_User", "b_User")
+            }
+
             "ignores dynamic declaration names because they cannot become lexical symbols" {
                 discover("/scripting/symbols/discovery/dynamic-declaration-name.microsmith.kts").symbols shouldBe
                     emptyList()
@@ -84,6 +109,27 @@ class ScriptSymbolDiscoveryTests :
             }
         },
     )
+
+private object SharedValueKeyContributor : ScriptSymbolContributor {
+    override val id = "test.shared-value-key"
+
+    override val declarationCallNames = setOf("declare")
+
+    override fun discover(site: ScriptSymbolDeclarationSite): ScriptSymbolDefinition? {
+        val name = (site.call.arguments.firstOrNull() as? ScriptLiteral.StringValue)?.value ?: return null
+        val namespace = site.enclosingCalls.mapNotNull { (it.callee as? ScriptCallCallee.Named)?.name }
+
+        return ScriptSymbolDefinition(
+            propertyName = name,
+            valueType = MessageRef::class,
+            kind = "declare",
+            valueKey = name,
+            qualifiedPath = namespace + name,
+        )
+    }
+
+    override fun createValue(kind: String, valueKey: String): Any = MessageRef(valueKey)
+}
 
 private fun discover(resource: String): ScriptSymbolDiscoveryResult = discoverText(scriptResource(resource))
 
