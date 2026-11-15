@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.plugin
 
-interface Environment {
-    fun variable(name: String): String?
+public interface Environment {
+    public fun variable(name: String): String?
 
-    fun property(name: String): String?
+    public fun property(name: String): String?
 }

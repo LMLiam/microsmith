@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.plugin
 
-enum class DiagnosticSeverity {
+public enum class DiagnosticSeverity {
     INFO,
     WARNING,
 }
