@@ -17,6 +17,12 @@ internal class MicrosmithGradleFunctionalTestProject private constructor(private
         file.writeText("$contents\n")
     }
 
+    fun writeResource(relativePath: String, resource: String) {
+        val file = file(relativePath)
+        checkNotNull(file.parent).createDirectories()
+        file.writeText(testResourceText(resource))
+    }
+
     fun build(vararg arguments: String): BuildResult = gradleRunner(*arguments).build()
 
     fun buildAndFail(vararg arguments: String): BuildResult = gradleRunner(*arguments).buildAndFail()
@@ -30,19 +36,25 @@ internal class MicrosmithGradleFunctionalTestProject private constructor(private
             .withArguments(*arguments, "--stacktrace")
 
     companion object {
-        fun create(name: String, buildScript: String): MicrosmithGradleFunctionalTestProject {
+        fun create(name: String, buildScriptResource: String): MicrosmithGradleFunctionalTestProject {
             val directory = createTempDirectory(name)
             val project = MicrosmithGradleFunctionalTestProject(directory)
             project.writeFile("settings.gradle.kts", "rootProject.name = \"$name\"")
             project.writeFile(
                 "build.gradle.kts",
                 listOf(
-                        buildScript,
+                        testResourceText(buildScriptResource),
                         MicrosmithGradleFunctionalTestRuntimeClasspath.buildScriptDependencyBlock(),
                     )
-                    .joinToString(separator = "\n\n"),
+                    .joinToString(separator = "\n"),
             )
             return project
         }
     }
 }
+
+private fun testResourceText(resource: String): String =
+    checkNotNull(MicrosmithGradleFunctionalTestProject::class.java.getResource(resource)) {
+            "Missing test resource $resource"
+        }
+        .readText()
