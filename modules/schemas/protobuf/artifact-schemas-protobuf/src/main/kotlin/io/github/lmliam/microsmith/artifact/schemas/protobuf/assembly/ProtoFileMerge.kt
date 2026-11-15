@@ -9,7 +9,7 @@ public class ProtoFileMerge {
     public fun <T> members(
         current: List<T>,
         next: List<T>,
-        kind: String,
+        kind: ProtoFileMemberKind,
         owner: String,
         nameOf: (T) -> String,
     ): List<T> {
@@ -17,7 +17,7 @@ public class ProtoFileMerge {
         next.forEach { member ->
             val existing = merged[nameOf(member)]
             require(existing == null || existing == member) {
-                "Conflicting protobuf $kind '${nameOf(member)}' for '$owner'."
+                "Conflicting protobuf ${kind.label} '${nameOf(member)}' for '$owner'."
             }
             merged.putIfAbsent(nameOf(member), member)
         }

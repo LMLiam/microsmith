@@ -5,6 +5,7 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
+import io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly.ProtoFileMemberKind
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly.ProtoFileMerge
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcPluginScope
 
@@ -32,7 +33,7 @@ internal class ProtobufRpcServiceArtifactAssembler(private val merge: ProtoFileM
 
         return current.copy(
             imports = merge.imports(current.imports, next.imports),
-            operations = merge.members(current.operations, next.operations, "RPC", owner) { it.name },
+            operations = merge.members(current.operations, next.operations, ProtoFileMemberKind.RPC, owner) { it.name },
         )
     }
 

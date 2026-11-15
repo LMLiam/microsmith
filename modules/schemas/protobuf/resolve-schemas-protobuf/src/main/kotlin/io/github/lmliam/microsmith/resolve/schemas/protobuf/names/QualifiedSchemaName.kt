@@ -39,27 +39,17 @@ private constructor(
 private fun parseQualifiedName(
     value: String,
 ): Either<ProtobufResolutionIssue.InvalidSchemaName, List<ProtoIdentifier>> {
-    if (value.isBlank()) {
-        return invalidSchemaName(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK)
-    }
-
-    if (value.startsWith(".")) {
-        return invalidSchemaName(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT)
-    }
-
-    if (value.endsWith(".")) {
-        return invalidSchemaName(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.TRAILING_DOT)
-    }
-
-    if (value.any(Char::isWhitespace)) {
-        return invalidSchemaName(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.WHITESPACE)
-    }
-
     val segments = value.split('.')
-
-    if (segments.any(String::isBlank)) {
-        return invalidSchemaName(value, ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT)
-    }
+    val reason =
+        when {
+            value.isBlank() -> ProtobufResolutionIssue.InvalidSchemaName.Reason.BLANK
+            value.startsWith(".") -> ProtobufResolutionIssue.InvalidSchemaName.Reason.LEADING_DOT
+            value.endsWith(".") -> ProtobufResolutionIssue.InvalidSchemaName.Reason.TRAILING_DOT
+            value.any(Char::isWhitespace) -> ProtobufResolutionIssue.InvalidSchemaName.Reason.WHITESPACE
+            segments.any(String::isBlank) -> ProtobufResolutionIssue.InvalidSchemaName.Reason.EMPTY_SEGMENT
+            else -> null
+        }
+    if (reason != null) return invalidSchemaName(value, reason)
 
     return Either.Right(
         segments.map { segment ->

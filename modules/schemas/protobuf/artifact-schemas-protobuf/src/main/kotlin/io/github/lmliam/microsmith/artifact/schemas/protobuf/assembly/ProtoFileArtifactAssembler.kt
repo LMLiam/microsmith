@@ -32,7 +32,10 @@ internal class ProtoFileArtifactAssembler(private val merge: ProtoFileMerge) : A
 
         return current.copy(
             imports = merge.imports(current.imports, next.imports),
-            declarations = merge.members(current.declarations, next.declarations, "declaration", owner) { it.name },
+            declarations =
+                merge.members(current.declarations, next.declarations, ProtoFileMemberKind.DECLARATION, owner) {
+                    it.name
+                },
         )
     }
 
