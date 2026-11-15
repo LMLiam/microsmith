@@ -25,12 +25,12 @@ private val systemGenerator: MicrosmithGenerator by lazy {
     )
 }
 
-suspend fun MicrosmithModel.generate(
+public suspend fun MicrosmithModel.generate(
     finalDir: FileSpace,
     pluginClassLoader: ClassLoader = MicrosmithModel::class.java.classLoader,
 ): List<Path> = systemGenerator.generate(this, finalDir, pluginClassLoader)
 
-suspend fun MicrosmithModel.generateTo(
+public suspend fun MicrosmithModel.generateTo(
     outputDir: Path,
     pluginClassLoader: ClassLoader = MicrosmithModel::class.java.classLoader,
 ): List<Path> = systemGenerator.generateTo(this, outputDir, pluginClassLoader)

@@ -11,7 +11,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 
-class SystemProcessLauncher(private val ioDispatcher: CoroutineDispatcher) : ProcessLauncher {
+internal class SystemProcessLauncher(private val ioDispatcher: CoroutineDispatcher) : ProcessLauncher {
     override suspend fun run(command: List<String>): ProcessResult =
         withContext(ioDispatcher) {
             val process = ProcessBuilder(command).redirectErrorStream(true).start()

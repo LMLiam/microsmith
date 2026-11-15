@@ -9,7 +9,7 @@ import java.nio.file.FileSystem
 import kotlin.time.Clock
 import kotlinx.coroutines.CoroutineDispatcher
 
-fun createMicrosmithGenerator(
+public fun createMicrosmithGenerator(
     fileSystem: FileSystem,
     clock: Clock,
     environment: Environment,
