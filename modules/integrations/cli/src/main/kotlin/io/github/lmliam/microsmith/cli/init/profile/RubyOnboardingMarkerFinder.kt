@@ -2,8 +2,9 @@ package io.github.lmliam.microsmith.cli.init.profile
 
 import java.io.IOException
 import java.io.UncheckedIOException
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
 
 internal object RubyOnboardingMarkerFinder {
     fun find(projectRoot: Path): List<String> =
@@ -18,8 +19,9 @@ internal object RubyOnboardingMarkerFinder {
         }
 
     private fun findRootGemspecs(projectRoot: Path): List<String> =
-        Files.newDirectoryStream(projectRoot) { candidate ->
-                Files.isRegularFile(candidate) && candidate.fileName.toString().endsWith(".gemspec")
-            }
-            .use { directoryStream -> directoryStream.map(Path::getFileName).map(Path::toString).sorted().toList() }
+        projectRoot
+            .listDirectoryEntries()
+            .filter { candidate -> candidate.isRegularFile() && candidate.fileName.toString().endsWith(".gemspec") }
+            .map { candidate -> candidate.fileName.toString() }
+            .sorted()
 }

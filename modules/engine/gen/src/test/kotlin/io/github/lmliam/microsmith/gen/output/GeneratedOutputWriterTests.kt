@@ -8,14 +8,17 @@ import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.nio.file.FileSystems
-import java.nio.file.Files
 import java.util.concurrent.Executors
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readBytes
+import kotlin.io.path.readText
 import kotlin.io.path.walk
+import kotlin.io.path.writeText
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -30,8 +33,8 @@ class GeneratedOutputWriterTests :
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
                     val outputRoot = fileSystem.getPath("/repo-root")
                     val existingProtoFile = outputRoot.resolve("services/UserService/UserCreated.proto")
-                    Files.createDirectories(existingProtoFile.parent)
-                    Files.writeString(existingProtoFile, "stale")
+                    existingProtoFile.parent.createDirectories()
+                    existingProtoFile.writeText("stale")
 
                     GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
                         .write(
@@ -46,7 +49,7 @@ class GeneratedOutputWriterTests :
                             space = DirectorySpace(outputRoot),
                         )
 
-                    Files.readString(existingProtoFile) shouldBe "fresh"
+                    existingProtoFile.readText() shouldBe "fresh"
                 }
             }
 
@@ -67,8 +70,7 @@ class GeneratedOutputWriterTests :
                             space = DirectorySpace(outputRoot),
                         )
 
-                    Files.readString(outputRoot.resolve("dotnet/Platform/Generated/Contracts/Models.cs")) shouldBe
-                        "models"
+                    outputRoot.resolve("dotnet/Platform/Generated/Contracts/Models.cs").readText() shouldBe "models"
                 }
             }
 
@@ -83,7 +85,7 @@ class GeneratedOutputWriterTests :
                             space = DirectorySpace(outputRoot),
                         )
 
-                    Files.readAllBytes(outputRoot.resolve("blob.bin")).toList() shouldBe bytes.toList()
+                    outputRoot.resolve("blob.bin").readBytes().toList() shouldBe bytes.toList()
                 }
             }
 
@@ -94,7 +96,7 @@ class GeneratedOutputWriterTests :
                     GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
                         .write(outputs = emptyList(), space = DirectorySpace(outputRoot))
 
-                    Files.isDirectory(outputRoot) shouldBe true
+                    outputRoot.isDirectory() shouldBe true
                 }
             }
 

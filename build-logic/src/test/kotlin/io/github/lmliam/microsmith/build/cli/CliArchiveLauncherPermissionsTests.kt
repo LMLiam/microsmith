@@ -3,8 +3,8 @@ package io.github.lmliam.microsmith.build.cli
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import java.io.File
-import java.nio.file.Files
 import java.util.zip.GZIPOutputStream
+import kotlin.io.path.createTempDirectory
 import org.apache.tools.tar.TarEntry
 import org.apache.tools.tar.TarOutputStream
 import org.apache.tools.zip.ZipEntry
@@ -56,7 +56,7 @@ private fun withArchives(
     tarMode: Int,
     block: (zipFile: File, tarFile: File) -> Unit,
 ) {
-    val tempDir = Files.createTempDirectory("cli-archive-permissions").toFile()
+    val tempDir = createTempDirectory("cli-archive-permissions").toFile()
     try {
         val zipFile = tempDir.resolve("cli.zip").apply { writeZipEntry(LAUNCHER_ENTRY, zipMode) }
         val tarFile = tempDir.resolve("cli.tar.gz").apply { writeTarGzEntry(LAUNCHER_ENTRY, tarMode) }

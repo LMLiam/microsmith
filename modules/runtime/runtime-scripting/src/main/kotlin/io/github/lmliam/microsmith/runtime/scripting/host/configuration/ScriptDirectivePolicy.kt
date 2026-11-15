@@ -2,8 +2,8 @@ package io.github.lmliam.microsmith.runtime.scripting.host.configuration
 
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.readLines
 
 private val DIRECT_FILE_DIRECTIVE =
     Regex(pattern = """^\s*@file:\s*(?:kotlin\.script\.experimental\.dependencies\.)?(DependsOn|Repository)\b""")
@@ -14,7 +14,7 @@ private val GROUP_FORBIDDEN_DIRECTIVE =
 
 internal object ScriptDirectivePolicy {
     fun validate(scriptPath: Path): ScriptRunFailure? {
-        val violations = collectViolations(Files.readAllLines(scriptPath))
+        val violations = collectViolations(scriptPath.readLines())
         if (violations.isEmpty()) {
             return null
         }

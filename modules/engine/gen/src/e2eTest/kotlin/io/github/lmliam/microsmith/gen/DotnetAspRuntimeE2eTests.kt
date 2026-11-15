@@ -13,11 +13,11 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.readText
@@ -29,7 +29,7 @@ class DotnetAspRuntimeE2eTests :
         {
             "generated ASP.NET controller bases work end to end when a user implements them"
                 .config(enabled = dotnetAvailable()) {
-                    val outputDir = Files.createTempDirectory("microsmith-dotnet-asp-runtime-")
+                    val outputDir = createTempDirectory("microsmith-dotnet-asp-runtime-")
                     try {
                         runtimeE2eModel().generateTo(outputDir)
 

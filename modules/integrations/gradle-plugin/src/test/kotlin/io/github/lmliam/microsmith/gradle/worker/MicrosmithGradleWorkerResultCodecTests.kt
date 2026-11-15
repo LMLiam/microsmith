@@ -2,8 +2,8 @@ package io.github.lmliam.microsmith.gradle.worker
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import java.nio.file.Files
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 
 @OptIn(ExperimentalPathApi::class)
@@ -11,7 +11,7 @@ class MicrosmithGradleWorkerResultCodecTests :
     StringSpec(
         {
             "round-trips issue codes of failure diagnostics" {
-                val directory = Files.createTempDirectory("microsmith-gradle-worker-result-codec")
+                val directory = createTempDirectory("microsmith-gradle-worker-result-codec")
                 try {
                     val codec = MicrosmithGradleWorkerResultCodec()
                     val failure =

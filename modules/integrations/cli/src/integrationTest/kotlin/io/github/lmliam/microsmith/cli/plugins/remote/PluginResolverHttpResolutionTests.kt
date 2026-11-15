@@ -13,12 +13,14 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import java.net.InetAddress
 import java.net.InetSocketAddress
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
 
 @OptIn(ExperimentalPathApi::class)
@@ -68,12 +70,12 @@ class PluginResolverHttpResolutionTests :
     )
 
 private fun serveDirectory(root: Path): HttpServer {
-    Files.createDirectories(root)
+    root.createDirectories()
     val server = HttpServer.create(InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0)
     server.createContext("/") { exchange ->
         val file = root.resolve(exchange.requestURI.path.removePrefix("/")).normalize()
-        if (file.startsWith(root) && Files.isRegularFile(file)) {
-            val bytes = Files.readAllBytes(file)
+        if (file.startsWith(root) && file.isRegularFile()) {
+            val bytes = file.readBytes()
             exchange.sendResponseHeaders(200, bytes.size.toLong())
             exchange.responseBody.use { it.write(bytes) }
         } else {

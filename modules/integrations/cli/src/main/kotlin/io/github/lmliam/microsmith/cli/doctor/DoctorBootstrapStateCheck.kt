@@ -2,9 +2,11 @@ package io.github.lmliam.microsmith.cli.doctor
 
 import io.github.lmliam.microsmith.cli.ide.IDE_HELPER_DIRECTORY
 import io.github.lmliam.microsmith.cli.ide.IdeHelperManagedSurface
-import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
 
 internal object DoctorBootstrapStateCheck {
     fun check(projectRoot: Path): DoctorCheckResult {
@@ -40,7 +42,7 @@ internal object DoctorBootstrapStateCheck {
                     details = mapOf("missingIdeHelperFiles" to missingHelperFiles.joinToString(separator = ",")),
                 )
 
-            Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) ->
+            helperRoot.isDirectory(LinkOption.NOFOLLOW_LINKS) ->
                 pass(
                     message = "Bootstrap files and JetBrains IDE helper are present.",
                     details = mapOf("projectRoot" to projectRoot.toString()),
@@ -63,9 +65,9 @@ internal object DoctorBootstrapStateCheck {
         helperRoot: Path,
     ): DoctorCheckResult? {
         val hasManagedSurface =
-            Files.exists(buildScript, LinkOption.NOFOLLOW_LINKS) ||
-                Files.exists(settingsScript, LinkOption.NOFOLLOW_LINKS) ||
-                Files.exists(helperRoot, LinkOption.NOFOLLOW_LINKS)
+            buildScript.exists(LinkOption.NOFOLLOW_LINKS) ||
+                settingsScript.exists(LinkOption.NOFOLLOW_LINKS) ||
+                helperRoot.exists(LinkOption.NOFOLLOW_LINKS)
         if (!hasManagedSurface) {
             return pass(
                 message = "Bootstrap files were not detected in the current working directory.",
@@ -92,7 +94,7 @@ internal object DoctorBootstrapStateCheck {
                     details = mapOf("missingBootstrapFiles" to missingBootstrapFiles.joinToString(separator = ",")),
                 )
 
-            managedPathExists(helperRoot) && !Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) ->
+            managedPathExists(helperRoot) && !helperRoot.isDirectory(LinkOption.NOFOLLOW_LINKS) ->
                 failure(
                     message =
                         "JetBrains IDE helper path is invalid. " +
@@ -106,13 +108,13 @@ internal object DoctorBootstrapStateCheck {
 
     private fun invalidIdeHelperFiles(projectRoot: Path, helperRoot: Path): List<String> =
         IdeHelperManagedSurface.requiredFiles(helperRoot)
-            .takeIf { Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) }
+            .takeIf { helperRoot.isDirectory(LinkOption.NOFOLLOW_LINKS) }
             ?.let { managedFiles -> invalidManagedFiles(projectRoot = projectRoot, managedFiles = managedFiles) }
             .orEmpty()
 
     private fun missingIdeHelperFiles(projectRoot: Path, helperRoot: Path): List<String> =
         IdeHelperManagedSurface.requiredFiles(helperRoot)
-            .takeIf { Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) }
+            .takeIf { helperRoot.isDirectory(LinkOption.NOFOLLOW_LINKS) }
             ?.let { managedFiles -> missingManagedFiles(projectRoot = projectRoot, managedFiles = managedFiles) }
             .orEmpty()
 
@@ -129,9 +131,9 @@ internal object DoctorBootstrapStateCheck {
             .sorted()
             .toList()
 
-    private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
+    private fun managedPathExists(path: Path): Boolean = path.exists(LinkOption.NOFOLLOW_LINKS)
 
-    private fun isManagedRegularFile(path: Path): Boolean = Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)
+    private fun isManagedRegularFile(path: Path): Boolean = path.isRegularFile(LinkOption.NOFOLLOW_LINKS)
 
     private fun pass(message: String, details: Map<String, String> = emptyMap()): DoctorCheckResult =
         DoctorCheckResult(

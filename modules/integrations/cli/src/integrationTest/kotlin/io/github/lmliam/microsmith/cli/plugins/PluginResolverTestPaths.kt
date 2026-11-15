@@ -1,12 +1,13 @@
 package io.github.lmliam.microsmith.cli.plugins
 
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
 
 internal fun createWorkingDirectoryTempDirectory(prefix: String): Path {
     val root = workingDirectory().resolve("build/tmp/plugin-resolver-tests")
-    Files.createDirectories(root)
-    return Files.createTempDirectory(root, prefix)
+    root.createDirectories()
+    return createTempDirectory(root, prefix)
 }
 
 internal fun relativizeFromWorkingDirectory(path: Path): Path =

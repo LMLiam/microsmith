@@ -8,7 +8,9 @@ import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import java.nio.file.Files
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.writeText
 
 class GeneratedOutputPathResolverTests :
     StringSpec(
@@ -31,7 +33,7 @@ class GeneratedOutputPathResolverTests :
 
                     val resolved = GeneratedOutputPathResolver(fileSystem).resolve(space, RelativePath.of("User.proto"))
 
-                    Files.exists(resolved) shouldBe false
+                    resolved.exists() shouldBe false
                 }
             }
 
@@ -84,7 +86,7 @@ class GeneratedOutputPathResolverTests :
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
                     val outputRoot = fileSystem.getPath("/out")
                     val space = DirectorySpace(outputRoot)
-                    Files.writeString(outputRoot, "not a directory")
+                    outputRoot.writeText("not a directory")
 
                     shouldThrow<IllegalArgumentException> {
                         GeneratedOutputPathResolver(fileSystem).resolve(space, RelativePath.of("User.proto"))
@@ -95,8 +97,8 @@ class GeneratedOutputPathResolverTests :
             "resolve rejects a path that passes through a regular file" {
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
                     val space = DirectorySpace(fileSystem.getPath("/out"))
-                    Files.createDirectories(fileSystem.getPath("/out"))
-                    Files.writeString(fileSystem.getPath("/out/proto"), "not a directory")
+                    fileSystem.getPath("/out").createDirectories()
+                    fileSystem.getPath("/out/proto").writeText("not a directory")
 
                     shouldThrow<IllegalArgumentException> {
                         GeneratedOutputPathResolver(fileSystem).resolve(space, RelativePath.of("proto", "User.proto"))

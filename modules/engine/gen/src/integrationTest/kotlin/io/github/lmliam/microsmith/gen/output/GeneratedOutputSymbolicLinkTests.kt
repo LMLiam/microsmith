@@ -7,7 +7,9 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.nio.file.FileSystems
-import java.nio.file.Files
+import kotlin.io.path.createSymbolicLinkPointingTo
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.exists
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 class GeneratedOutputSymbolicLinkTests :
@@ -16,9 +18,9 @@ class GeneratedOutputSymbolicLinkTests :
             val fileSystem = FileSystems.getDefault()
 
             "resolve rejects an output path that traverses a symbolic link" {
-                val root = Files.createTempDirectory("microsmith-paths-root-")
-                val outside = Files.createTempDirectory("microsmith-paths-outside-")
-                val linked = runCatching { Files.createSymbolicLink(root.resolve("link"), outside) }.isSuccess
+                val root = createTempDirectory("microsmith-paths-root-")
+                val outside = createTempDirectory("microsmith-paths-outside-")
+                val linked = runCatching { root.resolve("link").createSymbolicLinkPointingTo(outside) }.isSuccess
                 if (linked) {
                     val space = DirectorySpace(root)
 
@@ -29,9 +31,9 @@ class GeneratedOutputSymbolicLinkTests :
             }
 
             "resolve rejects a routed output root that traverses a symbolic link" {
-                val root = Files.createTempDirectory("microsmith-paths-root-")
-                val outside = Files.createTempDirectory("microsmith-paths-outside-")
-                val linked = runCatching { Files.createSymbolicLink(root.resolve("link"), outside) }.isSuccess
+                val root = createTempDirectory("microsmith-paths-root-")
+                val outside = createTempDirectory("microsmith-paths-outside-")
+                val linked = runCatching { root.resolve("link").createSymbolicLinkPointingTo(outside) }.isSuccess
                 if (linked) {
                     val space = DirectorySpace(root)
                     val output =
@@ -48,9 +50,9 @@ class GeneratedOutputSymbolicLinkTests :
             }
 
             "write does not create files outside the output root through a symbolic link" {
-                val root = Files.createTempDirectory("microsmith-paths-root-")
-                val outside = Files.createTempDirectory("microsmith-paths-outside-")
-                val linked = runCatching { Files.createSymbolicLink(root.resolve("link"), outside) }.isSuccess
+                val root = createTempDirectory("microsmith-paths-root-")
+                val outside = createTempDirectory("microsmith-paths-outside-")
+                val linked = runCatching { root.resolve("link").createSymbolicLinkPointingTo(outside) }.isSuccess
                 if (linked) {
                     shouldThrow<IllegalArgumentException> {
                         GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
@@ -60,7 +62,7 @@ class GeneratedOutputSymbolicLinkTests :
                             )
                     }
 
-                    Files.exists(outside.resolve("secret.proto")) shouldBe false
+                    outside.resolve("secret.proto").exists() shouldBe false
                 }
             }
         },

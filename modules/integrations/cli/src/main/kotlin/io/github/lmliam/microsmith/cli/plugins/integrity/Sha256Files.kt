@@ -1,12 +1,13 @@
 package io.github.lmliam.microsmith.cli.plugins.integrity
 
-import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
+import kotlin.io.path.inputStream
+import kotlin.io.path.isRegularFile
 
 internal fun sha256(path: Path): String {
     val digest = MessageDigest.getInstance("SHA-256")
-    Files.newInputStream(path).use { input ->
+    path.inputStream().use { input ->
         val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
         while (true) {
             val read = input.read(buffer)
@@ -21,7 +22,7 @@ internal fun sha256(path: Path): String {
 
 internal fun sha256IfRegularFile(path: Path): String? {
     val normalized = path.toAbsolutePath().normalize()
-    if (!Files.isRegularFile(normalized)) {
+    if (!normalized.isRegularFile()) {
         return null
     }
     return sha256(normalized)

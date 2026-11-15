@@ -14,14 +14,16 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import java.nio.file.Files
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
+import kotlin.io.path.createSymbolicLinkPointingTo
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.isRegularFile
+import kotlin.io.path.readBytes
 import kotlin.io.path.readText
+import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
 
 @OptIn(ExperimentalPathApi::class)
@@ -250,14 +252,14 @@ class InitBootstrapTests :
                 val repoRoot = createTempDirectory("microsmith-init-bootstrap-preserve-bytes")
                 val buildScript = repoRoot.resolve("build.microsmith.kts")
                 val originalBytes = byteArrayOf(0xC3.toByte(), 0x28)
-                Files.write(buildScript, originalBytes)
+                buildScript.writeBytes(originalBytes)
                 try {
                     val result = runInitBootstrap(command = InitCommand(projectRoot = repoRoot, skipIdeHelper = true))
 
                     result.createdFiles.shouldContainExactly(listOf(repoRoot.resolve("settings.microsmith.kts")))
                     result.overwrittenFiles shouldBe emptyList()
                     result.preservedFiles.shouldContainExactly(listOf(buildScript))
-                    Files.readAllBytes(buildScript).contentEquals(originalBytes) shouldBe true
+                    buildScript.readBytes().contentEquals(originalBytes) shouldBe true
                 } finally {
                     runCatching { repoRoot.deleteRecursively() }
                 }
@@ -299,7 +301,7 @@ class InitBootstrapTests :
             "overwrites undecodable bootstrap files when force is enabled" {
                 val repoRoot = createTempDirectory("microsmith-init-bootstrap-force-invalid-bytes")
                 val buildScript = repoRoot.resolve("build.microsmith.kts")
-                Files.write(buildScript, byteArrayOf(0xC3.toByte(), 0x28))
+                buildScript.writeBytes(byteArrayOf(0xC3.toByte(), 0x28))
                 try {
                     val result =
                         runInitBootstrap(
@@ -373,7 +375,7 @@ class InitBootstrapTests :
                         createTempDirectory("microsmith-init-bootstrap-symlink-target")
                             .resolve("external-build.microsmith.kts")
                     targetFile.writeText("// external build script")
-                    Files.createSymbolicLink(repoRoot.resolve("build.microsmith.kts"), targetFile)
+                    repoRoot.resolve("build.microsmith.kts").createSymbolicLinkPointingTo(targetFile)
                     try {
                         val error =
                             shouldThrow<InitConflictException> {

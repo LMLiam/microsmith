@@ -16,7 +16,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import java.nio.file.Files
+import kotlin.io.path.createTempDirectory
 
 data object FailureTestExtension : MicrosmithExtension
 
@@ -59,7 +59,7 @@ class GenerationResolutionFailureTests :
 
                 val model = MicrosmithBuilder().apply { put(FailureTestExtension::class, FailureTestExtension) }.model
 
-                val output = DirectorySpace(Files.createTempDirectory("microsmith-resolution-failure"))
+                val output = DirectorySpace(createTempDirectory("microsmith-resolution-failure"))
 
                 val failure =
                     shouldThrow<GenerationResolutionFailedException> { model.generate(output, pluginClassLoader) }

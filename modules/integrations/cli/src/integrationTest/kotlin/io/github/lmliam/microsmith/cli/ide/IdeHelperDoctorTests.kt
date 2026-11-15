@@ -6,11 +6,11 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import java.nio.file.Files
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
+import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
 
 @OptIn(ExperimentalPathApi::class)
@@ -126,7 +126,7 @@ class IdeHelperDoctorTests :
                         command = IdeRefreshCommand(projectRoot = repoRoot),
                         classpathResolver = { listOf(runtimeJar) },
                     )
-                    Files.write(helperRoot.resolve("build.gradle.kts"), byteArrayOf(0xC3.toByte(), 0x28))
+                    helperRoot.resolve("build.gradle.kts").writeBytes(byteArrayOf(0xC3.toByte(), 0x28))
 
                     val result =
                         runIdeHelperDoctor(

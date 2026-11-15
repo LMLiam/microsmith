@@ -3,11 +3,12 @@ package io.github.lmliam.microsmith.gen
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.CyclicBarrier
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
+import kotlin.io.path.readBytes
 import kotlin.io.path.readText
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -20,8 +21,8 @@ private class ConcurrentRuns(val firstOutput: Path, val secondOutput: Path, val 
 private suspend fun runTwoGenerationsAtOnce(dispatcher: CoroutineDispatcher = Dispatchers.IO): ConcurrentRuns {
     val diagnostics = RecordingDiagnosticSink()
     val generator = testGenerator(diagnostics, dispatcher)
-    val firstOutput = Files.createTempDirectory("microsmith-concurrent-first-")
-    val secondOutput = Files.createTempDirectory("microsmith-concurrent-second-")
+    val firstOutput = createTempDirectory("microsmith-concurrent-first-")
+    val secondOutput = createTempDirectory("microsmith-concurrent-second-")
     ResolutionRendezvous.barrier = CyclicBarrier(2)
 
     try {
@@ -61,7 +62,7 @@ class ConcurrentGenerationTests :
                     output.listDirectoryEntries().map { it.name } shouldContainExactlyInAnyOrder
                         listOf("label.txt", "label.bin")
                     output.resolve("label.txt").readText() shouldBe label
-                    Files.readAllBytes(output.resolve("label.bin")).decodeToString() shouldBe label
+                    output.resolve("label.bin").readBytes().decodeToString() shouldBe label
                 }
             }
 

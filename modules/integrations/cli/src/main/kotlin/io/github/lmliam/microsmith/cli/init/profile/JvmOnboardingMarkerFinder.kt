@@ -3,11 +3,12 @@ package io.github.lmliam.microsmith.cli.init.profile
 import java.io.IOException
 import java.io.UncheckedIOException
 import java.nio.file.FileVisitResult
-import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
-import java.nio.file.attribute.BasicFileAttributes
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.visitFileTree
 
 internal object JvmOnboardingMarkerFinder {
     fun find(projectRoot: Path, buildMarkers: List<Path>, sourceRootMatcher: (Path) -> Boolean): List<String> =
@@ -46,45 +47,34 @@ internal object JvmOnboardingMarkerFinder {
 
     private fun findRootSourceMarkers(projectRoot: Path, sourceRootMatcher: (Path) -> Boolean): List<String> {
         val srcDirectory = projectRoot.resolve(SOURCE_ROOT_DIRECTORY_NAME)
-        if (!Files.isDirectory(srcDirectory)) {
+        if (!srcDirectory.isDirectory()) {
             return emptyList()
         }
 
-        return Files.newDirectoryStream(srcDirectory).use { sourceSetDirectories ->
-            sourceSetDirectories
-                .asSequence()
-                .filter(Files::isDirectory)
-                .flatMap { sourceSetDirectory ->
-                    Files.newDirectoryStream(sourceSetDirectory).use { sourceTypeDirectories ->
-                        sourceTypeDirectories
-                            .asSequence()
-                            .filter(Files::isDirectory)
-                            .map(projectRoot::relativize)
-                            .filter(sourceRootMatcher)
-                            .map(Path::toString)
-                            .toList()
-                            .asSequence()
-                    }
-                }
-                .sorted()
-                .toList()
-        }
+        return srcDirectory
+            .listDirectoryEntries()
+            .filter { sourceSetDirectory -> sourceSetDirectory.isDirectory() }
+            .flatMap { sourceSetDirectory ->
+                sourceSetDirectory
+                    .listDirectoryEntries()
+                    .filter { sourceTypeDirectory -> sourceTypeDirectory.isDirectory() }
+                    .map(projectRoot::relativize)
+                    .filter(sourceRootMatcher)
+                    .map(Path::toString)
+            }
+            .sorted()
     }
 
+    @OptIn(ExperimentalPathApi::class)
     private fun findModuleSourceMarkers(projectRoot: Path, sourceRootMatcher: (Path) -> Boolean): List<String> {
         val matchedMarkers = mutableListOf<String>()
-        Files.walkFileTree(
-            projectRoot,
-            emptySet(),
-            MODULE_SOURCE_SEARCH_DEPTH,
-            object : SimpleFileVisitor<Path>() {
-                override fun preVisitDirectory(directory: Path, attributes: BasicFileAttributes): FileVisitResult {
-                    if (directory == projectRoot) {
-                        return FileVisitResult.CONTINUE
-                    }
-
+        projectRoot.visitFileTree(maxDepth = MODULE_SOURCE_SEARCH_DEPTH) {
+            onPreVisitDirectory { directory, _ ->
+                if (directory == projectRoot) {
+                    FileVisitResult.CONTINUE
+                } else {
                     val relativeDirectory = projectRoot.relativize(directory)
-                    return if (isIgnoredNestedScanRootDirectory(relativeDirectory)) {
+                    if (isIgnoredNestedScanRootDirectory(relativeDirectory)) {
                         FileVisitResult.SKIP_SUBTREE
                     } else if (isRootSourceMarker(relativeDirectory, sourceRootMatcher)) {
                         FileVisitResult.SKIP_SUBTREE
@@ -95,14 +85,10 @@ internal object JvmOnboardingMarkerFinder {
                         FileVisitResult.CONTINUE
                     }
                 }
-
-                override fun visitFileFailed(file: Path, exception: IOException): FileVisitResult =
-                    FileVisitResult.CONTINUE
-
-                override fun postVisitDirectory(directory: Path, exception: IOException?): FileVisitResult =
-                    FileVisitResult.CONTINUE
-            },
-        )
+            }
+            onVisitFileFailed { _, _ -> FileVisitResult.CONTINUE }
+            onPostVisitDirectory { _, _ -> FileVisitResult.CONTINUE }
+        }
         return matchedMarkers.sorted()
     }
 

@@ -5,8 +5,9 @@ import io.github.lmliam.microsmith.cli.plugins.cache.cachePathFor
 import io.github.lmliam.microsmith.cli.plugins.cache.pluginArtifactCacheRoot
 import io.github.lmliam.microsmith.cli.plugins.diagnostics.PluginResolutionDiagnosticException
 import io.github.lmliam.microsmith.cli.plugins.repository.RepositoryEndpoint
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
 import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.supplier.RepositorySystemSupplier
 
@@ -23,7 +24,7 @@ internal class MavenRemotePluginResolver(
         cacheDirectory: Path,
         offline: Boolean,
     ): ResolvedRemotePlugin {
-        val localRepositoryRoot = pluginArtifactCacheRoot(cacheDirectory).also { root -> Files.createDirectories(root) }
+        val localRepositoryRoot = pluginArtifactCacheRoot(cacheDirectory).also { root -> root.createDirectories() }
         val expectedRootArtifactPath = cachePathFor(localRepositoryRoot, coordinate)
         ensureOfflineRootAvailability(
             coordinate = coordinate,
@@ -58,7 +59,7 @@ internal class MavenRemotePluginResolver(
         expectedRootArtifactPath: Path,
         offline: Boolean,
     ) {
-        if (!offline || Files.exists(expectedRootArtifactPath)) {
+        if (!offline || expectedRootArtifactPath.exists()) {
             return
         }
 

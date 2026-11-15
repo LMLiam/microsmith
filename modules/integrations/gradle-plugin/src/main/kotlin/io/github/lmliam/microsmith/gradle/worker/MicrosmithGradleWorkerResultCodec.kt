@@ -4,9 +4,11 @@ import io.github.lmliam.microsmith.gradle.configuration.missingProperty
 import io.github.lmliam.microsmith.gradle.configuration.readValues
 import io.github.lmliam.microsmith.gradle.configuration.requiredBoolean
 import io.github.lmliam.microsmith.gradle.configuration.requiredLong
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Properties
+import kotlin.io.path.createDirectories
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 
 internal class MicrosmithGradleWorkerResultCodec {
     fun write(path: Path, result: MicrosmithGradleWorkerResult) {
@@ -15,13 +17,13 @@ internal class MicrosmithGradleWorkerResultCodec {
                 is MicrosmithGradleWorkerSuccess -> successProperties(result)
                 is MicrosmithGradleWorkerFailure -> failureProperties(result)
             }
-        path.parent?.let(Files::createDirectories)
-        Files.newOutputStream(path).use { output -> properties.store(output, null) }
+        path.parent?.let(Path::createDirectories)
+        path.outputStream().use { output -> properties.store(output, null) }
     }
 
     fun read(path: Path): MicrosmithGradleWorkerResult {
         val properties = Properties()
-        Files.newInputStream(path).use { input -> properties.load(input) }
+        path.inputStream().use { input -> properties.load(input) }
         return when (properties.getProperty(RESULT_STATUS)?.trim()) {
             RESULT_STATUS_SUCCESS ->
                 MicrosmithGradleWorkerSuccess(

@@ -5,8 +5,9 @@ import io.github.lmliam.microsmith.cli.plugins.REMOTE_ARTIFACT_KIND
 import io.github.lmliam.microsmith.cli.plugins.diagnostics.PluginResolutionDiagnosticException
 import io.github.lmliam.microsmith.cli.plugins.lockfile.LockEntry
 import io.github.lmliam.microsmith.cli.plugins.lockfile.ParsedLockfile
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
 
 /** Offline resolution requires a complete graph lock and matching cached jars and descriptors. */
 internal class OfflinePluginCacheReadinessChecker {
@@ -21,7 +22,7 @@ internal class OfflinePluginCacheReadinessChecker {
             .mapNotNull { (key, path) ->
                 when {
                     !path.startsWith(cacheRoot) -> key
-                    !Files.exists(path) || !Files.isRegularFile(path) -> key
+                    !path.exists() || !path.isRegularFile() -> key
                     else -> null
                 }
             }

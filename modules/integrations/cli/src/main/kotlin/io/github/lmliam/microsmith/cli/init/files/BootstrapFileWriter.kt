@@ -2,17 +2,20 @@ package io.github.lmliam.microsmith.cli.init.files
 
 import io.github.lmliam.microsmith.cli.init.InitConflictException
 import java.io.IOException
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readBytes
+import kotlin.io.path.writeText
 
 internal class BootstrapFileWriter {
     fun write(path: Path, content: String, force: Boolean): BootstrapFileWriteResult =
         when {
-            managedPathExists(path) && Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) -> {
+            managedPathExists(path) && path.isRegularFile(LinkOption.NOFOLLOW_LINKS) -> {
                 if (force && managedFileContentDiffers(path, content)) {
-                    Files.writeString(path, content, StandardCharsets.UTF_8)
+                    path.writeText(content)
                     BootstrapFileWriteResult.Overwritten(path)
                 } else {
                     BootstrapFileWriteResult.Preserved(path)
@@ -23,15 +26,15 @@ internal class BootstrapFileWriter {
                 throw InitConflictException("Bootstrap path '$path' exists but is not a regular file.")
 
             else -> {
-                Files.createDirectories(path.parent)
-                Files.writeString(path, content, StandardCharsets.UTF_8)
+                path.parent.createDirectories()
+                path.writeText(content)
                 BootstrapFileWriteResult.Created(path)
             }
         }
 
     private fun managedFileContentDiffers(path: Path, expectedContent: String): Boolean =
         try {
-            val existingContent = Files.readString(path, StandardCharsets.UTF_8)
+            val existingContent = path.readBytes().decodeToString(throwOnInvalidSequence = true)
             existingContent.normalizeLineEndings() != expectedContent.normalizeLineEndings()
         } catch (_: IOException) {
             true
@@ -40,6 +43,6 @@ internal class BootstrapFileWriter {
         }
 }
 
-private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
+private fun managedPathExists(path: Path): Boolean = path.exists(LinkOption.NOFOLLOW_LINKS)
 
 private fun String.normalizeLineEndings(): String = replace("\r\n", "\n")

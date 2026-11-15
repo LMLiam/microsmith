@@ -5,17 +5,20 @@ import io.github.lmliam.microsmith.cli.plugins.LOCKFILE_VERSION
 import io.github.lmliam.microsmith.cli.plugins.REMOTE_ARTIFACT_KIND
 import io.github.lmliam.microsmith.cli.plugins.REMOTE_KIND
 import io.github.lmliam.microsmith.cli.plugins.integrity.isSha256
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.readLines
+import kotlin.io.path.writeLines
 
 private const val LOCKFILE_ENTRY_PARTS = 3
 
 internal fun readLockfile(lockfilePath: Path): ParsedLockfile? {
-    if (!Files.exists(lockfilePath)) {
+    if (!lockfilePath.exists()) {
         return null
     }
 
-    val nonBlankLines = Files.readAllLines(lockfilePath).map(String::trim).filter(String::isNotEmpty)
+    val nonBlankLines = lockfilePath.readLines().map(String::trim).filter(String::isNotEmpty)
     require(nonBlankLines.isNotEmpty()) { "Plugin lockfile '$lockfilePath' is empty." }
 
     val versionLine = nonBlankLines.first()
@@ -90,8 +93,8 @@ internal fun writeLockfile(lockfilePath: Path, lockfile: ParsedLockfile) {
         }
     }
 
-    lockfilePath.parent?.let(Files::createDirectories)
-    Files.write(lockfilePath, lines)
+    lockfilePath.parent?.let(Path::createDirectories)
+    lockfilePath.writeLines(lines)
 }
 
 private fun parseLockEntry(line: String): LockEntry {

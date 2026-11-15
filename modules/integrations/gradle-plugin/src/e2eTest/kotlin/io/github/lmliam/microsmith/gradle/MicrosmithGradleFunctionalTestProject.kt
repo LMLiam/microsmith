@@ -1,7 +1,9 @@
 package io.github.lmliam.microsmith.gradle
 
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 
@@ -10,9 +12,9 @@ internal class MicrosmithGradleFunctionalTestProject private constructor(private
         val file = rootDirectory.resolve(relativePath)
         val parent = file.parent
         if (parent != null) {
-            Files.createDirectories(parent)
+            parent.createDirectories()
         }
-        Files.writeString(file, "$contents\n")
+        file.writeText("$contents\n")
     }
 
     fun build(vararg arguments: String): BuildResult = gradleRunner(*arguments).build()
@@ -29,7 +31,7 @@ internal class MicrosmithGradleFunctionalTestProject private constructor(private
 
     companion object {
         fun create(name: String, buildScript: String): MicrosmithGradleFunctionalTestProject {
-            val directory = Files.createTempDirectory(name)
+            val directory = createTempDirectory(name)
             val project = MicrosmithGradleFunctionalTestProject(directory)
             project.writeFile("settings.gradle.kts", "rootProject.name = \"$name\"")
             project.writeFile(

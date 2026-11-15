@@ -1,8 +1,10 @@
 package io.github.lmliam.microsmith.cli.plugins.repository
 
 import java.net.URI
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readLines
 
 internal const val REPOSITORY_CREDENTIALS_FILE_ENV = "MICROSMITH_REPOSITORY_CREDENTIALS_FILE"
 internal const val REPOSITORY_USERNAME_ENV = "MICROSMITH_REPOSITORY_USERNAME"
@@ -81,12 +83,12 @@ internal fun defaultRepositoryCredentialsResolver(
 }
 
 private fun readRepositoryCredentialsFile(credentialsFilePath: Path): Map<String, RepositoryCredentials> {
-    require(Files.exists(credentialsFilePath) && Files.isRegularFile(credentialsFilePath)) {
+    require(credentialsFilePath.exists() && credentialsFilePath.isRegularFile()) {
         "Repository credentials file '$credentialsFilePath' does not exist or is not a regular file."
     }
 
     val credentialsByRepository = linkedMapOf<String, RepositoryCredentials>()
-    for ((lineIndex, rawLine) in Files.readAllLines(credentialsFilePath).withIndex()) {
+    for ((lineIndex, rawLine) in credentialsFilePath.readLines().withIndex()) {
         val lineNumber = lineIndex + 1
         val line = rawLine.trim()
         if (line.isEmpty() || line.startsWith("#")) {

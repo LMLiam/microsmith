@@ -1,7 +1,8 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
 
 internal class JvmProcessIsolationWorkerLauncher(
     private val resultCodec: ProcessIsolationResultCodec = ProcessIsolationResultCodec(),
@@ -37,7 +38,7 @@ internal class JvmProcessIsolationWorkerLauncher(
         val javaHome = Path.of(System.getProperty("java.home"))
         val executableName = if (isWindows()) "java.exe" else "java"
         val executable = javaHome.resolve("bin").resolve(executableName)
-        require(Files.exists(executable) && Files.isRegularFile(executable)) {
+        require(executable.exists() && executable.isRegularFile()) {
             "Could not locate Java executable at '$executable' for process isolation mode."
         }
         return executable

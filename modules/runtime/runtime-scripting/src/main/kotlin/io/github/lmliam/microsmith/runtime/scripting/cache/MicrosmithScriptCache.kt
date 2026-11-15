@@ -1,10 +1,13 @@
 package io.github.lmliam.microsmith.runtime.scripting.cache
 
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import kotlin.io.encoding.Base64
+import kotlin.io.path.createTempFile
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.moveTo
+import kotlin.io.path.writeLines
 import kotlin.script.experimental.api.CompiledScript
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.SourceCode
@@ -68,15 +71,12 @@ internal class MicrosmithScriptCache(
         .getOrNull()
 
     private fun writeWarnings(file: File, warnings: List<String>) {
-        val temporary = Files.createTempFile(file.parentFile.toPath(), file.name, ".tmp")
+        val temporary = createTempFile(file.parentFile.toPath(), file.name, ".tmp")
         try {
-            Files.write(
-                temporary,
-                warnings.map { warning -> Base64.encode(warning.encodeToByteArray()) },
-            )
-            Files.move(temporary, file.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
+            temporary.writeLines(warnings.map { warning -> Base64.encode(warning.encodeToByteArray()) })
+            temporary.moveTo(file.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
         } finally {
-            Files.deleteIfExists(temporary)
+            temporary.deleteIfExists()
         }
     }
 }

@@ -2,8 +2,9 @@ package io.github.lmliam.microsmith.cli.plugins.remote
 
 import io.github.lmliam.microsmith.cli.plugins.PluginResolverErrorCategory
 import io.github.lmliam.microsmith.cli.plugins.diagnostics.PluginResolutionDiagnosticException
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
 import org.eclipse.aether.artifact.Artifact
 import org.eclipse.aether.resolution.ArtifactResult
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator
@@ -57,7 +58,7 @@ internal class ResolvedRemotePluginFactory {
         expectedRootArtifactPath: Path,
         artifactResults: List<ArtifactResult>,
     ): Path =
-        expectedRootArtifactPath.takeIf(Files::exists)
+        expectedRootArtifactPath.takeIf(Path::exists)
             ?: artifactResults
                 .asSequence()
                 .mapNotNull { result -> result.artifact }
@@ -84,7 +85,7 @@ internal class ResolvedRemotePluginFactory {
                 .asSequence()
                 .mapNotNull { result -> result.artifact?.file?.toPath() }
                 .map { path -> path.toAbsolutePath().normalize() }
-                .filter(Files::exists)
+                .filter(Path::exists)
                 .toList()
         val resolvedDescriptorArtifacts =
             artifactResults
@@ -126,8 +127,8 @@ internal class ResolvedRemotePluginFactory {
                 .toAbsolutePath()
                 .normalize()
         val candidates = listOfNotNull(fromArtifactFile, fromArtifactCoordinates).distinct()
-        val resolvedPath = candidates.firstOrNull(Files::exists) ?: candidates.first()
-        require(Files.exists(resolvedPath) && Files.isRegularFile(resolvedPath)) {
+        val resolvedPath = candidates.firstOrNull(Path::exists) ?: candidates.first()
+        require(resolvedPath.exists() && resolvedPath.isRegularFile()) {
             "Dependency descriptor for '${artifact.groupId}:${artifact.artifactId}:${artifact.version}' " +
                 "is missing from cache at '$resolvedPath'."
         }

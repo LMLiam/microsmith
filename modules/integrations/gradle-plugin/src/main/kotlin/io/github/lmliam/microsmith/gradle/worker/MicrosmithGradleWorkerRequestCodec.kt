@@ -3,9 +3,11 @@ package io.github.lmliam.microsmith.gradle.worker
 import io.github.lmliam.microsmith.gradle.configuration.readPairs
 import io.github.lmliam.microsmith.gradle.configuration.readValues
 import io.github.lmliam.microsmith.gradle.configuration.requiredPath
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Properties
+import kotlin.io.path.createDirectories
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 
 internal class MicrosmithGradleWorkerRequestCodec {
     fun write(path: Path, request: MicrosmithGradleWorkerRequest) {
@@ -26,13 +28,13 @@ internal class MicrosmithGradleWorkerRequestCodec {
             }
         properties[FLAG_COUNT] = request.flags.size.toString()
         request.flags.sorted().forEachIndexed { index, flag -> properties["$FLAG_PREFIX$index"] = flag }
-        path.parent?.let(Files::createDirectories)
-        Files.newOutputStream(path).use { output -> properties.store(output, null) }
+        path.parent?.let(Path::createDirectories)
+        path.outputStream().use { output -> properties.store(output, null) }
     }
 
     fun read(path: Path): MicrosmithGradleWorkerRequest {
         val properties = Properties()
-        Files.newInputStream(path).use { input -> properties.load(input) }
+        path.inputStream().use { input -> properties.load(input) }
         return MicrosmithGradleWorkerRequest(
             scriptPath = properties.requiredPath(SCRIPT_PATH),
             outputPath = properties.requiredPath(OUTPUT_PATH),
