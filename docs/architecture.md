@@ -90,6 +90,11 @@ flowchart LR
         G[gen]
     end
 
+    subgraph PluginStage[6. plugin modules]
+        PSP[plugin-schemas-protobuf]
+        PSPR[plugin-schemas-protobuf-rpc]
+    end
+
     subgraph ExecutionStage[Execution surfaces]
         RT[runtime-scripting]
         CLI[cli]
@@ -139,13 +144,18 @@ flowchart LR
     CVDA --> G
     CVDP --> G
 
+    CSP --> PSP
+    CSPR --> PSPR
+
     G --> RT
+    PSP --> RT
+    PSPR --> RT
     CLI --> RT
     GP --> RT
     MP --> RT
 ```
 
-`runtime-scripting` and `cli` currently bundle the schema and protobuf provider stack from resolver, artifact, compiler, and renderer provider modules.
+`runtime-scripting` and `cli` currently bundle the schema and protobuf provider stack from resolver, artifact, compiler, and renderer provider modules, and the `plugin-schemas-protobuf*` plugin modules that register the protobuf families.
 
 ### Provider responsibilities
 
@@ -200,6 +210,8 @@ This keeps the layering explicit:
 - `compile-services-dotnet-asp`: ASP.NET project and source-file compilation from normalized REST models
 - `compile-services-dotnet-packages`: .NET package artifact compilation into file artifacts
 - `plugin-api`: the plugin entry contracts `MicrosmithPlugin`, `HostServices` and `PluginServices`, which plugins compile against instead of `gen`
+- `plugin-schemas-protobuf`: the built-in `MicrosmithPlugin` for the protobuf schema family
+- `plugin-schemas-protobuf-rpc`: the built-in `MicrosmithPlugin` for the protobuf RPC family
 - `gen`: final file rendering, output routing, and generation orchestration
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution and built-in provider loading
 - `cli`: command-line entrypoint, diagnostics, installer packaging, IDE helper support, and built-in provider validation
@@ -213,6 +225,7 @@ This keeps the layering explicit:
 - `artifact-*` modules own logical artifacts and artifact contributions. They define what exists before rendering, how same-artifact contributions merge, and where conflicts are rejected.
 - `compile` owns the shared artifact-compilation contracts and recursive compilation loop. `compile-schemas` and `compile-services` own domain-root compile contracts, while feature compile modules own concrete artifact-to-artifact transformations.
 - `gen` owns final rendering, output routing, and shared generation orchestration.
+- `plugin-*` modules own the built-in `MicrosmithPlugin` of a family and wire its services with an internal Metro graph. Pipeline modules must not depend on them, and they must not depend on `gen`.
 - `dsl-schemas*`, `resolve-schemas*`, `artifact-schemas*`, `compile-schemas*`, and `gen` form the current schema-domain generation path. Keep protobuf-specific behavior in the protobuf-specific modules rather than bloating the generic schema layers.
 - `dsl-services*`, `resolve-services*`, `artifact-services*`, `compile-services*`, and `gen` form the current service-domain generation path. Keep .NET, ASP.NET, and package-management behavior in the feature-specific service modules rather than bloating the generic service layers.
 - `runtime-scripting` is the scripting host and execution boundary. It may depend on DSL and generation layers, but it must not absorb CLI parsing, onboarding, or distribution concerns.
@@ -224,7 +237,7 @@ This keeps the layering explicit:
 
 - `modules/`: production Gradle subprojects, grouped by capability:
   - `engine/`: the pipeline stages `dsl`, `resolve`, `artifact`, `compile`, and `gen`, and the `plugin-api` contracts
-  - `schemas/`: schema targets under `base/`, `protobuf/`, and `protobuf-rpc/`
+  - `schemas/`: schema targets under `base/`, `protobuf/`, and `protobuf-rpc/`, where each protobuf family also holds its `plugin-*` module
   - `services/`: service targets under `base/`, `dotnet/`, `dotnet-asp/`, and `dotnet-packages/`
   - `runtime/`: the scripting host and its API
   - `integrations/`: `cli`, `gradle-plugin`, and `maven-plugin`
