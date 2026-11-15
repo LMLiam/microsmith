@@ -5,7 +5,7 @@ import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDeclarationSite
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDefinition
 
-class TopicContributor : ScriptSymbolContributor {
+open class TopicContributor : ScriptSymbolContributor {
     override val id = "thirdparty.topics"
 
     override val declarationCallNames = setOf("fixtureTopic")

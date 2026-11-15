@@ -749,7 +749,7 @@ Do not use a factory for a value. `DirectorySpace.from(path)` builds a value but
 | Unit | May inject an in-memory file system (Jimfs) through the injected `FileSystem`. | Injected fakes, such as `TestTimeSource`. |
 | Integration and end-to-end | Real temporary directories, to catch real permissions, symbolic links and OS paths. For example, `GeneratedOutputPathResolver`'s symbolic-link checks need a real file system. | Real, unless the test is about them. |
 
-Tests use a plugin's real graph or hand-wired real collaborators. They do not use a test container. Tests of `suspend` code use `runTest` with a test dispatcher bound in place of the host's dispatcher (see [Coroutines and `suspend`](#coroutines-and-suspend)). The acceptance tests that slice 0 adds are listed under [Acceptance tests for slice 0](#acceptance-tests-for-slice-0).
+Tests use a plugin's real graph or hand-wired real collaborators. They do not use a test container. Tests of `suspend` code use `runTest` with a test dispatcher bound in place of the host's dispatcher (see [Coroutines and `suspend`](#coroutines-and-suspend)). The acceptance tests that slice 0 adds are listed under [Acceptance tests for slice 0](#acceptance-tests-for-slice-0), and those of the script host slice under [Acceptance tests for the script host slice](#acceptance-tests-for-the-script-host-slice).
 
 Changes to `AGENTS.md`:
 
@@ -1065,7 +1065,7 @@ What each slice adds beyond injection and visibility:
 | # | Added work |
 |---|---|
 | 0 | Plugin `id`, sort by id, duplicate and conflict errors that name both plugin ids, and the failure rules. `PluginServices` as `AutoCloseable`, and the generation-run lifecycle. The per-plugin `HostServices` view with its tagged `DiagnosticSink`. The file-system-independent path type and the moves of `ArtifactRenderer` and `GeneratedFile`. `kotlin.time.Clock`. The `suspend` `ProcessLauncher` interface and the dispatcher as a host binding. The `suspend` generation API with parallel file writing, and parallel rendering, which exercises the plugin concurrency rule. The [acceptance tests](#acceptance-tests-for-slice-0). |
-| 4 | `MicrosmithScriptingPlugin` and the script run graph. The `ScriptingHostConfiguration` key for the symbol registry. The `suspend` `MicrosmithScriptHost.run` chain, the cancellable bridge and `TimeSource` in `ScriptEvaluator`. The script body on a dedicated thread that ends with the script run. After the script run, interrupting any thread whose context class loader descends from the plugin class loader, and a warning diagnostic that names the plugin class path for one that does not stop. Land #204 before this slice. |
+| 4 | `MicrosmithScriptingPlugin` and the script run graph. The `ScriptingHostConfiguration` key for the symbol registry. The `suspend` `MicrosmithScriptHost.run` chain, the cancellable bridge and `TimeSource` in `ScriptEvaluator`. The script body on a dedicated thread that ends with the script run. After the script run, interrupting any thread whose context class loader descends from the plugin class loader, and a warning diagnostic that names the plugin class path for one that does not stop, and its [acceptance tests](#acceptance-tests-for-the-script-host-slice). Land #204 before this slice. |
 | 5 | One `runBlocking` in each composition root. `ProcessLauncher` implementations that cancel and destroy processes. Thread-safe `Console` and diagnostic emitters. The rewrite of `docs/plugin-development.md`, which documents how a Metro plugin relocates its runtime. Land #205 with this slice. |
 
 - Until slice 5, the host discovers both the old `ServiceLoader` contracts and `MicrosmithPlugin`, so built-in families can move one at a time. Slice 5 removes the old contracts before 4.0 ships.
@@ -1184,14 +1184,23 @@ Slice 0 automates these scenarios as integration tests. Each one composes severa
 | Duplicate plugin id | The generation run fails before the pipeline starts, and the error names the id. |
 | A plugin whose `services` throws | One failing plugin fails the whole generation run, with a diagnostic that names it. No partial loading. |
 | Two concurrent `generate` calls in one JVM | App-scoped seams are thread-safe. Diagnostics and progress do not leak between runs. |
-| Repeated script runs with different plugin class paths | Run B never sees a class or instance from run A, and the thread context class loader is restored after each run. |
-| Plugin class loader collectability | The plugin class loader, a plugin class and a plugin instance are collected after a script run. The test captures weak references inside the run, drops every strong reference, and calls `System.gc()` in a bounded loop until each one clears. A negative control must keep the loader reachable. It is a plugin that leaves a thread running that ignores interruption, because a thread local no longer pins the loader once the script runs on its own thread. The host reports a warning that names the plugin class path. The test cannot run under `-XX:+DisableExplicitGC`. |
 | The pipeline fails midway | Every plugin's `PluginServices` is still closed, in reverse order. |
 | Shuffled discovery order | Output is byte-identical whatever the `ServiceLoader` order. |
 | Parallel rendering with a plugin that holds no state | The host calls one plugin's services concurrently within a generation run, and the output is byte-identical to a sequential run. |
 | A Metro-using plugin built against another Metro version | Not tested. The [relocation spike](#spike-relocated-metro-runtime) verified the [Metro policy](#metro-across-the-plugin-boundary), and [Plugin development](../plugin-development.md) tells authors to relocate. The host's part, reporting a `LinkageError` as an incompatible plugin, is covered by the `linkage` fixture. |
 
-All of these are ordinary tests, written with the foundation slice. Nothing needs a spike first. The [relocation spike](#spike-relocated-metro-runtime) and the [collectability spike](#spike-class-loader-collectability) set the expected result of the class loader row, and the Metro row is verified by the relocation spike alone.
+All of these are ordinary tests, written with the foundation slice. Nothing needs a spike first. The Metro row is verified by the [relocation spike](#spike-relocated-metro-runtime) alone.
+
+### Acceptance tests for the script host slice
+
+The script host slice (slice 4) automates these scenarios as integration tests in `runtime-scripting`. Each one runs a script through the script host, with built plugin jars on the plugin class path.
+
+| Scenario | What it protects |
+|---|---|
+| Repeated script runs with different plugin class paths | Run B never sees a class or instance from run A, and the thread context class loader is restored after each run. |
+| Plugin class loader collectability | The plugin class loader, a plugin class and a plugin instance are collected after a script run. The test captures weak references inside the run, drops every strong reference, and calls `System.gc()` in a bounded loop until each one clears. A negative control must keep the loader reachable. It is a plugin that leaves a thread running that ignores interruption, because a thread local no longer pins the loader once the script runs on its own thread. The host reports a warning that names the plugin class path. The test cannot run under `-XX:+DisableExplicitGC`. |
+
+The [collectability spike](#spike-class-loader-collectability) sets the expected result of both rows.
 
 ## Settled questions
 

@@ -9,8 +9,10 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.job
+import kotlinx.coroutines.withContext
 
 @Inject
 internal class ScriptRunExecutor(
@@ -27,7 +29,17 @@ internal class ScriptRunExecutor(
 
     private suspend fun executeInClassLoader(request: ScriptRunRequest): ScriptRunResult = runCatching {
         val runGraph = runGraphFactory.create(request, currentCoroutineContext().job)
-        runGraph.classLoader.use { runGraph.run.execute() }
+        try {
+            runGraph.run.execute()
+        } finally {
+            withContext(NonCancellable) {
+                try {
+                    runGraph.classLoader.close()
+                } finally {
+                    runGraph.leftoverPluginThreads.stop()
+                }
+            }
+        }
     }
         .getOrElse { exception ->
             if (exception is CancellationException) throw exception

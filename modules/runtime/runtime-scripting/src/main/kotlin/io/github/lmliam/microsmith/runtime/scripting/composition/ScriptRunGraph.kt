@@ -4,6 +4,7 @@ import dev.zacsweers.metro.GraphExtension
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
+import io.github.lmliam.microsmith.runtime.scripting.host.execution.LeftoverPluginThreads
 import io.github.lmliam.microsmith.runtime.scripting.host.execution.ScriptGenerationBridge
 import io.github.lmliam.microsmith.runtime.scripting.host.execution.ScriptRun
 import io.github.lmliam.microsmith.runtime.scripting.host.execution.ScriptRunClassLoader
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Job
 internal interface ScriptRunGraph {
     val classLoader: ScriptRunClassLoader
     val run: ScriptRun
+    val leftoverPluginThreads: LeftoverPluginThreads
 
     @GraphExtension.Factory
     fun interface Factory {

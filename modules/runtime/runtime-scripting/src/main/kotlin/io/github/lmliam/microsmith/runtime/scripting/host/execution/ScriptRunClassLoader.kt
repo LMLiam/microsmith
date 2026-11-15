@@ -11,7 +11,7 @@ import java.net.URLClassLoader
 @SingleIn(ScriptRunScope::class)
 internal class ScriptRunClassLoader(request: ScriptRunRequest) : AutoCloseable {
     private val hostLoader: ClassLoader = MicrosmithScript::class.java.classLoader
-    private val pluginLoader: URLClassLoader? =
+    val pluginLoader: URLClassLoader? =
         request.pluginClasspath
             .takeIf { it.isNotEmpty() }
             ?.let { classpath -> URLClassLoader(classpath.map { it.toUri().toURL() }.toTypedArray(), hostLoader) }
