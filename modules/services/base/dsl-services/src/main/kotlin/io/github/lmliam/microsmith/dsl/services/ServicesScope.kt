@@ -9,6 +9,6 @@ import io.github.lmliam.microsmith.dsl.MicrosmithDsl
  * named service declarations.
  */
 @MicrosmithDsl
-interface ServicesScope {
-    operator fun String.invoke(block: ServiceScope.() -> Unit = {})
+public interface ServicesScope {
+    public operator fun String.invoke(block: ServiceScope.() -> Unit = {})
 }
