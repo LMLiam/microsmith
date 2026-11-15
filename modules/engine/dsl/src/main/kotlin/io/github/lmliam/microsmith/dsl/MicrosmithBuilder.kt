@@ -12,12 +12,12 @@ import kotlin.reflect.KClass
  * The builder maintains a mutable reference to the current model, but the model itself is immutable. Each [put] call
  * produces a new [MicrosmithModel].
  */
-class MicrosmithBuilder : MicrosmithScope {
+public class MicrosmithBuilder : MicrosmithScope {
     /** The current immutable model snapshot being built. */
-    var model = MicrosmithModel.empty()
+    public var model: MicrosmithModel = MicrosmithModel.empty()
         private set
 
-    fun <T : MicrosmithExtension> put(type: KClass<T>, ext: T) {
+    public fun <T : MicrosmithExtension> put(type: KClass<T>, ext: T) {
         model = model.with(type, ext)
     }
 }

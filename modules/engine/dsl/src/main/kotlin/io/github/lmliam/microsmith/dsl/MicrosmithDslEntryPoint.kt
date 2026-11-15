@@ -5,4 +5,4 @@ package io.github.lmliam.microsmith.dsl
  *
  * Returns the immutable [MicrosmithModel] built from the DSL.
  */
-fun microsmith(block: MicrosmithScope.() -> Unit) = MicrosmithBuilder().apply(block).model
+public fun microsmith(block: MicrosmithScope.() -> Unit): MicrosmithModel = MicrosmithBuilder().apply(block).model

@@ -6,6 +6,6 @@ package io.github.lmliam.microsmith.dsl
  * This is used for additive DSL blocks where later declarations should extend earlier ones instead of silently
  * replacing them.
  */
-interface MergeableExtension<T : ModelExtension> : ModelExtension {
-    fun merge(other: T): T
+public interface MergeableExtension<T : ModelExtension> : ModelExtension {
+    public fun merge(other: T): T
 }
