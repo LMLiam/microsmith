@@ -10,13 +10,10 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.isRegularFile
-import kotlin.io.path.readBytes
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -46,10 +43,8 @@ suspend fun generateWithPlugins(
     diagnostics: DiagnosticSink = RecordingDiagnosticSink(),
     output: Path = newOutputDirectory(),
     parent: ClassLoader = PluginFixtures::class.java.classLoader,
-    dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ): Path {
-    testGenerator(diagnostics, dispatcher)
-        .generateTo(fixtureModel(), output, PluginFixtures.classLoader(*plugins, parent = parent))
+    testGenerator(diagnostics).generateTo(fixtureModel(), output, PluginFixtures.classLoader(*plugins, parent = parent))
 
     return output
 }
@@ -107,13 +102,6 @@ suspend fun runCancelled(vararg plugins: String, trigger: CancelTrigger): Cancel
 
     return CancelledRun(temporaryRoot, diagnostics)
 }
-
-@OptIn(ExperimentalPathApi::class)
-fun generatedBytes(directory: Path): Map<String, List<Byte>> =
-    directory
-        .walk()
-        .filter { it.isRegularFile() }
-        .associate { it.relativeTo(directory).toString() to it.readBytes().toList() }
 
 @OptIn(ExperimentalPathApi::class)
 fun generatedTexts(directory: Path): Map<String, String> =
