@@ -161,7 +161,7 @@ flowchart LR
     MP --> RT
 ```
 
-`runtime-scripting` and `cli` currently bundle the schema and protobuf provider stack from resolver, artifact, compiler, and renderer provider modules, and the `plugin-schemas-protobuf*` and `plugin-services-dotnet*` plugin modules that register the protobuf, .NET and .NET packages families.
+`runtime-scripting` and `cli` currently bundle the schema, protobuf and .NET provider stacks from resolver, artifact, compiler, and renderer provider modules, and the `plugin-schemas-protobuf*` and `plugin-services-dotnet*` plugin modules that register the protobuf, .NET and .NET packages families.
 
 ### Provider responsibilities
 
@@ -246,7 +246,7 @@ This keeps the layering explicit:
 - `modules/`: production Gradle subprojects, grouped by capability:
   - `engine/`: the pipeline stages `dsl`, `resolve`, `artifact`, `compile`, and `gen`, and the `plugin-api` contracts
   - `schemas/`: schema targets under `base/`, `protobuf/`, and `protobuf-rpc/`, where each protobuf family also holds its `plugin-*` module
-  - `services/`: service targets under `base/`, `dotnet/`, `dotnet-asp/`, and `dotnet-packages/`
+  - `services/`: service targets under `base/`, `dotnet/`, `dotnet-asp/`, and `dotnet-packages/`, where `dotnet/` and `dotnet-packages/` also hold their `plugin-*` modules
   - `runtime/`: the scripting host and its API
   - `integrations/`: `cli`, `gradle-plugin`, and `maven-plugin`
 - `build-logic/`: included Gradle build that provides the task types for CLI packaging, release archives, and runtime scripting artefacts. The owning modules register these tasks.
