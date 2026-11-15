@@ -6,8 +6,8 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 
@@ -15,14 +15,12 @@ class SystemProcessLauncher(private val ioDispatcher: CoroutineDispatcher) : Pro
     override suspend fun run(command: List<String>): ProcessResult =
         withContext(ioDispatcher) {
             val process = ProcessBuilder(command).redirectErrorStream(true).start()
-            coroutineScope {
-                val output = async { process.inputStream.readBytes().decodeToString() }
-                try {
-                    ProcessResult(runInterruptible { process.waitFor() }, output.await())
-                } finally {
-                    process.destroyWithDescendants()
-                    process.inputStream.close()
-                }
+            val output = CoroutineScope(ioDispatcher).async { process.inputStream.readBytes().decodeToString() }
+            try {
+                ProcessResult(runInterruptible { process.waitFor() }, output.await())
+            } finally {
+                process.destroyWithDescendants()
+                process.inputStream.close()
             }
         }
 
