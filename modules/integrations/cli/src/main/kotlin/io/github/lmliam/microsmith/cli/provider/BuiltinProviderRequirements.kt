@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.cli.provider
 
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
@@ -9,6 +8,7 @@ import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
 import io.github.lmliam.microsmith.plugin.schemas.protobuf.ProtobufPlugin
 import io.github.lmliam.microsmith.plugin.schemas.protobuf.rpc.ProtobufRpcPlugin
+import io.github.lmliam.microsmith.plugin.services.dotnet.DotnetPlugin
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspace
 import kotlin.reflect.KClass
@@ -18,7 +18,8 @@ internal fun missingBuiltinProviderMessages(pluginCatalog: MicrosmithPluginCatal
         requirement.missingMessage(pluginCatalog)
     }
 
-internal val builtinPluginIds: List<String> = listOf(ProtobufPlugin(), ProtobufRpcPlugin()).map { it.id }
+internal val builtinPluginIds: List<String> =
+    listOf(DotnetPlugin(), ProtobufPlugin(), ProtobufRpcPlugin()).map { it.id }
 
 internal fun missingBuiltinPluginMessages(pluginIds: Set<String>, requiredPluginIds: List<String>): List<String> =
     requiredPluginIds.filterNot(pluginIds::contains).map {
@@ -34,11 +35,9 @@ private val builtinProviderRequirements =
         artifactAssemblerRequirement(DotnetAspServiceArtifact::class),
         artifactAssemblerRequirement(DotnetPackageVersionsArtifact::class),
         artifactAssemblerRequirement(DotnetPackageReferencesArtifact::class),
-        artifactAssemblerRequirement(MsBuildProjectArtifact::class),
         artifactCompilerRequirement(DotnetAspServiceArtifact::class),
         artifactCompilerRequirement(DotnetPackageVersionsArtifact::class),
         artifactCompilerRequirement(DotnetPackageReferencesArtifact::class),
-        artifactCompilerRequirement(MsBuildProjectArtifact::class),
     )
 
 private data class BuiltinProviderRequirement(

@@ -12,6 +12,7 @@ dependencies {
     testImplementation project(":dsl-services-dotnet-packages")
     testImplementation project(":compile-services-dotnet-packages")
     testImplementation project(":resolve-services-dotnet")
+    testRuntimeOnly project(":plugin-services-dotnet")
     testImplementation libs.jimfs
     testImplementation libs.coroutines.test
     api libs.coroutines.core

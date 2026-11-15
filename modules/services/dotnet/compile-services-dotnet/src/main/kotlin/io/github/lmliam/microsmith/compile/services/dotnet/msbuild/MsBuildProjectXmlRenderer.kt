@@ -1,10 +1,12 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import java.io.StringWriter
 import javax.xml.stream.XMLOutputFactory
 import javax.xml.stream.XMLStreamWriter
 
+@Inject
 internal class MsBuildProjectXmlRenderer {
     fun render(artifact: MsBuildProjectArtifact): String {
         val output = StringWriter()

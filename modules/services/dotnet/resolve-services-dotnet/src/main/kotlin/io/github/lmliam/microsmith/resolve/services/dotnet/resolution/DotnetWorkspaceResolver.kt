@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.mapOrAccumulate
 import arrow.core.toNonEmptyListOrNull
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.dsl.services.Service
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.defaults.DotnetDefaultsExtension
@@ -14,6 +15,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetWorkspaceResolu
 import io.github.lmliam.microsmith.resolve.services.dotnet.ResolvedDotnetService
 
 /** Normalises the shared and per-service .NET DSL into a resolved workspace model. */
+@InternalMicrosmithApi
 class DotnetWorkspaceResolver {
     fun resolve(extension: ServicesExtension): EitherNel<DotnetWorkspaceResolutionIssue, DotnetWorkspace> {
         val defaults = extension.get<DotnetDefaultsExtension>() ?: DotnetDefaultsExtension()

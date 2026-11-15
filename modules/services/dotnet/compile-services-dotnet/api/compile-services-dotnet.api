@@ -831,9 +831,6 @@ public final class io/github/lmliam/microsmith/compile/services/dotnet/csharp/Do
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/compile/services/dotnet/msbuild/MsBuildProjectArtifactCompiler : io/github/lmliam/microsmith/compile/services/ServicesArtifactCompiler {
-	public synthetic fun compile (Lio/github/lmliam/microsmith/artifact/Artifact;)Ljava/util/List;
-	public fun compile (Lio/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact;)Ljava/util/List;
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
+public abstract class io/github/lmliam/microsmith/compile/services/dotnet/msbuild/MsBuildProjectArtifactCompilerContributions {
 }
 

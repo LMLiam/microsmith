@@ -84,11 +84,7 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/ResolvedD
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/diagnostics/DotnetWorkspaceResolutionDiagnosticMapper : io/github/lmliam/microsmith/resolve/diagnostics/ResolutionIssueDiagnosticMapper {
-	public fun <init> ()V
-	public fun getIssueType ()Lkotlin/reflect/KClass;
-	public synthetic fun map (Lio/github/lmliam/microsmith/resolve/ResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
-	public fun map (Lio/github/lmliam/microsmith/resolve/services/dotnet/DotnetWorkspaceResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+public abstract class io/github/lmliam/microsmith/resolve/services/dotnet/diagnostics/DotnetWorkspaceResolutionDiagnosticMapperContributions {
 }
 
 public final class io/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspace : io/github/lmliam/microsmith/resolve/services/ResolvedServicesModel {
@@ -104,17 +100,6 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/resolutio
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceDomainResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
-	public fun <init> ()V
-	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;)V
-	public fun getAuthoringType ()Lkotlin/reflect/KClass;
-	public fun getResolvedType ()Lkotlin/reflect/KClass;
-	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
-	public fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
-}
-
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver {
-	public fun <init> ()V
-	public final fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Larrow/core/Either;
+public abstract class io/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceDomainResolverContributions {
 }
 

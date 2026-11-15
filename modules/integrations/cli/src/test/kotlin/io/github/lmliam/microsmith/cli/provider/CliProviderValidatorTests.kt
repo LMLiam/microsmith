@@ -5,7 +5,6 @@ import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
-import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
@@ -29,7 +28,7 @@ class CliProviderValidatorTests :
             "reports missing built-in providers when none are present" {
                 val errors = verifyBuiltinProviders(MicrosmithPluginCatalog(), requiredPluginIds = emptyList())
 
-                errors.shouldHaveSize(12)
+                errors.shouldHaveSize(10)
                 errors.shouldContain(
                     "Missing built-in DomainResolver for ServicesExtension -> " +
                         "DotnetAspWorkspace. Check CLI runtime packaging.",
@@ -56,9 +55,6 @@ class CliProviderValidatorTests :
                         "Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
-                    "Missing built-in ArtifactAssembler for MsBuildProjectArtifact. Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
                     "Missing built-in ArtifactCompiler for DotnetAspServiceArtifact. Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
@@ -67,9 +63,6 @@ class CliProviderValidatorTests :
                 errors.shouldContain(
                     "Missing built-in ArtifactCompiler for DotnetPackageReferencesArtifact. " +
                         "Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
-                    "Missing built-in ArtifactCompiler for MsBuildProjectArtifact. Check CLI runtime packaging.",
                 )
             }
 
@@ -92,14 +85,12 @@ class CliProviderValidatorTests :
                                     AssemblerStub(DotnetAspServiceArtifact::class),
                                     AssemblerStub(DotnetPackageVersionsArtifact::class),
                                     AssemblerStub(DotnetPackageReferencesArtifact::class),
-                                    AssemblerStub(MsBuildProjectArtifact::class),
                                 ),
                             artifactCompilers =
                                 listOf(
                                     CompilerStub(DotnetAspServiceArtifact::class),
                                     CompilerStub(DotnetPackageVersionsArtifact::class),
                                     CompilerStub(DotnetPackageReferencesArtifact::class),
-                                    CompilerStub(MsBuildProjectArtifact::class),
                                 ),
                         ),
                         requiredPluginIds = emptyList(),

@@ -48,13 +48,7 @@ public final class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
-	public fun <init> ()V
-	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact;
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
-	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun merge (Lio/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact;
+public abstract class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifactAssemblerContributions {
 }
 
 public abstract interface class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifactId : io/github/lmliam/microsmith/artifact/ArtifactId {

@@ -84,6 +84,7 @@ dependencies {
     implementation project(':compile-schemas')
     implementation project(':compile-schemas-protobuf')
     implementation project(':compile-schemas-protobuf-rpc')
+    implementation project(':plugin-services-dotnet')
     implementation project(':plugin-schemas-protobuf')
     implementation project(':plugin-schemas-protobuf-rpc')
     implementation project(':gen')

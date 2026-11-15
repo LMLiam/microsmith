@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.msbuild
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.RelativePath
@@ -12,14 +14,13 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProje
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactId
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
+import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetPluginScope
 
-@ServiceProvider(ArtifactCompiler::class)
-class MsBuildProjectArtifactCompiler
-internal constructor(
+@Inject
+@ContributesIntoSet(DotnetPluginScope::class, binding = binding<ArtifactCompiler<*>>())
+internal class MsBuildProjectArtifactCompiler(
     private val xmlRenderer: MsBuildProjectXmlRenderer,
 ) : ServicesArtifactCompiler<MsBuildProjectArtifact> {
-    constructor() : this(MsBuildProjectXmlRenderer())
-
     override val artifactType = MsBuildProjectArtifact::class
 
     override fun compile(artifact: MsBuildProjectArtifact): List<ArtifactContribution<out Artifact>> =

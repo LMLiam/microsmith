@@ -1,16 +1,18 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.resolution
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.DomainResolver
+import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetPluginScope
 
-@ServiceProvider(DomainResolver::class)
-class DotnetWorkspaceDomainResolver(
+@Inject
+@ContributesIntoSet(DotnetPluginScope::class, binding = binding<DomainResolver<*, *>>())
+internal class DotnetWorkspaceDomainResolver(
     private val workspaceResolver: DotnetWorkspaceResolver,
 ) : DomainResolver<ServicesExtension, DotnetWorkspace> {
-    constructor() : this(DotnetWorkspaceResolver())
-
     override val authoringType = ServicesExtension::class
     override val resolvedType = DotnetWorkspace::class
 
