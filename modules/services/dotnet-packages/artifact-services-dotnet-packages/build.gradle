@@ -1,5 +1,9 @@
-apply plugin: 'org.jetbrains.kotlin.kapt'
+apply plugin: 'dev.zacsweers.metro'
 apply plugin: 'tech.mappie.plugin'
+
+metro {
+    generateContributionProviders = true
+}
 
 dependencies {
     api project(":artifact")
@@ -7,6 +11,4 @@ dependencies {
     api project(":artifact-services-dotnet")
     implementation project(":resolve")
     implementation project(":resolve-services-dotnet-packages")
-    api libs.spi.tooling.annotations
-    kapt libs.spi.tooling.processor
 }

@@ -76,11 +76,7 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionDiagnosticMapper : io/github/lmliam/microsmith/resolve/diagnostics/ResolutionIssueDiagnosticMapper {
-	public fun <init> ()V
-	public fun getIssueType ()Lkotlin/reflect/KClass;
-	public synthetic fun map (Lio/github/lmliam/microsmith/resolve/ResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
-	public fun map (Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+public abstract class io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionDiagnosticMapperContributions {
 }
 
 public abstract interface class io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue : io/github/lmliam/microsmith/resolve/services/dotnet/DotnetResolutionIssue {
@@ -146,20 +142,6 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspaceDomainResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
-	public fun <init> ()V
-	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspaceResolver;)V
-	public synthetic fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspaceResolver;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun getAuthoringType ()Lkotlin/reflect/KClass;
-	public fun getResolvedType ()Lkotlin/reflect/KClass;
-	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
-	public fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
-}
-
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspaceResolver {
-	public fun <init> ()V
-	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;)V
-	public synthetic fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Larrow/core/Either;
+public abstract class io/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspaceDomainResolverContributions {
 }
 

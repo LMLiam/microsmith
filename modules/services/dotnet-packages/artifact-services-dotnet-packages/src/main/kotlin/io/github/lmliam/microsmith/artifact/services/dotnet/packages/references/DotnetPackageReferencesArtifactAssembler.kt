@@ -1,11 +1,15 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.packages.references
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackagesPluginScope
 
-@ServiceProvider(ArtifactAssembler::class)
-class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackageReferencesArtifact> {
+@Inject
+@ContributesIntoSet(DotnetPackagesPluginScope::class, binding = binding<ArtifactAssembler<*>>())
+internal class DotnetPackageReferencesArtifactAssembler : ArtifactAssembler<DotnetPackageReferencesArtifact> {
     override val artifactType = DotnetPackageReferencesArtifact::class
 
     override fun create(

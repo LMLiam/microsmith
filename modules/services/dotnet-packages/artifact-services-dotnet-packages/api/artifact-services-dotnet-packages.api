@@ -1,8 +1,4 @@
-public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/DotnetPackageArtifactContributor : io/github/lmliam/microsmith/artifact/ArtifactContributor {
-	public fun <init> ()V
-	public synthetic fun contribute (Lio/github/lmliam/microsmith/resolve/ResolvedModel;)Ljava/util/List;
-	public fun contribute (Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspace;)Ljava/util/List;
-	public fun getResolvedType ()Lkotlin/reflect/KClass;
+public abstract class io/github/lmliam/microsmith/artifact/services/dotnet/packages/DotnetPackageArtifactContributorContributions {
 }
 
 public abstract interface class io/github/lmliam/microsmith/artifact/services/dotnet/packages/DotnetPackagesArtifact : io/github/lmliam/microsmith/artifact/services/dotnet/DotnetArtifact {
@@ -60,13 +56,7 @@ public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
-	public fun <init> ()V
-	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact;
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
-	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun merge (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifact;
+public abstract class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactAssemblerContributions {
 }
 
 public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/references/DotnetPackageReferencesArtifactId : io/github/lmliam/microsmith/artifact/ArtifactId {
@@ -126,13 +116,7 @@ public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
-	public fun <init> ()V
-	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact;
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
-	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun merge (Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifact;
+public abstract class io/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactAssemblerContributions {
 }
 
 public final class io/github/lmliam/microsmith/artifact/services/dotnet/packages/versions/DotnetPackageVersionsArtifactId : io/github/lmliam/microsmith/artifact/ArtifactId {

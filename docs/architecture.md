@@ -94,6 +94,7 @@ flowchart LR
         PSP[plugin-schemas-protobuf]
         PSPR[plugin-schemas-protobuf-rpc]
         PSD[plugin-services-dotnet]
+        PSDP[plugin-services-dotnet-packages]
     end
 
     subgraph ExecutionStage[Execution surfaces]
@@ -148,17 +149,19 @@ flowchart LR
     CSP --> PSP
     CSPR --> PSPR
     CVD --> PSD
+    CVDP --> PSDP
 
     G --> RT
     PSP --> RT
     PSPR --> RT
     PSD --> RT
+    PSDP --> RT
     CLI --> RT
     GP --> RT
     MP --> RT
 ```
 
-`runtime-scripting` and `cli` currently bundle the schema and protobuf provider stack from resolver, artifact, compiler, and renderer provider modules, and the `plugin-schemas-protobuf*` and `plugin-services-dotnet` plugin modules that register the protobuf and .NET families.
+`runtime-scripting` and `cli` currently bundle the schema and protobuf provider stack from resolver, artifact, compiler, and renderer provider modules, and the `plugin-schemas-protobuf*` and `plugin-services-dotnet*` plugin modules that register the protobuf, .NET and .NET packages families.
 
 ### Provider responsibilities
 
@@ -216,6 +219,7 @@ This keeps the layering explicit:
 - `plugin-schemas-protobuf`: the built-in `MicrosmithPlugin` for the protobuf schema family
 - `plugin-schemas-protobuf-rpc`: the built-in `MicrosmithPlugin` for the protobuf RPC family
 - `plugin-services-dotnet`: the built-in `MicrosmithPlugin` for the .NET family
+- `plugin-services-dotnet-packages`: the built-in `MicrosmithPlugin` for the .NET packages family
 - `gen`: final file rendering, output routing, and generation orchestration
 - `runtime-scripting`: Kotlin scripting host for `.microsmith.kts` execution and built-in provider loading
 - `cli`: command-line entrypoint, diagnostics, installer packaging, IDE helper support, and built-in provider validation

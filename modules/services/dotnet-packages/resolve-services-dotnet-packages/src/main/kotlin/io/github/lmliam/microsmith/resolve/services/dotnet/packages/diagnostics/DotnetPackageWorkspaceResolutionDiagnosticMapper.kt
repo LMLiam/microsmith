@@ -1,11 +1,15 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.packages.diagnostics
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionIssueDiagnosticMapper
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackagesPluginScope
 
-@ServiceProvider(ResolutionIssueDiagnosticMapper::class)
-class DotnetPackageWorkspaceResolutionDiagnosticMapper :
+@Inject
+@ContributesIntoSet(DotnetPackagesPluginScope::class, binding = binding<ResolutionIssueDiagnosticMapper<*>>())
+internal class DotnetPackageWorkspaceResolutionDiagnosticMapper :
     ResolutionIssueDiagnosticMapper<DotnetPackageWorkspaceResolutionIssue> {
     override val issueType = DotnetPackageWorkspaceResolutionIssue::class
 

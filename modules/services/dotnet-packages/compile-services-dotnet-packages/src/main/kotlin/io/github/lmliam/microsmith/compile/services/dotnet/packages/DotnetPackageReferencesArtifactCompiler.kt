@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.packages
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildItem
@@ -12,9 +14,11 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackagesPluginScope
 
-@ServiceProvider(ArtifactCompiler::class)
-class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetPackageReferencesArtifact> {
+@Inject
+@ContributesIntoSet(DotnetPackagesPluginScope::class, binding = binding<ArtifactCompiler<*>>())
+internal class DotnetPackageReferencesArtifactCompiler : ServicesArtifactCompiler<DotnetPackageReferencesArtifact> {
     override val artifactType = DotnetPackageReferencesArtifact::class
 
     override fun compile(artifact: DotnetPackageReferencesArtifact): List<ArtifactContribution<out Artifact>> =

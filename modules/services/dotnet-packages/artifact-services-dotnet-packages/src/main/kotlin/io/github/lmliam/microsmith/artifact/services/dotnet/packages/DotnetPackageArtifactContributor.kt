@@ -1,12 +1,16 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.packages
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
+import io.github.lmliam.microsmith.resolve.services.dotnet.packages.DotnetPackagesPluginScope
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspace
 
-@ServiceProvider(ArtifactContributor::class)
-class DotnetPackageArtifactContributor : ArtifactContributor<DotnetPackageWorkspace> {
+@Inject
+@ContributesIntoSet(DotnetPackagesPluginScope::class, binding = binding<ArtifactContributor<*>>())
+internal class DotnetPackageArtifactContributor : ArtifactContributor<DotnetPackageWorkspace> {
     override val resolvedType = DotnetPackageWorkspace::class
 
     override fun contribute(model: DotnetPackageWorkspace): List<ArtifactContribution<*>> {
