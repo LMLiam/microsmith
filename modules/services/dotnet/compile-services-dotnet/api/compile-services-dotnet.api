@@ -832,7 +832,6 @@ public final class io/github/lmliam/microsmith/compile/services/dotnet/csharp/Do
 }
 
 public final class io/github/lmliam/microsmith/compile/services/dotnet/msbuild/MsBuildProjectArtifactCompiler : io/github/lmliam/microsmith/compile/services/ServicesArtifactCompiler {
-	public fun <init> ()V
 	public synthetic fun compile (Lio/github/lmliam/microsmith/artifact/Artifact;)Ljava/util/List;
 	public fun compile (Lio/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact;)Ljava/util/List;
 	public fun getArtifactType ()Lkotlin/reflect/KClass;

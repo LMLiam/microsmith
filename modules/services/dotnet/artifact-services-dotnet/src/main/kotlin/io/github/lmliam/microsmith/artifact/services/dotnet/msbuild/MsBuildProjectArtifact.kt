@@ -9,7 +9,7 @@ data class MsBuildProjectArtifact(
     val items: List<MsBuildItem>,
 ) : DotnetArtifact {
     init {
-        projectAttributes.keys.forEach(MsBuildNames::requireAttributeName)
-        properties.keys.forEach(MsBuildNames::requirePropertyName)
+        projectAttributes.keys.forEach(::requireAttributeName)
+        properties.keys.forEach(::requirePropertyName)
     }
 }

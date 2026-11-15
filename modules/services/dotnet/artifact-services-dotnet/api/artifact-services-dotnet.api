@@ -27,9 +27,6 @@ public final class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/
 	public static final field SDK_ATTRIBUTE Ljava/lang/String;
 	public static final field TARGET_FRAMEWORK_PROPERTY Ljava/lang/String;
 	public static final field VERSION_ATTRIBUTE Ljava/lang/String;
-	public final fun requireAttributeName (Ljava/lang/String;)Ljava/lang/String;
-	public final fun requireItemName (Ljava/lang/String;)Ljava/lang/String;
-	public final fun requirePropertyName (Ljava/lang/String;)Ljava/lang/String;
 }
 
 public final class io/github/lmliam/microsmith/artifact/services/dotnet/msbuild/MsBuildProjectArtifact : io/github/lmliam/microsmith/artifact/services/dotnet/DotnetArtifact {

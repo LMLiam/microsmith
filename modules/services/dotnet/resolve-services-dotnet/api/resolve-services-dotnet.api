@@ -107,7 +107,6 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/resolutio
 public final class io/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceDomainResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
 	public fun <init> ()V
 	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;)V
-	public synthetic fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun getAuthoringType ()Lkotlin/reflect/KClass;
 	public fun getResolvedType ()Lkotlin/reflect/KClass;
 	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;

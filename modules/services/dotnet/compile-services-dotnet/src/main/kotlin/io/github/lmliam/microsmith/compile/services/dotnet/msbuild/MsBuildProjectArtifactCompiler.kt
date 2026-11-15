@@ -14,7 +14,12 @@ import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.services.ServicesArtifactCompiler
 
 @ServiceProvider(ArtifactCompiler::class)
-class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectArtifact> {
+class MsBuildProjectArtifactCompiler
+internal constructor(
+    private val xmlRenderer: MsBuildProjectXmlRenderer,
+) : ServicesArtifactCompiler<MsBuildProjectArtifact> {
+    constructor() : this(MsBuildProjectXmlRenderer())
+
     override val artifactType = MsBuildProjectArtifact::class
 
     override fun compile(artifact: MsBuildProjectArtifact): List<ArtifactContribution<out Artifact>> =
@@ -25,7 +30,7 @@ class MsBuildProjectArtifactCompiler : ServicesArtifactCompiler<MsBuildProjectAr
                         relativePath = projectRelativePath(artifact),
                         outputRoot = artifact.outputRoot(),
                     ),
-                contents = MsBuildProjectXmlRenderer.render(artifact),
+                contents = xmlRenderer.render(artifact),
             ),
         )
 

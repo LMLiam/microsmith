@@ -7,8 +7,10 @@ import io.github.lmliam.microsmith.resolve.DomainResolver
 
 @ServiceProvider(DomainResolver::class)
 class DotnetWorkspaceDomainResolver(
-    private val workspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver(),
+    private val workspaceResolver: DotnetWorkspaceResolver,
 ) : DomainResolver<ServicesExtension, DotnetWorkspace> {
+    constructor() : this(DotnetWorkspaceResolver())
+
     override val authoringType = ServicesExtension::class
     override val resolvedType = DotnetWorkspace::class
 

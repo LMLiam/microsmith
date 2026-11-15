@@ -4,8 +4,8 @@ class MsBuildItem(val itemName: String, val include: String, attributes: Map<Str
     val attributes: Map<String, String> = attributes.toMap()
 
     init {
-        MsBuildNames.requireItemName(itemName)
-        this.attributes.keys.forEach(MsBuildNames::requireAttributeName)
+        requireItemName(itemName)
+        this.attributes.keys.forEach(::requireAttributeName)
     }
 
     override fun equals(other: Any?): Boolean =

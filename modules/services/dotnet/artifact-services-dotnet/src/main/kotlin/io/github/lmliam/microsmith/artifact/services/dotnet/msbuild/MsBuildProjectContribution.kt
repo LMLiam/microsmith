@@ -9,7 +9,7 @@ data class MsBuildProjectContribution(
     val items: List<MsBuildItem> = emptyList(),
 ) : ArtifactContribution<MsBuildProjectArtifact> {
     init {
-        projectAttributes.keys.forEach(MsBuildNames::requireAttributeName)
-        properties.keys.forEach(MsBuildNames::requirePropertyName)
+        projectAttributes.keys.forEach(::requireAttributeName)
+        properties.keys.forEach(::requirePropertyName)
     }
 }
