@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.runtime.scripting.symbols.discovery
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.EnumRef
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef
+import io.github.lmliam.microsmith.plugin.schemas.protobuf.ProtobufScriptingPlugin
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptCallCallee
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptLiteral
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor
@@ -137,7 +138,7 @@ private fun discoverText(sourceText: String): ScriptSymbolDiscoveryResult =
     ScriptSymbolDiscovery.discover(
         sourceName = "schema.microsmith.kts",
         sourceText = sourceText,
-        registry = ScriptSymbolContributorRegistry.of(listOf(ProtobufScriptSymbolContributor)),
+        registry = ScriptSymbolContributorRegistry.of(ProtobufScriptingPlugin().scriptSymbolContributors),
     )
 
 private fun scriptResource(resource: String): String =

@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.discovery
 
+import io.github.lmliam.microsmith.runtime.scripting.api.MicrosmithScriptingPlugin
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor
 import java.util.ServiceLoader
 
@@ -13,7 +14,11 @@ internal class ScriptSymbolContributorRegistry private constructor(val contribut
         fun discover(classLoader: ClassLoader = defaultClassLoader()): ScriptSymbolContributorRegistry =
             of(
                 buildList {
-                    add(ProtobufScriptSymbolContributor)
+                    addAll(
+                        ServiceLoader.load(MicrosmithScriptingPlugin::class.java, classLoader)
+                            .sortedBy(MicrosmithScriptingPlugin::id)
+                            .flatMap(MicrosmithScriptingPlugin::scriptSymbolContributors),
+                    )
                     addAll(ServiceLoader.load(ScriptSymbolContributor::class.java, classLoader))
                 },
             )

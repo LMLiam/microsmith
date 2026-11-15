@@ -6,7 +6,7 @@ import io.github.lmliam.microsmith.plugin.MicrosmithPlugin
 import io.github.lmliam.microsmith.plugin.PluginServices
 
 public class ProtobufPlugin : MicrosmithPlugin {
-    override val id: String = "io.github.lmliam.microsmith.protobuf"
+    override val id: String = PROTOBUF_PLUGIN_ID
 
     override fun services(host: HostServices): PluginServices =
         createGraphFactory<ProtobufPluginGraph.Factory>().create().services

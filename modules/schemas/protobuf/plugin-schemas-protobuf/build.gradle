@@ -12,6 +12,8 @@ dependencies {
     implementation project(":resolve-schemas-protobuf")
     implementation project(":artifact-schemas-protobuf")
     implementation project(":compile-schemas-protobuf")
+    implementation project(":runtime-scripting-api")
+    implementation project(":dsl-schemas-protobuf")
 }
 
 kotlin {

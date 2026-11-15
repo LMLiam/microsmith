@@ -8,13 +8,18 @@ import kotlin.script.experimental.api.ResultWithDiagnostics
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.ScriptConfigurationRefinementContext
 import kotlin.script.experimental.api.ScriptDiagnostic
+import kotlin.script.experimental.api.hostConfiguration
 import kotlin.script.experimental.api.makeFailureResult
 import kotlin.script.experimental.api.providedProperties
+import kotlin.script.experimental.host.ScriptingHostConfiguration
 
 internal fun refineMicrosmithScriptSymbols(
     context: ScriptConfigurationRefinementContext,
 ): ResultWithDiagnostics<ScriptCompilationConfiguration> = runCatching {
-    val registry = ScriptSymbolContributorRegistry.discover()
+    val registry =
+        context.compilationConfiguration[ScriptCompilationConfiguration.hostConfiguration]?.get(
+            ScriptingHostConfiguration.microsmithScriptSymbolRegistry,
+        ) ?: ScriptSymbolContributorRegistry.discover()
 
     val discovery =
         ScriptSymbolDiscovery.discover(

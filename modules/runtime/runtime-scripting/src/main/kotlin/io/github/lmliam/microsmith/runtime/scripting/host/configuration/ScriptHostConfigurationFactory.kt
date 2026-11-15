@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.configuration
 
 import io.github.lmliam.microsmith.runtime.scripting.cache.MicrosmithScriptCache
+import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolContributorRegistry
+import io.github.lmliam.microsmith.runtime.scripting.symbols.refinement.microsmithScriptSymbolRegistry
 import kotlin.script.experimental.host.ScriptingHostConfiguration
 import kotlin.script.experimental.host.with
 import kotlin.script.experimental.jvm.baseClassLoader
@@ -9,11 +11,15 @@ import kotlin.script.experimental.jvm.defaultJvmScriptingHostConfiguration
 import kotlin.script.experimental.jvm.jvm
 
 internal object ScriptHostConfigurationFactory {
-    fun create(cache: MicrosmithScriptCache, runtimeClassLoader: ClassLoader): ScriptingHostConfiguration =
-        defaultJvmScriptingHostConfiguration.with {
-            jvm {
-                baseClassLoader(runtimeClassLoader)
-                compilationCache(cache)
-            }
+    fun create(
+        cache: MicrosmithScriptCache,
+        runtimeClassLoader: ClassLoader,
+        symbolRegistry: ScriptSymbolContributorRegistry,
+    ): ScriptingHostConfiguration = defaultJvmScriptingHostConfiguration.with {
+        microsmithScriptSymbolRegistry(symbolRegistry)
+        jvm {
+            baseClassLoader(runtimeClassLoader)
+            compilationCache(cache)
         }
+    }
 }

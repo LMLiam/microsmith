@@ -9,6 +9,7 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
+import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolContributorRegistry
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.script.experimental.api.ScriptDiagnostic
@@ -24,6 +25,7 @@ internal class ClassloaderScriptRunner(private val cacheDirectory: Path) {
                     ScriptHostConfigurationFactory.create(
                         cache = cache,
                         runtimeClassLoader = runtimeClassLoader,
+                        symbolRegistry = ScriptSymbolContributorRegistry.discover(runtimeClassLoader),
                     )
                 val scriptContext = ScriptContextFactory.create(outputPath, request, runtimeClassLoader)
                 val (result, elapsedMillis) =
