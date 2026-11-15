@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.gen.plugins
 
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
 import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
+import io.github.lmliam.microsmith.gen.CancelTrigger
 import io.github.lmliam.microsmith.gen.FirstLabelResolver
 import io.github.lmliam.microsmith.gen.LabelExtension
 import io.github.lmliam.microsmith.gen.LabelFileContributor
@@ -13,9 +14,8 @@ import io.github.lmliam.microsmith.gen.errors.PluginLoadFailedException
 import io.github.lmliam.microsmith.gen.generateWithPlugins
 import io.github.lmliam.microsmith.gen.generatedTexts
 import io.github.lmliam.microsmith.gen.newOutputDirectory
+import io.github.lmliam.microsmith.gen.runCancelled
 import io.github.lmliam.microsmith.gen.testGenerator
-import io.github.lmliam.microsmith.plugin.Diagnostic
-import io.github.lmliam.microsmith.plugin.DiagnosticSink
 import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -26,11 +26,6 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import java.net.URLClassLoader
 import java.nio.file.Files
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import thirdparty.contract.CONTRIBUTING_CODE
 import thirdparty.contract.FixtureExtension
 
 private fun <T> List<T>.permutations(): List<List<T>> =
@@ -203,27 +198,9 @@ class PluginLoadingTests :
             }
 
             "when the run is cancelled every plugin is still closed" {
-                val recorder = RecordingDiagnosticSink()
-                lateinit var run: Job
-                val cancellingSink =
-                    object : DiagnosticSink {
-                        override fun report(diagnostic: Diagnostic) {
-                            recorder.report(diagnostic)
-                            if (diagnostic.code == CONTRIBUTING_CODE) run.cancel()
-                        }
-                    }
+                val run = runCancelled("alpha", "beta", trigger = CancelTrigger.CONTRIBUTING)
 
-                coroutineScope {
-                    run =
-                        launch(start = CoroutineStart.LAZY) {
-                            generateWithPlugins("alpha", "beta", diagnostics = cancellingSink)
-                        }
-                    run.start()
-                    run.join()
-                }
-
-                run.isCancelled shouldBe true
-                recorder.closedPluginIds() shouldBe listOf("thirdparty.beta", "thirdparty.alpha")
+                run.diagnostics.closedPluginIds() shouldBe listOf("thirdparty.beta", "thirdparty.alpha")
             }
         },
     )

@@ -7,6 +7,7 @@ import java.nio.file.FileSystem
 import java.nio.file.Files
 import kotlin.time.Clock
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
 @Inject
@@ -18,11 +19,14 @@ internal class TemporaryDirectories(
     private val ioDispatcher: CoroutineDispatcher,
 ) {
     suspend fun create(): TemporaryDirectory =
-        withContext(ioDispatcher) {
-            val parent = fileSystem.getPath(checkNotNull(environment.property("java.io.tmpdir")))
-            val root = Files.createTempDirectory(parent, PREFIX + clock.now().toEpochMilliseconds())
+        // Not cancellable, so a directory that was created always reaches the caller that removes it.
+        withContext(NonCancellable) {
+            withContext(ioDispatcher) {
+                val parent = fileSystem.getPath(checkNotNull(environment.property("java.io.tmpdir")))
+                val root = Files.createTempDirectory(parent, PREFIX + clock.now().toEpochMilliseconds())
 
-            TemporaryDirectory(root, diagnostics)
+                TemporaryDirectory(root, diagnostics)
+            }
         }
 
     private companion object {

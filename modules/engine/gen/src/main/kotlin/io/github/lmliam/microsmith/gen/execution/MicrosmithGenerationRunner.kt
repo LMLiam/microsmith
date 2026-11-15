@@ -13,6 +13,8 @@ import io.github.lmliam.microsmith.resolve.DomainResolutionService
 import io.github.lmliam.microsmith.resolve.ResolutionOutcome
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnosticService
 import java.nio.file.Path
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 @Inject
 @SingleIn(RunScope::class)
@@ -28,6 +30,8 @@ internal class MicrosmithGenerationRunner(
     suspend fun generate(model: MicrosmithModel, finalDir: FileSpace): List<Path> {
         val outputs =
             temporaryDirectories.create().use { tempSpace ->
+                currentCoroutineContext().ensureActive()
+
                 val resolvedModels =
                     when (val resolution = domainResolutionService.resolve(model)) {
                         is ResolutionOutcome.Success -> resolution.models

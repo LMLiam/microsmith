@@ -15,7 +15,7 @@ dependencies {
 
 def fixturePluginDirectory = layout.buildDirectory.dir('fixture-plugins')
 
-def fixturePluginJars = ['Alpha', 'Beta', 'Conflicting', 'Duplicate', 'Throwing', 'Linkage', 'CloseFailure'].collect { fixtureName ->
+def fixturePluginJars = ['Alpha', 'Beta', 'Conflicting', 'Duplicate', 'Throwing', 'Linkage', 'CloseFailure', 'Bulk'].collect { fixtureName ->
     def jarName = fixtureName.toLowerCase()
     tasks.register("${jarName}FixturePluginJar", Jar) {
         archiveFileName = "${jarName}.jar"
