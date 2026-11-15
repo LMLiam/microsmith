@@ -10,8 +10,11 @@ import io.kotest.matchers.shouldBe
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.util.concurrent.Executors
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 
 class GeneratedOutputWriterTests :
     StringSpec(
@@ -107,6 +110,48 @@ class GeneratedOutputWriterTests :
                 outputs.forEach { output ->
                     Files.readAllBytes(outputRoot.resolve(output.relativePath.toString())).toList() shouldBe
                         output.contents.toList()
+                }
+            }
+
+            "write stops before reaching every output when the run is cancelled" {
+                runTest {
+                    val outputRoot = Files.createTempDirectory("microsmith-writer-")
+                    val outputs =
+                        (0 until 6).map { index ->
+                            GeneratedFile(
+                                RelativePath.of("file$index.txt"),
+                                "contents$index".toByteArray(),
+                                RelativePath.of("root$index"),
+                            )
+                        }
+                    lateinit var run: Job
+                    val cancelWhenThirdIsReached =
+                        object : AbstractList<GeneratedFile>() {
+                            override val size = outputs.size
+
+                            override fun get(index: Int) = outputs[index]
+
+                            override fun iterator() = sequence {
+                                outputs.forEachIndexed { index, output ->
+                                    if (index == 2) run.cancel()
+                                    yield(output)
+                                }
+                            }
+                                .iterator()
+                        }
+
+                    run = launch {
+                        GeneratedOutputWriter(
+                                GeneratedOutputPathResolver(FileSystems.getDefault()),
+                                UnconfinedTestDispatcher(),
+                            )
+                            .write(cancelWhenThirdIsReached, DirectorySpace(outputRoot))
+                    }
+                    run.join()
+
+                    run.isCancelled shouldBe true
+                    Files.exists(outputRoot.resolve("root5")) shouldBe false
+                    Files.walk(outputRoot).use { paths -> paths.filter(Files::isRegularFile).count() } shouldBe 0L
                 }
             }
 
