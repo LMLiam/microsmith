@@ -209,9 +209,3 @@ tasks.register('releaseArtifacts') {
     group = 'distribution'
     dependsOn(distArtifactsTask, generateReleaseChecksumsTask)
 }
-
-kotlin {
-    compilerOptions {
-        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
-    }
-}

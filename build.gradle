@@ -205,6 +205,9 @@ subprojects {
             freeCompilerArgs.addAll([
                 '-Xjsr305=strict',
             ])
+            if (project.path != ':runtime-scripting-api') {
+                optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+            }
         }
     }
 

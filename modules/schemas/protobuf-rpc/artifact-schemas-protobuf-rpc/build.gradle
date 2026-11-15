@@ -16,7 +16,4 @@ dependencies {
 
 kotlin {
     explicitApi()
-    compilerOptions {
-        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
-    }
 }
