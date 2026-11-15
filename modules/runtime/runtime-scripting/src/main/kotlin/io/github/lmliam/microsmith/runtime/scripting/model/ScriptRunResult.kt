@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.runtime.scripting.model
 
-sealed interface ScriptRunResult
+public sealed interface ScriptRunResult

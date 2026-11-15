@@ -6,10 +6,15 @@ import io.github.lmliam.microsmith.runtime.scripting.host.paths.ScriptPathValida
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 
-class MicrosmithScriptHost @Inject internal constructor(private val runExecutor: ScriptRunExecutor) {
-    fun run(request: ScriptRunRequest): ScriptRunResult {
+@Inject
+public class MicrosmithScriptHost
+internal constructor(
+    private val runExecutor: ScriptRunExecutor,
+    private val pathValidator: ScriptPathValidator,
+) {
+    public fun run(request: ScriptRunRequest): ScriptRunResult {
         val normalizedRequest = request.normalized()
-        val validationFailure = ScriptPathValidator.validate(normalizedRequest.script)
+        val validationFailure = pathValidator.validate(normalizedRequest.script)
         return validationFailure ?: runExecutor.execute(normalizedRequest)
     }
 }

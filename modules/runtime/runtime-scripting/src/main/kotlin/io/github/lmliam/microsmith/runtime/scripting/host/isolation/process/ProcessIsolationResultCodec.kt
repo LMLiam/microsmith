@@ -6,6 +6,7 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
+import java.nio.file.FileSystem
 import java.nio.file.Path
 import java.util.Properties
 import kotlin.io.path.createDirectories
@@ -13,7 +14,7 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
 @Inject
-internal class ProcessIsolationResultCodec {
+internal class ProcessIsolationResultCodec(private val fileSystem: FileSystem) {
     fun write(path: Path, result: ScriptRunResult) {
         val properties = Properties()
         when (result) {
@@ -81,7 +82,7 @@ internal class ProcessIsolationResultCodec {
                         countKey = ProcessIsolationPropertyNames.RESULT_GENERATED_ROOT_COUNT,
                         keyPrefix = ProcessIsolationPropertyNames.RESULT_GENERATED_ROOT_PREFIX,
                     )
-                    .map(Path::of),
+                    .map(fileSystem::getPath),
         )
 
     private fun readFailure(properties: Properties): ScriptRunFailure =

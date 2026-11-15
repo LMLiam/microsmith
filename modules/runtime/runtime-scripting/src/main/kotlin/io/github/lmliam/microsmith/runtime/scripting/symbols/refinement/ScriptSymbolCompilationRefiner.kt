@@ -1,7 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.refinement
 
-import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolContributorRegistry
-import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolDiscovery
+import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.createScriptSymbolDiscovery
 import io.github.lmliam.microsmith.runtime.scripting.symbols.model.DiscoveredScriptSymbol
 import kotlin.script.experimental.api.KotlinType
 import kotlin.script.experimental.api.ResultWithDiagnostics
@@ -11,22 +10,20 @@ import kotlin.script.experimental.api.ScriptDiagnostic
 import kotlin.script.experimental.api.hostConfiguration
 import kotlin.script.experimental.api.makeFailureResult
 import kotlin.script.experimental.api.providedProperties
-import kotlin.script.experimental.host.ScriptingHostConfiguration
 
 internal fun refineMicrosmithScriptSymbols(
     context: ScriptConfigurationRefinementContext,
 ): ResultWithDiagnostics<ScriptCompilationConfiguration> = runCatching {
     val registry =
-        context.compilationConfiguration[ScriptCompilationConfiguration.hostConfiguration]?.get(
-            ScriptingHostConfiguration.microsmithScriptSymbolRegistry,
-        ) ?: ScriptSymbolContributorRegistry.discover()
+        context.compilationConfiguration[ScriptCompilationConfiguration.hostConfiguration].symbolRegistryOrDiscover()
 
     val discovery =
-        ScriptSymbolDiscovery.discover(
-            sourceName = context.script.name ?: "script.microsmith.kts",
-            sourceText = context.script.text,
-            registry = registry,
-        )
+        createScriptSymbolDiscovery()
+            .discover(
+                sourceName = context.script.name ?: "script.microsmith.kts",
+                sourceText = context.script.text,
+                registry = registry,
+            )
 
     val symbols = discovery.symbols
 

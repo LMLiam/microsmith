@@ -16,7 +16,8 @@ class ScriptDiagnosticsFormatterTests :
                         ScriptDiagnostic(0, "Unresolved reference", ScriptDiagnostic.Severity.ERROR),
                     )
 
-                ScriptDiagnosticsFormatter.format(reports)
+                ScriptDiagnosticsFormatter()
+                    .format(reports)
                     .shouldContainExactly(
                         "[error] <script> Unresolved reference",
                         "[warning] <script> Deprecated call",

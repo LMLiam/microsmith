@@ -17,7 +17,7 @@ import kotlin.time.Clock
 import kotlin.time.TimeSource
 import kotlinx.coroutines.Dispatchers
 
-fun createMicrosmithScriptHost(
+public fun createMicrosmithScriptHost(
     generator: MicrosmithGenerator,
     fileSystem: FileSystem,
     environment: Environment,
@@ -31,7 +31,7 @@ fun createMicrosmithScriptHost(
 
 @InternalMicrosmithApi
 @Suppress("InjectDispatcher")
-fun createSystemMicrosmithScriptHost(cacheDirectory: Path? = null): MicrosmithScriptHost {
+public fun createSystemMicrosmithScriptHost(cacheDirectory: Path? = null): MicrosmithScriptHost {
     val console = SystemConsole()
     val environment = SystemEnvironment()
     val diagnostics = ConsoleDiagnosticSink(console)

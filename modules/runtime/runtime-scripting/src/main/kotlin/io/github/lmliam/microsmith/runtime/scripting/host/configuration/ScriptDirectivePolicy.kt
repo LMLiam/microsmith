@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.configuration
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import java.nio.file.Path
@@ -12,7 +13,8 @@ private val GROUP_FILE_DIRECTIVE_END = Regex(pattern = """]""")
 private val GROUP_FORBIDDEN_DIRECTIVE =
     Regex(pattern = """(?:kotlin\.script\.experimental\.dependencies\.)?(DependsOn|Repository)\b""")
 
-internal object ScriptDirectivePolicy {
+@Inject
+internal class ScriptDirectivePolicy {
     fun validate(scriptPath: Path): ScriptRunFailure? {
         val violations = collectViolations(scriptPath.readLines())
         if (violations.isEmpty()) {

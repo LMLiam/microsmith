@@ -7,7 +7,7 @@ import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDefinition
 import io.github.lmliam.microsmith.runtime.scripting.symbols.model.DiscoveredScriptSymbol
 import io.github.lmliam.microsmith.runtime.scripting.symbols.parsing.KotlinScriptCallSiteParser
 
-internal object ScriptSymbolDiscovery {
+internal class ScriptSymbolDiscovery(private val callSiteParser: KotlinScriptCallSiteParser) {
     fun discover(
         sourceName: String,
         sourceText: String,
@@ -22,7 +22,7 @@ internal object ScriptSymbolDiscovery {
                 )
 
         val sites =
-            KotlinScriptCallSiteParser.declarations(
+            callSiteParser.declarations(
                 sourceName = sourceName,
                 sourceText = sourceText,
                 declarationCallNames = contributorsByCallName.keys,

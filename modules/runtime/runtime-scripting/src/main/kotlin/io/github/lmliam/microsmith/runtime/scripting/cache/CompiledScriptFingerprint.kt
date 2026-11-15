@@ -1,13 +1,14 @@
 package io.github.lmliam.microsmith.runtime.scripting.cache
 
-import java.nio.ByteBuffer
+import dev.zacsweers.metro.Inject
 import java.security.MessageDigest
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.SourceCode
 
 private const val COMPILED_SCRIPT_CACHE_VERSION = 3
 
-internal object CompiledScriptFingerprint {
+@Inject
+internal class CompiledScriptFingerprint(private val runtimeFingerprint: RuntimeClasspathFingerprint) {
     fun uniqueName(
         script: SourceCode,
         scriptCompilationConfiguration: ScriptCompilationConfiguration,
@@ -16,7 +17,7 @@ internal object CompiledScriptFingerprint {
         val digest = MessageDigest.getInstance("SHA-256")
         digest.update(COMPILED_SCRIPT_CACHE_VERSION.toByteArray())
         digest.addChunk(script.text)
-        digest.addChunk(RuntimeClasspathFingerprint.cached())
+        digest.addChunk(runtimeFingerprint.host)
         scriptCompilationConfiguration.notTransientData.entries
             .sortedBy { it.key.name }
             .forEach { entry ->
@@ -27,11 +28,3 @@ internal object CompiledScriptFingerprint {
         return digest.digest().toHexString()
     }
 }
-
-private fun MessageDigest.addChunk(chunk: String) {
-    val chunkBytes = chunk.toByteArray()
-    update(chunkBytes.size.toByteArray())
-    update(chunkBytes)
-}
-
-private fun Int.toByteArray() = ByteBuffer.allocate(Int.SIZE_BYTES).also { it.putInt(this) }.array()

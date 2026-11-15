@@ -10,7 +10,10 @@ import kotlin.script.experimental.api.EvaluationResult
 import kotlin.script.experimental.api.ResultWithDiagnostics
 
 @Inject
-internal class ScriptRunResultMapper(private val successFinalizer: ScriptEvaluationSuccessFinalizer) {
+internal class ScriptRunResultMapper(
+    private val successFinalizer: ScriptEvaluationSuccessFinalizer,
+    private val diagnosticsFormatter: ScriptDiagnosticsFormatter,
+) {
     fun toRunResult(
         result: ResultWithDiagnostics<EvaluationResult>,
         elapsedMillis: Long,
@@ -18,8 +21,8 @@ internal class ScriptRunResultMapper(private val successFinalizer: ScriptEvaluat
         cacheHit: Boolean,
         replayedWarnings: List<String>,
     ): ScriptRunResult {
-        val formattedReports = replayedWarnings + ScriptDiagnosticsFormatter.format(result.reports)
-        val hasErrors = ScriptDiagnosticsFormatter.containsErrors(formattedReports)
+        val formattedReports = replayedWarnings + diagnosticsFormatter.format(result.reports)
+        val hasErrors = diagnosticsFormatter.containsErrors(formattedReports)
 
         return when (result) {
             is ResultWithDiagnostics.Failure ->

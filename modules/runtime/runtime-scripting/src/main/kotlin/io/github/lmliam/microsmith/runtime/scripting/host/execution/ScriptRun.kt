@@ -4,12 +4,10 @@ import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.runtime.scripting.cache.MicrosmithScriptCache
 import io.github.lmliam.microsmith.runtime.scripting.context.MicrosmithScriptContext
 import io.github.lmliam.microsmith.runtime.scripting.host.configuration.ScriptHostConfigurationFactory
-import io.github.lmliam.microsmith.runtime.scripting.host.diagnostics.ScriptDiagnosticsFormatter
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
-import kotlin.script.experimental.api.ScriptDiagnostic
 
 @Inject
 internal class ScriptRun(
@@ -32,11 +30,7 @@ internal class ScriptRun(
                 scriptContext = scriptContext,
                 pluginClasspath = request.pluginClasspath,
             )
-        cache.recordWarnings(
-            ScriptDiagnosticsFormatter.format(
-                result.reports.filter { report -> report.severity == ScriptDiagnostic.Severity.WARNING },
-            ),
-        )
+        cache.recordWarnings(result.reports)
         resultMapper.toRunResult(
             result = result,
             elapsedMillis = elapsedMillis,

@@ -25,7 +25,7 @@ internal class ScriptCacheDirectoryPolicy(
                 "scripts",
             )
 
-    private companion object {
+    internal companion object {
         const val CACHE_DIRECTORY_VARIABLE = "MICROSMITH_SCRIPT_CACHE_DIR"
         const val USER_HOME_PROPERTY = "user.home"
     }

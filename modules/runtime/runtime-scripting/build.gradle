@@ -104,6 +104,11 @@ dependencies {
     fixturePluginsCompileOnly project(':runtime-scripting-api')
     fixturePluginsCompileOnly project(':plugin-api')
     integrationTestImplementation sourceSets.fixtureContract.output
+    testImplementation libs.jimfs
+}
+
+kotlin {
+    explicitApi()
 }
 
 def scriptingShadowJarTask = tasks.named('shadowJar', ShadowJar)

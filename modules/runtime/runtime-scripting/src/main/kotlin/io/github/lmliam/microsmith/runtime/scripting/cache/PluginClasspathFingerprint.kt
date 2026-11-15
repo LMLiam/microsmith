@@ -7,6 +7,6 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 
 @Inject
 @SingleIn(ScriptRunScope::class)
-internal class PluginClasspathFingerprint(request: ScriptRunRequest) {
-    val value: String = RuntimeClasspathFingerprint.calculate(request.pluginClasspath)
+internal class PluginClasspathFingerprint(request: ScriptRunRequest, runtimeFingerprint: RuntimeClasspathFingerprint) {
+    val value: String = runtimeFingerprint.calculate(request.pluginClasspath)
 }

@@ -4,16 +4,16 @@ public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScrip
 
 public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory : dev/zacsweers/metro/internal/Factory {
 	public static final field Companion Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory$Companion;
-	public synthetic fun <init> (Ldev/zacsweers/metro/Provider;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public static final fun create (Ldev/zacsweers/metro/Provider;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory;
+	public synthetic fun <init> (Ldev/zacsweers/metro/Provider;Ldev/zacsweers/metro/Provider;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public static final fun create (Ldev/zacsweers/metro/Provider;Ldev/zacsweers/metro/Provider;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory;
 	public final fun invoke ()Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost;
 	public synthetic fun invoke ()Ljava/lang/Object;
-	public static final fun newInstance (Lio/github/lmliam/microsmith/runtime/scripting/host/execution/ScriptRunExecutor;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost;
+	public static final fun newInstance (Lio/github/lmliam/microsmith/runtime/scripting/host/execution/ScriptRunExecutor;Lio/github/lmliam/microsmith/runtime/scripting/host/paths/ScriptPathValidator;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost;
 }
 
 public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory$Companion {
-	public final fun create (Ldev/zacsweers/metro/Provider;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory;
-	public final fun newInstance (Lio/github/lmliam/microsmith/runtime/scripting/host/execution/ScriptRunExecutor;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost;
+	public final fun create (Ldev/zacsweers/metro/Provider;Ldev/zacsweers/metro/Provider;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory;
+	public final fun newInstance (Lio/github/lmliam/microsmith/runtime/scripting/host/execution/ScriptRunExecutor;Lio/github/lmliam/microsmith/runtime/scripting/host/paths/ScriptPathValidator;)Lio/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost;
 }
 
 public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHostFactoryKt {
@@ -22,7 +22,6 @@ public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScrip
 }
 
 public final class io/github/lmliam/microsmith/runtime/scripting/context/MicrosmithScriptContext {
-	public fun <init> (Ljava/nio/file/Path;Ljava/util/Map;Ljava/util/Set;Lkotlin/jvm/functions/Function1;)V
 	public final fun emit (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;)V
 	public final fun generate (Lio/github/lmliam/microsmith/dsl/MicrosmithModel;)V
 	public final fun getFlags ()Ljava/util/Set;

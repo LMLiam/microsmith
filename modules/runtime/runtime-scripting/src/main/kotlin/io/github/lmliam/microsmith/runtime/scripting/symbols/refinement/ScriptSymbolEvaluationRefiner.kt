@@ -1,6 +1,5 @@
 package io.github.lmliam.microsmith.runtime.scripting.symbols.refinement
 
-import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolContributorRegistry
 import kotlin.script.experimental.api.ResultWithDiagnostics
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.ScriptEvaluationConfiguration
@@ -10,7 +9,6 @@ import kotlin.script.experimental.api.compilationConfiguration
 import kotlin.script.experimental.api.hostConfiguration
 import kotlin.script.experimental.api.makeFailureResult
 import kotlin.script.experimental.api.providedProperties
-import kotlin.script.experimental.host.ScriptingHostConfiguration
 
 internal fun refineMicrosmithScriptSymbolValues(
     context: ScriptEvaluationConfigurationRefinementContext,
@@ -27,9 +25,8 @@ internal fun refineMicrosmithScriptSymbolValues(
 
     return runCatching {
             val registry =
-                context.evaluationConfiguration[ScriptEvaluationConfiguration.hostConfiguration]?.get(
-                    ScriptingHostConfiguration.microsmithScriptSymbolRegistry,
-                ) ?: ScriptSymbolContributorRegistry.discover()
+                context.evaluationConfiguration[ScriptEvaluationConfiguration.hostConfiguration]
+                    .symbolRegistryOrDiscover()
 
             val values = symbols.associate { symbol ->
                 val contributor = registry.contributor(symbol.contributorId)

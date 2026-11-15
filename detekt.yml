@@ -149,7 +149,6 @@ style:
       - '**/src/e2eTest/**'
       - '**/src/testFixtures/**'
       - '**/modules/integrations/cli/**'
-      - '**/modules/runtime/runtime-scripting/**'
       - '**/modules/integrations/gradle-plugin/**'
       - '**/modules/engine/gen/src/main/kotlin/io/github/lmliam/microsmith/gen/system/**'
   ForbiddenImport:
