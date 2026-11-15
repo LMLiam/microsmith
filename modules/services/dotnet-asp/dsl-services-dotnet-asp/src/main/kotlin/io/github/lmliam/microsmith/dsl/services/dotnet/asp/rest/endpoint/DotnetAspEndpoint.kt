@@ -3,12 +3,12 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.response.DotnetAspResponse
 import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnetIdentifier
 
-data class DotnetAspEndpoint(
-    val method: DotnetAspHttpMethod,
-    val path: String,
-    val operationName: String,
-    val bindings: DotnetAspEndpointBindings = DotnetAspEndpointBindings(),
-    val responses: List<DotnetAspResponse>,
+public data class DotnetAspEndpoint(
+    public val method: DotnetAspHttpMethod,
+    public val path: String,
+    public val operationName: String,
+    public val bindings: DotnetAspEndpointBindings = DotnetAspEndpointBindings(),
+    public val responses: List<DotnetAspResponse>,
 ) {
     init {
         validateDotnetIdentifier(operationName, "ASP.NET operation name")

@@ -4,8 +4,8 @@ import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModelScope
 
 @MicrosmithDsl
-interface DotnetAspResponseScope {
-    fun model(block: DotnetModelScope.() -> Unit)
+public interface DotnetAspResponseScope {
+    public fun model(block: DotnetModelScope.() -> Unit)
 
-    fun headers(block: DotnetAspResponseHeadersScope.() -> Unit)
+    public fun headers(block: DotnetAspResponseHeadersScope.() -> Unit)
 }

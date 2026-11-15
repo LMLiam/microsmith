@@ -5,8 +5,8 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.service.DotnetAs
 
 /** Marker scope for opting a .NET service into ASP.NET scaffolding. */
 @MicrosmithDsl
-interface DotnetAspServiceScope {
-    fun ports(block: DotnetAspPortsScope.() -> Unit)
+public interface DotnetAspServiceScope {
+    public fun ports(block: DotnetAspPortsScope.() -> Unit)
 
-    fun rest(block: DotnetAspRestScope.() -> Unit)
+    public fun rest(block: DotnetAspRestScope.() -> Unit)
 }
