@@ -4,11 +4,8 @@ import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.plugin.DiagnosticSink
 import io.github.lmliam.microsmith.plugin.Environment
 import java.nio.file.FileSystem
-import java.nio.file.Files
+import kotlin.io.path.createTempDirectory
 import kotlin.time.Clock
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.withContext
 
 @Inject
 internal class TemporaryDirectories(
@@ -16,18 +13,13 @@ internal class TemporaryDirectories(
     private val clock: Clock,
     private val environment: Environment,
     private val diagnostics: DiagnosticSink,
-    private val ioDispatcher: CoroutineDispatcher,
 ) {
-    suspend fun create(): TemporaryDirectory =
-        // Not cancellable, so a directory that was created always reaches the caller that removes it.
-        withContext(NonCancellable) {
-            withContext(ioDispatcher) {
-                val parent = fileSystem.getPath(checkNotNull(environment.property("java.io.tmpdir")))
-                val root = Files.createTempDirectory(parent, PREFIX + clock.now().toEpochMilliseconds())
+    fun create(): TemporaryDirectory {
+        val parent = fileSystem.getPath(checkNotNull(environment.property("java.io.tmpdir")))
+        val root = createTempDirectory(parent, PREFIX + clock.now().toEpochMilliseconds())
 
-                TemporaryDirectory(root, diagnostics)
-            }
-        }
+        return TemporaryDirectory(root, diagnostics)
+    }
 
     private companion object {
         const val PREFIX = ".microsmith-gen-temp-"
