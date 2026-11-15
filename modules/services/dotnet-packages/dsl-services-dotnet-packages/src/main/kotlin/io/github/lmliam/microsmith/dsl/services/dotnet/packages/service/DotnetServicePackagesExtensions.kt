@@ -7,7 +7,7 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceCont
 import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceScope
 
 /** Start a per-project package references block inside a named .NET service. */
-fun DotnetServiceScope.packages(block: DotnetPackageReferencesScope.() -> Unit) {
+public fun DotnetServiceScope.packages(block: DotnetPackageReferencesScope.() -> Unit) {
     val builder =
         this as? DotnetServiceContext ?: error("packages { ... } can only be invoked within a .NET service block.")
 

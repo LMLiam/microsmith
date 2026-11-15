@@ -59,7 +59,6 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/
 	public final fun getName ()Ljava/lang/String;
 	public final fun getPackages ()Ljava/util/List;
 	public fun hashCode ()I
-	public final fun packageVersionsByName ()Ljava/util/Map;
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -79,52 +78,6 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/
 public abstract class io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionDiagnosticMapperContributions {
 }
 
-public abstract interface class io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue : io/github/lmliam/microsmith/resolve/services/dotnet/DotnetResolutionIssue {
-}
-
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$MixedPackageVersionManagement : io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue {
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$MixedPackageVersionManagement;
-	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$MixedPackageVersionManagement;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$MixedPackageVersionManagement;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getPackageName ()Ljava/lang/String;
-	public final fun getServiceName ()Ljava/lang/String;
-	public final fun getSolutionName ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$PackageNotCentrallyOwned : io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue {
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$PackageNotCentrallyOwned;
-	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$PackageNotCentrallyOwned;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$PackageNotCentrallyOwned;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getPackageName ()Ljava/lang/String;
-	public final fun getServiceName ()Ljava/lang/String;
-	public final fun getSolutionName ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$PackageVersionRequired : io/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue {
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$PackageVersionRequired;
-	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$PackageVersionRequired;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/diagnostics/DotnetPackageWorkspaceResolutionIssue$PackageVersionRequired;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getPackageName ()Ljava/lang/String;
-	public final fun getServiceName ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
 public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspace : io/github/lmliam/microsmith/resolve/services/ResolvedServicesModel {
 	public fun <init> (Ljava/util/Map;Ljava/util/Map;)V
 	public final fun component1 ()Ljava/util/Map;
@@ -132,13 +85,9 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/packages/
 	public final fun copy (Ljava/util/Map;Ljava/util/Map;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspace;
 	public static synthetic fun copy$default (Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspace;Ljava/util/Map;Ljava/util/Map;ILjava/lang/Object;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/resolution/DotnetPackageWorkspace;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun findService (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/ResolvedDotnetPackageService;
-	public final fun findSolution (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/ResolvedDotnetPackageSolution;
 	public final fun getServicesByName ()Ljava/util/Map;
 	public final fun getSolutionsByName ()Ljava/util/Map;
 	public fun hashCode ()I
-	public final fun requireService (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/ResolvedDotnetPackageService;
-	public final fun requireSolution (Ljava/lang/String;)Lio/github/lmliam/microsmith/resolve/services/dotnet/packages/ResolvedDotnetPackageSolution;
 	public fun toString ()Ljava/lang/String;
 }
 

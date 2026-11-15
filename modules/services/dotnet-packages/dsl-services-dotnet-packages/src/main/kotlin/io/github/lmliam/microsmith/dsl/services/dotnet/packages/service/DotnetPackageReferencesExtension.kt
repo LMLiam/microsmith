@@ -8,8 +8,9 @@ import io.github.lmliam.microsmith.dsl.services.ServiceExtension
  * package reference is versionless at the service level and must be satisfied by central package ownership during
  * resolution.
  */
-data class DotnetPackageReferencesExtension(val packages: List<DotnetPackageReferenceDeclaration> = emptyList()) :
-    ServiceExtension, MergeableExtension<DotnetPackageReferencesExtension> {
+public data class DotnetPackageReferencesExtension(
+    public val packages: List<DotnetPackageReferenceDeclaration> = emptyList(),
+) : ServiceExtension, MergeableExtension<DotnetPackageReferencesExtension> {
     override fun merge(other: DotnetPackageReferencesExtension): DotnetPackageReferencesExtension {
         val existingNames = packages.map(DotnetPackageReferenceDeclaration::name).toSet()
         val collisions =

@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions
 
-data class DotnetPackageVersion(val name: String, val version: String)
+public data class DotnetPackageVersion(public val name: String, public val version: String)

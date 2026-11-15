@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.packages
 
-data class ResolvedDotnetPackageVersion(val name: String, val version: String)
+public data class ResolvedDotnetPackageVersion(public val name: String, public val version: String)

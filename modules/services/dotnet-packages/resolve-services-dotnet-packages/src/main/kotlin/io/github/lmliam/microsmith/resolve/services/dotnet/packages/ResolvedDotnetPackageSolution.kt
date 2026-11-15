@@ -1,6 +1,9 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.packages
 
-data class ResolvedDotnetPackageSolution(val name: String, val packages: List<ResolvedDotnetPackageVersion>) {
-    fun packageVersionsByName(): Map<String, ResolvedDotnetPackageVersion> =
+public data class ResolvedDotnetPackageSolution(
+    public val name: String,
+    public val packages: List<ResolvedDotnetPackageVersion>,
+) {
+    internal fun packageVersionsByName(): Map<String, ResolvedDotnetPackageVersion> =
         packages.associateBy(ResolvedDotnetPackageVersion::name)
 }

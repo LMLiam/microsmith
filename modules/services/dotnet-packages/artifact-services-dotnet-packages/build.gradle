@@ -12,3 +12,7 @@ dependencies {
     implementation project(":resolve")
     implementation project(":resolve-services-dotnet-packages")
 }
+
+kotlin {
+    explicitApi()
+}

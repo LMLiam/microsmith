@@ -10,3 +10,7 @@ dependencies {
     api project(":artifact-services-dotnet-packages")
     implementation project(":resolve-services-dotnet-packages")
 }
+
+kotlin {
+    explicitApi()
+}
