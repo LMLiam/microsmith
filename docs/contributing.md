@@ -52,6 +52,14 @@
 - Any module may use Metro internally, but no published API module (`dsl`, `resolve`, `artifact`, `compile`, their submodules, `plugin-api` and `runtime-scripting-api`) may mention a Metro type in its ABI dump.
 - `./gradlew verifyModuleLayers` enforces both rules and runs as part of `check`.
 
+### Explicit API mode
+
+- Engine modules (`dsl`, `resolve`, `artifact`, `compile`, `plugin-api`, `gen`) compile with Kotlin explicit API mode in strict mode. Every public declaration states its visibility and its return type.
+- Make a declaration `internal` unless another module needs it. If another microsmith module needs it but plugin authors should not, keep it `public` and annotate it `@InternalMicrosmithApi`. Nested classes need their own annotation. The annotation is an opt-in error, and the ABI dump leaves such declarations out.
+- A module that uses an `@InternalMicrosmithApi` declaration opts in for the whole module with `optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')` in the `kotlin { compilerOptions { } }` block of its `build.gradle`. Do not add `@OptIn` at use sites.
+- A new engine module joins `explicitApiModules` in the root `build.gradle`.
+- Run `./gradlew updateKotlinAbi` when a public API changes, and commit the dump. `checkKotlinAbi` runs as part of `check`.
+
 Read [Architecture principles](architecture-principles.md) before you change a resolver, artifact, or compiler module.
 
 ### Review and PR slicing rules

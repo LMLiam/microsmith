@@ -39,7 +39,7 @@ Use the lowest layer that can observe the behaviour.
 
 | Layer | Scope | Where |
 |---|---|---|
-| Unit | One function, builder, or resolver. No process or network. A temporary directory is allowed when the unit writes files. | `src/test`, production package |
+| Unit | One function, builder, or resolver. No process or network. An in-memory file system is allowed when the unit reads or writes files. | `src/test`, production package |
 | Integration | Several pipeline stages composed, with real collaborators and temporary directories. | `src/integrationTest` |
 | End-to-end | A generated project built and run by its real toolchain, or the shipped artifact. | `src/e2eTest`, or a CI workflow |
 
@@ -76,8 +76,8 @@ Answer these questions for every test. Rewrite the test if an answer is "no".
 4. Does it go through the public API?
 5. Does it assert state or output, not call order?
 
-- Use real collaborators. Use a test double only at a boundary: network, file system, clock.
-- Use a temporary directory instead of a fake file system.
+- Use real collaborators. Use a test double only at a boundary: network, file system, clock, process, environment.
+- In unit tests, use an in-memory file system through the injected `FileSystem`. In integration and end-to-end tests, use a real temporary directory.
 - Assert one behaviour in each test. Name the test after the scenario and the expected outcome.
 - Do not test a library, a generated accessor, a data class, or a constant.
 - Keep a test input that is a whole file in another language (a script, source file, configuration, or expected output) under `src/<sourceSet>/resources`, and load it from there. Keep one-line snippets inline.
