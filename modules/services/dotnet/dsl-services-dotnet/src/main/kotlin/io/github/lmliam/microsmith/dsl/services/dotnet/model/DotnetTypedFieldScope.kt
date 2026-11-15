@@ -3,52 +3,52 @@ package io.github.lmliam.microsmith.dsl.services.dotnet.model
 import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 
 @MicrosmithDsl
-interface DotnetTypedFieldScope<TField> {
-    fun string(name: String): TField
+public interface DotnetTypedFieldScope<TField> {
+    public fun string(name: String): TField
 
-    fun char(name: String): TField
+    public fun char(name: String): TField
 
-    fun byte(name: String): TField
+    public fun byte(name: String): TField
 
-    fun sbyte(name: String): TField
+    public fun sbyte(name: String): TField
 
-    fun short(name: String): TField
+    public fun short(name: String): TField
 
-    fun ushort(name: String): TField
+    public fun ushort(name: String): TField
 
-    fun int(name: String): TField
+    public fun int(name: String): TField
 
-    fun uint(name: String): TField
+    public fun uint(name: String): TField
 
-    fun long(name: String): TField
+    public fun long(name: String): TField
 
-    fun ulong(name: String): TField
+    public fun ulong(name: String): TField
 
-    fun nint(name: String): TField
+    public fun nint(name: String): TField
 
-    fun nuint(name: String): TField
+    public fun nuint(name: String): TField
 
-    fun float(name: String): TField
+    public fun float(name: String): TField
 
-    fun double(name: String): TField
+    public fun double(name: String): TField
 
-    fun decimal(name: String): TField
+    public fun decimal(name: String): TField
 
-    fun bool(name: String): TField
+    public fun bool(name: String): TField
 
-    fun guid(name: String): TField
+    public fun guid(name: String): TField
 
-    fun dateOnly(name: String): TField
+    public fun dateOnly(name: String): TField
 
-    fun timeOnly(name: String): TField
+    public fun timeOnly(name: String): TField
 
-    fun dateTime(name: String): TField
+    public fun dateTime(name: String): TField
 
-    fun dateTimeOffset(name: String): TField
+    public fun dateTimeOffset(name: String): TField
 
-    fun timeSpan(name: String): TField
+    public fun timeSpan(name: String): TField
 
-    infix fun String.ref(target: String): TField
+    public infix fun String.ref(target: String): TField
 
-    infix fun String.references(target: String): TField
+    public infix fun String.references(target: String): TField
 }

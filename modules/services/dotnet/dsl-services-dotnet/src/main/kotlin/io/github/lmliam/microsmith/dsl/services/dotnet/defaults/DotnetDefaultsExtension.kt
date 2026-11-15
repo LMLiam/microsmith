@@ -8,23 +8,23 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.validation.validateDotnet
 import kotlin.reflect.KClass
 
 /** Shared .NET defaults declared under `services { dotnet { ... } }`. */
-data class DotnetDefaultsExtension(
-    val target: DotnetTarget? = null,
-    val solutions: Map<String, DotnetSolution> = emptyMap(),
-    val model: DotnetDefaultsModel = DotnetDefaultsModel.empty(),
+public data class DotnetDefaultsExtension(
+    public val target: DotnetTarget? = null,
+    public val solutions: Map<String, DotnetSolution> = emptyMap(),
+    public val model: DotnetDefaultsModel = DotnetDefaultsModel.empty(),
 ) : MicrosmithExtension, MergeableExtension<DotnetDefaultsExtension> {
-    fun findSolution(name: String) = solutions[name]
+    public fun findSolution(name: String): DotnetSolution? = solutions[name]
 
-    fun requireSolution(name: String): DotnetSolution {
+    public fun requireSolution(name: String): DotnetSolution {
         val normalized = validateDotnetQualifiedIdentifier(name, "Solution name")
         return findSolution(normalized) ?: error("Dotnet solution not found: $normalized")
     }
 
-    fun allSolutions() = solutions.values
+    public fun allSolutions(): Collection<DotnetSolution> = solutions.values
 
-    fun <T : MicrosmithExtension> get(type: KClass<T>) = model.get(type)
+    public fun <T : MicrosmithExtension> get(type: KClass<T>): T? = model.get(type)
 
-    inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
+    public inline fun <reified T : MicrosmithExtension> get(): T? = get(T::class)
 
     internal fun <T : MicrosmithExtension> with(type: KClass<T>, ext: T) = copy(model = model.with(type, ext))
 
