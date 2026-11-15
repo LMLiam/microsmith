@@ -15,8 +15,9 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspR
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspResultVariantTypeName
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRestTreeResolver
 
-internal class DotnetAspRestResolver {
-    private val treeResolver = DotnetAspRestTreeResolver()
+internal class DotnetAspRestResolver(
+    private val treeResolver: DotnetAspRestTreeResolver,
+) {
 
     fun resolve(
         serviceName: String,

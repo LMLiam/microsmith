@@ -12,9 +12,10 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspEndpointResolver
 
-internal class DotnetAspRestTreeResolver {
-    private val endpointResolver = DotnetAspEndpointResolver()
-    private val routeResolver = DotnetAspRouteResolver()
+internal class DotnetAspRestTreeResolver(
+    private val endpointResolver: DotnetAspEndpointResolver,
+    private val routeResolver: DotnetAspRouteResolver,
+) {
 
     fun resolve(
         serviceName: String,

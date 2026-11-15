@@ -8,9 +8,9 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspOperationContext
 
-internal class DotnetAspRouteResolver {
-    private val segmentParser = DotnetAspRouteSegmentParser()
-
+internal class DotnetAspRouteResolver(
+    private val segmentParser: DotnetAspRouteSegmentParser,
+) {
     fun parseDeclaredRoute(
         route: String,
         kind: DotnetAspResolutionIssue.RouteDeclarationKind,

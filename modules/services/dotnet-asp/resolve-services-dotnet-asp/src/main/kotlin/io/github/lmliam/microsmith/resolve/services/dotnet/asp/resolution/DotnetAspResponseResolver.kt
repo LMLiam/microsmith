@@ -16,8 +16,9 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.HTTP_NO_CO
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.RESULT_BODY_PROPERTY_NAME
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspHeaderPropertyName
 
-internal class DotnetAspResponseResolver {
-    private val modelResolver = DotnetAspModelResolver()
+internal class DotnetAspResponseResolver(
+    private val modelResolver: DotnetAspModelResolver,
+) {
 
     fun resolve(
         context: DotnetAspOperationContext,

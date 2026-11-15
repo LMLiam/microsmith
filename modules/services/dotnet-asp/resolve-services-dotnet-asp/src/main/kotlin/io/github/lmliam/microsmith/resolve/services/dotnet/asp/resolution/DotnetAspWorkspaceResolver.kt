@@ -16,15 +16,19 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.Dotne
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspControllerBaseTypeName
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRestTreeResolver
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRouteResolver
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRouteSegmentParser
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspace
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceResolver
 
 /** Finalises the ASP.NET subset of the .NET workspace into a scaffold-ready model. */
-class DotnetAspWorkspaceResolver(
-    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver(),
+class DotnetAspWorkspaceResolver
+internal constructor(
+    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver,
+    private val restResolver: DotnetAspRestResolver,
+    private val portAllocator: DotnetAspPortAllocator,
 ) {
-    private val restResolver = DotnetAspRestResolver()
-
     fun resolve(extension: ServicesExtension): EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> {
         val aspServiceNames =
             extension.services
@@ -55,7 +59,7 @@ class DotnetAspWorkspaceResolver(
         val aspExtensions = services.associate { it.name to aspExtensionOf(extension, it.name) }
 
         val ports =
-            DotnetAspPortAllocator.allocate(
+            portAllocator.allocate(
                 services.map { service ->
                     val declaredPorts = aspExtensions.getValue(service.name).ports
                     DotnetAspPortRequest(
@@ -145,4 +149,20 @@ class DotnetAspWorkspaceResolver(
             Either.Right(DotnetAspWorkspace(services.associateBy(ResolvedDotnetAspService::name)))
         }
     }
+}
+
+internal fun dotnetAspWorkspaceResolver(): DotnetAspWorkspaceResolver {
+    val modelResolver = DotnetAspModelResolver()
+    val bindingsResolver = DotnetAspEndpointBindingsResolver(DotnetAspBindingResolver(), modelResolver)
+    val responseResolver = DotnetAspResponseResolver(modelResolver)
+    val contentResolver = DotnetAspEndpointContentResolver(bindingsResolver, responseResolver)
+    val routeResolver = DotnetAspRouteResolver(DotnetAspRouteSegmentParser())
+    val endpointResolver = DotnetAspEndpointResolver(routeResolver, contentResolver)
+    val treeResolver = DotnetAspRestTreeResolver(endpointResolver, routeResolver)
+
+    return DotnetAspWorkspaceResolver(
+        dotnetWorkspaceResolver = DotnetWorkspaceResolver(),
+        restResolver = DotnetAspRestResolver(treeResolver),
+        portAllocator = DotnetAspPortAllocator(),
+    )
 }

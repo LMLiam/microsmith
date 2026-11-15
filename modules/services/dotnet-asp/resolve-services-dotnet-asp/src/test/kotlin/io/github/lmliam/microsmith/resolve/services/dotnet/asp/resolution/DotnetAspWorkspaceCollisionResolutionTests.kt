@@ -52,7 +52,7 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                dotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspResolutionIssue.DuplicateOperationName(
                             serviceName = "UserService",
@@ -89,7 +89,7 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                dotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspResolutionIssue.DuplicateRestEndpoint(
                             serviceName = "UserService",
@@ -126,7 +126,7 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                dotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspResolutionIssue.OutputRootCollision(
                             solutionName = "Platform",
@@ -164,7 +164,7 @@ class DotnetAspWorkspaceCollisionResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()).map {
+                dotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()).map {
                     (it as DotnetAspResolutionIssue.OutputRootCollision).outputRoot
                 } shouldContainExactly listOf("dotnet/A.B/Api", "dotnet/A/Api")
             }

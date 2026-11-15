@@ -8,9 +8,10 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRoute
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 
-internal class DotnetAspEndpointContentResolver {
-    private val bindingsResolver = DotnetAspEndpointBindingsResolver()
-    private val responseResolver = DotnetAspResponseResolver()
+internal class DotnetAspEndpointContentResolver(
+    private val bindingsResolver: DotnetAspEndpointBindingsResolver,
+    private val responseResolver: DotnetAspResponseResolver,
+) {
 
     fun resolve(
         context: DotnetAspOperationContext,

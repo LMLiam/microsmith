@@ -8,6 +8,7 @@ import io.github.lmliam.microsmith.dsl.services.services
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspaceResolver
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.dotnetAspWorkspaceResolver
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
@@ -52,7 +53,7 @@ class DotnetAspRouteResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveRouteIssues(builder.requireServicesExtension()) shouldContainExactly
+                dotnetAspWorkspaceResolver().resolveRouteIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspResolutionIssue.InvalidRouteDeclaration(
                             kind = DotnetAspResolutionIssue.RouteDeclarationKind.GROUP,

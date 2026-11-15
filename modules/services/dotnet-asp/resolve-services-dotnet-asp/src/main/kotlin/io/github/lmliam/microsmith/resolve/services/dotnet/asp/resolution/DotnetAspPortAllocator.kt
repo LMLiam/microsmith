@@ -18,7 +18,7 @@ internal data class DotnetAspPortRequest(
     val isConfigured: Boolean = http != null || https != null
 }
 
-internal object DotnetAspPortAllocator {
+internal class DotnetAspPortAllocator {
     fun allocate(
         requests: List<DotnetAspPortRequest>,
     ): EitherNel<DotnetAspResolutionIssue, Map<String, ResolvedDotnetAspPorts>> {
@@ -89,12 +89,12 @@ internal object DotnetAspPortAllocator {
     private fun httpPortForSlot(slot: Int): Int = BASE_HTTP_PORT + (slot * PORT_STRIDE)
 
     private fun isValidPort(port: Int): Boolean = port in MIN_PORT..MAX_PORT
-
-    private const val BASE_HTTP_PORT = 5_000
-    private const val PORT_STRIDE = 10
-    private const val HTTPS_PORT_OFFSET = 1
-    private const val PORT_SLOT_COUNT = 1_500
-    private const val PORT_HASH_MULTIPLIER = 31L
-    private const val MIN_PORT = 1
-    private const val MAX_PORT = 65_535
 }
+
+private const val BASE_HTTP_PORT = 5_000
+private const val PORT_STRIDE = 10
+private const val HTTPS_PORT_OFFSET = 1
+private const val PORT_SLOT_COUNT = 1_500
+private const val PORT_HASH_MULTIPLIER = 31L
+private const val MIN_PORT = 1
+private const val MAX_PORT = 65_535

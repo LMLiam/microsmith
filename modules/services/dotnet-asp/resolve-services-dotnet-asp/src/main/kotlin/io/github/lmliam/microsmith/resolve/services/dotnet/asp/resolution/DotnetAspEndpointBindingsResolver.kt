@@ -14,9 +14,10 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspBindingResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 
-internal class DotnetAspEndpointBindingsResolver {
-    private val bindingResolver = DotnetAspBindingResolver()
-    private val modelResolver = DotnetAspModelResolver()
+internal class DotnetAspEndpointBindingsResolver(
+    private val bindingResolver: DotnetAspBindingResolver,
+    private val modelResolver: DotnetAspModelResolver,
+) {
 
     fun resolve(
         context: DotnetAspOperationContext,

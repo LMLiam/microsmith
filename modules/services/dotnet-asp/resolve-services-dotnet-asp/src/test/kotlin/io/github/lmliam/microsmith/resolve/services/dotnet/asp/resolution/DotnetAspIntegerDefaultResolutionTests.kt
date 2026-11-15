@@ -41,7 +41,7 @@ private fun resolveQuery(
             }
         }
     }
-    return DotnetAspWorkspaceResolver().resolve(requireNotNull(builder.model.get<ServicesExtension>()))
+    return dotnetAspWorkspaceResolver().resolve(requireNotNull(builder.model.get<ServicesExtension>()))
 }
 
 private fun resolveQueryIssues(query: DotnetAspRequestBindingScope.() -> Unit): List<DotnetResolutionIssue> =

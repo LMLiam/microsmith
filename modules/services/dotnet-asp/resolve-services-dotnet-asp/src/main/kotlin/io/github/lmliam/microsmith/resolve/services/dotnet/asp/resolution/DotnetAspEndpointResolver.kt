@@ -9,9 +9,10 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.Dotne
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRouteFragment
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRouteResolver
 
-internal class DotnetAspEndpointResolver {
-    private val routeResolver = DotnetAspRouteResolver()
-    private val contentResolver = DotnetAspEndpointContentResolver()
+internal class DotnetAspEndpointResolver(
+    private val routeResolver: DotnetAspRouteResolver,
+    private val contentResolver: DotnetAspEndpointContentResolver,
+) {
 
     fun resolve(
         serviceName: String,

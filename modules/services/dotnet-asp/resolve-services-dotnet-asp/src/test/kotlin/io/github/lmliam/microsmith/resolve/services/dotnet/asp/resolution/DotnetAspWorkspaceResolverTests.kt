@@ -79,7 +79,7 @@ class DotnetAspWorkspaceResolverTests :
                     }
                 }
 
-                val workspace = DotnetAspWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
+                val workspace = dotnetAspWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
                 val service = requireNotNull(workspace.servicesByName["UserService"])
                 val endpoints = service.rest.endpoints.associateBy(ResolvedDotnetAspEndpoint::operationName)
                 val getUser = requireNotNull(endpoints["GetUser"])
@@ -132,7 +132,7 @@ class DotnetAspWorkspaceResolverTests :
                     }
                 }
 
-                val workspace = DotnetAspWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
+                val workspace = dotnetAspWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
 
                 requireNotNull(workspace.servicesByName["UserService"]).ports shouldBe
                     ResolvedDotnetAspPorts(http = 7000, https = 7443)
@@ -172,7 +172,7 @@ class DotnetAspWorkspaceResolverTests :
                     }
                 }
 
-                val workspace = DotnetAspWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
+                val workspace = dotnetAspWorkspaceResolver().resolveSuccessfully(builder.requireServicesExtension())
                 val service = requireNotNull(workspace.servicesByName["UserService"])
                 val endpoint = service.rest.endpoints.single()
 

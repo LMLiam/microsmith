@@ -716,7 +716,6 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resol
 public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceDomainResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
 	public fun <init> ()V
 	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceResolver;)V
-	public synthetic fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceResolver;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun getAuthoringType ()Lkotlin/reflect/KClass;
 	public fun getResolvedType ()Lkotlin/reflect/KClass;
 	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
@@ -724,9 +723,6 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resol
 }
 
 public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceResolver {
-	public fun <init> ()V
-	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;)V
-	public synthetic fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/resolution/DotnetWorkspaceResolver;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Larrow/core/Either;
 }
 
