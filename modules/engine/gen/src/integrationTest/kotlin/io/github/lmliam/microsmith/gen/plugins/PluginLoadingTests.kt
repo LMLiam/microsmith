@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.gen.plugins
 
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
 import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
+import io.github.lmliam.microsmith.gen.CancelTrigger
 import io.github.lmliam.microsmith.gen.FirstLabelResolver
 import io.github.lmliam.microsmith.gen.LabelExtension
 import io.github.lmliam.microsmith.gen.LabelFileContributor
@@ -13,12 +14,12 @@ import io.github.lmliam.microsmith.gen.errors.PluginLoadFailedException
 import io.github.lmliam.microsmith.gen.generateWithPlugins
 import io.github.lmliam.microsmith.gen.generatedTexts
 import io.github.lmliam.microsmith.gen.newOutputDirectory
+import io.github.lmliam.microsmith.gen.runCancelled
 import io.github.lmliam.microsmith.gen.testGenerator
-import io.github.lmliam.microsmith.plugin.Diagnostic
-import io.github.lmliam.microsmith.plugin.DiagnosticSink
 import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -28,11 +29,8 @@ import java.net.URLClassLoader
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.writeText
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import thirdparty.contract.CONTRIBUTING_CODE
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import thirdparty.contract.FixtureExtension
 
 private fun <T> List<T>.permutations(): List<List<T>> =
@@ -205,27 +203,19 @@ class PluginLoadingTests :
             }
 
             "when the run is cancelled every plugin is still closed" {
-                val recorder = RecordingDiagnosticSink()
-                lateinit var run: Job
-                val cancellingSink =
-                    object : DiagnosticSink {
-                        override fun report(diagnostic: Diagnostic) {
-                            recorder.report(diagnostic)
-                            if (diagnostic.code == CONTRIBUTING_CODE) run.cancel()
-                        }
-                    }
+                runTest {
+                    val run =
+                        runCancelled(
+                            "alpha",
+                            "beta",
+                            trigger = CancelTrigger.CONTRIBUTING,
+                            output = tempdir().toPath(),
+                            temporaryRoot = tempdir().toPath(),
+                            dispatcher = StandardTestDispatcher(testScheduler),
+                        )
 
-                coroutineScope {
-                    run =
-                        launch(start = CoroutineStart.LAZY) {
-                            generateWithPlugins("alpha", "beta", diagnostics = cancellingSink)
-                        }
-                    run.start()
-                    run.join()
+                    run.diagnostics.closedPluginIds() shouldBe listOf("thirdparty.beta", "thirdparty.alpha")
                 }
-
-                run.isCancelled shouldBe true
-                recorder.closedPluginIds() shouldBe listOf("thirdparty.beta", "thirdparty.alpha")
             }
         },
     )

@@ -7,13 +7,25 @@ import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import java.nio.file.FileSystems
+import java.util.concurrent.Executors
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.readBytes
 import kotlin.io.path.readText
+import kotlin.io.path.walk
 import kotlin.io.path.writeText
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 
+@OptIn(ExperimentalPathApi::class)
 class GeneratedOutputWriterTests :
     StringSpec(
         {
@@ -85,6 +97,70 @@ class GeneratedOutputWriterTests :
                         .write(outputs = emptyList(), space = DirectorySpace(outputRoot))
 
                     outputRoot.isDirectory() shouldBe true
+                }
+            }
+
+            "write stores every file when many outputs share their parent directories" {
+                val outputRoot = createTempDirectory("microsmith-writer-")
+                val outputs =
+                    (0 until 200).map { index ->
+                        GeneratedFile(
+                            RelativePath.of("group${index % 5}", "nested", "file$index.txt"),
+                            "contents$index".toByteArray(),
+                        )
+                    }
+
+                val executor = Executors.newFixedThreadPool(8)
+                executor.asCoroutineDispatcher().use { dispatcher ->
+                    GeneratedOutputWriter(GeneratedOutputPathResolver(FileSystems.getDefault()), dispatcher)
+                        .write(outputs, DirectorySpace(outputRoot))
+                }
+
+                outputs.forEach { output ->
+                    outputRoot.resolve(output.relativePath.toString()).readBytes().toList() shouldBe
+                        output.contents.toList()
+                }
+            }
+
+            "write stops before reaching every output when the run is cancelled" {
+                runTest {
+                    val outputRoot = createTempDirectory("microsmith-writer-")
+                    val outputs =
+                        (0 until 6).map { index ->
+                            GeneratedFile(
+                                RelativePath.of("file$index.txt"),
+                                "contents$index".toByteArray(),
+                                RelativePath.of("root$index"),
+                            )
+                        }
+                    lateinit var run: Job
+                    val cancelWhenThirdIsReached =
+                        object : AbstractList<GeneratedFile>() {
+                            override val size = outputs.size
+
+                            override fun get(index: Int) = outputs[index]
+
+                            override fun iterator() = sequence {
+                                outputs.forEachIndexed { index, output ->
+                                    if (index == 2) run.cancel()
+                                    yield(output)
+                                }
+                            }
+                                .iterator()
+                        }
+
+                    run = launch {
+                        GeneratedOutputWriter(
+                                GeneratedOutputPathResolver(FileSystems.getDefault()),
+                                UnconfinedTestDispatcher(),
+                            )
+                            .write(cancelWhenThirdIsReached, DirectorySpace(outputRoot))
+                    }
+                    run.join()
+
+                    run.isCancelled shouldBe true
+                    outputRoot.resolve("root5").exists() shouldBe false
+                    outputRoot.walk().count { it.isRegularFile() } shouldBe 0
                 }
             }
 

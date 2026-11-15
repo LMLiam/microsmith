@@ -10,6 +10,9 @@ import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeBytes
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 
 @Inject
@@ -22,13 +25,18 @@ internal class GeneratedOutputWriter(
         withContext(ioDispatcher) {
             pathResolver.resolve(space, RelativePath.ROOT)
 
-            outputs.forEach { output ->
-                val target = pathResolver.resolve(space, output)
-
-                target.parent?.let(Path::createDirectories)
-
-                target.writeBytes(output.contents)
-            }
+            outputs
+                .map { output ->
+                    ensureActive()
+                    pathResolver.resolve(space, output) to output.contents
+                }
+                .map { (target, contents) ->
+                    async {
+                        target.parent?.createDirectories()
+                        target.writeBytes(contents)
+                    }
+                }
+                .awaitAll()
         }
     }
 
