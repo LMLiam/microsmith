@@ -18,3 +18,9 @@ dependencies {
     testRuntimeOnly project(":plugin-schemas-protobuf")
     testRuntimeOnly project(":plugin-schemas-protobuf-rpc")
 }
+
+kotlin {
+    compilerOptions {
+        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+    }
+}

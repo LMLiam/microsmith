@@ -7,14 +7,15 @@ import io.github.lmliam.microsmith.resolve.schemas.ResolvedSchemasModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 
 @ConsistentCopyVisibility
-data class ResolvedProtobufRpcSchemaModel private constructor(val schemas: List<ResolvedProtobufRpcSchema>) :
-    ResolvedSchemasModel {
-    sealed interface Rejection {
-        data class DuplicateService(val identity: QualifiedSchemaName, val occurrences: Int) : Rejection
+public data class ResolvedProtobufRpcSchemaModel
+private constructor(public val schemas: List<ResolvedProtobufRpcSchema>) : ResolvedSchemasModel {
+    public sealed interface Rejection {
+        public data class DuplicateService(public val identity: QualifiedSchemaName, public val occurrences: Int) :
+            Rejection
     }
 
-    companion object {
-        fun of(schemas: List<ResolvedProtobufRpcSchema>): EitherNel<Rejection, ResolvedProtobufRpcSchemaModel> {
+    public companion object {
+        public fun of(schemas: List<ResolvedProtobufRpcSchema>): EitherNel<Rejection, ResolvedProtobufRpcSchemaModel> {
             val ownSchemas = schemas.toList()
             val rejections =
                 ownSchemas

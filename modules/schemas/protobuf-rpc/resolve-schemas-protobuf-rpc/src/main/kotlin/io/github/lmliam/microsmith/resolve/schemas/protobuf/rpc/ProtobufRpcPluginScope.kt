@@ -1,3 +1,5 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc
 
-interface ProtobufRpcPluginScope
+import io.github.lmliam.microsmith.InternalMicrosmithApi
+
+@InternalMicrosmithApi public interface ProtobufRpcPluginScope
