@@ -1,14 +1,14 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.msbuild
 
-object MsBuildNames {
-    const val SDK_ATTRIBUTE = "Sdk"
-    const val IMPLICIT_USINGS_PROPERTY = "ImplicitUsings"
-    const val MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY = "ManagePackageVersionsCentrally"
-    const val NULLABLE_PROPERTY = "Nullable"
-    const val PACKAGE_REFERENCE_ITEM = "PackageReference"
-    const val PACKAGE_VERSION_ITEM = "PackageVersion"
-    const val TARGET_FRAMEWORK_PROPERTY = "TargetFramework"
-    const val VERSION_ATTRIBUTE = "Version"
+public object MsBuildNames {
+    public const val SDK_ATTRIBUTE: String = "Sdk"
+    public const val IMPLICIT_USINGS_PROPERTY: String = "ImplicitUsings"
+    public const val MANAGE_PACKAGE_VERSIONS_CENTRALLY_PROPERTY: String = "ManagePackageVersionsCentrally"
+    public const val NULLABLE_PROPERTY: String = "Nullable"
+    public const val PACKAGE_REFERENCE_ITEM: String = "PackageReference"
+    public const val PACKAGE_VERSION_ITEM: String = "PackageVersion"
+    public const val TARGET_FRAMEWORK_PROPERTY: String = "TargetFramework"
+    public const val VERSION_ATTRIBUTE: String = "Version"
 }
 
 internal fun requirePropertyName(value: String): String {

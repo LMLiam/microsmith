@@ -1,14 +1,18 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet
 
-sealed interface DotnetWorkspaceResolutionIssue : DotnetResolutionIssue {
-    data class TargetNotConfigured(val serviceName: String) : DotnetWorkspaceResolutionIssue
+public sealed interface DotnetWorkspaceResolutionIssue : DotnetResolutionIssue {
+    public data class TargetNotConfigured(public val serviceName: String) : DotnetWorkspaceResolutionIssue
 
-    data class SolutionNotConfigured(val serviceName: String) : DotnetWorkspaceResolutionIssue
+    public data class SolutionNotConfigured(public val serviceName: String) : DotnetWorkspaceResolutionIssue
 
-    data class SolutionNotDeclared(val serviceName: String, val solutionName: String) : DotnetWorkspaceResolutionIssue
-
-    data class ProjectNotConfigured(val serviceName: String) : DotnetWorkspaceResolutionIssue
-
-    data class UnknownModelReference(val serviceName: String, val modelName: String, val targetName: String) :
+    public data class SolutionNotDeclared(public val serviceName: String, public val solutionName: String) :
         DotnetWorkspaceResolutionIssue
+
+    public data class ProjectNotConfigured(public val serviceName: String) : DotnetWorkspaceResolutionIssue
+
+    public data class UnknownModelReference(
+        public val serviceName: String,
+        public val modelName: String,
+        public val targetName: String,
+    ) : DotnetWorkspaceResolutionIssue
 }

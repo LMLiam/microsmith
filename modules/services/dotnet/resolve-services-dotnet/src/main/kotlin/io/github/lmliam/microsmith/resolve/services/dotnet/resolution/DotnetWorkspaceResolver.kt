@@ -16,8 +16,8 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.ResolvedDotnetService
 
 /** Normalises the shared and per-service .NET DSL into a resolved workspace model. */
 @InternalMicrosmithApi
-class DotnetWorkspaceResolver {
-    fun resolve(extension: ServicesExtension): EitherNel<DotnetWorkspaceResolutionIssue, DotnetWorkspace> {
+public class DotnetWorkspaceResolver {
+    public fun resolve(extension: ServicesExtension): EitherNel<DotnetWorkspaceResolutionIssue, DotnetWorkspace> {
         val defaults = extension.get<DotnetDefaultsExtension>() ?: DotnetDefaultsExtension()
         val services =
             extension.services

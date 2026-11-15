@@ -1,30 +1,30 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.csharp
 
 @CSharp.Dsl
-class CSharpCodeBlockBuilder internal constructor() {
+public class CSharpCodeBlockBuilder internal constructor() {
     private val statements = mutableListOf<CSharp.Statement>()
 
-    fun line(text: String) {
+    public fun line(text: String) {
         statements += CSharp.RawStatement(text)
     }
 
-    fun expression(expression: CSharp.Expression) {
+    public fun expression(expression: CSharp.Expression) {
         statements += CSharp.ExpressionStatement(expression)
     }
 
-    fun expression(text: String) {
+    public fun expression(text: String) {
         expression(rawExpression(text))
     }
 
-    fun returnStatement(expression: CSharp.Expression) {
+    public fun returnStatement(expression: CSharp.Expression) {
         statements += CSharp.ReturnStatement(expression)
     }
 
-    fun returnStatement(expression: String) {
+    public fun returnStatement(expression: String) {
         returnStatement(rawExpression(expression))
     }
 
-    fun local(keyword: String = "var", name: String, initializer: CSharp.Expression) {
+    public fun local(keyword: String = "var", name: String, initializer: CSharp.Expression) {
         statements +=
             CSharp.LocalDeclaration(
                 keyword = keyword,
@@ -33,11 +33,11 @@ class CSharpCodeBlockBuilder internal constructor() {
             )
     }
 
-    fun local(keyword: String = "var", name: String, initializer: String) {
+    public fun local(keyword: String = "var", name: String, initializer: String) {
         local(keyword = keyword, name = name, initializer = rawExpression(initializer))
     }
 
-    fun ifStatement(condition: CSharp.Expression, build: CSharpCodeBlockBuilder.() -> Unit) {
+    public fun ifStatement(condition: CSharp.Expression, build: CSharpCodeBlockBuilder.() -> Unit) {
         statements +=
             CSharp.IfStatement(
                 condition = condition,
@@ -45,11 +45,11 @@ class CSharpCodeBlockBuilder internal constructor() {
             )
     }
 
-    fun ifStatement(condition: String, build: CSharpCodeBlockBuilder.() -> Unit) {
+    public fun ifStatement(condition: String, build: CSharpCodeBlockBuilder.() -> Unit) {
         ifStatement(rawExpression(condition), build)
     }
 
-    fun foreach(signature: String, build: CSharpCodeBlockBuilder.() -> Unit) {
+    public fun foreach(signature: String, build: CSharpCodeBlockBuilder.() -> Unit) {
         statements +=
             CSharp.RawForeachStatement(
                 signature = signature,
@@ -57,7 +57,7 @@ class CSharpCodeBlockBuilder internal constructor() {
             )
     }
 
-    fun foreach(name: String, source: CSharp.Expression, build: CSharpCodeBlockBuilder.() -> Unit) {
+    public fun foreach(name: String, source: CSharp.Expression, build: CSharpCodeBlockBuilder.() -> Unit) {
         statements +=
             CSharp.StructuredForeachStatement(
                 target = CSharp.ForeachIdentifier(name),
@@ -66,7 +66,7 @@ class CSharpCodeBlockBuilder internal constructor() {
             )
     }
 
-    fun foreachDeconstruction(
+    public fun foreachDeconstruction(
         vararg names: String,
         source: CSharp.Expression,
         build: CSharpCodeBlockBuilder.() -> Unit,
@@ -79,7 +79,7 @@ class CSharpCodeBlockBuilder internal constructor() {
             )
     }
 
-    fun blankLine() {
+    public fun blankLine() {
         statements += CSharp.BlankLine
     }
 
