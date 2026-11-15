@@ -1,15 +1,17 @@
 package io.github.lmliam.microsmith.cli.ide
 
 import java.io.IOException
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readBytes
 
 internal object IdeHelperDoctorChecks {
     fun helperDirectoryCheck(helperRoot: Path): IdeDoctorCheckResult =
         when {
-            managedPathExists(helperRoot) && Files.isDirectory(helperRoot, LinkOption.NOFOLLOW_LINKS) ->
+            managedPathExists(helperRoot) && helperRoot.isDirectory(LinkOption.NOFOLLOW_LINKS) ->
                 IdeDoctorCheckResult(
                     id = "helper-directory",
                     passed = true,
@@ -118,16 +120,16 @@ internal object IdeHelperDoctorChecks {
         )
     }
 
-    private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
+    private fun managedPathExists(path: Path): Boolean = path.exists(LinkOption.NOFOLLOW_LINKS)
 
-    private fun isManagedRegularFile(path: Path): Boolean = Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)
+    private fun isManagedRegularFile(path: Path): Boolean = path.isRegularFile(LinkOption.NOFOLLOW_LINKS)
 
     private fun readManagedUtf8TextOrNull(path: Path): String? {
         return try {
             if (!isManagedRegularFile(path)) {
                 return null
             }
-            Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n")
+            path.readBytes().decodeToString(throwOnInvalidSequence = true).replace("\r\n", "\n")
         } catch (_: IOException) {
             null
         } catch (_: SecurityException) {

@@ -7,7 +7,11 @@ import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import java.nio.file.Files
+import kotlin.io.path.createDirectories
+import kotlin.io.path.isDirectory
+import kotlin.io.path.readBytes
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 class GeneratedOutputWriterTests :
@@ -17,8 +21,8 @@ class GeneratedOutputWriterTests :
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
                     val outputRoot = fileSystem.getPath("/repo-root")
                     val existingProtoFile = outputRoot.resolve("services/UserService/UserCreated.proto")
-                    Files.createDirectories(existingProtoFile.parent)
-                    Files.writeString(existingProtoFile, "stale")
+                    existingProtoFile.parent.createDirectories()
+                    existingProtoFile.writeText("stale")
 
                     GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
                         .write(
@@ -33,7 +37,7 @@ class GeneratedOutputWriterTests :
                             space = DirectorySpace(outputRoot),
                         )
 
-                    Files.readString(existingProtoFile) shouldBe "fresh"
+                    existingProtoFile.readText() shouldBe "fresh"
                 }
             }
 
@@ -54,8 +58,7 @@ class GeneratedOutputWriterTests :
                             space = DirectorySpace(outputRoot),
                         )
 
-                    Files.readString(outputRoot.resolve("dotnet/Platform/Generated/Contracts/Models.cs")) shouldBe
-                        "models"
+                    outputRoot.resolve("dotnet/Platform/Generated/Contracts/Models.cs").readText() shouldBe "models"
                 }
             }
 
@@ -70,7 +73,7 @@ class GeneratedOutputWriterTests :
                             space = DirectorySpace(outputRoot),
                         )
 
-                    Files.readAllBytes(outputRoot.resolve("blob.bin")).toList() shouldBe bytes.toList()
+                    outputRoot.resolve("blob.bin").readBytes().toList() shouldBe bytes.toList()
                 }
             }
 
@@ -81,7 +84,7 @@ class GeneratedOutputWriterTests :
                     GeneratedOutputWriter(GeneratedOutputPathResolver(fileSystem), UnconfinedTestDispatcher())
                         .write(outputs = emptyList(), space = DirectorySpace(outputRoot))
 
-                    Files.isDirectory(outputRoot) shouldBe true
+                    outputRoot.isDirectory() shouldBe true
                 }
             }
 

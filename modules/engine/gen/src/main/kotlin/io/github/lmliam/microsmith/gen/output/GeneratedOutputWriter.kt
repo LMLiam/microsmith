@@ -6,8 +6,9 @@ import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.gen.RunScope
 import io.github.lmliam.microsmith.gen.files.FileSpace
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.writeBytes
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
@@ -24,9 +25,9 @@ internal class GeneratedOutputWriter(
             outputs.forEach { output ->
                 val target = pathResolver.resolve(space, output)
 
-                target.parent?.let(Files::createDirectories)
+                target.parent?.let(Path::createDirectories)
 
-                Files.write(target, output.contents)
+                target.writeBytes(output.contents)
             }
         }
     }

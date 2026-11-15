@@ -7,8 +7,9 @@ import io.github.lmliam.microsmith.cli.plugins.integrity.sha256
 import io.github.lmliam.microsmith.cli.plugins.lockfile.LockEntry
 import io.github.lmliam.microsmith.cli.plugins.lockfile.ParsedLockfile
 import io.github.lmliam.microsmith.cli.plugins.lockfile.verifyChecksum
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
 
 internal class LocalPluginResolver(private val checksumCalculator: (Path) -> String = ::sha256) {
     fun resolveValidated(pluginJars: Set<Path>): List<LocalPluginJar> {
@@ -22,7 +23,7 @@ internal class LocalPluginResolver(private val checksumCalculator: (Path) -> Str
                 }
                 .sortedBy(LocalPluginJar::lockKey)
         localPluginJars.forEach { localJar ->
-            require(Files.exists(localJar.artifactPath) && Files.isRegularFile(localJar.artifactPath)) {
+            require(localJar.artifactPath.exists() && localJar.artifactPath.isRegularFile()) {
                 "Plugin jar '${localJar.artifactPath}' does not exist or is not a file."
             }
         }

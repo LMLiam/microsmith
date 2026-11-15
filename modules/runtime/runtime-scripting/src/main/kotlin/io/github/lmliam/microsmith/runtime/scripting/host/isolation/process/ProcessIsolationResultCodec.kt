@@ -5,9 +5,11 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunDiagnostic
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Properties
+import kotlin.io.path.createDirectories
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 
 internal class ProcessIsolationResultCodec {
     fun write(path: Path, result: ScriptRunResult) {
@@ -17,12 +19,12 @@ internal class ProcessIsolationResultCodec {
             is ScriptRunFailure -> writeFailure(properties, result)
         }
 
-        path.parent?.let(Files::createDirectories)
-        Files.newOutputStream(path).use { output -> properties.store(output, "Microsmith process isolation result") }
+        path.parent?.let(Path::createDirectories)
+        path.outputStream().use { output -> properties.store(output, "Microsmith process isolation result") }
     }
 
     fun read(path: Path): ScriptRunResult {
-        val properties = Properties().also { loaded -> Files.newInputStream(path).use { input -> loaded.load(input) } }
+        val properties = Properties().also { loaded -> path.inputStream().use { input -> loaded.load(input) } }
 
         return when (properties.getProperty(ProcessIsolationPropertyNames.RESULT_STATUS)?.trim()) {
             ProcessIsolationPropertyNames.RESULT_STATUS_SUCCESS -> readSuccess(properties)

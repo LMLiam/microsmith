@@ -2,10 +2,11 @@ package io.github.lmliam.microsmith.cli.eventlog
 
 import io.github.lmliam.microsmith.cli.diagnostics.toJsonValue
 import io.github.lmliam.microsmith.cli.plugins.integrity.sha256IfRegularFile
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.time.Instant
+import kotlin.io.path.createDirectories
+import kotlin.io.path.writeText
 
 internal object EventLogWriter {
     fun writeEventLog(path: Path, event: RunEventLogEntry) {
@@ -29,10 +30,10 @@ internal object EventLogWriter {
                 )
                 .apply { event.failureCode?.let { put("failureCode", it.id) } }
 
-        path.parent?.let(Files::createDirectories)
-        Files.writeString(
-            path,
+        path.parent?.let(Path::createDirectories)
+        path.writeText(
             "${toJsonValue(payload)}\n",
+            Charsets.UTF_8,
             StandardOpenOption.CREATE,
             StandardOpenOption.APPEND,
             StandardOpenOption.WRITE,

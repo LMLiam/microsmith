@@ -6,9 +6,12 @@ import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.gen.files.DirectorySpace
 import io.github.lmliam.microsmith.gen.files.FileSpace
 import java.nio.file.FileSystem
-import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isSymbolicLink
 
 @Inject
 internal class GeneratedOutputPathResolver(private val fileSystem: FileSystem) {
@@ -46,13 +49,13 @@ internal class GeneratedOutputPathResolver(private val fileSystem: FileSystem) {
     }
 
     private fun ensureOutputRootIsSafe(root: Path) {
-        if (Files.exists(root, LinkOption.NOFOLLOW_LINKS)) {
-            require(Files.isDirectory(root, LinkOption.NOFOLLOW_LINKS)) { "Output root '$root' must be a directory." }
-            require(!Files.isSymbolicLink(root)) { "Output root '$root' must not be a symbolic link." }
+        if (root.exists(LinkOption.NOFOLLOW_LINKS)) {
+            require(root.isDirectory(LinkOption.NOFOLLOW_LINKS)) { "Output root '$root' must be a directory." }
+            require(!root.isSymbolicLink()) { "Output root '$root' must not be a symbolic link." }
             return
         }
 
-        Files.createDirectories(root)
+        root.createDirectories()
     }
 
     private fun requireNoSymlinkTraversal(root: Path, relativePath: RelativePath) {
@@ -61,17 +64,17 @@ internal class GeneratedOutputPathResolver(private val fileSystem: FileSystem) {
         for ((index, segment) in segments.withIndex()) {
             current = current.resolve(segment)
 
-            if (!Files.exists(current, LinkOption.NOFOLLOW_LINKS)) {
+            if (!current.exists(LinkOption.NOFOLLOW_LINKS)) {
                 continue
             }
 
-            require(!Files.isSymbolicLink(current)) {
+            require(!current.isSymbolicLink()) {
                 "Generated output path '$relativePath' traverses symbolic link '$current'."
             }
 
             val isLastSegment = index == segments.lastIndex
             if (!isLastSegment) {
-                require(Files.isDirectory(current, LinkOption.NOFOLLOW_LINKS)) {
+                require(current.isDirectory(LinkOption.NOFOLLOW_LINKS)) {
                     "Generated output path '$relativePath' contains non-directory segment '$current'."
                 }
             }

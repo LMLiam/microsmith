@@ -1,7 +1,10 @@
 package io.github.lmliam.microsmith.gradle.worker
 
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
 import org.gradle.api.GradleException
 
 internal class MicrosmithGradleWorkerLauncher(
@@ -23,8 +26,8 @@ internal class MicrosmithGradleWorkerLauncher(
     }
 
     private fun createWorkspace(workDirectory: Path): Path {
-        Files.createDirectories(workDirectory)
-        return Files.createTempDirectory(workDirectory, WORKER_DIRECTORY_PREFIX)
+        workDirectory.createDirectories()
+        return createTempDirectory(workDirectory, WORKER_DIRECTORY_PREFIX)
     }
 
     private fun executeProcess(
@@ -34,7 +37,7 @@ internal class MicrosmithGradleWorkerLauncher(
     ): MicrosmithGradleWorkerExecutionOutcome {
         val processOutcome = processExecutor.execute(buildCommand(runtimeClasspath, requestFile, resultFile))
         val parsedResult =
-            resultFile.takeIf(Files::isRegularFile)?.let { file -> runCatching { resultCodec.read(file) }.getOrNull() }
+            resultFile.takeIf(Path::isRegularFile)?.let { file -> runCatching { resultCodec.read(file) }.getOrNull() }
         return MicrosmithGradleWorkerExecutionOutcome(
             exitCode = processOutcome.exitCode,
             processOutput = processOutcome.processOutput,
@@ -56,7 +59,7 @@ internal class MicrosmithGradleWorkerLauncher(
         val javaHome = Path.of(System.getProperty("java.home"))
         val executableName = if (isWindows()) "java.exe" else "java"
         val executable = javaHome.resolve("bin").resolve(executableName)
-        require(Files.exists(executable) && Files.isRegularFile(executable)) {
+        require(executable.exists() && executable.isRegularFile()) {
             "Could not locate Java executable at '$executable' for Microsmith Gradle worker."
         }
         return executable

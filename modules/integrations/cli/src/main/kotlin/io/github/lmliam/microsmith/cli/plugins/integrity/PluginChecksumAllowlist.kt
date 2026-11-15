@@ -5,8 +5,10 @@ import io.github.lmliam.microsmith.cli.plugins.REMOTE_ARTIFACT_KIND
 import io.github.lmliam.microsmith.cli.plugins.REMOTE_KIND
 import io.github.lmliam.microsmith.cli.plugins.lockfile.LockEntry
 import io.github.lmliam.microsmith.cli.plugins.lockfile.LockKey
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readLines
 
 private const val CHECKSUM_ALLOWLIST_PATH_ENV = "MICROSMITH_PLUGIN_ALLOWLIST_FILE"
 private const val ALLOWLIST_ENTRY_PARTS = 3
@@ -39,12 +41,11 @@ internal fun loadPluginChecksumAllowlistFromEnvironment(
 }
 
 internal fun loadPluginChecksumAllowlistFromPath(path: Path): PluginChecksumAllowlist {
-    require(Files.exists(path) && Files.isRegularFile(path)) {
-        "Plugin allowlist file '$path' does not exist or is not a file."
-    }
+    require(path.exists() && path.isRegularFile()) { "Plugin allowlist file '$path' does not exist or is not a file." }
 
     val entries =
-        Files.readAllLines(path)
+        path
+            .readLines()
             .asSequence()
             .map(String::trim)
             .filter(String::isNotEmpty)

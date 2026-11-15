@@ -1,10 +1,14 @@
 package io.github.lmliam.microsmith.cli.ide
 
 import java.io.IOException
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
+import kotlin.io.path.createDirectory
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readBytes
+import kotlin.io.path.writeText
 
 internal class ManagedIdeHelperFileWriter {
     fun ensureManagedDirectory(path: Path) {
@@ -14,7 +18,7 @@ internal class ManagedIdeHelperFileWriter {
             managedPathExists(path) ->
                 throw IdeHelperConflictException("IDE helper directory '$path' exists but is not a directory.")
 
-            else -> Files.createDirectory(path)
+            else -> path.createDirectory()
         }
     }
 
@@ -27,18 +31,19 @@ internal class ManagedIdeHelperFileWriter {
             managedFileContentMatches(path, normalizedContent) -> return false
         }
 
-        Files.writeString(path, normalizedContent, StandardCharsets.UTF_8)
+        path.writeText(normalizedContent)
         return true
     }
 
-    private fun managedPathExists(path: Path): Boolean = Files.exists(path, LinkOption.NOFOLLOW_LINKS)
+    private fun managedPathExists(path: Path): Boolean = path.exists(LinkOption.NOFOLLOW_LINKS)
 
     private fun managedFileContentMatches(path: Path, normalizedContent: String): Boolean =
         try {
             if (!isManagedRegularFile(path)) {
                 false
             } else {
-                Files.readString(path, StandardCharsets.UTF_8).replace("\r\n", "\n") == normalizedContent
+                path.readBytes().decodeToString(throwOnInvalidSequence = true).replace("\r\n", "\n") ==
+                    normalizedContent
             }
         } catch (_: IOException) {
             false
@@ -46,7 +51,7 @@ internal class ManagedIdeHelperFileWriter {
             false
         }
 
-    private fun isManagedDirectory(path: Path): Boolean = Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)
+    private fun isManagedDirectory(path: Path): Boolean = path.isDirectory(LinkOption.NOFOLLOW_LINKS)
 
-    private fun isManagedRegularFile(path: Path): Boolean = Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)
+    private fun isManagedRegularFile(path: Path): Boolean = path.isRegularFile(LinkOption.NOFOLLOW_LINKS)
 }

@@ -1,9 +1,10 @@
 package io.github.lmliam.microsmith.cli.doctor
 
 import io.github.lmliam.microsmith.cli.plugins.repository.defaultRepositoryAllowlistPolicy
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.ServiceConfigurationError
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteIfExists
 
 internal object DoctorEnvironmentChecks {
@@ -54,8 +55,8 @@ internal object DoctorEnvironmentChecks {
         }
 
     fun checkDirectoryWritable(id: String, directory: Path): DoctorCheckResult = runCatching {
-        Files.createDirectories(directory)
-        val probe = Files.createTempFile(directory, "microsmith-doctor-", ".tmp")
+        directory.createDirectories()
+        val probe = createTempFile(directory, "microsmith-doctor-", ".tmp")
         probe.deleteIfExists()
         DoctorCheckResult(
             id = id,

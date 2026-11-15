@@ -1,13 +1,18 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
-import java.nio.file.Files
 import java.nio.file.Path
-import java.util.Comparator
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.PathWalkOption
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.exists
+import kotlin.io.path.walk
 
 internal class ProcessIsolationWorkspaceFactory {
     fun create(cacheDirectory: Path): ProcessIsolationWorkspace {
-        Files.createDirectories(cacheDirectory)
-        val workingDirectory = Files.createTempDirectory(cacheDirectory, "process-isolation-")
+        cacheDirectory.createDirectories()
+        val workingDirectory = createTempDirectory(cacheDirectory, "process-isolation-")
         return ProcessIsolationWorkspace(
             workingDirectory = workingDirectory,
             requestFile = workingDirectory.resolve("request.properties"),
@@ -15,13 +20,14 @@ internal class ProcessIsolationWorkspaceFactory {
         )
     }
 
+    @OptIn(ExperimentalPathApi::class)
     fun delete(workspace: ProcessIsolationWorkspace) {
-        if (!Files.exists(workspace.workingDirectory)) {
+        if (!workspace.workingDirectory.exists()) {
             return
         }
 
-        Files.walk(workspace.workingDirectory).use { stream ->
-            stream.sorted(Comparator.reverseOrder()).forEach { entry -> Files.deleteIfExists(entry) }
+        workspace.workingDirectory.walk(PathWalkOption.INCLUDE_DIRECTORIES).sortedDescending().forEach { entry ->
+            entry.deleteIfExists()
         }
     }
 }

@@ -2,8 +2,9 @@ package io.github.lmliam.microsmith.cli.ide
 
 import io.github.lmliam.microsmith.cli.command.IdeRefreshCommand
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 
 internal class IdeHelperProjectGenerator(
     private val command: IdeRefreshCommand,
@@ -12,14 +13,14 @@ internal class IdeHelperProjectGenerator(
 ) {
     fun run(): IdeHelperRefreshResult {
         val projectRoot = command.projectRoot.toAbsolutePath().normalize()
-        require(Files.exists(projectRoot)) { "Repository root '$projectRoot' does not exist." }
-        require(Files.isDirectory(projectRoot)) { "Repository root '$projectRoot' is not a directory." }
+        require(projectRoot.exists()) { "Repository root '$projectRoot' does not exist." }
+        require(projectRoot.isDirectory()) { "Repository root '$projectRoot' is not a directory." }
 
         val helperRoot = projectRoot.resolve(IDE_HELPER_DIRECTORY).toAbsolutePath().normalize()
         val classpathEntries =
             classpathResolver()
                 .map { path -> path.toAbsolutePath().normalize() }
-                .filter(Files::exists)
+                .filter(Path::exists)
                 .distinctBy(Path::toString)
                 .sortedBy(Path::toString)
 

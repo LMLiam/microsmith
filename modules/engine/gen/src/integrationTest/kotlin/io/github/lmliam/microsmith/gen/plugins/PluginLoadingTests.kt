@@ -25,7 +25,9 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import java.net.URLClassLoader
-import java.nio.file.Files
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.writeText
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -104,11 +106,11 @@ class PluginLoadingTests :
             }
 
             "a provider class that does not exist fails the run naming the provider" {
-                val services = Files.createTempDirectory("microsmith-broken-plugin-")
+                val services = createTempDirectory("microsmith-broken-plugin-")
                 val registration =
                     services.resolve("META-INF/services/io.github.lmliam.microsmith.plugin.MicrosmithPlugin")
-                Files.createDirectories(registration.parent)
-                Files.writeString(registration, "no.such.Plugin\n")
+                registration.parent.createDirectories()
+                registration.writeText("no.such.Plugin\n")
 
                 val failure =
                     shouldThrow<PluginLoadFailedException> {

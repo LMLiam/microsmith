@@ -4,9 +4,9 @@ import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import io.github.lmliam.microsmith.plugin.DiagnosticSink
 import java.net.URLClassLoader
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
@@ -29,7 +29,7 @@ object PluginFixtures {
 fun fixtureModel(text: String = "hello"): MicrosmithModel =
     MicrosmithBuilder().apply { put(FixtureExtension::class, FixtureExtension(text)) }.model
 
-fun newOutputDirectory(): Path = Files.createTempDirectory("microsmith-plugin-run-")
+fun newOutputDirectory(): Path = createTempDirectory("microsmith-plugin-run-")
 
 suspend fun generateWithPlugins(
     vararg plugins: String,

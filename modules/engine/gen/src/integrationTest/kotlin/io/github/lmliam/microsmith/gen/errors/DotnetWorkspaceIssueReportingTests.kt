@@ -9,7 +9,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetWorkspaceResolu
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import java.nio.file.Files
+import kotlin.io.path.createTempDirectory
 
 class DotnetWorkspaceIssueReportingTests :
     StringSpec(
@@ -33,7 +33,7 @@ class DotnetWorkspaceIssueReportingTests :
 
                 val failure =
                     shouldThrow<GenerationResolutionFailedException> {
-                        model.generateTo(Files.createTempDirectory("microsmith-workspace-issue-"))
+                        model.generateTo(createTempDirectory("microsmith-workspace-issue-"))
                     }
 
                 failure.issues.toList() shouldBe

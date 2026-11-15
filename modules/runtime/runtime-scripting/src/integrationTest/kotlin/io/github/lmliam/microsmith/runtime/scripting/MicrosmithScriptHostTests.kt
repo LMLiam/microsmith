@@ -11,7 +11,6 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeTypeOf
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
@@ -285,7 +284,7 @@ class MicrosmithScriptHostTests :
 
                     result.shouldBeTypeOf<ScriptRunSuccess>()
                     val generatedFile = output.resolve("proto/EventRecord.proto")
-                    Files.exists(generatedFile) shouldBe true
+                    generatedFile.exists() shouldBe true
                     generatedFile.readText().shouldContain("message EventRecord")
                 } finally {
                     runCatching { tempDir.deleteRecursively() }
@@ -535,7 +534,7 @@ class MicrosmithScriptHostTests :
 
                     result.shouldBeTypeOf<ScriptRunSuccess>()
                     val generatedFile = output.resolve("proto/ProcessService.proto")
-                    Files.exists(generatedFile) shouldBe true
+                    generatedFile.exists() shouldBe true
                     generatedFile.readText().shouldContain("rpc Process (ProcessRequest) returns (ProcessResponse);")
                 } finally {
                     runCatching { tempDir.deleteRecursively() }

@@ -1,9 +1,11 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Properties
+import kotlin.io.path.createDirectories
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 
 internal class ProcessIsolationRequestCodec {
     fun write(path: Path, request: ProcessIsolationRequest) {
@@ -31,12 +33,12 @@ internal class ProcessIsolationRequestCodec {
             properties["${ProcessIsolationPropertyNames.REQUEST_FLAG_PREFIX}$index"] = flag
         }
 
-        path.parent?.let(Files::createDirectories)
-        Files.newOutputStream(path).use { output -> properties.store(output, "Microsmith process isolation request") }
+        path.parent?.let(Path::createDirectories)
+        path.outputStream().use { output -> properties.store(output, "Microsmith process isolation request") }
     }
 
     fun read(path: Path): ProcessIsolationRequest {
-        val properties = Properties().also { loaded -> Files.newInputStream(path).use { input -> loaded.load(input) } }
+        val properties = Properties().also { loaded -> path.inputStream().use { input -> loaded.load(input) } }
 
         val scriptPath = properties.requiredPath(ProcessIsolationPropertyNames.REQUEST_SCRIPT)
         val outputPath = properties.requiredPath(ProcessIsolationPropertyNames.REQUEST_OUTPUT_DIR)

@@ -6,12 +6,13 @@ import io.kotest.matchers.string.shouldContain
 import java.io.IOException
 import java.io.UncheckedIOException
 import java.nio.file.FileSystems
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
+import kotlin.io.path.getPosixFilePermissions
+import kotlin.io.path.setPosixFilePermissions
 import kotlin.io.path.writeText
 
 @OptIn(ExperimentalPathApi::class)
@@ -229,8 +230,8 @@ class OnboardingProfileDetectorTests :
                     readableProject.writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
                     unreadableProject.writeText("<Project Sdk=\"Microsoft.NET.Sdk\" />\n")
 
-                    val originalPermissions = Files.getPosixFilePermissions(unreadableDirectory)
-                    Files.setPosixFilePermissions(unreadableDirectory, emptySet())
+                    val originalPermissions = unreadableDirectory.getPosixFilePermissions()
+                    unreadableDirectory.setPosixFilePermissions(emptySet())
                     try {
                         detectOnboardingProfile(dotnetRoot) shouldBe
                             OnboardingProfileDetection(
@@ -239,7 +240,7 @@ class OnboardingProfileDetectorTests :
                                 matchedMarkers = listOf("src/apps/service/Fixture.csproj"),
                             )
                     } finally {
-                        runCatching { Files.setPosixFilePermissions(unreadableDirectory, originalPermissions) }
+                        runCatching { unreadableDirectory.setPosixFilePermissions(originalPermissions) }
                         runCatching { dotnetRoot.deleteRecursively() }
                     }
                 }
@@ -474,8 +475,8 @@ class OnboardingProfileDetectorTests :
                                 .trimIndent() + "\n",
                         )
 
-                    val originalPermissions = Files.getPosixFilePermissions(rubyRoot)
-                    Files.setPosixFilePermissions(rubyRoot, emptySet())
+                    val originalPermissions = rubyRoot.getPosixFilePermissions()
+                    rubyRoot.setPosixFilePermissions(emptySet())
                     try {
                         detectOnboardingProfile(rubyRoot) shouldBe
                             OnboardingProfileDetection(
@@ -484,7 +485,7 @@ class OnboardingProfileDetectorTests :
                                 matchedMarkers = emptyList(),
                             )
                     } finally {
-                        runCatching { Files.setPosixFilePermissions(rubyRoot, originalPermissions) }
+                        runCatching { rubyRoot.setPosixFilePermissions(originalPermissions) }
                         runCatching { rubyRoot.deleteRecursively() }
                     }
                 }

@@ -1,8 +1,9 @@
 package io.github.lmliam.microsmith.cli.ide
 
 import io.github.lmliam.microsmith.cli.command.IdeDoctorCommand
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 
 internal class IdeHelperDoctorRunner(
     private val command: IdeDoctorCommand,
@@ -29,7 +30,7 @@ internal class IdeHelperDoctorRunner(
     }
 
     private fun validateRepoRoot(projectRoot: Path, helperRoot: Path): IdeDoctorResult? {
-        if (!Files.exists(projectRoot)) {
+        if (!projectRoot.exists()) {
             return IdeDoctorResult(
                 projectRoot = projectRoot,
                 helperRoot = helperRoot,
@@ -44,7 +45,7 @@ internal class IdeHelperDoctorRunner(
             )
         }
 
-        if (!Files.isDirectory(projectRoot)) {
+        if (!projectRoot.isDirectory()) {
             return IdeDoctorResult(
                 projectRoot = projectRoot,
                 helperRoot = helperRoot,
@@ -65,7 +66,7 @@ internal class IdeHelperDoctorRunner(
     private fun resolveClasspathEntries(): List<Path> =
         classpathResolver()
             .map { path -> path.toAbsolutePath().normalize() }
-            .filter(Files::exists)
+            .filter(Path::exists)
             .distinctBy(Path::toString)
             .sortedBy(Path::toString)
 }

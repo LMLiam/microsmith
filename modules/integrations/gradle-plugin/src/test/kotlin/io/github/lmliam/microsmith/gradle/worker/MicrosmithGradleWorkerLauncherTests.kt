@@ -4,9 +4,10 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import org.gradle.api.GradleException
 
@@ -15,7 +16,7 @@ class MicrosmithGradleWorkerLauncherTests :
     StringSpec(
         {
             "launcher reads the worker result written for the current execution" {
-                val workDirectory = Files.createTempDirectory("microsmith-gradle-worker-launcher-success")
+                val workDirectory = createTempDirectory("microsmith-gradle-worker-launcher-success")
                 try {
                     val resultCodec = MicrosmithGradleWorkerResultCodec()
                     val launcher =
@@ -50,9 +51,9 @@ class MicrosmithGradleWorkerLauncherTests :
             }
 
             "launcher ignores stale result files from previous executions" {
-                val workDirectory = Files.createTempDirectory("microsmith-gradle-worker-launcher-stale")
+                val workDirectory = createTempDirectory("microsmith-gradle-worker-launcher-stale")
                 try {
-                    val staleWorkspace = Files.createDirectories(workDirectory.resolve("microsmith-worker"))
+                    val staleWorkspace = workDirectory.resolve("microsmith-worker").createDirectories()
                     MicrosmithGradleWorkerResultCodec()
                         .write(
                             staleWorkspace.resolve("result.properties"),

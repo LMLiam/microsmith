@@ -8,12 +8,12 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Properties
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
+import kotlin.io.path.outputStream
 
 @OptIn(ExperimentalPathApi::class)
 class ProcessIsolationProtocolTests :
@@ -117,7 +117,7 @@ class ProcessIsolationProtocolTests :
                             setProperty("result.diagnostics.count", "1")
                             setProperty("result.diagnostics.0", "legacy failure")
                         }
-                    Files.newOutputStream(resultFile).use { output -> properties.store(output, "legacy test payload") }
+                    resultFile.outputStream().use { output -> properties.store(output, "legacy test payload") }
 
                     val decoded = ProcessIsolationProtocol.readResult(resultFile).shouldBeInstanceOf<ScriptRunFailure>()
 

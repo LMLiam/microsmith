@@ -9,8 +9,9 @@ import io.github.lmliam.microsmith.cli.init.files.BootstrapFileWriteResult
 import io.github.lmliam.microsmith.cli.init.files.BootstrapFileWriter
 import io.github.lmliam.microsmith.cli.init.profile.detectOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.template.BootstrapScriptTemplates
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 
 internal class InitBootstrapper(
     private val command: InitCommand,
@@ -77,8 +78,8 @@ internal class InitBootstrapper(
     }
 
     private fun validateProjectRoot(projectRoot: Path) {
-        requireInit(Files.exists(projectRoot)) { "Repository root '$projectRoot' does not exist." }
-        requireInit(Files.isDirectory(projectRoot)) { "Repository root '$projectRoot' is not a directory." }
+        requireInit(projectRoot.exists()) { "Repository root '$projectRoot' does not exist." }
+        requireInit(projectRoot.isDirectory()) { "Repository root '$projectRoot' is not a directory." }
     }
 }
 

@@ -9,8 +9,8 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
 import kotlin.script.experimental.api.ScriptDiagnostic
 
 internal class ClassloaderScriptRunner(private val cacheDirectory: Path) {
@@ -18,7 +18,7 @@ internal class ClassloaderScriptRunner(private val cacheDirectory: Path) {
         PluginClassLoaderScope.withPluginClassLoader(request.pluginClasspath) { runtimeClassLoader ->
             runCatching {
                 val pluginClasspathFingerprint = RuntimeClasspathFingerprint.calculate(request.pluginClasspath)
-                Files.createDirectories(cacheDirectory)
+                cacheDirectory.createDirectories()
                 val cache = MicrosmithScriptCache(cacheDirectory) { listOf(pluginClasspathFingerprint) }
                 val runtimeHostConfiguration =
                     ScriptHostConfigurationFactory.create(

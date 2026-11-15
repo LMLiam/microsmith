@@ -8,14 +8,15 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
+import kotlin.io.path.createSymbolicLinkPointingTo
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.readText
+import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
 
 @OptIn(ExperimentalPathApi::class)
@@ -140,7 +141,7 @@ class IdeHelperGeneratorTests :
                 runtimeJar.parent.createDirectories()
                 helperRoot.createDirectories()
                 runtimeJar.writeText("jar-binary-placeholder")
-                Files.write(helperRoot.resolve("build.gradle.kts"), byteArrayOf(0xC3.toByte(), 0x28))
+                helperRoot.resolve("build.gradle.kts").writeBytes(byteArrayOf(0xC3.toByte(), 0x28))
 
                 try {
                     val result =
@@ -163,7 +164,7 @@ class IdeHelperGeneratorTests :
                     val runtimeJar = repoRoot.resolve("runtime/microsmith-cli-all.jar")
                     runtimeJar.parent.createDirectories()
                     runtimeJar.writeText("jar-binary-placeholder")
-                    Files.createSymbolicLink(repoRoot.resolve(".microsmith"), externalRoot)
+                    repoRoot.resolve(".microsmith").createSymbolicLinkPointingTo(externalRoot)
 
                     try {
                         val error =
@@ -192,7 +193,7 @@ class IdeHelperGeneratorTests :
                     helperRoot.createDirectories()
                     runtimeJar.writeText("jar-binary-placeholder")
                     targetFile.writeText("// external build file")
-                    Files.createSymbolicLink(helperRoot.resolve("build.gradle.kts"), targetFile)
+                    helperRoot.resolve("build.gradle.kts").createSymbolicLinkPointingTo(targetFile)
 
                     try {
                         val error =

@@ -1,13 +1,15 @@
 package io.github.lmliam.microsmith.maven
 
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.writeText
 
 internal class MicrosmithMavenTestProject private constructor(private val rootDirectory: Path) {
     fun writeFile(relativePath: String, contents: String) {
         val file = file(relativePath)
-        Files.createDirectories(checkNotNull(file.parent))
-        Files.writeString(file, "$contents\n")
+        checkNotNull(file.parent).createDirectories()
+        file.writeText("$contents\n")
     }
 
     fun createMojo(): MicrosmithGenerateMojo =
@@ -20,7 +22,6 @@ internal class MicrosmithMavenTestProject private constructor(private val rootDi
     fun file(relativePath: String): Path = rootDirectory.resolve(relativePath)
 
     companion object {
-        fun create(prefix: String): MicrosmithMavenTestProject =
-            MicrosmithMavenTestProject(Files.createTempDirectory(prefix))
+        fun create(prefix: String): MicrosmithMavenTestProject = MicrosmithMavenTestProject(createTempDirectory(prefix))
     }
 }

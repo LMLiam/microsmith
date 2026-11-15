@@ -7,7 +7,7 @@ import io.github.lmliam.microsmith.cli.plugins.lockfile.LockEntry
 import io.github.lmliam.microsmith.cli.plugins.lockfile.assertSameRemoteArtifactSet
 import io.github.lmliam.microsmith.cli.plugins.remote.RemotePluginResolutionAccumulator
 import io.github.lmliam.microsmith.cli.plugins.remote.parseCoordinate
-import java.nio.file.Files
+import kotlin.io.path.createDirectories
 
 internal class PluginResolutionService(
     private val settings: PluginResolverSettings,
@@ -26,7 +26,7 @@ internal class PluginResolutionService(
                 coordinates = coordinates,
                 localPluginJars = localPluginJars,
             )
-        Files.createDirectories(context.cacheDirectory)
+        context.cacheDirectory.createDirectories()
 
         val remoteResolution =
             remoteResolutionAccumulator.resolve(

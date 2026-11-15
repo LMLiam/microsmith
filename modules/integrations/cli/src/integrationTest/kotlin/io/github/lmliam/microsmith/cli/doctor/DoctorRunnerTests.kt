@@ -3,9 +3,9 @@ package io.github.lmliam.microsmith.cli.doctor
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import java.nio.file.Files
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
+import kotlin.io.path.createSymbolicLinkPointingTo
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.writeText
@@ -183,7 +183,7 @@ class DoctorRunnerTests :
                     val pluginCache = createTempDirectory("microsmith-doctor-plugin-cache")
                     val externalBuildScript = targetRoot.resolve("build.microsmith.kts")
                     externalBuildScript.writeText("microsmith { }")
-                    Files.createSymbolicLink(repoRoot.resolve("build.microsmith.kts"), externalBuildScript)
+                    repoRoot.resolve("build.microsmith.kts").createSymbolicLinkPointingTo(externalBuildScript)
                     repoRoot.resolve("settings.microsmith.kts").writeText("// settings")
                     try {
                         val result =

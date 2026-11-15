@@ -2,9 +2,14 @@ package io.github.lmliam.microsmith.runtime.scripting.cache
 
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript
 import java.nio.ByteBuffer
-import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.exists
+import kotlin.io.path.inputStream
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.walk
 import kotlin.script.experimental.jvm.util.classpathFromClassloader
 
 internal object RuntimeClasspathFingerprint {
@@ -36,14 +41,14 @@ internal object RuntimeClasspathFingerprint {
 
 private fun MessageDigest.addClasspathEntryFingerprint(entry: Path) {
     when {
-        !Files.exists(entry) -> addChunk("missing")
+        !entry.exists() -> addChunk("missing")
 
-        Files.isRegularFile(entry) -> {
+        entry.isRegularFile() -> {
             addChunk("file")
             addFileDigest(entry)
         }
 
-        Files.isDirectory(entry) -> {
+        entry.isDirectory() -> {
             addChunk("directory")
             addDirectoryFingerprint(entry)
         }
@@ -59,14 +64,13 @@ private fun MessageDigest.addDirectoryFingerprint(directory: Path) {
     }
 }
 
+@OptIn(ExperimentalPathApi::class)
 private fun directoryRegularFiles(directory: Path): List<Path> =
-    Files.walk(directory).use { stream ->
-        stream.filter { Files.isRegularFile(it) }.sorted(compareBy { it.toString() }).toList()
-    }
+    directory.walk().filter { it.isRegularFile() }.sortedBy { it.toString() }.toList()
 
 private fun MessageDigest.addFileDigest(path: Path) {
     val fileDigest = MessageDigest.getInstance("SHA-256")
-    Files.newInputStream(path).use { input ->
+    path.inputStream().use { input ->
         val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
         while (true) {
             val read = input.read(buffer)
