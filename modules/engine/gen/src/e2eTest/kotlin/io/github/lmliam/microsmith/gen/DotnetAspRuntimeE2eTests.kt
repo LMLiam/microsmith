@@ -147,18 +147,15 @@ class DotnetAspRuntimeE2eTests :
     )
 
 private fun writeUserController(projectRoot: Path) {
-    val resource = "/dotnet/asp-runtime/UserServiceController.cs"
     val controllerDir = projectRoot.resolve("Controllers")
     controllerDir.createDirectories()
     controllerDir
         .resolve("UserServiceController.cs")
-        .writeText(
-            checkNotNull(DotnetAspRuntimeE2eTests::class.java.getResource(resource)) {
-                    "Missing test resource $resource"
-                }
-                .readText(),
-        )
+        .writeText(readResource("/dotnet/asp-runtime/UserServiceController.cs"))
 }
+
+private fun readResource(path: String): String =
+    checkNotNull(DotnetAspRuntimeE2eTests::class.java.getResource(path)) { "Missing test resource $path" }.readText()
 
 private fun runtimeE2eModel() = microsmith {
     services {

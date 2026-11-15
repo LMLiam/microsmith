@@ -1,3 +1,6 @@
+import io.github.lmliam.microsmith.gradle.MicrosmithGradleExtension
+import io.github.lmliam.microsmith.gradle.task.MicrosmithGenerateTask
+
 plugins {
     java
     id("io.github.lmliam.microsmith")
@@ -6,7 +9,7 @@ plugins {
 tasks.register("verifyMicrosmithWiring") {
     doLast {
         val generateTask = tasks.named("microsmithGenerate").get()
-        check(generateTask is io.github.lmliam.microsmith.gradle.task.MicrosmithGenerateTask)
+        check(generateTask is MicrosmithGenerateTask)
         check(generateTask.group == "microsmith")
 
         val ide = project.configurations.getByName("microsmithIde")
@@ -22,6 +25,6 @@ tasks.register("verifyMicrosmithWiring") {
             runtime.attributes.getAttribute(Bundling.BUNDLING_ATTRIBUTE)?.name ==
                 Bundling.SHADOWED,
         )
-        check(extension is io.github.lmliam.microsmith.gradle.MicrosmithGradleExtension)
+        check(extension is MicrosmithGradleExtension)
     }
 }
