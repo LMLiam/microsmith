@@ -6,8 +6,8 @@ import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import kotlin.reflect.KClass
 
 @ServiceContract
-interface ArtifactCompiler<A : Artifact> {
-    val artifactType: KClass<A>
+public interface ArtifactCompiler<A : Artifact> {
+    public val artifactType: KClass<A>
 
-    fun compile(artifact: A): List<ArtifactContribution<Artifact>>
+    public fun compile(artifact: A): List<ArtifactContribution<Artifact>>
 }

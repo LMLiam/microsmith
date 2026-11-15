@@ -1,21 +1,23 @@
 package io.github.lmliam.microsmith.compile
 
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembly
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssemblyService
 
-class ArtifactCompilationService
+@InternalMicrosmithApi
+public class ArtifactCompilationService
 internal constructor(
     private val compilerRegistry: ArtifactCompilerRegistry,
     private val assemblyService: ArtifactAssemblyService,
 ) {
-    constructor(
+    public constructor(
         compilers: List<ArtifactCompiler<*>>,
         assemblyService: ArtifactAssemblyService,
     ) : this(ArtifactCompilerRegistry(compilers), assemblyService)
 
-    fun compile(assembly: ArtifactAssembly): ArtifactAssembly =
+    public fun compile(assembly: ArtifactAssembly): ArtifactAssembly =
         compileUntilStable(
             current = assembly,
             seenSignatures = mutableSetOf(),
