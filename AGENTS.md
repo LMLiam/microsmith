@@ -80,6 +80,7 @@ Answer these questions for every test. Rewrite the test if an answer is "no".
 - Use a temporary directory instead of a fake file system.
 - Assert one behaviour in each test. Name the test after the scenario and the expected outcome.
 - Do not test a library, a generated accessor, a data class, or a constant.
+- Keep a test input that is a whole file in another language (a script, source file, configuration, or expected output) under `src/<sourceSet>/resources`, and load it from there. Keep one-line snippets inline.
 - For a defect, add the failing test first. Confirm that it fails for the expected reason.
 
 ### Documentation
