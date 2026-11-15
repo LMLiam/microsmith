@@ -152,6 +152,11 @@ style:
       - '**/modules/runtime/runtime-scripting/**'
       - '**/modules/integrations/gradle-plugin/**'
       - '**/modules/engine/gen/src/main/kotlin/io/github/lmliam/microsmith/gen/system/**'
+  ForbiddenImport:
+    active: true
+    forbiddenImports:
+      - value: 'java.nio.file.Files'
+        reason: 'Use the kotlin.io.path extensions.'
   MagicNumber:
     active: true
     ignoreNumbers:
