@@ -40,7 +40,7 @@ private fun resolveDiagnostics(
         }
     }
     val mapper: ResolutionIssueDiagnosticMapper<DotnetAspResolutionIssue> = DotnetAspResolutionDiagnosticMapper()
-    return DotnetAspWorkspaceResolver()
+    return dotnetAspWorkspaceResolver()
         .resolve(requireNotNull(builder.model.get<ServicesExtension>()))
         .fold(
             ifLeft = { issues -> issues.toList().map { mapper.map(it.asAspIssue()) } },

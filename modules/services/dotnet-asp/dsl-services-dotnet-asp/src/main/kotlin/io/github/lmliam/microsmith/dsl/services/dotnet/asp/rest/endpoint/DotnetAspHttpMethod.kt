@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint
 
-enum class DotnetAspHttpMethod {
+public enum class DotnetAspHttpMethod {
     GET,
     POST,
     PUT,

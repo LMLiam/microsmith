@@ -1,9 +1,11 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing
 
 import arrow.core.Either
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.services.dotnet.validation.isDotnetIdentifier
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 
+@Inject
 internal class DotnetAspRouteSegmentParser {
     fun parse(
         segment: String,

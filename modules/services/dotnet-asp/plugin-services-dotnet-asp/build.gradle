@@ -1,0 +1,22 @@
+apply plugin: 'dev.zacsweers.metro'
+
+metro {
+    generateContributionProviders = true
+}
+
+dependencies {
+    api project(":plugin-api")
+    implementation project(":dsl")
+    implementation project(":resolve")
+    implementation project(":artifact")
+    implementation project(":compile")
+    implementation project(":resolve-services-dotnet")
+    implementation project(":compile-services-dotnet")
+    implementation project(":resolve-services-dotnet-asp")
+    implementation project(":artifact-services-dotnet-asp")
+    implementation project(":compile-services-dotnet-asp")
+}
+
+kotlin {
+    explicitApi()
+}

@@ -58,7 +58,7 @@ class DotnetAspBindingResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                dotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspBindingResolutionIssue.PathBindingFieldMismatch(
                             serviceName = "UserService",
@@ -105,7 +105,7 @@ class DotnetAspBindingResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                dotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspBindingResolutionIssue.UnknownSharedModelReference(
                             serviceName = "UserService",
@@ -144,7 +144,7 @@ class DotnetAspBindingResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                dotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspBindingResolutionIssue.MissingPathBinding(
                             serviceName = "UserService",
@@ -187,7 +187,7 @@ class DotnetAspBindingResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                dotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspBindingResolutionIssue.PathBindingWithoutPlaceholders(
                             serviceName = "UserService",
@@ -237,7 +237,7 @@ class DotnetAspBindingResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                dotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspBindingResolutionIssue.OptionalPathBindingField(
                             serviceName = "UserService",
@@ -286,7 +286,7 @@ class DotnetAspBindingResolutionTests :
                     }
                 }
 
-                DotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
+                dotnetAspWorkspaceResolver().resolveIssues(builder.requireServicesExtension()) shouldContainExactly
                     listOf(
                         DotnetAspBindingResolutionIssue.UnknownSharedModelReference(
                             serviceName = "UserService",

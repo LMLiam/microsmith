@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics
 
-sealed interface DotnetAspGenerationResolutionIssue : DotnetAspResolutionIssue {
+internal sealed interface DotnetAspGenerationResolutionIssue : DotnetAspResolutionIssue {
     data class ResponseHeaderCollidesWithBody(
         val serviceName: String,
         val operationName: String,

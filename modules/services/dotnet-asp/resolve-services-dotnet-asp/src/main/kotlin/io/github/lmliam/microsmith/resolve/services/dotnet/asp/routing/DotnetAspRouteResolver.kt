@@ -4,13 +4,15 @@ import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRoute
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspOperationContext
 
-internal class DotnetAspRouteResolver {
-    private val segmentParser = DotnetAspRouteSegmentParser()
-
+@Inject
+internal class DotnetAspRouteResolver(
+    private val segmentParser: DotnetAspRouteSegmentParser,
+) {
     fun parseDeclaredRoute(
         route: String,
         kind: DotnetAspResolutionIssue.RouteDeclarationKind,

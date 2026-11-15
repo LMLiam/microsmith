@@ -7,16 +7,16 @@ import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.response.DotnetA
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModelScope
 
 @MicrosmithDsl
-interface DotnetAspEndpointScope {
-    fun path(name: String, block: DotnetAspRequestBindingScope.() -> Unit)
+public interface DotnetAspEndpointScope {
+    public fun path(name: String, block: DotnetAspRequestBindingScope.() -> Unit)
 
-    fun query(name: String, block: DotnetAspRequestBindingScope.() -> Unit)
+    public fun query(name: String, block: DotnetAspRequestBindingScope.() -> Unit)
 
-    fun headers(name: String, block: DotnetAspHeadersBindingScope.() -> Unit)
+    public fun headers(name: String, block: DotnetAspHeadersBindingScope.() -> Unit)
 
-    fun body(modelName: String)
+    public fun body(modelName: String)
 
-    fun body(name: String, block: DotnetModelScope.() -> Unit)
+    public fun body(name: String, block: DotnetModelScope.() -> Unit)
 
-    fun responses(block: DotnetAspResponsesScope.() -> Unit)
+    public fun responses(block: DotnetAspResponsesScope.() -> Unit)
 }

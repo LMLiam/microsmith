@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.contract
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelLocality
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeadersBindingArtifact
@@ -14,16 +15,18 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpFileBuil
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpRenderer
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.file
 
-internal object DotnetAspContractFileRenderer {
-    private val csharpRenderer = CSharpRenderer()
-
+@Inject
+internal class DotnetAspContractFileRenderer(
+    private val csharpRenderer: CSharpRenderer,
+    private val typeRendering: DotnetAspContractTypeRendering,
+) {
     fun renderServiceModelsFile(artifact: DotnetAspServiceArtifact): String =
         renderContractsFile(artifact, usings = setOf(DotnetAspCSharpNamespaces.System)) {
             artifact.contractModels
                 .distinctBy(DotnetAspModelArtifact::typeName)
                 .filter { it.locality == DotnetAspModelLocality.SHARED }
                 .sortedBy(DotnetAspModelArtifact::typeName)
-                .forEach { addType(renderRecordType(it.typeName, it.model.fields)) }
+                .forEach { addType(typeRendering.renderRecordType(it.typeName, it.model.fields)) }
         }
 
     fun renderRequestModelsFile(artifact: DotnetAspServiceArtifact): String =
@@ -36,12 +39,12 @@ internal object DotnetAspContractFileRenderer {
                 ),
         ) {
             buildList {
-                    requestBindings(artifact).forEach { add(renderRequestBindingType(it)) }
-                    headerBindings(artifact).forEach { add(renderHeadersBindingType(it)) }
+                    requestBindings(artifact).forEach { add(typeRendering.renderRequestBindingType(it)) }
+                    headerBindings(artifact).forEach { add(typeRendering.renderHeadersBindingType(it)) }
                     artifact.endpoints.forEach { endpoint ->
                         endpoint.bindings.body
                             ?.takeIf { it.locality == DotnetAspModelLocality.INLINE }
-                            ?.let { add(renderRecordType(it.typeName, it.model.fields)) }
+                            ?.let { add(typeRendering.renderRecordType(it.typeName, it.model.fields)) }
                     }
                 }
                 .distinctBy(CSharp.Type::name)
@@ -56,11 +59,15 @@ internal object DotnetAspContractFileRenderer {
                             .map(DotnetAspResponseArtifact::model)
                             .filter { it.locality == DotnetAspModelLocality.INLINE }
                             .distinctBy(DotnetAspModelArtifact::typeName)
-                            .forEach { model -> add(renderRecordType(model.typeName, model.model.fields)) }
+                            .forEach { model ->
+                                add(typeRendering.renderRecordType(model.typeName, model.model.fields))
+                            }
                     }
                     artifact.endpoints.forEach { endpoint ->
-                        add(renderResultBaseType(endpoint))
-                        endpoint.responses.forEach { response -> add(renderResultVariantType(endpoint, response)) }
+                        add(typeRendering.renderResultBaseType(endpoint))
+                        endpoint.responses.forEach { response ->
+                            add(typeRendering.renderResultVariantType(endpoint, response))
+                        }
                     }
                 }
                 .distinctBy(CSharp.Type::name)

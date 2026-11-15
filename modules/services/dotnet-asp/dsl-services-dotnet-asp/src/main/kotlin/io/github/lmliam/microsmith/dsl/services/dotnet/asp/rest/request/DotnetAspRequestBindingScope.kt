@@ -4,5 +4,5 @@ import io.github.lmliam.microsmith.dsl.MicrosmithDsl
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetConfigurableTypedFieldScope
 
 @MicrosmithDsl
-interface DotnetAspRequestBindingScope :
+public interface DotnetAspRequestBindingScope :
     DotnetConfigurableTypedFieldScope<DotnetAspRequestField, DotnetAspRequestFieldScope>

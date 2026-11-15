@@ -6,6 +6,7 @@ import arrow.core.flatMap
 import arrow.core.mapOrAccumulate
 import arrow.core.raise.context.bindNel
 import arrow.core.toNonEmptyListOrNull
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.service.DotnetAspServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExtension
@@ -14,17 +15,22 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.ResolvedDotnetService
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspService
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspGenerationResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.DotnetAspNamingPolicy
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspControllerBaseTypeName
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRestTreeResolver
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRouteResolver
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRouteSegmentParser
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspace
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceResolver
 
 /** Finalises the ASP.NET subset of the .NET workspace into a scaffold-ready model. */
-class DotnetAspWorkspaceResolver(
-    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver = DotnetWorkspaceResolver(),
+@Inject
+internal class DotnetAspWorkspaceResolver(
+    private val dotnetWorkspaceResolver: DotnetWorkspaceResolver,
+    private val restResolver: DotnetAspRestResolver,
+    private val portAllocator: DotnetAspPortAllocator,
+    private val namingPolicy: DotnetAspNamingPolicy,
 ) {
-    private val restResolver = DotnetAspRestResolver()
-
     fun resolve(extension: ServicesExtension): EitherNel<DotnetResolutionIssue, DotnetAspWorkspace> {
         val aspServiceNames =
             extension.services
@@ -55,7 +61,7 @@ class DotnetAspWorkspaceResolver(
         val aspExtensions = services.associate { it.name to aspExtensionOf(extension, it.name) }
 
         val ports =
-            DotnetAspPortAllocator.allocate(
+            portAllocator.allocate(
                 services.map { service ->
                     val declaredPorts = aspExtensions.getValue(service.name).ports
                     DotnetAspPortRequest(
@@ -101,7 +107,7 @@ class DotnetAspWorkspaceResolver(
         services: List<ResolvedDotnetService>,
     ): EitherNel<DotnetResolutionIssue, Unit> {
         val issues = services.mapNotNull { service ->
-            val typeName = dotnetAspControllerBaseTypeName(service.project)
+            val typeName = namingPolicy.controllerBaseTypeName(service.project)
             if (typeName == MICROSMITH_CONTROLLER_BASE_TYPE_NAME) {
                 DotnetAspGenerationResolutionIssue.ControllerBaseTypeCollision(
                     service.name,

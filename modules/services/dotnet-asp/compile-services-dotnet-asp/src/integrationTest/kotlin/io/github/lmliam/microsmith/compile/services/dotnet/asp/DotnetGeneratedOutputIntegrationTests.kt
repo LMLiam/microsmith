@@ -12,13 +12,13 @@ import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
 import java.nio.file.Path
 import java.time.Duration
-import java.util.UUID
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readBytes
 import kotlin.io.path.relativeTo
 import kotlin.io.path.toPath
 import kotlin.io.path.walk
+import kotlin.uuid.Uuid
 
 class DotnetGeneratedOutputIntegrationTests :
     StringSpec(
@@ -136,7 +136,7 @@ class DotnetGeneratedOutputIntegrationTests :
                                                         default(Duration.ofMinutes(90))
                                                     }
                                                     guid("traceId") {
-                                                        default(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
+                                                        default(Uuid.parse("123e4567-e89b-12d3-a456-426614174000"))
                                                     }
                                                     long("limit") { default(100L) }
                                                     char("kind") { default('x') }

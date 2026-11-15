@@ -13,6 +13,7 @@ dependencies {
     testImplementation project(":compile-services-dotnet-packages")
     testImplementation project(":resolve-services-dotnet")
     testRuntimeOnly project(":plugin-services-dotnet")
+    testRuntimeOnly project(":plugin-services-dotnet-asp")
     testRuntimeOnly project(":plugin-services-dotnet-packages")
     testImplementation libs.jimfs
     testImplementation libs.coroutines.test

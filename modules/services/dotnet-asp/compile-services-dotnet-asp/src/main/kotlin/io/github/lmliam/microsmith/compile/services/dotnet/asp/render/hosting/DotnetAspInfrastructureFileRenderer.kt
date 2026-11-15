@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.hosting
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpNamespaces
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpTypes
@@ -14,9 +15,8 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.file
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
 
-internal object DotnetAspInfrastructureFileRenderer {
-    private val csharpRenderer = CSharpRenderer()
-
+@Inject
+internal class DotnetAspInfrastructureFileRenderer(private val csharpRenderer: CSharpRenderer) {
     fun renderProgramFile(artifact: DotnetAspServiceArtifact): String =
         """
         using ${hostingNamespace(artifact)};

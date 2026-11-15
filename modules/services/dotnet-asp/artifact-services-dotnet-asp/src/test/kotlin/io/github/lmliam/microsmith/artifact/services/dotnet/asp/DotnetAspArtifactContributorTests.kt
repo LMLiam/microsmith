@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp
 
 import io.github.lmliam.microsmith.artifact.files.RelativePath
+import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactFactory
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceContribution
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspHttpMethod
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
@@ -13,6 +14,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspResponse
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRest
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspService
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.DotnetAspNamingPolicy
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -21,7 +23,7 @@ class DotnetAspArtifactContributorTests :
     StringSpec(
         {
             "contribute copies the resolved launch ports" {
-                val contributor = DotnetAspArtifactContributor()
+                val contributor = dotnetAspArtifactContributor()
                 val workspace =
                     DotnetAspWorkspace(
                         servicesByName =
@@ -49,7 +51,7 @@ class DotnetAspArtifactContributorTests :
                     )
 
                 val contribution =
-                    DotnetAspArtifactContributor().contribute(workspace).single() as DotnetAspServiceContribution
+                    dotnetAspArtifactContributor().contribute(workspace).single() as DotnetAspServiceContribution
 
                 contribution.outputRoot shouldBe RelativePath.of("dotnet", "Platform", "UserService.Api")
             }
@@ -92,7 +94,7 @@ class DotnetAspArtifactContributorTests :
                     )
 
                 val contribution =
-                    DotnetAspArtifactContributor().contribute(workspace).single() as DotnetAspServiceContribution
+                    dotnetAspArtifactContributor().contribute(workspace).single() as DotnetAspServiceContribution
 
                 val allocatedTypeNames =
                     contribution.contractModels.map { it.typeName } +
@@ -101,6 +103,13 @@ class DotnetAspArtifactContributorTests :
             }
         },
     )
+
+private fun dotnetAspArtifactContributor(): DotnetAspArtifactContributor {
+    val namingPolicy = DotnetAspNamingPolicy()
+    return DotnetAspArtifactContributor { service, artifactId ->
+        DotnetAspServiceArtifactFactory(service, artifactId, namingPolicy)
+    }
+}
 
 private fun resolvedAspService(
     name: String,

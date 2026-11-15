@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp.request
 
-data class DotnetAspRequestBindingArtifact(
-    val typeName: String,
-    val name: String,
-    val fields: List<DotnetAspRequestFieldArtifact>,
+public data class DotnetAspRequestBindingArtifact(
+    public val typeName: String,
+    public val name: String,
+    public val fields: List<DotnetAspRequestFieldArtifact>,
 )

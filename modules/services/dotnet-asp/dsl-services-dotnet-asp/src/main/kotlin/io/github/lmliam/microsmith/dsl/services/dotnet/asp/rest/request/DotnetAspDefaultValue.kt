@@ -7,30 +7,30 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
-import java.util.UUID
+import kotlin.uuid.Uuid
 
-sealed interface DotnetAspDefaultValue {
-    @JvmInline value class StringValue(val value: String) : DotnetAspDefaultValue
+public sealed interface DotnetAspDefaultValue {
+    @JvmInline public value class StringValue(public val value: String) : DotnetAspDefaultValue
 
-    @JvmInline value class CharValue(val value: Char) : DotnetAspDefaultValue
+    @JvmInline public value class CharValue(public val value: Char) : DotnetAspDefaultValue
 
-    @JvmInline value class NumericValue(val value: Number) : DotnetAspDefaultValue
+    @JvmInline public value class NumericValue(public val value: Number) : DotnetAspDefaultValue
 
-    @JvmInline value class BooleanValue(val value: Boolean) : DotnetAspDefaultValue
+    @JvmInline public value class BooleanValue(public val value: Boolean) : DotnetAspDefaultValue
 
-    @JvmInline value class UuidValue(val value: UUID) : DotnetAspDefaultValue
+    @JvmInline public value class UuidValue(public val value: Uuid) : DotnetAspDefaultValue
 
-    @JvmInline value class LocalDateValue(val value: LocalDate) : DotnetAspDefaultValue
+    @JvmInline public value class LocalDateValue(public val value: LocalDate) : DotnetAspDefaultValue
 
-    @JvmInline value class LocalTimeValue(val value: LocalTime) : DotnetAspDefaultValue
+    @JvmInline public value class LocalTimeValue(public val value: LocalTime) : DotnetAspDefaultValue
 
-    @JvmInline value class LocalDateTimeValue(val value: LocalDateTime) : DotnetAspDefaultValue
+    @JvmInline public value class LocalDateTimeValue(public val value: LocalDateTime) : DotnetAspDefaultValue
 
-    @JvmInline value class InstantValue(val value: Instant) : DotnetAspDefaultValue
+    @JvmInline public value class InstantValue(public val value: Instant) : DotnetAspDefaultValue
 
-    @JvmInline value class OffsetDateTimeValue(val value: OffsetDateTime) : DotnetAspDefaultValue
+    @JvmInline public value class OffsetDateTimeValue(public val value: OffsetDateTime) : DotnetAspDefaultValue
 
-    @JvmInline value class DurationValue(val value: Duration) : DotnetAspDefaultValue
+    @JvmInline public value class DurationValue(public val value: Duration) : DotnetAspDefaultValue
 }
 
 internal fun dotnetAspDefaultValue(value: Any): DotnetAspDefaultValue =
@@ -43,7 +43,7 @@ internal fun dotnetAspDefaultValue(value: Any): DotnetAspDefaultValue =
 
         is Boolean -> DotnetAspDefaultValue.BooleanValue(value)
 
-        is UUID -> DotnetAspDefaultValue.UuidValue(value)
+        is Uuid -> DotnetAspDefaultValue.UuidValue(value)
 
         is LocalDate -> DotnetAspDefaultValue.LocalDateValue(value)
 

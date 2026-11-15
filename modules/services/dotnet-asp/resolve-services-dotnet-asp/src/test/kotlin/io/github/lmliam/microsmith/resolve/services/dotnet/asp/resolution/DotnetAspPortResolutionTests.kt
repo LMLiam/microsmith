@@ -43,7 +43,7 @@ private fun resolvePorts(vararg services: PortedService): EitherNel<DotnetResolu
             }
         }
     }
-    return DotnetAspWorkspaceResolver().resolve(requireNotNull(builder.model.get<ServicesExtension>()))
+    return dotnetAspWorkspaceResolver().resolve(requireNotNull(builder.model.get<ServicesExtension>()))
 }
 
 private fun EitherNel<DotnetResolutionIssue, DotnetAspWorkspace>.issues(): List<DotnetResolutionIssue> =

@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.toNonEmptyListOrNull
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspEndpoint
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.response.DotnetAspResponse
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
@@ -12,12 +13,15 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspBindingResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspGenerationResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.DotnetAspNamingPolicy
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.HTTP_NO_CONTENT_STATUS_CODE
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.RESULT_BODY_PROPERTY_NAME
-import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspHeaderPropertyName
 
-internal class DotnetAspResponseResolver {
-    private val modelResolver = DotnetAspModelResolver()
+@Inject
+internal class DotnetAspResponseResolver(
+    private val modelResolver: DotnetAspModelResolver,
+    private val namingPolicy: DotnetAspNamingPolicy,
+) {
 
     fun resolve(
         context: DotnetAspOperationContext,
@@ -79,7 +83,7 @@ internal class DotnetAspResponseResolver {
         context: DotnetAspOperationContext,
         response: DotnetAspResponse,
     ): List<DotnetAspGenerationResolutionIssue> {
-        val propertyNames = response.headers.associateWith { header -> dotnetAspHeaderPropertyName(header.name) }
+        val propertyNames = response.headers.associateWith { header -> namingPolicy.headerPropertyName(header.name) }
 
         return buildList {
             propertyNames.forEach { (header, propertyName) ->

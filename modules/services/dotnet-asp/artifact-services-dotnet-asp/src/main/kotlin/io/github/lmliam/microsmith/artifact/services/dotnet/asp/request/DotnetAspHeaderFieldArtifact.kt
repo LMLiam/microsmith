@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.artifact.services.dotnet.asp.request
 
-data class DotnetAspHeaderFieldArtifact(val name: String, val headerName: String)
+public data class DotnetAspHeaderFieldArtifact(public val name: String, public val headerName: String)

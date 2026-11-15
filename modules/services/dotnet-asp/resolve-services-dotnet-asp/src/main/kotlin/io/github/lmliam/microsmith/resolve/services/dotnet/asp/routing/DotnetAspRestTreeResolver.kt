@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.toNonEmptyListOrNull
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspEndpoint
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.route.DotnetAspRouteGroup
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.service.DotnetAspRest
@@ -12,9 +13,11 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspEndpointResolver
 
-internal class DotnetAspRestTreeResolver {
-    private val endpointResolver = DotnetAspEndpointResolver()
-    private val routeResolver = DotnetAspRouteResolver()
+@Inject
+internal class DotnetAspRestTreeResolver(
+    private val endpointResolver: DotnetAspEndpointResolver,
+    private val routeResolver: DotnetAspRouteResolver,
+) {
 
     fun resolve(
         serviceName: String,
