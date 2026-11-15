@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-GB
+tone_instructions: "Be direct and specific. Flag real defects, overengineering and policy breaches; skip praise and style nits that ktfmt or detekt already enforce."
+early_access: false
+inheritance: false
+
+reviews:
+  profile: assertive
+  request_changes_workflow: false
+  high_level_summary: true
+  high_level_summary_in_walkthrough: true
+  review_status: true
+  commit_status: true
+  collapse_walkthrough: true
+  changed_files_summary: true
+  sequence_diagrams: false
+  poem: false
+  assess_linked_issues: true
+  related_issues: true
+  related_prs: true
+  suggested_labels: true
+  auto_apply_labels: false
+  abort_on_close: true
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: false
+    base_branches:
+      - ".*"
+  path_filters:
+    - "!**/build/**"
+    - "!**/bin/**"
+    - "!**/out/**"
+    - "!**/.gradle/**"
+    - "!gradle/wrapper/**"
+    - "!.agents/**"
+    - "!.idea/**"
+  path_instructions:
+    - path: "**/*.kt"
+      instructions: |
+        Follow AGENTS.md. In particular:
+        - No commentary comments or KDoc that repeat a name; a comment is allowed only for a constraint or side effect the code cannot express, in one line.
+        - Prefer the simplest design that meets the linked issue. Flag speculative abstractions, extra public API, and machinery that exists only to improve error messages.
+        - One top-level type per file.
+        - Production code must not read the system directly (environment, properties, clock, console, exit); those go through injected collaborators, except in `gen/system`.
+        - Coroutines: check cancellation correctly, keep plugin APIs non-suspend, and inject dispatchers rather than hard-coding `Dispatchers.*`.
+    - path: "**/src/{test,integrationTest,e2eTest}/**/*.kt"
+      instructions: |
+        Apply the AGENTS.md testing policy:
+        - Use the lowest layer that can observe the behaviour (unit, then integration, then end-to-end).
+        - One behaviour per test, named after the scenario and expected outcome. Assert state or output, not call order.
+        - Use real collaborators; test doubles only at boundaries (network, file system, clock). Prefer a temporary directory to a fake file system.
+        - Flag tests of removed behaviour, of libraries, data classes or constants, and tests that could pass by luck (timing, thread scheduling).
+    - path: "**/api/*.api"
+      instructions: "These are generated ABI dumps. Review them only for unintended public API changes and flag anything that looks internal or accidental."
+    - path: "**/*.gradle*"
+      instructions: "Keep build logic configuration-cache friendly and avoid hand-maintained lists that can be derived from the file tree."
+    - path: ".github/workflows/**"
+      instructions: "Pin actions to a version, keep permissions minimal, and name end-to-end steps `Verify <target>`, never `Smoke test <target>`."
+    - path: "docs/**/*.md"
+      instructions: "Check the prose is accurate against the code in the same PR, plain and concise, in British English."
+  pre_merge_checks:
+    title:
+      mode: warning
+      requirements: "Conventional Commits: `type(scope)!: summary`, lower-case imperative summary, no trailing full stop."
+    description:
+      mode: warning
+    issue_assessment:
+      mode: warning
+  finishing_touches:
+    unit_tests:
+      enabled: false
+  tools:
+    detekt:
+      enabled: true
+      config_file: detekt.yml
+    actionlint:
+      enabled: true
+    yamllint:
+      enabled: true
+    markdownlint:
+      enabled: true
+    shellcheck:
+      enabled: true
+    gitleaks:
+      enabled: true
+    github-checks:
+      enabled: true
+    languagetool:
+      enabled: true
+      level: default
+    osvScanner:
+      enabled: true
+
+chat:
+  auto_reply: true
+  art: false
+
+knowledge_base:
+  opt_out: false
+  web_search:
+    enabled: true
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "AGENTS.md"
+      - "docs/design/**/*.md"
+  learnings:
+    scope: local
+  issues:
+    scope: local
+  pull_requests:
+    scope: local
