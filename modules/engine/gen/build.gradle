@@ -1,4 +1,5 @@
 apply plugin: 'dev.zacsweers.metro'
+apply from: "plugin-fixtures.gradle"
 
 dependencies {
     api project(":plugin-api")

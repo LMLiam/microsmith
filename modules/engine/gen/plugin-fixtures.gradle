@@ -1,0 +1,38 @@
+sourceSets {
+    fixtureContract
+    fixturePlugins {
+        compileClasspath += sourceSets.fixtureContract.output
+    }
+}
+
+dependencies {
+    fixtureContractCompileOnly project(':dsl')
+    fixtureContractCompileOnly project(':resolve')
+    fixturePluginsCompileOnly project(':plugin-api')
+    fixturePluginsCompileOnly project(':dsl')
+    integrationTestImplementation sourceSets.fixtureContract.output
+}
+
+def fixturePluginDirectory = layout.buildDirectory.dir('fixture-plugins')
+
+def fixturePluginJars = ['Alpha', 'Beta', 'Conflicting', 'Duplicate', 'Throwing', 'Linkage', 'CloseFailure'].collect { fixtureName ->
+    def jarName = fixtureName.toLowerCase()
+    tasks.register("${jarName}FixturePluginJar", Jar) {
+        archiveFileName = "${jarName}.jar"
+        destinationDirectory = fixturePluginDirectory
+        from(sourceSets.fixturePlugins.output.classesDirs) {
+            include "thirdparty/plugins/${fixtureName}Plugin*.class"
+            include 'thirdparty/common/**'
+        }
+        from(resources.text.fromString("thirdparty.plugins.${fixtureName}Plugin").asFile('UTF-8')) {
+            into 'META-INF/services'
+            rename { 'io.github.lmliam.microsmith.plugin.MicrosmithPlugin' }
+        }
+    }
+}
+
+tasks.named('integrationTest') {
+    dependsOn fixturePluginJars
+    inputs.files(fixturePluginJars.collect { it.map { jar -> jar.archiveFile } })
+    systemProperty 'microsmith.fixturePlugins', fixturePluginDirectory.get().asFile.absolutePath
+}

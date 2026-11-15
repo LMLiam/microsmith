@@ -25,17 +25,15 @@ class MicrosmithPluginCatalog(
     val resolutionIssueDiagnosticMappers: List<ResolutionIssueDiagnosticMapper<*>> =
         resolutionIssueDiagnosticMappers.toList()
 
-    internal fun including(
-        artifactAssemblers: Iterable<ArtifactAssembler<*>>,
-        artifactRenderers: Iterable<ArtifactRenderer<*>>,
-    ): MicrosmithPluginCatalog =
+    internal operator fun plus(other: MicrosmithPluginCatalog): MicrosmithPluginCatalog =
         MicrosmithPluginCatalog(
-            domainResolvers = domainResolvers,
-            artifactContributors = artifactContributors,
-            artifactAssemblers = artifactAssemblers + this.artifactAssemblers,
-            artifactCompilers = artifactCompilers,
-            artifactRenderers = artifactRenderers + this.artifactRenderers,
-            resolutionIssueDiagnosticMappers = resolutionIssueDiagnosticMappers,
+            domainResolvers = domainResolvers + other.domainResolvers,
+            artifactContributors = artifactContributors + other.artifactContributors,
+            artifactAssemblers = artifactAssemblers + other.artifactAssemblers,
+            artifactCompilers = artifactCompilers + other.artifactCompilers,
+            artifactRenderers = artifactRenderers + other.artifactRenderers,
+            resolutionIssueDiagnosticMappers =
+                resolutionIssueDiagnosticMappers + other.resolutionIssueDiagnosticMappers,
         )
 }
 

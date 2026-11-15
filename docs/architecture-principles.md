@@ -76,7 +76,11 @@ Metro wires the generation pipeline together. It stays out of every published AP
 
 Plugins join the pipeline through `java.util.ServiceLoader`, nothing else.
 
-- `discoverMicrosmithPlugins(classLoader)` fills a `MicrosmithPluginCatalog` with every `DomainResolver`, `ArtifactContributor`, `ArtifactAssembler`, `ArtifactCompiler`, `ArtifactRenderer`, and `ResolutionIssueDiagnosticMapper` it finds.
+- `RunGraph` discovers `MicrosmithPlugin` implementations with the plugin class loader, sorts them by `id`, rejects duplicate ids, and calls `services(host)` on each. Every plugin gets its own `HostServices`, whose `DiagnosticSink` tags each diagnostic with the plugin id.
+- The same run also loads the old contracts: `DomainResolver`, `ArtifactContributor`, `ArtifactAssembler`, `ArtifactCompiler`, `ArtifactRenderer`, and `ResolutionIssueDiagnosticMapper`. `discoverMicrosmithPlugins(classLoader)` fills a `MicrosmithPluginCatalog` with them. Both paths coexist until the old contracts are removed.
+- Two compilers, assemblers or renderers for one artifact type are a `PluginConflictException` that names the plugins, the host or the old contracts that supplied them. Two outputs with the same path are also a `PluginConflictException`. How contributions to one artifact combine is the artifact's `ArtifactAssembler.merge`, which the host does not second-guess.
+- An exception while discovering a provider or in `services(host)` fails the run before the pipeline starts, with a message that names the plugin id, or the provider class and jar. A `LinkageError` is reported as an incompatible plugin. There is no partial loading.
+- The host closes every `PluginServices` in reverse order in a non-cancellable `finally`. A failing `close` is a warning, and a suppressed exception of the original failure when the run failed.
 - `ScriptSymbolContributorRegistry` does the same for `ScriptSymbolContributor`.
 - `discoverMicrosmithPlugins` reads the class loader that the run graph gives it. `ScriptSymbolContributorRegistry` reads the thread context class loader and falls back to its own.
 - `TextFileArtifact` and `BinaryFileArtifact` are not discovered. The run graph binds their assemblers and renderers.

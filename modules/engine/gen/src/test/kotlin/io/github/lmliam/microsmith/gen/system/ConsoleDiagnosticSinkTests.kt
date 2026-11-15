@@ -39,5 +39,14 @@ class ConsoleDiagnosticSinkTests :
                 console.errLines shouldBe listOf("careful")
                 console.outLines shouldBe emptyList()
             }
+
+            "a diagnostic from a plugin is prefixed with the plugin id" {
+                val console = RecordingConsole()
+
+                ConsoleDiagnosticSink(console)
+                    .report(Diagnostic(DiagnosticSeverity.WARNING, "test.warning", "careful", pluginId = "acme.plugin"))
+
+                console.errLines shouldBe listOf("[acme.plugin] careful")
+            }
         },
     )

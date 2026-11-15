@@ -246,6 +246,30 @@ You can use that processor or write the files by hand. `ScriptSymbolContributor`
 
 Ship the DSL types in the same jar. Users add the jar with `--plugin` or `--plugin-jar`, or through the Gradle and Maven plugins. See [Plugin resolution](plugins.md), [Gradle plugin](gradle.md), and [Maven plugin](maven.md).
 
+### Loading rules
+
+Besides the contracts above, Microsmith loads a `MicrosmithPlugin`. Register it in `META-INF/services/io.github.lmliam.microsmith.plugin.MicrosmithPlugin` with a public no-argument constructor.
+
+```kotlin
+class ChangelogPlugin : MicrosmithPlugin {
+    override val id = "com.example.changelog"
+
+    override fun services(host: HostServices): PluginServices =
+        object : PluginServices {
+            override val domainResolvers = setOf(ChangelogResolver())
+            override val artifactContributors = setOf(ChangelogArtifactContributor())
+        }
+}
+```
+
+- The host sorts plugins by `id`, so output never depends on class path order. A duplicate `id` fails the run after the plugin constructors run and before any `services(host)` call.
+- Two plugins, or a plugin and the host, must not supply a compiler, assembler or renderer for the same artifact type. The error names both. Several resolvers for one authoring type all run. The host does not compare contributions: the artifact's `ArtifactAssembler.merge` decides how contributions to one artifact combine. An assembler rejects a conflict by throwing `IllegalArgumentException`, and the run fails with that exception unchanged. Two outputs with the same path fail the run with `PluginConflictException`.
+- `host.diagnostics` tags every diagnostic with your `id`.
+- If discovery or `services(host)` throws, the whole run fails and the error names your plugin. A `LinkageError` is reported as an incompatible plugin.
+- The host may call your services from several threads at once, so they must be stateless or thread-safe. It calls `PluginServices.close()` when the run ends, in reverse plugin order, also after a failure. A failing `close` is a warning and never hides the original failure.
+- A plugin that uses Metro must relocate its Metro runtime into its own package, for example with `relocate("dev.zacsweers.metro", "com.example.changelog.shaded.metro")` in the Shadow plugin, and must not shade `kotlin-stdlib`. The host's class loader is parent-first, so an unrelocated Metro runtime in the jar is ignored and the run fails with an incompatible-plugin error caused by a `LinkageError` when the host's Metro version differs. Wiring the services by hand needs no build set-up.
+- Old contract registrations keep working beside `MicrosmithPlugin` until the old contracts are removed.
+
 ## 7. Testing
 
 Microsmith ships no test-helper module. Test through the public API.

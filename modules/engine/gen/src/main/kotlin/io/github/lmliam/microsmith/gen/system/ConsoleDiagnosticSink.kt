@@ -7,9 +7,11 @@ import io.github.lmliam.microsmith.plugin.DiagnosticSink
 
 class ConsoleDiagnosticSink(private val console: Console) : DiagnosticSink {
     override fun report(diagnostic: Diagnostic) {
+        val line = diagnostic.pluginId?.let { "[$it] ${diagnostic.message}" } ?: diagnostic.message
+
         when (diagnostic.severity) {
-            DiagnosticSeverity.INFO -> console.out(diagnostic.message)
-            DiagnosticSeverity.WARNING -> console.err(diagnostic.message)
+            DiagnosticSeverity.INFO -> console.out(line)
+            DiagnosticSeverity.WARNING -> console.err(line)
         }
     }
 }

@@ -4,6 +4,7 @@ import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
 import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import io.github.lmliam.microsmith.artifact.files.RelativePath
+import io.github.lmliam.microsmith.gen.errors.PluginConflictException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 
@@ -19,7 +20,7 @@ class GeneratedOutputUniquenessValidatorTests :
         {
             "requireUniqueOutputPaths rejects duplicate normalized output paths" {
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
-                    shouldThrow<IllegalArgumentException> {
+                    shouldThrow<PluginConflictException> {
                         GeneratedOutputUniquenessValidator(fileSystem)
                             .requireUniqueOutputPaths(
                                 listOf(
@@ -33,7 +34,7 @@ class GeneratedOutputUniquenessValidatorTests :
 
             "requireUniqueOutputPaths rejects a file that reaches the same path through a different output root" {
                 Jimfs.newFileSystem(Configuration.unix()).use { fileSystem ->
-                    shouldThrow<IllegalArgumentException> {
+                    shouldThrow<PluginConflictException> {
                         GeneratedOutputUniquenessValidator(fileSystem)
                             .requireUniqueOutputPaths(
                                 listOf(
@@ -59,7 +60,7 @@ class GeneratedOutputUniquenessValidatorTests :
 
             "requireUniqueOutputPaths rejects names that differ only in case on a case-insensitive file system" {
                 Jimfs.newFileSystem(Configuration.windows()).use { fileSystem ->
-                    shouldThrow<IllegalArgumentException> {
+                    shouldThrow<PluginConflictException> {
                         GeneratedOutputUniquenessValidator(fileSystem)
                             .requireUniqueOutputPaths(
                                 listOf(generated("User.proto"), generated("user.proto", contents = 2)),

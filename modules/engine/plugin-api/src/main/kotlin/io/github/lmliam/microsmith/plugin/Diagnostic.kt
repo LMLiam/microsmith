@@ -4,4 +4,5 @@ class Diagnostic(
     val severity: DiagnosticSeverity,
     val code: String,
     val message: String,
+    val pluginId: String? = null,
 )

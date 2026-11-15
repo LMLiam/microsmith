@@ -20,6 +20,12 @@ public final class io/github/lmliam/microsmith/gen/errors/GenerationResolutionFa
 	public final fun getIssues-1X0FA-Y ()Ljava/util/List;
 }
 
+public final class io/github/lmliam/microsmith/gen/errors/PluginConflictException : java/lang/RuntimeException {
+}
+
+public final class io/github/lmliam/microsmith/gen/errors/PluginLoadFailedException : java/lang/RuntimeException {
+}
+
 public final class io/github/lmliam/microsmith/gen/files/DirectorySpace : io/github/lmliam/microsmith/gen/files/FileSpace {
 	public fun <init> (Ljava/nio/file/Path;)V
 	public fun getRoot ()Ljava/nio/file/Path;
