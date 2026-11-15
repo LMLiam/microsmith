@@ -51,6 +51,16 @@ public final class io/github/lmliam/microsmith/gen/plugins/MicrosmithPluginCatal
 	public static final fun discoverMicrosmithPlugins (Ljava/lang/ClassLoader;)Lio/github/lmliam/microsmith/gen/plugins/MicrosmithPluginCatalog;
 }
 
+public abstract interface class io/github/lmliam/microsmith/gen/process/ProcessLauncher {
+	public abstract fun run (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/lmliam/microsmith/gen/process/ProcessResult {
+	public fun <init> (ILjava/lang/String;)V
+	public final fun getExitCode ()I
+	public final fun getOutput ()Ljava/lang/String;
+}
+
 public final class io/github/lmliam/microsmith/gen/system/ConsoleDiagnosticSink : io/github/lmliam/microsmith/plugin/DiagnosticSink {
 	public fun <init> (Lio/github/lmliam/microsmith/plugin/Console;)V
 	public fun report (Lio/github/lmliam/microsmith/plugin/Diagnostic;)V
@@ -66,5 +76,10 @@ public final class io/github/lmliam/microsmith/gen/system/SystemEnvironment : io
 	public fun <init> ()V
 	public fun property (Ljava/lang/String;)Ljava/lang/String;
 	public fun variable (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class io/github/lmliam/microsmith/gen/system/SystemProcessLauncher : io/github/lmliam/microsmith/gen/process/ProcessLauncher {
+	public fun <init> (Lkotlinx/coroutines/CoroutineDispatcher;)V
+	public fun run (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
