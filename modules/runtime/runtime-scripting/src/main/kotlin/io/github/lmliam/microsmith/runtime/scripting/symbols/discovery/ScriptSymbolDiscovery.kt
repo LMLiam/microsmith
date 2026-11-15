@@ -6,6 +6,7 @@ import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDefinition
 import io.github.lmliam.microsmith.runtime.scripting.symbols.model.DiscoveredScriptSymbol
 import io.github.lmliam.microsmith.runtime.scripting.symbols.parsing.KotlinScriptCallSiteParser
+import kotlin.reflect.KClass
 
 internal data class ScriptSymbolDiscoveryResult(
     val symbols: List<DiscoveredScriptSymbol>,
@@ -73,11 +74,17 @@ internal object ScriptSymbolDiscovery {
         )
     }
 
+    private data class Target(
+        val contributorId: String,
+        val valueType: KClass<*>,
+        val kind: String,
+        val valueKey: String,
+    )
+
     private class Declaration(val contributor: ScriptSymbolContributor, val definition: ScriptSymbolDefinition) {
         val qualifiedName: String = definition.qualifiedPath.joinToString(QUALIFIED_NAME_SEPARATOR)
 
-        val target: List<Any?> =
-            listOf(contributor.id, definition.valueType.qualifiedName, definition.kind, definition.valueKey)
+        val target = Target(contributor.id, definition.valueType, definition.kind, definition.valueKey)
 
         fun symbol(propertyName: String) = DiscoveredScriptSymbol(contributor, definition, propertyName)
     }

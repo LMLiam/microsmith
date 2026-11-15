@@ -381,7 +381,7 @@ class MicrosmithScriptHostTests :
             "resolves same-named messages in different namespaces by their qualified symbols" {
                 val tempDir = createTempDirectory("microsmith-script-host-qualified-symbols")
                 try {
-                    val result = runScriptResource(tempDir, "/scripting/host/qualified-symbols.microsmith.kts")
+                    val result = runScriptResource(tempDir, "qualified-symbols.microsmith.kts")
 
                     result.shouldBeTypeOf<ScriptRunSuccess>()
 
@@ -397,7 +397,7 @@ class MicrosmithScriptHostTests :
             "replays the ambiguous plain symbol warning on a compile cache hit" {
                 val tempDir = createTempDirectory("microsmith-script-host-symbol-warning-cache")
                 try {
-                    val resource = "/scripting/host/qualified-symbols.microsmith.kts"
+                    val resource = "qualified-symbols.microsmith.kts"
 
                     val firstRun = runScriptResource(tempDir, resource).shouldBeTypeOf<ScriptRunSuccess>()
                     val secondRun = runScriptResource(tempDir, resource).shouldBeTypeOf<ScriptRunSuccess>()
@@ -413,7 +413,7 @@ class MicrosmithScriptHostTests :
             "fails compilation and reports a warning when a script uses an ambiguous plain symbol" {
                 val tempDir = createTempDirectory("microsmith-script-host-ambiguous-symbol")
                 try {
-                    val result = runScriptResource(tempDir, "/scripting/host/ambiguous-plain-symbol.microsmith.kts")
+                    val result = runScriptResource(tempDir, "ambiguous-plain-symbol.microsmith.kts")
 
                     val failure = result.shouldBeTypeOf<ScriptRunFailure>()
 
@@ -497,9 +497,11 @@ class MicrosmithScriptHostTests :
         },
     )
 
-private fun runScriptResource(tempDir: Path, resource: String): ScriptRunResult {
+private const val HOST_SCRIPT_RESOURCES = "/scripting/host"
+
+private fun runScriptResource(tempDir: Path, scriptName: String): ScriptRunResult {
     val script = tempDir.resolve("script.microsmith.kts")
-    copyResource(resource, script)
+    copyResource("$HOST_SCRIPT_RESOURCES/$scriptName", script)
 
     return MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
         .run(
