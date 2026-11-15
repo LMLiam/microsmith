@@ -76,8 +76,6 @@ tasks.named("check") {
 
 def testLibraries = libs
 
-def explicitApiModules = ['dsl', 'resolve', 'artifact', 'compile', 'plugin-api', 'gen']
-
 subprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'maven-publish'
@@ -190,9 +188,6 @@ subprojects {
 
     kotlin {
         jvmToolchain(25)
-        if (project.name in explicitApiModules) {
-            explicitApi()
-        }
         abiValidation {
             enabled = true
             filters {

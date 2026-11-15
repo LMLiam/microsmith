@@ -3,3 +3,7 @@ dependencies {
     api project(":artifact")
     api project(":compile")
 }
+
+kotlin {
+    explicitApi()
+}
