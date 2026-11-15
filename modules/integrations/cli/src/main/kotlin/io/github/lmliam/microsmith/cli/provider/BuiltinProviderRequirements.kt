@@ -20,6 +20,13 @@ internal fun missingBuiltinProviderMessages(pluginCatalog: MicrosmithPluginCatal
         requirement.missingMessage(pluginCatalog)
     }
 
+internal val builtinPluginIds: List<String> = emptyList()
+
+internal fun missingBuiltinPluginMessages(pluginIds: Set<String>, requiredPluginIds: List<String>): List<String> =
+    requiredPluginIds.filterNot(pluginIds::contains).map {
+        "Missing built-in plugin '$it'. Check CLI runtime packaging."
+    }
+
 private val builtinProviderRequirements =
     listOf(
         domainResolverRequirement(SchemasExtension::class, ResolvedProtobufSchemaModel::class),

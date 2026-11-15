@@ -147,6 +147,29 @@ class CliProviderValidatorTests :
 
                 errors shouldBe emptyList()
             }
+
+            "reports a required plugin id that is not present" {
+                val errors =
+                    verifyBuiltinProviders(
+                        MicrosmithPluginCatalog(),
+                        pluginIds = setOf("io.example.present"),
+                        requiredPluginIds = listOf("io.example.present", "io.example.absent"),
+                    )
+
+                errors shouldContain "Missing built-in plugin 'io.example.absent'. Check CLI runtime packaging."
+                errors.filter { it.contains("built-in plugin") } shouldHaveSize 1
+            }
+
+            "reports no plugin error when every required plugin id is present" {
+                val errors =
+                    verifyBuiltinProviders(
+                        MicrosmithPluginCatalog(),
+                        pluginIds = setOf("io.example.present"),
+                        requiredPluginIds = listOf("io.example.present"),
+                    )
+
+                errors.filter { it.contains("built-in plugin") } shouldBe emptyList()
+            }
         },
     )
 
