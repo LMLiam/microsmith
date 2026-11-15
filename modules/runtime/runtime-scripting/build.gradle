@@ -50,39 +50,6 @@ def scriptingPomScopes = scriptingApiProjectPaths.collect { path ->
     "${dependencyProject.group}:${dependencyProject.name}=compile"
 } + ["${scriptingCommonLibrary.group}:${scriptingCommonLibrary.name}=compile"]
 
-def scriptingIdeFallbackServiceProviders = [
-    'META-INF/services/io.github.lmliam.microsmith.plugin.MicrosmithPlugin' +
-        '=io.github.lmliam.microsmith.plugin.schemas.protobuf.ProtobufPlugin',
-    'META-INF/services/io.github.lmliam.microsmith.plugin.MicrosmithPlugin' +
-        '=io.github.lmliam.microsmith.plugin.schemas.protobuf.rpc.ProtobufRpcPlugin',
-    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
-        '=io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceDomainResolver',
-    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
-        '=io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspaceDomainResolver',
-    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
-        '=io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspaceDomainResolver',
-    'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor' +
-        '=io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspArtifactContributor',
-    'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor' +
-        '=io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageArtifactContributor',
-    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
-        '=io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactAssembler',
-    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
-        '=io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifactAssembler',
-    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
-        '=io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifactAssembler',
-    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
-        '=io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifactAssembler',
-    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
-        '=io.github.lmliam.microsmith.compile.services.dotnet.asp.DotnetAspServiceArtifactCompiler',
-    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
-        '=io.github.lmliam.microsmith.compile.services.dotnet.msbuild.MsBuildProjectArtifactCompiler',
-    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
-        '=io.github.lmliam.microsmith.compile.services.dotnet.packages.DotnetPackageReferencesArtifactCompiler',
-    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
-        '=io.github.lmliam.microsmith.compile.services.dotnet.packages.DotnetPackageVersionsArtifactCompiler',
-]
-
 dependencies {
     api project(':runtime-scripting-api')
     api project(':dsl')
@@ -165,7 +132,7 @@ def verifyIdeFallbackEntriesTask = tasks.register('verifyIdeFallbackJarEntries',
 def verifyIdeFallbackProvidersTask = tasks.register('verifyIdeFallbackServiceProviders', VerifyServiceProviders) {
     dependsOn(scriptingShadowJarTask)
     archive.set(scriptingShadowJarTask.flatMap { shadowJarTask -> shadowJarTask.archiveFile })
-    expectedProviders.set(scriptingIdeFallbackServiceProviders)
+    bundledClasspath.from(configurations.runtimeClasspath, tasks.named('jar', Jar).flatMap { jarTask -> jarTask.archiveFile })
     artifactDescription.set('IDE fallback shadow jar')
 }
 
