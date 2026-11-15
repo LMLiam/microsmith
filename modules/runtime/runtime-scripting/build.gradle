@@ -101,6 +101,8 @@ dependencies {
     implementation libs.kotlin.scripting.jvm
     implementation libs.kotlin.scripting.jvm.host
     implementation libs.kotlin.compiler.embeddable
+    fixtureContractCompileOnly project(':dsl')
+    fixtureContractCompileOnly project(':resolve')
     fixturePluginsCompileOnly project(':runtime-scripting-api')
     fixturePluginsCompileOnly project(':plugin-api')
     integrationTestImplementation sourceSets.fixtureContract.output

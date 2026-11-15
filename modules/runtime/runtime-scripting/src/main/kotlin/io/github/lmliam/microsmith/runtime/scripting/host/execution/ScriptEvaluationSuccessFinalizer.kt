@@ -9,6 +9,7 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunSuccess
 import kotlin.script.experimental.api.EvaluationResult
+import kotlinx.coroutines.CancellationException
 
 @Inject
 internal class ScriptEvaluationSuccessFinalizer(private val modelEmitter: ScriptEvaluationModelEmitter) {
@@ -30,7 +31,10 @@ internal class ScriptEvaluationSuccessFinalizer(private val modelEmitter: Script
                     generatedRoots = scriptContext.generatedRoots(),
                 )
             },
-            onFailure = { error -> failureOf(error, warnings) },
+            onFailure = { error ->
+                if (error is CancellationException) throw error
+                failureOf(error, warnings)
+            },
         )
 
     private fun failureOf(error: Throwable, warnings: List<String>): ScriptRunFailure {

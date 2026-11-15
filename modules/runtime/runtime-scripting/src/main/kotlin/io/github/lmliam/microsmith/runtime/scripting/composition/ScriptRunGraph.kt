@@ -9,6 +9,7 @@ import io.github.lmliam.microsmith.runtime.scripting.host.execution.ScriptRun
 import io.github.lmliam.microsmith.runtime.scripting.host.execution.ScriptRunClassLoader
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.symbols.discovery.ScriptSymbolContributorRegistry
+import kotlinx.coroutines.Job
 
 @GraphExtension(ScriptRunScope::class)
 internal interface ScriptRunGraph {
@@ -17,7 +18,7 @@ internal interface ScriptRunGraph {
 
     @GraphExtension.Factory
     fun interface Factory {
-        fun create(@Provides request: ScriptRunRequest): ScriptRunGraph
+        fun create(@Provides request: ScriptRunRequest, @Provides scriptRunJob: Job): ScriptRunGraph
     }
 
     @Provides

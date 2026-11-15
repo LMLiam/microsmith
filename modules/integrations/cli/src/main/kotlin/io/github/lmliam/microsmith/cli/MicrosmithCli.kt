@@ -33,6 +33,7 @@ import io.github.lmliam.microsmith.runtime.scripting.createSystemMicrosmithScrip
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.nio.file.Path
+import kotlinx.coroutines.runBlocking
 
 internal class MicrosmithCli(
     private val stdout: (String) -> Unit = ::println,
@@ -40,17 +41,19 @@ internal class MicrosmithCli(
     providerValidator: () -> List<String> = ::verifyBuiltinProviders,
     pluginResolver: (RunCommand) -> PluginResolutionResult = ::resolvePlugins,
     scriptRunner: (RunCommand, List<Path>) -> ScriptRunResult = { command, pluginClasspath ->
-        createSystemMicrosmithScriptHost()
-            .run(
-                ScriptRunRequest(
-                    script = command.script,
-                    outputDir = command.outputDir,
-                    variables = command.variables,
-                    flags = command.flags,
-                    pluginClasspath = pluginClasspath,
-                    isolationMode = command.isolationMode,
-                ),
-            )
+        runBlocking {
+            createSystemMicrosmithScriptHost()
+                .run(
+                    ScriptRunRequest(
+                        script = command.script,
+                        outputDir = command.outputDir,
+                        variables = command.variables,
+                        flags = command.flags,
+                        pluginClasspath = pluginClasspath,
+                        isolationMode = command.isolationMode,
+                    ),
+                )
+        }
     },
     doctorRunner: () -> DoctorResult = { runDoctorChecks(providerValidator = providerValidator) },
     private val versionProvider: () -> String = ::resolveCliVersion,

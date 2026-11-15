@@ -499,7 +499,7 @@ class MicrosmithScriptHostTests :
 
 internal const val HOST_SCRIPT_RESOURCES = "/scripting/host"
 
-private fun runScriptResource(tempDir: Path, scriptName: String): ScriptRunResult {
+private suspend fun runScriptResource(tempDir: Path, scriptName: String): ScriptRunResult {
     val script = tempDir.resolve("script.microsmith.kts")
     copyResource(scriptName, script)
 
@@ -522,7 +522,7 @@ internal fun copyResource(scriptName: String, target: Path) {
     target.writeText(source.readText())
 }
 
-private fun runScriptWithInvalidSchema(tempDir: Path, isolationMode: ScriptIsolationMode): ScriptRunResult {
+private suspend fun runScriptWithInvalidSchema(tempDir: Path, isolationMode: ScriptIsolationMode): ScriptRunResult {
     val script = tempDir.resolve("duplicates.microsmith.kts")
     copyResource("unresolved-references.microsmith.kts", script)
 

@@ -7,6 +7,7 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import java.nio.file.FileSystems
 import kotlin.system.exitProcess
+import kotlinx.coroutines.runBlocking
 
 internal object ProcessIsolatedScriptMain {
     @JvmStatic
@@ -29,14 +30,16 @@ internal object ProcessIsolatedScriptMain {
 
         val result = runCatching {
             val request = protocol.readRequest(requestFile)
-            createSystemMicrosmithScriptHost(request.cacheDirectory)
-                .run(
-                    request.request.copy(
-                        script = request.scriptPath,
-                        outputDir = request.outputPath,
-                        isolationMode = ScriptIsolationMode.CLASSLOADER,
-                    ),
-                )
+            runBlocking {
+                createSystemMicrosmithScriptHost(request.cacheDirectory)
+                    .run(
+                        request.request.copy(
+                            script = request.scriptPath,
+                            outputDir = request.outputPath,
+                            isolationMode = ScriptIsolationMode.CLASSLOADER,
+                        ),
+                    )
+            }
         }
             .getOrElse { error ->
                 val message = error.message ?: error::class.simpleName ?: "unknown process worker error"

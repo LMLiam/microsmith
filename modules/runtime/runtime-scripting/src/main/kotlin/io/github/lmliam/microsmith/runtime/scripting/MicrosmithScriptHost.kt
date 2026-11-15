@@ -12,7 +12,7 @@ internal constructor(
     private val runExecutor: ScriptRunExecutor,
     private val pathValidator: ScriptPathValidator,
 ) {
-    public fun run(request: ScriptRunRequest): ScriptRunResult {
+    public suspend fun run(request: ScriptRunRequest): ScriptRunResult {
         val normalizedRequest = request.normalized()
         val validationFailure = pathValidator.validate(normalizedRequest.script)
         return validationFailure ?: runExecutor.execute(normalizedRequest)

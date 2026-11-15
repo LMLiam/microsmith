@@ -7,7 +7,15 @@ import io.github.lmliam.microsmith.runtime.scripting.host.configuration.ScriptHo
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.nio.file.Path
+import kotlin.concurrent.thread
 import kotlin.io.path.createDirectories
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.completeWith
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 
 @Inject
 internal class ScriptRun(
@@ -20,7 +28,24 @@ internal class ScriptRun(
     private val evaluator: ScriptEvaluator,
     private val resultMapper: ScriptRunResultMapper,
 ) {
-    fun execute(): ScriptRunResult = classLoader.withContextClassLoader {
+    suspend fun execute(): ScriptRunResult {
+        val outcome = CompletableDeferred<ScriptRunResult>()
+        thread(name = SCRIPT_THREAD_NAME, contextClassLoader = classLoader.loader) {
+            outcome.completeWith(runCatching { evaluate() })
+        }
+
+        val result =
+            try {
+                outcome.await()
+            } catch (cancellation: CancellationException) {
+                withContext(NonCancellable) { outcome.join() }
+                throw cancellation
+            }
+        currentCoroutineContext().ensureActive()
+        return result
+    }
+
+    private fun evaluate(): ScriptRunResult {
         cacheDirectory.createDirectories()
         val runtimeHostConfiguration = hostConfigurationFactory.create()
         val (result, elapsedMillis) =
@@ -31,7 +56,7 @@ internal class ScriptRun(
                 pluginClasspath = request.pluginClasspath,
             )
         cache.recordWarnings(result.reports)
-        resultMapper.toRunResult(
+        return resultMapper.toRunResult(
             result = result,
             elapsedMillis = elapsedMillis,
             scriptContext = scriptContext,
@@ -40,3 +65,5 @@ internal class ScriptRun(
         )
     }
 }
+
+private const val SCRIPT_THREAD_NAME = "microsmith-script-run"

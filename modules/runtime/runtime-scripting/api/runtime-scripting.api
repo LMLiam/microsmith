@@ -1,5 +1,5 @@
 public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost {
-	public final fun run (Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunRequest;)Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunResult;
+	public final fun run (Lio/github/lmliam/microsmith/runtime/scripting/model/ScriptRunRequest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class io/github/lmliam/microsmith/runtime/scripting/MicrosmithScriptHost$MetroFactory : dev/zacsweers/metro/internal/Factory {

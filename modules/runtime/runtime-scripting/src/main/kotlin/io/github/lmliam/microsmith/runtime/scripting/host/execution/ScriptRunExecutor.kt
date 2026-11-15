@@ -8,13 +8,16 @@ import io.github.lmliam.microsmith.runtime.scripting.model.ScriptIsolationMode
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.job
 
 @Inject
 internal class ScriptRunExecutor(
     private val runGraphFactory: ScriptRunGraph.Factory,
     private val processExecutor: ProcessIsolatedScriptExecutor,
 ) {
-    fun execute(request: ScriptRunRequest): ScriptRunResult =
+    suspend fun execute(request: ScriptRunRequest): ScriptRunResult =
         when (request.isolationMode) {
             ScriptIsolationMode.CLASSLOADER -> executeInClassLoader(request)
 
@@ -22,11 +25,12 @@ internal class ScriptRunExecutor(
                 processExecutor.execute(request = request, scriptPath = request.script, outputPath = request.outputDir)
         }
 
-    private fun executeInClassLoader(request: ScriptRunRequest): ScriptRunResult = runCatching {
-        val runGraph = runGraphFactory.create(request)
+    private suspend fun executeInClassLoader(request: ScriptRunRequest): ScriptRunResult = runCatching {
+        val runGraph = runGraphFactory.create(request, currentCoroutineContext().job)
         runGraph.classLoader.use { runGraph.run.execute() }
     }
         .getOrElse { exception ->
+            if (exception is CancellationException) throw exception
             val message = exception.message ?: exception::class.simpleName ?: "unknown error"
             ScriptRunFailure.withMessages(
                 messages = listOf("Unhandled script host failure: $message"),

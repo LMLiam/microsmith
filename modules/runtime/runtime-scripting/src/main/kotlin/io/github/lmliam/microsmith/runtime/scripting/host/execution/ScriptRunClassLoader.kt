@@ -18,17 +18,6 @@ internal class ScriptRunClassLoader(request: ScriptRunRequest) : AutoCloseable {
 
     val loader: ClassLoader = pluginLoader ?: hostLoader
 
-    fun <T> withContextClassLoader(block: () -> T): T {
-        val thread = Thread.currentThread()
-        val previous = thread.contextClassLoader
-        thread.contextClassLoader = loader
-        return try {
-            block()
-        } finally {
-            thread.contextClassLoader = previous
-        }
-    }
-
     override fun close() {
         pluginLoader?.close()
     }

@@ -8,23 +8,26 @@ import io.github.lmliam.microsmith.runtime.scripting.createSystemMicrosmithScrip
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunResult
 import java.nio.file.Path
+import kotlinx.coroutines.runBlocking
 
 internal class RunCommandHandler(
     private val emitterFactory: CliDiagnosticEmitterFactory,
     providerValidator: () -> List<String>,
     pluginResolver: (RunCommand) -> PluginResolutionResult,
     scriptRunner: (RunCommand, List<Path>) -> ScriptRunResult = { command, pluginClasspath ->
-        createSystemMicrosmithScriptHost()
-            .run(
-                ScriptRunRequest(
-                    script = command.script,
-                    outputDir = command.outputDir,
-                    variables = command.variables,
-                    flags = command.flags,
-                    pluginClasspath = pluginClasspath,
-                    isolationMode = command.isolationMode,
-                ),
-            )
+        runBlocking {
+            createSystemMicrosmithScriptHost()
+                .run(
+                    ScriptRunRequest(
+                        script = command.script,
+                        outputDir = command.outputDir,
+                        variables = command.variables,
+                        flags = command.flags,
+                        pluginClasspath = pluginClasspath,
+                        isolationMode = command.isolationMode,
+                    ),
+                )
+        }
     },
     eventLogWriter: (Path, RunEventLogEntry) -> Unit = EventLogWriter::writeEventLog,
 ) {
