@@ -11,7 +11,7 @@ import io.kotest.matchers.shouldBe
 class ProtoFileArtifactAssemblerTests :
     StringSpec(
         {
-            val assembler = ProtoFileArtifactAssembler()
+            val assembler = ProtoFileArtifactAssembler(ProtoFileMerge())
             val sharedId = ProtoFileArtifactId(packageName = "acme.user.v1", typeName = "User")
 
             "merges imports and declarations for the same proto artifact" {

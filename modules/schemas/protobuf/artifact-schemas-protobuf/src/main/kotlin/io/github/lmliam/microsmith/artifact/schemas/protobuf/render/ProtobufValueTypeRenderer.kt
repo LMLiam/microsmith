@@ -1,8 +1,10 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
 
+@Inject
 internal class ProtobufValueTypeRenderer {
     @Suppress("CyclomaticComplexMethod")
     fun render(type: PrimitiveType): String =

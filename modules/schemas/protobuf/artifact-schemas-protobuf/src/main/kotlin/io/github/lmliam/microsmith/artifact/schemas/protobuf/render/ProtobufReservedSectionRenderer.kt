@@ -1,7 +1,9 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 
+@Inject
 internal class ProtobufReservedSectionRenderer {
     fun render(reservations: ResolvedProtobufReservations): String? =
         listOfNotNull(renderReservedNames(reservations), renderReservedNumbers(reservations))

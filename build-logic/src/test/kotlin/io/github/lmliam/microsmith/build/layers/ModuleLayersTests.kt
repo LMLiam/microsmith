@@ -5,11 +5,13 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.github.lmliam.microsmith.build.layers.ModuleLayerViolation.MetroTypeInPublishedApi
 import io.github.lmliam.microsmith.build.layers.ModuleLayerViolation.PluginApiDependsOnRuntimeScripting
+import io.github.lmliam.microsmith.build.layers.ModuleLayerViolation.PluginDependsOnGen
 import io.github.lmliam.microsmith.build.layers.ModuleLayerViolation.UpwardDependency
 import io.github.lmliam.microsmith.build.layers.PipelineLayer.ARTIFACT
 import io.github.lmliam.microsmith.build.layers.PipelineLayer.COMPILE
 import io.github.lmliam.microsmith.build.layers.PipelineLayer.DSL
 import io.github.lmliam.microsmith.build.layers.PipelineLayer.GEN
+import io.github.lmliam.microsmith.build.layers.PipelineLayer.PLUGIN
 import io.github.lmliam.microsmith.build.layers.PipelineLayer.PLUGIN_API
 import io.github.lmliam.microsmith.build.layers.PipelineLayer.RESOLVE
 
@@ -160,6 +162,43 @@ class ModuleLayersTests :
                 )
 
             violations.shouldBeEmpty()
+        }
+
+        "allows a plugin module depending on the pipeline layers and plugin-api" {
+            findModuleLayerViolations(
+                mapOf(
+                    "plugin-schemas-protobuf" to
+                        listOf("dsl-schemas-protobuf", "resolve-schemas-protobuf", "artifact", "compile", "plugin-api"),
+                ),
+                abiDumps = emptyMap(),
+            )
+                .shouldBeEmpty()
+        }
+
+        "rejects gen depending on a plugin module" {
+            val violations =
+                findModuleLayerViolations(mapOf("gen" to listOf("plugin-schemas-protobuf")), abiDumps = emptyMap())
+
+            violations.shouldContainExactly(upward("gen", GEN, "plugin-schemas-protobuf", PLUGIN))
+        }
+
+        "rejects a compile module depending on a plugin module" {
+            val violations =
+                findModuleLayerViolations(
+                    mapOf("compile-schemas-protobuf" to listOf("plugin-schemas-protobuf")),
+                    abiDumps = emptyMap(),
+                )
+
+            violations.shouldContainExactly(
+                upward("compile-schemas-protobuf", COMPILE, "plugin-schemas-protobuf", PLUGIN),
+            )
+        }
+
+        "rejects a plugin module depending on gen" {
+            val violations =
+                findModuleLayerViolations(mapOf("plugin-schemas-protobuf" to listOf("gen")), abiDumps = emptyMap())
+
+            violations.shouldContainExactly(PluginDependsOnGen("plugin-schemas-protobuf", "gen"))
         }
 
         "rejects plugin-api depending on runtime-scripting" {

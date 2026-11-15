@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.compile.schemas.protobuf
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.files.TextFileArtifactContribution
@@ -9,12 +11,12 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArti
 import io.github.lmliam.microsmith.compile.ArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.SchemasArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.protobuf.render.ProtobufFileRenderer
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufPluginScope
 
-@ServiceProvider(ArtifactCompiler::class)
-class ProtoFileArtifactCompiler private constructor(private val renderer: ProtobufFileRenderer) :
+@Inject
+@ContributesIntoSet(ProtobufPluginScope::class, binding = binding<ArtifactCompiler<*>>())
+internal class ProtoFileArtifactCompiler(private val renderer: ProtobufFileRenderer) :
     SchemasArtifactCompiler<ProtoFileArtifact> {
-    constructor() : this(ProtobufFileRenderer())
-
     override val artifactType = ProtoFileArtifact::class
 
     override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> =

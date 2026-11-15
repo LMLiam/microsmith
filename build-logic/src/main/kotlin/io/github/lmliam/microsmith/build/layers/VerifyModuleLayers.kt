@@ -44,6 +44,7 @@ private fun ModuleLayerViolation.describe(): String =
             "$module (${moduleLayer.moduleName}) depends upward on $dependency (${dependencyLayer.moduleName})"
         is ModuleLayerViolation.PluginApiDependsOnRuntimeScripting ->
             "$module must not depend on the runtime scripting module $dependency"
+        is ModuleLayerViolation.PluginDependsOnGen -> "$module must not depend on the gen module $dependency"
         is ModuleLayerViolation.MetroTypeInPublishedApi ->
             "$module exposes the Metro type ${type.internalName} in its published API"
     }

@@ -9,6 +9,7 @@ internal enum class PipelineLayer(
     COMPILE("compile"),
     PLUGIN_API("plugin-api"),
     GEN("gen"),
+    PLUGIN("plugin"),
     ;
 
     fun owns(module: String): Boolean = isModuleOrSubmodule(module, moduleName)

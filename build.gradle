@@ -194,6 +194,8 @@ subprojects {
                 exclude {
                     annotatedWith.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
                     byNames.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+                    byNames.add('**Contributions?To*')
+                    byNames.add('**Contributions?To*?**')
                 }
             }
         }

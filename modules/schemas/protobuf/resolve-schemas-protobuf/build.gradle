@@ -1,4 +1,8 @@
-apply plugin: 'org.jetbrains.kotlin.kapt'
+apply plugin: 'dev.zacsweers.metro'
+
+metro {
+    generateContributionProviders = true
+}
 
 dependencies {
     api libs.arrow.core
@@ -7,6 +11,4 @@ dependencies {
     implementation project(":resolve")
     api project(":resolve-schemas")
     api project(":dsl-schemas-protobuf")
-    api libs.spi.tooling.annotations
-    kapt libs.spi.tooling.processor
 }

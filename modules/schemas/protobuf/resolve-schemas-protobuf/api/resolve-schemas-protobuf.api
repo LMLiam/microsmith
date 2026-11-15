@@ -1,3 +1,6 @@
+public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufPluginScope {
+}
+
 public abstract interface class io/github/lmliam/microsmith/resolve/schemas/protobuf/ProtobufResolutionIssue : io/github/lmliam/microsmith/resolve/ResolutionIssue {
 }
 
@@ -1206,12 +1209,7 @@ public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resoluti
 	public static final fun declarationKind (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;)Lio/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufDeclarationKind;
 }
 
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSchemasResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
-	public fun <init> ()V
-	public fun getAuthoringType ()Lkotlin/reflect/KClass;
-	public fun getResolvedType ()Lkotlin/reflect/KClass;
-	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
-	public fun resolve (Lio/github/lmliam/microsmith/dsl/schemas/SchemasExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
+public abstract class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSchemasResolverContributions {
 }
 
 public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/resolution/ProtobufSymbolTable {

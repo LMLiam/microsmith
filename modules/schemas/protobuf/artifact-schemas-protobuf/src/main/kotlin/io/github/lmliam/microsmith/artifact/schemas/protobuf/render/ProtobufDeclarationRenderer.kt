@@ -1,11 +1,13 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufDeclaration
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufMessage
 
 private const val INDENT = "  "
 
+@Inject
 internal class ProtobufDeclarationRenderer(
     private val reservedSections: ProtobufReservedSectionRenderer,
     private val fields: ProtobufFieldRenderer,

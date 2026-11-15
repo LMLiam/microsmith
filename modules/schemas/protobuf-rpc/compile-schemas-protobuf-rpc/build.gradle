@@ -12,4 +12,5 @@ dependencies {
     testImplementation project(":dsl-schemas-protobuf")
     testImplementation project(":dsl-schemas-protobuf-rpc")
     testImplementation project(":gen")
+    testRuntimeOnly project(":plugin-schemas-protobuf")
 }

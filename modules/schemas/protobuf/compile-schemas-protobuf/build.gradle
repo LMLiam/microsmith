@@ -1,13 +1,17 @@
-apply plugin: 'org.jetbrains.kotlin.kapt'
+apply plugin: 'dev.zacsweers.metro'
+
+metro {
+    generateContributionProviders = true
+}
 
 dependencies {
     api project(":compile-schemas")
     api project(":artifact-schemas-protobuf")
-    api libs.spi.tooling.annotations
-    kapt libs.spi.tooling.processor
+    implementation project(":resolve-schemas-protobuf")
 
     testImplementation project(":dsl")
     testImplementation project(":dsl-schemas")
     testImplementation project(":dsl-schemas-protobuf")
     testImplementation project(":gen")
+    testRuntimeOnly project(":plugin-schemas-protobuf")
 }

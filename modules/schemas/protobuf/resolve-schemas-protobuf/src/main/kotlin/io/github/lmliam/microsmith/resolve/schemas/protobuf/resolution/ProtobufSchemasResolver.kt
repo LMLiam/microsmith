@@ -5,7 +5,9 @@ import arrow.core.flatMap
 import arrow.core.nonEmptyListOf
 import arrow.core.separateEither
 import arrow.core.toNonEmptyListOrNull
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Enum
@@ -13,27 +15,17 @@ import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.Message
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.types.ServiceDeclaration
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.DomainResolver
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufPluginScope
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.toIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.schemaGraphRejections
 
-@ServiceProvider(DomainResolver::class)
-class ProtobufSchemasResolver
-private constructor(
-    private val declarationResolvers: ProtobufDeclarationResolver.Factory,
-) : DomainResolver<SchemasExtension, ResolvedProtobufSchemaModel> {
-    constructor() :
-        this(
-            ProtobufDeclarationResolver.Factory { symbols ->
-                ProtobufDeclarationResolver(
-                    symbols,
-                    ProtobufReferenceResolver.Factory { ProtobufReferenceResolver(it) },
-                )
-            },
-        )
-
+@Inject
+@ContributesIntoSet(ProtobufPluginScope::class, binding = binding<DomainResolver<*, *>>())
+internal class ProtobufSchemasResolver(private val declarationResolvers: ProtobufDeclarationResolver.Factory) :
+    DomainResolver<SchemasExtension, ResolvedProtobufSchemaModel> {
     override val authoringType = SchemasExtension::class
     override val resolvedType = ResolvedProtobufSchemaModel::class
 

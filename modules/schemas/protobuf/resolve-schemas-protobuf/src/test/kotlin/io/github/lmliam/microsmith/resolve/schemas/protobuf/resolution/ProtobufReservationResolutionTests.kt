@@ -26,7 +26,7 @@ import io.kotest.matchers.types.shouldBeTypeOf
 class ProtobufReservationResolutionTests :
     StringSpec(
         {
-            val resolver = ProtobufSchemasResolver()
+            val resolver = protobufSchemasResolver()
 
             fun resolveMessage(vararg reservations: Reserved, fields: List<Pair<String, Int>> = emptyList()) =
                 resolver.resolve(

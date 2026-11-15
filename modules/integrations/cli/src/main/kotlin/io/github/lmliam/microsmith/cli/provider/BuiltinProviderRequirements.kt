@@ -1,6 +1,5 @@
 package io.github.lmliam.microsmith.cli.provider
 
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
@@ -9,7 +8,6 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.Do
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufSchemaModel
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspace
@@ -20,7 +18,7 @@ internal fun missingBuiltinProviderMessages(pluginCatalog: MicrosmithPluginCatal
         requirement.missingMessage(pluginCatalog)
     }
 
-internal val builtinPluginIds: List<String> = emptyList()
+internal val builtinPluginIds: List<String> = listOf("io.github.lmliam.microsmith.protobuf")
 
 internal fun missingBuiltinPluginMessages(pluginIds: Set<String>, requiredPluginIds: List<String>): List<String> =
     requiredPluginIds.filterNot(pluginIds::contains).map {
@@ -29,21 +27,17 @@ internal fun missingBuiltinPluginMessages(pluginIds: Set<String>, requiredPlugin
 
 private val builtinProviderRequirements =
     listOf(
-        domainResolverRequirement(SchemasExtension::class, ResolvedProtobufSchemaModel::class),
         domainResolverRequirement(SchemasExtension::class, ResolvedProtobufRpcSchemaModel::class),
         domainResolverRequirement(ServicesExtension::class, DotnetAspWorkspace::class),
         domainResolverRequirement(ServicesExtension::class, DotnetPackageWorkspace::class),
-        artifactContributorRequirement(ResolvedProtobufSchemaModel::class),
         artifactContributorRequirement(ResolvedProtobufRpcSchemaModel::class),
         artifactContributorRequirement(DotnetAspWorkspace::class),
         artifactContributorRequirement(DotnetPackageWorkspace::class),
-        artifactAssemblerRequirement(ProtoFileArtifact::class),
         artifactAssemblerRequirement(ProtobufRpcServiceArtifact::class),
         artifactAssemblerRequirement(DotnetAspServiceArtifact::class),
         artifactAssemblerRequirement(DotnetPackageVersionsArtifact::class),
         artifactAssemblerRequirement(DotnetPackageReferencesArtifact::class),
         artifactAssemblerRequirement(MsBuildProjectArtifact::class),
-        artifactCompilerRequirement(ProtoFileArtifact::class),
         artifactCompilerRequirement(ProtobufRpcServiceArtifact::class),
         artifactCompilerRequirement(DotnetAspServiceArtifact::class),
         artifactCompilerRequirement(DotnetPackageVersionsArtifact::class),

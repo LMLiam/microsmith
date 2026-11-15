@@ -63,6 +63,7 @@ def moduleDirectories = [
     'resolve-schemas-protobuf': 'schemas/protobuf/resolve-schemas-protobuf',
     'artifact-schemas-protobuf': 'schemas/protobuf/artifact-schemas-protobuf',
     'compile-schemas-protobuf': 'schemas/protobuf/compile-schemas-protobuf',
+    'plugin-schemas-protobuf': 'schemas/protobuf/plugin-schemas-protobuf',
     'dsl-schemas-protobuf-rpc': 'schemas/protobuf-rpc/dsl-schemas-protobuf-rpc',
     'resolve-schemas-protobuf-rpc': 'schemas/protobuf-rpc/resolve-schemas-protobuf-rpc',
     'artifact-schemas-protobuf-rpc': 'schemas/protobuf-rpc/artifact-schemas-protobuf-rpc',

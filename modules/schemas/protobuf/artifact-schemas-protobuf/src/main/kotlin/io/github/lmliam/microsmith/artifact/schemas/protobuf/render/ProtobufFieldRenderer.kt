@@ -1,10 +1,12 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.Cardinality
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnumValue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
 
+@Inject
 internal class ProtobufFieldRenderer(private val valueTypes: ProtobufValueTypeRenderer) {
     fun render(field: ResolvedProtobufField): String =
         when (field) {
