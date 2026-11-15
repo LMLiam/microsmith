@@ -1,5 +1,5 @@
 apply plugin: 'dev.zacsweers.metro'
-apply from: "plugin-fixtures.gradle"
+apply from: rootProject.file("gradle/plugin-fixtures.gradle")
 
 dependencies {
     api project(":plugin-api")
@@ -18,6 +18,11 @@ dependencies {
     testImplementation libs.jimfs
     testImplementation libs.coroutines.test
     api libs.coroutines.core
+    fixtureContractCompileOnly project(':dsl')
+    fixtureContractCompileOnly project(':resolve')
+    fixturePluginsCompileOnly project(':plugin-api')
+    fixturePluginsCompileOnly project(':dsl')
+    integrationTestImplementation sourceSets.fixtureContract.output
 }
 
 def windows = org.gradle.internal.os.OperatingSystem.current().isWindows()
