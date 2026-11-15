@@ -7,6 +7,8 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.Do
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
+import io.github.lmliam.microsmith.plugin.schemas.protobuf.ProtobufPlugin
+import io.github.lmliam.microsmith.plugin.schemas.protobuf.rpc.ProtobufRpcPlugin
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspace
 import kotlin.reflect.KClass
@@ -16,8 +18,7 @@ internal fun missingBuiltinProviderMessages(pluginCatalog: MicrosmithPluginCatal
         requirement.missingMessage(pluginCatalog)
     }
 
-internal val builtinPluginIds: List<String> =
-    listOf("io.github.lmliam.microsmith.protobuf", "io.github.lmliam.microsmith.protobuf.rpc")
+internal val builtinPluginIds: List<String> = listOf(ProtobufPlugin(), ProtobufRpcPlugin()).map { it.id }
 
 internal fun missingBuiltinPluginMessages(pluginIds: Set<String>, requiredPluginIds: List<String>): List<String> =
     requiredPluginIds.filterNot(pluginIds::contains).map {
