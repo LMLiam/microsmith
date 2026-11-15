@@ -11,7 +11,7 @@ public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/assembl
 }
 
 public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/assembly/ProtoFileMerge {
-	public static final field INSTANCE Lio/github/lmliam/microsmith/artifact/schemas/protobuf/assembly/ProtoFileMerge;
+	public fun <init> ()V
 	public final fun imports ([Ljava/util/List;)Ljava/util/List;
 	public final fun members (Ljava/util/List;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 }

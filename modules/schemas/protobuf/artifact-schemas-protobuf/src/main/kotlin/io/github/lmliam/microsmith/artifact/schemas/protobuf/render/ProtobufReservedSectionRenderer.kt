@@ -2,7 +2,7 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufReservations
 
-internal object ProtobufReservedSectionRenderer {
+internal class ProtobufReservedSectionRenderer {
     fun render(reservations: ResolvedProtobufReservations): String? =
         listOfNotNull(renderReservedNames(reservations), renderReservedNumbers(reservations))
             .joinToString("\n")

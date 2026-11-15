@@ -3,7 +3,7 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf.render
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.field.PrimitiveType
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufValueType
 
-internal object ProtobufValueTypeRenderer {
+internal class ProtobufValueTypeRenderer {
     @Suppress("CyclomaticComplexMethod")
     fun render(type: PrimitiveType): String =
         when (type) {

@@ -7,7 +7,10 @@ import io.github.lmliam.microsmith.artifact.schemas.protobuf.contribution.ProtoF
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifact
 
 @ServiceProvider(ArtifactAssembler::class)
-class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
+class ProtoFileArtifactAssembler private constructor(private val merge: ProtoFileMerge) :
+    ArtifactAssembler<ProtoFileArtifact> {
+    constructor() : this(ProtoFileMerge())
+
     override val artifactType = ProtoFileArtifact::class
 
     override fun create(contribution: ArtifactContribution<ProtoFileArtifact>): ProtoFileArtifact {
@@ -27,9 +30,8 @@ class ProtoFileArtifactAssembler : ArtifactAssembler<ProtoFileArtifact> {
         val owner = current.id.fullyQualifiedName
 
         return current.copy(
-            imports = ProtoFileMerge.imports(current.imports, next.imports),
-            declarations =
-                ProtoFileMerge.members(current.declarations, next.declarations, "declaration", owner) { it.name },
+            imports = merge.imports(current.imports, next.imports),
+            declarations = merge.members(current.declarations, next.declarations, "declaration", owner) { it.name },
         )
     }
 

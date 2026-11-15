@@ -5,13 +5,13 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufEnum
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufField
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ResolvedProtobufOneof
 
-internal object ProtobufFieldRenderer {
+internal class ProtobufFieldRenderer(private val valueTypes: ProtobufValueTypeRenderer) {
     fun render(field: ResolvedProtobufField): String =
         when (field) {
             is ResolvedProtobufField.Scalar ->
                 renderCardinalityField(
                     field.cardinality,
-                    ProtobufValueTypeRenderer.render(field.type),
+                    valueTypes.render(field.type),
                     field.name.value,
                     field.number.value,
                 )
@@ -27,9 +27,9 @@ internal object ProtobufFieldRenderer {
             is ResolvedProtobufField.Map ->
                 buildString {
                     append("map<")
-                    append(ProtobufValueTypeRenderer.render(field.key))
+                    append(valueTypes.render(field.key))
                     append(", ")
-                    append(ProtobufValueTypeRenderer.render(field.value))
+                    append(valueTypes.render(field.value))
                     append("> ")
                     append(field.name.value)
                     append(" = ")
@@ -47,7 +47,7 @@ internal object ProtobufFieldRenderer {
     }
 
     fun render(field: ResolvedProtobufOneof.Field): String =
-        "${ProtobufValueTypeRenderer.render(field.type)} ${field.name} = ${field.number.value};"
+        "${valueTypes.render(field.type)} ${field.name} = ${field.number.value};"
 
     fun render(value: ResolvedProtobufEnumValue): String = "${value.name} = ${value.number.value};"
 

@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.assembly
 
-object ProtoFileMerge {
+class ProtoFileMerge {
     fun imports(vararg parts: List<String>): List<String> = parts.flatMap { it }.distinct().sorted()
 
     fun <T> members(
