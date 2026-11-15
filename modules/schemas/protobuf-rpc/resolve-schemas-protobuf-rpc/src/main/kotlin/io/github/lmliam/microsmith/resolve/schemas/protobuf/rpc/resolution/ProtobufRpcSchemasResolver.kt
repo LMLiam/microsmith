@@ -1,7 +1,9 @@
 package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.resolution
 
 import arrow.core.mapOrAccumulate
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.dsl.schemas.SchemasExtension
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Service
@@ -10,15 +12,13 @@ import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.names.QualifiedSchemaName
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.ProtobufSymbolTable
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.resolution.declarationKind
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcPluginScope
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 
-@ServiceProvider(DomainResolver::class)
-class ProtobufRpcSchemasResolver
-private constructor(
-    private val schemaResolver: ProtobufRpcSchemaResolver,
-) : DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
-    constructor() : this(ProtobufRpcSchemaResolver())
-
+@Inject
+@ContributesIntoSet(ProtobufRpcPluginScope::class, binding = binding<DomainResolver<*, *>>())
+internal class ProtobufRpcSchemasResolver(private val schemaResolver: ProtobufRpcSchemaResolver) :
+    DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
     override val authoringType = SchemasExtension::class
     override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 

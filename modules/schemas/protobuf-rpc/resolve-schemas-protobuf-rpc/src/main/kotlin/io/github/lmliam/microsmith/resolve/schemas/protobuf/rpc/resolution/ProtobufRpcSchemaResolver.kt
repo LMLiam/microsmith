@@ -8,6 +8,7 @@ import arrow.core.mapOrAccumulate
 import arrow.core.raise.context.bind
 import arrow.core.raise.context.either
 import arrow.core.raise.context.ensure
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.ProtobufSchema
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.Rpc
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.rpc.RpcEndpoint
@@ -22,6 +23,7 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobuf
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcEndpoint
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchema
 
+@Inject
 internal class ProtobufRpcSchemaResolver {
     fun resolve(
         schema: ProtobufSchema,

@@ -28,7 +28,7 @@ import io.kotest.matchers.types.shouldBeTypeOf
 class ProtobufRpcSchemasResolverTests :
     StringSpec(
         {
-            val resolver = ProtobufRpcSchemasResolver()
+            val resolver = ProtobufRpcSchemasResolver(ProtobufRpcSchemaResolver())
 
             "resolves rpc schemas into finalized rpc models" {
                 val schemas = microsmith {

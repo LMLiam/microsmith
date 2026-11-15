@@ -4,7 +4,6 @@ import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
-import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.msbuild.MsBuildProjectArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifact
@@ -16,7 +15,6 @@ import io.github.lmliam.microsmith.gen.plugins.MicrosmithPluginCatalog
 import io.github.lmliam.microsmith.resolve.DomainResolution
 import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.github.lmliam.microsmith.resolve.ResolvedModel
-import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution.DotnetAspWorkspace
 import io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspace
 import io.kotest.core.spec.style.StringSpec
@@ -31,11 +29,7 @@ class CliProviderValidatorTests :
             "reports missing built-in providers when none are present" {
                 val errors = verifyBuiltinProviders(MicrosmithPluginCatalog(), requiredPluginIds = emptyList())
 
-                errors.shouldHaveSize(16)
-                errors.shouldContain(
-                    "Missing built-in DomainResolver for SchemasExtension -> " +
-                        "ResolvedProtobufRpcSchemaModel. Check CLI runtime packaging.",
-                )
+                errors.shouldHaveSize(12)
                 errors.shouldContain(
                     "Missing built-in DomainResolver for ServicesExtension -> " +
                         "DotnetAspWorkspace. Check CLI runtime packaging.",
@@ -45,17 +39,10 @@ class CliProviderValidatorTests :
                         "DotnetPackageWorkspace. Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
-                    "Missing built-in ArtifactContributor for ResolvedProtobufRpcSchemaModel. " +
-                        "Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
                     "Missing built-in ArtifactContributor for DotnetAspWorkspace. Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
                     "Missing built-in ArtifactContributor for DotnetPackageWorkspace. Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
-                    "Missing built-in ArtifactAssembler for ProtobufRpcServiceArtifact. Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
                     "Missing built-in ArtifactAssembler for DotnetAspServiceArtifact. Check CLI runtime packaging.",
@@ -70,9 +57,6 @@ class CliProviderValidatorTests :
                 )
                 errors.shouldContain(
                     "Missing built-in ArtifactAssembler for MsBuildProjectArtifact. Check CLI runtime packaging.",
-                )
-                errors.shouldContain(
-                    "Missing built-in ArtifactCompiler for ProtobufRpcServiceArtifact. Check CLI runtime packaging.",
                 )
                 errors.shouldContain(
                     "Missing built-in ArtifactCompiler for DotnetAspServiceArtifact. Check CLI runtime packaging.",
@@ -95,19 +79,16 @@ class CliProviderValidatorTests :
                         MicrosmithPluginCatalog(
                             domainResolvers =
                                 listOf(
-                                    ProtobufRpcResolverStub(),
                                     DotnetAspResolverStub(),
                                     DotnetPackageResolverStub(),
                                 ),
                             artifactContributors =
                                 listOf(
-                                    ProtobufRpcContributorStub(),
                                     ContributorStub(DotnetAspWorkspace::class),
                                     ContributorStub(DotnetPackageWorkspace::class),
                                 ),
                             artifactAssemblers =
                                 listOf(
-                                    ProtobufRpcAssemblerStub(),
                                     AssemblerStub(DotnetAspServiceArtifact::class),
                                     AssemblerStub(DotnetPackageVersionsArtifact::class),
                                     AssemblerStub(DotnetPackageReferencesArtifact::class),
@@ -115,7 +96,6 @@ class CliProviderValidatorTests :
                                 ),
                             artifactCompilers =
                                 listOf(
-                                    CompilerStub(ProtobufRpcServiceArtifact::class),
                                     CompilerStub(DotnetAspServiceArtifact::class),
                                     CompilerStub(DotnetPackageVersionsArtifact::class),
                                     CompilerStub(DotnetPackageReferencesArtifact::class),
@@ -153,21 +133,6 @@ class CliProviderValidatorTests :
         },
     )
 
-private class ProtobufRpcResolverStub : DomainResolver<SchemasExtension, ResolvedProtobufRpcSchemaModel> {
-    override val authoringType = SchemasExtension::class
-    override val resolvedType = ResolvedProtobufRpcSchemaModel::class
-
-    override fun resolve(authoring: SchemasExtension): DomainResolution<ResolvedProtobufRpcSchemaModel> =
-        ResolvedProtobufRpcSchemaModel.of(emptyList())
-            .fold(ifLeft = { error("an empty model is valid: $it") }, ifRight = { DomainResolution.Success(it) })
-}
-
-private class ProtobufRpcContributorStub : ArtifactContributor<ResolvedProtobufRpcSchemaModel> {
-    override val resolvedType = ResolvedProtobufRpcSchemaModel::class
-
-    override fun contribute(model: ResolvedProtobufRpcSchemaModel): List<ArtifactContribution<*>> = emptyList()
-}
-
 private class DotnetAspResolverStub : DomainResolver<ServicesExtension, DotnetAspWorkspace> {
     override val authoringType = ServicesExtension::class
     override val resolvedType = DotnetAspWorkspace::class
@@ -191,19 +156,6 @@ private class DotnetPackageResolverStub : DomainResolver<ServicesExtension, Dotn
 
 private class ContributorStub<T : ResolvedModel>(override val resolvedType: KClass<T>) : ArtifactContributor<T> {
     override fun contribute(model: T): List<ArtifactContribution<*>> = emptyList()
-}
-
-private class ProtobufRpcAssemblerStub : ArtifactAssembler<ProtobufRpcServiceArtifact> {
-    override val artifactType = ProtobufRpcServiceArtifact::class
-
-    override fun create(contribution: ArtifactContribution<ProtobufRpcServiceArtifact>): ProtobufRpcServiceArtifact {
-        error("Not used in provider validator tests.")
-    }
-
-    override fun merge(
-        current: ProtobufRpcServiceArtifact,
-        contribution: ArtifactContribution<ProtobufRpcServiceArtifact>,
-    ): ProtobufRpcServiceArtifact = current
 }
 
 private class AssemblerStub<T : Artifact>(override val artifactType: KClass<T>) : ArtifactAssembler<T> {

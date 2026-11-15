@@ -68,6 +68,7 @@ def moduleDirectories = [
     'resolve-schemas-protobuf-rpc': 'schemas/protobuf-rpc/resolve-schemas-protobuf-rpc',
     'artifact-schemas-protobuf-rpc': 'schemas/protobuf-rpc/artifact-schemas-protobuf-rpc',
     'compile-schemas-protobuf-rpc': 'schemas/protobuf-rpc/compile-schemas-protobuf-rpc',
+    'plugin-schemas-protobuf-rpc': 'schemas/protobuf-rpc/plugin-schemas-protobuf-rpc',
     'dsl-services': 'services/base/dsl-services',
     'resolve-services': 'services/base/resolve-services',
     'artifact-services': 'services/base/artifact-services',

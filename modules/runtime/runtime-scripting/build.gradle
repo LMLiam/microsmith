@@ -53,8 +53,8 @@ def scriptingPomScopes = scriptingApiProjectPaths.collect { path ->
 def scriptingIdeFallbackServiceProviders = [
     'META-INF/services/io.github.lmliam.microsmith.plugin.MicrosmithPlugin' +
         '=io.github.lmliam.microsmith.plugin.schemas.protobuf.ProtobufPlugin',
-    'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
-        '=io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.resolution.ProtobufRpcSchemasResolver',
+    'META-INF/services/io.github.lmliam.microsmith.plugin.MicrosmithPlugin' +
+        '=io.github.lmliam.microsmith.plugin.schemas.protobuf.rpc.ProtobufRpcPlugin',
     'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
         '=io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceDomainResolver',
     'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
@@ -62,13 +62,9 @@ def scriptingIdeFallbackServiceProviders = [
     'META-INF/services/io.github.lmliam.microsmith.resolve.DomainResolver' +
         '=io.github.lmliam.microsmith.resolve.services.dotnet.packages.resolution.DotnetPackageWorkspaceDomainResolver',
     'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor' +
-        '=io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcArtifactContributor',
-    'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor' +
         '=io.github.lmliam.microsmith.artifact.services.dotnet.asp.DotnetAspArtifactContributor',
     'META-INF/services/io.github.lmliam.microsmith.artifact.ArtifactContributor' +
         '=io.github.lmliam.microsmith.artifact.services.dotnet.packages.DotnetPackageArtifactContributor',
-    'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
-        '=io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifactAssembler',
     'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
         '=io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifactAssembler',
     'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
@@ -77,8 +73,6 @@ def scriptingIdeFallbackServiceProviders = [
         '=io.github.lmliam.microsmith.artifact.services.dotnet.packages.references.DotnetPackageReferencesArtifactAssembler',
     'META-INF/services/io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler' +
         '=io.github.lmliam.microsmith.artifact.services.dotnet.packages.versions.DotnetPackageVersionsArtifactAssembler',
-    'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
-        '=io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.ProtobufRpcServiceArtifactCompiler',
     'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
         '=io.github.lmliam.microsmith.compile.services.dotnet.asp.DotnetAspServiceArtifactCompiler',
     'META-INF/services/io.github.lmliam.microsmith.compile.ArtifactCompiler' +
@@ -124,6 +118,7 @@ dependencies {
     implementation project(':compile-schemas-protobuf')
     implementation project(':compile-schemas-protobuf-rpc')
     implementation project(':plugin-schemas-protobuf')
+    implementation project(':plugin-schemas-protobuf-rpc')
     implementation project(':gen')
     implementation libs.coroutines.core
     api libs.kotlin.scripting.common

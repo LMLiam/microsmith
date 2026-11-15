@@ -1,11 +1,7 @@
 public abstract interface class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcArtifact : io/github/lmliam/microsmith/artifact/schemas/protobuf/ProtobufArtifact {
 }
 
-public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcArtifactContributor : io/github/lmliam/microsmith/artifact/ArtifactContributor {
-	public fun <init> ()V
-	public synthetic fun contribute (Lio/github/lmliam/microsmith/resolve/ResolvedModel;)Ljava/util/List;
-	public fun contribute (Lio/github/lmliam/microsmith/resolve/schemas/protobuf/rpc/ResolvedProtobufRpcSchemaModel;)Ljava/util/List;
-	public fun getResolvedType ()Lkotlin/reflect/KClass;
+public abstract class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcArtifactContributorContributions {
 }
 
 public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcEndpoint {
@@ -52,13 +48,7 @@ public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/Pro
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
-	public fun <init> ()V
-	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifact;
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
-	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun merge (Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifact;
+public abstract class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactAssemblerContributions {
 }
 
 public final class io/github/lmliam/microsmith/artifact/schemas/protobuf/rpc/ProtobufRpcServiceArtifactId : io/github/lmliam/microsmith/artifact/ArtifactId {

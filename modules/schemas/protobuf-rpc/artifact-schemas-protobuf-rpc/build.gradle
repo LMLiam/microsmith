@@ -1,5 +1,9 @@
-apply plugin: 'org.jetbrains.kotlin.kapt'
+apply plugin: 'dev.zacsweers.metro'
 apply plugin: 'tech.mappie.plugin'
+
+metro {
+    generateContributionProviders = true
+}
 
 dependencies {
     api project(":artifact")
@@ -8,6 +12,4 @@ dependencies {
     implementation project(":resolve")
     implementation project(":resolve-schemas-protobuf")
     implementation project(":resolve-schemas-protobuf-rpc")
-    api libs.spi.tooling.annotations
-    kapt libs.spi.tooling.processor
 }

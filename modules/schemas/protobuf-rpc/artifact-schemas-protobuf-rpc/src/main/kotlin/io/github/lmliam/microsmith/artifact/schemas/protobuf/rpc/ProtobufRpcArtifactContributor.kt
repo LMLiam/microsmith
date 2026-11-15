@@ -1,13 +1,17 @@
 package io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.ArtifactContributor
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifactId
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcPluginScope
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ResolvedProtobufRpcSchemaModel
 
-@ServiceProvider(ArtifactContributor::class)
-class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSchemaModel> {
+@Inject
+@ContributesIntoSet(ProtobufRpcPluginScope::class, binding = binding<ArtifactContributor<*>>())
+internal class ProtobufRpcArtifactContributor : ArtifactContributor<ResolvedProtobufRpcSchemaModel> {
     override val resolvedType = ResolvedProtobufRpcSchemaModel::class
 
     override fun contribute(model: ResolvedProtobufRpcSchemaModel): List<ArtifactContribution<*>> =

@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.diagnostics
 
 import io.github.lmliam.microsmith.resolve.diagnostics.ResolutionDiagnostic
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.ProtobufResolutionIssue
+import io.github.lmliam.microsmith.resolve.schemas.protobuf.diagnostics.ProtobufResolutionDiagnosticMapper
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.rpc.ProtobufRpcResolutionIssue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -10,7 +11,7 @@ class ProtobufRpcResolutionDiagnosticMapperTests :
     StringSpec(
         {
             "maps protobuf rpc issues to diagnostics" {
-                val mapper = ProtobufRpcResolutionDiagnosticMapper()
+                val mapper = ProtobufRpcResolutionDiagnosticMapper(ProtobufResolutionDiagnosticMapper())
 
                 listOf(
                         ProtobufRpcResolutionIssue.SchemaIssue(

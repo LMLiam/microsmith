@@ -1,10 +1,12 @@
 package io.github.lmliam.microsmith.compile.schemas.protobuf.rpc.render
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcEndpoint
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc.ProtobufRpcServiceArtifact
 
 private const val INDENT = "  "
 
+@Inject
 internal class ProtobufServiceRenderer {
     fun render(service: ProtobufRpcServiceArtifact): String = buildString {
         if (service.operations.isEmpty()) {
