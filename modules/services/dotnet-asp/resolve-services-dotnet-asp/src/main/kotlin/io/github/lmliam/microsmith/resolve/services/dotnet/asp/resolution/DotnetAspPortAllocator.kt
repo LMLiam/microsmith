@@ -3,6 +3,7 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.toNonEmptyListOrNull
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspPorts
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue.PortKind
@@ -18,6 +19,7 @@ internal data class DotnetAspPortRequest(
     val isConfigured: Boolean = http != null || https != null
 }
 
+@Inject
 internal class DotnetAspPortAllocator {
     fun allocate(
         requests: List<DotnetAspPortRequest>,

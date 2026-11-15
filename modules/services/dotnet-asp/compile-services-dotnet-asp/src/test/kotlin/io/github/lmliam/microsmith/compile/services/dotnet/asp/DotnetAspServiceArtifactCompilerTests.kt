@@ -34,7 +34,7 @@ class DotnetAspServiceArtifactCompilerTests :
             "compile emits the abstract ASP.NET extension surface" {
                 val artifact = sampleArtifact()
 
-                val contributions = DotnetAspServiceArtifactCompiler().compile(artifact)
+                val contributions = dotnetAspServiceArtifactCompiler().compile(artifact)
                 val msbuild = contributions.filterIsInstance<MsBuildProjectContribution>().single()
                 val textFiles = contributions.filterIsInstance<TextFileArtifactContribution>()
                 val byPath = textFiles.associateBy { it.artifactId.relativePath.toString() }
@@ -111,7 +111,7 @@ class DotnetAspServiceArtifactCompilerTests :
 
             "compile emits nuint defaults with a 64-bit-safe literal" {
                 val requestModels =
-                    DotnetAspServiceArtifactCompiler()
+                    dotnetAspServiceArtifactCompiler()
                         .compile(integerDefaultArtifact(DotnetFieldType.UnsignedNativeInt, 4294967296L))
                         .filterIsInstance<TextFileArtifactContribution>()
                         .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
@@ -122,7 +122,7 @@ class DotnetAspServiceArtifactCompilerTests :
 
             "compile renders a long default with a 64-bit-safe literal" {
                 val requestModels =
-                    DotnetAspServiceArtifactCompiler()
+                    dotnetAspServiceArtifactCompiler()
                         .compile(integerDefaultArtifact(DotnetFieldType.Long, 99_999_999_999L))
                         .filterIsInstance<TextFileArtifactContribution>()
                         .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
@@ -133,7 +133,7 @@ class DotnetAspServiceArtifactCompilerTests :
 
             "compile emits sorted usings before the contract namespace when request bindings use system types" {
                 val requestModels =
-                    DotnetAspServiceArtifactCompiler()
+                    dotnetAspServiceArtifactCompiler()
                         .compile(requestBindingTypesArtifact())
                         .filterIsInstance<TextFileArtifactContribution>()
                         .single { it.artifactId.relativePath.toString() == "Generated/Contracts/RequestModels.cs" }
@@ -156,7 +156,7 @@ class DotnetAspServiceArtifactCompilerTests :
 
             "compile escapes service names before embedding them in appsettings json" {
                 val appSettings =
-                    DotnetAspServiceArtifactCompiler()
+                    dotnetAspServiceArtifactCompiler()
                         .compile(sampleArtifact(serviceName = "User\"Service\\Api"))
                         .filterIsInstance<TextFileArtifactContribution>()
                         .single { it.artifactId.relativePath.toString() == "appsettings.json" }

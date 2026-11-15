@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.model.DotnetAspModelReference
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetFieldType
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
@@ -12,6 +13,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAsp
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspBindingResolutionIssue
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 
+@Inject
 internal class DotnetAspModelResolver {
     fun resolve(
         context: DotnetAspOperationContext,

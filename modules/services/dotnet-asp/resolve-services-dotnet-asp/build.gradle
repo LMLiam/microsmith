@@ -1,4 +1,8 @@
-apply plugin: 'org.jetbrains.kotlin.kapt'
+apply plugin: 'dev.zacsweers.metro'
+
+metro {
+    generateContributionProviders = true
+}
 
 dependencies {
     implementation libs.arrow.core
@@ -7,6 +11,4 @@ dependencies {
     api project(":resolve-services")
     implementation project(":resolve-services-dotnet")
     implementation project(":dsl-services-dotnet-asp")
-    api libs.spi.tooling.annotations
-    kapt libs.spi.tooling.processor
 }

@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.contract
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelLocality
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAspHeadersBindingArtifact
@@ -14,6 +15,7 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpFileBuil
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpRenderer
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.file
 
+@Inject
 internal class DotnetAspContractFileRenderer(private val csharpRenderer: CSharpRenderer) {
     fun renderServiceModelsFile(artifact: DotnetAspServiceArtifact): String =
         renderContractsFile(artifact, usings = setOf(DotnetAspCSharpNamespaces.System)) {

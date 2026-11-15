@@ -28,7 +28,8 @@ def cliBundledPluginPaths = [
     ':artifact-schemas-protobuf-rpc', ':compile-services', ':compile-services-dotnet',
     ':compile-services-dotnet-asp', ':compile-services-dotnet-packages',
     ':compile-schemas-protobuf', ':compile-schemas-protobuf-rpc', ':plugin-schemas-protobuf',
-    ':plugin-schemas-protobuf-rpc', ':plugin-services-dotnet', ':plugin-services-dotnet-packages', ':gen',
+    ':plugin-schemas-protobuf-rpc', ':plugin-services-dotnet', ':plugin-services-dotnet-asp',
+    ':plugin-services-dotnet-packages', ':gen',
 ]
 
 def cliCatalogDirectory = layout.buildDirectory.dir('generated/microsmith')

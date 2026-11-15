@@ -2,12 +2,14 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution
 
 import arrow.core.Either
 import arrow.core.EitherNel
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspEndpoint
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspRoute
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.DotnetAspResolutionIssue
 
+@Inject
 internal class DotnetAspEndpointContentResolver(
     private val bindingsResolver: DotnetAspEndpointBindingsResolver,
     private val responseResolver: DotnetAspResponseResolver,

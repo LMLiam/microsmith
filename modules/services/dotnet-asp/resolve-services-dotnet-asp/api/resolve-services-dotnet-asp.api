@@ -494,11 +494,7 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagn
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionDiagnosticMapper : io/github/lmliam/microsmith/resolve/diagnostics/ResolutionIssueDiagnosticMapper {
-	public fun <init> ()V
-	public fun getIssueType ()Lkotlin/reflect/KClass;
-	public synthetic fun map (Lio/github/lmliam/microsmith/resolve/ResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
-	public fun map (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue;)Lio/github/lmliam/microsmith/resolve/diagnostics/ResolutionDiagnostic;
+public abstract class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionDiagnosticMapperContributions {
 }
 
 public abstract interface class io/github/lmliam/microsmith/resolve/services/dotnet/asp/diagnostics/DotnetAspResolutionIssue : io/github/lmliam/microsmith/resolve/services/dotnet/DotnetResolutionIssue {
@@ -713,16 +709,6 @@ public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resol
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceDomainResolver : io/github/lmliam/microsmith/resolve/DomainResolver {
-	public fun <init> ()V
-	public fun <init> (Lio/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceResolver;)V
-	public fun getAuthoringType ()Lkotlin/reflect/KClass;
-	public fun getResolvedType ()Lkotlin/reflect/KClass;
-	public synthetic fun resolve (Lio/github/lmliam/microsmith/dsl/MicrosmithExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
-	public fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Lio/github/lmliam/microsmith/resolve/DomainResolution;
-}
-
-public final class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceResolver {
-	public final fun resolve (Lio/github/lmliam/microsmith/dsl/services/ServicesExtension;)Larrow/core/Either;
+public abstract class io/github/lmliam/microsmith/resolve/services/dotnet/asp/resolution/DotnetAspWorkspaceDomainResolverContributions {
 }
 

@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.flatMap
 import arrow.core.toNonEmptyListOrNull
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.service.DotnetAspRest
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
@@ -15,6 +16,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspR
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.dotnetAspResultVariantTypeName
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRestTreeResolver
 
+@Inject
 internal class DotnetAspRestResolver(
     private val treeResolver: DotnetAspRestTreeResolver,
 ) {

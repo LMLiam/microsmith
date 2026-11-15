@@ -1,6 +1,8 @@
 package io.github.lmliam.microsmith.compile.services.dotnet.asp
 
-import com.github.eventhorizonlab.spi.ServiceProvider
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.service.DotnetAspServiceArtifact
@@ -18,25 +20,15 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.ms
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.renderDotnetAspAppSettingsFile
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.renderDotnetAspLaunchSettingsFile
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.render.project.textContribution
-import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpRenderer
+import io.github.lmliam.microsmith.resolve.services.dotnet.asp.DotnetAspPluginScope
 
-@ServiceProvider(ArtifactCompiler::class)
-class DotnetAspServiceArtifactCompiler
-internal constructor(
+@Inject
+@ContributesIntoSet(DotnetAspPluginScope::class, binding = binding<ArtifactCompiler<*>>())
+internal class DotnetAspServiceArtifactCompiler(
     private val infrastructureRenderer: DotnetAspInfrastructureFileRenderer,
     private val contractRenderer: DotnetAspContractFileRenderer,
     private val controllerRenderer: DotnetAspControllerFileRenderer,
 ) : ServicesArtifactCompiler<DotnetAspServiceArtifact> {
-    private constructor(
-        csharpRenderer: CSharpRenderer,
-    ) : this(
-        DotnetAspInfrastructureFileRenderer(csharpRenderer),
-        DotnetAspContractFileRenderer(csharpRenderer),
-        DotnetAspControllerFileRenderer(csharpRenderer),
-    )
-
-    public constructor() : this(CSharpRenderer())
-
     override val artifactType = DotnetAspServiceArtifact::class
 
     override fun compile(artifact: DotnetAspServiceArtifact): List<ArtifactContribution<out Artifact>> {

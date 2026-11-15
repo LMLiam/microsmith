@@ -2,6 +2,7 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.asp.resolution
 
 import arrow.core.EitherNel
 import arrow.core.flatMap
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspEndpoint
 import io.github.lmliam.microsmith.dsl.services.dotnet.model.DotnetModel
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.ResolvedDotnetAspEndpoint
@@ -9,6 +10,7 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics.Dotne
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRouteFragment
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.routing.DotnetAspRouteResolver
 
+@Inject
 internal class DotnetAspEndpointResolver(
     private val routeResolver: DotnetAspRouteResolver,
     private val contentResolver: DotnetAspEndpointContentResolver,

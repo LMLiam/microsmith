@@ -6,6 +6,7 @@ import arrow.core.flatMap
 import arrow.core.mapOrAccumulate
 import arrow.core.raise.context.bindNel
 import arrow.core.toNonEmptyListOrNull
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.dsl.services.ServicesExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.service.DotnetAspServiceExtension
 import io.github.lmliam.microsmith.dsl.services.dotnet.service.DotnetServiceExtension
@@ -23,8 +24,8 @@ import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWork
 import io.github.lmliam.microsmith.resolve.services.dotnet.resolution.DotnetWorkspaceResolver
 
 /** Finalises the ASP.NET subset of the .NET workspace into a scaffold-ready model. */
-class DotnetAspWorkspaceResolver
-internal constructor(
+@Inject
+internal class DotnetAspWorkspaceResolver(
     private val dotnetWorkspaceResolver: DotnetWorkspaceResolver,
     private val restResolver: DotnetAspRestResolver,
     private val portAllocator: DotnetAspPortAllocator,
@@ -149,20 +150,4 @@ internal constructor(
             Either.Right(DotnetAspWorkspace(services.associateBy(ResolvedDotnetAspService::name)))
         }
     }
-}
-
-internal fun dotnetAspWorkspaceResolver(): DotnetAspWorkspaceResolver {
-    val modelResolver = DotnetAspModelResolver()
-    val bindingsResolver = DotnetAspEndpointBindingsResolver(DotnetAspBindingResolver(), modelResolver)
-    val responseResolver = DotnetAspResponseResolver(modelResolver)
-    val contentResolver = DotnetAspEndpointContentResolver(bindingsResolver, responseResolver)
-    val routeResolver = DotnetAspRouteResolver(DotnetAspRouteSegmentParser())
-    val endpointResolver = DotnetAspEndpointResolver(routeResolver, contentResolver)
-    val treeResolver = DotnetAspRestTreeResolver(endpointResolver, routeResolver)
-
-    return DotnetAspWorkspaceResolver(
-        dotnetWorkspaceResolver = DotnetWorkspaceResolver(),
-        restResolver = DotnetAspRestResolver(treeResolver),
-        portAllocator = DotnetAspPortAllocator(),
-    )
 }
