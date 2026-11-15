@@ -1,3 +1,7 @@
 dependencies {
     api project(":artifact")
 }
+
+kotlin {
+    explicitApi()
+}

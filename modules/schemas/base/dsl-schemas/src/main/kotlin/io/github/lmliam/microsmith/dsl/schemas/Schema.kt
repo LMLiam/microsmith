@@ -5,12 +5,12 @@ package io.github.lmliam.microsmith.dsl.schemas
  *
  * @see SchemaType
  */
-interface Schema {
+public interface Schema {
     /** The type of the schema, e.g. `protobuf`, `json` */
-    val type: SchemaType
+    public val type: SchemaType
 
     /** The name of the schema, e.g. `User` */
-    val name: String
+    public val name: String
 }
 
 internal fun schemaKey(type: SchemaType, name: String): Pair<SchemaType, String> {

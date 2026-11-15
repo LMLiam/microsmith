@@ -29,7 +29,7 @@ package io.github.lmliam.microsmith.dsl.schemas
  * End-users never interact with [SchemasBuilder] directly; it is purely an internal mechanism to accumulate schemas
  * during DSL evaluation.
  */
-class SchemasBuilder : SchemasScope {
+public class SchemasBuilder : SchemasScope {
     private val schemasByKey = linkedMapOf<Pair<SchemaType, String>, Schema>()
     internal val schemas: Set<Schema>
         get() = schemasByKey.values.toSet()
@@ -39,7 +39,7 @@ class SchemasBuilder : SchemasScope {
      *
      * @throws IllegalArgumentException if the schema name is blank.
      */
-    fun register(schema: Schema) {
+    public fun register(schema: Schema) {
         val schemaKey = schema.schemaKey()
         require(schemaKey !in schemasByKey) { "Duplicate schema registration for '${schema.schemaDisplayKey()}'." }
 
@@ -47,5 +47,5 @@ class SchemasBuilder : SchemasScope {
     }
 
     /** Finalise the builder and produce an immutable [SchemasExtension] containing all registered schemas. */
-    fun toExtension() = SchemasExtension(schemas)
+    public fun toExtension(): SchemasExtension = SchemasExtension(schemas)
 }

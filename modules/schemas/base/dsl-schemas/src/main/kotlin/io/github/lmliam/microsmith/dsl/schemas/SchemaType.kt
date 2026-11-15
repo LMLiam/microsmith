@@ -27,6 +27,6 @@ package io.github.lmliam.microsmith.dsl.schemas
  *
  * @see Schema
  */
-interface SchemaType {
-    val typeName: String
+public interface SchemaType {
+    public val typeName: String
 }
