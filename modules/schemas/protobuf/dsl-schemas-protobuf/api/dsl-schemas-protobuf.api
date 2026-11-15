@@ -1,13 +1,3 @@
-public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufDeclarationContext : io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufScope {
-	public abstract fun qualifyName (Ljava/lang/String;)Ljava/lang/String;
-	public abstract fun registerDeclaration (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;)V
-	public abstract fun resolveReference (Ljava/lang/String;)Ljava/lang/String;
-}
-
-public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufDeclarationContext$DefaultImpls {
-	public static fun invoke (Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufDeclarationContext;ILkotlin/jvm/functions/Function1;)V
-}
-
 public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchema : io/github/lmliam/microsmith/dsl/schemas/Schema {
 	public fun <init> (Ljava/lang/String;Lio/github/lmliam/microsmith/dsl/schemas/protobuf/types/Type;)V
 	public final fun component1 ()Ljava/lang/String;
@@ -20,14 +10,6 @@ public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSche
 	public fun getType ()Lio/github/lmliam/microsmith/dsl/schemas/SchemaType;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-}
-
-public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchemaType : java/lang/Enum, io/github/lmliam/microsmith/dsl/schemas/SchemaType {
-	public static final field PROTOBUF Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchemaType;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public fun getTypeName ()Ljava/lang/String;
-	public static fun valueOf (Ljava/lang/String;)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchemaType;
-	public static fun values ()[Lio/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufSchemaType;
 }
 
 public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf/ProtobufScope {
@@ -412,7 +394,6 @@ public abstract interface class io/github/lmliam/microsmith/dsl/schemas/protobuf
 }
 
 public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved$Companion {
-	public final fun fromRange (Lkotlin/ranges/IntRange;I)Lio/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved;
 }
 
 public final class io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/ReservedIndex : io/github/lmliam/microsmith/dsl/schemas/protobuf/reserved/Reserved {

@@ -1,33 +1,33 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
 
-sealed interface PrimitiveType : ValueType {
-    object INT32 : MapKeyType
+public sealed interface PrimitiveType : ValueType {
+    public object INT32 : MapKeyType
 
-    object INT64 : MapKeyType
+    public object INT64 : MapKeyType
 
-    object UINT32 : MapKeyType
+    public object UINT32 : MapKeyType
 
-    object UINT64 : MapKeyType
+    public object UINT64 : MapKeyType
 
-    object SINT32 : MapKeyType
+    public object SINT32 : MapKeyType
 
-    object SINT64 : MapKeyType
+    public object SINT64 : MapKeyType
 
-    object FIXED32 : MapKeyType
+    public object FIXED32 : MapKeyType
 
-    object FIXED64 : MapKeyType
+    public object FIXED64 : MapKeyType
 
-    object SFIXED32 : MapKeyType
+    public object SFIXED32 : MapKeyType
 
-    object SFIXED64 : MapKeyType
+    public object SFIXED64 : MapKeyType
 
-    object STRING : MapKeyType
+    public object STRING : MapKeyType
 
-    object BOOL : MapKeyType
+    public object BOOL : MapKeyType
 
-    object FLOAT : PrimitiveType
+    public object FLOAT : PrimitiveType
 
-    object DOUBLE : PrimitiveType
+    public object DOUBLE : PrimitiveType
 
-    object BYTES : PrimitiveType
+    public object BYTES : PrimitiveType
 }

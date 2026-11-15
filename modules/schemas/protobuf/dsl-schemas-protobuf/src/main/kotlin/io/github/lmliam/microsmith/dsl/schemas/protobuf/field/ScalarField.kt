@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
 
-data class ScalarField(
+public data class ScalarField(
     override val name: String,
     override val index: Int,
-    val primitive: PrimitiveType,
+    public val primitive: PrimitiveType,
     override val cardinality: Cardinality = Cardinality.SINGULAR,
 ) : CardinalityField

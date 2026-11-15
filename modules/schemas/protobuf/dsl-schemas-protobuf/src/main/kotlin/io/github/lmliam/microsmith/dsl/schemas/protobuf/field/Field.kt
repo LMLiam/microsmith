@@ -1,6 +1,6 @@
 package io.github.lmliam.microsmith.dsl.schemas.protobuf.field
 
-sealed interface Field {
-    val name: String
-    val index: Int
+public sealed interface Field {
+    public val name: String
+    public val index: Int
 }

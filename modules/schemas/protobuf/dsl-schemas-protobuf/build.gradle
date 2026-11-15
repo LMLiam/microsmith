@@ -2,3 +2,10 @@ dependencies {
     api project(":dsl")
     implementation project(":dsl-schemas")
 }
+
+kotlin {
+    explicitApi()
+    compilerOptions {
+        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+    }
+}
