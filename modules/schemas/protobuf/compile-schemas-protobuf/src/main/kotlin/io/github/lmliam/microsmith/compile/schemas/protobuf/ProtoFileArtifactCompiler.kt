@@ -11,14 +11,17 @@ import io.github.lmliam.microsmith.compile.schemas.SchemasArtifactCompiler
 import io.github.lmliam.microsmith.compile.schemas.protobuf.render.ProtobufFileRenderer
 
 @ServiceProvider(ArtifactCompiler::class)
-class ProtoFileArtifactCompiler : SchemasArtifactCompiler<ProtoFileArtifact> {
+class ProtoFileArtifactCompiler private constructor(private val renderer: ProtobufFileRenderer) :
+    SchemasArtifactCompiler<ProtoFileArtifact> {
+    constructor() : this(ProtobufFileRenderer())
+
     override val artifactType = ProtoFileArtifact::class
 
     override fun compile(artifact: ProtoFileArtifact): List<ArtifactContribution<out Artifact>> =
         listOf(
             TextFileArtifactContribution(
                 artifactId = TextFileArtifactId(relativePath = artifact.id.relativePath),
-                contents = ProtobufFileRenderer.render(artifact),
+                contents = renderer.render(artifact),
             ),
         )
 }
