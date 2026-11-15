@@ -32,22 +32,7 @@ class MicrosmithScriptHostTests :
                     val output = tempDir.resolve("generated")
                     val cache = tempDir.resolve("cache")
 
-                    script.writeText(
-                        """
-                        microsmith {
-                            schemas {
-                                protobuf {
-                                    "pkg" {
-                                        message("User") {
-                                            int32("id") { index(1) }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/protobuf-user.microsmith.kts", script)
 
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
 
@@ -87,19 +72,7 @@ class MicrosmithScriptHostTests :
                 val tempDir = createTempDirectory("microsmith-script-host-warnings")
                 try {
                     val script = tempDir.resolve("service.microsmith.kts")
-                    script.writeText(
-                        """
-                        microsmith {
-                            services {
-                                dotnet {
-                                    target(NET8)
-                                    solutions { "Platform" {} }
-                                }
-                            }
-                        }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/deprecated-net8-target.microsmith.kts", script)
                     val host = MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
                     val request =
                         ScriptRunRequest(
@@ -125,19 +98,7 @@ class MicrosmithScriptHostTests :
                 val tempDir = createTempDirectory("microsmith-script-host-warnings-damaged")
                 try {
                     val script = tempDir.resolve("service.microsmith.kts")
-                    script.writeText(
-                        """
-                        microsmith {
-                            services {
-                                dotnet {
-                                    target(NET8)
-                                    solutions { "Platform" {} }
-                                }
-                            }
-                        }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/deprecated-net8-target.microsmith.kts", script)
                     val cache = tempDir.resolve("cache")
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val request =
@@ -174,49 +135,7 @@ class MicrosmithScriptHostTests :
                     val output = tempDir.resolve("generated")
                     val cache = tempDir.resolve("cache")
 
-                    script.writeText(
-                        """
-                        microsmith {
-                            services {
-                                dotnet {
-                                    target(NET10)
-                                    solutions {
-                                        "Platform" {}
-                                    }
-                                }
-
-                                "UserService" {
-                                    dotnet {
-                                        solution("Platform")
-                                        project("UserService.Api")
-                                        models {
-                                            "User" {
-                                                string("id")
-                                            }
-                                        }
-
-                                        asp {
-                                            rest {
-                                                "/users" {
-                                                    get("/{id}", "GetUser") {
-                                                        path("GetUserPath") {
-                                                            string("id")
-                                                        }
-
-                                                        responses {
-                                                            ok("User")
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/asp-user-service.microsmith.kts", script)
 
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val result =
@@ -249,27 +168,7 @@ class MicrosmithScriptHostTests :
                     val output = tempDir.resolve("generated")
                     val cache = tempDir.resolve("cache")
 
-                    script.writeText(
-                        """
-                        val schemaName = requireVar("schema")
-                        if (!hasFlag("emit")) {
-                            error("emit flag is required")
-                        }
-
-                        val model =
-                            microsmith {
-                                schemas {
-                                    protobuf {
-                                        message(schemaName) {
-                                            int32("id") { index(1) }
-                                        }
-                                    }
-                                }
-                            }
-                        emit(model)
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/emit-with-context.microsmith.kts", script)
 
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val result =
@@ -298,52 +197,7 @@ class MicrosmithScriptHostTests :
                     val output = tempDir.resolve("generated")
                     val cache = tempDir.resolve("cache")
 
-                    script.writeText(
-                        """
-                        microsmith {
-                            services {
-                                dotnet {
-                                    target(NET10)
-                                    solutions {
-                                        "Platform" {}
-                                    }
-                                }
-
-                                "UserService" {
-                                    dotnet {
-                                        solution("Platform")
-                                        project("UserService.Api")
-                                        models {
-                                            "User" {
-                                                string("id")
-                                                string("email")
-                                            }
-                                            "Problem" {
-                                                string("detail")
-                                            }
-                                        }
-                                        asp {
-                                            rest {
-                                                "/users" {
-                                                    get("/{id}", "GetUser") {
-                                                        path("GetUserPath") {
-                                                            string("id")
-                                                        }
-                                                        responses {
-                                                            ok("User")
-                                                            notFound("Problem")
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/asp-user-service-with-problem.microsmith.kts", script)
 
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val result =
@@ -382,14 +236,7 @@ class MicrosmithScriptHostTests :
                     val output = tempDir.resolve("generated")
                     val cache = tempDir.resolve("cache")
 
-                    script.writeText(
-                        """
-                        microsmith {
-                            unknownDsl()
-                        }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/unknown-dsl.microsmith.kts", script)
 
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val result =
@@ -417,14 +264,7 @@ class MicrosmithScriptHostTests :
                     val output = tempDir.resolve("generated")
                     val cache = tempDir.resolve("cache")
 
-                    script.writeText(
-                        """
-                        @file:DependsOn("com.acme:dangerous:1.0.0")
-
-                        microsmith { }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/depends-on-directive.microsmith.kts", script)
 
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val result =
@@ -454,17 +294,7 @@ class MicrosmithScriptHostTests :
                     val output = tempDir.resolve("generated")
                     val cache = tempDir.resolve("cache")
 
-                    script.writeText(
-                        """
-                        @file:[
-                            Suppress("unused")
-                            kotlin.script.experimental.dependencies.DependsOn("com.acme:dangerous:1.0.0")
-                        ]
-
-                        microsmith { }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/grouped-file-directive.microsmith.kts", script)
 
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val result =
@@ -494,31 +324,7 @@ class MicrosmithScriptHostTests :
                     val output = tempDir.resolve("generated")
                     val cache = tempDir.resolve("cache")
 
-                    script.writeText(
-                        """
-                        microsmith {
-                            schemas {
-                                protobuf {
-                                    service("ProcessService") {
-                                        "Process" {
-                                            request(ProcessRequest)
-                                            response(ProcessResponse)
-                                        }
-                                    }
-
-                                    message("ProcessRequest") {
-                                        int32("id") { index(1) }
-                                    }
-
-                                    message("ProcessResponse") {
-                                        int32("id") { index(1) }
-                                    }
-                                }
-                            }
-                        }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/process-isolation-service.microsmith.kts", script)
 
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val result =
@@ -548,31 +354,7 @@ class MicrosmithScriptHostTests :
                     val output = tempDir.resolve("generated")
                     val cache = tempDir.resolve("cache")
 
-                    script.writeText(
-                        """
-                        microsmith {
-                            schemas {
-                                protobuf {
-                                    service("Users") {
-                                        "GetUsers" {
-                                            request(GetUsersRequest)
-                                            response(GetUsersResponse)
-                                        }
-                                    }
-
-                                    message("GetUsersRequest") {
-                                        int32("id") { index(1) }
-                                    }
-
-                                    message("GetUsersResponse") {
-                                        int32("id") { index(1) }
-                                    }
-                                }
-                            }
-                        }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/forward-symbols.microsmith.kts", script)
 
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val result =
@@ -603,27 +385,7 @@ class MicrosmithScriptHostTests :
                     val output = tempDir.resolve("generated")
                     val cache = tempDir.resolve("cache")
 
-                    script.writeText(
-                        """
-                        microsmith {
-                            schemas {
-                                protobuf {
-                                    enum("Role") {
-                                        +"USER"
-                                    }
-
-                                    service("Users") {
-                                        "GetUsers" {
-                                            request(Role)
-                                            response(Role)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        """
-                            .trimIndent(),
-                    )
+                    copyResource("/scripting/host/enum-symbol-in-rpc.microsmith.kts", script)
 
                     val host = MicrosmithScriptHost(cacheDirectory = cache)
                     val result =
@@ -689,25 +451,15 @@ class MicrosmithScriptHostTests :
         },
     )
 
+private fun copyResource(resource: String, target: Path) {
+    val source =
+        checkNotNull(MicrosmithScriptHostTests::class.java.getResource(resource)) { "Missing test resource $resource" }
+    target.writeText(source.readText())
+}
+
 private fun runScriptWithInvalidSchema(tempDir: Path, isolationMode: ScriptIsolationMode): ScriptRunResult {
     val script = tempDir.resolve("duplicates.microsmith.kts")
-    script.writeText(
-        """
-        microsmith {
-            schemas {
-                protobuf {
-                    "pkg" {
-                        message("User") {
-                            ref("owner", "MissingOwner") { index(1) }
-                            ref("group", "MissingGroup") { index(2) }
-                        }
-                    }
-                }
-            }
-        }
-        """
-            .trimIndent(),
-    )
+    copyResource("/scripting/host/unresolved-references.microsmith.kts", script)
 
     return MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
         .run(
