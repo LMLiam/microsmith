@@ -58,6 +58,8 @@ reviews:
     base_branches:
       - ".*"
   path_filters:
+    - "**"
+    - "**/gen/**"
     - "!**/build/**"
     - "!**/bin/**"
     - "!**/out/**"
