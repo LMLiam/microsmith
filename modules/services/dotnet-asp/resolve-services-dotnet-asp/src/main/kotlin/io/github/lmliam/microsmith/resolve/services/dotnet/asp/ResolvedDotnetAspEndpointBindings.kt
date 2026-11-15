@@ -1,8 +1,8 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
-data class ResolvedDotnetAspEndpointBindings(
-    val path: ResolvedDotnetAspRequestBinding? = null,
-    val query: ResolvedDotnetAspRequestBinding? = null,
-    val headers: ResolvedDotnetAspHeadersBinding? = null,
-    val body: ResolvedDotnetAspModel? = null,
+public data class ResolvedDotnetAspEndpointBindings(
+    public val path: ResolvedDotnetAspRequestBinding? = null,
+    public val query: ResolvedDotnetAspRequestBinding? = null,
+    public val headers: ResolvedDotnetAspHeadersBinding? = null,
+    public val body: ResolvedDotnetAspModel? = null,
 )

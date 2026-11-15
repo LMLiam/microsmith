@@ -4,14 +4,15 @@ import io.github.lmliam.microsmith.InternalMicrosmithApi
 import java.util.Locale
 
 @InternalMicrosmithApi
-class DotnetAspNamingPolicy {
-    fun controllerBaseTypeName(projectName: String): String = "${typeName(projectName)}ControllerBase"
+public class DotnetAspNamingPolicy {
+    public fun controllerBaseTypeName(projectName: String): String = "${typeName(projectName)}ControllerBase"
 
-    fun resultBaseTypeName(operationName: String): String = "${operationName}Result"
+    public fun resultBaseTypeName(operationName: String): String = "${operationName}Result"
 
-    fun resultVariantTypeName(operationName: String, statusCode: Int): String = operationName + statusName(statusCode)
+    public fun resultVariantTypeName(operationName: String, statusCode: Int): String =
+        operationName + statusName(statusCode)
 
-    fun headerPropertyName(headerName: String): String? =
+    internal fun headerPropertyName(headerName: String): String? =
         headerName
             .trim()
             .split(HEADER_PROPERTY_DELIMITER_PATTERN)
@@ -28,12 +29,12 @@ class DotnetAspNamingPolicy {
             }
             .ifBlank { null }
 
-    fun requiredHeaderPropertyName(headerName: String): String =
+    public fun requiredHeaderPropertyName(headerName: String): String =
         checkNotNull(headerPropertyName(headerName)) {
             "Response header '$headerName' has no generated property name; resolution should have reported it."
         }
 
-    fun pascalIdentifier(identifier: String): String =
+    public fun pascalIdentifier(identifier: String): String =
         when {
             identifier.startsWith("@") && identifier.length > 1 ->
                 "@${identifier.substring(1).replaceFirstChar { firstChar ->

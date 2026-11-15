@@ -3,7 +3,7 @@ package io.github.lmliam.microsmith.resolve.services.dotnet.asp.diagnostics
 import io.github.lmliam.microsmith.dsl.services.dotnet.asp.rest.endpoint.DotnetAspHttpMethod
 import io.github.lmliam.microsmith.resolve.services.dotnet.DotnetResolutionIssue
 
-sealed interface DotnetAspResolutionIssue : DotnetResolutionIssue {
+internal sealed interface DotnetAspResolutionIssue : DotnetResolutionIssue {
     enum class RouteDeclarationKind {
         GROUP,
         ENDPOINT,

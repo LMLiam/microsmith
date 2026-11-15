@@ -1,7 +1,7 @@
 package io.github.lmliam.microsmith.resolve.services.dotnet.asp
 
-data class ResolvedDotnetAspRest(val endpoints: List<ResolvedDotnetAspEndpoint>) {
-    companion object {
-        fun empty() = ResolvedDotnetAspRest(emptyList())
+public data class ResolvedDotnetAspRest(public val endpoints: List<ResolvedDotnetAspEndpoint>) {
+    public companion object {
+        public fun empty(): ResolvedDotnetAspRest = ResolvedDotnetAspRest(emptyList())
     }
 }

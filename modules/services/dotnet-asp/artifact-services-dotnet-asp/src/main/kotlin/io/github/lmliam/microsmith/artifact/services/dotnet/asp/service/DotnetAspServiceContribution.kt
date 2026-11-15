@@ -5,7 +5,7 @@ import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.endpoint.DotnetAspEndpointArtifact
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.model.DotnetAspModelArtifact
 
-data class DotnetAspServiceContribution(
+internal data class DotnetAspServiceContribution(
     override val artifactId: DotnetAspServiceArtifactId,
     val serviceName: String,
     val targetFrameworkMoniker: String,

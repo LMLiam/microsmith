@@ -21,3 +21,7 @@ dependencies {
     testRuntimeOnly project(":compile-services-dotnet-packages")
     testRuntimeOnly project(":resolve-services-dotnet-packages")
 }
+
+kotlin {
+    explicitApi()
+}
