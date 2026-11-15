@@ -79,7 +79,7 @@ class AcmeScriptSymbolContributor : ScriptSymbolContributor {
 ```
 
 - `id` must be unique across contributors. A duplicate fails the run.
-- A call whose name is not a string literal, or not a Kotlin identifier, produces no symbol.
+- A call whose name is not a string literal produces no symbol. A name or qualified name that is not a Kotlin identifier gets no symbol of that form.
 - `qualifiedPath` defaults to `listOf(propertyName)`. The host exposes every definition as its `qualifiedPath` joined with `_`, and as `propertyName` only when no other definition uses that name and no other definition's qualified name equals it. A definition whose `qualifiedPath` is its `propertyName` keeps that name, even when others share it. Two different definitions that join to the same qualified name fail script compilation.
 - `valueType` should be a type your DSL overloads accept, such as `MessageRef`.
 
