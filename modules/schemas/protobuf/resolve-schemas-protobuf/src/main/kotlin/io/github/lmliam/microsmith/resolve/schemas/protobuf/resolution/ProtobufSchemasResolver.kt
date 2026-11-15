@@ -20,7 +20,20 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.toIssue
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.validation.schemaGraphRejections
 
 @ServiceProvider(DomainResolver::class)
-class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobufSchemaModel> {
+class ProtobufSchemasResolver
+private constructor(
+    private val declarationResolvers: ProtobufDeclarationResolver.Factory,
+) : DomainResolver<SchemasExtension, ResolvedProtobufSchemaModel> {
+    constructor() :
+        this(
+            ProtobufDeclarationResolver.Factory { symbols ->
+                ProtobufDeclarationResolver(
+                    symbols,
+                    ProtobufReferenceResolver.Factory { ProtobufReferenceResolver(it) },
+                )
+            },
+        )
+
     override val authoringType = SchemasExtension::class
     override val resolvedType = ResolvedProtobufSchemaModel::class
 
@@ -29,7 +42,7 @@ class ProtobufSchemasResolver : DomainResolver<SchemasExtension, ResolvedProtobu
         val declared = protobufSchemas.mapNotNull(::declaredSchemaOf)
 
         val (_, symbols) = declared.map { it.symbol() }.separateEither()
-        val resolver = ProtobufDeclarationResolver(ProtobufReferenceResolver(ProtobufSymbolTable(symbols)))
+        val resolver = declarationResolvers.create(ProtobufSymbolTable(symbols))
         val issues = mutableListOf<ProtobufResolutionIssue>()
         val drafts =
             declared

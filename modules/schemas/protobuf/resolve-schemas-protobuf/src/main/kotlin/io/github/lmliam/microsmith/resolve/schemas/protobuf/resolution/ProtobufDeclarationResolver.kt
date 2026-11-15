@@ -42,7 +42,12 @@ import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseIdentif
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.parseMessageDeclaration
 import io.github.lmliam.microsmith.resolve.schemas.protobuf.parsing.toIssue
 
-internal class ProtobufDeclarationResolver(private val referenceResolver: ProtobufReferenceResolver) {
+internal class ProtobufDeclarationResolver(
+    symbols: ProtobufSymbolTable,
+    referenceResolvers: ProtobufReferenceResolver.Factory,
+) {
+    private val referenceResolver = referenceResolvers.create(symbols)
+
     fun resolveMessage(
         identity: QualifiedSchemaName,
         message: Message,
@@ -171,6 +176,10 @@ internal class ProtobufDeclarationResolver(private val referenceResolver: Protob
 
             is Reference -> ResolvedProtobufValueType.Reference(referenceResolver.resolve(value, location).bind())
         }
+
+    fun interface Factory {
+        fun create(symbols: ProtobufSymbolTable): ProtobufDeclarationResolver
+    }
 }
 
 private typealias FieldBuilder = (ParsedField) -> ResolvedProtobufField

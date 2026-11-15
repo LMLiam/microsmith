@@ -33,4 +33,8 @@ internal class ProtobufReferenceResolver(private val symbols: ProtobufSymbolTabl
                 }
             }
             .map { symbol -> ResolvedProtobufReference(symbol.identity, symbol.kind) }
+
+    fun interface Factory {
+        fun create(symbols: ProtobufSymbolTable): ProtobufReferenceResolver
+    }
 }

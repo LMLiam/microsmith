@@ -1085,11 +1085,6 @@ public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/Pr
 	public final fun parse (Ljava/lang/String;)Larrow/core/Either;
 }
 
-public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtobufNameValidation {
-	public static final field INSTANCE Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/ProtobufNameValidation;
-	public final fun parseQualifiedName (Ljava/lang/String;)Larrow/core/Either;
-}
-
 public final class io/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName {
 	public static final field Companion Lio/github/lmliam/microsmith/resolve/schemas/protobuf/names/QualifiedSchemaName$Companion;
 	public final fun component1 ()Ljava/lang/String;
