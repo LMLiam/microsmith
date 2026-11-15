@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 sealed interface DotnetAspDefaultValue {
     @JvmInline value class StringValue(val value: String) : DotnetAspDefaultValue
@@ -18,7 +18,7 @@ sealed interface DotnetAspDefaultValue {
 
     @JvmInline value class BooleanValue(val value: Boolean) : DotnetAspDefaultValue
 
-    @JvmInline value class UuidValue(val value: UUID) : DotnetAspDefaultValue
+    @JvmInline value class UuidValue(val value: Uuid) : DotnetAspDefaultValue
 
     @JvmInline value class LocalDateValue(val value: LocalDate) : DotnetAspDefaultValue
 
@@ -43,7 +43,7 @@ internal fun dotnetAspDefaultValue(value: Any): DotnetAspDefaultValue =
 
         is Boolean -> DotnetAspDefaultValue.BooleanValue(value)
 
-        is UUID -> DotnetAspDefaultValue.UuidValue(value)
+        is Uuid -> DotnetAspDefaultValue.UuidValue(value)
 
         is LocalDate -> DotnetAspDefaultValue.LocalDateValue(value)
 

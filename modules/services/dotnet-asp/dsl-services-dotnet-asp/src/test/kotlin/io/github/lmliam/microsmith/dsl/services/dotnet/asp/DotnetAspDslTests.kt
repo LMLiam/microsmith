@@ -18,6 +18,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import kotlin.uuid.Uuid
 
 private fun MicrosmithBuilder.requireServicesExtension(): ServicesExtension =
     requireNotNull(model.get<ServicesExtension>())
@@ -326,6 +327,36 @@ class DotnetAspDslTests :
                     }
 
                 error.message.shouldContain("ASP.NET request bindings cannot declare reference field 'user' to 'User'")
+            }
+
+            "a Uuid default on a string request field is rejected during DSL authoring" {
+                val builder = MicrosmithBuilder()
+
+                val error =
+                    shouldThrow<IllegalArgumentException> {
+                        builder.services {
+                            "UserService" {
+                                dotnet {
+                                    asp {
+                                        rest {
+                                            "/users" {
+                                                get("ListUsers") {
+                                                    query("ListUsersQuery") {
+                                                        string("search") {
+                                                            default(Uuid.parse("123e4567-e89b-12d3-a456-426614174000"))
+                                                        }
+                                                    }
+                                                    responses { ok("User") }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                error.message.shouldContain("cannot use UuidValue")
             }
         },
     )

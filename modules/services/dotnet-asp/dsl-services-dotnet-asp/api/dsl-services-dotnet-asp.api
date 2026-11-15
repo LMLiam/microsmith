@@ -226,17 +226,17 @@ public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/requ
 }
 
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$UuidValue : io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue {
-	public static final synthetic fun box-impl (Ljava/util/UUID;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$UuidValue;
-	public static fun constructor-impl (Ljava/util/UUID;)Ljava/util/UUID;
+	public static final synthetic fun box-impl (Lkotlin/uuid/Uuid;)Lio/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspDefaultValue$UuidValue;
+	public static fun constructor-impl (Lkotlin/uuid/Uuid;)Lkotlin/uuid/Uuid;
 	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Ljava/util/UUID;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Ljava/util/UUID;Ljava/util/UUID;)Z
-	public final fun getValue ()Ljava/util/UUID;
+	public static fun equals-impl (Lkotlin/uuid/Uuid;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lkotlin/uuid/Uuid;Lkotlin/uuid/Uuid;)Z
+	public final fun getValue ()Lkotlin/uuid/Uuid;
 	public fun hashCode ()I
-	public static fun hashCode-impl (Ljava/util/UUID;)I
+	public static fun hashCode-impl (Lkotlin/uuid/Uuid;)I
 	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Ljava/util/UUID;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Ljava/util/UUID;
+	public static fun toString-impl (Lkotlin/uuid/Uuid;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lkotlin/uuid/Uuid;
 }
 
 public final class io/github/lmliam/microsmith/dsl/services/dotnet/asp/rest/request/DotnetAspHeaderField {
