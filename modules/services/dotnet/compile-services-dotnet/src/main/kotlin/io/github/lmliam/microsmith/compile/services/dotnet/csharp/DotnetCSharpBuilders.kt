@@ -64,24 +64,24 @@ fun csharpAutoProperty(
 
 fun csharpType(name: DotnetCSharpTypeName): CSharp.TypeRef = csharpType(name.value)
 
-fun csharpType(name: String): CSharp.TypeRef = CSharp.type(name)
+fun csharpType(name: String): CSharp.TypeRef = CSharp.NamedType(name)
 
 fun csharpNullableType(name: DotnetCSharpTypeName): CSharp.TypeRef = csharpNullableType(name.value)
 
-fun csharpNullableType(name: String): CSharp.TypeRef = CSharp.nullable(csharpType(name))
+fun csharpNullableType(name: String): CSharp.TypeRef = CSharp.NullableType(csharpType(name))
 
 fun csharpGenericType(name: DotnetCSharpTypeName, vararg arguments: CSharp.TypeRef): CSharp.TypeRef =
     csharpGenericType(name.value, *arguments)
 
 fun csharpGenericType(name: String, vararg arguments: CSharp.TypeRef): CSharp.TypeRef =
-    CSharp.genericType(name, *arguments)
+    CSharp.GenericType(name, arguments.toList())
 
-fun csharpArrayType(elementType: CSharp.TypeRef): CSharp.TypeRef = CSharp.array(elementType)
+fun csharpArrayType(elementType: CSharp.TypeRef): CSharp.TypeRef = CSharp.ArrayType(elementType)
 
-fun csharpTupleType(vararg elements: CSharp.TupleElement): CSharp.TypeRef = CSharp.tuple(*elements)
+fun csharpTupleType(vararg elements: CSharp.TupleElement): CSharp.TypeRef = CSharp.TupleType(elements.toList())
 
 fun csharpTupleElement(type: CSharp.TypeRef, name: String? = null): CSharp.TupleElement =
-    CSharp.tupleElement(type, name)
+    CSharp.TupleElement(type, name)
 
 fun CSharpFileBuilder.using(namespace: DotnetCSharpNamespace) {
     using(namespace.value)

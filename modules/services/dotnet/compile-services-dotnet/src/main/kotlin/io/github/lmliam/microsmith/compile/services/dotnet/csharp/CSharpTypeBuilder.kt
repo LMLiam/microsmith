@@ -74,7 +74,7 @@ internal constructor(
         initializer: String? = null,
     ) {
         property(
-            type = CSharp.type(type),
+            type = csharpType(type),
             name = name,
             modifiers = modifiers,
             attributes = attributes,
@@ -93,7 +93,7 @@ internal constructor(
     ) {
         method(
             name = name,
-            returnType = CSharp.type(returnType),
+            returnType = csharpType(returnType),
             modifiers = modifiers,
             attributes = attributes,
             parameters = parameters,

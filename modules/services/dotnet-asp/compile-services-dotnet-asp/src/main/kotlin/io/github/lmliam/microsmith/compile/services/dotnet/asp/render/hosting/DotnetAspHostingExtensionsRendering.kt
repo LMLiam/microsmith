@@ -2,8 +2,12 @@ package io.github.lmliam.microsmith.compile.services.dotnet.asp.render.hosting
 
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpTypes
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.call
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.codeBlock
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.extensionParameter
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.identifier
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.member
 
 internal fun renderAddMicrosmithExtension(): CSharp.Method =
     CSharp.Method(
@@ -13,16 +17,16 @@ internal fun renderAddMicrosmithExtension(): CSharp.Method =
         parameters =
             listOf(extensionParameter(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplicationBuilder, "builder")),
         body =
-            CSharp.codeBlock {
+            codeBlock {
                 expression(
-                    CSharp.call(
-                        CSharp.member(
-                            CSharp.member(CSharp.identifier("builder"), "Services"),
+                    call(
+                        member(
+                            member(identifier("builder"), "Services"),
                             "AddControllers",
                         ),
                     ),
                 )
-                returnStatement(CSharp.identifier("builder"))
+                returnStatement(identifier("builder"))
             },
     )
 
@@ -33,8 +37,8 @@ internal fun renderMapMicrosmithExtension(): CSharp.Method =
         returnType = csharpType(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplication),
         parameters = listOf(extensionParameter(DotnetAspCSharpTypes.AspNetCore.Builder.WebApplication, "app")),
         body =
-            CSharp.codeBlock {
-                expression(CSharp.call(CSharp.member(CSharp.identifier("app"), "MapControllers")))
-                returnStatement(CSharp.identifier("app"))
+            codeBlock {
+                expression(call(member(identifier("app"), "MapControllers")))
+                returnStatement(identifier("app"))
             },
     )

@@ -13,7 +13,7 @@ class CSharpCodeBlockBuilder internal constructor() {
     }
 
     fun expression(text: String) {
-        expression(CSharp.rawExpression(text))
+        expression(rawExpression(text))
     }
 
     fun returnStatement(expression: CSharp.Expression) {
@@ -21,7 +21,7 @@ class CSharpCodeBlockBuilder internal constructor() {
     }
 
     fun returnStatement(expression: String) {
-        returnStatement(CSharp.rawExpression(expression))
+        returnStatement(rawExpression(expression))
     }
 
     fun local(keyword: String = "var", name: String, initializer: CSharp.Expression) {
@@ -34,7 +34,7 @@ class CSharpCodeBlockBuilder internal constructor() {
     }
 
     fun local(keyword: String = "var", name: String, initializer: String) {
-        local(keyword = keyword, name = name, initializer = CSharp.rawExpression(initializer))
+        local(keyword = keyword, name = name, initializer = rawExpression(initializer))
     }
 
     fun ifStatement(condition: CSharp.Expression, build: CSharpCodeBlockBuilder.() -> Unit) {
@@ -46,7 +46,7 @@ class CSharpCodeBlockBuilder internal constructor() {
     }
 
     fun ifStatement(condition: String, build: CSharpCodeBlockBuilder.() -> Unit) {
-        ifStatement(CSharp.rawExpression(condition), build)
+        ifStatement(rawExpression(condition), build)
     }
 
     fun foreach(signature: String, build: CSharpCodeBlockBuilder.() -> Unit) {

@@ -11,8 +11,12 @@ import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.using
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.contractsNamespace
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpFileBuilder
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpRenderer
+import io.github.lmliam.microsmith.compile.services.dotnet.csharp.file
 
 internal object DotnetAspContractFileRenderer {
+    private val csharpRenderer = CSharpRenderer()
+
     fun renderServiceModelsFile(artifact: DotnetAspServiceArtifact): String =
         renderContractsFile(artifact, usings = setOf(DotnetAspCSharpNamespaces.System)) {
             artifact.contractModels
@@ -78,8 +82,8 @@ internal object DotnetAspContractFileRenderer {
         usings: Set<io.github.lmliam.microsmith.compile.services.dotnet.csharp.DotnetCSharpNamespace>,
         build: CSharpFileBuilder.() -> Unit,
     ): String =
-        CSharp.render(
-            CSharp.file(contractsNamespace(artifact)) {
+        csharpRenderer.render(
+            file(contractsNamespace(artifact)) {
                 usings.forEach(::using)
                 build()
             },
