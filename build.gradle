@@ -76,7 +76,7 @@ tasks.named("check") {
 
 def testLibraries = libs
 
-def explicitApiModules = ['dsl']
+def explicitApiModules = ['dsl', 'resolve']
 
 subprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'

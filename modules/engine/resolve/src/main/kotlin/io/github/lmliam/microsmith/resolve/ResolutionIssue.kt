@@ -5,4 +5,4 @@ package io.github.lmliam.microsmith.resolve
  *
  * Domain models should expose specific implementations instead of encoding semantic failures as exception messages.
  */
-interface ResolutionIssue
+public interface ResolutionIssue

@@ -5,8 +5,8 @@ import io.github.lmliam.microsmith.resolve.ResolutionIssue
 import kotlin.reflect.KClass
 
 @ServiceContract
-interface ResolutionIssueDiagnosticMapper<I : ResolutionIssue> {
-    val issueType: KClass<I>
+public interface ResolutionIssueDiagnosticMapper<I : ResolutionIssue> {
+    public val issueType: KClass<I>
 
-    fun map(issue: I): ResolutionDiagnostic
+    public fun map(issue: I): ResolutionDiagnostic
 }

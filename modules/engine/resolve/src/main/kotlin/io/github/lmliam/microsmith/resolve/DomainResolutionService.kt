@@ -2,14 +2,16 @@ package io.github.lmliam.microsmith.resolve
 
 import arrow.core.compareTo
 import arrow.core.toNonEmptyListOrNull
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.dsl.MicrosmithExtension
 import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import io.github.lmliam.microsmith.dsl.extensions
 
-class DomainResolutionService(resolvers: List<DomainResolver<*, *>>) {
+@InternalMicrosmithApi
+public class DomainResolutionService(resolvers: List<DomainResolver<*, *>>) {
     private val resolverRegistry = DomainResolverRegistry(resolvers)
 
-    fun resolve(model: MicrosmithModel): ResolutionOutcome {
+    public fun resolve(model: MicrosmithModel): ResolutionOutcome {
         val resolvedModels = mutableListOf<ResolvedModel>()
         val issues = mutableListOf<ResolutionIssue>()
 

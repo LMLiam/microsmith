@@ -3,3 +3,9 @@ dependencies {
     api libs.arrow.core
     api libs.spi.tooling.annotations
 }
+
+kotlin {
+    compilerOptions {
+        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+    }
+}

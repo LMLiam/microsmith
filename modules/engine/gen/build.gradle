@@ -29,3 +29,9 @@ def dotnetVersion = providers.exec {
 tasks.named('e2eTest') {
     inputs.property('dotnetVersion', dotnetVersion)
 }
+
+kotlin {
+    compilerOptions {
+        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+    }
+}
