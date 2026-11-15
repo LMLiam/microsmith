@@ -6,11 +6,6 @@ public abstract interface class io/github/lmliam/microsmith/artifact/ArtifactCon
 	public abstract fun getArtifactId ()Lio/github/lmliam/microsmith/artifact/ArtifactId;
 }
 
-public final class io/github/lmliam/microsmith/artifact/ArtifactContributionService {
-	public fun <init> (Ljava/util/List;)V
-	public final fun contribute (Ljava/util/List;)Ljava/util/List;
-}
-
 public abstract interface class io/github/lmliam/microsmith/artifact/ArtifactContributor {
 	public abstract fun contribute (Lio/github/lmliam/microsmith/resolve/ResolvedModel;)Ljava/util/List;
 	public abstract fun getResolvedType ()Lkotlin/reflect/KClass;
@@ -31,17 +26,6 @@ public abstract interface class io/github/lmliam/microsmith/artifact/assembly/Ar
 	public abstract fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
 }
 
-public final class io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembly {
-	public final fun artifacts ()Ljava/util/List;
-	public final fun get (Lio/github/lmliam/microsmith/artifact/ArtifactId;)Lio/github/lmliam/microsmith/artifact/Artifact;
-}
-
-public final class io/github/lmliam/microsmith/artifact/assembly/ArtifactAssemblyService {
-	public fun <init> (Ljava/util/List;)V
-	public final fun assemble (Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/assembly/ArtifactAssembly;
-	public final fun assembleRetaining (Ljava/util/List;Ljava/util/List;)Lio/github/lmliam/microsmith/artifact/assembly/ArtifactAssembly;
-}
-
 public final class io/github/lmliam/microsmith/artifact/files/BinaryFileArtifact : io/github/lmliam/microsmith/artifact/Artifact {
 	public fun <init> (Lio/github/lmliam/microsmith/artifact/files/BinaryFileArtifactId;[B)V
 	public fun equals (Ljava/lang/Object;)Z
@@ -50,15 +34,6 @@ public final class io/github/lmliam/microsmith/artifact/files/BinaryFileArtifact
 	public fun getId ()Lio/github/lmliam/microsmith/artifact/files/BinaryFileArtifactId;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-}
-
-public final class io/github/lmliam/microsmith/artifact/files/BinaryFileArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
-	public fun <init> ()V
-	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/files/BinaryFileArtifact;
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
-	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun merge (Lio/github/lmliam/microsmith/artifact/files/BinaryFileArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/files/BinaryFileArtifact;
 }
 
 public final class io/github/lmliam/microsmith/artifact/files/BinaryFileArtifactContribution : io/github/lmliam/microsmith/artifact/ArtifactContribution {
@@ -94,10 +69,6 @@ public final class io/github/lmliam/microsmith/artifact/files/GeneratedFile {
 	public final fun getRelativePath ()Lio/github/lmliam/microsmith/artifact/files/RelativePath;
 }
 
-public final class io/github/lmliam/microsmith/artifact/files/GeneratedFileKt {
-	public static final fun to (Lio/github/lmliam/microsmith/artifact/files/RelativePath;[B)Lio/github/lmliam/microsmith/artifact/files/GeneratedFile;
-}
-
 public final class io/github/lmliam/microsmith/artifact/files/RelativePath {
 	public static final field Companion Lio/github/lmliam/microsmith/artifact/files/RelativePath$Companion;
 	public fun equals (Ljava/lang/Object;)Z
@@ -125,15 +96,6 @@ public final class io/github/lmliam/microsmith/artifact/files/TextFileArtifact :
 	public fun getId ()Lio/github/lmliam/microsmith/artifact/files/TextFileArtifactId;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
-}
-
-public final class io/github/lmliam/microsmith/artifact/files/TextFileArtifactAssembler : io/github/lmliam/microsmith/artifact/assembly/ArtifactAssembler {
-	public fun <init> ()V
-	public synthetic fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun create (Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/files/TextFileArtifact;
-	public fun getArtifactType ()Lkotlin/reflect/KClass;
-	public synthetic fun merge (Lio/github/lmliam/microsmith/artifact/Artifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/Artifact;
-	public fun merge (Lio/github/lmliam/microsmith/artifact/files/TextFileArtifact;Lio/github/lmliam/microsmith/artifact/ArtifactContribution;)Lio/github/lmliam/microsmith/artifact/files/TextFileArtifact;
 }
 
 public final class io/github/lmliam/microsmith/artifact/files/TextFileArtifactContribution : io/github/lmliam/microsmith/artifact/ArtifactContribution {

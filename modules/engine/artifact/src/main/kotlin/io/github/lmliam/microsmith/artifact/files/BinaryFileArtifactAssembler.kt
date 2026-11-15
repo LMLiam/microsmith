@@ -1,10 +1,13 @@
 package io.github.lmliam.microsmith.artifact.files
 
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.artifact.ArtifactContribution
 import io.github.lmliam.microsmith.artifact.assembly.ArtifactAssembler
+import kotlin.reflect.KClass
 
-class BinaryFileArtifactAssembler : ArtifactAssembler<BinaryFileArtifact> {
-    override val artifactType = BinaryFileArtifact::class
+@InternalMicrosmithApi
+public class BinaryFileArtifactAssembler : ArtifactAssembler<BinaryFileArtifact> {
+    override val artifactType: KClass<BinaryFileArtifact> = BinaryFileArtifact::class
 
     override fun create(contribution: ArtifactContribution<BinaryFileArtifact>): BinaryFileArtifact {
         val binaryContribution = contribution.requireBinaryContribution()

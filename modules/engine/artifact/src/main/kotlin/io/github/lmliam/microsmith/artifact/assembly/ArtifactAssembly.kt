@@ -1,12 +1,14 @@
 package io.github.lmliam.microsmith.artifact.assembly
 
+import io.github.lmliam.microsmith.InternalMicrosmithApi
 import io.github.lmliam.microsmith.artifact.Artifact
 import io.github.lmliam.microsmith.artifact.ArtifactId
 
-class ArtifactAssembly internal constructor(artifactsById: Map<ArtifactId<Artifact>, Artifact>) {
+@InternalMicrosmithApi
+public class ArtifactAssembly internal constructor(artifactsById: Map<ArtifactId<Artifact>, Artifact>) {
     private val artifactsById = artifactsById.toMap()
 
-    fun artifacts(): List<Artifact> = artifactsById.values.toList()
+    public fun artifacts(): List<Artifact> = artifactsById.values.toList()
 
-    operator fun get(artifactId: ArtifactId<Artifact>): Artifact? = artifactsById[artifactId]
+    public operator fun get(artifactId: ArtifactId<Artifact>): Artifact? = artifactsById[artifactId]
 }

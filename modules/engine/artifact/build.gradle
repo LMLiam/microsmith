@@ -5,3 +5,9 @@ dependencies {
     api libs.spi.tooling.annotations
     kapt libs.spi.tooling.processor
 }
+
+kotlin {
+    compilerOptions {
+        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+    }
+}

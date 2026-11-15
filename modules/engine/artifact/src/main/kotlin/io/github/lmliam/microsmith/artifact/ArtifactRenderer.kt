@@ -5,8 +5,8 @@ import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import kotlin.reflect.KClass
 
 @ServiceContract
-interface ArtifactRenderer<A : Artifact> {
-    val artifactType: KClass<A>
+public interface ArtifactRenderer<A : Artifact> {
+    public val artifactType: KClass<A>
 
-    fun render(artifact: A): GeneratedFile
+    public fun render(artifact: A): GeneratedFile
 }

@@ -2,13 +2,13 @@ package io.github.lmliam.microsmith.artifact.files
 
 import io.github.lmliam.microsmith.artifact.Artifact
 
-class BinaryFileArtifact(
+public class BinaryFileArtifact(
     override val id: BinaryFileArtifactId,
     contents: ByteArray,
 ) : Artifact {
     private val bytes: ByteArray = contents.copyOf()
 
-    val contents: ByteArray
+    public val contents: ByteArray
         get() = bytes.copyOf()
 
     override fun equals(other: Any?): Boolean {

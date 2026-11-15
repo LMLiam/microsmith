@@ -7,3 +7,9 @@ dependencies {
 
     testImplementation project(":artifact")
 }
+
+kotlin {
+    compilerOptions {
+        optIn.add('io.github.lmliam.microsmith.InternalMicrosmithApi')
+    }
+}

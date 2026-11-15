@@ -1,10 +1,10 @@
 package io.github.lmliam.microsmith.artifact.files
 
-class RelativePath private constructor(val segments: List<String>) {
-    val isRoot: Boolean
+public class RelativePath private constructor(public val segments: List<String>) {
+    public val isRoot: Boolean
         get() = segments.isEmpty()
 
-    fun resolve(vararg parts: String): RelativePath = parse(segments + parts)
+    public fun resolve(vararg parts: String): RelativePath = parse(segments + parts)
 
     override fun equals(other: Any?): Boolean = other is RelativePath && segments == other.segments
 
@@ -12,7 +12,7 @@ class RelativePath private constructor(val segments: List<String>) {
 
     override fun toString(): String = if (isRoot) ROOT_TEXT else segments.joinToString(SEPARATOR.toString())
 
-    companion object {
+    public companion object {
         private const val SEPARATOR = '/'
         private const val WINDOWS_SEPARATOR = '\\'
         private const val ROOT_TEXT = "."
@@ -20,9 +20,9 @@ class RelativePath private constructor(val segments: List<String>) {
         private const val PARENT_SEGMENT = ".."
         private val driveLetter = Regex("^[A-Za-z]:")
 
-        val ROOT = RelativePath(emptyList())
+        public val ROOT: RelativePath = RelativePath(emptyList())
 
-        fun of(vararg parts: String): RelativePath = parse(parts.asList())
+        public fun of(vararg parts: String): RelativePath = parse(parts.asList())
 
         private fun parse(parts: List<String>): RelativePath {
             val segments = parts.flatMap { part ->
