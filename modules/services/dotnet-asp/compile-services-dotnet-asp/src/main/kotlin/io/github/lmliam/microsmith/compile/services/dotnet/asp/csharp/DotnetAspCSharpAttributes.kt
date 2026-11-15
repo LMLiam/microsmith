@@ -17,20 +17,6 @@ internal object DotnetAspCSharpAttributes {
                 val FromBody: CSharp.Attribute = attribute("FromBody")
                 val FromQuery: CSharp.Attribute = attribute("FromQuery")
                 val FromRoute: CSharp.Attribute = attribute("FromRoute")
-
-                fun endpointRoute(method: String, route: String, operationName: String): CSharp.Attribute =
-                    attribute(
-                        name = httpMethodAttributeName(method),
-                        positionalArgument(stringLiteral(route)),
-                        namedArgument("Name", stringLiteral(operationName)),
-                    )
-
-                fun producesResponseType(typeName: String, statusCode: Int): CSharp.Attribute =
-                    attribute(
-                        name = "ProducesResponseType",
-                        positionalArgument(rawExpression("typeof($typeName)")),
-                        positionalArgument(intLiteral(statusCode)),
-                    )
             }
         }
     }
@@ -38,3 +24,17 @@ internal object DotnetAspCSharpAttributes {
 
 private fun httpMethodAttributeName(method: String): String =
     "Http" + method.lowercase(Locale.ROOT).replaceFirstChar(Char::uppercase)
+
+internal fun endpointRoute(method: String, route: String, operationName: String): CSharp.Attribute =
+    attribute(
+        name = httpMethodAttributeName(method),
+        positionalArgument(stringLiteral(route)),
+        namedArgument("Name", stringLiteral(operationName)),
+    )
+
+internal fun producesResponseType(typeName: String, statusCode: Int): CSharp.Attribute =
+    attribute(
+        name = "ProducesResponseType",
+        positionalArgument(rawExpression("typeof($typeName)")),
+        positionalArgument(intLiteral(statusCode)),
+    )

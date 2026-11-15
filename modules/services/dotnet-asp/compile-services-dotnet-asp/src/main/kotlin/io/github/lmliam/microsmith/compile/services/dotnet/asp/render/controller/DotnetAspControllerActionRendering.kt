@@ -5,6 +5,8 @@ import io.github.lmliam.microsmith.artifact.services.dotnet.asp.request.DotnetAs
 import io.github.lmliam.microsmith.artifact.services.dotnet.asp.response.DotnetAspResponseArtifact
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpAttributes
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.DotnetAspCSharpTypes
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.endpointRoute
+import io.github.lmliam.microsmith.compile.services.dotnet.asp.csharp.producesResponseType
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.dotnetAspPascalIdentifier
 import io.github.lmliam.microsmith.compile.services.dotnet.asp.names.resultBaseTypeName
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharp
@@ -94,14 +96,14 @@ private fun renderHeadersInitializer(binding: DotnetAspHeadersBindingArtifact): 
     )
 
 private fun renderRouteAttribute(endpoint: DotnetAspEndpointArtifact): CSharp.Attribute =
-    DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.endpointRoute(
+    endpointRoute(
         method = endpoint.method,
         route = endpoint.route,
         operationName = endpoint.operationName,
     )
 
 private fun renderProducesResponseTypeAttribute(response: DotnetAspResponseArtifact): CSharp.Attribute =
-    DotnetAspCSharpAttributes.Microsoft.AspNetCore.Mvc.producesResponseType(
+    producesResponseType(
         typeName = responseAttributeType(response),
         statusCode = response.statusCode,
     )

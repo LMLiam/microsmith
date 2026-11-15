@@ -14,9 +14,7 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.csharpType
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.file
 import io.github.lmliam.microsmith.resolve.services.dotnet.asp.naming.MICROSMITH_CONTROLLER_BASE_TYPE_NAME
 
-internal object DotnetAspInfrastructureFileRenderer {
-    private val csharpRenderer = CSharpRenderer()
-
+internal class DotnetAspInfrastructureFileRenderer(private val csharpRenderer: CSharpRenderer) {
     fun renderProgramFile(artifact: DotnetAspServiceArtifact): String =
         """
         using ${hostingNamespace(artifact)};

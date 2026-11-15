@@ -14,9 +14,7 @@ import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpFileBuil
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.CSharpRenderer
 import io.github.lmliam.microsmith.compile.services.dotnet.csharp.file
 
-internal object DotnetAspContractFileRenderer {
-    private val csharpRenderer = CSharpRenderer()
-
+internal class DotnetAspContractFileRenderer(private val csharpRenderer: CSharpRenderer) {
     fun renderServiceModelsFile(artifact: DotnetAspServiceArtifact): String =
         renderContractsFile(artifact, usings = setOf(DotnetAspCSharpNamespaces.System)) {
             artifact.contractModels
