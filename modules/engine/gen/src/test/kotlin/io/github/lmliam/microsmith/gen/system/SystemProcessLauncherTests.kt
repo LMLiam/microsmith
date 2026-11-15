@@ -3,10 +3,13 @@ package io.github.lmliam.microsmith.gen.system
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.exists
+import kotlin.io.path.fileSize
+import kotlin.io.path.readText
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -35,23 +38,14 @@ class SystemProcessLauncherTests :
             }
 
             "cancelling run destroys the process" {
-                val directory = Files.createTempDirectory("microsmith-process-")
-                val pidFile = directory.resolve("pid")
-                val program = directory.resolve("Sleep.java")
-                Files.writeString(
-                    program,
-                    "public class Sleep { public static void main(String[] args) throws Exception {" +
-                        " java.nio.file.Files.writeString(java.nio.file.Path.of(args[0])," +
-                        " String.valueOf(ProcessHandle.current().pid()));" +
-                        " Thread.sleep(600_000); } }",
-                )
+                val pidFile = createTempDirectory("microsmith-process-").resolve("pid")
 
                 runBlocking {
                     val run =
                         CoroutineScope(dispatcher).launch {
-                            launcher.run(listOf(java, program.toString(), pidFile.toString()))
+                            launcher.run(listOf(java, programPath("Sleep"), pidFile.toString()))
                         }
-                    val pid = withTimeout(30.seconds) { awaitPid(pidFile) }
+                    val pid = withTimeout(30.seconds) { awaitText(pidFile) }.toLong()
 
                     withTimeout(10.seconds) { run.cancelAndJoin() }
 
@@ -61,22 +55,15 @@ class SystemProcessLauncherTests :
             }
 
             "cancelling run does not wait for a detached process that keeps the output open" {
-                val directory = Files.createTempDirectory("microsmith-process-")
-                val program = directory.resolve("Detach.java")
-                Files.writeString(
-                    program,
-                    "public class Detach { public static void main(String[] args) throws Exception {" +
-                        " if (args[0].equals(\"child\")) { Thread.sleep(20_000); return; }" +
-                        " new ProcessBuilder(ProcessHandle.current().info().command().get()," +
-                        " args[0], \"child\").inheritIO().start(); } }",
-                )
+                val markerFile = createTempDirectory("microsmith-process-").resolve("started")
 
                 runBlocking {
+                    val program = programPath("Detach")
                     val run =
                         CoroutineScope(dispatcher).launch {
-                            launcher.run(listOf(java, program.toString(), program.toString()))
+                            launcher.run(listOf(java, program, program, markerFile.toString()))
                         }
-                    delay(2.seconds)
+                    withTimeout(30.seconds) { awaitText(markerFile) }
 
                     withTimeout(10.seconds) { run.cancelAndJoin() }
                 }
@@ -84,7 +71,10 @@ class SystemProcessLauncherTests :
         },
     )
 
-private suspend fun awaitPid(pidFile: Path): Long {
-    while (!Files.exists(pidFile) || Files.size(pidFile) == 0L) delay(50)
-    return Files.readString(pidFile).toLong()
+private fun programPath(name: String): String =
+    Path.of(checkNotNull(SystemProcessLauncherTests::class.java.getResource("/process/$name.java")).toURI()).toString()
+
+private suspend fun awaitText(file: Path): String {
+    while (!file.exists() || file.fileSize() == 0L) delay(50)
+    return file.readText()
 }

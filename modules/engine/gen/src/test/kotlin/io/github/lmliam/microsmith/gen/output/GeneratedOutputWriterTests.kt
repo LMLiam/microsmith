@@ -10,12 +10,19 @@ import io.kotest.matchers.shouldBe
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.util.concurrent.Executors
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.exists
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readBytes
+import kotlin.io.path.walk
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 
+@OptIn(ExperimentalPathApi::class)
 class GeneratedOutputWriterTests :
     StringSpec(
         {
@@ -92,7 +99,7 @@ class GeneratedOutputWriterTests :
             }
 
             "write stores every file when many outputs share their parent directories" {
-                val outputRoot = Files.createTempDirectory("microsmith-writer-")
+                val outputRoot = createTempDirectory("microsmith-writer-")
                 val outputs =
                     (0 until 200).map { index ->
                         GeneratedFile(
@@ -108,14 +115,14 @@ class GeneratedOutputWriterTests :
                 }
 
                 outputs.forEach { output ->
-                    Files.readAllBytes(outputRoot.resolve(output.relativePath.toString())).toList() shouldBe
+                    outputRoot.resolve(output.relativePath.toString()).readBytes().toList() shouldBe
                         output.contents.toList()
                 }
             }
 
             "write stops before reaching every output when the run is cancelled" {
                 runTest {
-                    val outputRoot = Files.createTempDirectory("microsmith-writer-")
+                    val outputRoot = createTempDirectory("microsmith-writer-")
                     val outputs =
                         (0 until 6).map { index ->
                             GeneratedFile(
@@ -150,8 +157,8 @@ class GeneratedOutputWriterTests :
                     run.join()
 
                     run.isCancelled shouldBe true
-                    Files.exists(outputRoot.resolve("root5")) shouldBe false
-                    Files.walk(outputRoot).use { paths -> paths.filter(Files::isRegularFile).count() } shouldBe 0L
+                    outputRoot.resolve("root5").exists() shouldBe false
+                    outputRoot.walk().count { it.isRegularFile() } shouldBe 0
                 }
             }
 

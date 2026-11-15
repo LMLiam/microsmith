@@ -6,8 +6,9 @@ import io.github.lmliam.microsmith.artifact.files.GeneratedFile
 import io.github.lmliam.microsmith.artifact.files.RelativePath
 import io.github.lmliam.microsmith.gen.RunScope
 import io.github.lmliam.microsmith.gen.files.FileSpace
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.writeBytes
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -31,8 +32,8 @@ internal class GeneratedOutputWriter(
                 }
                 .map { (target, contents) ->
                     async {
-                        target.parent?.let(Files::createDirectories)
-                        Files.write(target, contents)
+                        target.parent?.createDirectories()
+                        target.writeBytes(contents)
                     }
                 }
                 .awaitAll()

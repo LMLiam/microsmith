@@ -9,6 +9,7 @@ import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
@@ -74,7 +75,7 @@ class CancelledRun(val temporaryRoot: Path, val diagnostics: RecordingDiagnostic
 suspend fun runCancelled(vararg plugins: String, trigger: CancelTrigger): CancelledRun {
     val diagnostics = RecordingDiagnosticSink()
     val output = newOutputDirectory()
-    val temporaryRoot = Files.createTempDirectory("microsmith-plugin-tmp-")
+    val temporaryRoot = createTempDirectory("microsmith-plugin-tmp-")
     lateinit var run: Job
     val sink =
         object : DiagnosticSink {
