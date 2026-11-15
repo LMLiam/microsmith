@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.cli.init
 
 import io.github.lmliam.microsmith.cli.command.InitCommand
+import io.github.lmliam.microsmith.cli.copyTestResource
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
 import io.github.lmliam.microsmith.cli.init.profile.GenericOnboardingProfile
 import io.github.lmliam.microsmith.cli.init.profile.KotlinOnboardingProfile
@@ -26,18 +27,10 @@ class KotlinOnboardingProfileTests :
                 repoRoot.resolve("build.gradle.kts").writeText("plugins { kotlin(\"jvm\") version \"2.4.20\" }\n")
                 repoRoot.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture-kotlin\"\n")
                 repoRoot.resolve("src/main/kotlin/example").createDirectories()
-                repoRoot
-                    .resolve("src/main/kotlin/example/App.kt")
-                    .writeText(
-                        """
-                        package example
-
-                        class App {
-                            fun message(): String = "Microsmith Kotlin fixture"
-                        }
-                        """
-                            .trimIndent() + "\n",
-                    )
+                copyTestResource(
+                    "/init/kotlin/App.kt",
+                    repoRoot.resolve("src/main/kotlin/example/App.kt"),
+                )
                 try {
                     val helperRoot = repoRoot.resolve(".microsmith/ide")
                     val result =

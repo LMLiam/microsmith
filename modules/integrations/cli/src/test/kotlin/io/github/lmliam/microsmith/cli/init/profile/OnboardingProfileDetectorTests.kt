@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.cli.init.profile
 
+import io.github.lmliam.microsmith.cli.copyTestResource
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -393,27 +394,15 @@ class OnboardingProfileDetectorTests :
                 val packageRoot = createTempDirectory("microsmith-init-detect-rust-package")
                 val workspaceRoot = createTempDirectory("microsmith-init-detect-rust-workspace")
                 try {
-                    packageRoot
-                        .resolve("Cargo.toml")
-                        .writeText(
-                            """
-                            [package]
-                            name = "fixture-rust"
-                            version = "0.1.0"
-                            edition = "2024"
-                            """
-                                .trimIndent() + "\n",
-                        )
+                    copyTestResource(
+                        "/init/profile/rust-package/Cargo.toml",
+                        packageRoot.resolve("Cargo.toml"),
+                    )
                     workspaceRoot.resolve("crates/app").createDirectories()
-                    workspaceRoot
-                        .resolve("Cargo.toml")
-                        .writeText(
-                            """
-                            [workspace]
-                            members = ["crates/app"]
-                            """
-                                .trimIndent() + "\n",
-                        )
+                    copyTestResource(
+                        "/init/profile/rust-workspace/Cargo.toml",
+                        workspaceRoot.resolve("Cargo.toml"),
+                    )
 
                     detectOnboardingProfile(packageRoot) shouldBe
                         OnboardingProfileDetection(
@@ -437,17 +426,10 @@ class OnboardingProfileDetectorTests :
                 val repoRoot = createTempDirectory("microsmith-init-detect-rust-nested-only")
                 try {
                     repoRoot.resolve("crates/app").createDirectories()
-                    repoRoot
-                        .resolve("crates/app/Cargo.toml")
-                        .writeText(
-                            """
-                            [package]
-                            name = "fixture-rust-app"
-                            version = "0.1.0"
-                            edition = "2024"
-                            """
-                                .trimIndent() + "\n",
-                        )
+                    copyTestResource(
+                        "/init/profile/rust-workspace/crates/app/Cargo.toml",
+                        repoRoot.resolve("crates/app/Cargo.toml"),
+                    )
 
                     detectOnboardingProfile(repoRoot) shouldBe
                         OnboardingProfileDetection(
@@ -463,17 +445,10 @@ class OnboardingProfileDetectorTests :
             "Ruby root gemspec detection skips unreadable repository roots"
                 .config(enabled = supportsPosixPermissions()) {
                     val rubyRoot = createTempDirectory("microsmith-init-detect-ruby-unreadable-root")
-                    rubyRoot
-                        .resolve("microsmith-ruby-fixture.gemspec")
-                        .writeText(
-                            """
-                            Gem::Specification.new do |spec|
-                              spec.name = "microsmith-ruby-fixture"
-                              spec.version = "0.1.0"
-                            end
-                            """
-                                .trimIndent() + "\n",
-                        )
+                    copyTestResource(
+                        "/init/profile/ruby/fixture.gemspec",
+                        rubyRoot.resolve("microsmith-ruby-fixture.gemspec"),
+                    )
 
                     val originalPermissions = rubyRoot.getPosixFilePermissions()
                     rubyRoot.setPosixFilePermissions(emptySet())

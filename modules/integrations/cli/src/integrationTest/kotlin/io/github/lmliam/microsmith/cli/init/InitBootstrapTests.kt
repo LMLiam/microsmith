@@ -1,6 +1,7 @@
 package io.github.lmliam.microsmith.cli.init
 
 import io.github.lmliam.microsmith.cli.command.InitCommand
+import io.github.lmliam.microsmith.cli.copyTestResource
 import io.github.lmliam.microsmith.cli.ide.IdeHelperConflictException
 import io.github.lmliam.microsmith.cli.ide.IdeHelperRefreshResult
 import io.github.lmliam.microsmith.cli.init.profile.DotnetOnboardingProfile
@@ -74,16 +75,10 @@ class InitBootstrapTests :
 
             "creates repo-aware bootstrap files for Python repositories without a repository-native output override" {
                 val repoRoot = createTempDirectory("microsmith-init-bootstrap-python")
-                repoRoot
-                    .resolve("pyproject.toml")
-                    .writeText(
-                        """
-                        [project]
-                        name = "fixture-python"
-                        version = "0.1.0"
-                        """
-                            .trimIndent() + "\n",
-                    )
+                copyTestResource(
+                    "/init/bootstrap/python/pyproject.toml",
+                    repoRoot.resolve("pyproject.toml"),
+                )
                 try {
                     val helperRoot = repoRoot.resolve(".microsmith/ide")
                     val result =
@@ -117,18 +112,10 @@ class InitBootstrapTests :
 
             "creates ASP.NET bootstrap files for .NET repositories" {
                 val repoRoot = createTempDirectory("microsmith-init-bootstrap-dotnet")
-                repoRoot
-                    .resolve("MicrosmithFixture.csproj")
-                    .writeText(
-                        """
-                        <Project Sdk="Microsoft.NET.Sdk">
-                          <PropertyGroup>
-                            <TargetFramework>net10.0</TargetFramework>
-                          </PropertyGroup>
-                        </Project>
-                        """
-                            .trimIndent() + "\n",
-                    )
+                copyTestResource(
+                    "/init/bootstrap/dotnet/MicrosmithFixture.csproj",
+                    repoRoot.resolve("MicrosmithFixture.csproj"),
+                )
                 try {
                     val helperRoot = repoRoot.resolve(".microsmith/ide")
                     val result =
@@ -169,26 +156,14 @@ class InitBootstrapTests :
             "creates repo-aware bootstrap files for Rust workspace roots without a repository-native output override" {
                 val repoRoot = createTempDirectory("microsmith-init-bootstrap-rust")
                 repoRoot.resolve("crates/app/src").createDirectories()
-                repoRoot
-                    .resolve("Cargo.toml")
-                    .writeText(
-                        """
-                        [workspace]
-                        members = ["crates/app"]
-                        """
-                            .trimIndent() + "\n",
-                    )
-                repoRoot
-                    .resolve("crates/app/Cargo.toml")
-                    .writeText(
-                        """
-                        [package]
-                        name = "fixture-rust-app"
-                        version = "0.1.0"
-                        edition = "2024"
-                        """
-                            .trimIndent() + "\n",
-                    )
+                copyTestResource(
+                    "/init/bootstrap/rust/Cargo.toml",
+                    repoRoot.resolve("Cargo.toml"),
+                )
+                copyTestResource(
+                    "/init/bootstrap/rust/crates/app/Cargo.toml",
+                    repoRoot.resolve("crates/app/Cargo.toml"),
+                )
                 try {
                     val helperRoot = repoRoot.resolve(".microsmith/ide")
                     val result =

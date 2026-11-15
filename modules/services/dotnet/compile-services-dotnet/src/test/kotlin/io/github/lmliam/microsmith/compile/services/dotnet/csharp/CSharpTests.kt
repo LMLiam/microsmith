@@ -42,22 +42,7 @@ class CSharpTests :
                         }
                     }
 
-                CSharp.render(file).trim() shouldBe
-                    """
-                    using Microsoft.AspNetCore.Mvc;
-                    using System.Threading.Tasks;
-
-                    namespace Platform.Api.Generated;
-
-                    [ApiController]
-                    public abstract class UsersControllerBase : ControllerBase
-                    {
-                        public string Name { get; set; } = "Users";
-
-                        public abstract Task<ActionResult<User>> GetUserAsync(CancellationToken cancellationToken);
-                    }
-                    """
-                        .trimIndent()
+                CSharp.render(file).trim() shouldBe csharpResource("class-with-structured-members.cs")
             }
 
             "render emits records with constructor parameters and defaults" {
@@ -153,27 +138,7 @@ class CSharpTests :
                         }
                     }
 
-                CSharp.render(file).trim() shouldBe
-                    """
-                    namespace Platform.Api.Generated;
-
-                    public sealed class Responder
-                    {
-                        public string Respond(string[] headers)
-                        {
-                            foreach (var header in headers)
-                            {
-                                if (header.Length > 0)
-                                {
-                                    Console.WriteLine(header);
-                                }
-                            }
-
-                            return "ok";
-                        }
-                    }
-                    """
-                        .trimIndent()
+                CSharp.render(file).trim() shouldBe csharpResource("structured-code-blocks-with-control-flow.cs")
             }
 
             "render emits structured expressions for calls object initializers and switch expressions" {
@@ -232,28 +197,7 @@ class CSharpTests :
                         }
                     }
 
-                CSharp.render(file).trim() shouldBe
-                    """
-                    namespace Platform.Api.Generated;
-
-                    public sealed class Responder
-                    {
-                        public ObjectResult Map(ResultBase result, object body)
-                        {
-                            var response = new ObjectResult(body)
-                            {
-                                StatusCode = 200
-                            };
-
-                            return result switch
-                            {
-                                OkResult ok => Respond(ok),
-                                _ => response
-                            };
-                        }
-                    }
-                    """
-                        .trimIndent()
+                CSharp.render(file).trim() shouldBe csharpResource("structured-expressions.cs")
             }
 
             "render emits structured attributes out arguments and throw expressions" {
@@ -316,25 +260,14 @@ class CSharpTests :
                         }
                     }
 
-                CSharp.render(file).trim() shouldBe
-                    """
-                    namespace Platform.Api.Generated;
-
-                    public abstract class UsersControllerBase
-                    {
-                        [HttpGet("/users/{id}", Name = "GetUser")]
-                        public string? GetUser([FromRoute] string id)
-                        {
-                            if (Request.Headers.TryGetValue("X-Correlation-Id", out var values))
-                            {
-                                return values.ToString();
-                            }
-
-                            return throw new InvalidOperationException("Missing header");
-                        }
-                    }
-                    """
-                        .trimIndent()
+                CSharp.render(file).trim() shouldBe csharpResource("structured-attributes-out-arguments-and-throw.cs")
             }
         },
     )
+
+private fun csharpResource(name: String): String {
+    val resource = "/csharp/$name"
+    return checkNotNull(CSharpTests::class.java.getResource(resource)) { "Missing test resource $resource" }
+        .readText()
+        .trimEnd()
+}

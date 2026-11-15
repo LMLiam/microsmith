@@ -15,21 +15,7 @@ class ScriptSymbolDiscoveryTests :
                     ScriptSymbolDiscovery.discover(
                         sourceName = "schema.microsmith.kts",
                         sourceText =
-                            """
-                            microsmith {
-                                schemas {
-                                    protobuf {
-                                        "acme.user" {
-                                            version(2) {
-                                                message("User")
-                                                enum("Role")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            """
-                                .trimIndent(),
+                            scriptResource("/scripting/symbols/discovery/qualified-protobuf-symbols.microsmith.kts"),
                         registry = ScriptSymbolContributorRegistry.of(listOf(ProtobufScriptSymbolContributor)),
                     )
 
@@ -57,17 +43,7 @@ class ScriptSymbolDiscoveryTests :
                     ScriptSymbolDiscovery.discover(
                         sourceName = "schema.microsmith.kts",
                         sourceText =
-                            """
-                            val name = "User"
-                            microsmith {
-                                schemas {
-                                    protobuf {
-                                        message(name)
-                                    }
-                                }
-                            }
-                            """
-                                .trimIndent(),
+                            scriptResource("/scripting/symbols/discovery/dynamic-declaration-name.microsmith.kts"),
                         registry = ScriptSymbolContributorRegistry.of(listOf(ProtobufScriptSymbolContributor)),
                     )
 
@@ -80,21 +56,7 @@ class ScriptSymbolDiscoveryTests :
                         ScriptSymbolDiscovery.discover(
                             sourceName = "schema.microsmith.kts",
                             sourceText =
-                                """
-                                microsmith {
-                                    schemas {
-                                        protobuf {
-                                            "one" {
-                                                message("User")
-                                            }
-                                            "two" {
-                                                message("User")
-                                            }
-                                        }
-                                    }
-                                }
-                                """
-                                    .trimIndent(),
+                                scriptResource("/scripting/symbols/discovery/ambiguous-symbols.microsmith.kts"),
                             registry = ScriptSymbolContributorRegistry.of(listOf(ProtobufScriptSymbolContributor)),
                         )
                     }
@@ -109,21 +71,7 @@ class ScriptSymbolDiscoveryTests :
                 val symbols =
                     ScriptSymbolDiscovery.discover(
                         sourceName = "schema.microsmith.kts",
-                        sourceText =
-                            """
-                            microsmith {
-                                schemas {
-                                    protobuf {
-                                        "acme" {
-                                            version(0x10) {
-                                                message("User")
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            """
-                                .trimIndent(),
+                        sourceText = scriptResource("/scripting/symbols/discovery/hexadecimal-version.microsmith.kts"),
                         registry = ScriptSymbolContributorRegistry.of(listOf(ProtobufScriptSymbolContributor)),
                     )
 
@@ -131,3 +79,7 @@ class ScriptSymbolDiscoveryTests :
             }
         },
     )
+
+private fun scriptResource(resource: String): String =
+    checkNotNull(ScriptSymbolDiscoveryTests::class.java.getResource(resource)) { "Missing test resource $resource" }
+        .readText()

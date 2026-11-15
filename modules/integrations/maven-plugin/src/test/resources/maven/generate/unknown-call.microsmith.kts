@@ -1,0 +1,7 @@
+microsmith {
+    schemas {
+        protobuf {
+            unknownCall()
+        }
+    }
+}
