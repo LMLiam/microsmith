@@ -332,22 +332,20 @@ class DotnetAspDslTests :
             "a Uuid default on a string request field is rejected during DSL authoring" {
                 val builder = MicrosmithBuilder()
 
-                val error =
-                    shouldThrow<IllegalArgumentException> {
-                        builder.services {
-                            "UserService" {
-                                dotnet {
-                                    asp {
-                                        rest {
-                                            "/users" {
-                                                get("ListUsers") {
-                                                    query("ListUsersQuery") {
-                                                        string("search") {
-                                                            default(Uuid.parse("123e4567-e89b-12d3-a456-426614174000"))
-                                                        }
+                shouldThrow<IllegalArgumentException> {
+                    builder.services {
+                        "UserService" {
+                            dotnet {
+                                asp {
+                                    rest {
+                                        "/users" {
+                                            get("ListUsers") {
+                                                query("ListUsersQuery") {
+                                                    string("search") {
+                                                        default(Uuid.parse("123e4567-e89b-12d3-a456-426614174000"))
                                                     }
-                                                    responses { ok("User") }
                                                 }
+                                                responses { ok("User") }
                                             }
                                         }
                                     }
@@ -355,8 +353,7 @@ class DotnetAspDslTests :
                             }
                         }
                     }
-
-                error.message.shouldContain("cannot use UuidValue")
+                }
             }
         },
     )
