@@ -4,24 +4,20 @@ import io.github.lmliam.microsmith.dsl.MicrosmithBuilder
 import io.github.lmliam.microsmith.dsl.MicrosmithModel
 import io.github.lmliam.microsmith.plugin.Diagnostic
 import io.github.lmliam.microsmith.plugin.DiagnosticSink
-import io.github.lmliam.microsmith.plugin.Environment
 import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.createTempDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import thirdparty.contract.ASSEMBLING_CODE
-import thirdparty.contract.CONTRIBUTING_CODE
 import thirdparty.contract.FixtureExtension
-import thirdparty.contract.RESOLVING_CODE
 
 object PluginFixtures {
     private val directory: Path =
@@ -52,34 +48,14 @@ suspend fun generateWithPlugins(
     return output
 }
 
-class IsolatedTemporaryEnvironment(
-    private val temporaryDirectory: Path,
-    private val onTemporaryDirectoryRequested: () -> Unit = {},
-) : Environment {
-    override fun variable(name: String): String? = System.getenv(name)
-
-    override fun property(name: String): String? =
-        if (name == "java.io.tmpdir") {
-            onTemporaryDirectoryRequested()
-            temporaryDirectory.toString()
-        } else {
-            System.getProperty(name)
-        }
-}
-
-enum class CancelTrigger(val diagnosticCode: String? = null) {
-    TEMPORARY_DIRECTORY_REQUESTED,
-    RESOLVING(RESOLVING_CODE),
-    CONTRIBUTING(CONTRIBUTING_CODE),
-    ASSEMBLING(ASSEMBLING_CODE),
-}
-
-class CancelledRun(val temporaryRoot: Path, val diagnostics: RecordingDiagnosticSink)
-
-suspend fun runCancelled(vararg plugins: String, trigger: CancelTrigger): CancelledRun {
+suspend fun runCancelled(
+    vararg plugins: String,
+    trigger: CancelTrigger,
+    output: Path,
+    temporaryRoot: Path,
+    dispatcher: CoroutineDispatcher,
+): CancelledRun {
     val diagnostics = RecordingDiagnosticSink()
-    val output = newOutputDirectory()
-    val temporaryRoot = createTempDirectory("microsmith-plugin-tmp-")
     lateinit var run: Job
     val sink =
         object : DiagnosticSink {
@@ -96,7 +72,7 @@ suspend fun runCancelled(vararg plugins: String, trigger: CancelTrigger): Cancel
     coroutineScope {
         run =
             launch(start = CoroutineStart.LAZY) {
-                testGenerator(sink, environment = environment)
+                testGenerator(sink, dispatcher, environment)
                     .generateTo(fixtureModel(), output, PluginFixtures.classLoader(*plugins))
             }
         run.start()

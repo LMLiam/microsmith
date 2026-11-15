@@ -19,6 +19,7 @@ import io.github.lmliam.microsmith.gen.testGenerator
 import io.github.lmliam.microsmith.resolve.DomainResolver
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -26,6 +27,8 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import java.net.URLClassLoader
 import java.nio.file.Files
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import thirdparty.contract.FixtureExtension
 
 private fun <T> List<T>.permutations(): List<List<T>> =
@@ -198,9 +201,19 @@ class PluginLoadingTests :
             }
 
             "when the run is cancelled every plugin is still closed" {
-                val run = runCancelled("alpha", "beta", trigger = CancelTrigger.CONTRIBUTING)
+                runTest {
+                    val run =
+                        runCancelled(
+                            "alpha",
+                            "beta",
+                            trigger = CancelTrigger.CONTRIBUTING,
+                            output = tempdir().toPath(),
+                            temporaryRoot = tempdir().toPath(),
+                            dispatcher = StandardTestDispatcher(testScheduler),
+                        )
 
-                run.diagnostics.closedPluginIds() shouldBe listOf("thirdparty.beta", "thirdparty.alpha")
+                    run.diagnostics.closedPluginIds() shouldBe listOf("thirdparty.beta", "thirdparty.alpha")
+                }
             }
         },
     )
