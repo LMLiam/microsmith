@@ -5,7 +5,7 @@ import io.github.lmliam.microsmith.plugin.HostServices
 import io.github.lmliam.microsmith.plugin.MicrosmithPlugin
 import io.github.lmliam.microsmith.plugin.PluginServices
 
-class ProtobufRpcPlugin : MicrosmithPlugin {
+public class ProtobufRpcPlugin : MicrosmithPlugin {
     override val id: String = "io.github.lmliam.microsmith.protobuf.rpc"
 
     override fun services(host: HostServices): PluginServices =

@@ -2,10 +2,11 @@ package io.github.lmliam.microsmith.artifact.schemas.protobuf.rpc
 
 import io.github.lmliam.microsmith.artifact.ArtifactId
 import io.github.lmliam.microsmith.artifact.schemas.protobuf.model.ProtoFileArtifactId
+import kotlin.reflect.KClass
 
-data class ProtobufRpcServiceArtifactId(val packageName: String?, val serviceName: String) :
+public data class ProtobufRpcServiceArtifactId(public val packageName: String?, public val serviceName: String) :
     ArtifactId<ProtobufRpcServiceArtifact> {
-    override val artifactType = ProtobufRpcServiceArtifact::class
+    override val artifactType: KClass<ProtobufRpcServiceArtifact> = ProtobufRpcServiceArtifact::class
 
-    val protoFile = ProtoFileArtifactId(packageName, serviceName)
+    public val protoFile: ProtoFileArtifactId = ProtoFileArtifactId(packageName, serviceName)
 }
