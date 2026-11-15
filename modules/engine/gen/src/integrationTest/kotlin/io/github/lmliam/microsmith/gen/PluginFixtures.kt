@@ -18,8 +18,10 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import thirdparty.contract.ASSEMBLING_CODE
 import thirdparty.contract.CONTRIBUTING_CODE
 import thirdparty.contract.FixtureExtension
+import thirdparty.contract.RESOLVING_CODE
 
 object PluginFixtures {
     private val directory: Path =
@@ -65,9 +67,11 @@ class IsolatedTemporaryEnvironment(
         }
 }
 
-enum class CancelTrigger {
-    CONTRIBUTING,
+enum class CancelTrigger(val diagnosticCode: String? = null) {
     TEMPORARY_DIRECTORY_REQUESTED,
+    RESOLVING(RESOLVING_CODE),
+    CONTRIBUTING(CONTRIBUTING_CODE),
+    ASSEMBLING(ASSEMBLING_CODE),
 }
 
 class CancelledRun(val temporaryRoot: Path, val diagnostics: RecordingDiagnosticSink)
@@ -81,7 +85,7 @@ suspend fun runCancelled(vararg plugins: String, trigger: CancelTrigger): Cancel
         object : DiagnosticSink {
             override fun report(diagnostic: Diagnostic) {
                 diagnostics.report(diagnostic)
-                if (trigger == CancelTrigger.CONTRIBUTING && diagnostic.code == CONTRIBUTING_CODE) run.cancel()
+                if (diagnostic.code == trigger.diagnosticCode) run.cancel()
             }
         }
     val environment =
