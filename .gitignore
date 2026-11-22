@@ -64,3 +64,6 @@ $RECYCLE.BIN/
 *.log
 *.tmp
 *.swp
+
+# graphify knowledge graph, rebuilt locally by its git hooks
+graphify-out/
