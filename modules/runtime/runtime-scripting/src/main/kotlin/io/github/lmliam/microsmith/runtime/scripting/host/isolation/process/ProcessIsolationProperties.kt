@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
+import java.nio.file.FileSystem
 import java.nio.file.Path
 import java.util.Properties
 
@@ -28,7 +29,8 @@ internal fun Properties.requiredInt(key: String): Int =
 internal fun Properties.requiredLong(key: String): Long =
     requiredString(key).toLongOrNull() ?: error("Missing or invalid '$key'.")
 
-internal fun Properties.requiredPath(key: String): Path = requiredString(key).let(Path::of)
+internal fun Properties.requiredPath(fileSystem: FileSystem, key: String): Path =
+    fileSystem.getPath(requiredString(key))
 
 private fun Properties.requiredString(key: String): String =
     getProperty(key)?.trim()?.takeIf(String::isNotEmpty) ?: error("Missing or invalid '$key'.")

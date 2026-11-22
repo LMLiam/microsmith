@@ -5,9 +5,9 @@ import io.github.lmliam.microsmith.runtime.scripting.api.ScriptCallSite
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptLiteral
 import org.jetbrains.kotlin.lexer.KtTokens
 
-internal object KotlinScriptCallParser {
+internal class KotlinScriptCallParser(private val literalParser: KotlinScriptLiteralParser) {
     fun parse(tokens: List<KotlinScriptToken>, index: Int): ParsedCall? {
-        val callee = KotlinScriptLiteralParser.parseCallee(tokens, index) ?: return null
+        val callee = literalParser.parseCallee(tokens, index) ?: return null
 
         if (callee.callee is ScriptCallCallee.Named && index > 0 && tokens[index - 1].isQualifiedAccess()) {
             return null
@@ -56,7 +56,7 @@ internal object KotlinScriptCallParser {
                     if (parenthesisDepth == 0) {
                         if (argumentStart < index) {
                             arguments +=
-                                KotlinScriptLiteralParser.parseLiteral(
+                                literalParser.parseLiteral(
                                     tokens,
                                     argumentStart,
                                     index,
@@ -81,7 +81,7 @@ internal object KotlinScriptCallParser {
                 KtTokens.COMMA ->
                     if (parenthesisDepth == 1 && bracketDepth == 0 && braceDepth == 0) {
                         arguments +=
-                            KotlinScriptLiteralParser.parseLiteral(
+                            literalParser.parseLiteral(
                                 tokens,
                                 argumentStart,
                                 index,

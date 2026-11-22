@@ -5,15 +5,13 @@ sourceSets {
     }
 }
 
-dependencies {
-    fixtureContractCompileOnly project(':dsl')
-    fixtureContractCompileOnly project(':resolve')
-    fixturePluginsCompileOnly project(':plugin-api')
-    fixturePluginsCompileOnly project(':dsl')
-    integrationTestImplementation sourceSets.fixtureContract.output
-}
-
 def fixturePluginDirectory = layout.buildDirectory.dir('fixture-plugins')
+
+def serviceInterfaceOf = { String fixtureName ->
+    fixtureName.endsWith('Scripting')
+            ? 'io.github.lmliam.microsmith.runtime.scripting.api.MicrosmithScriptingPlugin'
+            : 'io.github.lmliam.microsmith.plugin.MicrosmithPlugin'
+}
 
 def fixtureNames = fileTree('src/fixturePlugins/kotlin/thirdparty/plugins') { include '*Plugin.kt' }
         .files
@@ -31,7 +29,7 @@ def fixturePluginJars = fixtureNames.collect { fixtureName ->
         }
         from(resources.text.fromString("thirdparty.plugins.${fixtureName}Plugin").asFile('UTF-8')) {
             into 'META-INF/services'
-            rename { 'io.github.lmliam.microsmith.plugin.MicrosmithPlugin' }
+            rename { serviceInterfaceOf(fixtureName) }
         }
     }
 }

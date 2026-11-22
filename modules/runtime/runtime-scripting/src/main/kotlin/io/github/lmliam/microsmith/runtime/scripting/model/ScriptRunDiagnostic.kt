@@ -1,3 +1,3 @@
 package io.github.lmliam.microsmith.runtime.scripting.model
 
-data class ScriptRunDiagnostic(val message: String, val code: String? = null)
+public data class ScriptRunDiagnostic(public val message: String, public val code: String? = null)

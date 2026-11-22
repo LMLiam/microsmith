@@ -4,7 +4,7 @@ import io.github.lmliam.microsmith.runtime.scripting.api.ScriptCallCallee
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptLiteral
 import org.jetbrains.kotlin.lexer.KtTokens
 
-internal object KotlinScriptLiteralParser {
+internal class KotlinScriptLiteralParser {
     fun parseCallee(tokens: List<KotlinScriptToken>, index: Int): ParsedCallee? {
         val token = tokens[index]
 
@@ -135,15 +135,15 @@ internal object KotlinScriptLiteralParser {
     data class ParsedCallee(val callee: ScriptCallCallee, val nextIndex: Int)
 
     private data class ParsedString(val value: String?, val nextIndex: Int)
-
-    private const val HEX_PREFIX = "0x"
-    private const val BINARY_PREFIX = "0b"
-    private const val HEX_RADIX = 16
-    private const val BINARY_RADIX = 2
-    private const val RADIX_PREFIX_LENGTH = 2
-
-    private const val UNICODE_ESCAPE_PREFIX = "\\u"
-    private const val UNICODE_ESCAPE_LENGTH = 6
-
-    private val IDENTIFIER_PATTERN = Regex("[A-Za-z_][A-Za-z0-9_]*")
 }
+
+private const val HEX_PREFIX = "0x"
+private const val BINARY_PREFIX = "0b"
+private const val HEX_RADIX = 16
+private const val BINARY_RADIX = 2
+private const val RADIX_PREFIX_LENGTH = 2
+
+private const val UNICODE_ESCAPE_PREFIX = "\\u"
+private const val UNICODE_ESCAPE_LENGTH = 6
+
+private val IDENTIFIER_PATTERN = Regex("[A-Za-z_][A-Za-z0-9_]*")

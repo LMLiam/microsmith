@@ -1,13 +1,16 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.isolation.process
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
+import java.nio.file.FileSystem
 import java.nio.file.Path
 import java.util.Properties
 import kotlin.io.path.createDirectories
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
-internal class ProcessIsolationRequestCodec {
+@Inject
+internal class ProcessIsolationRequestCodec(private val fileSystem: FileSystem) {
     fun write(path: Path, request: ProcessIsolationRequest) {
         val properties = Properties()
         properties[ProcessIsolationPropertyNames.REQUEST_SCRIPT] = request.scriptPath.toString()
@@ -40,16 +43,16 @@ internal class ProcessIsolationRequestCodec {
     fun read(path: Path): ProcessIsolationRequest {
         val properties = Properties().also { loaded -> path.inputStream().use { input -> loaded.load(input) } }
 
-        val scriptPath = properties.requiredPath(ProcessIsolationPropertyNames.REQUEST_SCRIPT)
-        val outputPath = properties.requiredPath(ProcessIsolationPropertyNames.REQUEST_OUTPUT_DIR)
-        val cacheDirectory = properties.requiredPath(ProcessIsolationPropertyNames.REQUEST_CACHE_DIR)
+        val scriptPath = properties.requiredPath(fileSystem, ProcessIsolationPropertyNames.REQUEST_SCRIPT)
+        val outputPath = properties.requiredPath(fileSystem, ProcessIsolationPropertyNames.REQUEST_OUTPUT_DIR)
+        val cacheDirectory = properties.requiredPath(fileSystem, ProcessIsolationPropertyNames.REQUEST_CACHE_DIR)
         val pluginClasspath =
             properties
                 .readIndexedList(
                     countKey = ProcessIsolationPropertyNames.REQUEST_PLUGIN_CLASSPATH_COUNT,
                     keyPrefix = ProcessIsolationPropertyNames.REQUEST_PLUGIN_CLASSPATH_PREFIX,
                 )
-                .map(Path::of)
+                .map(fileSystem::getPath)
         val variables =
             properties.readIndexedMap(
                 countKey = ProcessIsolationPropertyNames.REQUEST_VARIABLE_COUNT,

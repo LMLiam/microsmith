@@ -1,9 +1,10 @@
 package io.github.lmliam.microsmith.gradle.worker
 
-import io.github.lmliam.microsmith.runtime.scripting.MicrosmithScriptHost
+import io.github.lmliam.microsmith.runtime.scripting.createSystemMicrosmithScriptHost
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunRequest
 import java.nio.file.Path
 import kotlin.system.exitProcess
+import kotlinx.coroutines.runBlocking
 
 internal object MicrosmithGradleWorkerMain {
     private val requestCodec = MicrosmithGradleWorkerRequestCodec()
@@ -30,9 +31,9 @@ internal object MicrosmithGradleWorkerMain {
 
     private fun runWorker(requestFile: Path): MicrosmithGradleWorkerResult = runCatching {
         val request = requestCodec.read(requestFile)
-        val host = MicrosmithScriptHost(cacheDirectory = request.cacheDirectory)
-        host
-            .run(
+        val host = createSystemMicrosmithScriptHost(cacheDirectory = request.cacheDirectory)
+        runBlocking {
+            host.run(
                 ScriptRunRequest(
                     script = request.scriptPath,
                     outputDir = request.outputPath,
@@ -41,6 +42,7 @@ internal object MicrosmithGradleWorkerMain {
                     pluginClasspath = request.pluginClasspath,
                 ),
             )
+        }
             .toWorkerResult()
     }
         .getOrElse { error ->

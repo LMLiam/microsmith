@@ -1,4 +1,4 @@
-package io.github.lmliam.microsmith.runtime.scripting.symbols.discovery
+package io.github.lmliam.microsmith.plugin.schemas.protobuf
 
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.EnumRef
 import io.github.lmliam.microsmith.dsl.schemas.protobuf.reference.MessageRef
@@ -9,7 +9,7 @@ import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolContributor
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDeclarationSite
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDefinition
 
-internal object ProtobufScriptSymbolContributor : ScriptSymbolContributor {
+internal class ProtobufScriptSymbolContributor : ScriptSymbolContributor {
     override val id: String = "microsmith.protobuf"
 
     override val declarationCallNames: Set<String> =
@@ -80,9 +80,9 @@ internal object ProtobufScriptSymbolContributor : ScriptSymbolContributor {
             ScriptCallCallee.Other -> Unit
         }
     }
-
-    private const val PROTOBUF_CALL = "protobuf"
-    private const val VERSION_CALL = "version"
-    private const val MESSAGE_CALL = "message"
-    private const val ENUM_CALL = "enum"
 }
+
+private const val PROTOBUF_CALL = "protobuf"
+private const val VERSION_CALL = "version"
+private const val MESSAGE_CALL = "message"
+private const val ENUM_CALL = "enum"

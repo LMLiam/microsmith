@@ -10,7 +10,7 @@ import kotlin.script.experimental.jvm.jvm
 import kotlin.script.experimental.jvm.updateClasspath
 import kotlin.script.experimental.jvm.util.classpathFromClassloader
 
-object MicrosmithScriptCompilationConfiguration :
+public object MicrosmithScriptCompilationConfiguration :
     ScriptCompilationConfiguration(
         {
             defaultImports(

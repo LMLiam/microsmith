@@ -1,8 +1,10 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.diagnostics
 
+import dev.zacsweers.metro.Inject
 import kotlin.script.experimental.api.ScriptDiagnostic
 
-internal object ScriptDiagnosticsFormatter {
+@Inject
+internal class ScriptDiagnosticsFormatter {
     fun format(reports: List<ScriptDiagnostic>): List<String> =
         reports
             .filter { it.severity >= ScriptDiagnostic.Severity.WARNING }

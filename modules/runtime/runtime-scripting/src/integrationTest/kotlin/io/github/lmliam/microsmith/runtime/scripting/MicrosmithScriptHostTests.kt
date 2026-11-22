@@ -34,7 +34,7 @@ class MicrosmithScriptHostTests :
 
                     copyResource("protobuf-user.microsmith.kts", script)
 
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
 
                     val firstRun =
                         host.run(
@@ -73,7 +73,7 @@ class MicrosmithScriptHostTests :
                 try {
                     val script = tempDir.resolve("service.microsmith.kts")
                     copyResource("redundant-cast.microsmith.kts", script)
-                    val host = MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
+                    val host = testScriptHost(cacheDirectory = tempDir.resolve("cache"))
                     val request =
                         ScriptRunRequest(
                             script = script,
@@ -100,7 +100,7 @@ class MicrosmithScriptHostTests :
                     val script = tempDir.resolve("service.microsmith.kts")
                     copyResource("redundant-cast.microsmith.kts", script)
                     val cache = tempDir.resolve("cache")
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
                     val request =
                         ScriptRunRequest(
                             script = script,
@@ -137,7 +137,7 @@ class MicrosmithScriptHostTests :
 
                     copyResource("asp-user-service.microsmith.kts", script)
 
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
                     val result =
                         host.run(
                             ScriptRunRequest(
@@ -170,7 +170,7 @@ class MicrosmithScriptHostTests :
 
                     copyResource("emit-with-context.microsmith.kts", script)
 
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
                     val result =
                         host.run(
                             ScriptRunRequest(
@@ -199,7 +199,7 @@ class MicrosmithScriptHostTests :
 
                     copyResource("asp-user-service-with-problem.microsmith.kts", script)
 
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
                     val result =
                         host.run(
                             ScriptRunRequest(
@@ -238,7 +238,7 @@ class MicrosmithScriptHostTests :
 
                     copyResource("unknown-dsl.microsmith.kts", script)
 
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
                     val result =
                         host.run(
                             ScriptRunRequest(
@@ -266,7 +266,7 @@ class MicrosmithScriptHostTests :
 
                     copyResource("depends-on-directive.microsmith.kts", script)
 
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
                     val result =
                         host.run(
                             ScriptRunRequest(
@@ -296,7 +296,7 @@ class MicrosmithScriptHostTests :
 
                     copyResource("grouped-file-directive.microsmith.kts", script)
 
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
                     val result =
                         host.run(
                             ScriptRunRequest(
@@ -326,7 +326,7 @@ class MicrosmithScriptHostTests :
 
                     copyResource("process-isolation-service.microsmith.kts", script)
 
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
                     val result =
                         host.run(
                             ScriptRunRequest(
@@ -356,7 +356,7 @@ class MicrosmithScriptHostTests :
 
                     copyResource("forward-symbols.microsmith.kts", script)
 
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
                     val result =
                         host.run(
                             ScriptRunRequest(
@@ -433,7 +433,7 @@ class MicrosmithScriptHostTests :
 
                     copyResource("enum-symbol-in-rpc.microsmith.kts", script)
 
-                    val host = MicrosmithScriptHost(cacheDirectory = cache)
+                    val host = testScriptHost(cacheDirectory = cache)
                     val result =
                         host.run(
                             ScriptRunRequest(
@@ -497,13 +497,13 @@ class MicrosmithScriptHostTests :
         },
     )
 
-private const val HOST_SCRIPT_RESOURCES = "/scripting/host"
+internal const val HOST_SCRIPT_RESOURCES = "/scripting/host"
 
-private fun runScriptResource(tempDir: Path, scriptName: String): ScriptRunResult {
+private suspend fun runScriptResource(tempDir: Path, scriptName: String): ScriptRunResult {
     val script = tempDir.resolve("script.microsmith.kts")
     copyResource(scriptName, script)
 
-    return MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
+    return testScriptHost(cacheDirectory = tempDir.resolve("cache"))
         .run(
             ScriptRunRequest(
                 script = script,
@@ -514,7 +514,7 @@ private fun runScriptResource(tempDir: Path, scriptName: String): ScriptRunResul
         )
 }
 
-private fun copyResource(scriptName: String, target: Path) {
+internal fun copyResource(scriptName: String, target: Path) {
     val resource = "$HOST_SCRIPT_RESOURCES/$scriptName"
 
     val source =
@@ -522,11 +522,11 @@ private fun copyResource(scriptName: String, target: Path) {
     target.writeText(source.readText())
 }
 
-private fun runScriptWithInvalidSchema(tempDir: Path, isolationMode: ScriptIsolationMode): ScriptRunResult {
+private suspend fun runScriptWithInvalidSchema(tempDir: Path, isolationMode: ScriptIsolationMode): ScriptRunResult {
     val script = tempDir.resolve("duplicates.microsmith.kts")
     copyResource("unresolved-references.microsmith.kts", script)
 
-    return MicrosmithScriptHost(cacheDirectory = tempDir.resolve("cache"))
+    return testScriptHost(cacheDirectory = tempDir.resolve("cache"))
         .run(
             ScriptRunRequest(
                 script = script,

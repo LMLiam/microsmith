@@ -4,6 +4,9 @@ import io.github.lmliam.microsmith.build.archive.VerifyJarEntries
 import io.github.lmliam.microsmith.build.archive.VerifyServiceProviders
 import io.github.lmliam.microsmith.build.runtime.VerifyPublishedPomScopes
 
+apply plugin: 'dev.zacsweers.metro'
+apply from: rootProject.file('gradle/plugin-fixtures.gradle')
+
 def scriptingVersionValue = version.toString()
 def scriptingScriptTemplateFqcn = 'io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript'
 def scriptingCompilationConfigurationFqcn =
@@ -23,6 +26,8 @@ def scriptingApiProjectPaths = [
     ':dsl-schemas',
     ':dsl-schemas-protobuf',
     ':dsl-schemas-protobuf-rpc',
+    ':gen',
+    ':plugin-api',
 ]
 
 def scriptingIdeFallbackReleaseAssetsDirectory = layout.buildDirectory.dir('release-assets')
@@ -60,6 +65,8 @@ dependencies {
     api project(':dsl-schemas')
     api project(':dsl-schemas-protobuf')
     api project(':dsl-schemas-protobuf-rpc')
+    api project(':gen')
+    api project(':plugin-api')
     implementation project(':resolve')
     implementation project(':resolve-services')
     implementation project(':resolve-services-dotnet')
@@ -89,12 +96,21 @@ dependencies {
     implementation project(':plugin-services-dotnet-packages')
     implementation project(':plugin-schemas-protobuf')
     implementation project(':plugin-schemas-protobuf-rpc')
-    implementation project(':gen')
     implementation libs.coroutines.core
     api libs.kotlin.scripting.common
     implementation libs.kotlin.scripting.jvm
     implementation libs.kotlin.scripting.jvm.host
     implementation libs.kotlin.compiler.embeddable
+    fixtureContractCompileOnly project(':dsl')
+    fixtureContractCompileOnly project(':resolve')
+    fixturePluginsCompileOnly project(':runtime-scripting-api')
+    fixturePluginsCompileOnly project(':plugin-api')
+    integrationTestImplementation sourceSets.fixtureContract.output
+    testImplementation libs.jimfs
+}
+
+kotlin {
+    explicitApi()
 }
 
 def scriptingShadowJarTask = tasks.named('shadowJar', ShadowJar)

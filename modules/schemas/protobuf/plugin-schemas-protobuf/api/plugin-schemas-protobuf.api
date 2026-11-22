@@ -4,3 +4,9 @@ public final class io/github/lmliam/microsmith/plugin/schemas/protobuf/ProtobufP
 	public fun services (Lio/github/lmliam/microsmith/plugin/HostServices;)Lio/github/lmliam/microsmith/plugin/PluginServices;
 }
 
+public final class io/github/lmliam/microsmith/plugin/schemas/protobuf/ProtobufScriptingPlugin : io/github/lmliam/microsmith/runtime/scripting/api/MicrosmithScriptingPlugin {
+	public fun <init> ()V
+	public fun getId ()Ljava/lang/String;
+	public fun getScriptSymbolContributors ()Ljava/util/Set;
+}
+

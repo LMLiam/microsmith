@@ -1,7 +1,9 @@
 package io.github.lmliam.microsmith.runtime.scripting.cache
 
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
+import io.github.lmliam.microsmith.runtime.scripting.composition.ScriptHostScope
 import io.github.lmliam.microsmith.runtime.scripting.definition.MicrosmithScript
-import java.nio.ByteBuffer
 import java.nio.file.Path
 import java.security.MessageDigest
 import kotlin.io.path.ExperimentalPathApi
@@ -12,8 +14,10 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.walk
 import kotlin.script.experimental.jvm.util.classpathFromClassloader
 
-internal object RuntimeClasspathFingerprint {
-    private val runtimeFingerprint: String by lazy {
+@Inject
+@SingleIn(ScriptHostScope::class)
+internal class RuntimeClasspathFingerprint {
+    val host: String by lazy {
         val classpathEntries =
             classpathFromClassloader(
                     MicrosmithScript::class.java.classLoader,
@@ -23,8 +27,6 @@ internal object RuntimeClasspathFingerprint {
                 .map { it.toPath().toAbsolutePath().normalize() }
         calculate(classpathEntries)
     }
-
-    fun cached(): String = runtimeFingerprint
 
     fun calculate(classpathEntries: List<Path>): String {
         val digest = MessageDigest.getInstance("SHA-256")
@@ -82,11 +84,3 @@ private fun MessageDigest.addFileDigest(path: Path) {
     }
     addChunk(fileDigest.digest().toHexString())
 }
-
-private fun MessageDigest.addChunk(chunk: String) {
-    val chunkBytes = chunk.toByteArray()
-    update(chunkBytes.size.toByteArray())
-    update(chunkBytes)
-}
-
-private fun Int.toByteArray() = ByteBuffer.allocate(Int.SIZE_BYTES).also { it.putInt(this) }.array()

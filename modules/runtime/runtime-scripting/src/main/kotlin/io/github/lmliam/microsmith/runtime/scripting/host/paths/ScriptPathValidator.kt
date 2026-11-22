@@ -1,5 +1,6 @@
 package io.github.lmliam.microsmith.runtime.scripting.host.paths
 
+import dev.zacsweers.metro.Inject
 import io.github.lmliam.microsmith.runtime.scripting.host.configuration.ScriptDirectivePolicy
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptFailureType
 import io.github.lmliam.microsmith.runtime.scripting.model.ScriptRunFailure
@@ -7,7 +8,8 @@ import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.isRegularFile
 
-internal object ScriptPathValidator {
+@Inject
+internal class ScriptPathValidator(private val directivePolicy: ScriptDirectivePolicy) {
     fun validate(scriptPath: Path): ScriptRunFailure? =
         when {
             !scriptPath.exists() ->
@@ -22,6 +24,6 @@ internal object ScriptPathValidator {
                     type = ScriptFailureType.VALIDATION,
                 )
 
-            else -> ScriptDirectivePolicy.validate(scriptPath)
+            else -> directivePolicy.validate(scriptPath)
         }
 }

@@ -15,6 +15,9 @@ import kotlin.script.experimental.host.FileScriptSource
 import kotlin.script.experimental.jvm.jvm
 import kotlin.script.experimental.jvm.updateClasspath
 
+private val runtimeFingerprint = RuntimeClasspathFingerprint()
+private val compiledScriptFingerprint = CompiledScriptFingerprint(runtimeFingerprint)
+
 @OptIn(ExperimentalPathApi::class)
 class MicrosmithScriptCacheTests :
     StringSpec(
@@ -25,10 +28,10 @@ class MicrosmithScriptCacheTests :
                     val classpathEntry = tempDir.resolve("cli.jar")
                     classpathEntry.writeText("abc")
 
-                    val firstFingerprint = RuntimeClasspathFingerprint.calculate(listOf(classpathEntry))
+                    val firstFingerprint = runtimeFingerprint.calculate(listOf(classpathEntry))
 
                     classpathEntry.writeText("xyz")
-                    val secondFingerprint = RuntimeClasspathFingerprint.calculate(listOf(classpathEntry))
+                    val secondFingerprint = runtimeFingerprint.calculate(listOf(classpathEntry))
 
                     secondFingerprint shouldNotBe firstFingerprint
                 } finally {
@@ -42,8 +45,8 @@ class MicrosmithScriptCacheTests :
                     val classpathEntry = tempDir.resolve("cli.jar")
                     classpathEntry.writeText("same-content")
 
-                    val firstFingerprint = RuntimeClasspathFingerprint.calculate(listOf(classpathEntry))
-                    val secondFingerprint = RuntimeClasspathFingerprint.calculate(listOf(classpathEntry))
+                    val firstFingerprint = runtimeFingerprint.calculate(listOf(classpathEntry))
+                    val secondFingerprint = runtimeFingerprint.calculate(listOf(classpathEntry))
 
                     secondFingerprint shouldBe firstFingerprint
                 } finally {
@@ -66,19 +69,19 @@ class MicrosmithScriptCacheTests :
                     val scriptSource = FileScriptSource(scriptFile.toFile())
 
                     val firstFingerprint =
-                        CompiledScriptFingerprint.uniqueName(
+                        compiledScriptFingerprint.uniqueName(
                             script = scriptSource,
                             scriptCompilationConfiguration = compilationConfiguration,
-                            additionalFingerprints = listOf(RuntimeClasspathFingerprint.calculate(listOf(pluginJar))),
+                            additionalFingerprints = listOf(runtimeFingerprint.calculate(listOf(pluginJar))),
                         )
 
                     pluginJar.writeText("v2")
 
                     val secondFingerprint =
-                        CompiledScriptFingerprint.uniqueName(
+                        compiledScriptFingerprint.uniqueName(
                             script = scriptSource,
                             scriptCompilationConfiguration = compilationConfiguration,
-                            additionalFingerprints = listOf(RuntimeClasspathFingerprint.calculate(listOf(pluginJar))),
+                            additionalFingerprints = listOf(runtimeFingerprint.calculate(listOf(pluginJar))),
                         )
 
                     secondFingerprint shouldNotBe firstFingerprint
@@ -124,13 +127,13 @@ class MicrosmithScriptCacheTests :
                     val source = FileScriptSource(scriptFile.toFile())
 
                     val firstFingerprint =
-                        CompiledScriptFingerprint.uniqueName(
+                        compiledScriptFingerprint.uniqueName(
                             script = source,
                             scriptCompilationConfiguration = firstConfiguration,
                         )
 
                     val secondFingerprint =
-                        CompiledScriptFingerprint.uniqueName(
+                        compiledScriptFingerprint.uniqueName(
                             script = source,
                             scriptCompilationConfiguration = secondConfiguration,
                         )

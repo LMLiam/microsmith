@@ -5,13 +5,16 @@ import io.github.lmliam.microsmith.runtime.scripting.api.ScriptCallSite
 import io.github.lmliam.microsmith.runtime.scripting.api.ScriptSymbolDeclarationSite
 import org.jetbrains.kotlin.lexer.KtTokens
 
-internal object KotlinScriptCallSiteParser {
+internal class KotlinScriptCallSiteParser(
+    private val tokenizer: KotlinScriptTokenizer,
+    private val callParser: KotlinScriptCallParser,
+) {
     fun declarations(
         @Suppress("UNUSED_PARAMETER") sourceName: String,
         sourceText: String,
         declarationCallNames: Set<String>,
     ): List<ScriptSymbolDeclarationSite> {
-        val tokens = KotlinScriptTokenizer.tokenize(sourceText)
+        val tokens = tokenizer.tokenize(sourceText)
         val callsByOpeningBrace = mutableMapOf<Int, ScriptCallSite>()
         val enclosingBlocks = mutableListOf<ScriptCallSite?>()
         val declarations = mutableListOf<ScriptSymbolDeclarationSite>()
@@ -26,7 +29,7 @@ internal object KotlinScriptCallSiteParser {
                     }
 
                 else -> {
-                    val parsedCall = KotlinScriptCallParser.parse(tokens, index) ?: continue
+                    val parsedCall = callParser.parse(tokens, index) ?: continue
 
                     parsedCall.openingBraceIndex?.let { braceIndex ->
                         callsByOpeningBrace[braceIndex] = parsedCall.call
